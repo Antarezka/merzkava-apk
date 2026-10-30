@@ -19,10 +19,14 @@ let databaseMessage = "Checking local storage…";
 let characters: Character[] = [];
 let notice = "";
 
+function escapeHtml(value: string): string {
+  return value.replace(/[&<>"']/g, char => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" })[char] ?? char);
+}
+
 function render(): void {
   app.innerHTML = `<div class="app-shell">
     <header class="app-header"><button class="brand" data-screen="home" aria-label="Merzkava home"><span class="brand-mark">M</span><span><small>MERZKAVA UNIVERSE</small><strong>Merzkava</strong></span></button><button class="header-settings" data-screen="settings" aria-label="Settings">⚙</button></header>
-    <main class="main-content">${notice ? `<p class="notice" role="status">${notice}</p>` : ""}${renderScreen(activeScreen, characters)}</main>
+    <main class="main-content">${notice ? `<p class="notice" role="status">${escapeHtml(notice)}</p>` : ""}${renderScreen(activeScreen, characters)}</main>
     <nav class="bottom-nav" aria-label="Main navigation">${navigation.map(item => `<button class="nav-item ${activeScreen === item.id ? "active" : ""}" data-screen="${item.id}" ${activeScreen === item.id ? 'aria-current="page"' : ""}><span>${item.icon}</span><small>${item.label}</small></button>`).join("")}</nav>
     <div class="storage-status"><span class="status-dot"></span>${databaseMessage}</div>
   </div>`;
