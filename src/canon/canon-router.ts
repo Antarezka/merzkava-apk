@@ -16,6 +16,15 @@ export interface CanonRouteResult {
 const MODULE_PATH = /(?:[A-Za-z0-9_.-]+\/)*[A-Za-z0-9_.-]+\.md/g;
 const STOP_WORDS = new Set(["yang", "dan", "atau", "untuk", "dengan", "dari", "pada", "saat", "ketika", "dalam", "the", "and", "for", "with", "when", "during", "about"]);
 
+const REQUIRED_GAMEPLAY_PATHS = [
+  "templates/AUTHORITY_ORDER.md",
+  "templates/GAMEPLAY_RESPONSE_TEMPLATE.md",
+  "templates/CHARACTER_PROFILE_TEMPLATE.md",
+  "templates/NARRATIVE_DYNAMICS.md",
+  "templates/ANTI_CHEAT_HARD_GATE.md",
+  "world/DYNAMIC_EVENTS.md"
+];
+
 function categoryFromPath(path: string): string {
   const folder = path.split("/")[0];
   if (folder === path) return "Bootstrap";
@@ -74,9 +83,15 @@ export function searchCanonModules(modules: CanonModule[], query: string, limit 
 /** Resolve and load relevant files from the exact active canon snapshot. */
 export async function routeCanonActivity(activity: string, limit = 5): Promise<CanonRouteResult> {
   const modules = await listCanonModules();
-  const selected = searchCanonModules(modules, activity, limit);
-  const loaded: CanonDocument[] = [];
+  const relevant = searchCanonModules(modules, activity, limit);
   const skipped: string[] = [];
+  const required = REQUIRED_GAMEPLAY_PATHS.flatMap(path => {
+    const module = modules.find(candidate => candidate.path === path);
+    if (!module) skipped.push("Wajib tetapi tidak terdaftar di INDEX: " + path);
+    return module ? [module] : [];
+  });
+  const selected = [...required, ...relevant.filter(module => !required.some(item => item.path === module.path))];
+  const loaded: CanonDocument[] = [];
   for (const module of selected) {
     try {
       loaded.push(await loadCanonModule(module.path));
