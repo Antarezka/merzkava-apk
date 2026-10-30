@@ -33,6 +33,22 @@ npm run gateway:deploy
 
 For local Worker testing, run `npm run gateway:dev`. This starts the Worker locally; configure local `.dev.vars` with the required secrets and keep that file out of version control.
 
+## Qwen Studio provider setup (pending console confirmation)
+
+The gateway uses the OpenAI-compatible Chat Completions protocol. Do not use a generic Qwen chat website URL: the API host and API key must come from the exact developer console/account that will serve the app.
+
+If by “Qwen Studio” you mean **Alibaba Cloud Model Studio**, configure the Singapore region (a sensible first choice for Indonesia) with:
+
+- `AI_BASE_URL`: `https://YOUR_WORKSPACE_ID.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1`
+- `AI_MODEL`: `qwen3.8-max` (the current flagship model listed in Model Studio documentation; verify availability in the selected workspace before deployment)
+- `AI_API_KEY`: a Model Studio API key created in the **same Singapore region and workspace**, stored only as a Cloudflare Worker secret
+
+Model Studio uses workspace-specific API hosts in supported regions, and API keys are region-bound. A key from a different region will fail authentication. Replace `YOUR_WORKSPACE_ID` with the Workspace ID shown in that Model Studio console.
+
+**Important naming check:** QwenCloud is a separate console/product with a different regional host pattern (`https://ap-southeast-1.maas.qwencloudapi.com/compatible-mode/v1`) and its own API key. Do not mix a QwenCloud key with an Alibaba Cloud Model Studio endpoint, or vice versa. The user must confirm which exact console is intended before the production endpoint and secret are set.
+
+After confirmation, set `AI_BASE_URL` and `AI_MODEL` in the Worker configuration, then run `npx wrangler@4 secret put AI_API_KEY` and enter the provider key directly in the terminal prompt. Never send the key in chat or commit it to Git.
+
 ## Request
 
 `POST /v1/gm`
