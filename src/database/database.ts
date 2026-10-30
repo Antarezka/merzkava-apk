@@ -22,6 +22,13 @@ export async function initializeDatabase(): Promise<DatabaseStatus> {
     database = await connection.createConnection(DATABASE_NAME, false, "no-encryption", SCHEMA_VERSION, false);
     await database.open();
     for (const statement of schema) await database.execute(statement);
+
+    // Additive migrations keep existing local saves readable after app updates.
+    const columns = await database.query("PRAGMA table_info(characters);");
+    const columnNames = new Set((columns.values ?? []).map(column => String(column.name)));
+    if (!columnNames.has("origin")) await database.execute("ALTER TABLE characters ADD COLUMN origin TEXT NOT NULL DEFAULT 'Golden Dragon Empire';");
+    if (!columnNames.has("background")) await database.execute("ALTER TABLE characters ADD COLUMN background TEXT NOT NULL DEFAULT '';"); 
+    if (!columnNames.has("awakened")) await database.execute("ALTER TABLE characters ADD COLUMN awakened INTEGER NOT NULL DEFAULT 0 CHECK(awakened IN (0,1));");
     await database.execute(`PRAGMA user_version = ${SCHEMA_VERSION};`);
     return { mode: "sqlite", message: "Database SQLite lokal siap di perangkat." };
   } catch (error) {
