@@ -64,21 +64,12 @@ jobs:
         working-directory: android
         run: ./gradlew assembleDebug
 
-      - name: Install APK on Android 14 emulator
-        uses: ReactiveCircus/android-emulator-runner@v2
-        with:
-          api-level: 34
-          target: default
-          arch: x86_64
-          profile: pixel_2
-          disable-animations: true
-          script: |
-            APK=android/app/build/outputs/apk/debug/app-debug.apk; echo "Attempting Package Manager installation: $APK"; if [ ! -f "$APK" ]; then echo "::error::APK file not found at $APK"; pwd; find . -path '*outputs/apk/debug/*.apk' -print; exit 2; fi; if adb install --no-streaming -r "$APK"; then echo "APK installation succeeded on Android API 34."; adb shell pm path com.antarezka.merzkava; adb shell dumpsys package com.antarezka.merzkava | grep -E "versionName|versionCode|primaryCpuAbi|secondaryCpuAbi" || true; else RESULT=$?; echo "::error::Android Package Manager rejected the APK (adb install exit $RESULT)."; adb logcat -d -v threadtime | grep -iE "PackageManager|PackageInstaller|installd|PackageParser|INSTALL_FAILED|parse error|parse failed" | tail -n 160 || true; exit "$RESULT"; fi
-
       - name: Verify APK package, alignment, and signature
         run: |
+          set -euo pipefail
           APK="android/app/build/outputs/apk/debug/app-debug.apk"
           BUILD_TOOLS="$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -n 1)"
+          test -s "$APK"
           echo "APK file:"
           file "$APK"
           echo "APK size and checksum:"
@@ -91,10 +82,47 @@ jobs:
           echo "APK signature:"
           "$BUILD_TOOLS/apksigner" verify --verbose --print-certs "$APK"
 
-      - name: Upload APK artifact
+      # Preserve a verified APK artifact even if the hosted emulator service is unstable.
+      - name: Upload verified APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: merzkava-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 7
+
+      - name: Install APK on Android 14 emulator
+        uses: ReactiveCircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: default
+          arch: x86_64
+          profile: pixel_2
+          cores: 4
+          ram-size: 4096M
+          emulator-boot-timeout: 900
+          pre-emulator-launch-script: adb start-server
+          disable-animations: false
+          script: |
+            set -euo pipefail
+            APK="android/app/build/outputs/apk/debug/app-debug.apk"
+            echo "Waiting for Android device..."
+            adb wait-for-device
+            for attempt in $(seq 1 30); do
+              BOOTED="$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r' || true)"
+              if [ "$BOOTED" = "1" ]; then break; fi
+              sleep 2
+            done
+            test "$(adb shell getprop sys.boot_completed | tr -d '\r')" = "1"
+            echo "Attempting Package Manager installation: $APK"
+            test -s "$APK"
+            if adb install --no-streaming -r "$APK"; then
+              echo "APK installation succeeded on Android API 34."
+              adb shell pm path com.antarezka.merzkava
+              adb shell dumpsys package com.antarezka.merzkava | grep -E "versionName|versionCode|primaryCpuAbi|secondaryCpuAbi" || true
+            else
+              RESULT=$?
+              echo "::error::Android Package Manager rejected the APK (adb install exit $RESULT)."
+              adb logcat -d -v threadtime | grep -iE "PackageManager|PackageInstaller|installd|PackageParser|INSTALL_FAILED|parse error|parse failed" | tail -n 160 || true
+              exit "$RESULT"
+            fi
