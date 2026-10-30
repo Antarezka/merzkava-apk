@@ -73,21 +73,7 @@ jobs:
           profile: pixel_2
           disable-animations: true
           script: |
-            APK="android/app/build/outputs/apk/debug/app-debug.apk"
-            echo "Attempting real Package Manager installation on Android API 34..."
-            set +e
-            adb install --no-streaming -r "$APK"
-            INSTALL_EXIT=$?
-            set -e
-            if [ "$INSTALL_EXIT" -ne 0 ]; then
-              echo "::error::Android Package Manager rejected the APK (adb install exit $INSTALL_EXIT)."
-              echo "Relevant Package Manager / Package Installer logs:"
-              adb logcat -d -v threadtime | grep -iE "PackageManager|PackageInstaller|installd|PackageParser|INSTALL_FAILED|parse error|parse failed" | tail -n 160 || true
-              exit "$INSTALL_EXIT"
-            fi
-            echo "APK installation succeeded on Android API 34."
-            adb shell pm path com.antarezka.merzkava
-            adb shell dumpsys package com.antarezka.merzkava | grep -E "versionName|versionCode|primaryCpuAbi|secondaryCpuAbi" || true
+            APK=android/app/build/outputs/apk/debug/app-debug.apk; echo "Attempting Package Manager installation: $APK"; if [ ! -f "$APK" ]; then echo "::error::APK file not found at $APK"; pwd; find . -path '*outputs/apk/debug/*.apk' -print; exit 2; fi; if adb install --no-streaming -r "$APK"; then echo "APK installation succeeded on Android API 34."; adb shell pm path com.antarezka.merzkava; adb shell dumpsys package com.antarezka.merzkava | grep -E "versionName|versionCode|primaryCpuAbi|secondaryCpuAbi" || true; else RESULT=$?; echo "::error::Android Package Manager rejected the APK (adb install exit $RESULT)."; adb logcat -d -v threadtime | grep -iE "PackageManager|PackageInstaller|installd|PackageParser|INSTALL_FAILED|parse error|parse failed" | tail -n 160 || true; exit "$RESULT"; fi
 
       - name: Verify APK package, alignment, and signature
         run: |
