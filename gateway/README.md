@@ -6,7 +6,22 @@ A server-side, OpenAI-compatible gateway for the AI Game Master. The provider AP
 
 - Cloudflare Workers (gateway runtime)
 - Supabase Auth (user identity; JWT is verified by calling Supabase Auth)
-- An OpenAI-compatible chat completions provider
+- Google Gemini API (OpenAI-compatible Chat Completions endpoint)
+
+## Gemini provider configuration
+
+The gateway is configured for Gemini 2.5 Flash:
+
+- `AI_BASE_URL`: `https://generativelanguage.googleapis.com/v1beta/openai/`
+- `AI_MODEL`: `gemini-2.5-flash`
+- `AI_API_KEY`: the Gemini API key created in Google AI Studio; store it as a Cloudflare Worker secret
+
+Gemini documents a Free Tier for Gemini 2.5 Flash, with a 1 million token context window. Free-tier request limits are enforced separately (including requests per minute, tokens per minute, and requests per day) and may vary by project and region. Check the current limits in Google AI Studio before testing. Free Tier data may be used to improve Google's products, so do not send private or sensitive information.
+
+Official references:
+- [Google AI Studio](https://aistudio.google.com/)
+- [Gemini OpenAI compatibility](https://ai.google.dev/gemini-api/docs/openai)
+- [Gemini API pricing and Free Tier](https://ai.google.dev/gemini-api/docs/pricing)
 
 ## Configure Cloudflare Worker
 
@@ -14,42 +29,25 @@ The Worker is configured by `gateway/wrangler.toml`; its entry point is `gateway
 
 - `SUPABASE_URL`: Supabase project URL
 - `SUPABASE_ANON_KEY`: Supabase anon/public key
-- `AI_BASE_URL`: OpenAI-compatible API base URL ending in `/v1` (default: `https://api.openai.com/v1`)
+- `AI_BASE_URL`: OpenAI-compatible API base URL
 - `AI_MODEL`: provider model identifier
 - `ALLOWED_ORIGINS`: comma-separated exact origins allowed by CORS, e.g. `capacitor://localhost,http://localhost`
 
 Add `AI_API_KEY` as a Worker secret, not a plain variable:
 
 ```sh
-npx wrangler secret put AI_API_KEY
+npx wrangler@4 secret put AI_API_KEY
 ```
 
-Deploy only after configuring the values:
+When prompted, paste the Gemini API key into the terminal/Cloudflare secret prompt. Never paste it into chat, put it in `.env`/Vite variables, or commit it to Git.
+
+Deploy only after configuring all values:
 
 ```sh
 npm run gateway:deploy
 ```
 
-
-For local Worker testing, run `npm run gateway:dev`. This starts the Worker locally; configure local `.dev.vars` with the required secrets and keep that file out of version control.
-
-## Qwen Studio / QwenCloud API setup
-
-The confirmed integration endpoint and model from the user's Qwen API example are:
-
-- `AI_BASE_URL`: `https://ap-southeast-1.maas.qwencloudapi.com/compatible-mode/v1`
-- `AI_MODEL`: `qwen3.7-max`
-- `AI_API_KEY`: the Model Studio API key used by the official example (`DASHSCOPE_API_KEY` in Python); store it as a Cloudflare Worker secret named `AI_API_KEY`
-
-The example uses the OpenAI-compatible Chat Completions API. This Worker calls the non-streaming endpoint and validates the returned JSON proposal in the app. The example's `stream=True` is not needed for the current app integration. `enable_thinking` is also intentionally not enabled yet; first validate the standard JSON proposal path and token budget.
-
-Set the API key directly in the terminal when prompted:
-
-```sh
-npx wrangler@4 secret put AI_API_KEY
-```
-
-Never paste the API key into chat, put it in `.env`/Vite variables, or commit it to Git. The Qwen Chat website login/session is not a substitute for this API key.
+For local Worker testing, run `npm run gateway:dev`. Configure local `.dev.vars` with the required secrets and keep that file out of version control.
 
 ## Request
 
@@ -92,16 +90,16 @@ Successful response:
 
 ## Current integration boundary
 
-The app now includes Supabase email/password sign-in, native secure session restoration, logout, and an authenticated gateway provider. Gameplay automatically sends a prepared prompt when all three public client variables are configured and a user is signed in. Otherwise, the manual prompt/response workflow remains available.
+The app includes Supabase email/password sign-in, native secure session restoration, logout, and an authenticated gateway provider. Gameplay automatically sends a prepared prompt when all three public client variables are configured and a user is signed in. Otherwise, the manual prompt/response workflow remains available.
 
-The app does not yet include an account sign-up screen. Create or invite the intended account in the Supabase Authentication dashboard. The Worker is still not deployed by this repository; deploy it only after setting the project-specific values and secret.
+The app does not yet include an account sign-up screen. Create or invite the intended account in the Supabase Authentication dashboard. The Worker is not deployed yet; deploy it only after setting the project-specific values and secret.
 
 ## Configure the Android app client
 
 Copy `.env.example` to `.env.local` for a local build and set:
 
 - `VITE_SUPABASE_URL`: the same Supabase project URL used by the Worker
-- `VITE_SUPABASE_ANON_KEY`: the Supabase anon/public client key (never the service-role key)
+- `VITE_SUPABASE_ANON_KEY`: the Supabase anon/public key (never the service-role key)
 - `VITE_GM_GATEWAY_URL`: the deployed Worker base URL, without a trailing slash
 
 The app uses Supabase email/password sign-in. Create or invite the account in the Supabase Authentication dashboard before signing in. Enable the Email provider and configure its confirmation policy there.
