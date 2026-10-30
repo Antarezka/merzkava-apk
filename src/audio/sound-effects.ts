@@ -3,6 +3,16 @@ type AudioContextConstructor = typeof AudioContext;
 let audioContext: AudioContext | null = null;
 let soundEnabled = true;
 let openingPlayed = false;
+let openingAudio: HTMLAudioElement | null = null;
+let voiceAudio: HTMLAudioElement | null = null;
+
+// Files bundled from public/audio. Add more entries here to enable random variants.
+const openingChimes = [
+  "/audio/A_delicate_Japanese__%231-1793404302182.mp3"
+];
+const openingVoices = [
+  "/audio/ElevenLabs_2026-10-30T23_45_26_Kuon%20-%20Cheerful%2C%20Clear%20and%20Steady_pvc_sp100_s35_sb100_v4.mp3"
+];
 
 function context(): AudioContext | null {
   if (!soundEnabled || typeof window === "undefined") return null;
@@ -38,21 +48,6 @@ function tone(
   oscillator.stop(start + duration + 0.02);
 }
 
-function playBell(): void {
-  const ctx = context();
-  if (!ctx) return;
-  const now = ctx.currentTime + 0.04;
-  const patterns = [
-    [880, 1174.66], [784, 1046.5, 1318.5], [988, 1318.5], [698.46, 1046.5, 1396.9]
-  ];
-  const notes = patterns[Math.floor(Math.random() * patterns.length)];
-  notes.forEach((frequency, index) => {
-    const start = now + index * (0.13 + Math.random() * 0.035);
-    tone(ctx, frequency, start, 1.15 + Math.random() * 0.3, 0.055 / (index * 0.25 + 1), "sine", frequency * 0.997);
-    tone(ctx, frequency * 2.01, start, 0.48, 0.009, "sine", frequency * 1.98);
-  });
-}
-
 function playSoftClick(): void {
   const ctx = context();
   if (!ctx) return;
@@ -68,39 +63,29 @@ function playSoftClick(): void {
   tone(ctx, sound.frequency * 2.4, now, 0.025, 0.006, "sine", sound.frequency * 1.8);
 }
 
-function speakOpening(): void {
-  if (!soundEnabled || !("speechSynthesis" in window) || !("SpeechSynthesisUtterance" in window)) return;
-  const synth = window.speechSynthesis;
-  const voices = synth.getVoices();
-  const japaneseVoices = voices.filter(voice => voice.lang.toLowerCase().startsWith("ja"));
-  const preferred = japaneseVoices.filter(voice => /female|woman|kyoko|mizuki|nanami|haruka|sayaka|google 日本語/i.test(voice.name));
-  const pool = preferred.length ? preferred : japaneseVoices;
-  const utterance = new SpeechSynthesisUtterance("Merzkava Universe");
-  utterance.lang = pool.length ? pool[0].lang : "ja-JP";
-  if (pool.length) utterance.voice = pool[Math.floor(Math.random() * pool.length)];
-  utterance.rate = 0.86 + Math.random() * 0.09;
-  utterance.pitch = 1.04 + Math.random() * 0.16;
-  utterance.volume = 0.82;
-  synth.cancel();
-  synth.speak(utterance);
+function playRandomAsset(paths: string[], volume: number): HTMLAudioElement | null {
+  if (!soundEnabled || paths.length === 0) return null;
+  const path = paths[Math.floor(Math.random() * paths.length)];
+  const audio = new Audio(path);
+  audio.preload = "auto";
+  audio.volume = volume;
+  void audio.play().catch(error => {
+    console.warn("Merzkava opening audio could not play:", error);
+  });
+  return audio;
 }
 
 export function playOpeningSequence(): void {
   if (openingPlayed || !soundEnabled) return;
   openingPlayed = true;
-  playBell();
-  let scheduled = false;
-  const startVoice = () => {
-    if (scheduled) return;
-    scheduled = true;
-    window.setTimeout(speakOpening, 520 + Math.random() * 220);
-  };
-  if ("speechSynthesis" in window && window.speechSynthesis.getVoices().length === 0) {
-    window.speechSynthesis.addEventListener("voiceschanged", startVoice, { once: true });
-    window.setTimeout(startVoice, 900);
-  } else {
-    startVoice();
-  }
+
+  openingAudio = playRandomAsset(openingChimes, 0.62);
+
+  // Let the chime begin first, then welcome the player with the voice.
+  window.setTimeout(() => {
+    if (!soundEnabled) return;
+    voiceAudio = playRandomAsset(openingVoices, 0.88);
+  }, 650);
 }
 
 export function playButtonSound(): void {
@@ -109,7 +94,15 @@ export function playButtonSound(): void {
 
 export function setSoundEnabled(enabled: boolean): void {
   soundEnabled = enabled;
-  if (!enabled && "speechSynthesis" in window) window.speechSynthesis.cancel();
+  if (!enabled) {
+    openingAudio?.pause();
+    voiceAudio?.pause();
+    if (openingAudio) openingAudio.currentTime = 0;
+    if (voiceAudio) voiceAudio.currentTime = 0;
+    if (audioContext?.state === "running") void audioContext.suspend();
+  } else if (audioContext?.state === "suspended") {
+    void audioContext.resume().catch(() => undefined);
+  }
 }
 
 export function isSoundEnabled(): boolean {
