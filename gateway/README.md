@@ -33,23 +33,23 @@ npm run gateway:deploy
 
 For local Worker testing, run `npm run gateway:dev`. This starts the Worker locally; configure local `.dev.vars` with the required secrets and keep that file out of version control.
 
-## Qwen Studio / Qwen Chat provider setup
+## Qwen Studio / QwenCloud API setup
 
-The user-facing chat website at `https://chat.qwen.ai/` is the Qwen Chat interface. A normal Qwen Chat login/session is **not** an official API credential for this gateway. Do not extract browser cookies, bearer tokens, or private web-session endpoints from the chat website and do not use unofficial reverse-engineered proxies.
+The confirmed integration endpoint and model from the user's Qwen API example are:
 
-For an app integration, use the official Qwen API Platform linked from Qwen's own site: `https://qwen.ai/apiplatform`. Create or obtain an API key there and follow that platform's currently displayed OpenAI-compatible Chat Completions instructions. The API Platform lists its supported model IDs; use the exact model ID shown in the account/console rather than assuming the chat website's model name is an API model ID.
+- `AI_BASE_URL`: `https://ap-southeast-1.maas.qwencloudapi.com/compatible-mode/v1`
+- `AI_MODEL`: `qwen3.7-max`
+- `AI_API_KEY`: the Model Studio API key used by the official example (`DASHSCOPE_API_KEY` in Python); store it as a Cloudflare Worker secret named `AI_API_KEY`
 
-Configure the Worker only after the API Platform confirms the account's API access and provides its exact base URL:
+The example uses the OpenAI-compatible Chat Completions API. This Worker calls the non-streaming endpoint and validates the returned JSON proposal in the app. The example's `stream=True` is not needed for the current app integration. `enable_thinking` is also intentionally not enabled yet; first validate the standard JSON proposal path and token budget.
 
-- `AI_BASE_URL`: exact OpenAI-compatible API base URL supplied by the official Qwen API Platform (must include `/v1` if the platform specifies it)
-- `AI_MODEL`: exact supported model ID shown by that platform
-- `AI_API_KEY`: API key created in that platform, stored only as a Cloudflare Worker secret
+Set the API key directly in the terminal when prompted:
 
-`chat.qwen.ai` sign-in and API Platform billing/quota may be separate. A free chat account does not imply free API usage or API access. Check the platform's pricing/quota before enabling production requests.
+```sh
+npx wrangler@4 secret put AI_API_KEY
+```
 
-After setting the verified base URL and model ID, run `npx wrangler@4 secret put AI_API_KEY` and enter the API key directly in the terminal prompt. Never send the key in chat or commit it to Git.
-
-**Do not substitute QwenCloud or Alibaba Cloud Model Studio credentials/endpoints** unless the user explicitly chooses those separate developer platforms.
+Never paste the API key into chat, put it in `.env`/Vite variables, or commit it to Git. The Qwen Chat website login/session is not a substitute for this API key.
 
 ## Request
 
