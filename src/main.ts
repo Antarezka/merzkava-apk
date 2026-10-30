@@ -1,30 +1,50 @@
 import "./style.css";
+import { initializeDatabase } from "./database/database";
+import { renderScreen, type ScreenId } from "./app/screens";
 
 const app = document.querySelector<HTMLDivElement>("#app");
+if (!app) throw new Error("App root element was not found.");
 
-if (!app) {
-  throw new Error("App root element was not found.");
+const navigation: { id: ScreenId; label: string; icon: string }[] = [
+  { id: "home", label: "Home", icon: "⌂" },
+  { id: "gameplay", label: "Play", icon: "✧" },
+  { id: "character", label: "Character", icon: "◉" },
+  { id: "inventory", label: "Inventory", icon: "▤" },
+  { id: "map", label: "Map", icon: "⌖" },
+  { id: "journal", label: "Journal", icon: "☷" },
+  { id: "settings", label: "Settings", icon: "⚙" }
+];
+
+let activeScreen: ScreenId = "home";
+let databaseMessage = "Checking local storage…";
+
+function render(): void {
+  app.innerHTML = `
+    <div class="app-shell">
+      <header class="app-header">
+        <button class="brand" data-screen="home" aria-label="Merzkava home"><span class="brand-mark">M</span><span><small>MERZKAVA UNIVERSE</small><strong>Merzkava</strong></span></button>
+        <button class="header-settings" data-screen="settings" aria-label="Settings">⚙</button>
+      </header>
+      <main class="main-content">${renderScreen(activeScreen)}</main>
+      <nav class="bottom-nav" aria-label="Main navigation">
+        ${navigation.map(item => `<button class="nav-item ${activeScreen === item.id ? "active" : ""}" data-screen="${item.id}" ${activeScreen === item.id ? 'aria-current="page"' : ""}><span>${item.icon}</span><small>${item.label}</small></button>`).join("")}
+      </nav>
+      <div class="storage-status"><span class="status-dot"></span>${databaseMessage}</div>
+    </div>`;
 }
 
-app.innerHTML = `
-  <main class="shell">
-    <header class="topbar">
-      <div class="mark" aria-hidden="true">M</div>
-      <div><p class="eyebrow">MERZKAVA UNIVERSE</p><h1>Merzkava</h1></div>
-      <span class="status">PROTOTYPE</span>
-    </header>
-    <section class="welcome">
-      <p class="eyebrow">A WORLD WAITING</p>
-      <h2>Your story<br /><em>begins here.</em></h2>
-      <p class="intro">A living cultivation world, guided by an AI Game Master and governed by consistent game rules.</p>
-      <button class="primary" type="button" disabled>Adventure is being prepared</button>
-    </section>
-    <section class="features" aria-label="Planned game sections">
-      <article><span>01</span><div><h3>Character</h3><p>Your identity and cultivation path</p></div></article>
-      <article><span>02</span><div><h3>Inventory</h3><p>Items, equipment, and wallet</p></div></article>
-      <article><span>03</span><div><h3>World Map</h3><p>Explore the three great powers</p></div></article>
-      <article><span>04</span><div><h3>Journal</h3><p>Events, quests, and memories</p></div></article>
-    </section>
-    <footer>FOUNDATION BUILD · LOCAL-FIRST DESIGN</footer>
-  </main>
-`;
+app.addEventListener("click", (event: MouseEvent) => {
+  const target = event.target;
+  if (!(target instanceof Element)) return;
+  const button = target.closest<HTMLButtonElement>("[data-screen]");
+  const nextScreen = button?.dataset.screen as ScreenId | undefined;
+  if (!nextScreen || !navigation.some(item => item.id === nextScreen)) return;
+  activeScreen = nextScreen;
+  render();
+});
+
+render();
+void initializeDatabase().then(status => {
+  databaseMessage = status.message;
+  render();
+});
