@@ -104,25 +104,4 @@ jobs:
           pre-emulator-launch-script: adb start-server
           disable-animations: false
           script: |
-            set -eu
-            APK="android/app/build/outputs/apk/debug/app-debug.apk"
-            echo "Waiting for Android device..."
-            adb wait-for-device
-            for attempt in $(seq 1 30); do
-              BOOTED="$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r' || true)"
-              if [ "$BOOTED" = "1" ]; then break; fi
-              sleep 2
-            done
-            test "$(adb shell getprop sys.boot_completed | tr -d '\r')" = "1"
-            echo "Attempting Package Manager installation: $APK"
-            test -s "$APK"
-            if adb install --no-streaming -r "$APK"; then
-              echo "APK installation succeeded on Android API 34."
-              adb shell pm path com.antarezka.merzkava
-              adb shell dumpsys package com.antarezka.merzkava | grep -E "versionName|versionCode|primaryCpuAbi|secondaryCpuAbi" || true
-            else
-              RESULT=$?
-              echo "::error::Android Package Manager rejected the APK (adb install exit $RESULT)."
-              adb logcat -d -v threadtime | grep -iE "PackageManager|PackageInstaller|installd|PackageParser|INSTALL_FAILED|parse error|parse failed" | tail -n 160 || true
-              exit "$RESULT"
-            fi
+            bash -c 'set -eu; APK="android/app/build/outputs/apk/debug/app-debug.apk"; echo "Waiting for Android device..."; adb wait-for-device; test -s "$APK"; echo "Attempting Package Manager installation: $APK"; adb install --no-streaming -r "$APK"; echo "APK installation succeeded on Android API 34."; adb shell pm path com.antarezka.merzkava; adb shell dumpsys package com.antarezka.merzkava | grep -E "versionName|versionCode|primaryCpuAbi|secondaryCpuAbi" || true'
