@@ -5,6 +5,7 @@ export interface Env {
   AI_BASE_URL?: string;
   AI_MODEL: string;
   ALLOWED_ORIGINS: string;
+  AI_RATE_LIMITER?: { limit(options: { key: string }): Promise<{ success: boolean }> };
 }
 
 interface GMRequest {
@@ -41,9 +42,9 @@ function isValidRequest(value: unknown): value is GMRequest {
     typeof body.version === "string" && body.version.length > 0 && body.version.length <= 80;
 }
 
-async function authenticate(request: Request, env: Env): Promise<boolean> {
+async function authenticate(request: Request, env: Env): Promise<string | null> {
   const authorization = request.headers.get("Authorization") ?? "";
-  if (!/^Bearer\s+[^\s]+$/i.test(authorization)) return false;
+  if (!/^Bearer\s+[^\s]+$/i.test(authorization)) return null;
   try {
     const response = await fetch(new URL("/auth/v1/user", env.SUPABASE_URL), {
       headers: {
@@ -51,9 +52,11 @@ async function authenticate(request: Request, env: Env): Promise<boolean> {
         "apikey": env.SUPABASE_ANON_KEY
       }
     });
-    return response.ok;
+    if (!response.ok) return null;
+    const user = await response.json() as { id?: unknown };
+    return typeof user.id === "string" ? user.id : null;
   } catch {
-    return false;
+    return null;
   }
 }
 
@@ -74,7 +77,12 @@ export default {
 
     const contentLength = Number(request.headers.get("Content-Length") ?? "0");
     if (contentLength > MAX_BODY_BYTES) return response({ error: "Request too large." }, 413, origin, env);
-    if (!await authenticate(request, env)) return response({ error: "Authentication required." }, 401, origin, env);
+    const userId = await authenticate(request, env);
+    if (!userId) return response({ error: "Authentication required." }, 401, origin, env);
+    if (env.AI_RATE_LIMITER) {
+      const limit = await env.AI_RATE_LIMITER.limit({ key: userId });
+      if (!limit.success) return response({ error: "Rate limit reached. Try again in a minute." }, 429, origin, env);
+    }
 
     let body: unknown;
     try {
@@ -107,6 +115,7 @@ export default {
         body: JSON.stringify({
           model: env.AI_MODEL,
           temperature: 0.4,
+          max_tokens: 1800,
           response_format: { type: "json_object" },
           messages: [{ role: "user", content: body.prompt }]
         })
