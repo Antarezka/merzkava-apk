@@ -33,21 +33,23 @@ npm run gateway:deploy
 
 For local Worker testing, run `npm run gateway:dev`. This starts the Worker locally; configure local `.dev.vars` with the required secrets and keep that file out of version control.
 
-## Qwen Studio provider setup (pending console confirmation)
+## Qwen Studio / Qwen Chat provider setup
 
-The gateway uses the OpenAI-compatible Chat Completions protocol. Do not use a generic Qwen chat website URL: the API host and API key must come from the exact developer console/account that will serve the app.
+The user-facing chat website at `https://chat.qwen.ai/` is the Qwen Chat interface. A normal Qwen Chat login/session is **not** an official API credential for this gateway. Do not extract browser cookies, bearer tokens, or private web-session endpoints from the chat website and do not use unofficial reverse-engineered proxies.
 
-If by “Qwen Studio” you mean **Alibaba Cloud Model Studio**, configure the Singapore region (a sensible first choice for Indonesia) with:
+For an app integration, use the official Qwen API Platform linked from Qwen's own site: `https://qwen.ai/apiplatform`. Create or obtain an API key there and follow that platform's currently displayed OpenAI-compatible Chat Completions instructions. The API Platform lists its supported model IDs; use the exact model ID shown in the account/console rather than assuming the chat website's model name is an API model ID.
 
-- `AI_BASE_URL`: `https://YOUR_WORKSPACE_ID.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1`
-- `AI_MODEL`: `qwen3.8-max` (the current flagship model listed in Model Studio documentation; verify availability in the selected workspace before deployment)
-- `AI_API_KEY`: a Model Studio API key created in the **same Singapore region and workspace**, stored only as a Cloudflare Worker secret
+Configure the Worker only after the API Platform confirms the account's API access and provides its exact base URL:
 
-Model Studio uses workspace-specific API hosts in supported regions, and API keys are region-bound. A key from a different region will fail authentication. Replace `YOUR_WORKSPACE_ID` with the Workspace ID shown in that Model Studio console.
+- `AI_BASE_URL`: exact OpenAI-compatible API base URL supplied by the official Qwen API Platform (must include `/v1` if the platform specifies it)
+- `AI_MODEL`: exact supported model ID shown by that platform
+- `AI_API_KEY`: API key created in that platform, stored only as a Cloudflare Worker secret
 
-**Important naming check:** QwenCloud is a separate console/product with a different regional host pattern (`https://ap-southeast-1.maas.qwencloudapi.com/compatible-mode/v1`) and its own API key. Do not mix a QwenCloud key with an Alibaba Cloud Model Studio endpoint, or vice versa. The user must confirm which exact console is intended before the production endpoint and secret are set.
+`chat.qwen.ai` sign-in and API Platform billing/quota may be separate. A free chat account does not imply free API usage or API access. Check the platform's pricing/quota before enabling production requests.
 
-After confirmation, set `AI_BASE_URL` and `AI_MODEL` in the Worker configuration, then run `npx wrangler@4 secret put AI_API_KEY` and enter the provider key directly in the terminal prompt. Never send the key in chat or commit it to Git.
+After setting the verified base URL and model ID, run `npx wrangler@4 secret put AI_API_KEY` and enter the API key directly in the terminal prompt. Never send the key in chat or commit it to Git.
+
+**Do not substitute QwenCloud or Alibaba Cloud Model Studio credentials/endpoints** unless the user explicitly chooses those separate developer platforms.
 
 ## Request
 
