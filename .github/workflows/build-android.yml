@@ -25,7 +25,7 @@ jobs:
   build-android:
     name: Build Android debug APK
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -63,6 +63,31 @@ jobs:
       - name: Build debug APK
         working-directory: android
         run: ./gradlew assembleDebug
+
+      - name: Install APK on Android 14 emulator
+        uses: ReactiveCircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: default
+          arch: x86_64
+          profile: pixel_2
+          disable-animations: true
+          script: |
+            APK="android/app/build/outputs/apk/debug/app-debug.apk"
+            echo "Attempting real Package Manager installation on Android API 34..."
+            set +e
+            adb install --no-streaming -r "$APK"
+            INSTALL_EXIT=$?
+            set -e
+            if [ "$INSTALL_EXIT" -ne 0 ]; then
+              echo "::error::Android Package Manager rejected the APK (adb install exit $INSTALL_EXIT)."
+              echo "Relevant Package Manager / Package Installer logs:"
+              adb logcat -d -v threadtime | grep -iE "PackageManager|PackageInstaller|installd|PackageParser|INSTALL_FAILED|parse error|parse failed" | tail -n 160 || true
+              exit "$INSTALL_EXIT"
+            fi
+            echo "APK installation succeeded on Android API 34."
+            adb shell pm path com.antarezka.merzkava
+            adb shell dumpsys package com.antarezka.merzkava | grep -E "versionName|versionCode|primaryCpuAbi|secondaryCpuAbi" || true
 
       - name: Verify APK package, alignment, and signature
         run: |
