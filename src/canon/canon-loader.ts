@@ -76,7 +76,12 @@ export async function getCanonIndex(): Promise<CanonDocument | null> {
 
 export async function loadCanonModule(path: string): Promise<CanonDocument> {
   if (!currentStatus.commitSha) throw new Error("Muat atau perbarui INDEX canon terlebih dahulu.");
-  return fetchPinnedDocument(path, currentStatus.commitSha);
+  const safePath = validateCanonPath(path);
+  const index = await getCachedCanonDocument("INDEX.md");
+  if (!index || index.commitSha !== currentStatus.commitSha || !index.content.includes(`\`${safePath}\``)) {
+    throw new Error("Path tidak tercantum di INDEX pada commit canon aktif.");
+  }
+  return fetchPinnedDocument(safePath, currentStatus.commitSha);
 }
 
 export async function refreshCanon(): Promise<CanonStatus> {
@@ -84,10 +89,8 @@ export async function refreshCanon(): Promise<CanonStatus> {
     const readme = await fetchText(README_URL);
     const shortHash = parsePinnedHash(readme);
     const commitSha = await resolvePinnedCommit(shortHash);
-    const [index, versionDoc] = await Promise.all([
-      fetchPinnedDocument("INDEX.md", commitSha),
-      fetchPinnedDocument("NIGHTLY_VERSION.md", commitSha)
-    ]);
+    await fetchPinnedDocument("INDEX.md", commitSha);
+    const versionDoc = await fetchPinnedDocument("NIGHTLY_VERSION.md", commitSha);
     const version = parseNightlyVersion(versionDoc.content);
     currentStatus = {
       status: "ready",
