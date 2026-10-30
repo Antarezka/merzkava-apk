@@ -29,7 +29,7 @@ function response(body: unknown, status: number, origin: string | null, env: Env
     headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
     headers.set("Access-Control-Max-Age", "86400");
   }
-  return new Response(JSON.stringify(body), { status, headers });
+  return new Response(status === 204 ? null : JSON.stringify(body), { status, headers });
 }
 
 function isValidRequest(value: unknown): value is GMRequest {
@@ -78,7 +78,11 @@ export default {
 
     let body: unknown;
     try {
-      body = await request.json();
+      const rawBody = await request.text();
+      if (new TextEncoder().encode(rawBody).byteLength > MAX_BODY_BYTES) {
+        return response({ error: "Request too large." }, 413, origin, env);
+      }
+      body = JSON.parse(rawBody);
     } catch {
       return response({ error: "Request body must be valid JSON." }, 400, origin, env);
     }
