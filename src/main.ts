@@ -1,4 +1,5 @@
 import "./style.css";
+import { playButtonSound, playOpeningSequence } from "./audio/sound-effects";
 const splashLogoUrl = new URL("../Untitled78_20261030213901.png", import.meta.url).href;
 import { initializeDatabase } from "./database/database";
 import { createCharacter, deleteCharacter, listCharacters, type Character } from "./characters/character-repository";
@@ -37,6 +38,7 @@ function showOpeningSplash(): void {
 }
 
 showOpeningSplash();
+playOpeningSequence();
 
 const navigation: { id: ScreenId; label: string; icon: string }[] = [
   { id: "home", label: "Home", icon: "⌂" }, { id: "gameplay", label: "Play", icon: "✧" },
@@ -108,6 +110,7 @@ async function refreshCharacters(): Promise<void> {
 root.addEventListener("click", async (event: MouseEvent) => {
   const target = event.target;
   if (!(target instanceof Element)) return;
+  if (target.closest("button:not(:disabled)")) playButtonSound();
   const refreshCanonButton = target.closest<HTMLButtonElement>("[data-refresh-canon]");
   if (refreshCanonButton && !canonBusy) {
     canonBusy = true; canonMessage = "Memeriksa pin README dan mengambil INDEX…"; render();
