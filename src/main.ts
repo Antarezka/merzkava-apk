@@ -6,6 +6,7 @@ import { validateCharacterDraft } from "./engine/character-validation";
 import { renderScreen, type ScreenId } from "./app/screens";
 import { getCanonStatus, loadCanonModule, refreshCanon, type CanonDocument } from "./canon/canon-loader";
 import { routeCanonActivity } from "./canon/canon-router";
+import { assembleGameplayContext } from "./canon/context-assembler";
 
 const app = document.querySelector<HTMLDivElement>("#app");
 if (!app) throw new Error("App root element was not found.");
@@ -51,6 +52,9 @@ let canonBusy = false;
 let canonRouteBusy = false;
 let canonRouteMessage = "";
 let canonRouteDocuments: CanonDocument[] = [];
+let gameplayContextText = "";
+let gameplayContextMessage = "";
+let gameplayContextBusy = false;
 
 function escapeHtml(value: string): string {
   return value.replace(/[&<>"']/g, char => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" })[char] ?? char);
@@ -113,6 +117,30 @@ root.addEventListener("click", async (event: MouseEvent) => {
 root.addEventListener("submit", async (event: SubmitEvent) => {
   const form = event.target;
   if (!(form instanceof HTMLFormElement)) return;
+  if (form.id === "gameplay-route-form") {
+    event.preventDefault();
+    const activity = String(new FormData(form).get("activity") ?? "").trim();
+    if (!activity || gameplayContextBusy) return;
+    gameplayContextBusy = true;
+    gameplayContextMessage = "Mengambil modul canon yang relevan…";
+    gameplayContextText = "";
+    render();
+    try {
+      const route = await routeCanonActivity(activity, 5);
+      const status = getCanonStatus();
+      const context = assembleGameplayContext(route, characters[0] ?? null, status.commitSha, status.version);
+      gameplayContextText = context.prompt;
+      gameplayContextMessage = `Context siap: ${context.documents.length} modul dimasukkan, ${context.omittedModules.length} dilewati karena batas ukuran. Snapshot ${context.snapshot || "tidak terverifikasi"}.${route.skipped.length ? " Modul gagal: " + route.skipped.join(" | ") : ""}`;
+      const output = root.querySelector<HTMLElement>("#gameplay-context");
+      if (output) output.innerHTML = `<p class="canon-status" role="status">${escapeHtml(gameplayContextMessage)}</p><label for="gameplay-context-output">Assembled context (read-only)</label><textarea id="gameplay-context-output" rows="12" readonly>${escapeHtml(gameplayContextText)}</textarea><p class="muted">${gameplayContextText.length.toLocaleString()} characters · no state changes performed</p>`;
+    } catch (error) {
+      gameplayContextMessage = error instanceof Error ? error.message : "Context gagal disusun.";
+      const output = root.querySelector<HTMLElement>("#gameplay-context");
+      if (output) output.innerHTML = `<p class="canon-status" role="alert">${escapeHtml(gameplayContextMessage)}</p>`;
+    }
+    gameplayContextBusy = false;
+    return;
+  }
   if (form.id === "canon-route-form") {
     event.preventDefault();
     const activity = String(new FormData(form).get("activity") ?? "").trim();
