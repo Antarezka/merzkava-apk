@@ -10,7 +10,7 @@ export interface GMProposal {
   unresolved_questions: string[];
 }
 
-export interface GMProvider { generate(prompt: string): Promise<string>; }
+export interface GMProvider { generate(prompt: string, metadata: { snapshot: string; version: string }): Promise<string>; }
 
 export type GMValidation =
   | { valid: true; proposal: GMProposal }
@@ -50,7 +50,7 @@ export function buildGMInstruction(context: GameplayContext): string {
 
 /** Provider adapter entry point; the returned response still requires validation and approval. */
 export async function requestGMProposal(provider: GMProvider, context: GameplayContext): Promise<GMValidation> {
-  const raw = await provider.generate(buildGMInstruction(context));
+  const raw = await provider.generate(buildGMInstruction(context), { snapshot: context.snapshot, version: context.version });
   return validateGMResponse(raw, context.snapshot, context.version);
 }
 
