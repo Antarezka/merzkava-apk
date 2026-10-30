@@ -1,6 +1,23 @@
 {
-  "name":"merzkava-apk","private":true,"version":"0.2.0","type":"module",
-  "scripts":{"dev":"vite --host 0.0.0.0","build":"tsc -b && vite build","preview":"vite preview --host 0.0.0.0","typecheck":"tsc -b --pretty","cap:sync":"cap sync android"},
-  "dependencies":{"@capacitor-community/sqlite":"^7.0.0","@capacitor/android":"^7.4.3","@capacitor/core":"^7.4.3"},
-  "devDependencies":{"@capacitor/cli":"^7.4.3","typescript":"^5.7.3","vite":"^6.0.7"}
+  "name": "merzkava-apk",
+  "private": true,
+  "version": "0.3.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "typecheck": "tsc --noEmit",
+    "cap:sync": "cap sync android"
+  },
+  "dependencies": {
+    "@capacitor-community/sqlite": "^7.0.0",
+    "@capacitor/android": "^7.4.3",
+    "@capacitor/core": "^7.4.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.4.3",
+    "typescript": "^5.7.3",
+    "vite": "^6.0.7"
+  }
 }
