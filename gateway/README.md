@@ -27,8 +27,11 @@ npx wrangler secret put AI_API_KEY
 Deploy only after configuring the values:
 
 ```sh
-npx wrangler@4 deploy --config gateway/wrangler.toml
+npm run gateway:deploy
 ```
+
+
+For local Worker testing, run `npm run gateway:dev`. This starts the Worker locally; configure local `.dev.vars` with the required secrets and keep that file out of version control.
 
 ## Request
 
