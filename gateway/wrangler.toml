@@ -7,7 +7,7 @@ AI_BASE_URL = "https://api.openai.com/v1"
 AI_MODEL = "SET_MODEL_ID"
 SUPABASE_URL = "SET_SUPABASE_PROJECT_URL"
 SUPABASE_ANON_KEY = "SET_SUPABASE_ANON_KEY"
-ALLOWED_ORIGINS = "capacitor://localhost,https://localhost,http://localhost"
+ALLOWED_ORIGINS = "capacitor://localhost,https://localhost,http://localhost,http://localhost:5173,http://localhost:4173"
 
 [[ratelimits]]
 name = "AI_RATE_LIMITER"
