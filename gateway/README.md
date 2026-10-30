@@ -64,7 +64,7 @@ Successful response:
 - CORS is a browser policy, not authentication. Every gameplay request must carry a valid Supabase access token.
 - The Worker validates that token with Supabase Auth before calling the model provider.
 - Keep provider credentials in Worker secrets. Never put them in Vite environment variables, local storage, the repository, or the APK.
-- Restrict Worker origins to the actual app origins. Add rate limiting at the Cloudflare edge before public deployment.
+- Restrict Worker origins to the actual app origins. The included rate-limit binding allows 10 requests per authenticated user per 60 seconds; adjust it in `wrangler.toml` if needed.
 - Provider output remains untrusted. The app must run `validateGMResponse` against the active snapshot and version.
 - This gateway does not write to the game database and does not apply proposed changes.
 - Do not deploy until Supabase Auth, provider settings, allowed origins, and rate limiting are configured.
