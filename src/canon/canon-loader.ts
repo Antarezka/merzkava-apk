@@ -28,14 +28,15 @@ async function fetchText(url: string): Promise<string> {
   return response.text();
 }
 
-async function resolvePinnedCommit(shortHash: string): Promise<string> {
+async function verifyPinnedCommit(shortHash: string): Promise<void> {
   const response = await fetch(`${API_BASE}/commits/${encodeURIComponent(shortHash)}`, {
     headers: { Accept: "application/vnd.github+json" }
   });
   if (!response.ok) throw new Error(`Hash pin ${shortHash} tidak dapat diverifikasi (HTTP ${response.status}).`);
   const data = await response.json() as { sha?: string };
-  if (!data.sha || !/^[a-f0-9]{40}$/i.test(data.sha)) throw new Error("GitHub tidak mengembalikan SHA commit yang valid.");
-  return data.sha;
+  if (!data.sha || !/^[a-f0-9]{40}$/i.test(data.sha) || !data.sha.toLowerCase().startsWith(shortHash.toLowerCase())) {
+    throw new Error("GitHub tidak mengonfirmasi hash pendek yang cocok dengan commit.");
+  }
 }
 
 function parsePinnedHash(readme: string): string {
@@ -88,16 +89,16 @@ export async function refreshCanon(): Promise<CanonStatus> {
   try {
     const readme = await fetchText(README_URL);
     const shortHash = parsePinnedHash(readme);
-    const commitSha = await resolvePinnedCommit(shortHash);
-    await fetchPinnedDocument("INDEX.md", commitSha);
-    const versionDoc = await fetchPinnedDocument("NIGHTLY_VERSION.md", commitSha);
+    await verifyPinnedCommit(shortHash);
+    await fetchPinnedDocument("INDEX.md", shortHash);
+    const versionDoc = await fetchPinnedDocument("NIGHTLY_VERSION.md", shortHash);
     const version = parseNightlyVersion(versionDoc.content);
     currentStatus = {
       status: "ready",
-      commitSha,
+      commitSha: shortHash,
       version,
       updatedAt: new Date().toISOString(),
-      message: `Canon terverifikasi · ${commitSha.slice(0, 7)} · ${version}`
+      message: `Canon terverifikasi · ${shortHash} · ${version}`
     };
     return getCanonStatus();
   } catch (error) {
@@ -107,7 +108,7 @@ export async function refreshCanon(): Promise<CanonStatus> {
       const version = parseNightlyVersion(cachedVersion.content);
       currentStatus = {
         status: "cached",
-        commitSha: cachedIndex.commitSha,
+        commitSha: cachedIndex.commitSha.slice(0, 7),
         version,
         updatedAt: cachedIndex.fetchedAt,
         message: `Offline: memakai canon tersimpan · ${cachedIndex.commitSha.slice(0, 7)}`
