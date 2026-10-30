@@ -45,7 +45,6 @@ let databaseMessage = "Checking local storage…";
 let characters: Character[] = [];
 let notice = "";
 let canonMessage = "Canon belum dimuat.";
-let canonDetails = "";
 let canonDocument: CanonDocument | null = null;
 let canonBusy = false;
 
@@ -103,7 +102,22 @@ root.addEventListener("click", async (event: MouseEvent) => {
 
 root.addEventListener("submit", async (event: SubmitEvent) => {
   const form = event.target;
-  if (!(form instanceof HTMLFormElement) || form.id !== "character-form") return;
+  if (!(form instanceof HTMLFormElement)) return;
+  if (form.id === "canon-module-form") {
+    event.preventDefault();
+    const path = String(new FormData(form).get("path") ?? "");
+    canonMessage = "Mengambil modul dari commit canon yang terverifikasi…";
+    render();
+    try {
+      canonDocument = await loadCanonModule(path);
+      canonMessage = `Modul ${canonDocument.path} berhasil dimuat.`;
+    } catch (error) {
+      canonMessage = error instanceof Error ? error.message : "Modul gagal dimuat.";
+    }
+    render();
+    return;
+  }
+  if (form.id !== "character-form") return;
   event.preventDefault();
   const data = new FormData(form);
   const draft = {
@@ -132,5 +146,8 @@ render();
 void initializeDatabase().then(async status => {
   databaseMessage = status.message;
   await refreshCharacters();
+  render();
+  const canonStatus = await refreshCanon();
+  canonMessage = canonStatus.message;
   render();
 });
