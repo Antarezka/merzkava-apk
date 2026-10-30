@@ -96,7 +96,11 @@ export default {
     }
     if (!isValidRequest(body)) return response({ error: "Invalid prompt, snapshot, or version." }, 400, origin, env);
 
-    const base = (env.AI_BASE_URL || "https://api.openai.com/v1").replace(/\/+$/, "");
+        const configuredBase = env.AI_BASE_URL?.trim();
+    if (!configuredBase || configuredBase.includes("YOUR_") || configuredBase.includes("SET_")) {
+      return response({ error: "AI_BASE_URL is not configured for the selected provider." }, 503, origin, env);
+    }
+    const base = configuredBase.replace(/\/+$/, "");
     let endpoint: URL;
     try {
       endpoint = new URL(base + "/chat/completions");
