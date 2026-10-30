@@ -191,7 +191,21 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       gameplayContextText = buildGMInstruction(context);
       gameplayContextMessage = `Context siap: ${context.documents.length} modul dimasukkan, ${context.omittedModules.length} dilewati karena batas ukuran. Snapshot ${context.snapshot || "tidak terverifikasi"}.${route.skipped.length ? " Modul gagal: " + route.skipped.join(" | ") : ""}`;
       const output = root.querySelector<HTMLElement>("#gameplay-context");
+      if (output && isGMGatewayConfigured() && getAuthSession()) {
+        output.innerHTML = "<p class=\"canon-status\" role=\"status\">Canon ready. Contacting the authenticated AI Gateway…</p>";
+        try {
+          const result = await requestGMProposal(new GatewayGMProvider(), context);
+          if (!result.valid) throw new Error(result.errors.join(" "));
+          gmProposal = result.proposal;
+          const list = (items: string[]) => items.length ? "<ul>" + items.map(item => "<li>" + escapeHtml(item) + "</li>").join("") + "</ul>" : "<p class=\"muted\">None</p>";
+          output.innerHTML = "<article class=\"record-card\"><div class=\"record-top\"><span>AI GAME MASTER</span><span class=\"record-status\">VALIDATED · NOT APPLIED</span></div><p class=\"canon-status\" role=\"status\">Response validated against snapshot " + escapeHtml(context.snapshot) + ".</p><h3>Story response</h3><p>" + escapeHtml(gmProposal.narration) + "</p><h3>Outcome</h3><p>" + escapeHtml(gmProposal.outcome) + "</p><h3>Canon basis</h3>" + list(gmProposal.canon_basis) + "<h3>Proposed changes (not applied)</h3>" + list(gmProposal.proposed_changes) + "<h3>Unresolved questions</h3>" + list(gmProposal.unresolved_questions) + "<p class=\"canon-status\">No character or save data was changed.</p></article>";
+        } catch (error) {
+          const message = error instanceof Error ? error.message : "Gateway request failed.";
+          output.innerHTML = "<p class=\"canon-status\" role=\"alert\">AI Gateway: " + escapeHtml(message) + "</p><p class=\"muted\">Manual fallback. No state changes were made.</p><label for=\"gameplay-context-output\">GM prompt</label><textarea id=\"gameplay-context-output\" rows=\"8\" readonly>" + escapeHtml(gameplayContextText) + "</textarea><label for=\"gm-response\">Paste the AI Game Master JSON response</label><form id=\"gm-response-form\"><textarea id=\"gm-response\" name=\"response\" rows=\"8\" maxlength=\"24000\" required></textarea><button class=\"action-button\" type=\"submit\">Validate GM response ↗</button></form><div id=\"gm-result\" aria-live=\"polite\"></div>";
+        }
+      } else if (output) {
       if (output) output.innerHTML = `<p class="canon-status" role="status">${escapeHtml(gameplayContextMessage)}</p><h3>GM instruction ready</h3><p class="muted">Copy this instruction into your AI provider. The app does not send data to an AI service yet.</p><label for="gameplay-context-output">GM prompt (read-only)</label><textarea id="gameplay-context-output" rows="10" readonly>${escapeHtml(gameplayContextText)}</textarea><label for="gm-response">Paste the AI Game Master's JSON response</label><form id="gm-response-form"><textarea id="gm-response" name="response" rows="8" maxlength="24000" placeholder='{"snapshot":"…","version":"…","narration":"…","outcome":"…","canon_basis":[],"proposed_changes":[],"unresolved_questions":[]}' required></textarea><button class="action-button" type="submit">Validate GM response ↗</button></form><div id="gm-result" aria-live="polite"></div><p class="muted">${gameplayContextText.length.toLocaleString()} characters · no game state changes performed</p>`;
+      }
     } catch (error) {
       gameplayContextMessage = error instanceof Error ? error.message : "Context gagal disusun.";
       const output = root.querySelector<HTMLElement>("#gameplay-context");
