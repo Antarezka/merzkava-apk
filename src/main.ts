@@ -1,4 +1,5 @@
 import "./style.css";
+const splashLogoUrl = new URL("../Untitled78_20261030213901.png", import.meta.url).href;
 import { initializeDatabase } from "./database/database";
 import { createCharacter, deleteCharacter, listCharacters, type Character } from "./characters/character-repository";
 import { validateCharacterDraft } from "./engine/character-validation";
@@ -15,7 +16,7 @@ function showOpeningSplash(): void {
   splash.setAttribute("aria-label", "Opening Merzkava Universe");
   splash.innerHTML = `
     <div class="splash-content">
-      <span class="splash-mark" aria-hidden="true">M</span>
+      <img class="splash-logo" src="${splashLogoUrl}" alt="Black Kitty, the Merzkava mascot" />
       <p class="splash-kicker">MERZKAVA UNIVERSE</p>
       <h1>Merzkava</h1>
       <span class="splash-rule" aria-hidden="true"></span>
