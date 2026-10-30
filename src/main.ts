@@ -128,7 +128,9 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     try {
       const route = await routeCanonActivity(activity, 5);
       const status = getCanonStatus();
-      const context = assembleGameplayContext(route, characters[0] ?? null, status.commitSha, status.version);
+      const characterId = String(new FormData(form).get("characterId") ?? "");
+      const selectedCharacter = characters.find(character => character.id === characterId) ?? null;
+      const context = assembleGameplayContext(route, selectedCharacter, status.commitSha, status.version);
       gameplayContextText = context.prompt;
       gameplayContextMessage = `Context siap: ${context.documents.length} modul dimasukkan, ${context.omittedModules.length} dilewati karena batas ukuran. Snapshot ${context.snapshot || "tidak terverifikasi"}.${route.skipped.length ? " Modul gagal: " + route.skipped.join(" | ") : ""}`;
       const output = root.querySelector<HTMLElement>("#gameplay-context");
