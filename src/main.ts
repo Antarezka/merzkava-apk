@@ -8,6 +8,29 @@ const app = document.querySelector<HTMLDivElement>("#app");
 if (!app) throw new Error("App root element was not found.");
 const root = app;
 
+function showOpeningSplash(): void {
+  const splash = document.createElement("div");
+  splash.className = "opening-splash";
+  splash.setAttribute("role", "status");
+  splash.setAttribute("aria-label", "Opening Merzkava Universe");
+  splash.innerHTML = `
+    <div class="splash-content">
+      <span class="splash-mark" aria-hidden="true">M</span>
+      <p class="splash-kicker">MERZKAVA UNIVERSE</p>
+      <h1>Merzkava</h1>
+      <span class="splash-rule" aria-hidden="true"></span>
+      <small class="splash-tagline">THE WORLD AWAITS</small>
+    </div>`;
+  splash.addEventListener("animationend", event => {
+    if (event.target === splash && event.animationName === "splash-curtain") {
+      splash.remove();
+    }
+  });
+  document.body.append(splash);
+}
+
+showOpeningSplash();
+
 const navigation: { id: ScreenId; label: string; icon: string }[] = [
   { id: "home", label: "Home", icon: "⌂" }, { id: "gameplay", label: "Play", icon: "✧" },
   { id: "character", label: "Character", icon: "◉" }, { id: "inventory", label: "Inventory", icon: "▤" },
