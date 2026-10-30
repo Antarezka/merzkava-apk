@@ -48,3 +48,16 @@ button{font:inherit;color:inherit;cursor:pointer} button:focus-visible{outline:2
 @keyframes splash-arrive{to{opacity:1;transform:translateY(0)}}
 @keyframes splash-curtain{0%,78%{opacity:1}100%{opacity:0;visibility:hidden}}
 @media(prefers-reduced-motion:reduce){.opening-splash{animation-duration:1.4s}.splash-content{animation-duration:.2s;animation-delay:0s}}
+
+
+/* Canon source panel */
+.canon-panel{margin-top:24px}
+.canon-status{padding:12px 14px;border:1px solid #b77b4530;border-radius:12px;background:#17120f;color:#d9b88f;font-size:13px;line-height:1.5;overflow-wrap:anywhere}
+.canon-panel .action-button{margin-top:8px}
+.canon-module-form{display:grid;gap:9px;margin-top:22px;padding-top:18px;border-top:1px solid #b77b4525}
+.canon-module-form label{color:#c8a47d;font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+.canon-module-form input{width:100%;min-width:0;padding:13px 14px;border:1px solid #72533866;border-radius:10px;background:#100e0c;color:#f1e5d5;font:inherit}
+.canon-module-form input:focus{outline:1px solid #c18a56;border-color:#c18a56}
+.canon-module-form .text-button{justify-self:start}
+.canon-document{margin-top:20px;min-width:0}
+.canon-document pre{max-height:420px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;padding:14px;border:1px solid #b77b4525;border-radius:12px;background:#100e0c;color:#d8c9b8;font:11px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace}
