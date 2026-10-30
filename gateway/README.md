@@ -10,7 +10,7 @@ A server-side, OpenAI-compatible gateway for the AI Game Master. The provider AP
 
 ## Configure Cloudflare Worker
 
-Create a Worker using `gateway/worker.ts` as its entry point. Set these non-secret variables:
+The Worker is configured by `gateway/wrangler.toml`; its entry point is `gateway/worker.ts`. Set these non-secret variables in that config or in the Cloudflare dashboard:
 
 - `SUPABASE_URL`: Supabase project URL
 - `SUPABASE_ANON_KEY`: Supabase anon/public key
@@ -27,7 +27,7 @@ npx wrangler secret put AI_API_KEY
 Deploy only after configuring the values:
 
 ```sh
-npx wrangler deploy
+npx wrangler@4 deploy --config gateway/wrangler.toml
 ```
 
 ## Request
@@ -71,7 +71,9 @@ Successful response:
 
 ## Current integration boundary
 
-The Worker endpoint is implemented as a deployable backend scaffold. The app does not yet have Supabase sign-in/session handling or a configured gateway URL, so it cannot call this endpoint automatically. Those are the next client-side integration tasks.
+The app now includes Supabase email/password sign-in, native secure session restoration, logout, and an authenticated gateway provider. Gameplay automatically sends a prepared prompt when all three public client variables are configured and a user is signed in. Otherwise, the manual prompt/response workflow remains available.
+
+The app does not yet include an account sign-up screen. Create or invite the intended account in the Supabase Authentication dashboard. The Worker is still not deployed by this repository; deploy it only after setting the project-specific values and secret.
 
 ## Configure the Android app client
 
@@ -83,11 +85,14 @@ Copy `.env.example` to `.env.local` for a local build and set:
 
 The app uses Supabase email/password sign-in. Create or invite the account in the Supabase Authentication dashboard before signing in. Enable the Email provider and configure its confirmation policy there.
 
-Install dependencies and synchronize native plugins after the Android project exists:
+For a local app build, install dependencies and add the native Android platform once:
 
 ```sh
 npm install
+npx cap add android
 npx cap sync android
 ```
+
+After changing native plugins, run `npx cap sync android` again. Build the web bundle with `npm run build`; build/install the Android APK from the generated `android/` project using Gradle or Android Studio.
 
 The secure-storage plugin is pinned to the Capacitor 7-compatible 7.1.x line. Android sessions are encrypted with Android Keystore when running in the native app. Browser preview intentionally keeps the session in memory only.
