@@ -6,6 +6,7 @@ import { renderScreen, type ScreenId } from "./app/screens";
 
 const app = document.querySelector<HTMLDivElement>("#app");
 if (!app) throw new Error("App root element was not found.");
+const root = app;
 
 const navigation: { id: ScreenId; label: string; icon: string }[] = [
   { id: "home", label: "Home", icon: "⌂" }, { id: "gameplay", label: "Play", icon: "✧" },
@@ -24,7 +25,7 @@ function escapeHtml(value: string): string {
 }
 
 function render(): void {
-  app.innerHTML = `<div class="app-shell">
+  root.innerHTML = `<div class="app-shell">
     <header class="app-header"><button class="brand" data-screen="home" aria-label="Merzkava home"><span class="brand-mark">M</span><span><small>MERZKAVA UNIVERSE</small><strong>Merzkava</strong></span></button><button class="header-settings" data-screen="settings" aria-label="Settings">⚙</button></header>
     <main class="main-content">${notice ? `<p class="notice" role="status">${escapeHtml(notice)}</p>` : ""}${renderScreen(activeScreen, characters)}</main>
     <nav class="bottom-nav" aria-label="Main navigation">${navigation.map(item => `<button class="nav-item ${activeScreen === item.id ? "active" : ""}" data-screen="${item.id}" ${activeScreen === item.id ? 'aria-current="page"' : ""}><span>${item.icon}</span><small>${item.label}</small></button>`).join("")}</nav>
@@ -37,7 +38,7 @@ async function refreshCharacters(): Promise<void> {
   catch (error) { notice = error instanceof Error ? error.message : "Could not load characters."; }
 }
 
-app.addEventListener("click", async (event: MouseEvent) => {
+root.addEventListener("click", async (event: MouseEvent) => {
   const target = event.target;
   if (!(target instanceof Element)) return;
   const deleteButton = target.closest<HTMLButtonElement>("[data-delete-character]");
@@ -58,7 +59,7 @@ app.addEventListener("click", async (event: MouseEvent) => {
   render();
 });
 
-app.addEventListener("submit", async (event: SubmitEvent) => {
+root.addEventListener("submit", async (event: SubmitEvent) => {
   const form = event.target;
   if (!(form instanceof HTMLFormElement) || form.id !== "character-form") return;
   event.preventDefault();
