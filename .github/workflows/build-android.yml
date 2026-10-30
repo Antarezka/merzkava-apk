@@ -64,6 +64,22 @@ jobs:
         working-directory: android
         run: ./gradlew assembleDebug
 
+      - name: Verify APK package, alignment, and signature
+        run: |
+          APK="android/app/build/outputs/apk/debug/app-debug.apk"
+          BUILD_TOOLS="$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -n 1)"
+          echo "APK file:"
+          file "$APK"
+          echo "APK size and checksum:"
+          stat -c '%s bytes' "$APK"
+          sha256sum "$APK"
+          echo "APK manifest metadata:"
+          "$BUILD_TOOLS/aapt" dump badging "$APK" | head -n 20
+          echo "APK alignment:"
+          "$BUILD_TOOLS/zipalign" -c -v 4 "$APK"
+          echo "APK signature:"
+          "$BUILD_TOOLS/apksigner" verify --verbose --print-certs "$APK"
+
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
