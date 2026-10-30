@@ -72,3 +72,22 @@ Successful response:
 ## Current integration boundary
 
 The Worker endpoint is implemented as a deployable backend scaffold. The app does not yet have Supabase sign-in/session handling or a configured gateway URL, so it cannot call this endpoint automatically. Those are the next client-side integration tasks.
+
+## Configure the Android app client
+
+Copy `.env.example` to `.env.local` for a local build and set:
+
+- `VITE_SUPABASE_URL`: the same Supabase project URL used by the Worker
+- `VITE_SUPABASE_ANON_KEY`: the Supabase anon/public client key (never the service-role key)
+- `VITE_GM_GATEWAY_URL`: the deployed Worker base URL, without a trailing slash
+
+The app uses Supabase email/password sign-in. Create or invite the account in the Supabase Authentication dashboard before signing in. Enable the Email provider and configure its confirmation policy there.
+
+Install dependencies and synchronize native plugins after the Android project exists:
+
+```sh
+npm install
+npx cap sync android
+```
+
+The secure-storage plugin is pinned to the Capacitor 7-compatible 7.1.x line. Android sessions are encrypted with Android Keystore when running in the native app. Browser preview intentionally keeps the session in memory only.
