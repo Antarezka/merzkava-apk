@@ -44,16 +44,16 @@ export function assembleGameplayContext(
           `Cultivation level: ${character.cultivationLevel}`,
           `Awakened: ${character.awakened ? "Yes" : "No"}`,
           `Background: ${character.background || "Not recorded"}`
-        ].join("\\n")
+        ].join("\n")
       : "No character selected. Do not assume a player character.",
     "",
     "## Official canon modules"
   ];
-  let prompt = sections.join("\\n");
+  let prompt = sections.join("\n");
   const included: CanonDocument[] = [];
   const omitted: string[] = [];
   for (const document of route.loaded) {
-    const section = `\\n\\n### ${document.path} [${document.commitSha}]\\n\\n${document.content}`;
+    const section = `\n\n### ${document.path} [${document.commitSha}]\n\n${document.content}`;
     if (prompt.length + section.length > maxCharacters) {
       omitted.push(document.path);
       continue;
@@ -62,7 +62,7 @@ export function assembleGameplayContext(
     included.push(document);
   }
   if (omitted.length) {
-    prompt += `\\n\\n[Context limit reached. Not loaded into this packet: ${omitted.join(", ")}]`;
+    prompt += `\n\n[Context limit reached. Not loaded into this packet: ${omitted.join(", ")}]`;
   }
   return {
     snapshot,
