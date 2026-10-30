@@ -19,12 +19,19 @@ export function isSupabaseConfigured(): boolean {
 }
 
 async function persistSession(value: AuthSession | null): Promise<void> {
-  session = value;
   // SecureStorage's web implementation uses localStorage. Never persist auth
   // credentials in the browser preview; native Android uses Android Keystore.
-  if (!Capacitor.isNativePlatform()) return;
-  if (value) await SecureStorage.setItem(SESSION_KEY, JSON.stringify(value));
-  else await SecureStorage.removeItem(SESSION_KEY);
+  if (!Capacitor.isNativePlatform()) {
+    session = value;
+    return;
+  }
+  if (value) {
+    await SecureStorage.setItem(SESSION_KEY, JSON.stringify(value));
+    session = value;
+  } else {
+    session = null;
+    await SecureStorage.removeItem(SESSION_KEY);
+  }
 }
 
 function parseSession(value: unknown): AuthSession | null {
