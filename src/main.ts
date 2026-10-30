@@ -115,6 +115,21 @@ root.addEventListener("click", async (event: MouseEvent) => {
     canonBusy = false; canonMessage = status.message; render();
     return;
   }
+  const logoutButton = target.closest<HTMLButtonElement>("[data-auth-logout]");
+  if (logoutButton && !authBusy) {
+    authBusy = true;
+    authMessage = "Signing out…";
+    render();
+    try {
+      await signOut();
+      authMessage = "Signed out successfully.";
+    } catch (error) {
+      authMessage = error instanceof Error ? error.message : "Could not clear the local session.";
+    }
+    authBusy = false;
+    render();
+    return;
+  }
   const deleteButton = target.closest<HTMLButtonElement>("[data-delete-character]");
   if (deleteButton?.dataset.deleteCharacter) {
     try {
@@ -136,6 +151,25 @@ root.addEventListener("click", async (event: MouseEvent) => {
 root.addEventListener("submit", async (event: SubmitEvent) => {
   const form = event.target;
   if (!(form instanceof HTMLFormElement)) return;
+  if (form.id === "auth-form") {
+    event.preventDefault();
+    if (authBusy) return;
+    const data = new FormData(form);
+    const email = String(data.get("email") ?? "").trim();
+    const password = String(data.get("password") ?? "");
+    authBusy = true;
+    authMessage = "Signing in with Supabase…";
+    render();
+    try {
+      const session = await signInWithPassword(email, password);
+      authMessage = "Signed in as " + (session.user.email ?? session.user.id) + ".";
+    } catch (error) {
+      authMessage = error instanceof Error ? error.message : "Sign-in failed.";
+    }
+    authBusy = false;
+    render();
+    return;
+  }
   if (form.id === "gameplay-route-form") {
     event.preventDefault();
     const formData = new FormData(form);
@@ -248,6 +282,12 @@ render();
 void initializeDatabase().then(async status => {
   databaseMessage = status.message;
   await refreshCharacters();
+  try {
+    await restoreAuthSession();
+    authMessage = getAuthSession() ? "Saved secure session restored." : "";
+  } catch (error) {
+    authMessage = error instanceof Error ? error.message : "Could not restore secure session.";
+  }
   render();
   const canonStatus = await refreshCanon();
   canonMessage = canonStatus.message;
