@@ -7,6 +7,7 @@ import { renderScreen, type ScreenId } from "./app/screens";
 import { getCanonStatus, loadCanonModule, refreshCanon, type CanonDocument } from "./canon/canon-loader";
 import { routeCanonActivity } from "./canon/canon-router";
 import { assembleGameplayContext } from "./canon/context-assembler";
+import { buildGMInstruction, validateGMResponse, type GMProposal } from "./engine/gm-engine";
 
 const app = document.querySelector<HTMLDivElement>("#app");
 if (!app) throw new Error("App root element was not found.");
@@ -55,6 +56,9 @@ let canonRouteDocuments: CanonDocument[] = [];
 let gameplayContextText = "";
 let gameplayContextMessage = "";
 let gameplayContextBusy = false;
+let gameplaySnapshot = "";
+let gameplayVersion = "";
+let gmProposal: GMProposal | null = null;
 
 function escapeHtml(value: string): string {
   return value.replace(/[&<>"']/g, char => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" })[char] ?? char);
@@ -119,7 +123,9 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
   if (!(form instanceof HTMLFormElement)) return;
   if (form.id === "gameplay-route-form") {
     event.preventDefault();
-    const activity = String(new FormData(form).get("activity") ?? "").trim();
+    const formData = new FormData(form);
+    const activity = String(formData.get("activity") ?? "").trim();
+    const characterId = String(formData.get("characterId") ?? "");
     if (!activity || gameplayContextBusy) return;
     gameplayContextBusy = true;
     gameplayContextMessage = "Mengambil modul canon yang relevan…";
@@ -128,19 +134,39 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     try {
       const route = await routeCanonActivity(activity, 5);
       const status = getCanonStatus();
-      const characterId = String(new FormData(form).get("characterId") ?? "");
       const selectedCharacter = characters.find(character => character.id === characterId) ?? null;
       const context = assembleGameplayContext(route, selectedCharacter, status.commitSha, status.version);
-      gameplayContextText = context.prompt;
+      gameplaySnapshot = context.snapshot;
+      gameplayVersion = context.version;
+      gmProposal = null;
+      gameplayContextText = buildGMInstruction(context);
       gameplayContextMessage = `Context siap: ${context.documents.length} modul dimasukkan, ${context.omittedModules.length} dilewati karena batas ukuran. Snapshot ${context.snapshot || "tidak terverifikasi"}.${route.skipped.length ? " Modul gagal: " + route.skipped.join(" | ") : ""}`;
       const output = root.querySelector<HTMLElement>("#gameplay-context");
-      if (output) output.innerHTML = `<p class="canon-status" role="status">${escapeHtml(gameplayContextMessage)}</p><label for="gameplay-context-output">Assembled context (read-only)</label><textarea id="gameplay-context-output" rows="12" readonly>${escapeHtml(gameplayContextText)}</textarea><p class="muted">${gameplayContextText.length.toLocaleString()} characters · no state changes performed</p>`;
+      if (output) output.innerHTML = `<p class="canon-status" role="status">${escapeHtml(gameplayContextMessage)}</p><h3>GM instruction ready</h3><p class="muted">Copy this instruction into your AI provider. The app does not send data to an AI service yet.</p><label for="gameplay-context-output">GM prompt (read-only)</label><textarea id="gameplay-context-output" rows="10" readonly>${escapeHtml(gameplayContextText)}</textarea><label for="gm-response">Paste the AI Game Master's JSON response</label><form id="gm-response-form"><textarea id="gm-response" name="response" rows="8" maxlength="24000" placeholder='{"snapshot":"…","version":"…","narration":"…","outcome":"…","canon_basis":[],"proposed_changes":[],"unresolved_questions":[]}' required></textarea><button class="action-button" type="submit">Validate GM response ↗</button></form><div id="gm-result" aria-live="polite"></div><p class="muted">${gameplayContextText.length.toLocaleString()} characters · no game state changes performed</p>`;
     } catch (error) {
       gameplayContextMessage = error instanceof Error ? error.message : "Context gagal disusun.";
       const output = root.querySelector<HTMLElement>("#gameplay-context");
       if (output) output.innerHTML = `<p class="canon-status" role="alert">${escapeHtml(gameplayContextMessage)}</p>`;
     }
     gameplayContextBusy = false;
+    return;
+  }
+  if (form.id === "gm-response-form") {
+    event.preventDefault();
+    const response = String(new FormData(form).get("response") ?? "");
+    const result = validateGMResponse(response, gameplaySnapshot, gameplayVersion);
+    const target = root.querySelector<HTMLElement>("#gm-result");
+    if (!target) return;
+    if (!result.valid) {
+      gmProposal = null;
+      target.innerHTML = "<p class=\"canon-status\" role=\"alert\">" + escapeHtml(result.errors.join(" ")) + "</p>";
+      return;
+    }
+    gmProposal = result.proposal;
+    const list = (items: string[]) => items.length
+      ? "<ul>" + items.map(item => "<li>" + escapeHtml(item) + "</li>").join("") + "</ul>"
+      : "<p class=\"muted\">None</p>";
+    target.innerHTML = "<article class=\"record-card\"><div class=\"record-top\"><span>GM PROPOSAL</span><span class=\"record-status\">VALIDATED · NOT APPLIED</span></div><h3>Story response</h3><p>" + escapeHtml(gmProposal.narration) + "</p><h3>Outcome</h3><p>" + escapeHtml(gmProposal.outcome) + "</p><h3>Canon basis</h3>" + list(gmProposal.canon_basis) + "<h3>Proposed changes (not applied)</h3>" + list(gmProposal.proposed_changes) + "<h3>Unresolved questions</h3>" + list(gmProposal.unresolved_questions) + "<p class=\"canon-status\" role=\"status\">Structure valid. No game state has been changed.</p></article>";
     return;
   }
   if (form.id === "canon-route-form") {
