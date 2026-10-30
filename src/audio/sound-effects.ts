@@ -88,7 +88,12 @@ export function playOpeningSequence(): void {
   if (openingPlayed || !soundEnabled) return;
   openingPlayed = true;
   playBell();
-  const startVoice = () => window.setTimeout(speakOpening, 520 + Math.random() * 220);
+  let scheduled = false;
+  const startVoice = () => {
+    if (scheduled) return;
+    scheduled = true;
+    window.setTimeout(speakOpening, 520 + Math.random() * 220);
+  };
   if ("speechSynthesis" in window && window.speechSynthesis.getVoices().length === 0) {
     window.speechSynthesis.addEventListener("voiceschanged", startVoice, { once: true });
     window.setTimeout(startVoice, 900);
