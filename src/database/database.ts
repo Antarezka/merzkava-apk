@@ -30,6 +30,8 @@ export async function initializeDatabase(): Promise<DatabaseStatus> {
     if (!columnNames.has("origin")) await database.execute("ALTER TABLE characters ADD COLUMN origin TEXT NOT NULL DEFAULT 'Golden Dragon Empire';");
     if (!columnNames.has("background")) await database.execute("ALTER TABLE characters ADD COLUMN background TEXT NOT NULL DEFAULT '';"); 
     if (!columnNames.has("awakened")) await database.execute("ALTER TABLE characters ADD COLUMN awakened INTEGER NOT NULL DEFAULT 0 CHECK(awakened IN (0,1));");
+    // Normalize legacy full-length canon hashes to the 7-character pinned hash.
+    await database.execute("UPDATE canon_documents SET commit_sha = substr(commit_sha, 1, 7) WHERE length(commit_sha) = 40;");
     await database.execute(`PRAGMA user_version = ${SCHEMA_VERSION};`);
     return { mode: "sqlite", message: "Database SQLite lokal siap di perangkat." };
   } catch (error) {
@@ -55,8 +57,17 @@ export interface CachedCanonDocument {
 const CANON_PREVIEW_KEY = "merzkava.canon.documents.v1";
 
 function readPreviewCanon(): CachedCanonDocument[] {
-  try { return JSON.parse(localStorage.getItem(CANON_PREVIEW_KEY) ?? "[]") as CachedCanonDocument[]; }
-  catch { return []; }
+  try {
+    const stored = JSON.parse(localStorage.getItem(CANON_PREVIEW_KEY) ?? "[]") as CachedCanonDocument[];
+    const normalized = stored.map(item => ({
+      ...item,
+      commitSha: item.commitSha.length === 40 ? item.commitSha.slice(0, 7) : item.commitSha
+    }));
+    if (normalized.some((item, index) => item.commitSha !== stored[index]?.commitSha)) {
+      localStorage.setItem(CANON_PREVIEW_KEY, JSON.stringify(normalized));
+    }
+    return normalized;
+  } catch { return []; }
 }
 
 export async function cacheCanonDocument(document: CachedCanonDocument): Promise<void> {
