@@ -6,12 +6,13 @@ let openingPlayed = false;
 
 function context(): AudioContext | null {
   if (!soundEnabled || typeof window === "undefined") return null;
-  const AudioContextClass = (window as Window & { webkitAudioContext?: AudioContextConstructor }).AudioContext
+  const AudioContextClass = window.AudioContext
     ?? (window as Window & { webkitAudioContext?: AudioContextConstructor }).webkitAudioContext;
   if (!AudioContextClass) return null;
-  audioContext ??= new AudioContextClass();
-  if (audioContext.state === "suspended") void audioContext.resume().catch(() => undefined);
-  return audioContext;
+  if (!audioContext) audioContext = new AudioContextClass();
+  const activeContext = audioContext;
+  if (activeContext.state === "suspended") void activeContext.resume().catch(() => undefined);
+  return activeContext;
 }
 
 function tone(
