@@ -1,0 +1,24 @@
+name: Web App Validation
+
+on:
+  push:
+    branches:
+      - main
+      - setup/project-foundation
+      - feature/navigation-local-database
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: npm install
+      - name: Type-check and build
+        run: npm run build
