@@ -3,8 +3,8 @@ main = "worker.ts"
 compatibility_date = "2026-10-30"
 
 [vars]
-AI_BASE_URL = "https://api.openai.com/v1"
-AI_MODEL = "SET_MODEL_ID"
+AI_BASE_URL = "SET_QWEN_STUDIO_COMPATIBLE_BASE_URL"
+AI_MODEL = "qwen3.8-max"
 SUPABASE_URL = "SET_SUPABASE_PROJECT_URL"
 SUPABASE_ANON_KEY = "SET_SUPABASE_ANON_KEY"
 ALLOWED_ORIGINS = "capacitor://localhost,https://localhost,http://localhost,http://localhost:5173,http://localhost:4173"
