@@ -40,7 +40,7 @@ button{font:inherit;color:inherit;cursor:pointer} button:focus-visible{outline:2
 .opening-splash::before,.opening-splash::after{position:absolute;content:"";width:min(78vw,420px);aspect-ratio:1;border:1px solid #8b603a22;border-radius:50%;pointer-events:none}
 .opening-splash::after{width:min(58vw,310px);border-color:#d39a5b18}
 .splash-content{position:relative;display:grid;justify-items:center;text-align:center;opacity:0;transform:translateY(10px);animation:splash-arrive .9s .35s ease-out forwards}
-.splash-mark{display:grid;place-items:center;width:76px;height:76px;margin-bottom:25px;border:1px solid #b77b45;color:#e5a45e;font:42px/1 Georgia,serif;box-shadow:0 0 38px #c17b3820,inset 0 0 22px #c17b3812}
+.splash-logo{display:block;width:clamp(220px,72vw,340px);aspect-ratio:1;margin-bottom:24px;border:1px solid #b77b4544;border-radius:50%;object-fit:cover;background:#090807;box-shadow:0 0 46px #c17b3820,0 0 0 8px #b77b4508}
 .splash-kicker{margin:0 0 8px;color:#c18a56;font-size:9px;font-weight:700;letter-spacing:.34em}
 .splash-content h1{margin:0;color:#f1e5d5;font:400 clamp(43px,12vw,62px)/1.05 Georgia,serif;letter-spacing:.015em}
 .splash-rule{width:52px;height:1px;margin:23px 0 15px;background:linear-gradient(90deg,transparent,#b77b45,transparent)}
