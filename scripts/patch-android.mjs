@@ -45,9 +45,9 @@ if (!patchedActivity.includes("FloatingWindowPlugin.class")) {
 let lifecycleActivity = await readFile(mainActivityPath, "utf8");
 if (!lifecycleActivity.includes("FloatingWindowPlugin.onBubbleTapped")) {
   if (!lifecycleActivity.includes("import android.content.Intent;")) {
-    lifecycleActivity = lifecycleActivity.replace(/^package\\s+[\\w.]+;/m, match => match + "\\n\\nimport android.content.Intent;");
+    lifecycleActivity = lifecycleActivity.replace(/^package\s+[\w.]+;/m, match => match + "\n\nimport android.content.Intent;");
   }
-  lifecycleActivity = lifecycleActivity.replace(/\\n}\\s*$/, `
+  lifecycleActivity = lifecycleActivity.replace(/\n}\s*$/, `
     @Override
     public void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
@@ -63,7 +63,7 @@ if (!lifecycleActivity.includes("FloatingWindowPlugin.onBubbleTapped")) {
 
 let manifest = await readFile(manifestPath, "utf8");
 if (!manifest.includes('android:launchMode="singleTop"')) {
-  manifest = manifest.replace(/<activity\\b([^>]*)>/, (match, attributes) =>
+  manifest = manifest.replace(/<activity\b([^>]*)>/, (match, attributes) =>
     '<activity' + attributes + ' android:launchMode="singleTop">'
   );
 }
