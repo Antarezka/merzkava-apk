@@ -5,7 +5,7 @@ import { initializeDatabase } from "./database/database";
 import { createCharacter, deleteCharacter, listCharacters, type Character } from "./characters/character-repository";
 import { validateCharacterDraft } from "./engine/character-validation";
 import { renderScreen, type ScreenId } from "./app/screens";
-import { getCanonStatus, loadCanonModule, refreshCanon, type CanonDocument } from "./canon/canon-loader";
+import { getCanonIndex, getCanonStatus, loadCanonModule, loadPlayerRegistry, refreshCanon, type CanonDocument } from "./canon/canon-loader";
 import { routeCanonActivity } from "./canon/canon-router";
 import { assembleGameplayContext } from "./canon/context-assembler";
 import { requestGMProposal, validateGMResponse, type GMProposal } from "./engine/gm-engine";
@@ -451,7 +451,12 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     if (sendButton) sendButton.disabled = true;
     try {
       const route = await routeCanonActivity(routeQuery, 7);
-      const context = assembleGameplayContext({ ...route, query: activity }, character, activeSha, status.version);
+      const indexDocument = await getCanonIndex();
+      if (!indexDocument || indexDocument.commitSha.slice(0, 7) !== activeSha) throw new Error("Bootstrap gagal: INDEX.md pada ACTIVE_SHA tidak tersedia.");
+      const playerRegistry = mode === "new" ? await loadPlayerRegistry(activeSha) : null;
+      const context = assembleGameplayContext({ ...route, query: activity }, character, activeSha, status.version, 140000);
+      context.prompt += "\n\n## FULL INDEX.md · HARD GATE · ACTIVE_SHA " + activeSha + "\n" + indexDocument.content;
+      if (playerRegistry) context.prompt += "\n\n## FULL players.md · ACTIVE_SHA " + activeSha + "\n" + playerRegistry.content;
       const previous = mode === "new" ? [] : activeChat.messages;
       context.prompt += "\n\n## SESSION MODE\n" + (mode === "new" ? "NEW SESSION: initialize from the exact trigger below." : "CONTINUING SESSION: continue without resetting established state.") +
         "\n\n## EXACT TRIGGER\n" + (mode === "new" ? trigger : "Not applicable; continuation.") +
