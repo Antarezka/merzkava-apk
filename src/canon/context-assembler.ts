@@ -49,18 +49,24 @@ export function assembleGameplayContext(
     "",
     "## Official canon modules"
   ];
+  const requiredPaths = new Set(route.requiredPaths ?? []);
+  const loadedPaths = new Set(route.loaded.map(document => document.path));
+  const missingRequired = [...requiredPaths].filter(path => !loadedPaths.has(path));
+  if (missingRequired.length) throw new Error("Context assembly ditolak: modul wajib belum dimuat: " + missingRequired.join(", "));
   let prompt = sections.join("\n");
   const included: CanonDocument[] = [];
   const omitted: string[] = [];
   for (const document of route.loaded) {
     const section = `\n\n### ${document.path} [${document.commitSha}]\n\n${document.content}`;
-    if (prompt.length + section.length > maxCharacters) {
+    if (prompt.length + section.length > maxCharacters && !requiredPaths.has(document.path)) {
       omitted.push(document.path);
       continue;
     }
     prompt += section;
     included.push(document);
   }
+  const omittedRequired = [...requiredPaths].filter(path => !included.some(document => document.path === path));
+  if (omittedRequired.length) throw new Error("Context assembly ditolak: modul wajib terpotong: " + omittedRequired.join(", "));
   if (omitted.length) {
     prompt += `\n\n[Context limit reached. Not loaded into this packet: ${omitted.join(", ")}]`;
   }
