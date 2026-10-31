@@ -740,8 +740,10 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       const previous = mode === "new" ? [] : activeChat.messages;
       const latestGMMessage = [...previous].reverse().find(item => item.role === "gm");
       const latestGMPanel = latestGMMessage ? parseGameplayResponseProfile(latestGMMessage.text) : null;
-      const baselineParse = latestGMPanel && latestGMPanel.errors.length === 0
-        ? { valid: true as const, profile: latestGMPanel.profile }
+      const baselineParse = latestGMMessage
+        ? (latestGMPanel && latestGMPanel.errors.length === 0
+          ? { valid: true as const, profile: latestGMPanel.profile }
+          : { valid: false as const, errors: ["Panel profil sesi terakhir tidak dapat dibaca; snapshot awal tidak boleh menimpa state sesi berjalan."] })
         : parseCharacterProfile(activeProfileMarkdown);
       const profileValidationErrors = baselineParse.valid ? validateCharacterProfile(baselineParse.profile) : baselineParse.errors;
       const usableProfile = baselineParse.valid && profileValidationErrors.length === 0 ? baselineParse.profile : null;
@@ -815,7 +817,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     const list = (items: string[]) => items.length
       ? "<ul>" + items.map(item => "<li>" + escapeHtml(item) + "</li>").join("") + "</ul>"
       : "<p class=\"muted\">None</p>";
-    target.innerHTML = "<article class=\"record-card\"><div class=\"record-top\"><span>GM PROPOSAL</span><span class=\"record-status\">VALIDATED · NOT APPLIED</span></div><h3>Story response</h3><p>" + escapeHtml(gmProposal.narration) + "</p><h3>Outcome</h3><p>" + escapeHtml(gmProposal.outcome) + "</p><h3>Canon basis</h3>" + list(gmProposal.canon_basis) + "<h3>Proposed changes (not applied)</h3>" + list(gmProposal.proposed_changes) + "<h3>Unresolved questions</h3>" + list(gmProposal.unresolved_questions) + "<p class=\"canon-status\" role=\"status\">Structure valid. No game state has been changed.</p></article>";
+    target.innerHTML = "<article class=\"record-card\"><div class=\"record-top\"><span>GM PROPOSAL</span><span class=\"record-status\">VALIDATED · NOT APPLIED</span></div><h3>Canonical player response</h3><p>" + escapeHtml(gmProposal.player_response).replace(/\\n/g, "<br>") + "</p><h3>Canon basis</h3>" + list(gmProposal.canon_basis) + "<h3>Proposed changes (not applied)</h3>" + list(gmProposal.proposed_changes) + "<h3>Unresolved questions</h3>" + list(gmProposal.unresolved_questions) + "<p class=\"canon-status\" role=\"status\">Structure valid. No game state has been changed.</p></article>";
     return;
   }
   if (form.id === "canon-route-form") {
