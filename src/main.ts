@@ -471,20 +471,19 @@ root.addEventListener("click", async (event: MouseEvent) => {
       } else if (action === "start-bubble") {
         await refreshFloatingReadiness();
         if (!floatingSetupComplete()) throw new Error("Selesaikan tiga izin pertama secara berurutan sebelum memulai bubble mode.");
-        await playEntrySplash();
         activeScreen = "gameplay";
         loadCharacterWorldTime(activeCharacterId);
         loadCharacterChat(activeCharacterId);
         render();
         await showFloatingBubble();
       } else if (action === "open-game") {
+        await stopFloatingService();
         await playEntrySplash();
         activeScreen = "home";
         render();
       } else if (action === "open-window") {
         await refreshFloatingReadiness();
         if (!floatingReadiness.displayOverApps) throw new Error("Aktifkan izin Display over the app terlebih dahulu.");
-        await playEntrySplash();
         activeScreen = "gameplay";
         loadCharacterWorldTime(activeCharacterId);
         loadCharacterChat(activeCharacterId);
