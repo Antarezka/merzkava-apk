@@ -93,6 +93,16 @@ export async function loadCanonModule(path: string): Promise<CanonDocument> {
   return fetchPinnedDocument(safePath, currentStatus.commitSha);
 }
 
+export async function activateCanonSnapshot(shortHash: string): Promise<CanonStatus> {
+  const hash = shortHash.slice(0, 7);
+  if (!/^[a-f0-9]{7}$/i.test(hash)) throw new Error("ACTIVE_SHA tidak valid.");
+  await verifyPinnedCommit(hash);
+  await fetchPinnedDocument("INDEX.md", hash);
+  const versionDoc = await fetchPinnedDocument("NIGHTLY_VERSION.md", hash);
+  const version = parseNightlyVersion(versionDoc.content);
+  currentStatus = { status: "ready", commitSha: hash, version, updatedAt: new Date().toISOString(), message: `Canon snapshot aktif · ${hash} · ${version}` };
+  return getCanonStatus();
+}
 export async function refreshCanon(): Promise<CanonStatus> {
   try {
     const readme = await fetchText(README_URL);
