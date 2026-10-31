@@ -1,7 +1,8 @@
 import { cacheCanonDocument, getCachedCanonDocument, type CachedCanonDocument } from "../database/database";
 
 const CANON_REPOSITORY = "Antarezka/merzkava-universe";
-// Update this full commit SHA only when the owner deliberately advances the Universe pinned source. Runtime never bootstraps from README.\nconst DEFAULT_CANON_SNAPSHOT = "58693e13ead18dc44528f8f0259ca89cfb7faff9";
+// Update this full commit SHA only when the owner deliberately advances the Universe pinned source. Runtime never bootstraps from README.
+const DEFAULT_CANON_SNAPSHOT = "58693e13ead18dc44528f8f0259ca89cfb7faff9";
 const API_BASE = `https://api.github.com/repos/${CANON_REPOSITORY}`;
 
 export interface CanonStatus {
