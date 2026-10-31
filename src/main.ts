@@ -21,6 +21,7 @@ import { floatingControlMarkup } from "./app/floating-control";
 const app = document.querySelector<HTMLDivElement>("#app");
 if (!app) throw new Error("App root element was not found.");
 const root = app;
+let menuRevealPending = false;
 initializeLedgerNotifications();
 
 function showOpeningSplash(): HTMLDivElement {
@@ -59,12 +60,7 @@ async function playEntrySplash(): Promise<void> {
     });
     close();
   });
-  const shell = root.querySelector<HTMLElement>(".app-shell");
-  if (shell) {
-    shell.classList.remove("is-entering");
-    void shell.offsetWidth;
-    shell.classList.add("is-entering");
-  }
+  menuRevealPending = true;
 }
 
 const navigation: { id: ScreenId; label: string; icon: string }[] = [
@@ -331,7 +327,7 @@ function render(): void {
   const content = isControl
     ? floatingControlMarkup(floatingReadiness)
     : renderScreen(activeScreen as ScreenId, availableCharacters(), playerRegistryMessage, activeCharacterId ? getLedgerLog(activeCharacterId) : []);
-  root.innerHTML = `<div class="app-shell ${isControl ? "control-shell" : ""}">
+  root.innerHTML = `<div class="app-shell ${isControl ? "control-shell" : ""} ${menuRevealPending ? "is-entering" : ""}">
     ${isControl ? "" : '<header class="app-header"><button class="brand" data-screen="home" aria-label="Merzkava home"><span class="brand-mark">M</span><span><small>MERZKAVA UNIVERSE</small><strong>Merzkava</strong></span></button><button class="header-settings" data-floating-action="start-bubble" aria-label="Start Bubble Mode" title="Start Bubble Mode">◉</button><button class="header-settings" data-screen="settings" aria-label="Settings">⚙</button></header>'}
     ${notice ? `<p class="notice" role="status">${escapeHtml(notice)}</p>` : ""}
     ${isControl ? content : `<main class="main-content">${content}${activeScreen === "settings" ? authPanel() + canonPanel() : ""}</main>`}
@@ -341,6 +337,7 @@ function render(): void {
     ${activeScreen === "home" && noticeboardVisible ? noticeboardMarkup() : ""}
     ${bugPanelMarkup()}
   </div>`;
+  menuRevealPending = false;
   updateSessionCalendar();
   renderChat();
 }
