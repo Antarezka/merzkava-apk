@@ -154,7 +154,7 @@ function renderChat(): void {
   const feed = root.querySelector<HTMLElement>("#conversation-feed");
   if (feed) {
     feed.innerHTML = activeChat.messages.length
-      ? activeChat.messages.map(message => '<article class="chat-message ' + message.role + '"><small>' + (message.role === "gm" ? "GAME MASTER" : "AKSI PEMAIN") + '</small><p>' + escapeHtml(message.text).replace(/\\n/g, "<br>") + '</p></article>').join("")
+      ? activeChat.messages.map(message => '<article class="chat-message ' + message.role + '"><small>' + (message.role === "gm" ? "GAME MASTER" : "AKSI PEMAIN") + '</small><p>' + escapeHtml(message.text).replace(/\n/g, "<br>") + '</p></article>').join("")
       : '<div class="conversation-empty"><span class="conversation-ornament">✧</span><h3>Your story begins here</h3><p>Mulai sesi baru atau lanjutkan perjalanan yang tersimpan untuk karakter ini.</p></div>';
     feed.scrollTop = feed.scrollHeight;
   }
@@ -817,7 +817,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     const list = (items: string[]) => items.length
       ? "<ul>" + items.map(item => "<li>" + escapeHtml(item) + "</li>").join("") + "</ul>"
       : "<p class=\"muted\">None</p>";
-    target.innerHTML = "<article class=\"record-card\"><div class=\"record-top\"><span>GM PROPOSAL</span><span class=\"record-status\">VALIDATED · NOT APPLIED</span></div><h3>Canonical player response</h3><p>" + escapeHtml(gmProposal.player_response).replace(/\\n/g, "<br>") + "</p><h3>Canon basis</h3>" + list(gmProposal.canon_basis) + "<h3>Proposed changes (not applied)</h3>" + list(gmProposal.proposed_changes) + "<h3>Unresolved questions</h3>" + list(gmProposal.unresolved_questions) + "<p class=\"canon-status\" role=\"status\">Structure valid. No game state has been changed.</p></article>";
+    target.innerHTML = "<article class=\"record-card\"><div class=\"record-top\"><span>GM PROPOSAL</span><span class=\"record-status\">VALIDATED · NOT APPLIED</span></div><h3>Canonical player response</h3><p>" + escapeHtml(gmProposal.player_response).replace(/\n/g, "<br>") + "</p><h3>Canon basis</h3>" + list(gmProposal.canon_basis) + "<h3>Proposed changes (not applied)</h3>" + list(gmProposal.proposed_changes) + "<h3>Unresolved questions</h3>" + list(gmProposal.unresolved_questions) + "<p class=\"canon-status\" role=\"status\">Structure valid. No game state has been changed.</p></article>";
     return;
   }
   if (form.id === "canon-route-form") {
