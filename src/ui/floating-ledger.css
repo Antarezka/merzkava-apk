@@ -21,3 +21,17 @@
 @keyframes ledger-balloon-rise{0%{opacity:0;transform:translateY(24px) scale(.84)}12%{opacity:1;transform:translateY(0) scale(1.02)}22%{transform:translateY(-2px) scale(1)}72%{opacity:1;transform:translateY(-7px) scale(1.035)}100%{opacity:0;transform:translateY(-36px) scale(1.09)}}
 @keyframes ledger-pop{to{opacity:0;transform:scale(1.22)}}
 @media(prefers-reduced-motion:reduce){.ledger-bubble{animation:none}.ledger-bubble.is-popping{animation:ledger-pop .12s ease-in forwards;}}
+
+/* Chronological ledger history in the Inventory screen. */
+.ledger-log-panel{padding-top:6px;}
+.ledger-log-list{display:grid;gap:9px;margin:0;padding:0;list-style:none;}
+.ledger-log-entry{display:grid;gap:5px;padding:12px 13px;border:1px solid #c7bea9;background:#eee7d6;color:#34483e;}
+.ledger-log-meta{display:flex;align-items:center;justify-content:space-between;gap:8px;color:#7d806f;font-size:8px;letter-spacing:.08em;}
+.ledger-log-meta time{font-size:8px;letter-spacing:0;text-align:right;}
+.ledger-log-entry>strong{font-size:13px;font-variant-numeric:tabular-nums;}
+.ledger-log-entry>p,.ledger-log-entry>small{margin:0;color:#737b70;font-size:10px;line-height:1.45;overflow-wrap:anywhere;}
+.ledger-log-entry.tone-positive{border-left:3px solid #4f9a6a;}
+.ledger-log-entry.tone-positive>strong{color:#247b4b;}
+.ledger-log-entry.tone-negative{border-left:3px solid #bd6969;}
+.ledger-log-entry.tone-negative>strong{color:#b33d42;}
+.ledger-log-entry.tone-neutral{border-left:3px solid #9b9b88;}
