@@ -8,7 +8,7 @@ import { renderScreen, type ScreenId } from "./app/screens";
 import { getCanonStatus, loadCanonModule, refreshCanon, type CanonDocument } from "./canon/canon-loader";
 import { routeCanonActivity } from "./canon/canon-router";
 import { assembleGameplayContext } from "./canon/context-assembler";
-import { buildGMInstruction, requestGMProposal, validateGMResponse, type GMProposal } from "./engine/gm-engine";
+import { requestGMProposal, validateGMResponse, type GMProposal } from "./engine/gm-engine";
 import { getAuthSession, isSupabaseConfigured, restoreAuthSession, signInWithPassword, signOut } from "./auth/supabase-auth";
 import { GatewayGMProvider, isGMGatewayConfigured } from "./engine/gateway-gm-provider";
 
@@ -67,8 +67,6 @@ let canonBusy = false;
 let canonRouteBusy = false;
 let canonRouteMessage = "";
 let canonRouteDocuments: CanonDocument[] = [];
-let gameplayContextText = "";
-let gameplayContextMessage = "";
 let gameplayContextBusy = false;
 let gameplaySnapshot = "";
 let gameplayVersion = "";
@@ -250,6 +248,7 @@ function render(): void {
     ${activeScreen === "home" && noticeboardVisible ? noticeboardMarkup() : ""}
   </div>`;
   updateSessionCalendar();
+  renderChat();
 }
 
 async function refreshCharacters(): Promise<void> {
@@ -443,7 +442,8 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     if (mode === "new") activeChat = { messages: [], started: false, showOptions: activeChat.showOptions };
     const status = getCanonStatus();
     if (status.status !== "ready" && status.status !== "cached") { notice = "Canon belum terverifikasi. Refresh canon terlebih dahulu."; render(); return; }
-    const trigger = "analisis link berikut ini secara penuh dan pelajari dengan seksama untuk memulai permainan roleplay ini : https://raw.githubusercontent.com/Antarezka/merzkava-universe/" + status.commitSha + "/INDEX.md?v=1 dan https://raw.githubusercontent.com/Antarezka/merzkava-universe/" + status.commitSha + "/players.md?v=1 untuk Memulai permainan sebagai " + character.name + "!";
+    const activeSha = status.commitSha.slice(0, 7);
+    const trigger = "analisis link berikut ini secara penuh dan pelajari dengan seksama untuk memulai permainan roleplay ini : https://raw.githubusercontent.com/Antarezka/merzkava-universe/" + activeSha + "/INDEX.md?v=1 dan https://raw.githubusercontent.com/Antarezka/merzkava-universe/" + activeSha + "/players.md?v=1 untuk Memulai permainan sebagai " + character.name + "!";
     const activity = mode === "new" ? trigger : typedActivity;
     const routeQuery = mode === "new" ? "new session character introduction starting location initial character state" : activity;
     gameplayContextBusy = true;
@@ -451,7 +451,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     if (sendButton) sendButton.disabled = true;
     try {
       const route = await routeCanonActivity(routeQuery, 7);
-      const context = assembleGameplayContext({ ...route, query: activity }, character, status.commitSha, status.version);
+      const context = assembleGameplayContext({ ...route, query: activity }, character, activeSha, status.version);
       const previous = mode === "new" ? [] : activeChat.messages;
       context.prompt += "\n\n## SESSION MODE\n" + (mode === "new" ? "NEW SESSION: initialize from the exact trigger below." : "CONTINUING SESSION: continue without resetting established state.") +
         "\n\n## EXACT TRIGGER\n" + (mode === "new" ? trigger : "Not applicable; continuation.") +
