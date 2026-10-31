@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.content.pm.verify.domain.DomainVerificationManager;
+import android.content.pm.verify.domain.DomainVerificationUserState;
 import android.app.NotificationManager;
 import android.os.PowerManager;
 import android.content.Intent;
@@ -83,9 +85,23 @@ public class FloatingWindowPlugin extends Plugin {
         result.put("notifications", notificationReady);
         result.put("batteryExemption", batteryReady);
         result.put("serviceRunning", isServiceRunning(context));
-        // This remains a manual Google Play Console configuration step until a verified
-        // Play Games / OAuth return URI and signing certificate are supplied.
-        result.put("playReturnLink", false);
+        boolean appLinksReady = false;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            try {
+                DomainVerificationManager manager = context.getSystemService(DomainVerificationManager.class);
+                DomainVerificationUserState state = manager == null ? null : manager.getDomainVerificationUserState(context.getPackageName());
+                if (state != null) {
+                    for (Integer domainState : state.getHostToStateMap().values()) {
+                        if (domainState != null && (domainState == DomainVerificationUserState.DOMAIN_STATE_SELECTED
+                            || domainState == DomainVerificationUserState.DOMAIN_STATE_VERIFIED)) {
+                            appLinksReady = true;
+                            break;
+                        }
+                    }
+                }
+            } catch (Exception ignored) { }
+        }
+        result.put("playReturnLink", appLinksReady);
         call.resolve(result);
     }
 
@@ -123,6 +139,25 @@ public class FloatingWindowPlugin extends Plugin {
             }
         }
         call.resolve();
+    }
+
+    @PluginMethod
+    public void openAppLinksSettings(PluginCall call) {
+        Activity activity = getActivity();
+        try {
+            Intent intent;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                intent = new Intent(Settings.ACTION_APP_OPEN_BY_DEFAULT_SETTINGS,
+                    Uri.parse("package:" + activity.getPackageName()));
+            } else {
+                intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                    Uri.parse("package:" + activity.getPackageName()));
+            }
+            activity.startActivity(intent);
+            call.resolve();
+        } catch (Exception error) {
+            call.reject("Could not open Merzkava App Links settings: " + error.getMessage());
+        }
     }
 
     @PluginMethod
