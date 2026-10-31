@@ -3,7 +3,7 @@ import "./ui/floating-ledger.css";
 import "./ui/floating-control.css";
 import { cancelOpeningSequence, playButtonSound, playOpeningSequence, playSnapshotSlideSound, playWarningBeep } from "./audio/sound-effects";
 const splashLogoUrl = new URL("../Untitled78_20261030213901.png", import.meta.url).href;
-import { initializeDatabase } from "./database/database";
+import { getGameplaySessionRecord, initializeDatabase, saveGameplaySessionRecord } from "./database/database";
 import { createCharacter, deleteCharacter, listCharacters, type Character } from "./characters/character-repository";
 import { validateCharacterDraft } from "./engine/character-validation";
 import { renderScreen, type ScreenId } from "./app/screens";
@@ -98,6 +98,7 @@ let canonRouteDocuments: CanonDocument[] = [];
 let gameplayContextBusy = false;
 let gameplaySnapshot = "";
 let gameplayVersion = "";
+let activeProfileMarkdown = "";
 let gmProposal: GMProposal | null = null;
 let authMessage = "";
 let authBusy = false;
@@ -363,7 +364,9 @@ async function refreshPlayerRegistry(): Promise<void> {
   playerRegistryBusy = true;
   playerRegistryMessage = "Mengambil daftar karakter dari players.md…";
   try {
-    const result = await refreshLatestPlayerRegistry();
+    const status = getCanonStatus();
+    if (!status.commitSha || status.status === "error") throw new Error("Canon ACTIVE_SHA belum terverifikasi; registry tidak boleh memakai sumber lain.");
+    const result = await refreshLatestPlayerRegistry(status.commitSha);
     registeredCharacters = result.players.map(player => ({
       id: "registry:" + player.path,
       name: player.name,
@@ -572,7 +575,7 @@ root.addEventListener("click", async (event: MouseEvent) => {
 
   const refreshCanonButton = target.closest<HTMLButtonElement>("[data-refresh-canon]");
   if (refreshCanonButton && !canonBusy) {
-    canonBusy = true; canonMessage = "Memeriksa pin README dan mengambil INDEX…"; render();
+    canonBusy = true; canonMessage = "Memverifikasi snapshot canon yang dikonfigurasi dan mengambil INDEX…"; render();
     const status = await refreshCanon();
     canonBusy = false; canonMessage = status.message; render();
     return;
@@ -692,7 +695,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       }
     }
     if (mode === "continue" && !gameplaySnapshot) { notice = "Belum ada sesi tersimpan untuk karakter ini. Tekan New session terlebih dahulu."; render(); return; }
-    const activeSha = mode === "new" ? activeStatus.commitSha.slice(0, 7) : gameplaySnapshot.slice(0, 7);
+    const activeSha = mode === "new" ? activeStatus.commitSha : gameplaySnapshot;
     const trigger = "analisis link berikut ini secara penuh dan pelajari dengan seksama untuk memulai permainan roleplay ini : https://raw.githubusercontent.com/Antarezka/merzkava-universe/" + activeSha + "/INDEX.md?v=1 dan https://raw.githubusercontent.com/Antarezka/merzkava-universe/" + activeSha + "/players.md?v=1 untuk Memulai permainan sebagai ( " + character.name + " )!";
     const activity = mode === "new" ? trigger : typedActivity;
     const routeQuery = mode === "new" ? "new session character introduction starting location initial character state" : activity;
@@ -704,16 +707,22 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     try {
       if (mode === "continue") activeStatus = await activateCanonSnapshot(activeSha);
       const route = await routeCanonActivity(routeQuery, 7);
-      const indexDocument = await getCanonIndex();
-      if (!indexDocument || indexDocument.commitSha.slice(0, 7) !== activeSha) throw new Error("Bootstrap gagal: INDEX.md pada ACTIVE_SHA tidak tersedia.");
+      const indexDocument = await getCanonIndex(activeSha);
+      if (!indexDocument || indexDocument.commitSha !== activeSha) throw new Error("Bootstrap gagal: INDEX.md pada ACTIVE_SHA penuh tidak tersedia.");
       const playerRegistry = mode === "new" ? await loadPlayerRegistry(activeSha) : null;
       const registeredProfile = mode === "new" && character.registryPath ? await loadRegisteredPlayerProfile(activeSha, character.registryPath) : null;
+      const savedSession = mode === "continue" ? await getGameplaySessionRecord(characterId) : null;
+      if (mode === "continue" && !savedSession) throw new Error("Save sesi lama belum memiliki baseline canon yang terverifikasi. Mulai sesi baru agar profil sumber dan snapshot dapat disimpan dengan aman.");
+      if (mode === "continue" && savedSession && savedSession.snapshotSha !== activeSha) throw new Error("Save sesi dan ACTIVE_SHA berbeda. Sesi tidak boleh mencampur snapshot canon.");
+      activeProfileMarkdown = mode === "new" ? (registeredProfile?.content ?? "") : (savedSession?.profileMarkdown ?? "");
       const context = assembleGameplayContext({ ...route, query: activity }, character, activeSha, activeStatus.version, 140000);
       context.prompt += "\n\n## FULL INDEX.md · HARD GATE · ACTIVE_SHA " + activeSha + "\n" + indexDocument.content;
       if (playerRegistry) context.prompt += "\n\n## FULL players.md · ACTIVE_SHA " + activeSha + "\n" + playerRegistry.content;
       if (registeredProfile) context.prompt += "\n\n## FULL REGISTERED CHARACTER PROFILE · " + registeredProfile.path + " · ACTIVE_SHA " + activeSha + "\n" + registeredProfile.content;
       const previous = mode === "new" ? [] : activeChat.messages;
-      context.prompt += "\n\n## SESSION MODE\n" + (mode === "new" ? "NEW SESSION: initialize from the exact trigger below." : "CONTINUING SESSION: continue without resetting established state.") +
+      context.prompt += "\n\n## VERIFIED CHARACTER PROFILE SOURCE\n" + (activeProfileMarkdown || "No registered profile markdown is available; use the official new-character bootstrap template and preserve unknowns.") +
+        "\n\n## PERSISTED STATE TRUST\n" + (mode === "new" ? "New-session profile source is the baseline. Do not invent missing values." : (savedSession?.stateVerified ? "The persisted state record is marked verified." : "The persisted record is NOT mechanically verified. Preserve only source-backed facts; do not promote prior GM proposals or unverified changes into facts. If an action depends on an unverified value, stop and ask for reconciliation.")) +
+        "\n\n## SESSION MODE\n" + (mode === "new" ? "NEW SESSION: initialize from the exact trigger below." : "CONTINUING SESSION: continue without resetting established state.") +
         "\n\n## EXACT TRIGGER\n" + (mode === "new" ? trigger : "Not applicable; continuation.") +
         "\n\n## CHRONOLOGICAL PLAYER/GM TRANSCRIPT\n" + (previous.length ? previous.map(item => (item.role === "player" ? "PLAYER: " : "GM: ") + item.text).join("\n\n") : "No previous turns.") +
         "\n\n## PLAYER PRESENTATION\n" + (activeChat.showOptions ? "Include concise optional GM suggestions at the end." : "Do not provide suggested action options.") +
@@ -730,6 +739,15 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       activeChat.started = true;
       form.dataset.sessionMode = "continue";
       saveCharacterChat();
+      await saveGameplaySessionRecord({
+        characterId,
+        snapshotSha: activeSha,
+        canonVersion: activeStatus.version,
+        profileMarkdown: activeProfileMarkdown,
+        stateJson: JSON.stringify({ status: "unverified", worldTime: { ...worldTime }, lastProposal: { snapshot: gmProposal.snapshot, version: gmProposal.version, proposedChanges: gmProposal.proposed_changes }, note: "GM proposals are not authoritative state; deterministic reconciliation is not implemented yet." }),
+        stateVerified: false,
+        updatedAt: new Date().toISOString()
+      });
       renderChat();
       const action = root.querySelector<HTMLTextAreaElement>("#gameplay-action");
       if (action) action.value = "";
@@ -848,6 +866,6 @@ void initializeDatabase().then(async status => {
   render();
   const canonStatus = await refreshCanon();
   canonMessage = canonStatus.message;
-  await refreshPlayerRegistry();
+  if (canonStatus.status !== "error" && canonStatus.commitSha) await refreshPlayerRegistry();
   render();
 });
