@@ -41,7 +41,7 @@ button{font:inherit;color:inherit;cursor:pointer} button:focus-visible{outline:2
 .opening-splash::before,.opening-splash::after{position:absolute;content:"";width:min(78vw,420px);aspect-ratio:1;border:1px solid #8b603a22;border-radius:50%;pointer-events:none}
 .opening-splash::after{width:min(58vw,310px);border-color:#d39a5b18}
 .splash-content{position:relative;z-index:1;display:grid;justify-items:center;text-align:center;opacity:0;transform:translateY(16px);will-change:transform,opacity}
-.splash-mascot{position:relative;isolation:isolate;width:clamp(250px,76vw,360px);aspect-ratio:1;margin-bottom:24px;overflow:visible;transform-origin:50% 58%;filter:drop-shadow(0 0 22px #c17b3820)}.splash-mascot:before{position:absolute;inset:4%;content:"";border:1px solid #b77b4538;border-radius:50%;box-shadow:0 0 46px #c17b3820,0 0 0 8px #b77b4508;pointer-events:none}.kitty-layer{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:contain;pointer-events:none;user-select:none;will-change:transform,opacity}.kitty-shadow{z-index:0;transform-origin:50% 72%;}.kitty-tail{z-index:1;transform-origin:53% 57%;}.kitty-body{z-index:2;transform-origin:50% 72%;}.kitty-head{z-index:3;transform-origin:58% 58%;}
+.splash-mascot{position:relative;isolation:isolate;width:clamp(250px,76vw,360px);aspect-ratio:1;margin-bottom:24px;overflow:visible;transform-origin:50% 58%;filter:drop-shadow(0 0 22px #c17b3820)}.splash-mascot:before{position:absolute;inset:4%;content:"";border:1px solid #d4c39b55;border-radius:50%;box-shadow:0 0 30px #d4c39b12,0 0 0 8px #d4c39b08;pointer-events:none}.kitty-layer{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:contain;pointer-events:none;user-select:none;will-change:transform,opacity}.kitty-shadow{z-index:0;transform-origin:50% 72%;}.kitty-tail{z-index:1;transform-origin:53% 57%;}.kitty-body{z-index:2;transform-origin:50% 72%;}.kitty-head{z-index:3;transform-origin:58% 58%;}
 .splash-kicker{margin:0 0 8px;color:#c18a56;font-size:9px;font-weight:700;letter-spacing:.34em}
 .splash-content h1{margin:0;color:#f1e5d5;font:400 clamp(43px,12vw,62px)/1.05 Georgia,serif;letter-spacing:.015em}
 .splash-rule{width:52px;height:1px;margin:23px 0 15px;background:linear-gradient(90deg,transparent,#b77b45,transparent)}
@@ -218,14 +218,18 @@ button {color:inherit;} button:focus-visible {outline-color:#a68d5e;}
 .session-actions{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 5px}.session-actions .text-button{color:#8c7549;font-size:10px}.composer-status{color:#7c8478;font-size:8px}
 .chat-message{max-width:94%;margin:0 0 13px;padding:11px 12px;border:1px solid #c9bea7;background:#f5efdf;color:#394e44}.chat-message.gm{margin-right:auto;border-left:3px solid #a68d5e}.chat-message.player{margin-left:auto;border-right:3px solid #718176;background:#e5e8dc}.chat-message small{display:block;margin-bottom:6px;color:#8a7955;font-size:8px;font-weight:700;letter-spacing:.14em}.chat-message p{margin:0;font-size:12px;line-height:1.7;overflow-wrap:anywhere}.conversation-composer .action-button:disabled{opacity:.55;cursor:wait}
 
-/* Cinematic entry: reveal the scene, fall back to black, then softly reveal the menu. */
-.opening-splash.is-closing { animation:none; }
-.opening-splash.is-closing .splash-content { animation:splash-depart .58s cubic-bezier(.4,0,.2,1) forwards; }
-@keyframes splash-depart { to { opacity:0; transform:translateY(-7px) scale(.985); filter:blur(3px); } }
-.app-shell.is-entering { animation:menu-reveal .72s cubic-bezier(.2,.7,.2,1) both; }
+/* Slow, continuous cinematic hand-off: fade into Kitty, fade out, then reveal the menu. */
+.opening-splash { opacity:1; }
+.opening-splash.is-arriving { animation:splash-fade-in 2400ms ease both; }
+.opening-splash.is-closing { animation:splash-fade-out 2400ms ease-in-out forwards; }
+.opening-splash.is-closing .splash-content { animation:splash-depart 2400ms ease-in-out forwards; }
+@keyframes splash-fade-in { from { opacity:0; } to { opacity:1; } }
+@keyframes splash-fade-out { from { opacity:1; } to { opacity:0; visibility:hidden; } }
+@keyframes splash-depart { from { opacity:1; transform:translateY(0) scale(1); filter:blur(0); } to { opacity:0; transform:translateY(-7px) scale(.985); filter:blur(3px); } }
+.app-shell.is-entering { animation:menu-reveal 2400ms cubic-bezier(.2,.7,.2,1) both; }
 @keyframes menu-reveal { from { opacity:0; transform:translateY(7px); } to { opacity:1; transform:translateY(0); } }
 @media(prefers-reduced-motion:reduce) {
-  .opening-splash.is-closing .splash-content,.app-shell.is-entering { animation-duration:.18s; }
+  .opening-splash.is-arriving,.opening-splash.is-closing,.opening-splash.is-closing .splash-content,.app-shell.is-entering { animation-duration:.18s; }
 }
 
 
