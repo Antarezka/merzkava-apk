@@ -1,4 +1,4 @@
-import { cp, readFile, readdir, writeFile, mkdir } from "node:fs/promises";
+import { cp, readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 const root = process.cwd();
@@ -21,7 +21,7 @@ const mainActivityPath = await findFile(javaRoot, "MainActivity.java");
 if (!mainActivityPath) throw new Error("Generated Capacitor MainActivity.java was not found.");
 const packageDirectory = path.dirname(mainActivityPath);
 const mainActivity = await readFile(mainActivityPath, "utf8");
-const packageName = mainActivity.match(/^package\\s+([\\w.]+);/m)?.[1];
+const packageName = mainActivity.match(/^package\s+([\w.]+);/m)?.[1];
 if (!packageName) throw new Error("Could not determine Android application package.");
 
 for (const filename of ["FloatingWindowPlugin.java", "FloatingKeepAliveService.java"]) {
@@ -31,12 +31,12 @@ for (const filename of ["FloatingWindowPlugin.java", "FloatingKeepAliveService.j
 let patchedActivity = await readFile(mainActivityPath, "utf8");
 if (!patchedActivity.includes("FloatingWindowPlugin.class")) {
   patchedActivity = patchedActivity.replace(
-    /^package\\s+[\\w.]+;/m,
-    match => match + "\\n\\nimport android.os.Bundle;\\nimport " + packageName + ".FloatingWindowPlugin;"
+    /^package\s+[\w.]+;/m,
+    match => match + "\n\nimport android.os.Bundle;\nimport " + packageName + ".FloatingWindowPlugin;"
   );
   patchedActivity = patchedActivity.replace(
-    /public class MainActivity extends BridgeActivity\\s*\\{/,
-    match => match + "\\n    @Override\\n    public void onCreate(Bundle savedInstanceState) {\\n        registerPlugin(FloatingWindowPlugin.class);\\n        super.onCreate(savedInstanceState);\\n    }\\n"
+    /public class MainActivity extends BridgeActivity\s*\{/,
+    match => match + "\n    @Override\n    public void onCreate(Bundle savedInstanceState) {\n        registerPlugin(FloatingWindowPlugin.class);\n        super.onCreate(savedInstanceState);\n    }\n"
   );
   await writeFile(mainActivityPath, patchedActivity);
 }
@@ -49,22 +49,22 @@ const permissions = [
   "android.permission.POST_NOTIFICATIONS"
 ];
 for (const permission of permissions) {
-  const declaration = `    <uses-permission android:name="${permission}" />`;
-  if (!manifest.includes(`android:name="${permission}"`)) {
-    manifest = manifest.replace("<application", declaration + "\\n    <application");
+  const declaration = \`    <uses-permission android:name="\${permission}" />\`;
+  if (!manifest.includes(\`android:name="\${permission}"\`)) {
+    manifest = manifest.replace("<application", declaration + "\n    <application");
   }
 }
 if (!manifest.includes("FloatingKeepAliveService")) {
-  const service = `
+  const service = \`
         <service
-            android:name=".${"FloatingKeepAliveService"}"
+            android:name=".FloatingKeepAliveService"
             android:exported="false"
             android:foregroundServiceType="specialUse">
             <property
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
                 android:value="interactive overlay window for user-requested multitasking" />
         </service>
-`;
+\`;
   manifest = manifest.replace("</application>", service + "    </application>");
 }
 await writeFile(manifestPath, manifest);
