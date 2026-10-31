@@ -143,3 +143,32 @@ export async function refreshCanon(): Promise<CanonStatus> {
     return getCanonStatus();
   }
 }
+
+
+export interface RegisteredPlayer {
+  name: string;
+  path: string;
+  age: number | null;
+  realm: string;
+}
+
+export async function refreshLatestPlayerRegistry(): Promise<{ commitSha: string; players: RegisteredPlayer[] }> {
+  const readme = await fetchText(README_URL);
+  const shortHash = parsePinnedHash(readme);
+  await verifyPinnedCommit(shortHash);
+  const registry = await fetchPinnedDocument("players.md", shortHash);
+  const rows = [...registry.content.matchAll(/^\|\s*([^|]+?)\s*\|\s*\[([^\]]+)\]\(([^)]+)\)\s*\|\s*([^|]+?)\s*\|$/gm)];
+  const players: RegisteredPlayer[] = [];
+  for (const row of rows) {
+    const name = row[1].trim();
+    const relativePath = decodeURIComponent(row[3].trim());
+    if (!name || !relativePath.startsWith("players/") || !relativePath.endsWith(".md")) continue;
+    const path = relativePath.split("/").map(encodeURIComponent).join("/");
+    const profile = await fetchText(`https://raw.githubusercontent.com/${CANON_REPOSITORY}/${shortHash}/${path}`);
+    const ageMatch = profile.match(/^-\s*\*\*Usia:\*\*\s*(\d+)/m);
+    const realmMatch = profile.match(/^-\s*\*\*Spirit Realm:\*\*\s*([^\n]+)/m);
+    players.push({ name, path: relativePath, age: ageMatch ? Number(ageMatch[1]) : null, realm: realmMatch?.[1].trim() ?? "Belum ditetapkan" });
+  }
+  if (!players.length) throw new Error("Tidak ada karakter valid yang ditemukan pada tabel Daftar Karakter di players.md.");
+  return { commitSha: shortHash, players };
+}
