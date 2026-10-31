@@ -172,3 +172,12 @@ export async function refreshLatestPlayerRegistry(): Promise<{ commitSha: string
   if (!players.length) throw new Error("Tidak ada karakter valid yang ditemukan pada tabel Daftar Karakter di players.md.");
   return { commitSha: shortHash, players };
 }
+
+export async function loadRegisteredPlayerProfile(activeSha: string, path: string): Promise<CanonDocument> {
+  const registry = await fetchPinnedDocument("players.md", activeSha.slice(0, 7));
+  const safePath = validateCanonPath(path);
+  const listed = [...registry.content.matchAll(/^\|\s*([^|]+?)\s*\|\s*\[[^\]]+\]\(([^)]+)\)\s*\|/gm)]
+    .some(row => decodeURIComponent(row[2].trim()) === safePath);
+  if (!listed || !safePath.startsWith("players/")) throw new Error("Profil karakter tidak tercantum di players.md pada snapshot aktif.");
+  return fetchPinnedDocument(safePath, activeSha.slice(0, 7));
+}
