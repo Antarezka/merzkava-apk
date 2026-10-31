@@ -220,26 +220,34 @@ let noticeboardVisible = (() => {
   catch { return true; }
 })();
 
-function noticeboardMarkup(): string {
-  return `<div class="noticeboard-backdrop" data-noticeboard-backdrop>
-    <section class="noticeboard-panel" role="dialog" aria-modal="true" aria-labelledby="noticeboard-title">
-      <div class="noticeboard-topline"><span>MERZKAVA UNIVERSE</span><span>DAILY BULLETIN · 001</span></div>
-      <button class="noticeboard-close" data-notice-dismiss="once" aria-label="Close noticeboard">×</button>
-      <div class="noticeboard-seal">M</div>
-      <p class="noticeboard-kicker">A NOTE FROM THE ARCHIVE</p>
-      <h2 id="noticeboard-title">Today's<br><em>Noticeboard</em></h2>
-      <div class="noticeboard-rule"></div>
-      <p class="noticeboard-copy">The world is waiting beyond these pages. Review your records, prepare your character, and let the next chapter begin.</p>
-      <div class="noticeboard-entry"><span>01</span><div><strong>YOUR JOURNEY</strong><small>Characters, memories, and discoveries belong to your own archive.</small></div></div>
-      <div class="noticeboard-actions">
-        <button class="noticeboard-today" data-notice-dismiss="today">Close for today</button>
-        <button class="noticeboard-ignore" data-notice-dismiss="once">Dismiss</button>
-      </div>
-      <p class="noticeboard-footnote">Tap outside this notice to close it.</p>
-    </section>
-  </div>`;
+interface NoticeboardUpdate { title: string; hash: string; version: string; description: string; }
+let noticeboardUpdates: NoticeboardUpdate[] = [];
+let noticeboardSourceStatus = "Connecting to the World Archive…";
+function escapeNoticeText(value: string): string {
+  return value.replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char] ?? char);
 }
-
+function highlightNoticeKeywords(value: string): string {
+  return escapeNoticeText(value).replace(/\*\*(.+?)\*\*/g, '<mark class="noticeboard-highlight">$1</mark>').replace(/`([^`]+)`/g, '<mark class="noticeboard-highlight">$1</mark>');
+}
+function parseNoticeboardUpdates(readme: string): NoticeboardUpdate[] {
+  const start = readme.indexOf("**THE LATEST FROM MERZKAVA**");
+  if (start < 0) throw new Error("Latest update section not found.");
+  const pattern = /^- ✦ \*\*(.+?)\*\*\s*\n\s*Hash:\s*``([^`]+)``\s*\|\s*Ver:\s*``([^`]+)``\s*\n([\s\S]*?)(?=\n- ✦ \*\*|\n<\\/div>|$)/gm;
+  const result: NoticeboardUpdate[] = [];
+  for (const match of readme.slice(start).matchAll(pattern)) { result.push({ title: match[1].trim(), hash: match[2].trim(), version: match[3].trim(), description: match[4].trim().replace(/\\s+/g, " ") }); if (result.length === 3) break; }
+  if (!result.length) throw new Error("No valid README update bullets found.");
+  return result;
+}
+async function refreshNoticeboardUpdates(): Promise<void> {
+  try { const response = await fetch("https://raw.githubusercontent.com/Antarezka/merzkava-universe/main/README.md?noticeboard=" + Date.now(), { cache: "no-store" }); if (!response.ok) throw new Error("README request failed: " + response.status); noticeboardUpdates = parseNoticeboardUpdates(await response.text()); noticeboardSourceStatus = "LIVE · WORLD ARCHIVE"; }
+  catch (error) { noticeboardSourceStatus = "ARCHIVE CONNECTION UNAVAILABLE"; console.warn("Noticeboard sync failed:", error); }
+  if (noticeboardVisible) render();
+}
+function noticeboardMarkup(): string {
+  const entries = noticeboardUpdates.map((item, index) => '<article class="noticeboard-entry"><span class="noticeboard-entry-index">' + String(index + 1).padStart(2, "0") + '</span><div class="noticeboard-entry-content"><h3>' + highlightNoticeKeywords(item.title) + '</h3><p>' + highlightNoticeKeywords(item.description) + '</p><div class="noticeboard-entry-meta"><span>HASH · ' + escapeNoticeText(item.hash) + '</span><span>' + escapeNoticeText(item.version) + '</span></div></div></article>').join("");
+  const content = entries || '<p class="noticeboard-loading">' + escapeNoticeText(noticeboardSourceStatus) + '</p>';
+  return '<div class="noticeboard-backdrop" data-noticeboard-backdrop><section class="noticeboard-panel" role="dialog" aria-modal="true" aria-labelledby="noticeboard-title"><div class="noticeboard-topline"><span>MERZKAVA UNIVERSE</span><span>' + (entries ? 'LATEST ARCHIVE NOTES' : 'WORLD ARCHIVE') + '</span></div><button class="noticeboard-close" data-notice-dismiss="once" aria-label="Close noticeboard">×</button><div class="noticeboard-seal">M</div><p class="noticeboard-kicker">A DISPATCH FROM THE WORLD ARCHIVE</p><h2 id="noticeboard-title">The Latest<br><em>Notices</em></h2><div class="noticeboard-rule"><span>✦</span></div><p class="noticeboard-copy">The world does not stand still. These are the latest records from the Merzkava archive.</p><div class="noticeboard-feed">' + content + '</div><div class="noticeboard-actions"><button class="noticeboard-today" data-notice-dismiss="today">Close for today</button><button class="noticeboard-ignore" data-notice-dismiss="once">Dismiss</button></div><p class="noticeboard-footnote">' + escapeNoticeText(noticeboardSourceStatus) + ' · Tap outside to close</p></section></div>';
+}
 function updateSessionCalendar(): void {
   if (activeScreen !== "gameplay") return;
   const set = (id: string, value: string) => {
@@ -888,6 +896,7 @@ window.addEventListener("error", event => { recordBug(event.error ?? event.messa
 window.addEventListener("unhandledrejection", event => { recordBug(event.reason, "Unhandled promise rejection", "Global handler"); render(); });
 render();
 void refreshFloatingReadiness();
+void refreshNoticeboardUpdates();
 document.addEventListener("visibilitychange", () => { if (!document.hidden) void refreshFloatingReadiness(); });
 window.addEventListener("focus", () => { void refreshFloatingReadiness(); });
 void initializeDatabase().then(async status => {
