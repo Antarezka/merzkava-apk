@@ -295,8 +295,8 @@ function bugReportText(): string {
     "Android/WebView: " + navigator.userAgent,
     "Viewport: " + window.innerWidth + "x" + window.innerHeight,
     "Floating readiness: " + JSON.stringify(floatingReadiness),
-    bugReport.stack ? "Stack:\\n" + bugReport.stack : ""
-  ].filter(Boolean).join("\\n");
+    bugReport.stack ? "Stack:\n" + bugReport.stack : ""
+  ].filter(Boolean).join("\n");
 }
 function bugPanelMarkup(): string {
   if (!bugReport) return "";
@@ -328,6 +328,7 @@ function render(): void {
     ${isControl ? "" : `<div class="storage-status"><span class="status-dot"></span>${databaseMessage}</div>`}
     ${activeScreen === "gameplay" ? snapshotBlindMarkup() : ""}
     ${activeScreen === "home" && noticeboardVisible ? noticeboardMarkup() : ""}
+    ${bugPanelMarkup()}
   </div>`;
   updateSessionCalendar();
   renderChat();
@@ -497,6 +498,7 @@ root.addEventListener("click", async (event: MouseEvent) => {
       if (activeScreen === "control") render();
       else if (notice) render();
     } catch (error) {
+      recordBug(error, "Floating Control · " + (action ?? "unknown action"), "Floating Mode");
       notice = error instanceof Error ? error.message : "Floating Control action failed.";
       await refreshFloatingReadiness();
       render();
@@ -543,6 +545,7 @@ root.addEventListener("click", async (event: MouseEvent) => {
     try {
       await startFloatingMode();
     } catch (error) {
+      recordBug(error, "Start Floating Mode", "Floating Mode");
       notice = error instanceof Error ? error.message : "Floating Mode could not start.";
       render();
     }
@@ -565,7 +568,8 @@ root.addEventListener("click", async (event: MouseEvent) => {
       await signOut();
       authMessage = "Signed out successfully.";
     } catch (error) {
-      recordBug(error, "Sign out", "Authentication");\n    authMessage = error instanceof Error ? error.message : "Could not clear the local session.";
+      recordBug(error, "Sign out", "Authentication");\n    recordBug(error, "Sign out", "Authentication");
+    authMessage = error instanceof Error ? error.message : "Could not clear the local session.";
     }
     authBusy = false;
     render();
@@ -636,7 +640,8 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       const session = await signInWithPassword(email, password);
       authMessage = "Signed in as " + (session.user.email ?? session.user.id) + ".";
     } catch (error) {
-      recordBug(error, "Sign in", "Authentication");\n      authMessage = error instanceof Error ? error.message : "Sign-in failed.";
+      recordBug(error, "Sign in", "Authentication");\n      recordBug(error, "Sign in", "Authentication");
+      authMessage = error instanceof Error ? error.message : "Sign-in failed.";
     }
     authBusy = false;
     render();
@@ -707,7 +712,8 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       const action = root.querySelector<HTMLTextAreaElement>("#gameplay-action");
       if (action) action.value = "";
     } catch (error) {
-      recordBug(error, "Game Master response", "Gameplay");\n      notice = error instanceof Error ? error.message : "Game Master gagal merespons.";
+      recordBug(error, "Game Master response", "Gameplay");\n      recordBug(error, "Game Master response", "Gameplay");
+      notice = error instanceof Error ? error.message : "Game Master gagal merespons.";
       const feed = root.querySelector<HTMLElement>("#conversation-feed");
       if (feed) feed.insertAdjacentHTML("beforeend", '<p class="canon-status" role="alert">' + escapeHtml(notice) + '</p>');
     } finally {
@@ -751,7 +757,8 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
         ? `Router memilih ${result.modules.length} modul dan berhasil memuat ${result.loaded.length} dari snapshot ${result.loaded[0].commitSha.slice(0,7)}.${result.skipped.length ? " Gagal: " + result.skipped.join(" | ") : ""}`
         : `Tidak ada modul yang cocok atau modul gagal dimuat.${result.skipped.length ? " " + result.skipped.join(" | ") : ""}`;
     } catch (error) {
-      recordBug(error, "Canon Router", "Canon");\n      canonRouteMessage = error instanceof Error ? error.message : "Canon Router gagal.";
+      recordBug(error, "Canon Router", "Canon");\n      recordBug(error, "Canon Router", "Canon");
+      canonRouteMessage = error instanceof Error ? error.message : "Canon Router gagal.";
     }
     canonRouteBusy = false;
     render();
@@ -766,7 +773,8 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       canonDocument = await loadCanonModule(path);
       canonMessage = `Modul ${canonDocument.path} berhasil dimuat.`;
     } catch (error) {
-      recordBug(error, "Load canon module", "Canon");\n      canonMessage = error instanceof Error ? error.message : "Modul gagal dimuat.";
+      recordBug(error, "Load canon module", "Canon");\n      recordBug(error, "Load canon module", "Canon");
+      canonMessage = error instanceof Error ? error.message : "Modul gagal dimuat.";
     }
     render();
     return;
@@ -792,10 +800,13 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     notice = "Character created and saved on this device.";
     render();
   } catch (error) {
-    recordBug(error, "Save character", "Character storage");\n    if (errorNode) errorNode.textContent = error instanceof Error ? error.message : "Could not save character.";
+    recordBug(error, "Save character", "Character storage");\n    recordBug(error, "Save character", "Character storage");
+    if (errorNode) errorNode.textContent = error instanceof Error ? error.message : "Could not save character.";
   }
 });
 
+window.addEventListener("error", event => { recordBug(event.error ?? event.message, "Uncaught JavaScript error", "Global handler"); render(); });
+window.addEventListener("unhandledrejection", event => { recordBug(event.reason, "Unhandled promise rejection", "Global handler"); render(); });
 render();
 void refreshFloatingReadiness();
 document.addEventListener("visibilitychange", () => { if (!document.hidden) void refreshFloatingReadiness(); });
