@@ -205,6 +205,12 @@ function renderChat(): void {
   if (status) status.textContent = activeChat.started ? "Sesi aktif · " + (characterName(activeCharacterId) || "Karakter") : (activeCharacterId ? "Profil siap · Mulai sesi baru" : "Pilih karakter untuk memulai");
   const saveButton = root.querySelector<HTMLButtonElement>("[data-save-session]");
   if (saveButton) { saveButton.hidden = !activeChat.started; saveButton.disabled = saveBusy || gameplayContextBusy; saveButton.textContent = saveBusy ? "Menyusun…" : "Save ✧"; }
+  const characterSelect = root.querySelector<HTMLSelectElement>("#gameplay-character");
+  if (characterSelect) characterSelect.disabled = saveBusy || gameplayContextBusy;
+  const actionInput = root.querySelector<HTMLTextAreaElement>("#gameplay-action");
+  if (actionInput) actionInput.disabled = saveBusy || gameplayContextBusy;
+  const actionButton = root.querySelector<HTMLButtonElement>("#gameplay-send-action");
+  if (actionButton) actionButton.disabled = saveBusy || gameplayContextBusy;
   const startPanel = root.querySelector<HTMLElement>("[data-session-start]");
   const composePanel = root.querySelector<HTMLElement>("[data-session-compose]");
   if (startPanel) startPanel.hidden = activeChat.started;
@@ -904,7 +910,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     const mode = form.dataset.sessionMode === "new" ? "new" : (activeChat.started ? "continue" : "new");
     // Continuing player actions can only be submitted by the dedicated paper-plane button.
     if (mode === "continue" && (!(event.submitter instanceof HTMLButtonElement) || event.submitter.id !== "gameplay-send-action")) return;
-    if (gameplayContextBusy || !characterId || (mode === "continue" && !typedActivity)) return;
+    if (saveBusy || gameplayContextBusy || !characterId || (mode === "continue" && !typedActivity)) return;
     const character = availableCharacters().find(item => item.id === characterId);
     if (!character) { notice = "Karakter tidak ditemukan."; render(); return; }
     if (!isGMGatewayConfigured() || !getAuthSession()) {
