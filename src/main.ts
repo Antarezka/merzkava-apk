@@ -13,6 +13,7 @@ import { assembleGameplayContext } from "./canon/context-assembler";
 import { requestGMProposal, validateGMResponse, type GMProposal } from "./engine/gm-engine";
 import { parseCharacterProfile, parseGameplayResponseProfile, validateCharacterProfile } from "./engine/profile-parser";
 import { reconcileGMProposal } from "./engine/state-reconciliation";
+import { buildSaveCheckpointPrompt } from "./engine/save-checkpoint";
 import { getAuthSession, isSupabaseConfigured, restoreAuthSession, signInWithPassword, signOut } from "./auth/supabase-auth";
 import { GatewayGMProvider, isGMGatewayConfigured } from "./engine/gateway-gm-provider";
 import { getLedgerLog, initializeLedgerNotifications, showLedgerProposalBubble } from "./ui/ledger-log";
@@ -129,10 +130,11 @@ const EMPTY_WORLD_TIME: WorldTimeState = { era:"", year:"", season:"", date:"", 
 let activeCharacterId = "";
 let worldTime: WorldTimeState = { ...EMPTY_WORLD_TIME };
 let blindOpen = false;
-type ChatMessage = { role: "player" | "gm"; text: string; createdAt: string };
+type ChatMessage = { role: "player" | "gm"; text: string; createdAt: string; kind?: "save"; continued?: boolean };
 type CharacterChat = { messages: ChatMessage[]; started: boolean; showOptions: boolean };
 const CHAT_STORE_KEY = "merzkava.chat-by-character.v1";
 let activeChat: CharacterChat = { messages: [], started: false, showOptions: false };
+let saveBusy = false;
 function readChatStore(): Record<string, CharacterChat> {
   try { return JSON.parse(localStorage.getItem(CHAT_STORE_KEY) ?? "{}") as Record<string, CharacterChat>; }
   catch { return {}; }
@@ -142,6 +144,14 @@ function saveCharacterChat(): void {
   const store = readChatStore();
   store[activeCharacterId] = activeChat;
   try { localStorage.setItem(CHAT_STORE_KEY, JSON.stringify(store)); } catch { notice = "Penyimpanan percakapan tidak tersedia."; }
+}
+async function persistChatTranscriptToSQLite(): Promise<void> {
+  if (!activeCharacterId) return;
+  const record = await getGameplaySessionRecord(activeCharacterId);
+  if (!record) return;
+  let state: Record<string, unknown> = {};
+  try { const parsed = JSON.parse(record.stateJson); if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) state = parsed as Record<string, unknown>; } catch { /* Keep the transcript even when an older state payload is malformed. */ }
+  await saveGameplaySessionRecord({ ...record, stateJson: JSON.stringify({ ...state, transcript: activeChat.messages, worldTime: { ...worldTime } }), updatedAt: new Date().toISOString() });
 }
 function loadCharacterChat(characterId: string): void {
   const saved = characterId ? readChatStore()[characterId] : undefined;
@@ -169,7 +179,7 @@ function characterName(characterId: string): string {
   return availableCharacters().find(item => item.id === characterId)?.name ?? "";
 }
 function latestGameplayProfile(): ReturnType<typeof parseGameplayResponseProfile> | null {
-  const latest = [...activeChat.messages].reverse().find(message => message.role === "gm");
+  const latest = [...activeChat.messages].reverse().find(message => message.role === "gm" && message.kind !== "save");
   if (!latest) return null;
   const parsed = parseGameplayResponseProfile(latest.text);
   return parsed.errors.length ? null : parsed;
@@ -183,7 +193,9 @@ function renderChat(): void {
   const feed = root.querySelector<HTMLElement>("#conversation-feed");
   if (feed) {
     feed.innerHTML = activeChat.messages.length
-      ? activeChat.messages.map(message => '<article class="chat-message ' + message.role + '"><small>' + (message.role === "gm" ? "GAME MASTER" : "AKSI PEMAIN") + '</small><p>' + escapeHtml(message.text).replace(/\n/g, "<br>") + '</p></article>').join("")
+      ? activeChat.messages.map((message, index) => message.kind === "save"
+        ? '<article class="chat-message gm save-checkpoint"><small>CHARACTER CHECKPOINT · SAVE</small><div class="save-checkpoint-content">' + escapeHtml(message.text).replace(/\n/g, "<br>") + '</div><div class="save-checkpoint-actions"><button type="button" data-save-copy="' + index + '">Copy</button>' + (message.continued ? '<span class="save-resumed-label">SCENE RESUMED</span>' : '<button type="button" data-save-continue="' + index + '">Lanjut ↗</button>') + '</div></article>'
+        : '<article class="chat-message ' + message.role + '"><small>' + (message.role === "gm" ? "GAME MASTER" : "AKSI PEMAIN") + '</small><p>' + escapeHtml(message.text).replace(/\n/g, "<br>") + '</p></article>').join("")
       : '<div class="conversation-empty"><span class="conversation-ornament">✧</span><h3>Your story begins here</h3><p>Mulai sesi baru atau lanjutkan perjalanan yang tersimpan untuk karakter ini.</p></div>';
     feed.scrollTop = feed.scrollHeight;
   }
@@ -191,6 +203,8 @@ function renderChat(): void {
   if (setting) setting.value = activeChat.showOptions ? "yes" : "no";
   const status = root.querySelector<HTMLElement>("#session-status");
   if (status) status.textContent = activeChat.started ? "Sesi aktif · " + (characterName(activeCharacterId) || "Karakter") : (activeCharacterId ? "Profil siap · Mulai sesi baru" : "Pilih karakter untuk memulai");
+  const saveButton = root.querySelector<HTMLButtonElement>("[data-save-session]");
+  if (saveButton) { saveButton.hidden = !activeChat.started; saveButton.disabled = saveBusy || gameplayContextBusy; saveButton.textContent = saveBusy ? "Menyusun…" : "Save ✧"; }
   const startPanel = root.querySelector<HTMLElement>("[data-session-start]");
   const composePanel = root.querySelector<HTMLElement>("[data-session-compose]");
   if (startPanel) startPanel.hidden = activeChat.started;
@@ -544,6 +558,67 @@ root.addEventListener("click", async (event: MouseEvent) => {
   );
   if (interactive) playButtonSound();
 
+  const saveCopyButton = target.closest<HTMLButtonElement>("[data-save-copy]");
+  if (saveCopyButton) {
+    const message = activeChat.messages[Number(saveCopyButton.dataset.saveCopy)];
+    if (!message || message.kind !== "save") return;
+    try {
+      if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(message.text);
+      else {
+        const field = document.createElement("textarea"); field.value = message.text; field.setAttribute("readonly", ""); field.style.position = "fixed"; field.style.opacity = "0"; document.body.append(field); field.select();
+        const copied = document.execCommand("copy"); field.remove(); if (!copied) throw new Error("Clipboard API tidak tersedia di perangkat ini.");
+      }
+      saveCopyButton.textContent = "Tersalin ✓";
+    } catch (error) { recordBug(error, "Copy character checkpoint", "Gameplay Save"); render(); }
+    return;
+  }
+  const resumeSaveButton = target.closest<HTMLButtonElement>("[data-save-continue]");
+  if (resumeSaveButton) {
+    const message = activeChat.messages[Number(resumeSaveButton.dataset.saveContinue)];
+    if (!message || message.kind !== "save") return;
+    message.continued = true;
+    saveCharacterChat();
+    try { await persistChatTranscriptToSQLite(); } catch (error) { recordBug(error, "Persist resumed gameplay transcript", "Gameplay Save"); }
+    renderChat();
+    root.querySelector<HTMLTextAreaElement>("#gameplay-action")?.focus();
+    return;
+  }
+  const saveSessionButton = target.closest<HTMLButtonElement>("[data-save-session]");
+  if (saveSessionButton) {
+    if (saveBusy || gameplayContextBusy || !activeChat.started || !activeCharacterId || !gameplaySnapshot || !gameplayVersion) return;
+    if (!isGMGatewayConfigured() || !getAuthSession()) { notice = "AI Game Master belum siap. Login dan lengkapi konfigurasi Gateway di Settings sebelum membuat Save."; render(); return; }
+    saveBusy = true;
+    renderChat();
+    try {
+      const gameplayMessages = activeChat.messages.filter(item => item.kind !== "save");
+      const latestGM = [...gameplayMessages].reverse().find(item => item.role === "gm");
+      if (!latestGM) throw new Error("Belum ada respons gameplay dari GM untuk dijadikan checkpoint.");
+      const profile = parseGameplayResponseProfile(latestGM.text);
+      const profileStatus = profile.errors.length ? "Panel profil terakhir tidak dapat diparse: " + profile.errors.join(" ") : "Panel profil gameplay terakhir tersedia dan menjadi acuan status saat ini.";
+      const prompt = buildSaveCheckpointPrompt({
+        characterName: characterName(activeCharacterId) || "Belum diketahui",
+        profileMarkdown: activeProfileMarkdown,
+        lastProfileStatus: profileStatus,
+        transcript: gameplayMessages.map(item => ({ role: item.role, text: item.text }))
+      });
+      const checkpoint = await new GatewayGMProvider().generate(prompt, { snapshot: gameplaySnapshot, version: gameplayVersion });
+      if (!checkpoint.trim()) throw new Error("GM mengembalikan Save kosong.");
+      activeChat.messages.push({ role: "gm", kind: "save", text: checkpoint.trim(), createdAt: new Date().toISOString() });
+      saveCharacterChat();
+      await persistChatTranscriptToSQLite();
+      renderChat();
+      const feed = root.querySelector<HTMLElement>("#conversation-feed");
+      if (feed) feed.scrollTop = feed.scrollHeight;
+    } catch (error) {
+      recordBug(error, "Create character checkpoint", "Gameplay Save");
+      notice = error instanceof Error ? error.message : "Save gagal dibuat.";
+      render();
+    } finally {
+      saveBusy = false;
+      renderChat();
+    }
+    return;
+  }
   const bugCopyButton = target.closest<HTMLButtonElement>("[data-bug-copy]");
   if (bugCopyButton) {
     const report = bugReportText();
@@ -873,8 +948,8 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       const savedSession = mode === "continue" ? await getGameplaySessionRecord(characterId) : null;
       if (mode === "continue" && savedSession && savedSession.snapshotSha !== activeSha) throw new Error("Save sesi dan ACTIVE_SHA berbeda. Sesi tidak boleh mencampur snapshot canon.");
       activeProfileMarkdown = mode === "new" ? (registeredProfile?.content ?? "") : (savedSession?.profileMarkdown ?? "");
-      const previous = mode === "new" ? [] : activeChat.messages;
-      const latestGMMessage = [...previous].reverse().find(item => item.role === "gm");
+      const previous = mode === "new" ? [] : activeChat.messages.filter(item => item.kind !== "save");
+      const latestGMMessage = [...previous].reverse().find(item => item.role === "gm" && item.kind !== "save");
       const latestGMPanel = latestGMMessage ? parseGameplayResponseProfile(latestGMMessage.text) : null;
       const baselineParse = latestGMMessage
         ? (latestGMPanel && latestGMPanel.errors.length === 0
