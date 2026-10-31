@@ -656,6 +656,11 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     if (gameplayContextBusy || !characterId || (mode === "continue" && !typedActivity)) return;
     const character = availableCharacters().find(item => item.id === characterId);
     if (!character) { notice = "Karakter tidak ditemukan."; render(); return; }
+    if (!isGMGatewayConfigured() || !getAuthSession()) {
+      notice = "AI Game Master belum siap. Login dan lengkapi konfigurasi Gateway di Settings sebelum memulai atau melanjutkan sesi.";
+      render();
+      return;
+    }
     activeCharacterId = characterId;
     loadCharacterWorldTime(characterId);
     if (mode === "new") activeChat = { messages: [], started: false, showOptions: activeChat.showOptions };
@@ -698,7 +703,6 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
         "\nOnly use GM-reported world time. Never use device time. Preserve all established character state.";
       gameplaySnapshot = activeSha;
       gameplayVersion = activeStatus.version;
-      if (!isGMGatewayConfigured() || !getAuthSession()) throw new Error("AI Game Master belum siap. Periksa login dan konfigurasi Gateway di Settings.");
       const result = await requestGMProposal(new GatewayGMProvider(), context);
       if (!result.valid) throw new Error(result.errors.join(" "));
       gmProposal = result.proposal;
