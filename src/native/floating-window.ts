@@ -23,6 +23,12 @@ export interface FloatingWindowPlugin {
 
 const FloatingWindow = registerPlugin<FloatingWindowPlugin>("FloatingWindow");
 
+export async function requestFloatingOverlayPermission(): Promise<void> {
+  if (!Capacitor.isNativePlatform()) throw new Error("Floating Mode hanya tersedia di APK Android.");
+  const permission = await FloatingWindow.checkPermission();
+  if (!permission.granted) await FloatingWindow.requestPermission();
+}
+
 export async function startFloatingMode(): Promise<void> {
   if (!Capacitor.isNativePlatform()) {
     throw new Error("Floating Mode lintas aplikasi hanya tersedia di APK Android.");
