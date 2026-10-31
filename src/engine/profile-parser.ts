@@ -56,7 +56,7 @@ export function validateCharacterProfile(profile: ParsedCharacterProfile): strin
   }
   if (!/^\d+(?:\.\d+)?%\s*\/\s*\d+(?:\.\d+)?%(?:\s|$)/.test(f["Sync progress"])) errors.push("Sync progress harus berbentuk persentase saat ini/cap.");
   for (const field of PROFILE_FIELDS) if (!f[field].trim()) errors.push("Field profil tidak boleh kosong: " + field + ".");
-  if (!/^``[^`]+``\s*\|\s*(?:\?+|\d+)\s*Day left$/i.test(f["Spirit Ring Absorption"])) errors.push("Spirit Ring Absorption harus memakai format ``status`` | Day left.");
+  if (!/^(?:``)?[^`]+(?:``)?\s*\|\s*(?:\?+|\d+|∞)\s*Day left$/i.test(f["Spirit Ring Absorption"])) errors.push("Spirit Ring Absorption harus memakai format ``status`` | Day left.");
   if (!f.Nama.trim()) errors.push("Nama karakter tidak boleh kosong.");
   if (!f["Spirit Realm"].trim()) errors.push("Spirit Realm tidak boleh kosong.");
   if (!f["Spirit Ring Absorption"].trim()) errors.push("Spirit Ring Absorption tidak boleh kosong.");
@@ -148,6 +148,10 @@ export function parseGameplayResponseProfile(response: string): GameplayResponse
   }
   if (boundaries[3] && !/╲━━━━━━━━━━━━━━━━━━━━━━╱/.test(boundaries[3])) {
     errors.push("Panel CATATAN PEMAIN & KONSISTENSI tidak memiliki bingkai penutup resmi.");
+  }
+  const ringStatus = values["Spirit Ring Absorption"] ?? "";
+  if (!/^``[^`]+``\s*\|\s*(?:\?+|\d+|∞)\s*Day left$/i.test(ringStatus)) {
+    errors.push("Spirit Ring Absorption pada panel gameplay wajib memakai token status ber-double-backtick dan format Day left kanonis.");
   }
   const missing = RESPONSE_FIELD_ORDER.filter(field => typeof values[field] !== "string");
   if (missing.length) errors.push(...missing.map(field => "Nilai panel belum terbaca: " + field + "."));
