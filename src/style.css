@@ -430,8 +430,8 @@ button {color:inherit;} button:focus-visible {outline-color:#a68d5e;}
 .save-checkpoint { border:1px solid #b49b68 !important; background:linear-gradient(145deg,#f7f0df,#eee5d1) !important; }
 .save-checkpoint-content { white-space:normal; overflow-wrap:anywhere; }
 .save-checkpoint-actions { display:flex; align-items:center; gap:9px; flex-wrap:wrap; margin-top:14px; padding-top:10px; border-top:1px solid #c8b995; }
-.save-checkpoint-actions button { min-height:34px; padding:7px 13px; border:1px solid #a89366; border-radius:999px; background:#e8dec8; color:#42574c; font:600 11px/1.2 inherit; }
-.save-resumed-label { color:#71806b; font:700 9px/1.2 inherit; letter-spacing:.12em; }
+.save-checkpoint-actions button { min-height:34px; padding:7px 13px; border:1px solid #a89366; border-radius:999px; background:#e8dec8; color:#42574c; font:inherit; font-size:11px; font-weight:600; line-height:1.2; }
+.save-resumed-label { color:#71806b; font:inherit; font-size:9px; font-weight:700; line-height:1.2; letter-spacing:.12em; }
 :root[data-theme="dark"] .session-save-button { color:#e4d7b9; background:#3b493f; border-color:#a99161; }
 :root[data-theme="dark"] .save-checkpoint { background:linear-gradient(145deg,#354239,#2b372f) !important; border-color:#a99161 !important; }
 :root[data-theme="dark"] .save-checkpoint-actions { border-color:#6c765f; }
