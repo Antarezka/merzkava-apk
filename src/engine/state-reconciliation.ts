@@ -31,7 +31,7 @@ const deterministicFields = new Set<ProfileField>([
 ]);
 
 function normalizeFieldValue(value: string): string {
-  return value.trim().replace(/^``([\s\S]*)``$/, "$1").replace(/^\*\*([\s\S]*)\*\*$/, "$1").trim();
+  return value.trim().replace(/``/g, "").replace(/\*/g, "").trim();
 }
 
 function validateAfterValue(field: string, value: string): string | null {
