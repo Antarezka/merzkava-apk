@@ -1,3 +1,5 @@
+import type { LedgerEntry } from "../ui/ledger-log";
+import { canonLabelMarkup } from "../ui/canon-labels";
 import type { Character } from "../characters/character-repository";
 
 export type ScreenId = "home" | "gameplay" | "character" | "inventory" | "map" | "journal" | "settings";
@@ -8,7 +10,7 @@ function escapeHtml(value: string): string {
 
 function characterView(characters: Character[], registryStatus: string): string {
   const cards = characters.length
-    ? characters.map(character => `<article class="character-card"><div class="record-top"><span>${escapeHtml(character.origin)}</span><span class="record-status">${character.awakened ? "AWAKENED" : "NOT AWAKENED"}</span></div><h3>${escapeHtml(character.name)}</h3><p class="muted">Age ${character.age ? character.age : "—"} · ${escapeHtml(character.realm)} · Cultivation ${character.cultivationLevel}</p><p class="muted">${escapeHtml(character.background || "No background recorded.")}</p>${character.registryPath ? `<span class="record-status">REGISTERED · players.md</span>` : `<button class="text-button danger" data-delete-character="${escapeHtml(character.id)}">Delete character</button>`}</article>`).join("")
+    ? characters.map(character => `<article class="character-card"><div class="record-top"><span>${escapeHtml(character.origin)}</span><span class="record-status">${character.awakened ? "AWAKENED" : "NOT AWAKENED"}</span></div><h3>${escapeHtml(character.name)}</h3><p class="muted">Age ${character.age ? character.age : "—"} · ${canonLabelMarkup("spirit-realm", character.realm)} · Cultivation ${character.cultivationLevel}</p><p class="muted">${escapeHtml(character.background || "No background recorded.")}</p>${character.registryPath ? `<span class="record-status">REGISTERED · players.md</span>` : `<button class="text-button danger" data-delete-character="${escapeHtml(character.id)}">Delete character</button>`}</article>`).join("")
     : `<div class="empty-state compact"><h3>No character yet</h3><p>Create your first adventurer using the form above.</p></div>`;
   return `<div class="page-heading"><p class="eyebrow">YOUR IDENTITY</p><h2>Character</h2><p class="muted">Create a local character, or refresh the official players.md registry below to select a registered character.</p></div>
   <form id="character-form" class="record-card character-form">
@@ -21,6 +23,25 @@ function characterView(characters: Character[], registryStatus: string): string 
     <button class="action-button" type="submit">Create character <span>↗</span></button>
   </form>
   <section class="section-block"><div class="section-heading"><span>PLAYER REGISTRY · players.md</span><button class="text-button" type="button" data-refresh-players>↻ Refresh players</button></div><p class="muted" id="player-registry-status">${escapeHtml(registryStatus)}</p><div class="section-heading"><span>YOUR CHARACTERS</span><small>${characters.length} AVAILABLE</small></div><div class="character-list">${cards}</div></section>`;
+}
+
+
+function ledgerLogMarkup(entries: LedgerEntry[]): string {
+  if (!entries.length) return '<div class="empty-state compact"><h3>No ledger entries yet</h3><p>Only verified changes to character state will appear here. GM narration alone never changes your records.</p></div>';
+  return '<ol class="ledger-log-list">' + [...entries].reverse().map(entry => `
+    <li class="ledger-log-entry tone-${entry.tone}">
+      <div class="ledger-log-meta"><span>${escapeHtml(entry.title)}</span><time datetime="${escapeHtml(entry.createdAt)}">${escapeHtml(new Date(entry.createdAt).toLocaleString())}</time></div>
+      <strong>${escapeHtml(entry.change)}</strong>
+      ${entry.before || entry.after ? `<p>${escapeHtml(entry.before ?? "")}${entry.before && entry.after ? " → " : ""}${escapeHtml(entry.after ?? "")}</p>` : ""}
+      ${entry.detail ? `<small>${escapeHtml(entry.detail)}</small>` : ""}
+    </li>`).join("") + "</ol>";
+}
+
+function inventoryView(entries: LedgerEntry[]): string {
+  return `<div class="page-heading"><p class="eyebrow">POSSESSIONS & FINANCES</p><h2>Inventory</h2><p class="muted">Items, equipment, structures, and wallet.</p></div>
+    <div class="wallet-card"><span class="eyebrow">WALLET</span><div class="wallet-values"><span>xc</span><span>xs</span><span>xg</span><span>zj</span><span>az</span></div><p class="muted">Balances will be calculated and validated by the game engine.</p></div>
+    <div class="empty-state compact"><h3>Inventory is empty</h3><p>Items acquired during gameplay will be recorded here.</p></div>
+    <section class="section-block ledger-log-panel"><div class="section-heading"><span>LEDGER LOG</span><small>${entries.length} RECORDED CHANGES</small></div>${ledgerLogMarkup(entries)}</section>`;
 }
 
 const views: Record<Exclude<ScreenId, "character">, string> = {
@@ -46,8 +67,9 @@ map:`<div class="page-heading"><p class="eyebrow">THE KNOWN WORLD</p><h2>World M
 journal:`<div class="page-heading"><p class="eyebrow">YOUR RECORDED HISTORY</p><h2>Journal</h2><p class="muted">Quests, discoveries, and gameplay events.</p></div><div class="empty-state"><span class="empty-symbol">⌁</span><h3>No entries yet</h3><p>Verified events and important story moments will be recorded here.</p></div>`,
 settings:`<div class="page-heading"><p class="eyebrow">APPLICATION</p><h2>Settings</h2><p class="muted">Device storage and AI configuration.</p></div><div class="setting-row"><div><h3>Save location</h3><p>Local device database</p></div><span class="setting-value">SQLITE</span></div><div class="setting-row"><div><h3>AI Game Master</h3><p>Sign in with Supabase to use the authenticated AI Gateway.</p></div><span class="setting-value">GATEWAY</span></div><div class="setting-row"><div><h3>Canon source</h3><p>Antarezka / merzkava-universe</p></div><span class="setting-value">PLANNED</span></div>`
 };
-export function renderScreen(screen: ScreenId, characters: Character[] = [], registryStatus = "Registered characters are loaded from the pinned players.md snapshot."): string {
+export function renderScreen(screen: ScreenId, characters: Character[] = [], registryStatus = "Registered characters are loaded from the pinned players.md snapshot.", ledgerEntries: LedgerEntry[] = []): string {
   if (screen === "character") return characterView(characters, registryStatus);
+  if (screen === "inventory") return inventoryView(ledgerEntries);
   if (screen === "gameplay") {
     const options = characters.map(character => `<option value="${escapeHtml(character.id)}">${escapeHtml(character.name)}</option>`).join("");
     return views.gameplay.replace("{{CHARACTER_OPTIONS}}", options);
