@@ -109,9 +109,9 @@ const palettes: Record<CanonLabelCategory, Record<string, string>> = {
 const neutral = "#A8B0BA";
 
 export function getCanonLabelColor(category: CanonLabelCategory, label: string): string {
-  if (/^unknown$|^\\?+$/i.test(label.trim())) return neutral;
+  if (/^unknown$|^\?+$/i.test(label.trim())) return neutral;
   if (category === "arcanist-grade" || category === "beast-age-grade" || category === "economic-quality") {
-    const number = label.match(/(?:Grade\\s*|Tier\\s*)?(\\d{1,2})$/i)?.[1];
+    const number = label.match(/(?:Grade\s*|Tier\s*)?(\d{1,2})$/i)?.[1];
     if (number) {
       if (category === "arcanist-grade") return palettes[category]["Arcanist Grade " + Number(number)] ?? neutral;
       if (category === "beast-age-grade") return palettes[category]["Beast Age Grade " + Number(number)] ?? neutral;
