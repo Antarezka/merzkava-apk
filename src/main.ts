@@ -169,6 +169,15 @@ async function restoreGameplayTranscript(characterId: string): Promise<void> {
 function characterName(characterId: string): string {
   return availableCharacters().find(item => item.id === characterId)?.name ?? "";
 }
+function latestGameplayProfile(): ReturnType<typeof parseGameplayResponseProfile> | null {
+  const latest = [...activeChat.messages].reverse().find(message => message.role === "gm");
+  if (!latest) return null;
+  const parsed = parseGameplayResponseProfile(latest.text);
+  return parsed.errors.length ? null : parsed;
+}
+function profileValue(profile: ReturnType<typeof parseGameplayResponseProfile> | null, field: keyof ReturnType<typeof parseGameplayResponseProfile>["profile"]["fields"], fallback = "Belum disinkronkan"): string {
+  return profile?.profile.fields[field] || fallback;
+}
 
 function renderChat(): void {
   if (activeScreen !== "gameplay") return;
@@ -191,8 +200,27 @@ function renderChat(): void {
   if (routeForm) routeForm.dataset.sessionMode = activeChat.started ? "continue" : "new";
   const character = availableCharacters().find(item => item.id === activeCharacterId);
   const record = root.querySelector<HTMLElement>("#player-character-record");
+  const currentProfile = latestGameplayProfile();
+  const field = (label: string, value: string) => '<dt>' + escapeHtml(label) + '</dt><dd>' + escapeHtml(value) + '</dd>';
   if (record) record.innerHTML = character
-    ? '<details open><summary>PROFIL KARAKTER</summary><dl><dt>Nama</dt><dd>' + escapeHtml(character.name) + '</dd><dt>Usia</dt><dd>' + (character.origin === "Registry" ? "See source profile" : character.age) + '</dd><dt>Spirit Realm</dt><dd>' + canonLabelMarkup("spirit-realm", character.realm) + '</dd><dt>Sync progress</dt><dd>Belum disinkronkan</dd><dt>Spirit Ring Absorption</dt><dd>Belum disinkronkan</dd><dt>Martial Soul</dt><dd>Belum disinkronkan</dd><dt>Arcanist Grade</dt><dd>???</dd><dt>Arcanist Focus</dt><dd>Belum diverifikasi</dd><dt>HP</dt><dd>Belum disinkronkan</dd><dt>Satiety</dt><dd>Belum disinkronkan</dd><dt>Qi</dt><dd>Belum disinkronkan</dd><dt>Kondisi Tubuh</dt><dd>Belum disinkronkan</dd><dt>Equipment</dt><dd>Belum disinkronkan</dd><dt>Asal</dt><dd>' + escapeHtml(character.origin) + '</dd><dt>Awakening</dt><dd>' + (character.origin === "Registry" ? "See source profile" : (character.awakened ? "Awakened" : "Not awakened")) + '</dd><dt>Background</dt><dd>' + escapeHtml(character.background || "—") + '</dd></dl></details><details><summary>INV & KEUANGAN</summary><p>Inventory: Belum disinkronkan</p><p>Assets Bangunan: Belum disinkronkan</p><p>Wallet (wealth): Belum diverifikasi · xc | xs | xg | zj | az</p></details><details><summary>TEKNIK & TUJUAN</summary><p>Teknik / Kemampuan: Belum disinkronkan</p><p>Tujuan Saat Ini: Belum disinkronkan</p></details><details><summary>CATATAN PEMAIN & KONSISTENSI</summary><p>State kanonis dan Ledger Log belum disinkronkan dari GM. Aplikasi tidak mengarang atau mengubah nilai yang belum diverifikasi.</p></details>'
+    ? '<details open><summary>PROFIL KARAKTER</summary><dl>' +
+      field("Nama", profileValue(currentProfile, "Nama", character.name)) +
+      field("Usia", profileValue(currentProfile, "Usia", character.origin === "Registry" ? "Lihat profil registry" : String(character.age))) +
+      field("Spirit Realm", profileValue(currentProfile, "Spirit Realm", character.realm)) +
+      field("Sync progress", profileValue(currentProfile, "Sync progress")) +
+      field("Spirit Ring Absorption", profileValue(currentProfile, "Spirit Ring Absorption")) +
+      field("Martial Soul", profileValue(currentProfile, "Martial Soul")) +
+      field("Arcanist Grade", profileValue(currentProfile, "Arcanist Grade")) +
+      field("Arcanist Focus", profileValue(currentProfile, "Arcanist Focus")) +
+      field("HP", profileValue(currentProfile, "HP")) +
+      field("Satiety", profileValue(currentProfile, "Satiety")) +
+      field("Qi", profileValue(currentProfile, "Qi")) +
+      field("Kondisi Tubuh", profileValue(currentProfile, "Kondisi Tubuh")) +
+      field("Equipment", profileValue(currentProfile, "Equipment")) +
+      field("Asal", character.origin) +
+      field("Awakening", character.origin === "Registry" ? "Lihat profil registry" : (character.awakened ? "Awakened" : "Not awakened")) +
+      field("Background", character.background || "—") +
+      '</dl></details><details><summary>INV & KEUANGAN</summary><p>Inventory: ' + escapeHtml(profileValue(currentProfile, "Inventory")) + '</p><p>Assets Bangunan: ' + escapeHtml(profileValue(currentProfile, "Assets Bangunan")) + '</p><p>Wallet (wealth): ' + escapeHtml(profileValue(currentProfile, "Wallet (wealth)", "Belum diverifikasi · xc | xs | xg | zj | az")) + '</p></details><details><summary>TEKNIK & TUJUAN</summary><p>Teknik / Kemampuan: ' + escapeHtml(profileValue(currentProfile, "Teknik / Kemampuan")) + '</p><p>Tujuan Saat Ini: ' + escapeHtml(profileValue(currentProfile, "Tujuan Saat Ini")) + '</p></details><details><summary>CATATAN PEMAIN & KONSISTENSI</summary><p>' + (currentProfile ? "Nilai terakhir berasal dari respons GM dan masih menunggu verifikasi mekanik serta persetujuan pemain." : "Belum ada profil gameplay dari GM. Aplikasi tidak mengarang atau mengubah nilai yang belum diverifikasi.") + '</p></details>'
     : "Pilih karakter untuk melihat catatan lokalnya.";
 }
 
@@ -384,9 +412,11 @@ function render(): void {
     lastPlayWarningNotice = "";
   }
   const isControl = activeScreen === "control";
+  const currentProfile = latestGameplayProfile();
+  const inventorySnapshot = currentProfile ? { inventory: currentProfile.profile.fields.Inventory, assets: currentProfile.profile.fields["Assets Bangunan"], wallet: currentProfile.profile.fields["Wallet (wealth)"] } : undefined;
   const content = isControl
     ? floatingControlMarkup(floatingReadiness)
-    : renderScreen(activeScreen as ScreenId, availableCharacters(), playerRegistryMessage, activeCharacterId ? getLedgerLog(activeCharacterId) : []);
+    : renderScreen(activeScreen as ScreenId, availableCharacters(), playerRegistryMessage, activeCharacterId ? getLedgerLog(activeCharacterId) : [], inventorySnapshot);
   root.innerHTML = `<div class="app-shell ${isControl ? "control-shell" : ""} ${menuRevealPending ? "is-entering" : ""}">
     ${isControl ? "" : '<header class="app-header"><button class="brand" data-screen="home" aria-label="Merzkava home"><span class="brand-mark">M</span><span><small>MERZKAVA UNIVERSE</small><strong>Merzkava</strong></span></button><button class="header-settings" data-floating-action="start-bubble" aria-label="Start Bubble Mode" title="Start Bubble Mode">◉</button><button class="header-settings" data-screen="settings" aria-label="Settings">⚙</button></header>'}
     ${notice ? `<p class="notice" role="status">${escapeHtml(notice)}</p>` : ""}
