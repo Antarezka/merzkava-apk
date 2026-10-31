@@ -43,13 +43,22 @@ export function getLedgerLog(characterId: string): LedgerEntry[] {
 function isLedgerEntry(value: unknown): value is LedgerEntry {
   if (!value || typeof value !== "object") return false;
   const entry = value as Partial<LedgerEntry>;
+  const categories: LedgerCategory[] = ["wallet", "inventory", "hp", "satiety", "body", "equipment", "cultivation", "other"];
+  const tones: LedgerTone[] = ["positive", "negative", "neutral"];
+  const labelCategories: CanonLabelCategory[] = ["spirit-realm", "arcanist-grade", "arcanist-focus", "economic-quality", "artifact-condition", "martial-soul-rarity", "spirit-beast", "beast-trait", "beast-age-grade", "spirit-ring", "spirit-realm-tradition"];
   return typeof entry.id === "string"
     && typeof entry.characterId === "string"
-    && typeof entry.category === "string"
+    && typeof entry.category === "string" && categories.includes(entry.category as LedgerCategory)
     && typeof entry.title === "string"
     && typeof entry.change === "string"
-    && typeof entry.tone === "string"
-    && typeof entry.createdAt === "string";
+    && typeof entry.tone === "string" && tones.includes(entry.tone as LedgerTone)
+    && typeof entry.createdAt === "string"
+    && (entry.before === undefined || typeof entry.before === "string")
+    && (entry.after === undefined || typeof entry.after === "string")
+    && (entry.detail === undefined || typeof entry.detail === "string")
+    && (entry.labelCategory === undefined || (typeof entry.labelCategory === "string" && labelCategories.includes(entry.labelCategory)))
+    && (entry.label === undefined || typeof entry.label === "string")
+    && (entry.stage === undefined || typeof entry.stage === "string");
 }
 
 export function initializeLedgerNotifications(): void {
