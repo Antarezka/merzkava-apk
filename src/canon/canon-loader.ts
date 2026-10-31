@@ -1,7 +1,7 @@
 import { cacheCanonDocument, getCachedCanonDocument, type CachedCanonDocument } from "../database/database";
 
 const CANON_REPOSITORY = "Antarezka/merzkava-universe";
-const README_URL = `https://raw.githubusercontent.com/${CANON_REPOSITORY}/main/README.md`;
+const DEFAULT_CANON_SNAPSHOT = "58693e1";
 const API_BASE = `https://api.github.com/repos/${CANON_REPOSITORY}`;
 
 export interface CanonStatus {
@@ -28,7 +28,7 @@ async function fetchText(url: string): Promise<string> {
   return response.text();
 }
 
-async function verifyPinnedCommit(shortHash: string): Promise<void> {
+async function verifyPinnedCommit(shortHash: string): Promise<string> {
   const response = await fetch(`${API_BASE}/commits/${encodeURIComponent(shortHash)}`, {
     headers: { Accept: "application/vnd.github+json" }
   });
@@ -37,12 +37,7 @@ async function verifyPinnedCommit(shortHash: string): Promise<void> {
   if (!data.sha || !/^[a-f0-9]{40}$/i.test(data.sha) || !data.sha.toLowerCase().startsWith(shortHash.toLowerCase())) {
     throw new Error("GitHub tidak mengonfirmasi hash pendek yang cocok dengan commit.");
   }
-}
-
-function parsePinnedHash(readme: string): string {
-  const match = readme.match(/Latest pinned source:\*\*\s*`([a-f0-9]{7,40})`/i);
-  if (!match) throw new Error("Baris Latest pinned source tidak ditemukan di README.");
-  return match[1];
+  return data.sha.toLowerCase();
 }
 
 function parseNightlyVersion(markdown: string): string {
@@ -71,75 +66,53 @@ export function getCanonStatus(): CanonStatus {
   return { ...currentStatus };
 }
 
-export async function getCanonIndex(): Promise<CanonDocument | null> {
-  return getCachedCanonDocument("INDEX.md");
+export async function getCanonIndex(activeSha?: string): Promise<CanonDocument | null> {
+  return getCachedCanonDocument("INDEX.md", activeSha);
 }
 
 export async function loadPlayerRegistry(activeSha: string): Promise<CanonDocument> {
-  const expected = activeSha.slice(0, 7);
-  if (!currentStatus.commitSha || currentStatus.commitSha.slice(0, 7) !== expected) {
-    throw new Error("ACTIVE_SHA tidak cocok dengan canon yang sedang diverifikasi.");
-  }
+  const expected = activeSha.toLowerCase();
+  if (!/^[a-f0-9]{40}$/.test(expected) || currentStatus.commitSha !== expected) throw new Error("ACTIVE_SHA penuh tidak cocok dengan canon yang sedang diverifikasi.");
   return fetchPinnedDocument("players.md", expected);
 }
 
 export async function loadCanonModule(path: string): Promise<CanonDocument> {
   if (!currentStatus.commitSha) throw new Error("Muat atau perbarui INDEX canon terlebih dahulu.");
   const safePath = validateCanonPath(path);
-  const index = await getCachedCanonDocument("INDEX.md");
+  const index = await getCachedCanonDocument("INDEX.md", currentStatus.commitSha);
   if (!index || index.commitSha !== currentStatus.commitSha || !index.content.includes(`\`${safePath}\``)) {
     throw new Error("Path tidak tercantum di INDEX pada commit canon aktif.");
   }
   return fetchPinnedDocument(safePath, currentStatus.commitSha);
 }
 
-export async function activateCanonSnapshot(shortHash: string): Promise<CanonStatus> {
-  const hash = shortHash.slice(0, 7);
-  if (!/^[a-f0-9]{7}$/i.test(hash)) throw new Error("ACTIVE_SHA tidak valid.");
-  await verifyPinnedCommit(hash);
-  await fetchPinnedDocument("INDEX.md", hash);
-  const versionDoc = await fetchPinnedDocument("NIGHTLY_VERSION.md", hash);
+export async function activateCanonSnapshot(snapshot: string): Promise<CanonStatus> {
+  const requested = snapshot.trim();
+  if (!/^[a-f0-9]{7,40}$/i.test(requested)) throw new Error("ACTIVE_SHA tidak valid.");
+  const fullSha = await verifyPinnedCommit(requested);
+  const index = await fetchPinnedDocument("INDEX.md", fullSha);
+  const authority = await fetchPinnedDocument("templates/AUTHORITY_ORDER.md", fullSha);
+  const versionDoc = await fetchPinnedDocument("NIGHTLY_VERSION.md", fullSha);
+  if (!index.content.trim()) throw new Error("INDEX.md kosong pada ACTIVE_SHA.");
+  if (!authority.content.trim()) throw new Error("templates/AUTHORITY_ORDER.md kosong pada ACTIVE_SHA.");
   const version = parseNightlyVersion(versionDoc.content);
-  currentStatus = { status: "ready", commitSha: hash, version, updatedAt: new Date().toISOString(), message: `Canon snapshot aktif · ${hash} · ${version}` };
+  currentStatus = { status: "ready", commitSha: fullSha, version, updatedAt: new Date().toISOString(), message: `Canon snapshot terverifikasi · ${fullSha.slice(0,7)} · ${version}` };
   return getCanonStatus();
 }
-export async function refreshCanon(): Promise<CanonStatus> {
-  try {
-    const readme = await fetchText(README_URL);
-    const shortHash = parsePinnedHash(readme);
-    await verifyPinnedCommit(shortHash);
-    await fetchPinnedDocument("INDEX.md", shortHash);
-    const versionDoc = await fetchPinnedDocument("NIGHTLY_VERSION.md", shortHash);
-    const version = parseNightlyVersion(versionDoc.content);
-    currentStatus = {
-      status: "ready",
-      commitSha: shortHash,
-      version,
-      updatedAt: new Date().toISOString(),
-      message: `Canon terverifikasi · ${shortHash} · ${version}`
-    };
-    return getCanonStatus();
-  } catch (error) {
+
+export async function refreshCanon(snapshot = DEFAULT_CANON_SNAPSHOT): Promise<CanonStatus> {
+  try { return await activateCanonSnapshot(snapshot); }
+  catch (error) {
+    const requested = snapshot.trim().toLowerCase();
     const cachedIndex = await getCachedCanonDocument("INDEX.md");
     const cachedVersion = await getCachedCanonDocument("NIGHTLY_VERSION.md");
-    if (cachedIndex && cachedVersion) {
+    const cachedAuthority = await getCachedCanonDocument("templates/AUTHORITY_ORDER.md");
+    if (/^[a-f0-9]{7,40}$/.test(requested) && cachedIndex && cachedVersion && cachedAuthority && cachedIndex.commitSha.startsWith(requested) && cachedVersion.commitSha === cachedIndex.commitSha && cachedAuthority.commitSha === cachedIndex.commitSha) {
       const version = parseNightlyVersion(cachedVersion.content);
-      currentStatus = {
-        status: "cached",
-        commitSha: cachedIndex.commitSha.slice(0, 7),
-        version,
-        updatedAt: cachedIndex.fetchedAt,
-        message: `Offline: memakai canon tersimpan · ${cachedIndex.commitSha.slice(0, 7)}`
-      };
+      currentStatus = { status: "cached", commitSha: cachedIndex.commitSha, version, updatedAt: cachedIndex.fetchedAt, message: `Offline: memakai snapshot canon tersimpan yang sama · ${cachedIndex.commitSha.slice(0,7)}` };
       return getCanonStatus();
     }
-    currentStatus = {
-      status: "error",
-      commitSha: "",
-      version: "",
-      updatedAt: "",
-      message: error instanceof Error ? error.message : "Canon gagal dimuat."
-    };
+    currentStatus = { status: "error", commitSha: "", version: "", updatedAt: "", message: error instanceof Error ? error.message : "Canon gagal dimuat." };
     return getCanonStatus();
   }
 }
@@ -152,11 +125,10 @@ export interface RegisteredPlayer {
   realm: string;
 }
 
-export async function refreshLatestPlayerRegistry(): Promise<{ commitSha: string; players: RegisteredPlayer[] }> {
-  const readme = await fetchText(README_URL);
-  const shortHash = parsePinnedHash(readme);
-  await verifyPinnedCommit(shortHash);
-  const registry = await fetchPinnedDocument("players.md", shortHash);
+export async function refreshLatestPlayerRegistry(activeSha: string): Promise<{ commitSha: string; players: RegisteredPlayer[] }> {
+  const fullSha = activeSha.toLowerCase();
+  if (!/^[a-f0-9]{40}$/.test(fullSha) || currentStatus.commitSha !== fullSha) throw new Error("Registry harus dimuat dari ACTIVE_SHA penuh yang sedang aktif.");
+  const registry = await fetchPinnedDocument("players.md", fullSha);
   const rows = [...registry.content.matchAll(/^\|\s*([^|]+?)\s*\|\s*\[([^\]]+)\]\(([^)]+)\)\s*\|\s*([^|]+?)\s*\|$/gm)];
   const players: RegisteredPlayer[] = [];
   for (const row of rows) {
@@ -170,14 +142,16 @@ export async function refreshLatestPlayerRegistry(): Promise<{ commitSha: string
     players.push({ name, path: relativePath, age: ageMatch ? Number(ageMatch[1]) : null, realm: realmMatch?.[1].trim() ?? "Belum ditetapkan" });
   }
   if (!players.length) throw new Error("Tidak ada karakter valid yang ditemukan pada tabel Daftar Karakter di players.md.");
-  return { commitSha: shortHash, players };
+  return { commitSha: fullSha, players };
 }
 
 export async function loadRegisteredPlayerProfile(activeSha: string, path: string): Promise<CanonDocument> {
-  const registry = await fetchPinnedDocument("players.md", activeSha.slice(0, 7));
+  const fullSha = activeSha.toLowerCase();
+  if (!/^[a-f0-9]{40}$/.test(fullSha) || currentStatus.commitSha !== fullSha) throw new Error("Profil hanya boleh dimuat dari ACTIVE_SHA penuh yang aktif.");
+  const registry = await fetchPinnedDocument("players.md", fullSha);
   const safePath = validateCanonPath(path);
   const listed = [...registry.content.matchAll(/^\|\s*([^|]+?)\s*\|\s*\[[^\]]+\]\(([^)]+)\)\s*\|/gm)]
     .some(row => decodeURIComponent(row[2].trim()) === safePath);
   if (!listed || !safePath.startsWith("players/")) throw new Error("Profil karakter tidak tercantum di players.md pada snapshot aktif.");
-  return fetchPinnedDocument(safePath, activeSha.slice(0, 7));
+  return fetchPinnedDocument(safePath, fullSha);
 }
