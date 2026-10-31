@@ -40,7 +40,7 @@ type WalletDenomination = "xc" | "xs" | "xg" | "zj" | "az";
 const WALLET_ORDER: WalletDenomination[] = ["xc", "xs", "xg", "zj", "az"];
 
 function parseWalletBalance(value: string): Record<WalletDenomination, number> | null {
-  const match = value.match(/^(\\d+)\\s*xc\\s*\\|\\s*(\\d+)\\s*xs\\s*\\|\\s*(\\d+)\\s*xg\\s*\\|\\s*(\\d+)\\s*zj\\s*\\|\\s*(\\d+)\\s*az$/i);
+  const match = value.match(/^(\d+)\s*xc\s*\|\s*(\d+)\s*xs\s*\|\s*(\d+)\s*xg\s*\|\s*(\d+)\s*zj\s*\|\s*(\d+)\s*az$/i);
   if (!match) return null;
   const amounts = match.slice(1).map(Number);
   if (amounts.some(amount => !Number.isSafeInteger(amount) || amount < 0)) return null;
