@@ -33,7 +33,7 @@ export function floatingControlMarkup(state: FloatingReadiness): string {
         ${state.batteryExemption ? '<span class="floating-check">✓</span>' : `<button data-floating-action="battery" ${!state.notifications ? "disabled" : ""}>Allow ↗</button>`}
       </article>
       <article class="floating-step manual-step">
-        <span class="floating-step-number">04</span><div class="floating-step-copy"><strong>Set up return link for Google Play</strong><small>Requires a Google Play Console app entry and verified signing / redirect configuration.</small></div>
+        <span class="floating-step-number">04</span><div class="floating-step-copy"><strong>Set up Merzkava App Links</strong><small>Open Android App Links settings, enable supported links, then select the official Merzkava domain.</small></div>
         ${state.playReturnLink ? '<span class="floating-check">✓</span>' : '<button data-floating-action="play-return">Set up ↗</button>'}
       </article>
     </section>
@@ -46,6 +46,6 @@ export function floatingControlMarkup(state: FloatingReadiness): string {
       <button class="floating-stop" data-floating-action="stop" ${!state.serviceRunning && !state.displayOverApps ? "disabled" : ""}>Stop service and close window <span>×</span></button>
       <button class="floating-donate" data-floating-action="donate">Donate stuff <span>♡</span></button>
     </section>
-    <p class="floating-footnote">The Google Play return link is separate from overlay permissions. It will remain NOT READY until its real Play Console credentials are configured.</p>
+    <p class="floating-footnote">App Links readiness is checked from Android. The Merzkava domain must first be declared in the app and verified by its website association file.</p>
   </main>`;
 }
