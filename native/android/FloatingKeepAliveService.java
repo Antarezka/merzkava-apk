@@ -27,6 +27,7 @@ public class FloatingKeepAliveService extends Service {
     private static final String CHANNEL_ID = "merzkava_floating_mode";
     private static final int NOTIFICATION_ID = 2301;
     private static volatile boolean active;
+    private static volatile boolean bubbleVisible;
     private WindowManager windowManager;
     private KittyBubbleView bubble;
     private WindowManager.LayoutParams bubbleParams;
@@ -35,6 +36,7 @@ public class FloatingKeepAliveService extends Service {
     private boolean moved;
 
     public static boolean isActive() { return active; }
+    public static boolean isBubbleVisible() { return bubbleVisible; }
 
     @Override public void onCreate() {
         super.onCreate();
@@ -73,12 +75,15 @@ public class FloatingKeepAliveService extends Service {
             }
         } catch (Exception error) {
             active = false;
+            bubbleVisible = false;
+            android.util.Log.e("MerzkavaFloating", "Foreground floating service action failed", error);
             stopSelf();
         }
         return START_NOT_STICKY;
     }
 
     private void showBubble() {
+        bubbleVisible = false;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) return;
         if (windowManager == null) windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         if (windowManager == null) return;
@@ -117,6 +122,7 @@ public class FloatingKeepAliveService extends Service {
             }
         });
         windowManager.addView(bubble, bubbleParams);
+        bubbleVisible = true;
     }
 
     private void openFloatingWindow() {
@@ -133,6 +139,7 @@ public class FloatingKeepAliveService extends Service {
         }
         bubble = null;
         bubbleParams = null;
+        bubbleVisible = false;
     }
 
     private int dp(float value) {
@@ -164,6 +171,7 @@ public class FloatingKeepAliveService extends Service {
     @Override public void onDestroy() {
         removeBubble();
         active = false;
+        bubbleVisible = false;
         stopForeground(true);
         super.onDestroy();
     }
