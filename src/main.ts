@@ -1,5 +1,6 @@
 import "./style.css";
 import "./ui/floating-ledger.css";
+import "./ui/floating-control.css";
 import { cancelOpeningSequence, playButtonSound, playOpeningSequence } from "./audio/sound-effects";
 const splashLogoUrl = new URL("../Untitled78_20261030213901.png", import.meta.url).href;
 import { initializeDatabase } from "./database/database";
@@ -14,7 +15,8 @@ import { getAuthSession, isSupabaseConfigured, restoreAuthSession, signInWithPas
 import { GatewayGMProvider, isGMGatewayConfigured } from "./engine/gateway-gm-provider";
 import { getLedgerLog, initializeLedgerNotifications } from "./ui/ledger-log";
 import { canonLabelMarkup } from "./ui/canon-labels";
-import { startFloatingMode } from "./native/floating-window";
+import { startFloatingMode, getFloatingReadiness, requestFloatingNotifications, requestFloatingBatteryExemption, startFloatingService, showFloatingBubble, stopFloatingService, type FloatingReadiness } from "./native/floating-window";
+import { floatingControlMarkup } from "./app/floating-control";
 
 const app = document.querySelector<HTMLDivElement>("#app");
 if (!app) throw new Error("App root element was not found.");
@@ -41,19 +43,18 @@ function showOpeningSplash(): HTMLDivElement {
   return splash;
 }
 
-const openingSplash = showOpeningSplash();
-let openingSplashClosed = false;
-function closeOpeningSplash(): void {
-  if (openingSplashClosed) return;
-  openingSplashClosed = true;
-  openingSplash.classList.add("is-closing");
+async function playEntrySplash(): Promise<void> {
+  const splash = showOpeningSplash();
+  let closed = false;
+  const close = () => {
+    if (closed) return;
+    closed = true;
+    splash.classList.add("is-closing");
+  };
+  splash.addEventListener("click", () => { cancelOpeningSequence(); close(); }, { once: true });
+  await playOpeningSequence();
+  close();
 }
-openingSplash.addEventListener("click", () => {
-  if (openingSplashClosed) return;
-  cancelOpeningSequence();
-  closeOpeningSplash();
-});
-void playOpeningSequence().then(closeOpeningSplash);
 
 const navigation: { id: ScreenId; label: string; icon: string }[] = [
   { id: "home", label: "Home", icon: "⌂" }, { id: "gameplay", label: "Play", icon: "✧" },
@@ -62,7 +63,18 @@ const navigation: { id: ScreenId; label: string; icon: string }[] = [
   { id: "settings", label: "Settings", icon: "⚙" }
 ];
 
-let activeScreen: ScreenId = "home";
+type AppScreen = ScreenId | "control";
+let activeScreen: AppScreen = "control";
+let floatingReadiness: FloatingReadiness = { displayOverApps: false, notifications: false, batteryExemption: false, serviceRunning: false, playReturnLink: false };
+let floatingBusy = false;
+async function refreshFloatingReadiness(): Promise<void> {
+  try { floatingReadiness = await getFloatingReadiness(); }
+  catch { floatingReadiness = { ...floatingReadiness, serviceRunning: false }; }
+  if (activeScreen === "control") render();
+}
+function floatingSetupComplete(): boolean {
+  return floatingReadiness.displayOverApps && floatingReadiness.notifications && floatingReadiness.batteryExemption;
+}
 let databaseMessage = "Checking local storage…";
 let characters: Character[] = [];
 let registeredCharacters: Character[] = [];
@@ -257,11 +269,16 @@ function snapshotBlindMarkup(): string {
   </section>`;
 }
 function render(): void {
-  root.innerHTML = `<div class="app-shell">
-    <header class="app-header"><button class="brand" data-screen="home" aria-label="Merzkava home"><span class="brand-mark">M</span><span><small>MERZKAVA UNIVERSE</small><strong>Merzkava</strong></span></button><button class="header-settings" data-screen="settings" aria-label="Settings">⚙</button></header>
-    <main class="main-content">${notice ? `<p class="notice" role="status">${escapeHtml(notice)}</p>` : ""}${renderScreen(activeScreen, availableCharacters(), playerRegistryMessage, activeCharacterId ? getLedgerLog(activeCharacterId) : [])}${activeScreen === "settings" ? authPanel() + canonPanel() : ""}</main>
-    <nav class="bottom-nav" aria-label="Main navigation">${navigation.map(item => `<button class="nav-item ${activeScreen === item.id ? "active" : ""}" data-screen="${item.id}" ${activeScreen === item.id ? 'aria-current="page"' : ""}><span>${item.icon}</span><small>${item.label}</small></button>`).join("")}</nav>
-    <div class="storage-status"><span class="status-dot"></span>${databaseMessage}</div>
+  const isControl = activeScreen === "control";
+  const content = isControl
+    ? floatingControlMarkup(floatingReadiness)
+    : renderScreen(activeScreen, availableCharacters(), playerRegistryMessage, activeCharacterId ? getLedgerLog(activeCharacterId) : []);
+  root.innerHTML = `<div class="app-shell ${isControl ? "control-shell" : ""}">
+    ${isControl ? "" : '<header class="app-header"><button class="brand" data-screen="home" aria-label="Merzkava home"><span class="brand-mark">M</span><span><small>MERZKAVA UNIVERSE</small><strong>Merzkava</strong></span></button><button class="header-settings" data-screen="settings" aria-label="Settings">⚙</button></header>'}
+    ${notice ? `<p class="notice" role="status">${escapeHtml(notice)}</p>` : ""}
+    ${isControl ? content : `<main class="main-content">${content}${activeScreen === "settings" ? authPanel() + canonPanel() : ""}</main>`}
+    ${isControl ? "" : `<nav class="bottom-nav" aria-label="Main navigation">${navigation.map(item => `<button class="nav-item ${activeScreen === item.id ? "active" : ""}" data-screen="${item.id}" ${activeScreen === item.id ? 'aria-current="page"' : ""}><span>${item.icon}</span><small>${item.label}</small></button>`).join("")}</nav>`}
+    ${isControl ? "" : `<div class="storage-status"><span class="status-dot"></span>${databaseMessage}</div>`}
     ${activeScreen === "gameplay" ? snapshotBlindMarkup() : ""}
     ${activeScreen === "home" && noticeboardVisible ? noticeboardMarkup() : ""}
   </div>`;
@@ -359,6 +376,54 @@ root.addEventListener("click", async (event: MouseEvent) => {
     "button:not(:disabled), a[href], [role='button'], [role='tab'], [role='menuitem'], input:not([type='hidden']):not(:disabled), select:not(:disabled), textarea:not(:disabled), summary"
   );
   if (interactive) playButtonSound();
+
+  const floatingAction = target.closest<HTMLButtonElement>("[data-floating-action]");
+  if (floatingAction) {
+    const action = floatingAction.dataset.floatingAction;
+    if (floatingBusy) return;
+    floatingBusy = true;
+    floatingAction.disabled = true;
+    try {
+      if (action === "overlay") {
+        await startFloatingMode();
+      } else if (action === "notifications") {
+        await requestFloatingNotifications();
+      } else if (action === "battery") {
+        await requestFloatingBatteryExemption();
+      } else if (action === "play-return") {
+        notice = "Google Play return link belum dapat diaktifkan otomatis. Tahap ini membutuhkan aplikasi terdaftar di Play Console, SHA-1 signing certificate, dan redirect URI resmi. Izin bubble tetap dapat diuji tanpa tahap ini.";
+      } else if (action === "start-bubble") {
+        await refreshFloatingReadiness();
+        if (!floatingSetupComplete()) throw new Error("Selesaikan tiga izin pertama secara berurutan sebelum memulai bubble mode.");
+        await startFloatingService();
+        await showFloatingBubble();
+      } else if (action === "open-game") {
+        await playEntrySplash();
+        activeScreen = "home";
+      } else if (action === "open-window") {
+        await refreshFloatingReadiness();
+        if (!floatingReadiness.displayOverApps) throw new Error("Aktifkan izin Display over the app terlebih dahulu.");
+        await playEntrySplash();
+        activeScreen = "gameplay";
+        render();
+        await startFloatingMode();
+      } else if (action === "stop") {
+        await stopFloatingService();
+      } else if (action === "donate") {
+        notice = "Donation link belum dipasang. Tidak ada tautan pembayaran yang akan dibuka sebelum alamat resminya tersedia.";
+      }
+      await refreshFloatingReadiness();
+      if (activeScreen === "control") render();
+      else if (notice) render();
+    } catch (error) {
+      notice = error instanceof Error ? error.message : "Floating Control action failed.";
+      await refreshFloatingReadiness();
+      render();
+    } finally {
+      floatingBusy = false;
+    }
+    return;
+  }
 
   const startSessionButton = target.closest<HTMLButtonElement>("[data-start-session]");
   if (startSessionButton) {
@@ -651,6 +716,9 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
 });
 
 render();
+void refreshFloatingReadiness();
+document.addEventListener("visibilitychange", () => { if (!document.hidden) void refreshFloatingReadiness(); });
+window.addEventListener("focus", () => { void refreshFloatingReadiness(); });
 void initializeDatabase().then(async status => {
   databaseMessage = status.message;
   await refreshCharacters();
