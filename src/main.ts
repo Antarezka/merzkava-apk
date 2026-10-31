@@ -15,7 +15,7 @@ import { parseCharacterProfile, parseGameplayResponseProfile, validateCharacterP
 import { reconcileGMProposal } from "./engine/state-reconciliation";
 import { getAuthSession, isSupabaseConfigured, restoreAuthSession, signInWithPassword, signOut } from "./auth/supabase-auth";
 import { GatewayGMProvider, isGMGatewayConfigured } from "./engine/gateway-gm-provider";
-import { getLedgerLog, initializeLedgerNotifications } from "./ui/ledger-log";
+import { getLedgerLog, initializeLedgerNotifications, showLedgerProposalBubble } from "./ui/ledger-log";
 import { startFloatingMode, requestFloatingOverlayPermission, getFloatingReadiness, requestFloatingNotifications, requestFloatingBatteryExemption, showFloatingBubble, stopFloatingService, type FloatingReadiness } from "./native/floating-window";
 import { floatingControlMarkup } from "./app/floating-control";
 
