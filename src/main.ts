@@ -125,6 +125,23 @@ function loadCharacterChat(characterId: string): void {
   const saved = characterId ? readChatStore()[characterId] : undefined;
   activeChat = saved ? { messages: Array.isArray(saved.messages) ? saved.messages : [], started: Boolean(saved.started), showOptions: Boolean(saved.showOptions) } : { messages: [], started: false, showOptions: false };
   renderChat();
+  if (!activeChat.messages.length && characterId) void restoreGameplayTranscript(characterId);
+}
+
+async function restoreGameplayTranscript(characterId: string): Promise<void> {
+  try {
+    const record = await getGameplaySessionRecord(characterId);
+    if (!record || activeCharacterId !== characterId || activeChat.messages.length) return;
+    const stored = JSON.parse(record.stateJson) as { transcript?: unknown };
+    if (!Array.isArray(stored.transcript)) return;
+    const messages = stored.transcript.filter((item): item is ChatMessage => Boolean(item) && typeof item === "object" && ((item as ChatMessage).role === "player" || (item as ChatMessage).role === "gm") && typeof (item as ChatMessage).text === "string" && typeof (item as ChatMessage).createdAt === "string");
+    if (!messages.length || activeCharacterId !== characterId || activeChat.messages.length) return;
+    activeChat = { messages, started: true, showOptions: activeChat.showOptions };
+    saveCharacterChat();
+    renderChat();
+  } catch (error) {
+    recordBug(error, "Restore gameplay transcript", "Gameplay save");
+  }
 }
 function characterName(characterId: string): string {
   return availableCharacters().find(item => item.id === characterId)?.name ?? "";
