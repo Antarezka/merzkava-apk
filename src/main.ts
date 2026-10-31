@@ -46,7 +46,6 @@ function closeOpeningSplash(): void {
 openingSplash.addEventListener("click", () => {
   if (openingSplashClosed) return;
   cancelOpeningSequence();
-  playButtonSound();
   closeOpeningSplash();
 });
 void playOpeningSequence().then(closeOpeningSplash);
@@ -118,10 +117,40 @@ async function refreshCharacters(): Promise<void> {
   catch (error) { notice = error instanceof Error ? error.message : "Could not load characters."; }
 }
 
+let pointerStart: { x: number; y: number } | null = null;
+let suppressNextPointerClick = false;
+
+root.addEventListener("pointerdown", event => {
+  pointerStart = { x: event.clientX, y: event.clientY };
+  suppressNextPointerClick = false;
+}, { passive: true });
+
+root.addEventListener("pointermove", event => {
+  if (!pointerStart) return;
+  const distance = Math.hypot(event.clientX - pointerStart.x, event.clientY - pointerStart.y);
+  if (distance > 10) suppressNextPointerClick = true;
+}, { passive: true });
+
+root.addEventListener("pointerup", () => {
+  pointerStart = null;
+}, { passive: true });
+
+root.addEventListener("pointercancel", () => {
+  pointerStart = null;
+  suppressNextPointerClick = false;
+}, { passive: true });
+
 root.addEventListener("click", async (event: MouseEvent) => {
   const target = event.target;
   if (!(target instanceof Element)) return;
-  if (target.closest("button:not(:disabled)")) playButtonSound();
+  if (event.detail !== 0 && suppressNextPointerClick) {
+    suppressNextPointerClick = false;
+    return;
+  }
+  const interactive = target.closest(
+    "button:not(:disabled), a[href], [role='button'], [role='tab'], [role='menuitem'], input:not([type='hidden']):not(:disabled), select:not(:disabled), textarea:not(:disabled), summary"
+  );
+  if (interactive) playButtonSound();
   const refreshCanonButton = target.closest<HTMLButtonElement>("[data-refresh-canon]");
   if (refreshCanonButton && !canonBusy) {
     canonBusy = true; canonMessage = "Memeriksa pin README dan mengambil INDEX…"; render();
