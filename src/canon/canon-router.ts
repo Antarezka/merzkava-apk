@@ -101,7 +101,7 @@ export async function routeCanonActivity(activity: string, limit = 5): Promise<C
     } catch (error) {
       const detail = `${module.path}: ${error instanceof Error ? error.message : "gagal dimuat"}`;
       skipped.push(detail);
-      if (REQUIRED_GAMEPLAY_PATHS.includes(module.path)) throw new Error(`BOOTSTRAP FAIL-CLOSED — sumber wajib tidak tersedia: ${detail}`);
+      throw new Error(`CANON ROUTING FAIL-CLOSED — modul terpilih tidak tersedia: ${detail}`);
     }
   }
   const missing = REQUIRED_GAMEPLAY_PATHS.filter(path => !loaded.some(document => document.path === path));
