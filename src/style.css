@@ -104,25 +104,28 @@ button {color:inherit;} button:focus-visible {outline-color:#a68d5e;}
 .canon-document pre {border-color:#c7bea9;background:#e7dfcd;color:#3c5048;}
 
 /* Main-menu noticeboard modal */
-.noticeboard-backdrop {position:fixed;inset:0;z-index:30;display:grid;place-items:center;padding:22px 16px;background:#182a25a8;backdrop-filter:blur(5px);animation:noticeboard-fade .24s ease-out;}
-.noticeboard-panel {position:relative;width:min(100%,430px);max-height:min(88vh,720px);overflow:auto;padding:24px 22px 19px;border:1px solid #b39a68;background:linear-gradient(90deg,#d8cfb9 0 1px,transparent 1px 100%),repeating-linear-gradient(0deg,#f0e9d9 0 31px,#e9e1cf 32px);color:#2b403a;box-shadow:0 22px 70px #101d19a6,inset 0 0 0 5px #a68d5e18;}
-.noticeboard-panel:before {content:"";position:absolute;inset:9px;border:1px solid #b6a47d55;pointer-events:none;}
-.noticeboard-topline {display:flex;justify-content:space-between;gap:12px;padding:0 24px 12px 0;border-bottom:1px solid #b7aa8d;color:#88764e;font-size:8px;font-weight:700;letter-spacing:.13em;}
-.noticeboard-close {position:absolute;top:15px;right:15px;width:30px;height:30px;border:1px solid #b6a47d;background:#e8dfcc;color:#42574d;font:23px/1 Georgia,serif;}
-.noticeboard-seal {display:grid;place-items:center;width:43px;height:43px;margin:21px auto 12px;border:1px solid #a68d5e;border-radius:50%;color:#967d4f;font:24px Georgia,serif;}
-.noticeboard-kicker {margin:0;color:#8e7951;text-align:center;font-size:8px;font-weight:700;letter-spacing:.2em;}
-.noticeboard-panel h2 {margin:9px 0 11px;color:#2d433c;text-align:center;font:400 clamp(35px,9vw,48px)/.94 Georgia,serif;}
-.noticeboard-panel h2 em {color:#8a8d72;font-weight:400;} .noticeboard-rule {width:54px;height:1px;margin:16px auto;background:#a68d5e;}
-.noticeboard-copy {max-width:310px;margin:0 auto 20px;color:#69756a;text-align:center;font-size:12px;line-height:1.7;}
-.noticeboard-entry {display:flex;gap:13px;align-items:flex-start;padding:13px 0;border-top:1px solid #c9bea6;border-bottom:1px solid #c9bea6;}
-.noticeboard-entry>span {color:#a08757;font:21px Georgia,serif;} .noticeboard-entry strong,.noticeboard-entry small {display:block;}
-.noticeboard-entry strong {color:#4b5d50;font-size:9px;letter-spacing:.14em;} .noticeboard-entry small {margin-top:5px;color:#798074;font-size:10px;line-height:1.5;}
-.noticeboard-actions {display:flex;gap:9px;margin-top:20px;} .noticeboard-actions button {flex:1;min-height:42px;padding:9px;border:1px solid #a68d5e;font-size:10px;letter-spacing:.04em;}
-.noticeboard-today {background:#314a41;color:#f0e8d8;} .noticeboard-ignore {background:transparent;color:#52665a;}
-.noticeboard-footnote {margin:13px 0 0;color:#8b8c7b;text-align:center;font-size:9px;}
-@keyframes noticeboard-fade {from{opacity:0}to{opacity:1}}
-
-/* Persona-style calendar composition, recoloured to the Reverse: 1999 palette. */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:wght@400;500;600;700&display=swap');
+.noticeboard-backdrop{position:fixed;inset:0;z-index:30;display:grid;place-items:center;padding:18px 13px;background:#17221dd9;backdrop-filter:blur(7px);animation:noticeboard-fade .28s ease-out}
+.noticeboard-panel{position:relative;width:min(100%,460px);max-height:min(90vh,780px);overflow:auto;padding:22px 20px 17px;border:1px solid #9f895e;background:radial-gradient(ellipse at 50% 0%,#fff9e9,#eee4cf 56%,#e4d8bf);color:#2b342d;box-shadow:0 24px 75px #080e0bbd,inset 0 0 0 5px #a68d5e17}
+.noticeboard-panel:before{content:'';position:absolute;inset:8px;border:1px solid #a58d6266;pointer-events:none}
+.noticeboard-topline{display:flex;justify-content:space-between;gap:12px;padding:5px 25px 12px 0;border-bottom:1px solid #b7a781;color:#766344;font:600 8px Cinzel,serif;letter-spacing:.14em}
+.noticeboard-close{position:absolute;top:16px;right:16px;z-index:2;width:29px;height:29px;border:1px solid #aa956c;background:#f1e8d5;color:#485347;font:22px/1 'Cormorant Garamond',serif}
+.noticeboard-seal{display:grid;place-items:center;width:43px;height:43px;margin:17px auto 10px;border:1px solid #9d8350;border-radius:50%;color:#967b49;font:600 23px Cinzel,serif;text-shadow:1px 1px 0 #fff8e8,-1px -1px 0 #92794c}
+.noticeboard-kicker{margin:0;color:#8b7047;text-align:center;font:600 8px Cinzel,serif;letter-spacing:.2em}
+.noticeboard-panel h2{margin:9px 0 8px;color:#35443b;text-align:center;font:500 clamp(34px,9vw,45px)/.92 'Cormorant Garamond',serif;-webkit-text-stroke:.35px #35443b;text-shadow:.6px .6px 0 #fff7e6}
+.noticeboard-panel h2 em{color:#9a754b;font-weight:500;-webkit-text-stroke:.25px #9a754b}
+.noticeboard-rule{display:flex;align-items:center;justify-content:center;gap:9px;margin:15px auto 12px;color:#a1844d;font:12px Cinzel,serif}
+.noticeboard-rule:before,.noticeboard-rule:after{content:'';height:1px;flex:1;background:linear-gradient(90deg,transparent,#b49a69)}.noticeboard-rule:after{background:linear-gradient(90deg,#b49a69,transparent)}
+.noticeboard-copy{max-width:330px;margin:0 auto 16px;color:#6c7164;text-align:center;font:500 14px/1.4 'Cormorant Garamond',serif}
+.noticeboard-feed{display:grid;border-top:1px solid #b8a77f}.noticeboard-entry{position:relative;display:grid;grid-template-columns:30px minmax(0,1fr);gap:10px;padding:13px 2px 12px;border-bottom:1px solid #b8a77f}
+.noticeboard-entry:after{content:'✦  ─────────  ✦';position:absolute;bottom:-7px;left:50%;z-index:1;transform:translateX(-50%);padding:0 7px;background:#eee4cf;color:#a1844d;font:8px Cinzel,serif;letter-spacing:.13em}
+.noticeboard-entry-index{color:#a1844d;font:600 19px Cinzel,serif;-webkit-text-stroke:.3px #a1844d;text-shadow:.5px .5px 0 #fff9e8}
+.noticeboard-entry-content h3{margin:0;color:#39483e;font:600 15px/1.2 Cinzel,serif;-webkit-text-stroke:.2px #39483e}.noticeboard-entry-content p{margin:5px 0 7px;color:#626b60;font:500 15px/1.32 'Cormorant Garamond',serif}
+.noticeboard-highlight{padding:0 2px;background:linear-gradient(transparent 52%,#d7bd7b99 52%);color:#815d32;font-weight:700;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.noticeboard-entry-meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px;color:#89734c;font:600 7px Cinzel,serif;letter-spacing:.08em}.noticeboard-loading{padding:18px 0;text-align:center;color:#7e735d;font:600 10px Cinzel,serif;letter-spacing:.12em}
+.noticeboard-actions{display:flex;gap:9px;margin-top:17px}.noticeboard-actions button{flex:1;min-height:40px;padding:8px;border:1px solid #9d8350;font:600 9px Cinzel,serif}.noticeboard-today{background:#35483d;color:#f4ead7}.noticeboard-ignore{background:transparent;color:#526052}
+.noticeboard-footnote{margin:11px 0 0;color:#8b806a;text-align:center;font:600 7px Cinzel,serif;letter-spacing:.08em}@keyframes noticeboard-fade{from{opacity:0}to{opacity:1}}
+@media(max-width:360px){.noticeboard-panel{padding:20px 16px 15px}.noticeboard-entry{grid-template-columns:25px minmax(0,1fr);gap:7px}.noticeboard-entry-content h3{font-size:13px}}/* Persona-style calendar composition, recoloured to the Reverse: 1999 palette. */
 .session-calendar-panel {position:relative;overflow:hidden;margin:0 0 27px;padding:15px 17px 12px;border:1px solid #6d7b6d;background:linear-gradient(135deg,#304941,#263c36 75%,#405448);color:#eee7d6;box-shadow:0 8px 24px #263c361c;}
 .session-calendar-panel:after {content:"";position:absolute;right:-36px;top:-56px;width:160px;height:160px;border:1px solid #d2bd8833;border-radius:50%;box-shadow:0 0 0 13px #d2bd8809,0 0 0 27px #d2bd8807;pointer-events:none;}
 .calendar-heading,.calendar-footer {display:flex;justify-content:space-between;align-items:center;gap:10px;}
