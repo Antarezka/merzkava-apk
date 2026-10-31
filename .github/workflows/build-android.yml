@@ -8,6 +8,8 @@ on:
     paths:
       - "src/**"
       - "public/**"
+      - "native/**"
+      - "scripts/**"
       - "package.json"
       - "package-lock.json"
       - "capacitor.config.ts"
@@ -58,6 +60,9 @@ jobs:
 
       - name: Sync Capacitor Android project
         run: npx cap sync android
+
+      - name: Install Merzkava Floating Mode native integration
+        run: node scripts/patch-android.mjs
 
       - name: Configure permanent update signing and version
         env:
