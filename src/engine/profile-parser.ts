@@ -47,14 +47,16 @@ export function parseCharacterProfile(markdown: string): ProfileParseResult {
 export function validateCharacterProfile(profile: ParsedCharacterProfile): string[] {
   const f = profile.fields;
   const errors: string[] = [];
-  const hp = f.HP.match(/^(\d+)\s*\/\s*(\d+)$/);
+  const hp = f.HP.match(/^(\d+)\s*\/\s*(\d+)/);
   if (!hp || Number(hp[2]) <= 0 || Number(hp[1]) > Number(hp[2])) errors.push("HP harus berbentuk current/max dan current tidak boleh melebihi maksimum.");
-  const satiety = f.Satiety.match(/^(\d+)\s*\/\s*100$/);
+  const satiety = f.Satiety.match(/^(\d+)\s*\/\s*100/);
   if (!satiety || Number(satiety[1]) > 100) errors.push("Satiety harus berada pada rentang 0–100 dengan format N/100.");
-  if (!/^\d+\s*xc\s*\|\s*\d+\s*xs\s*\|\s*\d+\s*xg\s*\|\s*\d+\s*zj\s*\|\s*\d+\s*az$/i.test(f["Wallet (wealth)"])) {
+  if (!/^\d+\s*xc\s*\|\s*\d+\s*xs\s*\|\s*\d+\s*xg\s*\|\s*\d+\s*zj\s*\|\s*\d+\s*az(?:\s|$)/i.test(f["Wallet (wealth)"])) {
     errors.push("Wallet harus memakai urutan xc | xs | xg | zj | az dan nominal bilangan bulat.");
   }
-  if (!/^\d+(?:\.\d+)?%\s*\/\s*\d+(?:\.\d+)?%$/.test(f["Sync progress"])) errors.push("Sync progress harus berbentuk persentase saat ini/cap.");
+  if (!/^\d+(?:\.\d+)?%\s*\/\s*\d+(?:\.\d+)?%(?:\s|$)/.test(f["Sync progress"])) errors.push("Sync progress harus berbentuk persentase saat ini/cap.");
+  for (const field of PROFILE_FIELDS) if (!f[field].trim()) errors.push("Field profil tidak boleh kosong: " + field + ".");
+  if (!/^``[^`]+``\s*\|\s*(?:\?+|\d+)\s*Day left$/i.test(f["Spirit Ring Absorption"])) errors.push("Spirit Ring Absorption harus memakai format ``status`` | Day left.");
   if (!f.Nama.trim()) errors.push("Nama karakter tidak boleh kosong.");
   if (!f["Spirit Realm"].trim()) errors.push("Spirit Realm tidak boleh kosong.");
   if (!f["Spirit Ring Absorption"].trim()) errors.push("Spirit Ring Absorption tidak boleh kosong.");
