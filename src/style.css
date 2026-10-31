@@ -173,8 +173,22 @@ button {color:inherit;} button:focus-visible {outline-color:#a68d5e;}
 .composer-topline{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;}
 .composer-topline label,.composer-label{color:#89764e;font-size:8px;font-weight:700;letter-spacing:.13em;}
 .composer-topline select{max-width:65%;padding:5px 7px;border:1px solid #c1b79f;background:#f5efdf;color:#34483f;font-size:10px;}
-.conversation-composer textarea{display:block;width:100%;min-height:52px;max-height:120px;resize:vertical;margin-top:5px;padding:10px 11px;border:1px solid #c1b79f;background:#f8f3e8;color:#30463e;font-family:inherit;font-size:13px;line-height:1.5;}
+.conversation-composer textarea{display:block;width:100%;min-width:0;min-height:54px;max-height:150px;resize:vertical;margin:0;padding:10px 11px;border:1px solid #c1b79f;background:#f8f3e8;color:#30463e;font-family:inherit;font-size:13px;line-height:1.5;}
 .conversation-composer textarea:focus{outline:1px solid #a68d5e;border-color:#a68d5e;}
+.composer-entry-row{display:flex;align-items:stretch;gap:7px;margin-top:5px;}
+.composer-send-button{display:grid;flex:0 0 48px;place-items:center;align-self:stretch;min-height:54px;padding:0;border:1px solid #a99060;border-radius:3px;background:linear-gradient(145deg,#e8d8b2,#cdb982);color:#40564b;box-shadow:inset 0 0 0 2px #f5edda88,0 2px 5px #34473b12;cursor:pointer;transition:background .18s ease,transform .18s ease,box-shadow .18s ease;}
+.composer-send-button svg{width:23px;height:23px;filter:drop-shadow(0 1px 0 #fff8);}
+.composer-send-button:active{transform:translateY(1px);background:#c4b17e;box-shadow:inset 0 1px 3px #40564b22;}
+.composer-send-button:disabled{opacity:.5;cursor:wait;}
+.composer-format{margin-top:5px;}
+.composer-format-toggle{display:flex;align-items:center;justify-content:space-between;width:100%;padding:5px 2px;border:0;background:transparent;color:#88764f;font-size:8px;font-weight:700;letter-spacing:.14em;text-align:left;cursor:pointer;}
+.composer-format-chevron{font:15px/1 Georgia,serif;color:#9a8556;}
+.composer-format-panel{display:flex;align-items:center;gap:7px;padding:7px 0 2px;border-top:1px solid #c9bea7;}
+.composer-format-panel[hidden]{display:none!important;}
+.composer-format-panel button{display:flex;align-items:center;gap:6px;min-width:58px;padding:6px 9px;border:1px solid #c7bea9;background:#f2ead8;color:#40564b;cursor:pointer;}
+.composer-format-panel button>span{font:600 13px Georgia,serif;color:#927b50;}
+.composer-format-panel button small{font-size:8px;color:#6f796e;}
+.composer-format-panel button:active{background:#e4dac4;}
 .conversation-composer .action-button{width:100%;margin-top:8px;min-height:39px;}
 /* Roller blind is an independent top overlay; it never participates in chat layout. */
 .snapshot-blind{position:fixed;z-index:18;top:0;left:50%;width:min(100%,900px);transform:translateX(-50%);pointer-events:none;}
