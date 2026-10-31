@@ -15,8 +15,8 @@ const openingVoices = [
 ];
 const buttonSounds = ["/audio/soft-click.mp3"];
 
-function playAudio(path: string, volume: number): Promise<void> {
-  if (!soundEnabled || openingCancelled) return Promise.resolve();
+function playAudio(path: string, volume: number, allowAfterOpeningCancel = false): Promise<void> {
+  if (!soundEnabled || (openingCancelled && !allowAfterOpeningCancel)) return Promise.resolve();
   return new Promise(resolve => {
     const audio = new Audio(path);
     audio.preload = "auto";
@@ -72,7 +72,7 @@ export function cancelOpeningSequence(): void {
 export function playButtonSound(): void {
   if (!soundEnabled) return;
   const path = buttonSounds[Math.floor(Math.random() * buttonSounds.length)];
-  void playAudio(path, 0.48);
+  void playAudio(path, 0.48, true);
 }
 
 export function setSoundEnabled(enabled: boolean): void {
