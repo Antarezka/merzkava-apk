@@ -40,7 +40,7 @@ function ledgerLogMarkup(entries: LedgerEntry[]): string {
 
 type InventorySnapshot = { inventory: string; assets: string; wallet: string };
 function inventoryView(entries: LedgerEntry[], snapshot?: InventorySnapshot): string {
-  const walletMatch = snapshot?.wallet.match(/^(\\d+)\\s*xc\\s*\\|\\s*(\\d+)\\s*xs\\s*\\|\\s*(\\d+)\\s*xg\\s*\\|\\s*(\\d+)\\s*zj\\s*\\|\\s*(\\d+)\\s*az/i);
+  const walletMatch = snapshot?.wallet.match(/^(\d+)\s*xc\s*\|\s*(\d+)\s*xs\s*\|\s*(\d+)\s*xg\s*\|\s*(\d+)\s*zj\s*\|\s*(\d+)\s*az/i);
   const wallet = walletMatch ? walletMatch.slice(1).map((amount, index) => `<span>${amount} ${["xc","xs","xg","zj","az"][index]}</span>`).join("") : `<span>— xc</span><span>— xs</span><span>— xg</span><span>— zj</span><span>— az</span>`;
   const inventory = snapshot?.inventory || "Belum disinkronkan";
   const assets = snapshot?.assets || "Belum disinkronkan";
