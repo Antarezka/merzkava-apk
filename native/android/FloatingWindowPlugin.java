@@ -31,6 +31,7 @@ import android.widget.TextView;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
+import com.getcapacitor.BridgeActivity;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 
@@ -39,9 +40,10 @@ import java.util.List;
 
 @CapacitorPlugin(name = "FloatingWindow")
 public class FloatingWindowPlugin extends Plugin {
-    private static final int MODE_WINDOW = 0;
-    private static final int MODE_STRIP = 1;
-    private static final int MODE_BUBBLE = 2;
+    private static final int MODE_FULL_SCREEN = 0;
+    private static final int MODE_WINDOW = 1;
+    private static final int MODE_STRIP = 2;
+    private static final int MODE_BUBBLE = 3;
     private static final Handler MAIN = new Handler(Looper.getMainLooper());
 
     private static WeakReference<Activity> activityRef;
@@ -56,7 +58,8 @@ public class FloatingWindowPlugin extends Plugin {
     private static View bubbleView;
     private static TextView stripView;
     private static WindowManager.LayoutParams overlayParams;
-    private static int mode = MODE_WINDOW;
+    private static volatile int mode = MODE_FULL_SCREEN;
+    private static boolean transitionInProgress;
     private static int windowWidth;
     private static int windowHeight;
     private static int touchStartX;
@@ -74,7 +77,7 @@ public class FloatingWindowPlugin extends Plugin {
         if (activity != null) {
             activityRef = new WeakReference<>(activity);
             webView = getBridge().getWebView();
-            windowManager = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
+            windowManager = (WindowManager) activity.getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
         }
     }
 
@@ -93,7 +96,7 @@ public class FloatingWindowPlugin extends Plugin {
         result.put("displayOverApps", overlay);
         result.put("notifications", notificationReady);
         result.put("batteryExemption", batteryReady);
-        result.put("serviceRunning", FloatingKeepAliveService.isActive());
+        result.put("serviceRunning", isServiceRunning(context) && FloatingKeepAliveService.isActive());
         call.resolve(result);
     }
 
@@ -101,7 +104,7 @@ public class FloatingWindowPlugin extends Plugin {
         ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         if (manager == null) return false;
         for (ActivityManager.RunningServiceInfo info : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (FloatingKeepAliveService.class.getName().equals(info.service.getClassName())) return true;
+            if (FloatingKeepAliveService.class.getName().equals(info.service.getClassName()) && info.foreground) return true;
         }
         return false;
     }
@@ -188,7 +191,8 @@ public class FloatingWindowPlugin extends Plugin {
                 webView.evaluateJavascript("document.body.classList.remove('native-floating-mode')", null);
             }
             if (activity != null) activity.stopService(new Intent(activity, FloatingKeepAliveService.class));
-            mode = MODE_WINDOW;
+            mode = MODE_FULL_SCREEN;
+            transitionInProgress = false;
             call.resolve();
         });
     }
@@ -372,7 +376,10 @@ public class FloatingWindowPlugin extends Plugin {
 
     private static void showWindowMode() {
         Activity activity = getActivityRef();
-        if (activity == null || webView == null) return;
+        if (activity == null || activity.isFinishing() || webView == null) return;
+        if (transitionInProgress) return;
+        if (currentOverlay == floatingRoot && floatingRoot != null && floatingRoot.getParent() != null) return;
+        transitionInProgress = true;
         try {
             Intent hideBubble = new Intent(activity, FloatingKeepAliveService.class);
             hideBubble.setAction(FloatingKeepAliveService.ACTION_HIDE_BUBBLE);
@@ -381,9 +388,19 @@ public class FloatingWindowPlugin extends Plugin {
             if (floatingRoot == null || webView.getParent() != contentFrame) attachWebViewToFloatingRoot(activity);
             mode = MODE_WINDOW;
             addOverlay(floatingRoot, windowWidth, windowHeight);
-            MAIN.postDelayed(() -> activity.moveTaskToBack(true), 180);
+            MAIN.post(() -> {
+                if (activity.isFinishing()) { restoreToActivity(); return; }
+                if (currentOverlay == floatingRoot && floatingRoot != null && floatingRoot.getParent() != null) {
+                    transitionInProgress = false;
+                    activity.moveTaskToBack(true);
+                } else {
+                    transitionInProgress = false;
+                    restoreToActivity();
+                }
+            });
         } catch (Exception error) {
             android.util.Log.e("MerzkavaFloating", "Could not attach floating mini window", error);
+            transitionInProgress = false;
             restoreToActivity();
         }
     }
@@ -392,6 +409,7 @@ public class FloatingWindowPlugin extends Plugin {
         Activity activity = getActivityRef();
         if (activity == null) return;
         mode = MODE_STRIP;
+        transitionInProgress = false;
         if (stripView == null) {
             stripView = new TextView(activity);
             stripView.setText("MERZKAVA  ·  TAP TO RESTORE");
@@ -427,6 +445,7 @@ public class FloatingWindowPlugin extends Plugin {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) activity.startForegroundService(service);
             else activity.startService(service);
             mode = MODE_BUBBLE;
+            transitionInProgress = false;
             MAIN.postDelayed(() -> {
                 if (FloatingKeepAliveService.isBubbleVisible()) {
                     activity.moveTaskToBack(true);
@@ -437,7 +456,8 @@ public class FloatingWindowPlugin extends Plugin {
                         if (!tasks.isEmpty()) tasks.get(0).moveToFront();
                     } catch (Exception ignored) { }
                     activity.stopService(new Intent(activity, FloatingKeepAliveService.class));
-                    mode = MODE_WINDOW;
+                    mode = MODE_FULL_SCREEN;
+                    transitionInProgress = false;
                 }
             }, 450);
         } catch (Exception error) {
@@ -531,10 +551,23 @@ public class FloatingWindowPlugin extends Plugin {
     }
 
     public static void onBubbleTapped(Activity activity) {
-        if (activity == null) return;
+        if (activity == null || activity.isFinishing()) return;
         activityRef = new WeakReference<>(activity);
-        windowManager = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
-        MAIN.post(() -> showWindowMode());
+        windowManager = (WindowManager) activity.getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
+        // Refresh the Bridge WebView from the resumed host instead of trusting a
+        // possibly stale static reference after Android recreates MainActivity.
+        if (activity instanceof BridgeActivity) {
+            WebView resumedWebView = ((BridgeActivity) activity).getBridge().getWebView();
+            if (resumedWebView != null) webView = resumedWebView;
+        }
+        if (webView == null) {
+            android.util.Log.e("MerzkavaFloating", "Cannot open mini window: Capacitor WebView is unavailable.");
+            return;
+        }
+        MAIN.post(() -> {
+            if (activity.isFinishing()) return;
+            showWindowMode();
+        });
     }
 
     public static void restoreForForeground() {
@@ -559,7 +592,8 @@ public class FloatingWindowPlugin extends Plugin {
                 if (!tasks.isEmpty()) tasks.get(0).moveToFront();
             } catch (Exception ignored) { }
             activity.stopService(new Intent(activity, FloatingKeepAliveService.class));
-            mode = MODE_WINDOW;
+            mode = MODE_FULL_SCREEN;
+            transitionInProgress = false;
         });
     }
 }
