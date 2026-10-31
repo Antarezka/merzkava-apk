@@ -733,7 +733,6 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       const registeredProfile = mode === "new" && exactRegistryPath ? await loadRegisteredPlayerProfile(activeSha, exactRegistryPath) : null;
       const contextCharacter = registeredProfile ? { ...character, origin: "Registry" } : character;
       const savedSession = mode === "continue" ? await getGameplaySessionRecord(characterId) : null;
-      if (mode === "continue" && !savedSession) throw new Error("Save sesi lama belum memiliki baseline canon yang terverifikasi. Mulai sesi baru agar profil sumber dan snapshot dapat disimpan dengan aman.");
       if (mode === "continue" && savedSession && savedSession.snapshotSha !== activeSha) throw new Error("Save sesi dan ACTIVE_SHA berbeda. Sesi tidak boleh mencampur snapshot canon.");
       activeProfileMarkdown = mode === "new" ? (registeredProfile?.content ?? "") : (savedSession?.profileMarkdown ?? "");
       const context = assembleGameplayContext({ ...route, query: activity }, contextCharacter, activeSha, activeStatus.version, 220000);
@@ -741,7 +740,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       if (playerRegistry) context.prompt += "\n\n## FULL players.md · ACTIVE_SHA " + activeSha + "\n" + playerRegistry.content;
       if (registeredProfile) context.prompt += "\n\n## FULL REGISTERED CHARACTER PROFILE · " + registeredProfile.path + " · ACTIVE_SHA " + activeSha + "\n" + registeredProfile.content;
       const previous = mode === "new" ? [] : activeChat.messages;
-      context.prompt += "\n\n## VERIFIED CHARACTER PROFILE SOURCE\n" + (activeProfileMarkdown || "No registered profile markdown is available; use the official new-character bootstrap template and preserve unknowns.") +
+      context.prompt += "\n\n## VERIFIED CHARACTER PROFILE SOURCE\n" + (activeProfileMarkdown || (mode === "new" ? "No registered profile markdown is available; use the official new-character bootstrap template and preserve unknowns." : "Legacy session has no persisted verified profile source. Use its chronological transcript only as unverified continuity; do not reset the character or invent state. Ask for a verified save/profile when an action depends on missing state.")) +
         "\n\n## PERSISTED STATE TRUST\n" + (mode === "new" ? "New-session profile source is the baseline. Do not invent missing values." : (savedSession?.stateVerified ? "The persisted state record is marked verified." : "The persisted record is NOT mechanically verified. Preserve only source-backed facts; do not promote prior GM proposals or unverified changes into facts. If an action depends on an unverified value, stop and ask for reconciliation.")) +
         "\n\n## SESSION MODE\n" + (mode === "new" ? "NEW SESSION: initialize from the exact trigger below." : "CONTINUING SESSION: continue without resetting established state.") +
         "\n\n## EXACT TRIGGER\n" + (mode === "new" ? trigger : "Not applicable; continuation.") +
