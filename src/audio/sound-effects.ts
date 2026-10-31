@@ -83,6 +83,52 @@ export function playButtonSound(): void {
   });
 }
 
+export function playSnapshotSlideSound(direction: "down" | "up"): void {
+  if (!soundEnabled) return;
+
+  // A short, filtered noise sweep gives the snapshot strip a soft paper-on-paper glide.
+  try {
+    const AudioContextConstructor = window.AudioContext;
+    if (AudioContextConstructor) {
+      const context = new AudioContextConstructor();
+      const duration = direction === "down" ? 0.2 : 0.17;
+      const frameCount = Math.max(1, Math.floor(context.sampleRate * duration));
+      const buffer = context.createBuffer(1, frameCount, context.sampleRate);
+      const channel = buffer.getChannelData(0);
+      for (let i = 0; i < frameCount; i++) {
+        const fadeIn = Math.min(1, i / (context.sampleRate * 0.018));
+        const fadeOut = Math.min(1, (frameCount - i) / (context.sampleRate * 0.055));
+        channel[i] = (Math.random() * 2 - 1) * fadeIn * fadeOut;
+      }
+
+      const source = context.createBufferSource();
+      const filter = context.createBiquadFilter();
+      const volume = context.createGain();
+      source.buffer = buffer;
+      filter.type = "bandpass";
+      filter.frequency.setValueAtTime(direction === "down" ? 1250 : 1450, context.currentTime);
+      filter.frequency.exponentialRampToValueAtTime(720, context.currentTime + duration);
+      filter.Q.value = 0.7;
+      volume.gain.setValueAtTime(0.0001, context.currentTime);
+      volume.gain.exponentialRampToValueAtTime(0.12, context.currentTime + 0.035);
+      volume.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + duration);
+      source.connect(filter);
+      filter.connect(volume);
+      volume.connect(context.destination);
+      source.onended = () => { void context.close(); };
+      if (context.state === "suspended") void context.resume();
+      source.start();
+    }
+  } catch (error) {
+    console.warn("Merzkava snapshot slide sound could not play:", error);
+  }
+
+  // Closing upward ends with the existing warm, quiet mechanical tap.
+  if (direction === "up") {
+    window.setTimeout(() => playButtonSound(), 115);
+  }
+}
+
 export function setSoundEnabled(enabled: boolean): void {
   soundEnabled = enabled;
   if (!enabled) {
