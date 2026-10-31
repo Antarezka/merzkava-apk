@@ -50,7 +50,7 @@ function validateAfterValue(field: string, value: string): string | null {
  * Reconcile a proposal against the exact parsed profile baseline.
  * Candidate means structurally consistent only; canon mechanics and player approval are still required.
  */
-export function reconcileGMProposal(profile: ParsedCharacterProfile | null, proposal: GMProposal, responseProfile?: ParsedCharacterProfile | null): StateReconciliation {
+export function reconcileGMProposal(profile: ParsedCharacterProfile | null, proposal: GMProposal, responseProfile?: ParsedCharacterProfile | null, responseText?: string): StateReconciliation {
   if (!profile) {
     return {
       status: "review-required",
@@ -75,6 +75,11 @@ export function reconcileGMProposal(profile: ParsedCharacterProfile | null, prop
       continue;
     }
     seen.add(field);
+    if (change.before.trim() === change.after.trim()) {
+      errors.push("state_changes untuk " + field + " tidak boleh mencatat perubahan tanpa perubahan nilai.");
+      changes.push({ field, before: change.before, after: change.after, status: "rejected", reason: "Nilai sebelum dan sesudah identik." });
+      continue;
+    }
     const actual = profile.fields[field];
     if (change.before.trim() !== actual.trim()) {
       errors.push("Nilai before tidak cocok dengan profil untuk " + field + ".");
@@ -98,6 +103,19 @@ export function reconcileGMProposal(profile: ParsedCharacterProfile | null, prop
       continue;
     }
     changes.push({ field, before: change.before, after: change.after, status: "candidate", reason: "Baseline cocok dan format dasar valid; belum diterapkan, belum disahkan mekanik, dan menunggu persetujuan pemain." });
+  }
+  if (responseText !== undefined) {
+    const hasLedger = responseText.includes("╭─ LEDGER LOG · #");
+    const logMarkerCount = (responseText.match(/Log tercatat!/g) ?? []).length;
+    const firstProfilePanel = responseText.indexOf("◈━━┫ PROFIL KARAKTER ┣━━◈");
+    const ledgerPosition = responseText.indexOf("╭─ LEDGER LOG · #");
+    if (proposal.state_changes.length > 0) {
+      if (!hasLedger || logMarkerCount !== 1 || ledgerPosition < 0 || ledgerPosition > firstProfilePanel) {
+        errors.push("Perubahan state wajib memiliki tepat satu `Log tercatat!` dan satu LEDGER LOG sebelum panel profil.");
+      }
+    } else if (hasLedger || logMarkerCount > 0) {
+      errors.push("LEDGER LOG dan `Log tercatat!` tidak boleh muncul ketika tidak ada state_changes.");
+    }
   }
   if (responseProfile) {
     for (const field of deterministicFields) {
