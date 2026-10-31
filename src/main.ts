@@ -7,7 +7,7 @@ import { getGameplaySessionRecord, initializeDatabase, saveGameplaySessionRecord
 import { createCharacter, deleteCharacter, listCharacters, type Character } from "./characters/character-repository";
 import { validateCharacterDraft } from "./engine/character-validation";
 import { renderScreen, type ScreenId } from "./app/screens";
-import { activateCanonSnapshot, getCanonIndex, getCanonStatus, loadCanonModule, loadPlayerRegistry, loadRegisteredPlayerProfile, refreshCanon, refreshLatestPlayerRegistry, type CanonDocument } from "./canon/canon-loader";
+import { getCanonIndex, getCanonStatus, loadCanonModule, loadPlayerRegistry, loadRegisteredPlayerProfile, refreshCanon, refreshLatestPlayerRegistry, type CanonDocument } from "./canon/canon-loader";
 import { routeCanonActivity } from "./canon/canon-router";
 import { assembleGameplayContext } from "./canon/context-assembler";
 import { requestGMProposal, validateGMResponse, type GMProposal } from "./engine/gm-engine";
@@ -705,7 +705,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     if (sendButton) sendButton.disabled = true;
     if (startButton) startButton.disabled = true;
     try {
-      if (mode === "continue") { activeStatus = await activateCanonSnapshot(activeSha); activeSha = activeStatus.commitSha; }
+      if (mode === "continue") { activeStatus = await refreshCanon(activeSha); if (activeStatus.status === "error" || !activeStatus.commitSha) throw new Error(activeStatus.message); activeSha = activeStatus.commitSha; }
       const route = await routeCanonActivity(routeQuery, 7);
       const indexDocument = await getCanonIndex(activeSha);
       if (!indexDocument || indexDocument.commitSha !== activeSha) throw new Error("Bootstrap gagal: INDEX.md pada ACTIVE_SHA penuh tidak tersedia.");
