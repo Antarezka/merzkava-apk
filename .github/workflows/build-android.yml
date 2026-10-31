@@ -90,7 +90,7 @@ jobs:
           signing = '''
               signingConfigs {
                   debug {
-                      storeFile file("$rootDir/merzkava-upload.jks")
+                      storeFile file("${rootProject.projectDir}/merzkava-upload.jks")
                       storePassword System.getenv("MERZKAVA_KEYSTORE_PASSWORD")
                       keyAlias System.getenv("MERZKAVA_KEY_ALIAS")
                       keyPassword System.getenv("MERZKAVA_KEY_PASSWORD")
