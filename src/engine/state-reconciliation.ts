@@ -117,6 +117,14 @@ export function reconcileGMProposal(profile: ParsedCharacterProfile | null, prop
       errors.push("LEDGER LOG dan `Log tercatat!` tidak boleh muncul ketika tidak ada state_changes.");
     }
   }
+  if (responseText !== undefined) {
+    const hasLedger = responseText.includes("╭─ LEDGER LOG · #");
+    const markerCount = (responseText.match(/Log tercatat!/g) ?? []).length;
+    const panelPosition = responseText.indexOf("◈━━┫ PROFIL KARAKTER ┣━━◈");
+    const ledgerPosition = responseText.indexOf("╭─ LEDGER LOG · #");
+    if (proposal.state_changes.length > 0 && (!hasLedger || markerCount !== 1 || ledgerPosition > panelPosition)) errors.push('A state change must have one ledger before the profile panel.');
+    if (proposal.state_changes.length === 0 && (hasLedger || markerCount > 0)) errors.push('Ledger must be omitted when there are no state changes.');
+  }
   if (responseProfile) {
     for (const field of deterministicFields) {
       if (profile.fields[field] !== responseProfile.fields[field] && !seen.has(field)) {
