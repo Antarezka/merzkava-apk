@@ -139,11 +139,11 @@ export function subscribeToLedgerChanges(listener: (entry: LedgerEntry) => void)
 export function showLedgerProposalBubble(event: LedgerProposalEvent): void {
   const incoming = event.direction === "in";
   const label = event.kind === "item" ? (incoming ? "ITEM MASUK" : "ITEM KELUAR") : (incoming ? "UANG MASUK" : "UANG KELUAR");
-  const amount = event.kind === "item" ? `${event.quantity} ${event.unit ?? "×"} · ${event.item}` : `${event.amount} ${event.currency}`;
+  const amount = event.kind === "item" ? `${incoming ? "+" : "−"}${event.quantity} ${event.unit ?? "×"} · ${event.item}` : `${incoming ? "+" : "−"}${event.amount} ${event.currency}`;
   showBubble({
     id: `proposal-${Date.now()}-${Math.random()}`, characterId: "pending",
-    category: event.kind === "item" ? "inventory" : "wallet", title: `MENUNGGU VERIFIKASI · ${label}`,
+    category: event.kind === "item" ? "inventory" : "wallet", title: label,
     change: amount, tone: incoming ? "positive" : "negative", createdAt: new Date().toISOString(),
-    detail: `${event.reason} · Belum masuk ledger; menunggu verifikasi canon dan persetujuan pemain.`
+    detail: `Belum disahkan · ${event.reason}`
   });
 }
