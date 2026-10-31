@@ -348,3 +348,15 @@ button {color:inherit;} button:focus-visible {outline-color:#a68d5e;}
 :root[data-theme="dark"] .noticeboard-actions button {border-color:#8c7950;}
 :root[data-theme="dark"] .noticeboard-today {background:#52614f;color:#f0e8d8;}
 :root[data-theme="dark"] .noticeboard-ignore {background:transparent;color:#d4d5c6;}
+
+
+:root[data-theme="dark"] .player-tools {border-color:#48554a;background:#242c27;color:#aeb5a6;}
+:root[data-theme="dark"] .chat-message {border-color:#465047;background:#2b342d;color:#e5dfd1;}
+:root[data-theme="dark"] .chat-message.gm {border-left-color:#c1a875;background:#29342d;}
+:root[data-theme="dark"] .chat-message.player {border-right-color:#849487;background:#303a31;}
+:root[data-theme="dark"] .chat-message small {color:#c1a875;}
+:root[data-theme="dark"] .composer-topline select {border-color:#536052;background:#18211c;color:#e5dfd1;}
+:root[data-theme="dark"] .session-actions .text-button,
+:root[data-theme="dark"] .composer-status {color:#c0c6b6;}
+:root[data-theme="dark"] .player-record {color:#e5dfd1;}
+:root[data-theme="dark"] .player-record-content {color:#c6cbbb;}
