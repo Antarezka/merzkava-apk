@@ -24,6 +24,8 @@ export async function initializeDatabase(): Promise<DatabaseStatus> {
     const connection = new SQLiteConnection(CapacitorSQLite);
     database = await connection.createConnection(DATABASE_NAME, false, "no-encryption", SCHEMA_VERSION, false);
     await database.open();
+    // SQLite does not guarantee FK enforcement unless enabled per connection.
+    await database.execute("PRAGMA foreign_keys = ON;");
     for (const statement of schema) await database.execute(statement);
 
     // Additive migrations keep existing local saves readable after app updates.
