@@ -30,11 +30,11 @@ export function animateOpeningSplash(splash: HTMLElement): () => void {
   const entrance = createTimeline({ defaults: { ease: "outCubic" } });
   entrance
     .add(content, { opacity: [0, 1], translateY: [16, 0], duration: 900 }, 180)
-    .add(logo, { scale: [0.88, 1], rotate: [-2, 0], duration: 1100, ease: "outBack" }, 220)
-    .add(kicker, { opacity: [0, 1], translateY: [7, 0], duration: 600 }, 680)
-    .add(title, { opacity: [0, 1], translateY: [10, 0], duration: 760 }, 780)
-    .add(rule, { scaleX: [0, 1], opacity: [0, 1], duration: 650 }, 1040)
-    .add(tagline, { opacity: [0, 1], duration: 700 }, 1200);
+    .add(logo, { scale: [0.88, 1], rotate: [-2, 0], duration: 1100, ease: "outBack" }, 220);
+  if (kicker) entrance.add(kicker, { opacity: [0, 1], translateY: [7, 0], duration: 600 }, 680);
+  entrance.add(title, { opacity: [0, 1], translateY: [10, 0], duration: 760 }, 780);
+  if (rule) entrance.add(rule, { scaleX: [0, 1], opacity: [0, 1], duration: 650 }, 1040);
+  if (tagline) entrance.add(tagline, { opacity: [0, 1], duration: 700 }, 1200);
 
   const idle = animate(logo, {
     translateY: [-3, 3],
