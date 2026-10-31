@@ -83,6 +83,30 @@ export function playButtonSound(): void {
   });
 }
 
+export function playWarningBeep(): void {
+  if (!soundEnabled) return;
+  try {
+    const context = new window.AudioContext();
+    const now = context.currentTime;
+    [0, 0.105].forEach((offset, index) => {
+      const oscillator = context.createOscillator();
+      const volume = context.createGain();
+      oscillator.type = "sine";
+      oscillator.frequency.setValueAtTime(index === 0 ? 740 : 620, now + offset);
+      volume.gain.setValueAtTime(0.0001, now + offset);
+      volume.gain.exponentialRampToValueAtTime(0.075, now + offset + 0.012);
+      volume.gain.exponentialRampToValueAtTime(0.0001, now + offset + 0.075);
+      oscillator.connect(volume);
+      volume.connect(context.destination);
+      oscillator.start(now + offset);
+      oscillator.stop(now + offset + 0.08);
+    });
+    window.setTimeout(() => { void context.close(); }, 280);
+  } catch (error) {
+    console.warn("Merzkava warning beep could not play:", error);
+  }
+}
+
 export function playSnapshotSlideSound(direction: "down" | "up"): void {
   if (!soundEnabled) return;
 
