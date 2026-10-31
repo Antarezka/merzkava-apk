@@ -768,7 +768,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       if (responsePanels.errors.length) throw new Error("Respons GM ditolak karena tidak sesuai empat panel resmi: " + responsePanels.errors.join(" "));
       const responseProfileErrors = validateCharacterProfile(responsePanels.profile);
       if (responseProfileErrors.length) throw new Error("Nilai panel profil GM tidak valid: " + responseProfileErrors.join(" "));
-      const stateReconciliation = reconcileGMProposal(usableProfile, gmProposal, responsePanels.profile);
+      const stateReconciliation = reconcileGMProposal(usableProfile, gmProposal, responsePanels.profile, gmProposal.player_response);
       applyGMWorldTime(gmProposal);
       activeChat.messages.push({ role: "player", text: mode === "new" ? "Memulai sesi baru sebagai " + character.name + "." : typedActivity, createdAt: new Date().toISOString() });
       activeChat.messages.push({ role: "gm", text: gmProposal.player_response, createdAt: new Date().toISOString() });
