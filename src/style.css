@@ -369,3 +369,56 @@ button {color:inherit;} button:focus-visible {outline-color:#a68d5e;}
 .preference-choice button.is-selected,.preference-toggle[aria-pressed="true"] {border-color:#9d8557;background:#e2d6b8;color:#34483f;box-shadow:inset 0 0 0 1px #b49b6844;}
 .preference-toggle {flex:0 0 auto;min-width:86px;}
 @media(max-width:380px){.setting-row:has(.preference-toggle){align-items:flex-start;}.preference-choice button{flex:1;}}
+
+
+/* Floating transaction bubbles: separate from the narrative card and anchored to the viewport. */
+#ledger-bubble-stack {
+  position: fixed; inset: 0; z-index: 1200; overflow: hidden;
+  pointer-events: none; isolation: isolate;
+}
+.ledger-bubble {
+  position: absolute; right: clamp(14px, 5vw, 34px); bottom: 18px;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 4px;
+  width: max-content; max-width: min(78vw, 290px); padding: 12px 17px 13px;
+  border: 1px solid #b9a779; border-radius: 999px; color: #34473d;
+  background: radial-gradient(ellipse at 28% 12%,#fffdf2e8 0%,#f1ead5e8 48%,#d9ddcbe8 100%);
+  box-shadow: 0 8px 26px #27372b25,inset 0 1px 5px #ffffffd9,inset 0 -2px 8px #8d9a7b30;
+  text-align: left; pointer-events: auto; cursor: pointer;
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  animation: ledger-soap-float 5.2s cubic-bezier(.32,.02,.62,.98) both;
+  will-change: transform, opacity;
+}
+.ledger-bubble:before {
+  content: ""; position: absolute; width: 23px; height: 9px; top: 7px; left: 19px;
+  border-radius: 50%; background: linear-gradient(90deg,#ffffffa8,#ffffff12);
+  transform: rotate(-28deg); pointer-events: none;
+}
+.ledger-bubble-kicker { font: 700 8px/1.2 "Cinzel",serif; letter-spacing: .16em; color: #85734f; }
+.ledger-bubble-change { font: 600 14px/1.25 "Cormorant Garamond",serif; letter-spacing: .025em; overflow-wrap: anywhere; }
+.ledger-bubble-total,.ledger-bubble-detail { max-width: 100%; font: 500 9px/1.35 "Cormorant Garamond",serif; color: #657166; }
+.ledger-bubble.tone-positive { border-color:#8b9a78; }
+.ledger-bubble.tone-negative { border-color:#b58c83; }
+.ledger-bubble.tone-neutral { border-color:#b9a779; }
+.ledger-bubble.is-popping { animation: ledger-bubble-pop .22s ease-out forwards; }
+@keyframes ledger-soap-float {
+  0% { opacity:0; transform:translate3d(0,0,0) scale(.72); }
+  8% { opacity:1; transform:translate3d(-8px,-8vh,0) scale(1); }
+  23% { transform:translate3d(12px,-25vh,0) scale(1.025); }
+  39% { transform:translate3d(-11px,-43vh,0) scale(1.01); }
+  55% { transform:translate3d(10px,-61vh,0) scale(1.025); }
+  72% { transform:translate3d(-8px,-79vh,0) scale(1); }
+  88% { opacity:.92; transform:translate3d(7px,-98vh,0) scale(.96); }
+  100% { opacity:0; transform:translate3d(-5px,-116vh,0) scale(.9); }
+}
+@keyframes ledger-bubble-pop { to { opacity:0; transform:scale(1.14); filter:blur(5px); } }
+:root[data-theme="dark"] .ledger-bubble {
+  border-color:#b8a06c; color:#e8e0cf;
+  background:radial-gradient(ellipse at 28% 12%,#657064f0 0%,#344139f0 55%,#26332bf0 100%);
+  box-shadow:0 8px 28px #0007,inset 0 1px 6px #ffffff30,inset 0 -2px 8px #0003;
+}
+:root[data-theme="dark"] .ledger-bubble-kicker { color:#ddc58f; }
+:root[data-theme="dark"] .ledger-bubble-total,:root[data-theme="dark"] .ledger-bubble-detail { color:#c4c9b9; }
+@media(prefers-reduced-motion:reduce) {
+  .ledger-bubble { animation-duration:1ms; }
+  .ledger-bubble.is-popping { animation-duration:1ms; }
+}
