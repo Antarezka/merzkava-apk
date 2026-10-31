@@ -92,7 +92,7 @@ describe("GM state reconciliation", () => {
   });
 
   it("reports no changes only when the proposal contains no state delta", () => {
-    const result = reconcileGMProposal(profile, proposal([]));
+    const result = reconcileGMProposal(profile, proposal([]), profile);
     expect(result.status).toBe("no-changes");
     expect(result.changes).toHaveLength(0);
   });
