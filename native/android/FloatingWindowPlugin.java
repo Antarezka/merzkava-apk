@@ -427,9 +427,22 @@ public class FloatingWindowPlugin extends Plugin {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) activity.startForegroundService(service);
             else activity.startService(service);
             mode = MODE_BUBBLE;
-            MAIN.postDelayed(() -> activity.moveTaskToBack(true), 180);
+            MAIN.postDelayed(() -> {
+                if (FloatingKeepAliveService.isBubbleVisible()) {
+                    activity.moveTaskToBack(true);
+                } else {
+                    android.util.Log.e("MerzkavaFloating", "Kitty bubble was not attached; restoring the app to the foreground.");
+                    try {
+                        List<ActivityManager.AppTask> tasks = ((ActivityManager) activity.getSystemService(Context.ACTIVITY_SERVICE)).getAppTasks();
+                        if (!tasks.isEmpty()) tasks.get(0).moveToFront();
+                    } catch (Exception ignored) { }
+                    activity.stopService(new Intent(activity, FloatingKeepAliveService.class));
+                    mode = MODE_WINDOW;
+                }
+            }, 450);
         } catch (Exception error) {
             android.util.Log.e("MerzkavaFloating", "Could not minimize to Kitty bubble", error);
+            restoreToActivity();
         }
     }
 
