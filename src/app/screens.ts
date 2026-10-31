@@ -61,8 +61,23 @@ gameplay:`<section class="world-time-panel" aria-label="Waktu Merzkava Universe"
     <div class="session-actions"><span id="session-status" class="composer-status">Pilih karakter untuk memulai</span></div>
     <div data-session-start><button class="action-button" type="button" data-start-session>Mulai Convo <span>↗</span></button></div>
     <div data-session-compose hidden>
-      <label class="composer-label" for="gameplay-action">Aksiku</label><textarea id="gameplay-action" name="activity" rows="2" maxlength="1200" placeholder="Ceritakan tindakan karaktermu…"></textarea>
-      <button class="action-button" type="submit">Kirim <span>↗</span></button>
+      <label class="composer-label" for="gameplay-action">Aksiku</label>
+      <div class="composer-entry-row">
+        <textarea id="gameplay-action" name="activity" rows="2" maxlength="1200" enterkeyhint="enter" placeholder="Ceritakan tindakan karaktermu…"></textarea>
+        <button id="gameplay-send-action" class="composer-send-button" type="submit" aria-label="Kirim aksi" title="Kirim aksi">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.8 3.1 21.6 11.2 2.8 20.9l2.1-8.1 8.2-1.1-8.2-1.1L2.8 3.1Z" fill="currentColor"/><path d="m4.9 12.8 8.2-1.1" fill="none" stroke="#eee7d6" stroke-width="1.05" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="composer-format">
+        <button class="composer-format-toggle" type="button" data-format-toggle aria-expanded="false" aria-controls="composer-format-panel">
+          <span>FORMAT TEKS</span><span class="composer-format-chevron" aria-hidden="true">▾</span>
+        </button>
+        <div id="composer-format-panel" class="composer-format-panel" hidden>
+          <button type="button" data-action-format="italic" aria-label="Italic" title="Italic"><span>*</span><small>Italic</small></button>
+          <button type="button" data-action-format="bold" aria-label="Bold" title="Bold"><span>**</span><small>Bold</small></button>
+          <button type="button" data-action-format="code" aria-label="Code" title="Code"><span>`</span><small>Code</small></button>
+        </div>
+      </div>
     </div>
   </form>
 </section>`,
