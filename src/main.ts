@@ -410,6 +410,8 @@ root.addEventListener("click", async (event: MouseEvent) => {
         if (!floatingReadiness.displayOverApps) throw new Error("Aktifkan izin Display over the app terlebih dahulu.");
         await playEntrySplash();
         activeScreen = "gameplay";
+        loadCharacterWorldTime(activeCharacterId);
+        loadCharacterChat(activeCharacterId);
         render();
         await startFloatingMode();
       } else if (action === "stop") {
