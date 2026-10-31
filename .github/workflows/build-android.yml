@@ -2,7 +2,9 @@ name: Build Merzkava Android APK
 
 on:
   workflow_dispatch:
-  # APK builds remain manual until explicitly requested.
+  push:
+    branches:
+      - feature/archive-experience
 
 permissions:
   contents: read
@@ -154,4 +156,4 @@ jobs:
           pre-emulator-launch-script: adb start-server
           disable-animations: false
           script: |
-            bash -c 'set -eu; APK="android/app/build/outputs/apk/debug/app-debug.apk"; echo "Waiting for Android device..."; adb wait-for-device; test -s "$APK"; echo "Attempting Package Manager installation: $APK"; adb install --no-streaming -r "$APK"; echo "APK installation succeeded on Android API 34."; adb shell pm path com.antarezka.merzkava; adb shell dumpsys package com.antarezka.merzkava | grep -E "versionName|versionCode|primaryCpuAbi|secondaryCpuAbi" || true'
+            bash -c 'set -eu; APK="android/app/build/outputs/apk/debug/app-debug.apk"; echo "Waiting for Android device..."; adb wait-for-device; test -s "$APK"; echo "Attempting Package Manager installation: $APK"; adb install --no-streaming -r "$APK"; echo "APK installation succeeded on Android API 34."; adb shell pm path com.antarezka.merzkava; adb shell dumpsys package com.antarezka.merzkava | grep -E "versionName|versionCode|primaryCpuAbi|secondaryCpuAbi" || true; echo "Launching Merzkava on emulator..."; adb shell monkey -p com.antarezka.merzkava 1; sleep 12; test -n "$(adb shell pidof com.antarezka.merzkava)"; adb shell dumpsys activity activities | grep -E "mResumedActivity|topResumedActivity" | grep -q "com.antarezka.merzkava"; if adb logcat -d -t 2500 | grep -E "FATAL EXCEPTION|Process: com.antarezka.merzkava" | grep -q "com.antarezka.merzkava"; then echo "App crash detected in emulator logcat."; exit 1; fi; echo "Emulator install-and-launch smoke test passed."'
