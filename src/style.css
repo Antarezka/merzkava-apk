@@ -192,3 +192,11 @@ button {color:inherit;} button:focus-visible {outline-color:#a68d5e;}
 
 /* Keep the expanding shade in the header band, above—not over—the conversation. */
 .app-shell:has(.snapshot-blind.is-open) .app-header{padding-top:100px;}
+
+/* Player-facing chat and private character notes */
+.player-tools{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 11px;border-top:1px solid #c9bea7;background:#eee7d7;}
+.player-record{flex:1;min-width:0;color:#52665a;font-size:10px}.player-record summary{cursor:pointer;color:#89764e;font-size:9px;font-weight:700;letter-spacing:.08em}
+.player-record-content{padding:10px 2px;color:#657166;font-size:10px;line-height:1.55}.player-record-content dl{display:grid;grid-template-columns:95px 1fr;gap:4px 9px;margin:0 0 9px}.player-record-content dt{color:#8a7955}.player-record-content dd{margin:0;color:#3e5549;overflow-wrap:anywhere}
+.gm-options-toggle{display:grid;gap:4px;color:#89764e;font-size:8px;font-weight:700;letter-spacing:.08em}.gm-options-toggle select{padding:6px 8px;border:1px solid #c1b79f;background:#f5efdf;color:#34483f;font-size:10px}
+.session-actions{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 5px}.session-actions .text-button{color:#8c7549;font-size:10px}.composer-status{color:#7c8478;font-size:8px}
+.chat-message{max-width:94%;margin:0 0 13px;padding:11px 12px;border:1px solid #c9bea7;background:#f5efdf;color:#394e44}.chat-message.gm{margin-right:auto;border-left:3px solid #a68d5e}.chat-message.player{margin-left:auto;border-right:3px solid #718176;background:#e5e8dc}.chat-message small{display:block;margin-bottom:6px;color:#8a7955;font-size:8px;font-weight:700;letter-spacing:.14em}.chat-message p{margin:0;font-size:12px;line-height:1.7;overflow-wrap:anywhere}.conversation-composer .action-button:disabled{opacity:.55;cursor:wait}
