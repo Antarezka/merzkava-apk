@@ -129,7 +129,25 @@ export function validateGMResponse(raw: string, expectedSnapshot: string, expect
       errors.push("Isi " + field + " melewati batas yang diizinkan.");
     }
   }
-  const rawEvents = item.ledger_events;\n  const ledgerEvents: LedgerProposalEvent[] = [];\n  if (!Array.isArray(rawEvents) || rawEvents.length > 50) {\n    errors.push("Field ledger_events wajib berupa daftar maksimal 50 peristiwa.");\n  } else {\n    rawEvents.forEach((entry, index) => {\n      if (!entry || typeof entry !== "object" || Array.isArray(entry)) { errors.push("ledger_events[" + index + "] harus berupa objek."); return; }\n      const event = entry as Record<string, unknown>;\n      if ((event.kind !== "item" && event.kind !== "currency") || (event.direction !== "in" && event.direction !== "out") || typeof event.reason !== "string" || !event.reason.trim() || event.reason.length > 500) { errors.push("ledger_events[" + index + "] memiliki tipe, arah, atau alasan tidak valid."); return; }\n      if (event.kind === "item") {\n        if (typeof event.item !== "string" || !event.item.trim() || event.item.length > 160 || !Number.isSafeInteger(event.quantity) || Number(event.quantity) <= 0 || (event.unit !== undefined && (typeof event.unit !== "string" || event.unit.length > 32))) { errors.push("ledger_events[" + index + "] item membutuhkan nama dan jumlah bulat positif."); return; }\n        ledgerEvents.push({ kind: "item", direction: event.direction, item: event.item.trim(), quantity: Number(event.quantity), unit: typeof event.unit === "string" ? event.unit.trim() : undefined, reason: event.reason.trim() });\n      } else {\n        if (!["xc","xs","xg","zj","az"].includes(String(event.currency)) || !Number.isSafeInteger(event.amount) || Number(event.amount) <= 0) { errors.push("ledger_events[" + index + "] currency membutuhkan denominasi resmi dan nominal bulat positif."); return; }\n        ledgerEvents.push({ kind: "currency", direction: event.direction, currency: event.currency as LedgerProposalEvent["currency"], amount: Number(event.amount), reason: event.reason.trim() });\n      }\n    });\n  }\n  const rawChanges = item.state_changes;
+  const rawEvents = item.ledger_events;
+  const ledgerEvents: LedgerProposalEvent[] = [];
+  if (!Array.isArray(rawEvents) || rawEvents.length > 50) {
+    errors.push("Field ledger_events wajib berupa daftar maksimal 50 peristiwa.");
+  } else {
+    rawEvents.forEach((entry, index) => {
+      if (!entry || typeof entry !== "object" || Array.isArray(entry)) { errors.push("ledger_events[" + index + "] harus berupa objek."); return; }
+      const event = entry as Record<string, unknown>;
+      if ((event.kind !== "item" && event.kind !== "currency") || (event.direction !== "in" && event.direction !== "out") || typeof event.reason !== "string" || !event.reason.trim() || event.reason.length > 500) { errors.push("ledger_events[" + index + "] memiliki tipe, arah, atau alasan tidak valid."); return; }
+      if (event.kind === "item") {
+        if (typeof event.item !== "string" || !event.item.trim() || event.item.length > 160 || !Number.isSafeInteger(event.quantity) || Number(event.quantity) <= 0 || (event.unit !== undefined && (typeof event.unit !== "string" || event.unit.length > 32))) { errors.push("ledger_events[" + index + "] item membutuhkan nama dan jumlah bulat positif."); return; }
+        ledgerEvents.push({ kind: "item", direction: event.direction, item: event.item.trim(), quantity: Number(event.quantity), unit: typeof event.unit === "string" ? event.unit.trim() : undefined, reason: event.reason.trim() });
+      } else {
+        if (!["xc","xs","xg","zj","az"].includes(String(event.currency)) || !Number.isSafeInteger(event.amount) || Number(event.amount) <= 0) { errors.push("ledger_events[" + index + "] currency membutuhkan denominasi resmi dan nominal bulat positif."); return; }
+        ledgerEvents.push({ kind: "currency", direction: event.direction, currency: event.currency as LedgerProposalEvent["currency"], amount: Number(event.amount), reason: event.reason.trim() });
+      }
+    });
+  }
+  const rawChanges = item.state_changes;
   const stateChanges: GMProposal["state_changes"] = [];
   if (!Array.isArray(rawChanges) || rawChanges.length > 30) {
     errors.push("Field state_changes wajib berupa daftar maksimal 30 perubahan terstruktur.");
