@@ -11,7 +11,17 @@ function escapeHtml(value: string): string {
 function registryProfileMarkup(character: Character): string {
   if (!character.profileMarkdown) return "";
   const read = (label: string): string => {
-    const escaped = label.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\function characterView(characters: Character[], registryStatus: string): string {");
+    const line = character.profileMarkdown?.split(/\\r?\\n/).find(item => item.trimStart().startsWith("- **" + label + ":**"));
+    return line?.replace(/^\\s*-\\s*\\*\\*[^*]+:\\*\\*\\s*/, "").trim() ?? "Belum tercatat";
+  };
+  const field = (label: string) => "<dt>" + escapeHtml(label) + "</dt><dd>" + escapeHtml(read(label)) + "</dd>";
+  return '<details class="registry-profile"><summary>INITIAL PROFILE · players.md</summary><dl>' +
+    field("Martial Soul") + field("Arcanist Grade") + field("Arcanist Focus") +
+    field("Equipment") + field("Inventory") + field("Assets Bangunan") + field("Wallet (wealth)") +
+    '</dl></details>';
+}
+
+function characterView(characters: Character[], registryStatus: string): string {");
     const match = character.profileMarkdown?.match(new RegExp("^-\\\\s*\\\\*\\\\*" + escaped + ":\\\\*\\\\*\\\\s*(.*)$", "m"));
     return match?.[1]?.trim() ?? "Belum tercatat";
   };
