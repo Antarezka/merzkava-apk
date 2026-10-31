@@ -37,7 +37,7 @@ import { initializeDatabase } from "./database/database";
 import { createCharacter, deleteCharacter, listCharacters, type Character } from "./characters/character-repository";
 import { validateCharacterDraft } from "./engine/character-validation";
 import { renderScreen, type ScreenId } from "./app/screens";
-import { activateCanonSnapshot, getCanonIndex, getCanonStatus, loadCanonModule, loadPlayerRegistry, refreshCanon, refreshLatestPlayerRegistry, type CanonDocument } from "./canon/canon-loader";
+import { activateCanonSnapshot, getCanonIndex, getCanonStatus, loadCanonModule, loadPlayerRegistry, loadRegisteredPlayerProfile, refreshCanon, refreshLatestPlayerRegistry, type CanonDocument } from "./canon/canon-loader";
 import { routeCanonActivity } from "./canon/canon-router";
 import { assembleGameplayContext } from "./canon/context-assembler";
 import { requestGMProposal, validateGMResponse, type GMProposal } from "./engine/gm-engine";
@@ -276,7 +276,7 @@ function snapshotBlindMarkup(): string {
 function render(): void {
   root.innerHTML = `<div class="app-shell">
     <header class="app-header"><button class="brand" data-screen="home" aria-label="Merzkava home"><span class="brand-mark">M</span><span><small>MERZKAVA UNIVERSE</small><strong>Merzkava</strong></span></button><button class="header-settings" data-screen="settings" aria-label="Settings">⚙</button></header>
-    <main class="main-content">${notice ? `<p class="notice" role="status">${escapeHtml(notice)}</p>` : ""}${renderScreen(activeScreen, [...registeredCharacters, ...characters.filter(local => !registeredCharacters.some(registered => registered.name === local.name))])}${activeScreen === "settings" ? authPanel() + canonPanel() : ""}</main>
+    <main class="main-content">${notice ? `<p class="notice" role="status">${escapeHtml(notice)}</p>` : ""}${renderScreen(activeScreen, availableCharacters(), playerRegistryMessage)}${activeScreen === "settings" ? authPanel() + canonPanel() : ""}</main>
     <nav class="bottom-nav" aria-label="Main navigation">${navigation.map(item => `<button class="nav-item ${activeScreen === item.id ? "active" : ""}" data-screen="${item.id}" ${activeScreen === item.id ? 'aria-current="page"' : ""}><span>${item.icon}</span><small>${item.label}</small></button>`).join("")}</nav>
     <div class="storage-status"><span class="status-dot"></span>${databaseMessage}</div>
     ${activeScreen === "gameplay" ? snapshotBlindMarkup() : ""}
