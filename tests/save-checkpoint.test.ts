@@ -5,7 +5,7 @@ describe("Merzkava Save checkpoint prompt", () => {
   it("uses the adapted Merzkava framework and preserves the gameplay transcript", () => {
     const prompt = buildSaveCheckpointPrompt({
       characterName: "Yuha",
-      profileMarkdown: "## PROFIL\nNama: Yuha",
+      profileMarkdown: "## PROFIL\nNama: Yuha\nWallet: 79 xc | 9 xs | 4 xg | 0 zj | 0 az",
       lastProfileStatus: "Panel terakhir tersedia.",
       transcript: [
         { role: "player", text: "Memasuki hutan." },
