@@ -227,7 +227,23 @@ function escapeNoticeText(value: string): string {
   return value.replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char] ?? char);
 }
 function highlightNoticeKeywords(value: string): string {
+  let safe = escapeNoticeText(value)
+    .replace(/\*\*(.+?)\*\*/g, '<mark class="noticeboard-highlight">$1</mark>')
+    .replace(/`([^`]+)`/g, '<mark class="noticeboard-highlight">$1</mark>');
+  const keywords = [
+    "Golden Dragon Empire", "Tianhai Yunzhou", "Beiming Gu", "Merzkava Universe",
+    "World Map", "Investigation Board", "Spirit Realms", "Spirit Rings",
+    "Spirit Beasts", "Martial Souls", "Arcanists", "Artificial Artifacts",
+    "character records", "regional maps", "maritime routes", "coastal shelves",
+    "deep-sea bathymetry", "Spirit systems", "ancient ruins", "factions"
+  ];
+  for (const keyword of keywords) {
+    const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\function highlightNoticeKeywords(value: string): string {
   return escapeNoticeText(value).replace(/\*\*(.+?)\*\*/g, '<mark class="noticeboard-highlight">$1</mark>').replace(/`([^`]+)`/g, '<mark class="noticeboard-highlight">$1</mark>');
+}");
+    safe = safe.replace(new RegExp("(?<!<[^>]*)\\b(" + escaped + ")\\b(?![^<]*>)", "gi"), '<mark class="noticeboard-highlight">$1</mark>');
+  }
+  return safe;
 }
 function parseNoticeboardUpdates(readme: string): NoticeboardUpdate[] {
   const start = readme.indexOf("**THE LATEST FROM MERZKAVA**");
