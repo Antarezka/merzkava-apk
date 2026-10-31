@@ -690,7 +690,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     const data = new FormData(form);
     const typedActivity = String(data.get("activity") ?? "").trim();
     const characterId = String(data.get("characterId") ?? "");
-    const mode = activeChat.started ? "continue" : "new";
+    const mode = form.dataset.sessionMode === "new" ? "new" : (activeChat.started ? "continue" : "new");
     if (gameplayContextBusy || !characterId || (mode === "continue" && !typedActivity)) return;
     const character = availableCharacters().find(item => item.id === characterId);
     if (!character) { notice = "Karakter tidak ditemukan."; render(); return; }
