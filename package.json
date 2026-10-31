@@ -18,7 +18,8 @@
     "@capacitor-community/sqlite": "^7.0.0",
     "@capacitor/android": "^7.4.3",
     "@capacitor/core": "^7.4.3",
-    "@aparajita/capacitor-secure-storage": "^7.1.6"
+    "@aparajita/capacitor-secure-storage": "^7.1.6",
+    "animejs": "^4.5.0"
   },
   "devDependencies": {
     "@capacitor/cli": "^7.4.3",
