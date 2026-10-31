@@ -96,10 +96,62 @@ if ! timeout 30s adb shell am start -W -n "$LAUNCHER_COMPONENT" > "$DIAG_DIR/lau
 fi
 cat "$DIAG_DIR/launch.txt"
 
-echo "Capturing splash-screen frames while the opening animation is active..."
-sleep 0.45
+if ! grep -qE '^Status: *ok
+APP_PID=""
+for attempt in $(seq 1 12); do
+  APP_PID="$(timeout 10s adb shell pidof com.antarezka.merzkava 2>/dev/null | tr -d '\r' || true)"
+  if [[ -n "$APP_PID" ]]; then
+    echo "Merzkava is running with PID $APP_PID (attempt $attempt)."
+    break
+  fi
+  sleep 5
+done
+
+adb logcat -d -t 6000 > "$DIAG_DIR/launch-logcat.txt" 2>&1 || true
+adb shell dumpsys activity activities > "$DIAG_DIR/activities.txt" 2>&1 || true
+
+if [[ -z "$APP_PID" ]]; then
+  echo "Merzkava process did not appear within 60 seconds."
+  collect_diagnostics
+  exit 1
+fi
+
+if grep -E -A 8 "FATAL EXCEPTION|Fatal signal" "$DIAG_DIR/launch-logcat.txt" | grep -q "com.antarezka.merzkava"; then
+  echo "Merzkava-specific fatal crash detected in emulator logcat."
+  collect_diagnostics
+  exit 1
+fi
+
+echo "Emulator install-and-launch smoke test passed."
+ "$DIAG_DIR/launch.txt"; then
+  echo "Android did not report a successful activity launch."
+  collect_diagnostics
+  exit 1
+fi
+
+echo "Waiting for the actual Merzkava activity window (up to 120 seconds)..."
+ACTIVITY_READY=0
+for attempt in $(seq 1 24); do
+  WINDOW_STATE="$(timeout 10s adb shell dumpsys window windows 2>/dev/null || true)"
+  if printf '%s' "$WINDOW_STATE" | grep -qE 'mCurrentFocus=.*com\.antarezka\.merzkava.*MainActivity' \
+    && ! printf '%s' "$WINDOW_STATE" | grep -q 'Splash Screen com.antarezka.merzkava'; then
+    ACTIVITY_READY=1
+    echo "Merzkava activity window is in the foreground (attempt $attempt)."
+    break
+  fi
+  sleep 5
+done
+
+if [[ "$ACTIVITY_READY" -ne 1 ]]; then
+  echo "Merzkava did not reach its actual foreground activity window."
+  collect_diagnostics
+  exit 1
+fi
+
+echo "Capturing actual app frames after the activity is ready..."
+sleep 2
 adb exec-out screencap -p > "$DIAG_DIR/kitty-splash-early.png"
-sleep 0.75
+sleep 2
 adb exec-out screencap -p > "$DIAG_DIR/kitty-splash-mid.png"
 test -s "$DIAG_DIR/kitty-splash-early.png"
 test -s "$DIAG_DIR/kitty-splash-mid.png"
