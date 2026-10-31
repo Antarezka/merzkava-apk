@@ -1,3 +1,4 @@
+import { canonLabelMarkup, type CanonLabelCategory } from "./canon-labels";
 export type LedgerCategory = "wallet" | "inventory" | "hp" | "satiety" | "body" | "equipment" | "cultivation" | "other";
 export type LedgerTone = "positive" | "negative" | "neutral";
 
@@ -12,6 +13,9 @@ export interface LedgerEntry {
   tone: LedgerTone;
   createdAt: string;
   detail?: string;
+  labelCategory?: CanonLabelCategory;
+  label?: string;
+  stage?: string;
 }
 
 const STORAGE_PREFIX = "merzkava.ledger-log.v1:";
@@ -75,6 +79,7 @@ function showBubble(entry: LedgerEntry): void {
     <span class="ledger-bubble-kicker">${escapeHtml(entry.title)}</span>
     <strong class="ledger-bubble-change">${escapeHtml(entry.change)}</strong>
     ${entry.before || entry.after ? `<span class="ledger-bubble-total">${escapeHtml(entry.before ?? "")}${entry.before && entry.after ? " → " : ""}${escapeHtml(entry.after ?? "")}</span>` : ""}
+    ${entry.labelCategory && entry.label ? canonLabelMarkup(entry.labelCategory, entry.label, entry.stage) : ""}
     ${entry.detail ? `<span class="ledger-bubble-detail">${escapeHtml(entry.detail)}</span>` : ""}
   `;
   bubble.addEventListener("click", () => removeBubble(bubble), { once: true });
