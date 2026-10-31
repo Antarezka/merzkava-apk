@@ -91,6 +91,68 @@ describe("GM state reconciliation", () => {
     expect(result.errors.join(" ")).toContain("lebih dari sekali");
   });
 
+
+  it("accepts a Wallet delta only when currency events reconcile exactly", () => {
+    const result = reconcileGMProposal(profile, proposal([
+      { field: "Wallet (wealth)", before: profileFields["Wallet (wealth)"], after: "84 xc | 9 xs | 4 xg | 0 zj | 0 az", reason: "Payment received", canon_basis: ["core/10_ECONOMY_SYSTEM.md"] }
+    ]), {
+      fields: { ...profileFields, "Wallet (wealth)": "84 xc | 9 xs | 4 xg | 0 zj | 0 az" },
+      source: "markdown"
+    });
+    const withEvent = reconcileGMProposal(profile, {
+      ...proposal([
+        { field: "Wallet (wealth)", before: profileFields["Wallet (wealth)"], after: "84 xc | 9 xs | 4 xg | 0 zj | 0 az", reason: "Payment received", canon_basis: ["core/10_ECONOMY_SYSTEM.md"] }
+      ]),
+      ledger_events: [{ kind: "currency", direction: "in", currency: "xc", amount: 5, reason: "Payment received" }]
+    }, {
+      fields: { ...profileFields, "Wallet (wealth)": "84 xc | 9 xs | 4 xg | 0 zj | 0 az" },
+      source: "markdown"
+    });
+    expect(result.errors.join(" ")).toContain("wajib memiliki rincian transaksi");
+    expect(withEvent.errors).toHaveLength(0);
+    expect(withEvent.changes[0].status).toBe("candidate");
+  });
+
+  it("rejects currency events that do not match the proposed ending balance", () => {
+    const result = reconcileGMProposal(profile, {
+      ...proposal([
+        { field: "Wallet (wealth)", before: profileFields["Wallet (wealth)"], after: "83 xc | 9 xs | 4 xg | 0 zj | 0 az", reason: "Payment received", canon_basis: ["core/10_ECONOMY_SYSTEM.md"] }
+      ]),
+      ledger_events: [{ kind: "currency", direction: "in", currency: "xc", amount: 5, reason: "Payment received" }]
+    }, {
+      fields: { ...profileFields, "Wallet (wealth)": "83 xc | 9 xs | 4 xg | 0 zj | 0 az" },
+      source: "markdown"
+    });
+    expect(result.status).toBe("review-required");
+    expect(result.errors.join(" ")).toContain("tidak cocok dengan perubahan Wallet");
+  });
+
+  it("rejects currency events without a Wallet state change", () => {
+    const result = reconcileGMProposal(profile, {
+      ...proposal([]),
+      ledger_events: [{ kind: "currency", direction: "out", currency: "xs", amount: 1, reason: "Purchase" }]
+    }, profile);
+    expect(result.status).toBe("review-required");
+    expect(result.errors.join(" ")).toContain("tidak memiliki perubahan Wallet");
+  });
+
+  it("supports an exchange represented by matching outgoing and incoming denominations", () => {
+    const result = reconcileGMProposal(profile, {
+      ...proposal([
+        { field: "Wallet (wealth)", before: profileFields["Wallet (wealth)"], after: "79 xc | 10 xs | 4 xg | 0 zj | 0 az", reason: "Currency exchange", canon_basis: ["core/10_ECONOMY_SYSTEM.md"] }
+      ]),
+      ledger_events: [
+        { kind: "currency", direction: "out", currency: "xc", amount: 100, reason: "Currency exchange" },
+        { kind: "currency", direction: "in", currency: "xs", amount: 1, reason: "Currency exchange" }
+      ]
+    }, {
+      fields: { ...profileFields, "Wallet (wealth)": "79 xc | 10 xs | 4 xg | 0 zj | 0 az" },
+      source: "markdown"
+    });
+    expect(result.errors).toHaveLength(0);
+    expect(result.changes[0].status).toBe("candidate");
+  });
+
   it("reports no changes only when the proposal contains no state delta", () => {
     const result = reconcileGMProposal(profile, proposal([]), profile);
     expect(result.status).toBe("no-changes");
