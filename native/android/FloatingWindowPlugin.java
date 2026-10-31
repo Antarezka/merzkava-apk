@@ -147,7 +147,9 @@ public class FloatingWindowPlugin extends Plugin {
         }
         try {
             activityRef = new WeakReference<>(activity);
+            webView = getBridge().getWebView();
             windowManager = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
+            attachWebViewToFloatingRoot(activity);
             Intent service = new Intent(activity, FloatingKeepAliveService.class);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) activity.startForegroundService(service);
             else activity.startService(service);
