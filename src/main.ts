@@ -48,7 +48,7 @@ initializeLedgerNotifications();
 
 function showOpeningSplash(): HTMLDivElement {
   const splash = document.createElement("div");
-  splash.className = "opening-splash";
+  splash.className = "opening-splash is-arriving";
   splash.setAttribute("role", "status");
   splash.setAttribute("aria-label", "Opening Merzkava Universe");
   splash.innerHTML = `
@@ -228,7 +228,10 @@ function renderChat(): void {
   if (routeForm) routeForm.dataset.sessionMode = activeChat.started ? "continue" : "new";
   const character = availableCharacters().find(item => item.id === activeCharacterId);
   const record = root.querySelector<HTMLElement>("#player-character-record");
-  const currentProfile = latestGameplayProfile();
+  const sourceProfile = character?.profileMarkdown ? parseCharacterProfile(character.profileMarkdown) : null;
+  const currentProfile = latestGameplayProfile() ?? (sourceProfile?.valid
+    ? { profile: sourceProfile.profile, panels: { character: "", inventory: "", techniques: "", continuity: "" }, errors: [] }
+    : null);
   const field = (label: string, value: string) => '<dt>' + escapeHtml(label) + '</dt><dd>' + escapeHtml(value) + '</dd>';
   if (record) record.innerHTML = character
     ? '<details open><summary>PROFIL KARAKTER</summary><dl>' +
@@ -500,13 +503,14 @@ async function refreshPlayerRegistry(): Promise<void> {
       name: player.name,
       age: player.age ?? 0,
       origin: "Registry",
-      background: "",
+      background: player.background,
       realm: player.realm,
       cultivationLevel: 0,
       awakened: false,
       createdAt: "",
       registryPath: player.path,
-      registryCommitSha: result.commitSha
+      registryCommitSha: result.commitSha,
+      profileMarkdown: player.profileMarkdown
     }));
     playerRegistryMessage = `${registeredCharacters.length} karakter dari players.md · snapshot ${result.commitSha}`;
     if (activeScreen === "character" || activeScreen === "gameplay") render();
