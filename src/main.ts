@@ -15,7 +15,7 @@ import { getAuthSession, isSupabaseConfigured, restoreAuthSession, signInWithPas
 import { GatewayGMProvider, isGMGatewayConfigured } from "./engine/gateway-gm-provider";
 import { getLedgerLog, initializeLedgerNotifications } from "./ui/ledger-log";
 import { canonLabelMarkup } from "./ui/canon-labels";
-import { startFloatingMode, requestFloatingOverlayPermission, getFloatingReadiness, requestFloatingNotifications, requestFloatingBatteryExemption, startFloatingService, showFloatingBubble, stopFloatingService, type FloatingReadiness } from "./native/floating-window";
+import { startFloatingMode, requestFloatingOverlayPermission, getFloatingReadiness, requestFloatingNotifications, requestFloatingBatteryExemption, showFloatingBubble, stopFloatingService, type FloatingReadiness } from "./native/floating-window";
 import { floatingControlMarkup } from "./app/floating-control";
 
 const app = document.querySelector<HTMLDivElement>("#app");
