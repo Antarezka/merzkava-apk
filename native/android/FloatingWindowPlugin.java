@@ -104,6 +104,8 @@ public class FloatingWindowPlugin extends Plugin {
                 if (current != null) current.moveTaskToBack(true);
             }, 180);
         } catch (Exception error) {
+            restoreToActivity();
+            activity.stopService(new Intent(activity, FloatingKeepAliveService.class));
             call.reject("Could not open Floating Mode: " + error.getMessage());
         }
     }
@@ -374,9 +376,14 @@ public class FloatingWindowPlugin extends Plugin {
         }
     }
 
+    public static void restoreForForeground() {
+        restoreToActivity();
+    }
+
     private static void restoreToActivity() {
         Activity activity = getActivityRef();
         if (activity == null || webView == null || originalParent == null) return;
+        if (currentOverlay == null && webView.getParent() == originalParent) return;
         MAIN.post(() -> {
             removeCurrentOverlay();
             if (webView.getParent() instanceof ViewGroup) {
