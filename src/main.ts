@@ -695,7 +695,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       }
     }
     if (mode === "continue" && !gameplaySnapshot) { notice = "Belum ada sesi tersimpan untuk karakter ini. Tekan New session terlebih dahulu."; render(); return; }
-    const activeSha = mode === "new" ? activeStatus.commitSha : gameplaySnapshot;
+    let activeSha = mode === "new" ? activeStatus.commitSha : gameplaySnapshot;
     const trigger = "analisis link berikut ini secara penuh dan pelajari dengan seksama untuk memulai permainan roleplay ini : https://raw.githubusercontent.com/Antarezka/merzkava-universe/" + activeSha + "/INDEX.md?v=1 dan https://raw.githubusercontent.com/Antarezka/merzkava-universe/" + activeSha + "/players.md?v=1 untuk Memulai permainan sebagai ( " + character.name + " )!";
     const activity = mode === "new" ? trigger : typedActivity;
     const routeQuery = mode === "new" ? "new session character introduction starting location initial character state" : activity;
@@ -705,7 +705,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     if (sendButton) sendButton.disabled = true;
     if (startButton) startButton.disabled = true;
     try {
-      if (mode === "continue") activeStatus = await activateCanonSnapshot(activeSha);
+      if (mode === "continue") { activeStatus = await activateCanonSnapshot(activeSha); activeSha = activeStatus.commitSha; }
       const route = await routeCanonActivity(routeQuery, 7);
       const indexDocument = await getCanonIndex(activeSha);
       if (!indexDocument || indexDocument.commitSha !== activeSha) throw new Error("Bootstrap gagal: INDEX.md pada ACTIVE_SHA penuh tidak tersedia.");
