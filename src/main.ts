@@ -466,7 +466,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
         "\n\n## PLAYER PRESENTATION\n" + (activeChat.showOptions ? "Include concise optional GM suggestions at the end." : "Do not provide suggested action options.") +
         "\n\n## LAST GM WORLD TIME\n" + (Object.values(worldTime).some(Boolean) ? JSON.stringify(worldTime) : "No time reported. Do not invent missing fields.") +
         "\nOnly use GM-reported world time. Never use device time. Preserve all established character state.";
-      gameplaySnapshot = status.commitSha;
+      gameplaySnapshot = activeSha;
       gameplayVersion = activeStatus.version;
       if (!isGMGatewayConfigured() || !getAuthSession()) throw new Error("AI Game Master belum siap. Periksa login dan konfigurasi Gateway di Settings.");
       const result = await requestGMProposal(new GatewayGMProvider(), context);
