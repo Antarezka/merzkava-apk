@@ -61,3 +61,80 @@ button{font:inherit;color:inherit;cursor:pointer} button:focus-visible{outline:2
 .canon-module-form .text-button{justify-self:start}
 .canon-document{margin-top:20px;min-width:0}
 .canon-document pre{max-height:420px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;padding:14px;border:1px solid #b77b4525;border-radius:12px;background:#100e0c;color:#d8c9b8;font:11px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace}
+
+
+/* Reverse: 1999-inspired visual system — antique paper, muted teal, sage and aged brass. */
+:root {
+  color:#293d38;background:#e5ddca;font-synthesis:none;
+  --muted:#777e73;--accent:#a68d5e;--line:#c7bea9;
+  --r99-paper:#eee7d6;--r99-ink:#293d38;--r99-deep:#243a35;
+  --r99-sage:#718176;--r99-brass:#b49b68;
+}
+body {color:var(--r99-ink);background:radial-gradient(ellipse at 88% 3%,#b8b59b55 0%,transparent 42%),radial-gradient(ellipse at 8% 40%,#d1c7ad55 0%,transparent 48%),#e5ddca;}
+button {color:inherit;} button:focus-visible {outline-color:#a68d5e;}
+.app-shell {color:var(--r99-ink);}
+.app-header {border-bottom-color:#bdb49e;}
+.brand-mark {border-color:var(--r99-brass);color:#8e7951;background:#f0e8d7;}
+.brand small,.eyebrow {color:#8e7951;} .brand strong {color:#293d38;}
+.header-settings {border-color:#bdb49e;background:#e9e1cf;color:#52675e;}
+.main-content {color:var(--r99-ink);}
+.hero-panel {border:1px solid #68776b;color:#eee7d6;background:linear-gradient(135deg,#314943 0%,#263b36 68%,#3b5147 100%);box-shadow:inset 0 0 0 5px #eee7d60d;}
+.hero-panel h2 {color:#f0e8d8;} .hero-panel h2 em {color:#c5ad79;} .hero-panel .muted {color:#c7c9b9;}
+.action-button {border:1px solid #a99060;background:#d9c89e;color:#2b403a;} .action-button:hover {background:#e5d7b5;}
+.section-heading,.record-top {color:#927b50;} .section-heading small,.record-status,.setting-value {color:#798075;}
+.overview-card,.record-card,.wallet-card,.realm-list article,.empty-state,.character-card {border-color:#c7bea9;background:#eee7d6ef;color:#293d38;box-shadow:0 5px 18px #4d4b3b0a;}
+.overview-card h3,.record-card h3,.empty-state h3,.realm-list h3,.setting-row h3,.character-card h3 {color:#2d433c;}
+.overview-card p,.realm-list p,.setting-row p,.empty-state p,.muted,.character-card .muted {color:#737b70;}
+.card-index,.empty-symbol {color:#9d8557;} .page-heading h2 {color:#293d38;}
+.wallet-card {border-color:#66796d;background:linear-gradient(145deg,#344d45,#263c36);color:#eee7d6;}
+.wallet-card .eyebrow,.wallet-values span {color:#d2bd88;} .wallet-card .muted {color:#c6c9b8;} .wallet-values span {border-color:#a68d5e66;}
+.realm-list article>span {color:#967f53;} .setting-row {border-bottom-color:#c7bea9;}
+.bottom-nav {border-color:#53685e;background:#263c36f5;box-shadow:0 -5px 22px #293d381c;}
+.nav-item {color:#bdc3b3;} .nav-item.active {color:#e1c995;}
+.storage-status {border-color:#b9b099;background:#eee7d6f2;color:#68736a;} .status-dot {background:#a68d5e;}
+.notice {border-color:#bca779;background:#f0e7d2;color:#4a5d50;}
+.character-form label {color:#56695d;}
+.character-form input,.character-form select,.character-form textarea {border-color:#c1b79f;background:#f7f1e4;color:#293d38;}
+.character-form input:focus,.character-form select:focus,.character-form textarea:focus {outline-color:#a68d5e;border-color:#a68d5e;}
+.text-button.danger {color:#96695c;}
+.canon-status {border-color:#c7b88e;background:#e8dfca;color:#53685c;}
+.canon-module-form {border-top-color:#c7bea9;} .canon-module-form label {color:#7e6b47;}
+.canon-module-form input {border-color:#c1b79f;background:#f7f1e4;color:#293d38;}
+.canon-module-form input:focus {outline-color:#a68d5e;border-color:#a68d5e;}
+.canon-document pre {border-color:#c7bea9;background:#e7dfcd;color:#3c5048;}
+
+/* Main-menu noticeboard modal */
+.noticeboard-backdrop {position:fixed;inset:0;z-index:30;display:grid;place-items:center;padding:22px 16px;background:#182a25a8;backdrop-filter:blur(5px);animation:noticeboard-fade .24s ease-out;}
+.noticeboard-panel {position:relative;width:min(100%,430px);max-height:min(88vh,720px);overflow:auto;padding:24px 22px 19px;border:1px solid #b39a68;background:linear-gradient(90deg,#d8cfb9 0 1px,transparent 1px 100%),repeating-linear-gradient(0deg,#f0e9d9 0 31px,#e9e1cf 32px);color:#2b403a;box-shadow:0 22px 70px #101d19a6,inset 0 0 0 5px #a68d5e18;}
+.noticeboard-panel:before {content:"";position:absolute;inset:9px;border:1px solid #b6a47d55;pointer-events:none;}
+.noticeboard-topline {display:flex;justify-content:space-between;gap:12px;padding:0 24px 12px 0;border-bottom:1px solid #b7aa8d;color:#88764e;font-size:8px;font-weight:700;letter-spacing:.13em;}
+.noticeboard-close {position:absolute;top:15px;right:15px;width:30px;height:30px;border:1px solid #b6a47d;background:#e8dfcc;color:#42574d;font:23px/1 Georgia,serif;}
+.noticeboard-seal {display:grid;place-items:center;width:43px;height:43px;margin:21px auto 12px;border:1px solid #a68d5e;border-radius:50%;color:#967d4f;font:24px Georgia,serif;}
+.noticeboard-kicker {margin:0;color:#8e7951;text-align:center;font-size:8px;font-weight:700;letter-spacing:.2em;}
+.noticeboard-panel h2 {margin:9px 0 11px;color:#2d433c;text-align:center;font:400 clamp(35px,9vw,48px)/.94 Georgia,serif;}
+.noticeboard-panel h2 em {color:#8a8d72;font-weight:400;} .noticeboard-rule {width:54px;height:1px;margin:16px auto;background:#a68d5e;}
+.noticeboard-copy {max-width:310px;margin:0 auto 20px;color:#69756a;text-align:center;font-size:12px;line-height:1.7;}
+.noticeboard-entry {display:flex;gap:13px;align-items:flex-start;padding:13px 0;border-top:1px solid #c9bea6;border-bottom:1px solid #c9bea6;}
+.noticeboard-entry>span {color:#a08757;font:21px Georgia,serif;} .noticeboard-entry strong,.noticeboard-entry small {display:block;}
+.noticeboard-entry strong {color:#4b5d50;font-size:9px;letter-spacing:.14em;} .noticeboard-entry small {margin-top:5px;color:#798074;font-size:10px;line-height:1.5;}
+.noticeboard-actions {display:flex;gap:9px;margin-top:20px;} .noticeboard-actions button {flex:1;min-height:42px;padding:9px;border:1px solid #a68d5e;font-size:10px;letter-spacing:.04em;}
+.noticeboard-today {background:#314a41;color:#f0e8d8;} .noticeboard-ignore {background:transparent;color:#52665a;}
+.noticeboard-footnote {margin:13px 0 0;color:#8b8c7b;text-align:center;font-size:9px;}
+@keyframes noticeboard-fade {from{opacity:0}to{opacity:1}}
+
+/* Persona-style calendar composition, recoloured to the Reverse: 1999 palette. */
+.session-calendar-panel {position:relative;overflow:hidden;margin:0 0 27px;padding:15px 17px 12px;border:1px solid #6d7b6d;background:linear-gradient(135deg,#304941,#263c36 75%,#405448);color:#eee7d6;box-shadow:0 8px 24px #263c361c;}
+.session-calendar-panel:after {content:"";position:absolute;right:-36px;top:-56px;width:160px;height:160px;border:1px solid #d2bd8833;border-radius:50%;box-shadow:0 0 0 13px #d2bd8809,0 0 0 27px #d2bd8807;pointer-events:none;}
+.calendar-heading,.calendar-footer {display:flex;justify-content:space-between;align-items:center;gap:10px;}
+.calendar-heading {padding-bottom:11px;border-bottom:1px solid #d2bd883b;color:#d2bd88;font-size:8px;font-weight:700;letter-spacing:.15em;}
+.calendar-live {display:flex;align-items:center;gap:6px;color:#c8cbb7;font-size:8px;} .calendar-live i {width:6px;height:6px;border-radius:50%;background:#b9bd91;box-shadow:0 0 8px #b9bd91;}
+.calendar-main {position:relative;z-index:1;display:flex;justify-content:space-between;align-items:center;gap:15px;padding:15px 0 13px;}
+.calendar-date {display:grid;justify-items:start;gap:1px;} .calendar-date span:first-child {color:#c7c9b7;font-size:9px;font-weight:700;letter-spacing:.15em;}
+.calendar-date strong {color:#f0e8d8;font:400 clamp(48px,13vw,66px)/.95 Georgia,serif;}
+.calendar-date span:last-child {color:#d2bd88;font-size:9px;letter-spacing:.13em;}
+.calendar-time {display:grid;justify-items:end;gap:5px;} .calendar-time-label {color:#c7c9b7;font-size:8px;letter-spacing:.15em;}
+.calendar-time strong {color:#f0e8d8;font:400 clamp(30px,8vw,40px)/1 Georgia,serif;font-variant-numeric:tabular-nums;}
+.calendar-time span:last-child {max-width:150px;overflow:hidden;color:#d2bd88;font-size:8px;text-align:right;text-overflow:ellipsis;white-space:nowrap;}
+.calendar-footer {padding-top:10px;border-top:1px solid #d2bd883b;color:#c7c9b7;font-size:8px;letter-spacing:.1em;}
+.calendar-footer time {color:#d2bd88;font-size:9px;letter-spacing:.04em;}
+@media(max-width:360px) {.noticeboard-panel {padding:20px 17px 16px;}.calendar-main {gap:8px;}.calendar-time strong {font-size:29px;}}
