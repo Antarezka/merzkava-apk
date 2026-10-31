@@ -13,6 +13,7 @@ export interface Character {
   createdAt: string;
   registryPath?: string;
   registryCommitSha?: string;
+  profileMarkdown?: string;
 }
 
 export interface CharacterDraft {
