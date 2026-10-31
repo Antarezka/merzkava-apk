@@ -2,20 +2,7 @@ name: Build Merzkava Android APK
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - feature/opening-splash-screen
-      - feature/floating-mode-ledger
-      - feature/lumivara-floating-adoption
-    paths:
-      - "src/**"
-      - "public/**"
-      - "native/**"
-      - "scripts/**"
-      - "package.json"
-      - "package-lock.json"
-      - "capacitor.config.ts"
-      - "vite.config.ts"
+  # APK builds remain manual until explicitly requested.
 
 permissions:
   contents: read
