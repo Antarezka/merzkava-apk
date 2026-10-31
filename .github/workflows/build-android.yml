@@ -109,6 +109,10 @@ jobs:
 
       - name: Build debug APK
         working-directory: android
+        env:
+          MERZKAVA_KEYSTORE_PASSWORD: ${{ secrets.MERZKAVA_KEYSTORE_PASSWORD }}
+          MERZKAVA_KEY_ALIAS: ${{ secrets.MERZKAVA_KEY_ALIAS }}
+          MERZKAVA_KEY_PASSWORD: ${{ secrets.MERZKAVA_KEY_PASSWORD }}
         run: ./gradlew assembleDebug
 
       - name: Verify APK package, alignment, and signature
