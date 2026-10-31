@@ -336,7 +336,7 @@ function render(): void {
 
 async function refreshCharacters(): Promise<void> {
   try { characters = await listCharacters(); }
-  catch (error) { notice = error instanceof Error ? error.message : "Could not load characters."; }
+  catch (error) { recordBug(error, "Load characters", "Character storage"); notice = error instanceof Error ? error.message : "Could not load characters."; }
 }
 
 function availableCharacters(): Character[] {
@@ -365,6 +365,7 @@ async function refreshPlayerRegistry(): Promise<void> {
     playerRegistryMessage = `${registeredCharacters.length} karakter dari players.md · snapshot ${result.commitSha}`;
     if (activeScreen === "character" || activeScreen === "gameplay") render();
   } catch (error) {
+    recordBug(error, "Load player registry", "Player registry");
     playerRegistryMessage = error instanceof Error ? error.message : "Gagal memuat players.md.";
     notice = playerRegistryMessage;
     if (activeScreen === "character" || activeScreen === "gameplay") render();
@@ -569,7 +570,7 @@ root.addEventListener("click", async (event: MouseEvent) => {
       authMessage = "Signed out successfully.";
     } catch (error) {
       recordBug(error, "Sign out", "Authentication");
-    authMessage = error instanceof Error ? error.message : "Could not clear the local session.";
+      authMessage = error instanceof Error ? error.message : "Could not clear the local session.";
     }
     authBusy = false;
     render();
@@ -582,7 +583,7 @@ root.addEventListener("click", async (event: MouseEvent) => {
       await refreshCharacters();
       notice = "Character deleted.";
       render();
-    } catch (error) { notice = error instanceof Error ? error.message : "Could not delete character."; render(); }
+    } catch (error) { recordBug(error, "Delete character", "Character storage"); notice = error instanceof Error ? error.message : "Could not delete character."; render(); }
     return;
   }
   const blindButton = target.closest<HTMLButtonElement>("[data-blind-toggle]");
@@ -818,6 +819,7 @@ void initializeDatabase().then(async status => {
     await restoreAuthSession();
     authMessage = getAuthSession() ? "Saved secure session restored." : "";
   } catch (error) {
+    recordBug(error, "Restore authentication session", "Authentication");
     authMessage = error instanceof Error ? error.message : "Could not restore secure session.";
   }
   render();
