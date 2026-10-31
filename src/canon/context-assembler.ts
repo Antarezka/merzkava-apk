@@ -36,15 +36,21 @@ export function assembleGameplayContext(
     "",
     "## Character state",
     character
-      ? [
-          `Name: ${character.name}`,
-          `Age: ${character.age}`,
-          `Origin: ${character.origin}`,
-          `Realm: ${character.realm}`,
-          `Cultivation level: ${character.cultivationLevel}`,
-          `Awakened: ${character.awakened ? "Yes" : "No"}`,
-          `Background: ${character.background || "Not recorded"}`
-        ].join("\n")
+      ? (character.origin === "Registry"
+          ? [
+              `Name: ${character.name}`,
+              "Character is registry-backed. The full Markdown profile below is authoritative.",
+              "Do not infer origin, cultivation level, awakening, background, Martial Soul, ring, stats, equipment, inventory, or wallet from local registry placeholders."
+            ].join("\n")
+          : [
+              `Name: ${character.name}`,
+              `Age: ${character.age}`,
+              `Origin: ${character.origin}`,
+              `Realm: ${character.realm}`,
+              `Cultivation level: ${character.cultivationLevel}`,
+              `Awakened: ${character.awakened ? "Yes" : "No"}`,
+              `Background: ${character.background || "Not recorded"}`
+            ].join("\n"))
       : "No character selected. Do not assume a player character.",
     "",
     "## Official canon modules"
