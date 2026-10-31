@@ -906,6 +906,13 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       if (responseProfileErrors.length) throw new Error("Nilai panel profil GM tidak valid: " + responseProfileErrors.join(" "));
       const stateReconciliation = reconcileGMProposal(usableProfile, gmProposal, responsePanels.profile, gmProposal.player_response);
       if (usableProfile && (stateReconciliation.status === "rejected" || stateReconciliation.errors.length > 0)) throw new Error("Panel profil dan Ledger Log tidak konsisten dengan baseline: " + stateReconciliation.errors.join(" "));
+      const resourceChangesAreCandidates = usableProfile !== null && stateReconciliation.errors.length === 0 && stateReconciliation.changes.every(change => change.status === "candidate");
+      const eventFields = new Set(gmProposal.ledger_events.map(event => event.kind === "item" ? "Inventory" : "Wallet (wealth)"));
+      const declaredResourceFields = new Set(gmProposal.state_changes.filter(change => change.field === "Inventory" || change.field === "Wallet (wealth)").map(change => change.field));
+      if (gmProposal.ledger_events.length && (!resourceChangesAreCandidates || [...eventFields].some(field => !declaredResourceFields.has(field)))) {
+        throw new Error("Peristiwa item/uang tidak cocok dengan perubahan Inventory/Wallet yang lolos rekonsiliasi.");
+      }
+      if (resourceChangesAreCandidates) gmProposal.ledger_events.forEach(showLedgerProposalBubble);
       applyGMWorldTime(gmProposal);
       activeChat.messages.push({ role: "player", text: mode === "new" ? "Memulai sesi baru sebagai " + character.name + "." : typedActivity, createdAt: new Date().toISOString() });
       activeChat.messages.push({ role: "gm", text: gmProposal.player_response, createdAt: new Date().toISOString() });
