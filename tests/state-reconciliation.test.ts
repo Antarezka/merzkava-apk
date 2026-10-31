@@ -137,16 +137,20 @@ describe("GM state reconciliation", () => {
   });
 
   it("supports an exchange represented by matching outgoing and incoming denominations", () => {
-    const result = reconcileGMProposal(profile, {
+    const exchangeBaseline: ParsedCharacterProfile = {
+      fields: { ...profileFields, "Wallet (wealth)": "100 xc | 9 xs | 4 xg | 0 zj | 0 az" },
+      source: "markdown"
+    };
+    const result = reconcileGMProposal(exchangeBaseline, {
       ...proposal([
-        { field: "Wallet (wealth)", before: profileFields["Wallet (wealth)"], after: "79 xc | 10 xs | 4 xg | 0 zj | 0 az", reason: "Currency exchange", canon_basis: ["core/10_ECONOMY_SYSTEM.md"] }
+        { field: "Wallet (wealth)", before: "100 xc | 9 xs | 4 xg | 0 zj | 0 az", after: "0 xc | 10 xs | 4 xg | 0 zj | 0 az", reason: "Currency exchange", canon_basis: ["core/10_ECONOMY_SYSTEM.md"] }
       ]),
       ledger_events: [
         { kind: "currency", direction: "out", currency: "xc", amount: 100, reason: "Currency exchange" },
         { kind: "currency", direction: "in", currency: "xs", amount: 1, reason: "Currency exchange" }
       ]
     }, {
-      fields: { ...profileFields, "Wallet (wealth)": "79 xc | 10 xs | 4 xg | 0 zj | 0 az" },
+      fields: { ...exchangeBaseline.fields, "Wallet (wealth)": "0 xc | 10 xs | 4 xg | 0 zj | 0 az" },
       source: "markdown"
     });
     expect(result.errors).toHaveLength(0);
