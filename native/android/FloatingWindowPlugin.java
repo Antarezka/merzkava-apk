@@ -188,8 +188,10 @@ public class FloatingWindowPlugin extends Plugin {
 
         int screenWidth = activity.getResources().getDisplayMetrics().widthPixels;
         int screenHeight = activity.getResources().getDisplayMetrics().heightPixels;
-        windowWidth = Math.min(Math.max(dp(activity, 240), screenWidth - dp(activity, 20)), dp(activity, 420));
-        windowHeight = Math.min(Math.max(dp(activity, 260), screenHeight - dp(activity, 80)), dp(activity, 560));
+        int defaultWidth = Math.min(Math.max(dp(activity, 240), screenWidth - dp(activity, 20)), dp(activity, 420));
+        int defaultHeight = Math.min(Math.max(dp(activity, 260), screenHeight - dp(activity, 80)), dp(activity, 560));
+        windowWidth = activity.getPreferences(Context.MODE_PRIVATE).getInt("floating_width", defaultWidth);
+        windowHeight = activity.getPreferences(Context.MODE_PRIVATE).getInt("floating_height", defaultHeight);
     }
 
     private static GradientDrawable background(String fill, String stroke, int radius) {
@@ -324,10 +326,11 @@ public class FloatingWindowPlugin extends Plugin {
                 try { windowManager.updateViewLayout(currentOverlay, overlayParams); } catch (Exception ignored) { }
                 return true;
             case MotionEvent.ACTION_UP:
-                if (!resize && dragged) {
-                    activity.getPreferences(Context.MODE_PRIVATE).edit()
-                        .putInt("floating_x", overlayParams.x)
-                        .putInt("floating_y", overlayParams.y).apply();
+                if (dragged) {
+                    android.content.SharedPreferences.Editor editor = activity.getPreferences(Context.MODE_PRIVATE).edit();
+                    if (resize) editor.putInt("floating_width", windowWidth).putInt("floating_height", windowHeight);
+                    else editor.putInt("floating_x", overlayParams.x).putInt("floating_y", overlayParams.y);
+                    editor.apply();
                 }
                 return true;
             case MotionEvent.ACTION_CANCEL:
