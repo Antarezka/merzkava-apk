@@ -46,7 +46,8 @@ const permissions = [
   "android.permission.SYSTEM_ALERT_WINDOW",
   "android.permission.FOREGROUND_SERVICE",
   "android.permission.FOREGROUND_SERVICE_SPECIAL_USE",
-  "android.permission.POST_NOTIFICATIONS"
+  "android.permission.POST_NOTIFICATIONS",
+  "android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"
 ];
 for (const permission of permissions) {
   const declaration = '    <uses-permission android:name="' + permission + '" />';
