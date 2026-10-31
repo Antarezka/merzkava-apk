@@ -105,6 +105,10 @@ function loadCharacterChat(characterId: string): void {
   activeChat = saved ? { messages: Array.isArray(saved.messages) ? saved.messages : [], started: Boolean(saved.started), showOptions: Boolean(saved.showOptions) } : { messages: [], started: false, showOptions: false };
   renderChat();
 }
+function characterName(characterId: string): string {
+  return availableCharacters().find(item => item.id === characterId)?.name ?? "";
+}
+
 function renderChat(): void {
   if (activeScreen !== "gameplay") return;
   const feed = root.querySelector<HTMLElement>("#conversation-feed");
@@ -117,7 +121,13 @@ function renderChat(): void {
   const setting = root.querySelector<HTMLSelectElement>("#gm-options-setting");
   if (setting) setting.value = activeChat.showOptions ? "yes" : "no";
   const status = root.querySelector<HTMLElement>("#session-status");
-  if (status) status.textContent = activeChat.started ? "Sesi tersimpan di perangkat" : "Belum ada sesi aktif";
+  if (status) status.textContent = activeChat.started ? "Sesi aktif · " + (characterName(activeCharacterId) || "Karakter") : (activeCharacterId ? "Profil siap · Mulai sesi baru" : "Pilih karakter untuk memulai");
+  const startPanel = root.querySelector<HTMLElement>("[data-session-start]");
+  const composePanel = root.querySelector<HTMLElement>("[data-session-compose]");
+  if (startPanel) startPanel.hidden = activeChat.started;
+  if (composePanel) composePanel.hidden = !activeChat.started;
+  const routeForm = root.querySelector<HTMLFormElement>("#gameplay-route-form");
+  if (routeForm) routeForm.dataset.sessionMode = activeChat.started ? "continue" : "new";
   const character = availableCharacters().find(item => item.id === activeCharacterId);
   const record = root.querySelector<HTMLElement>("#player-character-record");
   if (record) record.innerHTML = character
@@ -353,10 +363,12 @@ root.addEventListener("click", async (event: MouseEvent) => {
   const startSessionButton = target.closest<HTMLButtonElement>("[data-start-session]");
   if (startSessionButton) {
     const characterId = root.querySelector<HTMLSelectElement>("#gameplay-character")?.value ?? "";
-    if (!characterId) { notice = "Pilih karakter terlebih dahulu."; render(); return; }
+    if (!characterId || !availableCharacters().some(item => item.id === characterId)) {
+      notice = "Pilih profil karakter terlebih dahulu.";
+      render();
+      return;
+    }
     activeCharacterId = characterId;
-    activeChat = { messages: [], started: false, showOptions: activeChat.showOptions };
-    saveCharacterChat();
     const form = root.querySelector<HTMLFormElement>("#gameplay-route-form");
     if (form) form.dataset.sessionMode = "new";
     form?.requestSubmit();
@@ -489,24 +501,30 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     const data = new FormData(form);
     const typedActivity = String(data.get("activity") ?? "").trim();
     const characterId = String(data.get("characterId") ?? "");
-    const mode = form.dataset.sessionMode === "new" ? "new" : "continue";
+    const mode = activeChat.started ? "continue" : "new";
     if (gameplayContextBusy || !characterId || (mode === "continue" && !typedActivity)) return;
-    const character = characters.find(item => item.id === characterId);
+    const character = availableCharacters().find(item => item.id === characterId);
     if (!character) { notice = "Karakter tidak ditemukan."; render(); return; }
     activeCharacterId = characterId;
     loadCharacterWorldTime(characterId);
     if (mode === "new") activeChat = { messages: [], started: false, showOptions: activeChat.showOptions };
     let activeStatus = getCanonStatus();
-    if (mode === "new" && character.registryCommitSha) activeStatus = await activateCanonSnapshot(character.registryCommitSha);
-    if (mode === "new" && activeStatus.status !== "ready") { notice = "Sesi baru memerlukan canon aktif yang baru diverifikasi. Refresh canon terlebih dahulu."; render(); return; }
+    if (mode === "new") {
+      activeStatus = await refreshCanon();
+      if (activeStatus.status !== "ready" || !activeStatus.commitSha) {
+        throw new Error("Sesi baru membutuhkan koneksi dan latest hash yang berhasil diverifikasi. Periksa koneksi lalu coba lagi.");
+      }
+    }
     if (mode === "continue" && !gameplaySnapshot) { notice = "Belum ada sesi tersimpan untuk karakter ini. Tekan New session terlebih dahulu."; render(); return; }
     const activeSha = mode === "new" ? activeStatus.commitSha.slice(0, 7) : gameplaySnapshot.slice(0, 7);
-    const trigger = "analisis link berikut ini secara penuh dan pelajari dengan seksama untuk memulai permainan roleplay ini : https://raw.githubusercontent.com/Antarezka/merzkava-universe/" + activeSha + "/INDEX.md?v=1 dan https://raw.githubusercontent.com/Antarezka/merzkava-universe/" + activeSha + "/players.md?v=1 untuk Memulai permainan sebagai " + character.name + "!";
+    const trigger = "analisis link berikut ini secara penuh dan pelajari dengan seksama untuk memulai permainan roleplay ini : https://raw.githubusercontent.com/Antarezka/merzkava-universe/" + activeSha + "/INDEX.md?v=1 dan https://raw.githubusercontent.com/Antarezka/merzkava-universe/" + activeSha + "/players.md?v=1 untuk Memulai permainan sebagai ( " + character.name + " )!";
     const activity = mode === "new" ? trigger : typedActivity;
     const routeQuery = mode === "new" ? "new session character introduction starting location initial character state" : activity;
     gameplayContextBusy = true;
     const sendButton = root.querySelector<HTMLButtonElement>("#gameplay-route-form button[type=submit]");
+    const startButton = root.querySelector<HTMLButtonElement>("[data-start-session]");
     if (sendButton) sendButton.disabled = true;
+    if (startButton) startButton.disabled = true;
     try {
       if (mode === "continue") activeStatus = await activateCanonSnapshot(activeSha);
       const route = await routeCanonActivity(routeQuery, 7);
@@ -547,6 +565,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     } finally {
       gameplayContextBusy = false;
       if (sendButton) sendButton.disabled = false;
+      if (startButton) startButton.disabled = false;
     }
     return;
   }
