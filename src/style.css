@@ -453,10 +453,11 @@ button {color:inherit;} button:focus-visible {outline-color:#a68d5e;}
 
 
 /* Kitty's registered layered pose, anchored low as one diagonal composition. */
-.splash-content { width:100%; padding:0 10px; }
+.splash-content { width:100%; padding:0 10px; transform:none; }
 .splash-kicker { position:relative; z-index:6; margin:0 0 2px; color:#9d8968; font-size:8px; letter-spacing:.28em; }
 .splash-stage { position:relative; width:min(100vw,460px); height:clamp(350px,69vh,500px); margin:0 auto; isolation:isolate; perspective:1100px; overflow:visible; }
 .splash-wordmark { position:absolute; z-index:2; top:25%; left:57%; width:122%; transform:translate(-50%,-50%) perspective(900px) rotateY(-43deg) rotateZ(-22deg) skewX(-5deg) scaleX(1.08); transform-origin:58% 50%; color:#eee5d3; text-align:left; white-space:nowrap; font:500 clamp(35px,10vw,56px)/1 Cinzel,Georgia,serif; letter-spacing:.085em; text-shadow:0 2px 0 #78684e,0 8px 24px #1c1710aa,0 0 22px #d7a96a44; will-change:opacity; }
+.splash-mascot::before { content:none; }
 .splash-mascot { position:absolute; z-index:3; left:47%; bottom:-3%; width:clamp(300px,88vw,430px); aspect-ratio:1; margin:0; isolation:isolate; overflow:visible; filter:drop-shadow(0 13px 20px #18130e38); }
 .splash-mascot .kitty-layer { object-fit:contain; }
 .splash-mascot .kitty-shadow { z-index:0; opacity:.9; transform:translate(2%,5%) scale(1.015); transform-origin:50% 72%; filter:blur(1.5px); }
