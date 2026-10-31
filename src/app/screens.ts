@@ -64,7 +64,7 @@ gameplay:`<section class="world-time-panel" aria-label="Waktu Merzkava Universe"
   <div class="player-tools"><details class="player-record"><summary>Catatan karakter & status</summary><div id="player-character-record" class="player-record-content">Pilih karakter untuk melihat catatan lokalnya.</div></details><label class="gm-options-toggle"><span>Show GM options</span><select id="gm-options-setting"><option value="no">No</option><option value="yes">Yes</option></select></label></div>
   <form id="gameplay-route-form" class="conversation-composer" data-session-mode="new">
     <div class="composer-topline"><label for="gameplay-character">ACTIVE CHARACTER</label><button class="text-button" type="button" data-refresh-players>↻</button><select id="gameplay-character" name="characterId"><option value="">No character selected</option>{{CHARACTER_OPTIONS}}</select></div>
-    <div class="session-actions"><span id="session-status" class="composer-status">Pilih karakter untuk memulai</span></div>
+    <div class="session-actions"><span id="session-status" class="composer-status">Pilih karakter untuk memulai</span><button type="button" class="text-button session-save-button" data-save-session hidden>Save ✧</button></div>
     <div data-session-start><button class="action-button" type="button" data-start-session>Mulai Convo <span>↗</span></button></div>
     <div data-session-compose hidden>
       <label class="composer-label" for="gameplay-action">Aksiku</label>
