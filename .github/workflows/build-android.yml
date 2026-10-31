@@ -89,7 +89,7 @@ jobs:
               raise SystemExit("Could not locate app versionName in android/app/build.gradle")
           signing = '''
               signingConfigs {
-                  debug {
+                  merzkavaUpload {
                       storeFile file("${rootProject.projectDir}/merzkava-upload.jks")
                       storePassword System.getenv("MERZKAVA_KEYSTORE_PASSWORD")
                       keyAlias System.getenv("MERZKAVA_KEY_ALIAS")
@@ -97,11 +97,10 @@ jobs:
                   }
               }
           '''
-          if "signingConfigs {" not in s:
-              s = s.replace("android {", "android {\n" + signing, 1)
-          if re.search(r'buildTypes\s*\{', s) is None:
+          s = s.replace("android {", "android {\\n" + signing, 1)
+          if re.search(r'buildTypes\\s*\\{', s) is None:
               raise SystemExit("Could not locate buildTypes in android/app/build.gradle")
-          s, n = re.subn(r'(buildTypes\s*\{)', r'\1\n        debug { signingConfig signingConfigs.debug }', s, count=1)
+          s, n = re.subn(r'(buildTypes\\s*\\{)', r'\\1\\n        debug { signingConfig signingConfigs.merzkavaUpload }', s, count=1)
           if n != 1:
               raise SystemExit("Could not configure debug signing")
           p.write_text(s)
