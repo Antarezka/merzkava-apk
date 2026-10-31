@@ -64,6 +64,25 @@ jobs:
       - name: Sync Capacitor Android project
         run: npx cap sync android
 
+      - name: Verify Kitty splash assets in web build
+        run: |
+          set -euo pipefail
+          for asset in body/kitty-body.png kepala/kitty-head.png ekor/kitty-tail.png shadow/kitty-shadow.png; do
+            test -s "public/kitty/$asset"
+            test -s "dist/kitty/$asset"
+            echo "Verified dist/kitty/$asset"
+          done
+          node --input-type=module - <<'NODE'
+          import { readFileSync, readdirSync } from "node:fs";
+          const files = readdirSync("dist/assets");
+          const js = files.filter(name => name.endsWith(".js")).map(name => readFileSync("dist/assets/" + name, "utf8")).join("\n");
+          for (const token of ["/kitty/body/kitty-body.png", "/kitty/kepala/kitty-head.png", "/kitty/ekor/kitty-tail.png", "/kitty/shadow/kitty-shadow.png"]) {
+            if (!js.includes(token)) throw new Error("Built JS is missing Kitty asset reference: " + token);
+          }
+          if (!js.includes(".splash-wordmark")) throw new Error("Built JS does not include the Kitty splash wordmark selector.");
+          console.log("Kitty asset references and splash selector are present in the web bundle.");
+          NODE
+
       - name: Install Merzkava Floating Mode native integration
         run: node scripts/patch-android.mjs
 
