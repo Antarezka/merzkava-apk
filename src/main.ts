@@ -98,6 +98,7 @@ let canonRouteBusy = false;
 let canonRouteMessage = "";
 let canonRouteDocuments: CanonDocument[] = [];
 let gameplayContextBusy = false;
+let formatToolbarOpen = false;
 let gameplaySnapshot = "";
 let gameplayVersion = "";
 let activeProfileMarkdown = "";
@@ -379,6 +380,14 @@ function render(): void {
   menuRevealPending = false;
   updateSessionCalendar();
   renderChat();
+  const formatToggle = root.querySelector<HTMLButtonElement>("[data-format-toggle]");
+  const formatPanel = root.querySelector<HTMLElement>("#composer-format-panel");
+  if (formatToggle && formatPanel) {
+    formatPanel.hidden = !formatToolbarOpen;
+    formatToggle.setAttribute("aria-expanded", String(formatToolbarOpen));
+    const chevron = formatToggle.querySelector<HTMLElement>(".composer-format-chevron");
+    if (chevron) chevron.textContent = formatToolbarOpen ? "▴" : "▾";
+  }
 }
 
 async function refreshCharacters(): Promise<void> {
@@ -560,6 +569,40 @@ root.addEventListener("click", async (event: MouseEvent) => {
     return;
   }
 
+  const formatToggle = target.closest<HTMLButtonElement>("[data-format-toggle]");
+  if (formatToggle) {
+    formatToolbarOpen = !formatToolbarOpen;
+    const panel = root.querySelector<HTMLElement>("#composer-format-panel");
+    panel && (panel.hidden = !formatToolbarOpen);
+    formatToggle.setAttribute("aria-expanded", String(formatToolbarOpen));
+    const chevron = formatToggle.querySelector<HTMLElement>(".composer-format-chevron");
+    if (chevron) chevron.textContent = formatToolbarOpen ? "▴" : "▾";
+    return;
+  }
+  const formatButton = target.closest<HTMLButtonElement>("[data-action-format]");
+  if (formatButton) {
+    const textarea = root.querySelector<HTMLTextAreaElement>("#gameplay-action");
+    if (!textarea) return;
+    const format = formatButton.dataset.actionFormat;
+    const wrappers: Record<string, [string, string]> = {
+      italic: ["*", "*"],
+      bold: ["**", "**"],
+      code: ["`", "`"]
+    };
+    const wrapper = format ? wrappers[format] : undefined;
+    if (!wrapper) return;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selected = textarea.value.slice(start, end);
+    const [prefix, suffix] = wrapper;
+    textarea.setRangeText(prefix + selected + suffix, start, end, "select");
+    if (selected) textarea.setSelectionRange(start + prefix.length, start + prefix.length + selected.length);
+    else textarea.setSelectionRange(start + prefix.length, start + prefix.length);
+    textarea.focus();
+    textarea.dispatchEvent(new Event("input", { bubbles: true }));
+    return;
+  }
+
   const startSessionButton = target.closest<HTMLButtonElement>("[data-start-session]");
   if (startSessionButton) {
     const characterId = root.querySelector<HTMLSelectElement>("#gameplay-character")?.value ?? "";
@@ -705,6 +748,8 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     const typedActivity = String(data.get("activity") ?? "").trim();
     const characterId = String(data.get("characterId") ?? "");
     const mode = form.dataset.sessionMode === "new" ? "new" : (activeChat.started ? "continue" : "new");
+    // Continuing player actions can only be submitted by the dedicated paper-plane button.
+    if (mode === "continue" && (!(event.submitter instanceof HTMLButtonElement) || event.submitter.id !== "gameplay-send-action")) return;
     if (gameplayContextBusy || !characterId || (mode === "continue" && !typedActivity)) return;
     const character = availableCharacters().find(item => item.id === characterId);
     if (!character) { notice = "Karakter tidak ditemukan."; render(); return; }
@@ -731,7 +776,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     const activity = mode === "new" ? trigger : typedActivity;
     const routeQuery = mode === "new" ? "new session character introduction starting location initial character state" : activity;
     gameplayContextBusy = true;
-    const sendButton = root.querySelector<HTMLButtonElement>("#gameplay-route-form button[type=submit]");
+    const sendButton = root.querySelector<HTMLButtonElement>("#gameplay-send-action");
     const startButton = root.querySelector<HTMLButtonElement>("[data-start-session]");
     if (sendButton) sendButton.disabled = true;
     if (startButton) startButton.disabled = true;
