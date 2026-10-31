@@ -165,6 +165,7 @@ export function validateGMResponse(raw: string, expectedSnapshot: string, expect
       canon_basis: item.canon_basis as string[],
       proposed_changes: item.proposed_changes as string[],
       state_changes: stateChanges,
+      ledger_events: ledgerEvents,
       unresolved_questions: item.unresolved_questions as string[],
       world_time: worldTime as GMProposal["world_time"]
     }
