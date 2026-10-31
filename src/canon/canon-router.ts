@@ -1,4 +1,4 @@
-import { getCanonIndex, loadCanonModule, type CanonDocument } from "./canon-loader";
+import { getCanonIndex, getCanonStatus, loadCanonModule, type CanonDocument } from "./canon-loader";
 
 export interface CanonModule {
   path: string;
@@ -60,8 +60,10 @@ export function parseCanonModules(indexMarkdown: string): CanonModule[] {
 }
 
 export async function listCanonModules(): Promise<CanonModule[]> {
-  const index = await getCanonIndex();
-  if (!index) throw new Error("INDEX canon belum tersedia. Refresh canon terlebih dahulu.");
+  const status = getCanonStatus();
+  if (!status.commitSha) throw new Error("ACTIVE_SHA belum terverifikasi.");
+  const index = await getCanonIndex(status.commitSha);
+  if (!index || index.commitSha !== status.commitSha) throw new Error("INDEX canon pada ACTIVE_SHA aktif belum tersedia.");
   return parseCanonModules(index.content);
 }
 
