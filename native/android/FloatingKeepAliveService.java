@@ -126,11 +126,15 @@ public class FloatingKeepAliveService extends Service {
     }
 
     private void openFloatingWindow() {
-        Intent launch = getPackageManager().getLaunchIntentForPackage(getPackageName());
-        if (launch == null) return;
-        launch.setAction(ACTION_OPEN_WINDOW);
-        launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(launch);
+        try {
+            Intent launch = getPackageManager().getLaunchIntentForPackage(getPackageName());
+            if (launch == null) throw new IllegalStateException("MainActivity launch intent is unavailable.");
+            launch.setAction(ACTION_OPEN_WINDOW);
+            launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(launch);
+        } catch (Exception error) {
+            android.util.Log.e("MerzkavaFloating", "Could not launch the floating mini window", error);
+        }
     }
 
     private void removeBubble() {
