@@ -11,8 +11,8 @@ function escapeHtml(value: string): string {
 function registryProfileMarkup(character: Character): string {
   if (!character.profileMarkdown) return "";
   const read = (label: string): string => {
-    const line = character.profileMarkdown?.split(/\\r?\\n/).find(item => item.trimStart().startsWith("- **" + label + ":**"));
-    return line?.replace(/^\\s*-\\s*\\*\\*[^*]+:\\*\\*\\s*/, "").trim() ?? "Belum tercatat";
+    const line = character.profileMarkdown?.split(/\r?\n/).find(item => item.trimStart().startsWith("- **" + label + ":**"));
+    return line?.replace(/^\s*-\s*\*\*[^*]+:\*\*\s*/, "").trim() ?? "Belum tercatat";
   };
   const field = (label: string) => "<dt>" + escapeHtml(label) + "</dt><dd>" + escapeHtml(read(label)) + "</dd>";
   return '<details class="registry-profile"><summary>INITIAL PROFILE · players.md</summary><dl>' +
