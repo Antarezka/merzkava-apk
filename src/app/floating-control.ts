@@ -19,7 +19,7 @@ export function floatingControlMarkup(state: FloatingReadiness): string {
     </section>
 
     <section class="floating-setup">
-      <div class="floating-section-label">INITIAL SETUP <span>01 — 04</span></div>
+      <div class="floating-section-label">INITIAL SETUP <span>01 — 03</span></div>
       <article class="floating-step ${state.displayOverApps ? "is-ready" : ""}">
         <span class="floating-step-number">01</span><div class="floating-step-copy"><strong>Allowed display over the app</strong><small>Allow Merzkava to appear above other apps.</small></div>
         ${state.displayOverApps ? '<span class="floating-check">✓</span>' : '<button data-floating-action="overlay">Allow ↗</button>'}
@@ -32,10 +32,6 @@ export function floatingControlMarkup(state: FloatingReadiness): string {
         <span class="floating-step-number">03</span><div class="floating-step-copy"><strong>Allow background activity / battery</strong><small>Reduce the chance that HiOS stops the floating service.</small></div>
         ${state.batteryExemption ? '<span class="floating-check">✓</span>' : `<button data-floating-action="battery" ${!state.notifications ? "disabled" : ""}>Allow ↗</button>`}
       </article>
-      <article class="floating-step manual-step">
-        <span class="floating-step-number">04</span><div class="floating-step-copy"><strong>Set up Merzkava App Links</strong><small>Open Android App Links settings, enable supported links, then select the official Merzkava domain.</small></div>
-        ${state.playReturnLink ? '<span class="floating-check">✓</span>' : '<button data-floating-action="play-return">Set up ↗</button>'}
-      </article>
     </section>
 
     <section class="floating-actions">
@@ -46,6 +42,6 @@ export function floatingControlMarkup(state: FloatingReadiness): string {
       <button class="floating-stop" data-floating-action="stop" ${!state.serviceRunning && !state.displayOverApps ? "disabled" : ""}>Stop service and close window <span>×</span></button>
       <button class="floating-donate" data-floating-action="donate">Donate stuff <span>♡</span></button>
     </section>
-    <p class="floating-footnote">App Links readiness is checked from Android. The Merzkava domain must first be declared in the app and verified by its website association file.</p>
+    <p class="floating-footnote">Foreground service starts automatically when you enter Floating Mode and keeps an ongoing notification visible while the floating session is active.</p>
   </main>`;
 }
