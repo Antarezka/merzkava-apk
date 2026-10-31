@@ -149,7 +149,6 @@ public class FloatingWindowPlugin extends Plugin {
             activityRef = new WeakReference<>(activity);
             webView = getBridge().getWebView();
             windowManager = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
-            attachWebViewToFloatingRoot(activity);
             Intent service = new Intent(activity, FloatingKeepAliveService.class);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) activity.startForegroundService(service);
             else activity.startService(service);
@@ -361,7 +360,11 @@ public class FloatingWindowPlugin extends Plugin {
 
     private static void showWindowMode() {
         Activity activity = getActivityRef();
-        if (activity == null || floatingRoot == null) return;
+        if (activity == null) return;
+        if (floatingRoot == null) {
+            if (webView == null) return;
+            attachWebViewToFloatingRoot(activity);
+        }
         mode = MODE_WINDOW;
         addOverlay(floatingRoot, windowWidth, windowHeight);
     }
