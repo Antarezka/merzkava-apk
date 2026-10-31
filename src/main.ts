@@ -512,7 +512,9 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     if (mode === "new") {
       activeStatus = await refreshCanon();
       if (activeStatus.status !== "ready" || !activeStatus.commitSha) {
-        throw new Error("Sesi baru membutuhkan koneksi dan latest hash yang berhasil diverifikasi. Periksa koneksi lalu coba lagi.");
+        notice = "Sesi baru membutuhkan koneksi dan latest hash yang berhasil diverifikasi. Periksa koneksi lalu coba lagi.";
+        render();
+        return;
       }
     }
     if (mode === "continue" && !gameplaySnapshot) { notice = "Belum ada sesi tersimpan untuk karakter ini. Tekan New session terlebih dahulu."; render(); return; }
