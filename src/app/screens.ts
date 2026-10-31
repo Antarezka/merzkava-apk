@@ -38,10 +38,16 @@ function ledgerLogMarkup(entries: LedgerEntry[]): string {
     </li>`).join("") + "</ol>";
 }
 
-function inventoryView(entries: LedgerEntry[]): string {
+type InventorySnapshot = { inventory: string; assets: string; wallet: string };
+function inventoryView(entries: LedgerEntry[], snapshot?: InventorySnapshot): string {
+  const walletMatch = snapshot?.wallet.match(/^(\\d+)\\s*xc\\s*\\|\\s*(\\d+)\\s*xs\\s*\\|\\s*(\\d+)\\s*xg\\s*\\|\\s*(\\d+)\\s*zj\\s*\\|\\s*(\\d+)\\s*az/i);
+  const wallet = walletMatch ? walletMatch.slice(1).map((amount, index) => `<span>${amount} ${["xc","xs","xg","zj","az"][index]}</span>`).join("") : `<span>— xc</span><span>— xs</span><span>— xg</span><span>— zj</span><span>— az</span>`;
+  const inventory = snapshot?.inventory || "Belum disinkronkan";
+  const assets = snapshot?.assets || "Belum disinkronkan";
   return `<div class="page-heading"><p class="eyebrow">POSSESSIONS & FINANCES</p><h2>Inventory</h2><p class="muted">Items, equipment, structures, and wallet.</p></div>
-    <div class="wallet-card"><span class="eyebrow">WALLET</span><div class="wallet-values"><span>xc</span><span>xs</span><span>xg</span><span>zj</span><span>az</span></div><p class="muted">Balances will be calculated and validated by the game engine.</p></div>
-    <div class="empty-state compact"><h3>Inventory is empty</h3><p>Items acquired during gameplay will be recorded here.</p></div>
+    <div class="wallet-card"><span class="eyebrow">WALLET · GM REPORTED</span><div class="wallet-values">${wallet}</div><p class="muted">${snapshot ? "Saldo dari panel profil gameplay terakhir · belum disahkan." : "Saldo belum tersedia. Mulai sesi dan tunggu profil karakter dari GM."}</p></div>
+    <section class="section-block"><div class="section-heading"><span>INVENTORY</span><small>GM REPORTED</small></div><article class="record-card"><p class="muted">${escapeHtml(inventory)}</p></article></section>
+    <section class="section-block"><div class="section-heading"><span>BUILDING ASSETS</span><small>GM REPORTED</small></div><article class="record-card"><p class="muted">${escapeHtml(assets)}</p></article></section>
     <section class="section-block ledger-log-panel"><div class="section-heading"><span>LEDGER LOG</span><small>${entries.length} RECORDED CHANGES</small></div>${ledgerLogMarkup(entries)}</section>`;
 }
 
@@ -86,9 +92,9 @@ map:`<div class="page-heading"><p class="eyebrow">THE KNOWN WORLD</p><h2>World M
 journal:`<div class="page-heading"><p class="eyebrow">YOUR RECORDED HISTORY</p><h2>Journal</h2><p class="muted">Quests, discoveries, and gameplay events.</p></div><div class="empty-state"><span class="empty-symbol">⌁</span><h3>No entries yet</h3><p>Verified events and important story moments will be recorded here.</p></div>`,
 settings:`<div class="page-heading"><p class="eyebrow">APPLICATION</p><h2>Settings</h2><p class="muted">Appearance, sound, local storage, and AI configuration.</p></div><section class="section-block preference-panel"><div class="section-heading"><span>APPEARANCE</span><small>DISPLAY MODE</small></div><p class="muted">The archive keeps its antique paper identity by default. Night mode shifts it into a quiet, dark reading room.</p><div class="preference-choice" role="group" aria-label="Appearance"><button type="button" data-theme-mode="light" aria-pressed="true">☼ &nbsp; Archive Light</button><button type="button" data-theme-mode="dark" aria-pressed="false">☾ &nbsp; Archive Night</button></div></section><section class="section-block preference-panel"><div class="section-heading"><span>SOUND</span><small>APP AUDIO</small></div><div class="setting-row"><div><h3>Sound effects & voice</h3><p>Opening chime, spoken title, interface clicks, and subtle interface sounds.</p></div><button class="preference-toggle" type="button" data-sound-toggle aria-pressed="true">Sound On</button></div></section><section class="section-block floating-mode-settings"><div class="section-heading"><span>FLOATING MODE</span><small>ANDROID OVERLAY</small></div><p class="muted">Keep the same interactive Merzkava session in a movable mini window above other apps. Android will ask for permission the first time.</p><button class="action-button" type="button" data-floating-start>Start Floating Mode <span>↗</span></button></section><div class="setting-row"><div><h3>Save location</h3><p>Local device database</p></div><span class="setting-value">SQLITE</span></div><div class="setting-row"><div><h3>AI Game Master</h3><p>Sign in with Supabase to use the authenticated AI Gateway.</p></div><span class="setting-value">GATEWAY</span></div><div class="setting-row"><div><h3>Canon source</h3><p>Antarezka / merzkava-universe</p></div><span class="setting-value">ACTIVE</span></div>`
 };
-export function renderScreen(screen: ScreenId, characters: Character[] = [], registryStatus = "Registered characters are loaded from the pinned players.md snapshot.", ledgerEntries: LedgerEntry[] = []): string {
+export function renderScreen(screen: ScreenId, characters: Character[] = [], registryStatus = "Registered characters are loaded from the pinned players.md snapshot.", ledgerEntries: LedgerEntry[] = [], inventorySnapshot?: InventorySnapshot): string {
   if (screen === "character") return characterView(characters, registryStatus);
-  if (screen === "inventory") return inventoryView(ledgerEntries);
+  if (screen === "inventory") return inventoryView(ledgerEntries, inventorySnapshot);
   if (screen === "gameplay") {
     const options = characters.map(character => `<option value="${escapeHtml(character.id)}">${escapeHtml(character.name)}</option>`).join("");
     return views.gameplay.replace("{{CHARACTER_OPTIONS}}", options);
