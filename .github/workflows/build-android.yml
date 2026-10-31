@@ -168,7 +168,7 @@ jobs:
           pre-emulator-launch-script: adb start-server
           disable-animations: true
           script: |
-            set -uo pipefail
+            set -eu
             APK="android/app/build/outputs/apk/debug/app-debug.apk"
             DIAG_DIR="$RUNNER_TEMP/merzkava-emulator-diagnostics"
             mkdir -p "$DIAG_DIR"
