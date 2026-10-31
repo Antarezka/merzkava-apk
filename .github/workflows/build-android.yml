@@ -87,6 +87,11 @@ jobs:
       - name: Install Merzkava Floating Mode native integration
         run: node scripts/patch-android.mjs
 
+      - name: Generate transparent Kitty launcher icons
+        run: |
+          python3 -m pip install --user Pillow
+          python3 scripts/generate-android-icons.py
+
       - name: Configure permanent update signing and version
         env:
           MERZKAVA_KEYSTORE_BASE64: ${{ secrets.MERZKAVA_KEYSTORE_BASE64 }}
