@@ -2,7 +2,7 @@ import { Capacitor } from "@capacitor/core";
 import { CapacitorSQLite, SQLiteConnection, type SQLiteDBConnection } from "@capacitor-community/sqlite";
 
 const DATABASE_NAME = "merzkava";
-const SCHEMA_VERSION = 4;
+const SCHEMA_VERSION = 5;
 let database: SQLiteDBConnection | null = null;
 
 const schema = [
