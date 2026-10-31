@@ -37,7 +37,7 @@ function showOpeningSplash(): HTMLDivElement {
       <small class="splash-tagline">THE WORLD AWAITS</small>
     </div>`;
   splash.addEventListener("animationend", event => {
-    if (event.target === splash && event.animationName === "splash-curtain") splash.remove();
+    if (event.target === splash.querySelector(".splash-content") && event.animationName === "splash-depart") splash.remove();
   });
   document.body.append(splash);
   return splash;
@@ -53,7 +53,18 @@ async function playEntrySplash(): Promise<void> {
   };
   splash.addEventListener("click", () => { cancelOpeningSequence(); close(); }, { once: true });
   await playOpeningSequence();
-  close();
+  await new Promise<void>(resolve => {
+    splash.addEventListener("animationend", event => {
+      if (event.target === splash.querySelector(".splash-content") && event.animationName === "splash-depart") resolve();
+    });
+    close();
+  });
+  const shell = root.querySelector<HTMLElement>(".app-shell");
+  if (shell) {
+    shell.classList.remove("is-entering");
+    void shell.offsetWidth;
+    shell.classList.add("is-entering");
+  }
 }
 
 const navigation: { id: ScreenId; label: string; icon: string }[] = [
