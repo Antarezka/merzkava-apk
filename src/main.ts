@@ -769,6 +769,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       const responseProfileErrors = validateCharacterProfile(responsePanels.profile);
       if (responseProfileErrors.length) throw new Error("Nilai panel profil GM tidak valid: " + responseProfileErrors.join(" "));
       const stateReconciliation = reconcileGMProposal(usableProfile, gmProposal, responsePanels.profile, gmProposal.player_response);
+      if (usableProfile && (stateReconciliation.status === "rejected" || stateReconciliation.errors.length > 0)) throw new Error("Panel profil dan Ledger Log tidak konsisten dengan baseline: " + stateReconciliation.errors.join(" "));
       applyGMWorldTime(gmProposal);
       activeChat.messages.push({ role: "player", text: mode === "new" ? "Memulai sesi baru sebagai " + character.name + "." : typedActivity, createdAt: new Date().toISOString() });
       activeChat.messages.push({ role: "gm", text: gmProposal.player_response, createdAt: new Date().toISOString() });
