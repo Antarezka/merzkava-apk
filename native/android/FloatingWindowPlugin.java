@@ -159,7 +159,7 @@ public class FloatingWindowPlugin extends Plugin {
         try {
             activityRef = new WeakReference<>(activity);
             webView = getBridge().getWebView();
-            windowManager = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
+            windowManager = (WindowManager) activity.getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
             Intent service = new Intent(activity, FloatingKeepAliveService.class);
             service.setAction(FloatingKeepAliveService.ACTION_START_BUBBLE);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) activity.startForegroundService(service);
@@ -224,7 +224,7 @@ public class FloatingWindowPlugin extends Plugin {
         try {
             activityRef = new WeakReference<>(activity);
             webView = getBridge().getWebView();
-            windowManager = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
+            windowManager = (WindowManager) activity.getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
             Intent service = new Intent(activity, FloatingKeepAliveService.class);
             service.setAction(FloatingKeepAliveService.ACTION_HIDE_BUBBLE);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) activity.startForegroundService(service);
