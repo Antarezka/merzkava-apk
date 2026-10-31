@@ -1,0 +1,31 @@
+.floating-control{width:min(100% - 28px,560px);min-height:100dvh;margin:0 auto;padding:max(28px,env(safe-area-inset-top)) 0 34px;color:#293d38}
+.floating-control-brand{display:flex;align-items:center;gap:13px;padding:6px 0 19px;border-bottom:1px solid #bdb49e}
+.floating-brand-mark{display:grid;place-items:center;width:48px;height:48px;border:1px solid #a68d5e;background:#eee7d6;color:#8e7951;font:28px Georgia,serif}
+.floating-control-brand small{color:#8e7951;font-size:8px;font-weight:700;letter-spacing:.2em}
+.floating-control-brand h1{margin:4px 0 0;color:#293d38;font:27px Georgia,serif;font-weight:400}
+.floating-control-intro{margin:16px 0 18px;color:#737b70;font-size:12px;line-height:1.7}
+.floating-health-panel{padding:4px 14px;border:1px solid #c7bea9;background:#eee7d6;box-shadow:0 5px 18px #4d4b3b0a}
+.floating-health-row{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:43px;border-bottom:1px solid #d8cfbb;color:#42564b;font-size:11px}
+.floating-health-row:last-child{border-bottom:0}
+.floating-status{display:inline-flex;align-items:center;gap:6px;font-size:8px;font-weight:700;letter-spacing:.12em;white-space:nowrap}
+.floating-status i{width:7px;height:7px;border-radius:50%;background:#ad7966}
+.floating-status.ready{color:#55745e}.floating-status.ready i{background:#6f9878}
+.floating-setup,.floating-actions{margin-top:24px}
+.floating-section-label{display:flex;justify-content:space-between;margin-bottom:10px;color:#8e7951;font-size:9px;font-weight:700;letter-spacing:.16em}
+.floating-section-label span{color:#929083}
+.floating-step{display:flex;align-items:center;gap:10px;min-height:72px;padding:10px 11px;border:1px solid #c7bea9;border-bottom:0;background:#eee7d6}
+.floating-step:last-child{border-bottom:1px solid #c7bea9}
+.floating-step-number{display:grid;place-items:center;flex:0 0 27px;width:27px;height:27px;border:1px solid #b9aa87;border-radius:50%;color:#927b50;font:12px Georgia,serif}
+.floating-step-copy{display:grid;flex:1;gap:4px;min-width:0}
+.floating-step-copy strong{color:#354a40;font-size:10px;font-weight:650;line-height:1.4}
+.floating-step-copy small{color:#7a8175;font-size:9px;line-height:1.45}
+.floating-step button,.floating-actions>button{min-height:34px;padding:8px 10px;border:1px solid #b49b68;background:#e6dcc5;color:#40564a;font-size:9px;white-space:nowrap}
+.floating-step button:disabled,.floating-actions>button:disabled{opacity:.42}
+.floating-check{color:#66846c;font-size:17px}
+.manual-step{background:#e9e2d2}
+.floating-actions{display:grid;gap:8px}
+.floating-actions>button{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:45px;padding:0 14px;text-align:left;font-size:11px}
+.floating-actions>button.floating-primary{border-color:#66796d;background:#314a41;color:#f0e8d8}
+.floating-actions>button.floating-stop{border-color:#c6a99b;background:#eee2d9;color:#875e51}
+.floating-actions>button.floating-donate{background:transparent;border-color:#c7bea9;color:#927b50}
+.floating-footnote{margin:17px 2px 0;color:#858779;font-size:9px;line-height:1.6}
