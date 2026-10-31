@@ -1,11 +1,43 @@
-import "./style.css";
+im
+async function refreshPlayerRegistry(): Promise<void> {
+  if (playerRegistryBusy) return;
+  playerRegistryBusy = true;
+  playerRegistryMessage = "Mengambil daftar karakter dari players.md…";
+  try {
+    const result = await refreshLatestPlayerRegistry();
+    registeredCharacters = result.players.map(player => ({
+      id: "registry:" + player.path,
+      name: player.name,
+      age: player.age ?? 0,
+      origin: "Registry",
+      background: "",
+      realm: player.realm,
+      cultivationLevel: 0,
+      awakened: false,
+      createdAt: "",
+      registryPath: player.path
+    }));
+    playerRegistryMessage = `${registeredCharacters.length} karakter dari players.md · snapshot ${result.commitSha}`;
+    const statusNode = root.querySelector<HTMLElement>("#player-registry-status");
+    if (statusNode) statusNode.textContent = playerRegistryMessage;
+    if (activeScreen === "character" || activeScreen === "gameplay") render();
+  } catch (error) {
+    playerRegistryMessage = error instanceof Error ? error.message : "Gagal memuat players.md.";
+    const statusNode = root.querySelector<HTMLElement>("#player-registry-status");
+    if (statusNode) statusNode.textContent = playerRegistryMessage;
+    notice = playerRegistryMessage;
+  } finally {
+    playerRegistryBusy = false;
+  }
+}
+port "./style.css";
 import { cancelOpeningSequence, playButtonSound, playOpeningSequence } from "./audio/sound-effects";
 const splashLogoUrl = new URL("../Untitled78_20261030213901.png", import.meta.url).href;
 import { initializeDatabase } from "./database/database";
 import { createCharacter, deleteCharacter, listCharacters, type Character } from "./characters/character-repository";
 import { validateCharacterDraft } from "./engine/character-validation";
 import { renderScreen, type ScreenId } from "./app/screens";
-import { activateCanonSnapshot, getCanonIndex, getCanonStatus, loadCanonModule, loadPlayerRegistry, refreshCanon, type CanonDocument } from "./canon/canon-loader";
+import { activateCanonSnapshot, getCanonIndex, getCanonStatus, loadCanonModule, loadPlayerRegistry, refreshCanon, refreshLatestPlayerRegistry, type CanonDocument } from "./canon/canon-loader";
 import { routeCanonActivity } from "./canon/canon-router";
 import { assembleGameplayContext } from "./canon/context-assembler";
 import { requestGMProposal, validateGMResponse, type GMProposal } from "./engine/gm-engine";
@@ -60,6 +92,9 @@ const navigation: { id: ScreenId; label: string; icon: string }[] = [
 let activeScreen: ScreenId = "home";
 let databaseMessage = "Checking local storage…";
 let characters: Character[] = [];
+let registeredCharacters: Character[] = [];
+let playerRegistryBusy = false;
+let playerRegistryMessage = "Registry players.md belum dimuat.";
 let notice = "";
 let canonMessage = "Canon belum dimuat.";
 let canonDocument: CanonDocument | null = null;
@@ -110,7 +145,7 @@ function renderChat(): void {
   if (setting) setting.value = activeChat.showOptions ? "yes" : "no";
   const status = root.querySelector<HTMLElement>("#session-status");
   if (status) status.textContent = activeChat.started ? "Sesi tersimpan di perangkat" : "Belum ada sesi aktif";
-  const character = characters.find(item => item.id === activeCharacterId);
+  const character = [...registeredCharacters, ...characters].find(item => item.id === activeCharacterId);
   const record = root.querySelector<HTMLElement>("#player-character-record");
   if (record) record.innerHTML = character
     ? '<details open><summary>PROFIL KARAKTER</summary><dl><dt>Nama</dt><dd>' + escapeHtml(character.name) + '</dd><dt>Usia</dt><dd>' + character.age + '</dd><dt>Spirit Realm</dt><dd>' + escapeHtml(character.realm) + '</dd><dt>Sync progress</dt><dd>Belum disinkronkan</dd><dt>Spirit Ring Absorption</dt><dd>Belum disinkronkan</dd><dt>Martial Soul</dt><dd>Belum disinkronkan</dd><dt>Arcanist Grade</dt><dd>???</dd><dt>Arcanist Focus</dt><dd>Belum diverifikasi</dd><dt>HP</dt><dd>Belum disinkronkan</dd><dt>Satiety</dt><dd>Belum disinkronkan</dd><dt>Qi</dt><dd>Belum disinkronkan</dd><dt>Kondisi Tubuh</dt><dd>Belum disinkronkan</dd><dt>Equipment</dt><dd>Belum disinkronkan</dd><dt>Asal</dt><dd>' + escapeHtml(character.origin) + '</dd><dt>Awakening</dt><dd>' + (character.awakened ? "Awakened" : "Not awakened") + '</dd><dt>Background</dt><dd>' + escapeHtml(character.background || "—") + '</dd></dl></details><details><summary>INV & KEUANGAN</summary><p>Inventory: Belum disinkronkan</p><p>Assets Bangunan: Belum disinkronkan</p><p>Wallet (wealth): Belum diverifikasi · xc | xs | xg | zj | az</p></details><details><summary>TEKNIK & TUJUAN</summary><p>Teknik / Kemampuan: Belum disinkronkan</p><p>Tujuan Saat Ini: Belum disinkronkan</p></details><details><summary>CATATAN PEMAIN & KONSISTENSI</summary><p>State kanonis dan Ledger Log belum disinkronkan dari GM. Aplikasi tidak mengarang atau mengubah nilai yang belum diverifikasi.</p></details>'
@@ -241,7 +276,7 @@ function snapshotBlindMarkup(): string {
 function render(): void {
   root.innerHTML = `<div class="app-shell">
     <header class="app-header"><button class="brand" data-screen="home" aria-label="Merzkava home"><span class="brand-mark">M</span><span><small>MERZKAVA UNIVERSE</small><strong>Merzkava</strong></span></button><button class="header-settings" data-screen="settings" aria-label="Settings">⚙</button></header>
-    <main class="main-content">${notice ? `<p class="notice" role="status">${escapeHtml(notice)}</p>` : ""}${renderScreen(activeScreen, characters)}${activeScreen === "settings" ? authPanel() + canonPanel() : ""}</main>
+    <main class="main-content">${notice ? `<p class="notice" role="status">${escapeHtml(notice)}</p>` : ""}${renderScreen(activeScreen, [...registeredCharacters, ...characters.filter(local => !registeredCharacters.some(registered => registered.name === local.name))])}${activeScreen === "settings" ? authPanel() + canonPanel() : ""}</main>
     <nav class="bottom-nav" aria-label="Main navigation">${navigation.map(item => `<button class="nav-item ${activeScreen === item.id ? "active" : ""}" data-screen="${item.id}" ${activeScreen === item.id ? 'aria-current="page"' : ""}><span>${item.icon}</span><small>${item.label}</small></button>`).join("")}</nav>
     <div class="storage-status"><span class="status-dot"></span>${databaseMessage}</div>
     ${activeScreen === "gameplay" ? snapshotBlindMarkup() : ""}
@@ -249,6 +284,10 @@ function render(): void {
   </div>`;
   updateSessionCalendar();
   renderChat();
+}
+
+function availableCharacters(): Character[] {
+  return [...registeredCharacters, ...characters.filter(local => !registeredCharacters.some(registered => registered.name === local.name))];
 }
 
 async function refreshCharacters(): Promise<void> {
@@ -335,6 +374,11 @@ root.addEventListener("click", async (event: MouseEvent) => {
     return;
   }
 
+  const refreshPlayersButton = target.closest<HTMLButtonElement>("[data-refresh-players]");
+  if (refreshPlayersButton && !playerRegistryBusy) {
+    await refreshPlayerRegistry();
+    return;
+  }
   const refreshCanonButton = target.closest<HTMLButtonElement>("[data-refresh-canon]");
   if (refreshCanonButton && !canonBusy) {
     canonBusy = true; canonMessage = "Memeriksa pin README dan mengambil INDEX…"; render();
@@ -435,7 +479,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     const characterId = String(data.get("characterId") ?? "");
     const mode = form.dataset.sessionMode === "new" ? "new" : "continue";
     if (gameplayContextBusy || !characterId || (mode === "continue" && !typedActivity)) return;
-    const character = characters.find(item => item.id === characterId);
+    const character = availableCharacters().find(item => item.id === characterId);
     if (!character) { notice = "Karakter tidak ditemukan."; render(); return; }
     activeCharacterId = characterId;
     loadCharacterWorldTime(characterId);
