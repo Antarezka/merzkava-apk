@@ -49,22 +49,20 @@ const permissions = [
   "android.permission.POST_NOTIFICATIONS"
 ];
 for (const permission of permissions) {
-  const declaration = \`    <uses-permission android:name="\${permission}" />\`;
-  if (!manifest.includes(\`android:name="\${permission}"\`)) {
+  const declaration = '    <uses-permission android:name="' + permission + '" />';
+  if (!manifest.includes('android:name="' + permission + '"')) {
     manifest = manifest.replace("<application", declaration + "\n    <application");
   }
 }
 if (!manifest.includes("FloatingKeepAliveService")) {
-  const service = \`
-        <service
-            android:name=".FloatingKeepAliveService"
-            android:exported="false"
-            android:foregroundServiceType="specialUse">
-            <property
-                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-                android:value="interactive overlay window for user-requested multitasking" />
-        </service>
-\`;
+  const service = "\n        <service\n" +
+    '            android:name=".FloatingKeepAliveService"\n' +
+    '            android:exported="false"\n' +
+    '            android:foregroundServiceType="specialUse">\n' +
+    "            <property\n" +
+    '                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"\n' +
+    '                android:value="interactive overlay window for user-requested multitasking" />\n' +
+    "        </service>\n";
   manifest = manifest.replace("</application>", service + "    </application>");
 }
 await writeFile(manifestPath, manifest);
