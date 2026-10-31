@@ -123,25 +123,6 @@ public class FloatingWindowPlugin extends Plugin {
     }
 
     @PluginMethod
-    public void openAppLinksSettings(PluginCall call) {
-        Activity activity = getActivity();
-        try {
-            Intent intent;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                intent = new Intent(Settings.ACTION_APP_OPEN_BY_DEFAULT_SETTINGS,
-                    Uri.parse("package:" + activity.getPackageName()));
-            } else {
-                intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                    Uri.parse("package:" + activity.getPackageName()));
-            }
-            activity.startActivity(intent);
-            call.resolve();
-        } catch (Exception error) {
-            call.reject("Could not open Merzkava App Links settings: " + error.getMessage());
-        }
-    }
-
-    @PluginMethod
     public void startService(PluginCall call) {
         try {
             Context context = getContext();
@@ -171,6 +152,7 @@ public class FloatingWindowPlugin extends Plugin {
             showBubbleMode();
             call.resolve();
         } catch (Exception error) {
+            activity.stopService(new Intent(activity, FloatingKeepAliveService.class));
             call.reject("Could not show the Kitty bubble: " + error.getMessage());
         }
     }
