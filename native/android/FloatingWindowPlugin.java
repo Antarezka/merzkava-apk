@@ -3,6 +3,9 @@ package com.antarezka.merzkava;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.app.NotificationManager;
+import android.os.PowerManager;
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -63,6 +66,114 @@ public class FloatingWindowPlugin extends Plugin {
     private static boolean dragged;
     private static int resizeStartWidth;
     private static int resizeStartHeight;
+
+    @PluginMethod
+    public void getReadiness(PluginCall call) {
+        Context context = getContext();
+        JSObject result = new JSObject();
+        boolean overlay = Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Settings.canDrawOverlays(context);
+        NotificationManager notifications = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        boolean notificationReady = notifications != null && notifications.areNotificationsEnabled();
+        if (Build.VERSION.SDK_INT >= 33) {
+            notificationReady = notificationReady && context.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED;
+        }
+        PowerManager power = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+        boolean batteryReady = Build.VERSION.SDK_INT < Build.VERSION_CODES.M || (power != null && power.isIgnoringBatteryOptimizations(context.getPackageName()));
+        result.put("displayOverApps", overlay);
+        result.put("notifications", notificationReady);
+        result.put("batteryExemption", batteryReady);
+        result.put("serviceRunning", isServiceRunning(context));
+        // This remains a manual Google Play Console configuration step until a verified
+        // Play Games / OAuth return URI and signing certificate are supplied.
+        result.put("playReturnLink", false);
+        call.resolve(result);
+    }
+
+    private static boolean isServiceRunning(Context context) {
+        ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        if (manager == null) return false;
+        for (ActivityManager.RunningServiceInfo info : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (FloatingKeepAliveService.class.getName().equals(info.service.getClassName())) return true;
+        }
+        return false;
+    }
+
+    @PluginMethod
+    public void requestNotifications(PluginCall call) {
+        Intent intent = new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
+        intent.putExtra(Settings.EXTRA_APP_PACKAGE, getContext().getPackageName());
+        getActivity().startActivity(intent);
+        call.resolve();
+    }
+
+    @PluginMethod
+    public void requestBatteryExemption(PluginCall call) {
+        Context context = getContext();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            PowerManager power = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+            if (power == null || !power.isIgnoringBatteryOptimizations(context.getPackageName())) {
+                Intent intent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
+                    Uri.parse("package:" + context.getPackageName()));
+                try { getActivity().startActivity(intent); }
+                catch (Exception error) {
+                    Intent fallback = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                        Uri.parse("package:" + context.getPackageName()));
+                    getActivity().startActivity(fallback);
+                }
+            }
+        }
+        call.resolve();
+    }
+
+    @PluginMethod
+    public void startService(PluginCall call) {
+        try {
+            Context context = getContext();
+            Intent service = new Intent(context, FloatingKeepAliveService.class);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) context.startForegroundService(service);
+            else context.startService(service);
+            call.resolve();
+        } catch (Exception error) {
+            call.reject("Could not start the floating service: " + error.getMessage());
+        }
+    }
+
+    @PluginMethod
+    public void showBubble(PluginCall call) {
+        Activity activity = getActivity();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(activity)) {
+            call.reject("Display over other apps permission is not enabled.");
+            return;
+        }
+        try {
+            activityRef = new WeakReference<>(activity);
+            windowManager = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
+            Intent service = new Intent(activity, FloatingKeepAliveService.class);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) activity.startForegroundService(service);
+            else activity.startService(service);
+            showBubbleMode();
+            call.resolve();
+        } catch (Exception error) {
+            call.reject("Could not show the Kitty bubble: " + error.getMessage());
+        }
+    }
+
+    @PluginMethod
+    public void stop(PluginCall call) {
+        Activity activity = getActivity();
+        MAIN.post(() -> {
+            removeCurrentOverlay();
+            if (webView != null && originalParent != null && webView.getParent() != originalParent) {
+                if (webView.getParent() instanceof ViewGroup) ((ViewGroup) webView.getParent()).removeView(webView);
+                int index = Math.max(0, Math.min(originalIndex, originalParent.getChildCount()));
+                originalParent.addView(webView, index, originalLayoutParams);
+                webView.evaluateJavascript("document.body.classList.remove('native-floating-mode')", null);
+            }
+            if (activity != null) activity.stopService(new Intent(activity, FloatingKeepAliveService.class));
+            mode = MODE_WINDOW;
+            call.resolve();
+        });
+    }
 
     @PluginMethod
     public void checkPermission(PluginCall call) {
