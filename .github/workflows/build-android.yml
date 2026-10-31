@@ -170,7 +170,7 @@ jobs:
           script: |
             set -eu
             APK="android/app/build/outputs/apk/debug/app-debug.apk"
-            DIAG_DIR="$RUNNER_TEMP/merzkava-emulator-diagnostics"
+            DIAG_DIR="emulator-diagnostics"
             mkdir -p "$DIAG_DIR"
             FAILED=1
 
@@ -263,6 +263,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: merzkava-emulator-diagnostics
-          path: ${{ runner.temp }}/merzkava-emulator-diagnostics/
+          path: emulator-diagnostics/
           if-no-files-found: ignore
           retention-days: 7
