@@ -1,6 +1,17 @@
 import type { GameplayContext } from "../canon/context-assembler";
 
-export interface GMWorldTime { era: string | null; year: string | null; season: string | null; date: string | null; weekday: string | null; weather: string | null; hour: string | null; cycle: string | null; }\n\nexport interface GMProposal {
+export interface GMWorldTime {
+  era: string | null;
+  year: string | null;
+  season: string | null;
+  date: string | null;
+  weekday: string | null;
+  weather: string | null;
+  hour: string | null;
+  cycle: string | null;
+}
+
+export interface GMProposal {
   snapshot: string;
   version: string;
   narration: string;
@@ -8,6 +19,7 @@ export interface GMWorldTime { era: string | null; year: string | null; season: 
   canon_basis: string[];
   proposed_changes: string[];
   unresolved_questions: string[];
+  world_time: GMWorldTime;
 }
 
 export interface GMProvider { generate(prompt: string, metadata: { snapshot: string; version: string }): Promise<string>; }
