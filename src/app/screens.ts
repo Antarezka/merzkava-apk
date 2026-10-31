@@ -56,11 +56,14 @@ gameplay:`<section class="world-time-panel" aria-label="Waktu Merzkava Universe"
   <div class="conversation-heading"><span>THE CHRONICLE</span><span>PLAYER SESSION</span></div>
   <div id="conversation-feed" class="conversation-feed" aria-live="polite"><div class="conversation-empty"><span class="conversation-ornament">✧</span><h3>Your story begins here</h3><p>Pilih karakter, lalu mulai sesi baru. Riwayat percakapan tersimpan terpisah untuk setiap karakter.</p></div></div>
   <div class="player-tools"><details class="player-record"><summary>Catatan karakter & status</summary><div id="player-character-record" class="player-record-content">Pilih karakter untuk melihat catatan lokalnya.</div></details><label class="gm-options-toggle"><span>Show GM options</span><select id="gm-options-setting"><option value="no">No</option><option value="yes">Yes</option></select></label></div>
-  <form id="gameplay-route-form" class="conversation-composer" data-session-mode="continue">
+  <form id="gameplay-route-form" class="conversation-composer" data-session-mode="new">
     <div class="composer-topline"><label for="gameplay-character">ACTIVE CHARACTER</label><button class="text-button" type="button" data-refresh-players>↻</button><select id="gameplay-character" name="characterId"><option value="">No character selected</option>{{CHARACTER_OPTIONS}}</select></div>
-    <div class="session-actions"><button class="text-button" type="button" data-start-session>＋ New session</button><span id="session-status" class="composer-status">Pilih karakter</span></div>
-    <label class="composer-label" for="gameplay-action">Aksiku</label><textarea id="gameplay-action" name="activity" rows="2" maxlength="1200" placeholder="Ceritakan tindakan karaktermu…"></textarea>
-    <button class="action-button" type="submit">Kirim <span>↗</span></button>
+    <div class="session-actions"><span id="session-status" class="composer-status">Pilih karakter untuk memulai</span></div>
+    <div data-session-start><button class="action-button" type="button" data-start-session>Mulai Convo <span>↗</span></button></div>
+    <div data-session-compose hidden>
+      <label class="composer-label" for="gameplay-action">Aksiku</label><textarea id="gameplay-action" name="activity" rows="2" maxlength="1200" placeholder="Ceritakan tindakan karaktermu…"></textarea>
+      <button class="action-button" type="submit">Kirim <span>↗</span></button>
+    </div>
   </form>
 </section>`,
 inventory:`<div class="page-heading"><p class="eyebrow">POSSESSIONS & FINANCES</p><h2>Inventory</h2><p class="muted">Items, equipment, structures, and wallet.</p></div><div class="wallet-card"><span class="eyebrow">WALLET</span><div class="wallet-values"><span>xc</span><span>xs</span><span>xg</span><span>zj</span><span>az</span></div><p class="muted">Balances will be calculated and validated by the game engine.</p></div><div class="empty-state compact"><h3>Inventory is empty</h3><p>Items acquired during gameplay will be recorded here.</p></div>`,
