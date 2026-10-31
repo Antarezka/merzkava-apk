@@ -1,3 +1,4 @@
+import { animate } from "animejs";
 import { canonLabelMarkup, type CanonLabelCategory } from "./canon-labels";
 export type LedgerCategory = "wallet" | "inventory" | "hp" | "satiety" | "body" | "equipment" | "cultivation" | "other";
 export type LedgerTone = "positive" | "negative" | "neutral";
@@ -81,10 +82,67 @@ export function initializeLedgerNotifications(): void {
   document.body.append(bubbleHost);
 }
 
+const bubbleMotion = new WeakMap<HTMLElement, ReturnType<typeof animate>>();
+const bubbleTimers = new WeakMap<HTMLElement, number>();
+
 function removeBubble(bubble: HTMLElement): void {
+  if (bubble.dataset.popping === "true") return;
+  bubble.dataset.popping = "true";
+  bubbleMotion.get(bubble)?.pause();
+  const timer = bubbleTimers.get(bubble);
+  if (timer) window.clearTimeout(timer);
+
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    bubble.remove();
+    return;
+  }
+
   bubble.classList.add("is-popping");
-  bubble.addEventListener("animationend", () => bubble.remove(), { once: true });
-  window.setTimeout(() => bubble.remove(), 260);
+  const flakes: HTMLSpanElement[] = [];
+  for (let index = 0; index < 14; index += 1) {
+    const flake = document.createElement("span");
+    flake.className = "ledger-snowflake";
+    flake.setAttribute("aria-hidden", "true");
+    bubble.append(flake);
+    flakes.push(flake);
+  }
+
+  animate(bubble, {
+    scale: [1, 1.16, 0.72],
+    opacity: [1, 0.72, 0],
+    filter: ["blur(0px)", "blur(2px)", "blur(5px)"],
+    duration: 430,
+    ease: "outCubic",
+    onComplete: () => bubble.remove()
+  });
+
+  flakes.forEach((flake, index) => {
+    const angle = (Math.PI * 2 * index) / flakes.length;
+    const distance = 24 + (index % 4) * 13;
+    animate(flake, {
+      translateX: Math.cos(angle) * distance,
+      translateY: Math.sin(angle) * distance - 7,
+      scale: [0.45, 1, 0.12],
+      opacity: [0, 0.95, 0],
+      rotate: (index % 2 ? 1 : -1) * (90 + index * 17),
+      duration: 360 + (index % 4) * 65,
+      delay: index % 3 * 18,
+      ease: "outCubic"
+    });
+  });
+}
+
+function floatBubble(bubble: HTMLElement): void {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const motion = animate(bubble, {
+    translateX: [0, -13, 8, -9, 0],
+    translateY: [0, -15, -33, -48, -66],
+    rotate: [-1.4, 1.8, -1.2, 1.5, 0],
+    scale: [0.96, 1.015, 0.99, 1.02, 0.98],
+    duration: 5000,
+    ease: "inOutSine"
+  });
+  bubbleMotion.set(bubble, motion);
 }
 
 function showBubble(entry: LedgerEntry): void {
@@ -97,8 +155,9 @@ function showBubble(entry: LedgerEntry): void {
   const lane = bubbleHost.children.length % 4;
   bubble.style.right = `${14 + lane * 22}px`;
   bubble.style.bottom = `${18 + lane * 13}px`;
-  bubble.setAttribute("aria-label", `${entry.title}: ${entry.change}. Tap to dismiss.`);
+  bubble.setAttribute("aria-label", `${entry.title}: ${entry.change}. Tap to pop and dismiss.`);
   bubble.innerHTML = `
+    <span class="ledger-bubble-glint" aria-hidden="true"></span>
     <span class="ledger-bubble-kicker">${escapeHtml(entry.title)}</span>
     <strong class="ledger-bubble-change">${escapeHtml(entry.change)}</strong>
     ${entry.before || entry.after ? `<span class="ledger-bubble-total">${escapeHtml(entry.before ?? "")}${entry.before && entry.after ? " → " : ""}${escapeHtml(entry.after ?? "")}</span>` : ""}
@@ -107,11 +166,15 @@ function showBubble(entry: LedgerEntry): void {
   `;
   bubble.addEventListener("click", () => removeBubble(bubble), { once: true });
   bubbleHost.append(bubble);
+  floatBubble(bubble);
 
-  while (bubbleHost.children.length > 4) bubbleHost.firstElementChild?.remove();
-  window.setTimeout(() => {
+  while (bubbleHost.children.length > 4) {
+    const oldest = bubbleHost.firstElementChild;
+    if (oldest instanceof HTMLElement) removeBubble(oldest);
+  }
+  bubbleTimers.set(bubble, window.setTimeout(() => {
     if (bubble.isConnected) removeBubble(bubble);
-  }, 5200);
+  }, 5200));
 }
 
 export function recordLedgerChange(input: Omit<LedgerEntry, "id" | "createdAt">): LedgerEntry {
