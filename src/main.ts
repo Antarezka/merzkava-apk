@@ -232,9 +232,9 @@ function highlightNoticeKeywords(value: string): string {
 function parseNoticeboardUpdates(readme: string): NoticeboardUpdate[] {
   const start = readme.indexOf("**THE LATEST FROM MERZKAVA**");
   if (start < 0) throw new Error("Latest update section not found.");
-  const pattern = /^- ✦ \*\*(.+?)\*\*\s*\n\s*Hash:\s*``([^`]+)``\s*\|\s*Ver:\s*``([^`]+)``\s*\n([\s\S]*?)(?=\n- ✦ \*\*|\n<\\/div>|$)/gm;
+  const pattern = /^- ✦ \*\*(.+?)\*\*\s*\n\s*Hash:\s*``([^`]+)``\s*\|\s*Ver:\s*``([^`]+)``\s*\n([\s\S]*?)(?=\n- ✦ \*\*|\n<\/div>|$)/gm;
   const result: NoticeboardUpdate[] = [];
-  for (const match of readme.slice(start).matchAll(pattern)) { result.push({ title: match[1].trim(), hash: match[2].trim(), version: match[3].trim(), description: match[4].trim().replace(/\\s+/g, " ") }); if (result.length === 3) break; }
+  for (const match of readme.slice(start).matchAll(pattern)) { result.push({ title: match[1].trim(), hash: match[2].trim(), version: match[3].trim(), description: match[4].trim().replace(/\s+/g, " ") }); if (result.length === 3) break; }
   if (!result.length) throw new Error("No valid README update bullets found.");
   return result;
 }
