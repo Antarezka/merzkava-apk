@@ -96,6 +96,15 @@ if ! timeout 30s adb shell am start -W -n "$LAUNCHER_COMPONENT" > "$DIAG_DIR/lau
 fi
 cat "$DIAG_DIR/launch.txt"
 
+echo "Capturing splash-screen frames while the opening animation is active..."
+sleep 0.45
+adb exec-out screencap -p > "$DIAG_DIR/kitty-splash-early.png"
+sleep 0.75
+adb exec-out screencap -p > "$DIAG_DIR/kitty-splash-mid.png"
+test -s "$DIAG_DIR/kitty-splash-early.png"
+test -s "$DIAG_DIR/kitty-splash-mid.png"
+file "$DIAG_DIR/kitty-splash-early.png" "$DIAG_DIR/kitty-splash-mid.png"
+
 echo "Waiting for Merzkava process (up to 60 seconds)..."
 APP_PID=""
 for attempt in $(seq 1 12); do
