@@ -7,8 +7,6 @@ import android.content.pm.PackageManager;
 import android.app.NotificationManager;
 import android.os.PowerManager;
 import android.content.Intent;
-import android.content.Context;
-import android.os.Bundle;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
