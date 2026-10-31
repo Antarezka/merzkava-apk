@@ -46,3 +46,5 @@ body.native-floating-mode .bottom-nav{width:100%;max-width:none;bottom:0;border-
 body.native-floating-mode .conversation-window{min-height:260px;}
 body.native-floating-mode .snapshot-blind{top:0;}
 @media(max-height:520px){body.native-floating-mode .app-shell{padding-bottom:58px;}body.native-floating-mode .bottom-nav{padding-top:5px;padding-bottom:5px;}}
+
+body.native-floating-mode{min-width:0;}
