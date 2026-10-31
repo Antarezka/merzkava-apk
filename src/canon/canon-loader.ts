@@ -148,7 +148,7 @@ export async function refreshLatestPlayerRegistry(activeSha: string): Promise<{ 
     const profile = await fetchText(`https://raw.githubusercontent.com/${CANON_REPOSITORY}/${fullSha}/${path}`);
     const ageMatch = profile.match(/^-\s*\*\*Usia:\*\*\s*(\d+)/m);
     const realmMatch = profile.match(/^-\s*\*\*Spirit Realm:\*\*\s*([^\n]+)/m);
-    const backgroundMatch = profile.match(/^## Latar Belakang Orisinal[^\n]*\n([\s\S]*?)(?=\n## |$)/m);
+    const backgroundMatch = profile.match(/(?:^|\n)## Latar Belakang Orisinal[^\n]*\n([\s\S]*?)(?=\n## |\s*$)/);
     players.push({
       name,
       path: relativePath,
