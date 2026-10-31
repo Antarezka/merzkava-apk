@@ -41,7 +41,32 @@ if (!patchedActivity.includes("FloatingWindowPlugin.class")) {
   await writeFile(mainActivityPath, patchedActivity);
 }
 
+
+let lifecycleActivity = await readFile(mainActivityPath, "utf8");
+if (!lifecycleActivity.includes("FloatingWindowPlugin.onBubbleTapped")) {
+  if (!lifecycleActivity.includes("import android.content.Intent;")) {
+    lifecycleActivity = lifecycleActivity.replace(/^package\\s+[\\w.]+;/m, match => match + "\\n\\nimport android.content.Intent;");
+  }
+  lifecycleActivity = lifecycleActivity.replace(/\\n}\\s*$/, `
+    @Override
+    public void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        if (intent != null && FloatingKeepAliveService.ACTION_OPEN_WINDOW.equals(intent.getAction())) {
+            FloatingWindowPlugin.onBubbleTapped(this);
+        }
+    }
+}
+`);
+  await writeFile(mainActivityPath, lifecycleActivity);
+}
+
 let manifest = await readFile(manifestPath, "utf8");
+if (!manifest.includes('android:launchMode="singleTop"')) {
+  manifest = manifest.replace(/<activity\\b([^>]*)>/, (match, attributes) =>
+    '<activity' + attributes + ' android:launchMode="singleTop">'
+  );
+}
 const permissions = [
   "android.permission.SYSTEM_ALERT_WINDOW",
   "android.permission.FOREGROUND_SERVICE",
