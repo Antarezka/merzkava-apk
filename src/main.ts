@@ -1,7 +1,7 @@
 import "./style.css";
 import "./ui/floating-ledger.css";
 import "./ui/floating-control.css";
-import { cancelOpeningSequence, isSoundEnabled, playButtonSound, playOpeningSequence, playSnapshotSlideSound, playWarningBeep, setSoundEnabled } from "./audio/sound-effects";
+import { cancelOpeningSequence, playButtonSound, playOpeningSequence, playSnapshotSlideSound, playWarningBeep, setSoundEnabled } from "./audio/sound-effects";
 const splashLogoUrl = new URL("../Untitled78_20261030213901.png", import.meta.url).href;
 import { getGameplaySessionRecord, initializeDatabase, saveGameplaySessionRecord } from "./database/database";
 import { createCharacter, deleteCharacter, listCharacters, type Character } from "./characters/character-repository";
