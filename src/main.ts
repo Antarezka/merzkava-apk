@@ -710,12 +710,16 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       const indexDocument = await getCanonIndex(activeSha);
       if (!indexDocument || indexDocument.commitSha !== activeSha) throw new Error("Bootstrap gagal: INDEX.md pada ACTIVE_SHA penuh tidak tersedia.");
       const playerRegistry = mode === "new" ? await loadPlayerRegistry(activeSha) : null;
-      const registeredProfile = mode === "new" && character.registryPath ? await loadRegisteredPlayerProfile(activeSha, character.registryPath) : null;
+      const exactRegistryRow = playerRegistry ? [...playerRegistry.content.matchAll(/^\|\s*([^|]+?)\s*\|\s*\[[^\]]+\]\(([^)]+)\)\s*\|/gm)].find(row => row[1].trim() === character.name) : null;
+      const exactRegistryPath = exactRegistryRow ? decodeURIComponent(exactRegistryRow[2].trim()) : null;
+      if (mode === "new" && character.registryPath && exactRegistryPath !== character.registryPath) throw new Error("Identitas registry tidak cocok persis dengan players.md pada ACTIVE_SHA.");
+      const registeredProfile = mode === "new" && exactRegistryPath ? await loadRegisteredPlayerProfile(activeSha, exactRegistryPath) : null;
+      const contextCharacter = registeredProfile ? { ...character, origin: "Registry" } : character;
       const savedSession = mode === "continue" ? await getGameplaySessionRecord(characterId) : null;
       if (mode === "continue" && !savedSession) throw new Error("Save sesi lama belum memiliki baseline canon yang terverifikasi. Mulai sesi baru agar profil sumber dan snapshot dapat disimpan dengan aman.");
       if (mode === "continue" && savedSession && savedSession.snapshotSha !== activeSha) throw new Error("Save sesi dan ACTIVE_SHA berbeda. Sesi tidak boleh mencampur snapshot canon.");
       activeProfileMarkdown = mode === "new" ? (registeredProfile?.content ?? "") : (savedSession?.profileMarkdown ?? "");
-      const context = assembleGameplayContext({ ...route, query: activity }, character, activeSha, activeStatus.version, 140000);
+      const context = assembleGameplayContext({ ...route, query: activity }, contextCharacter, activeSha, activeStatus.version, 140000);
       context.prompt = "## FULL INDEX.md · HARD GATE · ACTIVE_SHA " + activeSha + "\n" + indexDocument.content + "\n\n" + context.prompt;
       if (playerRegistry) context.prompt += "\n\n## FULL players.md · ACTIVE_SHA " + activeSha + "\n" + playerRegistry.content;
       if (registeredProfile) context.prompt += "\n\n## FULL REGISTERED CHARACTER PROFILE · " + registeredProfile.path + " · ACTIVE_SHA " + activeSha + "\n" + registeredProfile.content;
