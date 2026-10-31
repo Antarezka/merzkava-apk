@@ -14,6 +14,7 @@ import { getAuthSession, isSupabaseConfigured, restoreAuthSession, signInWithPas
 import { GatewayGMProvider, isGMGatewayConfigured } from "./engine/gateway-gm-provider";
 import { getLedgerLog, initializeLedgerNotifications } from "./ui/ledger-log";
 import { canonLabelMarkup } from "./ui/canon-labels";
+import { startFloatingMode } from "./native/floating-window";
 
 const app = document.querySelector<HTMLDivElement>("#app");
 if (!app) throw new Error("App root element was not found.");
@@ -378,6 +379,17 @@ root.addEventListener("click", async (event: MouseEvent) => {
 
   const refreshPlayersButton = target.closest<HTMLButtonElement>("[data-refresh-players]");
   if (refreshPlayersButton && !playerRegistryBusy) { await refreshPlayerRegistry(); return; }
+  const floatingStartButton = target.closest<HTMLButtonElement>("[data-floating-start]");
+  if (floatingStartButton) {
+    floatingStartButton.disabled = true;
+    try {
+      await startFloatingMode();
+    } catch (error) {
+      notice = error instanceof Error ? error.message : "Floating Mode could not start.";
+      render();
+    }
+    return;
+  }
 
   const refreshCanonButton = target.closest<HTMLButtonElement>("[data-refresh-canon]");
   if (refreshCanonButton && !canonBusy) {
