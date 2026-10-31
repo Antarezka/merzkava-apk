@@ -81,10 +81,10 @@ jobs:
           import re
           p = Path("android/app/build.gradle")
           s = p.read_text()
-          s, n = re.subn(r'versionCode\\s+\\d+', 'versionCode Integer.parseInt(System.getenv("MERZKAVA_VERSION_CODE") ?: "1")', s, count=1)
+          s, n = re.subn(r'versionCode\s+\d+', 'versionCode Integer.parseInt(System.getenv("MERZKAVA_VERSION_CODE") ?: "1")', s, count=1)
           if n != 1:
               raise SystemExit("Could not locate app versionCode in android/app/build.gradle")
-          s, n = re.subn(r'versionName\\s+"[^"]+"', 'versionName "1.0." + (System.getenv("MERZKAVA_VERSION_CODE") ?: "1")', s, count=1)
+          s, n = re.subn(r'versionName\s+"[^"]+"', 'versionName "1.0." + (System.getenv("MERZKAVA_VERSION_CODE") ?: "1")', s, count=1)
           if n != 1:
               raise SystemExit("Could not locate app versionName in android/app/build.gradle")
           signing = '''
@@ -98,10 +98,10 @@ jobs:
               }
           '''
           if "signingConfigs {" not in s:
-              s = s.replace("android {", "android {\\n" + signing, 1)
-          if re.search(r'buildTypes\\s*\\{', s) is None:
+              s = s.replace("android {", "android {\n" + signing, 1)
+          if re.search(r'buildTypes\s*\{', s) is None:
               raise SystemExit("Could not locate buildTypes in android/app/build.gradle")
-          s, n = re.subn(r'(buildTypes\\s*\\{)', r'\\1\\n        debug { signingConfig signingConfigs.debug }', s, count=1)
+          s, n = re.subn(r'(buildTypes\s*\{)', r'\1\n        debug { signingConfig signingConfigs.debug }', s, count=1)
           if n != 1:
               raise SystemExit("Could not configure debug signing")
           p.write_text(s)
