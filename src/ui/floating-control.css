@@ -29,3 +29,17 @@
 .floating-actions>button.floating-stop{border-color:#c6a99b;background:#eee2d9;color:#875e51}
 .floating-actions>button.floating-donate{background:transparent;border-color:#c7bea9;color:#927b50}
 .floating-footnote{margin:17px 2px 0;color:#858779;font-size:9px;line-height:1.6}
+
+/* Compact diagnostic panel for actionable error reports. */
+.bug-report-backdrop{position:fixed;z-index:10020;inset:0;display:grid;place-items:center;padding:18px;background:#17231fc2;backdrop-filter:blur(4px)}
+.bug-report-panel{width:min(100%,440px);max-height:min(82dvh,620px);overflow:auto;padding:19px;border:1px solid #a68d5e;background:#eee7d6;color:#293d38;box-shadow:0 20px 65px #101d1980}
+.bug-report-heading{display:flex;justify-content:space-between;gap:12px;padding-bottom:10px;border-bottom:1px solid #c7bea9;color:#8e7951;font-size:8px;font-weight:700;letter-spacing:.15em}
+.bug-report-heading span:last-child{color:#9b6257}
+.bug-report-panel h2{margin:16px 0 8px;color:#31483f;font:23px Georgia,serif;font-weight:400}
+.bug-report-message{padding:11px;border:1px solid #cba99a;background:#f4e8df;color:#78594e;font:11px/1.55 ui-monospace,monospace;overflow-wrap:anywhere;white-space:pre-wrap}
+.bug-report-hint{color:#747c70;font-size:10px;line-height:1.6}
+.bug-report-actions{display:grid;grid-template-columns:1.3fr 1fr .7fr;gap:7px;margin-top:16px}
+.bug-report-actions button{min-height:40px;padding:8px 6px;border:1px solid #b49b68;background:#e4dac3;color:#40564a;font-size:10px}
+.bug-report-actions button:first-child{border-color:#66796d;background:#314a41;color:#f0e8d8}
+.bug-report-minimized{position:fixed;z-index:10020;right:14px;bottom:18px;min-height:40px;padding:9px 13px;border:1px solid #b49b68;background:#314a41;color:#f0e8d8;box-shadow:0 5px 20px #17231f55;font-size:10px}
+@media(max-width:360px){.bug-report-actions{grid-template-columns:1fr 1fr}.bug-report-actions button:first-child{grid-column:1/-1}}
