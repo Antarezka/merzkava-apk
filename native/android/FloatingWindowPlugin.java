@@ -98,11 +98,11 @@ public class FloatingWindowPlugin extends Plugin {
             else activity.startService(service);
             showWindowMode();
             webView.evaluateJavascript("document.body.classList.add('native-floating-mode')", null);
+            // Keep the host Activity alive while the overlay is attached.
+            // Moving the task to the background here can trigger an immediate
+            // onResume/restore cycle on some Android launchers, causing the
+            // floating window to blink and disappear.
             call.resolve();
-            MAIN.postDelayed(() -> {
-                Activity current = getActivityRef();
-                if (current != null) current.moveTaskToBack(true);
-            }, 180);
         } catch (Exception error) {
             restoreToActivity();
             activity.stopService(new Intent(activity, FloatingKeepAliveService.class));
