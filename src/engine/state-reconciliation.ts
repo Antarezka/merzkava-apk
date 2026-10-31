@@ -1,0 +1,102 @@
+import type { GMProposal } from "./gm-engine";
+import type { ParsedCharacterProfile, ProfileField } from "./profile-parser";
+
+export interface ProposedStateChange {
+  field: string;
+  before: string;
+  after: string;
+  reason: string;
+  canon_basis: string[];
+}
+
+export interface ReconciledChange {
+  field: string;
+  before: string;
+  after: string;
+  status: "candidate" | "rejected" | "needs-review";
+  reason: string;
+}
+
+export interface StateReconciliation {
+  status: "no-changes" | "review-required" | "rejected";
+  changes: ReconciledChange[];
+  errors: string[];
+}
+
+const deterministicFields = new Set<ProfileField>([
+  "HP", "Satiety", "Qi", "Wallet (wealth)", "Equipment", "Inventory",
+  "Assets Bangunan", "Kondisi Tubuh", "Spirit Realm", "Sync progress",
+  "Spirit Ring Absorption", "Arcanist Grade", "Arcanist Focus", "Tujuan Saat Ini"
+]);
+
+function validateAfterValue(field: string, value: string): string | null {
+  if (!value.trim()) return "Nilai sesudah tidak boleh kosong.";
+  if (field === "HP") {
+    const m = value.match(/^(\d+)\s*\/\s*(\d+)$/);
+    if (!m || Number(m[2]) <= 0 || Number(m[1]) > Number(m[2])) return "Format/rentang HP tidak valid.";
+  }
+  if (field === "Satiety") {
+    const m = value.match(/^(\d+)\s*\/\s*100$/);
+    if (!m || Number(m[1]) > 100) return "Satiety harus berada pada rentang 0–100.";
+  }
+  if (field === "Wallet (wealth)" && !/^\d+\s*xc\s*\|\s*\d+\s*xs\s*\|\s*\d+\s*xg\s*\|\s*\d+\s*zj\s*\|\s*\d+\s*az$/i.test(value)) {
+    return "Format Wallet tidak sesuai urutan denominasi resmi.";
+  }
+  return null;
+}
+
+/**
+ * Reconcile a proposal against the exact parsed profile baseline.
+ * Candidate means structurally consistent only; canon mechanics and player approval are still required.
+ */
+export function reconcileGMProposal(profile: ParsedCharacterProfile | null, proposal: GMProposal): StateReconciliation {
+  if (!proposal.state_changes.length) return { status: "no-changes", changes: [], errors: [] };
+  if (!profile) {
+    return {
+      status: "review-required",
+      changes: proposal.state_changes.map(change => ({ ...change, status: "needs-review", reason: "Profil baseline tidak tersedia; nilai before tidak dapat dicocokkan." })),
+      errors: ["Tidak ada profil karakter terstruktur untuk membandingkan perubahan."]
+    };
+  }
+  const changes: ReconciledChange[] = [];
+  const errors: string[] = [];
+  const seen = new Set<string>();
+  for (const change of proposal.state_changes) {
+    const field = change.field as ProfileField;
+    if (!deterministicFields.has(field)) {
+      errors.push("Field tidak didukung untuk rekonsiliasi otomatis: " + change.field + ".");
+      changes.push({ field: change.field, before: change.before, after: change.after, status: "rejected", reason: "Field tidak dikenal atau tidak diizinkan." });
+      continue;
+    }
+    if (seen.has(field)) {
+      errors.push("Field diubah lebih dari sekali dalam satu proposal: " + field + ".");
+      changes.push({ field, before: change.before, after: change.after, status: "rejected", reason: "Duplikasi perubahan field." });
+      continue;
+    }
+    seen.add(field);
+    const actual = profile.fields[field];
+    if (change.before.trim() !== actual.trim()) {
+      errors.push("Nilai before tidak cocok dengan profil untuk " + field + ".");
+      changes.push({ field, before: change.before, after: change.after, status: "rejected", reason: "Baseline mismatch; perubahan ditolak." });
+      continue;
+    }
+    const invalid = validateAfterValue(field, change.after);
+    if (invalid) {
+      errors.push(field + ": " + invalid);
+      changes.push({ field, before: change.before, after: change.after, status: "rejected", reason: invalid });
+      continue;
+    }
+    if (!change.reason.trim() || !change.canon_basis.length) {
+      changes.push({ field, before: change.before, after: change.after, status: "needs-review", reason: "Alasan dan rujukan canon harus diperiksa." });
+      errors.push(field + " membutuhkan alasan dan rujukan canon yang dapat diverifikasi.");
+      continue;
+    }
+    changes.push({ field, before: change.before, after: change.after, status: "candidate", reason: "Baseline cocok dan format dasar valid; belum diterapkan, belum disahkan mekanik, dan menunggu persetujuan pemain." });
+  }
+  const status = changes.some(change => change.status === "rejected")
+    ? "rejected"
+    : changes.some(change => change.status === "needs-review") || errors.length
+      ? "review-required"
+      : "review-required";
+  return { status, changes, errors };
+}
