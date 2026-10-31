@@ -1,6 +1,17 @@
 import { canonLabelMarkup, type CanonLabelCategory } from "./canon-labels";
 export type LedgerCategory = "wallet" | "inventory" | "hp" | "satiety" | "body" | "equipment" | "cultivation" | "other";
-export type LedgerTone = "positive" | "negative" | "neutral";\n\nexport interface LedgerProposalEvent {\n  kind: "item" | "currency";\n  direction: "in" | "out";\n  item?: string;\n  quantity?: number;\n  unit?: string;\n  currency?: "xc" | "xs" | "xg" | "zj" | "az";\n  amount?: number;\n  reason: string;\n}
+export type LedgerTone = "positive" | "negative" | "neutral";
+
+export interface LedgerProposalEvent {
+  kind: "item" | "currency";
+  direction: "in" | "out";
+  item?: string;
+  quantity?: number;
+  unit?: string;
+  currency?: "xc" | "xs" | "xg" | "zj" | "az";
+  amount?: number;
+  reason: string;
+}
 
 export interface LedgerEntry {
   id: string;
@@ -124,5 +135,15 @@ export function subscribeToLedgerChanges(listener: (entry: LedgerEntry) => void)
   return () => window.removeEventListener("merzkava:ledger-change", handler);
 }
 
-
-/** Show a clearly provisional event bubble; this does not write to the ledger or mutate character state. */\nexport function showLedgerProposalBubble(event: LedgerProposalEvent): void {\n  const incoming = event.direction === "in";\n  const label = event.kind === "item" ? (incoming ? "ITEM MASUK" : "ITEM KELUAR") : (incoming ? "UANG MASUK" : "UANG KELUAR");\n  const amount = event.kind === "item" ? `${event.quantity} ${event.unit ?? "×"} · ${event.item}` : `${event.amount} ${event.currency}`;\n  showBubble({\n    id: `proposal-${Date.now()}-${Math.random()}`, characterId: "pending",\n    category: event.kind === "item" ? "inventory" : "wallet", title: `MENUNGGU VERIFIKASI · ${label}`,\n    change: amount, tone: incoming ? "positive" : "negative", createdAt: new Date().toISOString(),\n    detail: `${event.reason} · Belum masuk ledger; menunggu verifikasi canon dan persetujuan pemain.`\n  });\n}\n
+/** Show a clearly provisional event bubble; this does not write to the ledger or mutate character state. */
+export function showLedgerProposalBubble(event: LedgerProposalEvent): void {
+  const incoming = event.direction === "in";
+  const label = event.kind === "item" ? (incoming ? "ITEM MASUK" : "ITEM KELUAR") : (incoming ? "UANG MASUK" : "UANG KELUAR");
+  const amount = event.kind === "item" ? `${event.quantity} ${event.unit ?? "×"} · ${event.item}` : `${event.amount} ${event.currency}`;
+  showBubble({
+    id: `proposal-${Date.now()}-${Math.random()}`, characterId: "pending",
+    category: event.kind === "item" ? "inventory" : "wallet", title: `MENUNGGU VERIFIKASI · ${label}`,
+    change: amount, tone: incoming ? "positive" : "negative", createdAt: new Date().toISOString(),
+    detail: `${event.reason} · Belum masuk ledger; menunggu verifikasi canon dan persetujuan pemain.`
+  });
+}
