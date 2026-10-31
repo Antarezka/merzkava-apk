@@ -32,18 +32,18 @@ let patchedActivity = await readFile(mainActivityPath, "utf8");
 if (!patchedActivity.includes("FloatingWindowPlugin.class")) {
   patchedActivity = patchedActivity.replace(
     /^package\s+[\w.]+;/m,
-    match => match + "\n\nimport android.os.Bundle;\nimport " + packageName + ".FloatingWindowPlugin;"
+    match => match + "\n\nimport android.os.Bundle;\nimport android.content.Intent;\nimport " + packageName + ".FloatingWindowPlugin;"
   );
   patchedActivity = patchedActivity.replace(
     /public class MainActivity extends BridgeActivity\s*\{/,
-    match => match + "\n    @Override\n    public void onCreate(Bundle savedInstanceState) {\n        registerPlugin(FloatingWindowPlugin.class);\n        super.onCreate(savedInstanceState);\n    }\n    @Override\n    public void onResume() {\n        super.onResume();\n        FloatingWindowPlugin.restoreForForeground();\n    }\n"
+    match => match + "\n    @Override\n    public void onCreate(Bundle savedInstanceState) {\n        registerPlugin(FloatingWindowPlugin.class);\n        super.onCreate(savedInstanceState);\n    }\n    @Override\n    public void onResume() {\n        super.onResume();\n        Intent intent = getIntent();\n        if (intent != null && FloatingKeepAliveService.ACTION_OPEN_WINDOW.equals(intent.getAction())) {\n            FloatingWindowPlugin.onBubbleTapped(this);\n            intent.setAction(null);\n            setIntent(intent);\n        } else {\n            FloatingWindowPlugin.restoreForForeground();\n        }\n    }\n"
   );
   await writeFile(mainActivityPath, patchedActivity);
 }
 
 
 let lifecycleActivity = await readFile(mainActivityPath, "utf8");
-if (!lifecycleActivity.includes("FloatingWindowPlugin.onBubbleTapped")) {
+if (!lifecycleActivity.includes("public void onNewIntent(Intent intent)")) {
   if (!lifecycleActivity.includes("import android.content.Intent;")) {
     lifecycleActivity = lifecycleActivity.replace(/^package\s+[\w.]+;/m, match => match + "\n\nimport android.content.Intent;");
   }
@@ -52,9 +52,6 @@ if (!lifecycleActivity.includes("FloatingWindowPlugin.onBubbleTapped")) {
     public void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
-        if (intent != null && FloatingKeepAliveService.ACTION_OPEN_WINDOW.equals(intent.getAction())) {
-            FloatingWindowPlugin.onBubbleTapped(this);
-        }
     }
 }
 `);
