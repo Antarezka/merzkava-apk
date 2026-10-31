@@ -79,15 +79,18 @@ adb shell cmd package resolve-activity --brief \
   -c android.intent.category.LAUNCHER \
   com.antarezka.merzkava > "$DIAG_DIR/launcher-activity.txt" 2>&1 || true
 cat "$DIAG_DIR/launcher-activity.txt"
+LAUNCHER_COMPONENT="$(grep -E '^[[:alnum:]_.]+/[[:alnum:]_.$]+' "$DIAG_DIR/launcher-activity.txt" | tail -n 1 | tr -d '\r')"
+if [[ -z "$LAUNCHER_COMPONENT" ]]; then
+  echo "No launcher component was resolved for com.antarezka.merzkava."
+  collect_diagnostics
+  exit 1
+fi
 
-echo "Clearing old logcat entries and launching Merzkava directly..."
+echo "Clearing old logcat entries and launching $LAUNCHER_COMPONENT..."
 adb logcat -c || true
-if ! timeout 30s adb shell am start \
-  -a android.intent.action.MAIN \
-  -c android.intent.category.LAUNCHER \
-  -p com.antarezka.merzkava > "$DIAG_DIR/launch.txt" 2>&1; then
+if ! timeout 30s adb shell am start -W -n "$LAUNCHER_COMPONENT" > "$DIAG_DIR/launch.txt" 2>&1; then
   cat "$DIAG_DIR/launch.txt"
-  echo "Android ActivityManager could not launch Merzkava."
+  echo "Android ActivityManager could not launch $LAUNCHER_COMPONENT."
   collect_diagnostics
   exit 1
 fi
