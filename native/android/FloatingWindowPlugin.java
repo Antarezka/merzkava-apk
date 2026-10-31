@@ -4,7 +4,10 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
@@ -47,7 +50,7 @@ public class FloatingWindowPlugin extends Plugin {
     private static View currentOverlay;
     private static LinearLayout floatingRoot;
     private static FrameLayout contentFrame;
-    private static TextView bubbleView;
+    private static View bubbleView;
     private static TextView stripView;
     private static WindowManager.LayoutParams overlayParams;
     private static int mode = MODE_WINDOW;
@@ -58,6 +61,8 @@ public class FloatingWindowPlugin extends Plugin {
     private static float touchRawX;
     private static float touchRawY;
     private static boolean dragged;
+    private static int resizeStartWidth;
+    private static int resizeStartHeight;
 
     @PluginMethod
     public void checkPermission(PluginCall call) {
@@ -181,10 +186,8 @@ public class FloatingWindowPlugin extends Plugin {
 
         int screenWidth = activity.getResources().getDisplayMetrics().widthPixels;
         int screenHeight = activity.getResources().getDisplayMetrics().heightPixels;
-        windowWidth = Math.min(screenWidth - dp(activity, 20), dp(activity, 420));
-        windowHeight = Math.min(screenHeight - dp(activity, 80), dp(activity, 560));
-        windowWidth = Math.max(dp(activity, 300), windowWidth);
-        windowHeight = Math.max(dp(activity, 320), windowHeight);
+        windowWidth = Math.min(Math.max(dp(activity, 240), screenWidth - dp(activity, 20)), dp(activity, 420));
+        windowHeight = Math.min(Math.max(dp(activity, 260), screenHeight - dp(activity, 80)), dp(activity, 560));
     }
 
     private static GradientDrawable background(String fill, String stroke, int radius) {
@@ -274,10 +277,7 @@ public class FloatingWindowPlugin extends Plugin {
         if (activity == null) return;
         mode = MODE_BUBBLE;
         if (bubbleView == null) {
-            bubbleView = new TextView(activity);
-            bubbleView.setText("🐈‍⬛");
-            bubbleView.setTextSize(30);
-            bubbleView.setGravity(Gravity.CENTER);
+            bubbleView = new KittyBubbleView(activity);
             bubbleView.setBackground(background("#263c36", "#d4af37", dp(activity, 40)));
             bubbleView.setElevation(dp(activity, 8));
             bubbleView.setOnTouchListener((view, event) -> {
@@ -300,6 +300,8 @@ public class FloatingWindowPlugin extends Plugin {
                 touchStartY = overlayParams.y;
                 touchRawX = event.getRawX();
                 touchRawY = event.getRawY();
+                resizeStartWidth = windowWidth;
+                resizeStartHeight = windowHeight;
                 dragged = false;
                 return true;
             case MotionEvent.ACTION_MOVE:
@@ -309,8 +311,8 @@ public class FloatingWindowPlugin extends Plugin {
                 if (resize) {
                     int maxWidth = activity.getResources().getDisplayMetrics().widthPixels - dp(activity, 16);
                     int maxHeight = activity.getResources().getDisplayMetrics().heightPixels - dp(activity, 70);
-                    windowWidth = Math.max(dp(activity, 300), Math.min(maxWidth, windowWidth + dx));
-                    windowHeight = Math.max(dp(activity, 320), Math.min(maxHeight, windowHeight + dy));
+                    windowWidth = Math.max(dp(activity, 240), Math.min(maxWidth, resizeStartWidth + dx));
+                    windowHeight = Math.max(dp(activity, 260), Math.min(maxHeight, resizeStartHeight + dy));
                     overlayParams.width = windowWidth;
                     overlayParams.height = windowHeight;
                 } else {
@@ -330,6 +332,45 @@ public class FloatingWindowPlugin extends Plugin {
                 return true;
             default:
                 return false;
+        }
+    }
+
+
+    private static class KittyBubbleView extends View {
+        private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private final Path head = new Path();
+
+        KittyBubbleView(Context context) { super(context); }
+
+        @Override
+        protected void onDraw(Canvas canvas) {
+            super.onDraw(canvas);
+            float cx = getWidth() / 2f;
+            float cy = getHeight() / 2f;
+            float unit = Math.min(getWidth(), getHeight()) * 0.39f;
+
+            head.reset();
+            head.moveTo(cx - unit * 0.72f, cy - unit * 0.02f);
+            head.lineTo(cx - unit * 0.82f, cy - unit * 0.92f);
+            head.lineTo(cx - unit * 0.22f, cy - unit * 0.52f);
+            head.quadTo(cx, cy - unit * 0.66f, cx + unit * 0.22f, cy - unit * 0.52f);
+            head.lineTo(cx + unit * 0.82f, cy - unit * 0.92f);
+            head.lineTo(cx + unit * 0.72f, cy - unit * 0.02f);
+            head.quadTo(cx + unit * 0.62f, cy + unit * 0.78f, cx, cy + unit * 0.78f);
+            head.quadTo(cx - unit * 0.62f, cy + unit * 0.78f, cx - unit * 0.72f, cy - unit * 0.02f);
+            head.close();
+
+            paint.setColor(Color.rgb(10, 12, 11));
+            paint.setStyle(Paint.Style.FILL);
+            canvas.drawPath(head, paint);
+
+            paint.setColor(Color.rgb(212, 175, 55));
+            canvas.drawOval(cx - unit * 0.43f, cy + unit * 0.02f, cx - unit * 0.12f, cy + unit * 0.28f, paint);
+            canvas.drawOval(cx + unit * 0.12f, cy + unit * 0.02f, cx + unit * 0.43f, cy + unit * 0.28f, paint);
+
+            paint.setColor(Color.rgb(24, 27, 23));
+            canvas.drawCircle(cx - unit * 0.275f, cy + unit * 0.15f, unit * 0.065f, paint);
+            canvas.drawCircle(cx + unit * 0.275f, cy + unit * 0.15f, unit * 0.065f, paint);
         }
     }
 
