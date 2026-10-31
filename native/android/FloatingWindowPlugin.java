@@ -388,6 +388,7 @@ public class FloatingWindowPlugin extends Plugin {
             if (floatingRoot == null || webView.getParent() != contentFrame) attachWebViewToFloatingRoot(activity);
             mode = MODE_WINDOW;
             addOverlay(floatingRoot, windowWidth, windowHeight);
+            android.util.Log.i("MerzkavaFloating", "Transitioned to MINI_WINDOW; overlay attached.");
             MAIN.post(() -> {
                 if (activity.isFinishing()) { restoreToActivity(); return; }
                 if (currentOverlay == floatingRoot && floatingRoot != null && floatingRoot.getParent() != null) {
@@ -446,6 +447,7 @@ public class FloatingWindowPlugin extends Plugin {
             else activity.startService(service);
             mode = MODE_BUBBLE;
             transitionInProgress = false;
+            android.util.Log.i("MerzkavaFloating", "Transition requested: BUBBLE.");
             MAIN.postDelayed(() -> {
                 if (FloatingKeepAliveService.isBubbleVisible()) {
                     activity.moveTaskToBack(true);
@@ -594,6 +596,7 @@ public class FloatingWindowPlugin extends Plugin {
             activity.stopService(new Intent(activity, FloatingKeepAliveService.class));
             mode = MODE_FULL_SCREEN;
             transitionInProgress = false;
+            android.util.Log.i("MerzkavaFloating", "Transitioned to FULL_SCREEN; overlay removed and service stopped.");
         });
     }
 }
