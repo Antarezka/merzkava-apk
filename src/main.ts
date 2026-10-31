@@ -15,7 +15,7 @@ import { getAuthSession, isSupabaseConfigured, restoreAuthSession, signInWithPas
 import { GatewayGMProvider, isGMGatewayConfigured } from "./engine/gateway-gm-provider";
 import { getLedgerLog, initializeLedgerNotifications } from "./ui/ledger-log";
 import { canonLabelMarkup } from "./ui/canon-labels";
-import { startFloatingMode, getFloatingReadiness, requestFloatingNotifications, requestFloatingBatteryExemption, startFloatingService, showFloatingBubble, stopFloatingService, type FloatingReadiness } from "./native/floating-window";
+import { startFloatingMode, requestFloatingOverlayPermission, getFloatingReadiness, requestFloatingNotifications, requestFloatingBatteryExemption, startFloatingService, showFloatingBubble, stopFloatingService, type FloatingReadiness } from "./native/floating-window";
 import { floatingControlMarkup } from "./app/floating-control";
 
 const app = document.querySelector<HTMLDivElement>("#app");
@@ -385,7 +385,7 @@ root.addEventListener("click", async (event: MouseEvent) => {
     floatingAction.disabled = true;
     try {
       if (action === "overlay") {
-        await startFloatingMode();
+        await requestFloatingOverlayPermission();
       } else if (action === "notifications") {
         await requestFloatingNotifications();
       } else if (action === "battery") {
@@ -395,7 +395,6 @@ root.addEventListener("click", async (event: MouseEvent) => {
       } else if (action === "start-bubble") {
         await refreshFloatingReadiness();
         if (!floatingSetupComplete()) throw new Error("Selesaikan tiga izin pertama secara berurutan sebelum memulai bubble mode.");
-        await startFloatingService();
         await showFloatingBubble();
       } else if (action === "open-game") {
         await playEntrySplash();
