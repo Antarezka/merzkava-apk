@@ -83,7 +83,13 @@ export async function loadCanonModule(path: string): Promise<CanonDocument> {
   if (!index || index.commitSha !== currentStatus.commitSha || !index.content.includes(`\`${safePath}\``)) {
     throw new Error("Path tidak tercantum di INDEX pada commit canon aktif.");
   }
-  return fetchPinnedDocument(safePath, currentStatus.commitSha);
+  try {
+    return await fetchPinnedDocument(safePath, currentStatus.commitSha);
+  } catch (error) {
+    const cached = await getCachedCanonDocument(safePath, currentStatus.commitSha);
+    if (cached && cached.commitSha === currentStatus.commitSha && cached.content.trim()) return cached;
+    throw new Error(`Canon module ${safePath} unavailable for ACTIVE_SHA ${currentStatus.commitSha.slice(0,7)}: ${error instanceof Error ? error.message : "fetch failed"}`);
+  }
 }
 
 export async function activateCanonSnapshot(snapshot: string): Promise<CanonStatus> {
