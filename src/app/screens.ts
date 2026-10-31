@@ -1,7 +1,7 @@
 import type { LedgerEntry } from "../ui/ledger-log";
 import { canonLabelMarkup } from "../ui/canon-labels";
 import type { Character } from "../characters/character-repository";
-import { PROFILE_FIELDS, parseCharacterProfile } from "../engine/profile-parser";
+import { PROFILE_FIELDS, parseCharacterProfile, type ProfileField } from "../engine/profile-parser";
 
 const PROFILE_FIELD_GROUPS = [
   { title: "PROFIL KARAKTER", fields: PROFILE_FIELDS.slice(0, 13) },
@@ -19,27 +19,15 @@ function registryProfileMarkup(character: Character): string {
   if (!character.profileMarkdown) return "";
   const parsed = parseCharacterProfile(character.profileMarkdown);
   const fields = parsed.valid ? parsed.profile.fields : null;
-  const read = (label: keyof typeof PROFILE_FIELD_GROUPS[number]["fields"]): string => {
+  const read = (label: ProfileField): string => {
     if (fields) return fields[label] || "Belum tercatat";
-    const escaped = String(label).replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\function registryProfileMarkup(character: Character): string {
-  if (!character.profileMarkdown) return "";
-  const read = (label: string): string => {
     const line = character.profileMarkdown?.split(/\r?\n/).find(item => item.trimStart().startsWith("- **" + label + ":**"));
-    return line?.replace(/^\s*-\s*\*\*[^*]+:\*\*\s*/, "").trim() ?? "Belum tercatat";
-  };
-  const field = (label: string) => "<dt>" + escapeHtml(label) + "</dt><dd>" + escapeHtml(read(label)) + "</dd>";
-  return '<details class="registry-profile"><summary>INITIAL PROFILE · players.md</summary><dl>' +
-    field("Martial Soul") + field("Arcanist Grade") + field("Arcanist Focus") +
-    field("Equipment") + field("Inventory") + field("Assets Bangunan") + field("Wallet (wealth)") +
-    '</dl></details>';
-}");
-    const match = character.profileMarkdown?.match(new RegExp("^\\\\s*-\\\\s+\\\\*\\\\*" + escaped + ":\\\\*\\\\*\\\\s*(.*?)\\\\s*$", "m"));
-    return match?.[1]?.trim() || "Belum tercatat";
+    return line?.replace(/^\s*-\s*\*\*[^*]+:\*\*\s*/, "").trim() || "Belum tercatat";
   };
   const display = (value: string) => value
-    .replace(/``([^\`]+)``/g, "$1")
-    .replace(/\\*\\*([^*]+)\\*\\*/g, "$1")
-    .replace(/\\*([^*]+)\\*/g, "$1");
+    .split(String.fromCharCode(96, 96)).join("")
+    .replace(/\*\*([^*]+)\*\*/g, "$1")
+    .replace(/\*([^*]+)\*/g, "$1");
   const groups = PROFILE_FIELD_GROUPS.map(group =>
     '<section class="registry-profile-group"><h4>' + group.title + '</h4><dl>' +
     group.fields.map(label => "<dt>" + escapeHtml(label) + "</dt><dd>" + escapeHtml(display(read(label))) + "</dd>").join("") +
@@ -48,7 +36,6 @@ function registryProfileMarkup(character: Character): string {
   const warning = parsed.valid ? "" : '<p class="registry-profile-warning">Profil belum lengkap atau formatnya tidak sesuai: ' + escapeHtml(parsed.errors.join(" ")) + '</p>';
   return '<details class="registry-profile"><summary>FULL CHARACTER PROFILE · players.md · 18 FIELDS</summary>' + warning + groups + '</details>';
 }
-
 function characterView(characters: Character[], registryStatus: string): string {
   const cards = characters.length
     ? characters.map(character => `<article class="character-card"><div class="record-top"><span>${escapeHtml(character.origin)}</span><span class="record-status">${character.registryPath ? "PINNED PROFILE" : character.awakened ? "AWAKENED" : "NOT AWAKENED"}</span></div><h3>${escapeHtml(character.name)}</h3><p class="muted">Age ${character.age ? character.age : "—"} · ${canonLabelMarkup("spirit-realm", character.realm)}${character.registryPath ? "" : " · Cultivation " + character.cultivationLevel}</p><p class="muted">${escapeHtml(character.background || "No background recorded.")}</p>${character.registryPath ? `<span class="record-status">REGISTERED · players.md</span>${registryProfileMarkup(character)}` : `<button class="text-button danger" data-delete-character="${escapeHtml(character.id)}">Delete character</button>`}</article>`).join("")
