@@ -24,9 +24,10 @@ export interface StateReconciliation {
 }
 
 const deterministicFields = new Set<ProfileField>([
-  "HP", "Satiety", "Qi", "Wallet (wealth)", "Equipment", "Inventory",
-  "Assets Bangunan", "Kondisi Tubuh", "Spirit Realm", "Sync progress",
-  "Spirit Ring Absorption", "Arcanist Grade", "Arcanist Focus", "Tujuan Saat Ini"
+  "Nama", "Usia", "Spirit Realm", "Sync progress", "Spirit Ring Absorption",
+  "Martial Soul", "Arcanist Grade", "Arcanist Focus", "HP", "Satiety", "Qi",
+  "Kondisi Tubuh", "Equipment", "Inventory", "Assets Bangunan", "Wallet (wealth)",
+  "Teknik / Kemampuan", "Tujuan Saat Ini"
 ]);
 
 function validateAfterValue(field: string, value: string): string | null {
