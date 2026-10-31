@@ -1,7 +1,7 @@
 import "./style.css";
 import "./ui/floating-ledger.css";
 import "./ui/floating-control.css";
-import { cancelOpeningSequence, playButtonSound, playOpeningSequence, playSnapshotSlideSound } from "./audio/sound-effects";
+import { cancelOpeningSequence, playButtonSound, playOpeningSequence, playSnapshotSlideSound, playWarningBeep } from "./audio/sound-effects";
 const splashLogoUrl = new URL("../Untitled78_20261030213901.png", import.meta.url).href;
 import { initializeDatabase } from "./database/database";
 import { createCharacter, deleteCharacter, listCharacters, type Character } from "./characters/character-repository";
@@ -88,6 +88,7 @@ let registeredCharacters: Character[] = [];
 let playerRegistryBusy = false;
 let playerRegistryMessage = "Registry players.md belum dimuat.";
 let notice = "";
+let lastPlayWarningNotice = "";
 let canonMessage = "Canon belum dimuat.";
 let canonDocument: CanonDocument | null = null;
 let canonBusy = false;
@@ -323,6 +324,12 @@ function bugPanelMarkup(): string {
   </div>`;
 }
 function render(): void {
+  if (activeScreen === "gameplay" && notice && notice !== lastPlayWarningNotice) {
+    playWarningBeep();
+    lastPlayWarningNotice = notice;
+  } else if (!notice || activeScreen !== "gameplay") {
+    lastPlayWarningNotice = "";
+  }
   const isControl = activeScreen === "control";
   const content = isControl
     ? floatingControlMarkup(floatingReadiness)
@@ -731,6 +738,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       notice = error instanceof Error ? error.message : "Game Master gagal merespons.";
       const feed = root.querySelector<HTMLElement>("#conversation-feed");
       if (feed) feed.insertAdjacentHTML("beforeend", '<p class="canon-status" role="alert">' + escapeHtml(notice) + '</p>');
+      playWarningBeep();
     } finally {
       gameplayContextBusy = false;
       if (sendButton) sendButton.disabled = false;
