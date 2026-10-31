@@ -484,6 +484,8 @@ root.addEventListener("click", async (event: MouseEvent) => {
       } else if (action === "open-window") {
         await refreshFloatingReadiness();
         if (!floatingReadiness.displayOverApps) throw new Error("Aktifkan izin Display over the app terlebih dahulu.");
+        // Preserve the normal entry experience before switching the WebView into the floating mini window.
+        await playEntrySplash();
         activeScreen = "gameplay";
         loadCharacterWorldTime(activeCharacterId);
         loadCharacterChat(activeCharacterId);
