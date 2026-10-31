@@ -35,3 +35,14 @@
 .ledger-log-entry.tone-negative{border-left:3px solid #bd6969;}
 .ledger-log-entry.tone-negative>strong{color:#b33d42;}
 .ledger-log-entry.tone-neutral{border-left:3px solid #9b9b88;}
+
+.floating-mode-settings{padding:16px;border:1px solid #c7bea9;background:#eee7d6;}
+.floating-mode-settings .action-button{margin-top:5px;}
+body.native-floating-mode .app-shell{width:100%;min-height:100%;padding:8px 8px 72px;}
+body.native-floating-mode .app-header{display:none;}
+body.native-floating-mode .main-content{min-height:0;padding:8px 0 12px;}
+body.native-floating-mode .storage-status{display:none;}
+body.native-floating-mode .bottom-nav{width:100%;max-width:none;bottom:0;border-radius:0;}
+body.native-floating-mode .conversation-window{min-height:260px;}
+body.native-floating-mode .snapshot-blind{top:0;}
+@media(max-height:520px){body.native-floating-mode .app-shell{padding-bottom:58px;}body.native-floating-mode .bottom-nav{padding-top:5px;padding-bottom:5px;}}
