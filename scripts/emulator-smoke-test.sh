@@ -9,9 +9,11 @@ collect_diagnostics() {
   adb shell pm list packages > "$DIAG_DIR/package-list.txt" 2>&1 || true
   adb shell dumpsys package com.antarezka.merzkava > "$DIAG_DIR/package-manager.txt" 2>&1 || true
   adb shell df -h > "$DIAG_DIR/storage.txt" 2>&1 || true
-  adb logcat -b all -d -t 6000 > "$DIAG_DIR/logcat.txt" 2>&1 || true
+  adb logcat -b all -d -t 10000 > "$DIAG_DIR/logcat.txt" 2>&1 || true
+  adb logcat -d -t 10000 -s chromium WebViewFactory ActivityManager AndroidRuntime Capacitor Console > "$DIAG_DIR/app-webview-logcat.txt" 2>&1 || true
   adb shell dumpsys activity activities > "$DIAG_DIR/activities.txt" 2>&1 || true
   adb shell dumpsys window windows > "$DIAG_DIR/windows.txt" 2>&1 || true
+  adb exec-out screencap -p > "$DIAG_DIR/failure-screen.png" 2>/dev/null || true
 }
 echo "Waiting for Android device..."
 adb wait-for-device || { collect_diagnostics; exit 1; }
@@ -48,17 +50,41 @@ LAUNCHER_COMPONENT="$(grep -E '^[[:alnum:]_.]+/[[:alnum:]_.$]+' "$DIAG_DIR/launc
 if [[ -z "$LAUNCHER_COMPONENT" ]]; then echo "No launcher component resolved."; collect_diagnostics; exit 1; fi
 echo "Launching $LAUNCHER_COMPONENT..."
 adb logcat -c || true
-if ! timeout 30s adb shell am start -W -n "$LAUNCHER_COMPONENT" > "$DIAG_DIR/launch.txt" 2>&1; then cat "$DIAG_DIR/launch.txt"; echo "ActivityManager could not launch Merzkava."; collect_diagnostics; exit 1; fi
+echo "Launching $LAUNCHER_COMPONENT (slow emulator launches are allowed to continue)..."
+START_EXIT=0
+timeout 60s adb shell am start -W -n "$LAUNCHER_COMPONENT" > "$DIAG_DIR/launch.txt" 2>&1 || START_EXIT=$?
 cat "$DIAG_DIR/launch.txt"
-if ! grep -qE '^Status: *ok$' "$DIAG_DIR/launch.txt"; then echo "Android did not report a successful activity launch."; collect_diagnostics; exit 1; fi
-echo "Waiting for actual Merzkava foreground activity..."
+if grep -qE '^Status: *ok$' "$DIAG_DIR/launch.txt"; then
+  echo "ActivityManager confirmed launch."
+elif grep -qE '^Status: *timeout$' "$DIAG_DIR/launch.txt" || [[ "$START_EXIT" -ne 0 ]]; then
+  echo "ActivityManager launch wait timed out (exit $START_EXIT); checking actual Activity and first-draw state instead of failing early."
+else
+  echo "ActivityManager did not confirm launch; checking whether the app nevertheless started."
+fi
+echo "Waiting up to 240 seconds for the real app window to draw..."
 ACTIVITY_READY=0
-for attempt in $(seq 1 24); do
-  WINDOW_STATE="$(timeout 10s adb shell dumpsys window windows 2>/dev/null || true)"
-  if printf '%s' "$WINDOW_STATE" | grep -qE 'mCurrentFocus=.*com\.antarezka\.merzkava.*MainActivity' && ! printf '%s' "$WINDOW_STATE" | grep -q 'Splash Screen com.antarezka.merzkava'; then ACTIVITY_READY=1; echo "Merzkava foregrounded (attempt $attempt)."; break; fi
+for attempt in $(seq 1 48); do
+  ACTIVITY_STATE="$(timeout 8s adb shell dumpsys activity activities 2>/dev/null || true)"
+  WINDOW_STATE="$(timeout 8s adb shell dumpsys window windows 2>/dev/null || true)"
+  APP_RESUMED=0
+  FIRST_DRAW=0
+  APP_WINDOW=0
+  printf '%s' "$ACTIVITY_STATE" | grep -q 'ResumedActivity:.*com.antarezka.merzkava/.MainActivity' && APP_RESUMED=1 || true
+  printf '%s' "$ACTIVITY_STATE" | grep -qE 'reportedDrawn=true|firstWindowDrawn=true' && FIRST_DRAW=1 || true
+  printf '%s' "$WINDOW_STATE" | grep -qE 'Window\\{.*com.antarezka.merzkava/.MainActivity|mCurrentFocus=.*com.antarezka.merzkava.*MainActivity' && APP_WINDOW=1 || true
+  if [[ "$APP_RESUMED" -eq 1 && "$FIRST_DRAW" -eq 1 && "$APP_WINDOW" -eq 1 ]] && ! printf '%s' "$WINDOW_STATE" | grep -q 'Splash Screen com.antarezka.merzkava'; then
+    ACTIVITY_READY=1
+    echo "Merzkava MainActivity has drawn its real app window (attempt $attempt)."
+    break
+  fi
+  if (( attempt % 6 == 0 )); then echo "Still waiting for first app draw ($((attempt * 5)) seconds elapsed; resumed=$APP_RESUMED drawn=$FIRST_DRAW window=$APP_WINDOW)."; fi
   sleep 5
 done
-if [[ "$ACTIVITY_READY" -ne 1 ]]; then echo "Merzkava did not reach foreground activity."; collect_diagnostics; exit 1; fi
+if [[ "$ACTIVITY_READY" -ne 1 ]]; then
+  echo "Merzkava did not draw its real app window within 240 seconds."
+  collect_diagnostics
+  exit 1
+fi
 echo "Waiting for app process..."
 APP_PID=""
 for attempt in $(seq 1 12); do
