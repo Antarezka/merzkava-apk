@@ -77,14 +77,27 @@ export async function createCharacter(draft: CharacterDraft): Promise<Character>
   }
 
   const db = getDatabase();
-  await db.run(
-    "INSERT INTO characters (id, name, age, origin, background, realm, cultivation_level, awakened, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
-    [character.id, character.name, character.age, character.origin, character.background, character.realm, 0, 0, character.createdAt, character.createdAt]
-  );
-  await db.run(
-    "INSERT INTO character_stats (character_id, hp_current, hp_max, stamina_current, stamina_max) VALUES (?, 100, 100, 100, 100);",
-    [character.id]
-  );
+  // Character and its initial stats form one logical record: never leave a
+  // half-created character if the second insert fails.
+  await db.execute("BEGIN TRANSACTION;");
+  try {
+    await db.run(
+      "INSERT INTO characters (id, name, age, origin, background, realm, cultivation_level, awakened, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
+      [character.id, character.name, character.age, character.origin, character.background, character.realm, 0, 0, character.createdAt, character.createdAt]
+    );
+    await db.run(
+      "INSERT INTO character_stats (character_id, hp_current, hp_max, stamina_current, stamina_max) VALUES (?, 100, 100, 100, 100);",
+      [character.id]
+    );
+    await db.execute("COMMIT;");
+  } catch (error) {
+    try {
+      await db.execute("ROLLBACK;");
+    } catch {
+      // Preserve the original insert failure; the database layer reports rollback failures separately.
+    }
+    throw error;
+  }
   return character;
 }
 
