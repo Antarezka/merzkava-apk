@@ -12,7 +12,8 @@ import { assembleGameplayContext } from "./canon/context-assembler";
 import { requestGMProposal, validateGMResponse, type GMProposal } from "./engine/gm-engine";
 import { getAuthSession, isSupabaseConfigured, restoreAuthSession, signInWithPassword, signOut } from "./auth/supabase-auth";
 import { GatewayGMProvider, isGMGatewayConfigured } from "./engine/gateway-gm-provider";
-import { initializeLedgerNotifications } from "./ui/ledger-log";
+import { getLedgerLog, initializeLedgerNotifications } from "./ui/ledger-log";
+import { canonLabelMarkup } from "./ui/canon-labels";
 
 const app = document.querySelector<HTMLDivElement>("#app");
 if (!app) throw new Error("App root element was not found.");
@@ -119,7 +120,7 @@ function renderChat(): void {
   const character = availableCharacters().find(item => item.id === activeCharacterId);
   const record = root.querySelector<HTMLElement>("#player-character-record");
   if (record) record.innerHTML = character
-    ? '<details open><summary>PROFIL KARAKTER</summary><dl><dt>Nama</dt><dd>' + escapeHtml(character.name) + '</dd><dt>Usia</dt><dd>' + character.age + '</dd><dt>Spirit Realm</dt><dd>' + escapeHtml(character.realm) + '</dd><dt>Sync progress</dt><dd>Belum disinkronkan</dd><dt>Spirit Ring Absorption</dt><dd>Belum disinkronkan</dd><dt>Martial Soul</dt><dd>Belum disinkronkan</dd><dt>Arcanist Grade</dt><dd>???</dd><dt>Arcanist Focus</dt><dd>Belum diverifikasi</dd><dt>HP</dt><dd>Belum disinkronkan</dd><dt>Satiety</dt><dd>Belum disinkronkan</dd><dt>Qi</dt><dd>Belum disinkronkan</dd><dt>Kondisi Tubuh</dt><dd>Belum disinkronkan</dd><dt>Equipment</dt><dd>Belum disinkronkan</dd><dt>Asal</dt><dd>' + escapeHtml(character.origin) + '</dd><dt>Awakening</dt><dd>' + (character.awakened ? "Awakened" : "Not awakened") + '</dd><dt>Background</dt><dd>' + escapeHtml(character.background || "—") + '</dd></dl></details><details><summary>INV & KEUANGAN</summary><p>Inventory: Belum disinkronkan</p><p>Assets Bangunan: Belum disinkronkan</p><p>Wallet (wealth): Belum diverifikasi · xc | xs | xg | zj | az</p></details><details><summary>TEKNIK & TUJUAN</summary><p>Teknik / Kemampuan: Belum disinkronkan</p><p>Tujuan Saat Ini: Belum disinkronkan</p></details><details><summary>CATATAN PEMAIN & KONSISTENSI</summary><p>State kanonis dan Ledger Log belum disinkronkan dari GM. Aplikasi tidak mengarang atau mengubah nilai yang belum diverifikasi.</p></details>'
+    ? '<details open><summary>PROFIL KARAKTER</summary><dl><dt>Nama</dt><dd>' + escapeHtml(character.name) + '</dd><dt>Usia</dt><dd>' + character.age + '</dd><dt>Spirit Realm</dt><dd>' + canonLabelMarkup("spirit-realm", character.realm) + '</dd><dt>Sync progress</dt><dd>Belum disinkronkan</dd><dt>Spirit Ring Absorption</dt><dd>Belum disinkronkan</dd><dt>Martial Soul</dt><dd>Belum disinkronkan</dd><dt>Arcanist Grade</dt><dd>???</dd><dt>Arcanist Focus</dt><dd>Belum diverifikasi</dd><dt>HP</dt><dd>Belum disinkronkan</dd><dt>Satiety</dt><dd>Belum disinkronkan</dd><dt>Qi</dt><dd>Belum disinkronkan</dd><dt>Kondisi Tubuh</dt><dd>Belum disinkronkan</dd><dt>Equipment</dt><dd>Belum disinkronkan</dd><dt>Asal</dt><dd>' + escapeHtml(character.origin) + '</dd><dt>Awakening</dt><dd>' + (character.awakened ? "Awakened" : "Not awakened") + '</dd><dt>Background</dt><dd>' + escapeHtml(character.background || "—") + '</dd></dl></details><details><summary>INV & KEUANGAN</summary><p>Inventory: Belum disinkronkan</p><p>Assets Bangunan: Belum disinkronkan</p><p>Wallet (wealth): Belum diverifikasi · xc | xs | xg | zj | az</p></details><details><summary>TEKNIK & TUJUAN</summary><p>Teknik / Kemampuan: Belum disinkronkan</p><p>Tujuan Saat Ini: Belum disinkronkan</p></details><details><summary>CATATAN PEMAIN & KONSISTENSI</summary><p>State kanonis dan Ledger Log belum disinkronkan dari GM. Aplikasi tidak mengarang atau mengubah nilai yang belum diverifikasi.</p></details>'
     : "Pilih karakter untuk melihat catatan lokalnya.";
 }
 
@@ -247,7 +248,7 @@ function snapshotBlindMarkup(): string {
 function render(): void {
   root.innerHTML = `<div class="app-shell">
     <header class="app-header"><button class="brand" data-screen="home" aria-label="Merzkava home"><span class="brand-mark">M</span><span><small>MERZKAVA UNIVERSE</small><strong>Merzkava</strong></span></button><button class="header-settings" data-screen="settings" aria-label="Settings">⚙</button></header>
-    <main class="main-content">${notice ? `<p class="notice" role="status">${escapeHtml(notice)}</p>` : ""}${renderScreen(activeScreen, availableCharacters(), playerRegistryMessage)}${activeScreen === "settings" ? authPanel() + canonPanel() : ""}</main>
+    <main class="main-content">${notice ? `<p class="notice" role="status">${escapeHtml(notice)}</p>` : ""}${renderScreen(activeScreen, availableCharacters(), playerRegistryMessage, activeCharacterId ? getLedgerLog(activeCharacterId) : [])}${activeScreen === "settings" ? authPanel() + canonPanel() : ""}</main>
     <nav class="bottom-nav" aria-label="Main navigation">${navigation.map(item => `<button class="nav-item ${activeScreen === item.id ? "active" : ""}" data-screen="${item.id}" ${activeScreen === item.id ? 'aria-current="page"' : ""}><span>${item.icon}</span><small>${item.label}</small></button>`).join("")}</nav>
     <div class="storage-status"><span class="status-dot"></span>${databaseMessage}</div>
     ${activeScreen === "gameplay" ? snapshotBlindMarkup() : ""}
