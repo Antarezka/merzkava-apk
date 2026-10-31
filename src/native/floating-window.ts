@@ -5,14 +5,12 @@ export interface FloatingReadiness {
   notifications: boolean;
   batteryExemption: boolean;
   serviceRunning: boolean;
-  playReturnLink: boolean;
 }
 
 export interface FloatingWindowPlugin {
   getReadiness(): Promise<FloatingReadiness>;
   requestNotifications(): Promise<void>;
   requestBatteryExemption(): Promise<void>;
-  openAppLinksSettings(): Promise<void>;
   startService(): Promise<void>;
   showBubble(): Promise<void>;
   stop(): Promise<void>;
@@ -44,7 +42,7 @@ export async function startFloatingMode(): Promise<void> {
 
 export async function getFloatingReadiness(): Promise<FloatingReadiness> {
   if (!Capacitor.isNativePlatform()) {
-    return { displayOverApps: false, notifications: false, batteryExemption: false, serviceRunning: false, playReturnLink: false };
+    return { displayOverApps: false, notifications: false, batteryExemption: false, serviceRunning: false };
   }
   return FloatingWindow.getReadiness();
 }
@@ -57,11 +55,6 @@ export async function requestFloatingNotifications(): Promise<void> {
 export async function requestFloatingBatteryExemption(): Promise<void> {
   if (!Capacitor.isNativePlatform()) throw new Error("Pengaturan baterai hanya tersedia di APK Android.");
   await FloatingWindow.requestBatteryExemption();
-}
-
-export async function openFloatingAppLinksSettings(): Promise<void> {
-  if (!Capacitor.isNativePlatform()) throw new Error("Pengaturan App Links hanya tersedia di APK Android.");
-  await FloatingWindow.openAppLinksSettings();
 }
 
 export async function startFloatingService(): Promise<void> {
