@@ -64,18 +64,14 @@ export function assembleGameplayContext(
   const omitted: string[] = [];
   for (const document of route.loaded) {
     const section = `\n\n### ${document.path} [${document.commitSha}]\n\n${document.content}`;
-    if (prompt.length + section.length > maxCharacters && !requiredPaths.has(document.path)) {
-      omitted.push(document.path);
-      continue;
+    if (prompt.length + section.length > maxCharacters) {
+      throw new Error("Context assembly ditolak: modul terpilih tidak muat utuh dalam batas konteks. Pecah pemilihan modul sebelum meminta GM.");
     }
     prompt += section;
     included.push(document);
   }
   const omittedRequired = [...requiredPaths].filter(path => !included.some(document => document.path === path));
-  if (omittedRequired.length) throw new Error("Context assembly ditolak: modul wajib terpotong: " + omittedRequired.join(", "));
-  if (omitted.length) {
-    prompt += `\n\n[Context limit reached. Not loaded into this packet: ${omitted.join(", ")}]`;
-  }
+  if (omittedRequired.length || omitted.length) throw new Error("Context assembly ditolak: sumber terpilih tidak lengkap: " + [...omittedRequired, ...omitted].join(", "));
   return {
     snapshot,
     version,
