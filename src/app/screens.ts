@@ -46,8 +46,8 @@ map:`<div class="page-heading"><p class="eyebrow">THE KNOWN WORLD</p><h2>World M
 journal:`<div class="page-heading"><p class="eyebrow">YOUR RECORDED HISTORY</p><h2>Journal</h2><p class="muted">Quests, discoveries, and gameplay events.</p></div><div class="empty-state"><span class="empty-symbol">⌁</span><h3>No entries yet</h3><p>Verified events and important story moments will be recorded here.</p></div>`,
 settings:`<div class="page-heading"><p class="eyebrow">APPLICATION</p><h2>Settings</h2><p class="muted">Device storage and AI configuration.</p></div><div class="setting-row"><div><h3>Save location</h3><p>Local device database</p></div><span class="setting-value">SQLITE</span></div><div class="setting-row"><div><h3>AI Game Master</h3><p>Sign in with Supabase to use the authenticated AI Gateway.</p></div><span class="setting-value">GATEWAY</span></div><div class="setting-row"><div><h3>Canon source</h3><p>Antarezka / merzkava-universe</p></div><span class="setting-value">PLANNED</span></div>`
 };
-export function renderScreen(screen: ScreenId, characters: Character[] = []): string {
-  if (screen === "character") return characterView(characters);
+export function renderScreen(screen: ScreenId, characters: Character[] = [], registryStatus = "Registered characters are loaded from the pinned players.md snapshot."): string {
+  if (screen === "character") return characterView(characters, registryStatus);
   if (screen === "gameplay") {
     const options = characters.map(character => `<option value="${escapeHtml(character.id)}">${escapeHtml(character.name)}</option>`).join("");
     return views.gameplay.replace("{{CHARACTER_OPTIONS}}", options);
