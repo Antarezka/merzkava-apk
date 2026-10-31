@@ -739,6 +739,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       const feed = root.querySelector<HTMLElement>("#conversation-feed");
       if (feed) feed.insertAdjacentHTML("beforeend", '<p class="canon-status" role="alert">' + escapeHtml(notice) + '</p>');
       playWarningBeep();
+      lastPlayWarningNotice = notice;
     } finally {
       gameplayContextBusy = false;
       if (sendButton) sendButton.disabled = false;
