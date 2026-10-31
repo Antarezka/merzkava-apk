@@ -1,7 +1,7 @@
 import "./style.css";
 import "./ui/floating-ledger.css";
 import "./ui/floating-control.css";
-import { cancelOpeningSequence, playButtonSound, playOpeningSequence, playSnapshotSlideSound, playWarningBeep } from "./audio/sound-effects";
+import { cancelOpeningSequence, isSoundEnabled, playButtonSound, playOpeningSequence, playSnapshotSlideSound, playWarningBeep, setSoundEnabled } from "./audio/sound-effects";
 const splashLogoUrl = new URL("../Untitled78_20261030213901.png", import.meta.url).href;
 import { getGameplaySessionRecord, initializeDatabase, saveGameplaySessionRecord } from "./database/database";
 import { createCharacter, deleteCharacter, listCharacters, type Character } from "./characters/character-repository";
@@ -23,6 +23,26 @@ import { floatingControlMarkup } from "./app/floating-control";
 const app = document.querySelector<HTMLDivElement>("#app");
 if (!app) throw new Error("App root element was not found.");
 const root = app;
+
+type ThemeMode = "light" | "dark";
+const THEME_STORAGE_KEY = "merzkava-theme-mode";
+const SOUND_STORAGE_KEY = "merzkava-sound-enabled";
+function readPreference(key: string, fallback: string): string {
+  try { return localStorage.getItem(key) ?? fallback; } catch { return fallback; }
+}
+let themeMode: ThemeMode = readPreference(THEME_STORAGE_KEY, "light") === "dark" ? "dark" : "light";
+let soundEnabled = readPreference(SOUND_STORAGE_KEY, "true") !== "false";
+function applyAppPreferences(): void {
+  document.documentElement.dataset.theme = themeMode;
+  setSoundEnabled(soundEnabled);
+}
+function saveAppPreferences(): void {
+  try {
+    localStorage.setItem(THEME_STORAGE_KEY, themeMode);
+    localStorage.setItem(SOUND_STORAGE_KEY, String(soundEnabled));
+  } catch { /* Preferences remain active for this app session. */ }
+}
+applyAppPreferences();
 let menuRevealPending = false;
 initializeLedgerNotifications();
 
@@ -380,6 +400,16 @@ function render(): void {
   menuRevealPending = false;
   updateSessionCalendar();
   renderChat();
+  root.querySelectorAll<HTMLButtonElement>("[data-theme-mode]").forEach(button => {
+    const selected = button.dataset.themeMode === themeMode;
+    button.classList.toggle("is-selected", selected);
+    button.setAttribute("aria-pressed", String(selected));
+  });
+  const soundToggle = root.querySelector<HTMLButtonElement>("[data-sound-toggle]");
+  if (soundToggle) {
+    soundToggle.setAttribute("aria-pressed", String(soundEnabled));
+    soundToggle.textContent = soundEnabled ? "Sound On" : "Sound Off";
+  }
   const formatToggle = root.querySelector<HTMLButtonElement>("[data-format-toggle]");
   const formatPanel = root.querySelector<HTMLElement>("#composer-format-panel");
   if (formatToggle && formatPanel) {
@@ -566,6 +596,26 @@ root.addEventListener("click", async (event: MouseEvent) => {
     } finally {
       floatingBusy = false;
     }
+    return;
+  }
+
+  const themeButton = target.closest<HTMLButtonElement>("[data-theme-mode]");
+  if (themeButton) {
+    const requested = themeButton.dataset.themeMode;
+    if (requested === "light" || requested === "dark") {
+      themeMode = requested;
+      applyAppPreferences();
+      saveAppPreferences();
+      render();
+    }
+    return;
+  }
+  const soundToggle = target.closest<HTMLButtonElement>("[data-sound-toggle]");
+  if (soundToggle) {
+    soundEnabled = !soundEnabled;
+    applyAppPreferences();
+    saveAppPreferences();
+    render();
     return;
   }
 
