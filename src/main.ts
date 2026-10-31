@@ -568,7 +568,7 @@ root.addEventListener("click", async (event: MouseEvent) => {
       await signOut();
       authMessage = "Signed out successfully.";
     } catch (error) {
-      recordBug(error, "Sign out", "Authentication");\n    recordBug(error, "Sign out", "Authentication");
+      recordBug(error, "Sign out", "Authentication");
     authMessage = error instanceof Error ? error.message : "Could not clear the local session.";
     }
     authBusy = false;
@@ -640,7 +640,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       const session = await signInWithPassword(email, password);
       authMessage = "Signed in as " + (session.user.email ?? session.user.id) + ".";
     } catch (error) {
-      recordBug(error, "Sign in", "Authentication");\n      recordBug(error, "Sign in", "Authentication");
+      recordBug(error, "Sign in", "Authentication");
       authMessage = error instanceof Error ? error.message : "Sign-in failed.";
     }
     authBusy = false;
@@ -712,7 +712,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       const action = root.querySelector<HTMLTextAreaElement>("#gameplay-action");
       if (action) action.value = "";
     } catch (error) {
-      recordBug(error, "Game Master response", "Gameplay");\n      recordBug(error, "Game Master response", "Gameplay");
+      recordBug(error, "Game Master response", "Gameplay");
       notice = error instanceof Error ? error.message : "Game Master gagal merespons.";
       const feed = root.querySelector<HTMLElement>("#conversation-feed");
       if (feed) feed.insertAdjacentHTML("beforeend", '<p class="canon-status" role="alert">' + escapeHtml(notice) + '</p>');
@@ -757,7 +757,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
         ? `Router memilih ${result.modules.length} modul dan berhasil memuat ${result.loaded.length} dari snapshot ${result.loaded[0].commitSha.slice(0,7)}.${result.skipped.length ? " Gagal: " + result.skipped.join(" | ") : ""}`
         : `Tidak ada modul yang cocok atau modul gagal dimuat.${result.skipped.length ? " " + result.skipped.join(" | ") : ""}`;
     } catch (error) {
-      recordBug(error, "Canon Router", "Canon");\n      recordBug(error, "Canon Router", "Canon");
+      recordBug(error, "Canon Router", "Canon");
       canonRouteMessage = error instanceof Error ? error.message : "Canon Router gagal.";
     }
     canonRouteBusy = false;
@@ -773,7 +773,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       canonDocument = await loadCanonModule(path);
       canonMessage = `Modul ${canonDocument.path} berhasil dimuat.`;
     } catch (error) {
-      recordBug(error, "Load canon module", "Canon");\n      recordBug(error, "Load canon module", "Canon");
+      recordBug(error, "Load canon module", "Canon");
       canonMessage = error instanceof Error ? error.message : "Modul gagal dimuat.";
     }
     render();
@@ -800,7 +800,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     notice = "Character created and saved on this device.";
     render();
   } catch (error) {
-    recordBug(error, "Save character", "Character storage");\n    recordBug(error, "Save character", "Character storage");
+    recordBug(error, "Save character", "Character storage");
     if (errorNode) errorNode.textContent = error instanceof Error ? error.message : "Could not save character.";
   }
 });
