@@ -70,7 +70,7 @@ function showBubble(entry: LedgerEntry): void {
   const bubble = document.createElement("button");
   bubble.type = "button";
   bubble.className = `ledger-bubble tone-${entry.tone}`;
-  bubble.setAttribute("aria-label", `${entry.title}: ${entry.change}. Tap to dismiss.`;
+  bubble.setAttribute("aria-label", `${entry.title}: ${entry.change}. Tap to dismiss.`);
   bubble.innerHTML = `
     <span class="ledger-bubble-kicker">${escapeHtml(entry.title)}</span>
     <strong class="ledger-bubble-change">${escapeHtml(entry.change)}</strong>
