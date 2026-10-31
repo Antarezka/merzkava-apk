@@ -61,3 +61,88 @@ export function validateCharacterProfile(profile: ParsedCharacterProfile): strin
   if (!f["Arcanist Grade"].trim() || !f["Arcanist Focus"].trim()) errors.push("Arcanist Grade dan Arcanist Focus wajib diisi.");
   return errors;
 }
+
+
+export const RESPONSE_PANEL_HEADERS = [
+  "◈━━┫ PROFIL KARAKTER ┣━━◈",
+  "◈━━┫ INV & KEUANGAN ┣━━◈",
+  "◈━━┫ TEKNIK & TUJUAN ┣━━◈",
+  "◈━━┫ CATATAN PEMAIN & KONSISTENSI ┣━━◈"
+] as const;
+
+const RESPONSE_FIELD_ORDER: ProfileField[] = [
+  "Nama", "Usia", "Spirit Realm", "Sync progress", "Spirit Ring Absorption",
+  "Martial Soul", "Arcanist Grade", "Arcanist Focus", "HP", "Satiety", "Qi",
+  "Kondisi Tubuh", "Equipment", "Inventory", "Assets Bangunan", "Wallet (wealth)",
+  "Teknik / Kemampuan", "Tujuan Saat Ini"
+];
+
+export interface GameplayResponseProfile {
+  profile: ParsedCharacterProfile;
+  panels: {
+    character: string;
+    inventory: string;
+    techniques: string;
+    continuity: string;
+  };
+  errors: string[];
+}
+
+function findFieldLines(section: string, fields: ProfileField[]): { values: Partial<Record<ProfileField, string>>; errors: string[] } {
+  const values: Partial<Record<ProfileField, string>> = {};
+  const errors: string[] = [];
+  for (const field of fields) {
+    const escaped = field.replace(/[.*+?^\${}()|[\]\\]/g, "\\$&");
+    const matches = [...section.matchAll(new RegExp("^" + escaped + ":\\s*(.*)$", "gm"))];
+    if (matches.length !== 1) {
+      errors.push(matches.length === 0 ? "Field panel hilang: " + field + "." : "Field panel duplikat: " + field + ".");
+    } else {
+      values[field] = cleanValue(matches[0][1]);
+    }
+  }
+  return { values, errors };
+}
+
+/** Parse the four literal player-facing panels inside the GM's complete response, not the source profile file. */
+export function parseGameplayResponseProfile(response: string): GameplayResponseProfile {
+  const errors: string[] = [];
+  const positions = RESPONSE_PANEL_HEADERS.map(header => response.indexOf(header));
+  if (positions.some(position => position < 0)) errors.push("Respons GM wajib memuat keempat panel profil resmi.");
+  if (positions.every(position => position >= 0) && positions.some((position, index) => index > 0 && position <= positions[index - 1])) {
+    errors.push("Urutan empat panel respons GM tidak sesuai template resmi.");
+  }
+  const section = (start: number, end: number) => response.slice(start, end);
+  const boundaries = positions.map((position, index) => {
+    const next = positions[index + 1] ?? response.length;
+    return position < 0 ? "" : section(position, next);
+  });
+  const panelFields: ProfileField[][] = [
+    RESPONSE_FIELD_ORDER.slice(0, 13),
+    RESPONSE_FIELD_ORDER.slice(13, 16),
+    RESPONSE_FIELD_ORDER.slice(16, 18),
+    []
+  ];
+  const values: Partial<Record<ProfileField, string>> = {};
+  for (let i = 0; i < 3; i++) {
+    if (!boundaries[i]) continue;
+    const parsed = findFieldLines(boundaries[i], panelFields[i]);
+    Object.assign(values, parsed.values);
+    errors.push(...parsed.errors);
+  }
+  if (boundaries[3] && !/╲━━━━━━━━━━━━━━━━━━━━━━╱/.test(boundaries[3])) {
+    errors.push("Panel CATATAN PEMAIN & KONSISTENSI tidak memiliki bingkai penutup resmi.");
+  }
+  const missing = RESPONSE_FIELD_ORDER.filter(field => typeof values[field] !== "string");
+  if (missing.length) errors.push(...missing.map(field => "Nilai panel belum terbaca: " + field + "."));
+  const fields = Object.fromEntries(RESPONSE_FIELD_ORDER.map(field => [field, values[field] ?? ""])) as Record<ProfileField, string>;
+  return {
+    profile: { fields, source: "markdown" },
+    panels: {
+      character: boundaries[0] ?? "",
+      inventory: boundaries[1] ?? "",
+      techniques: boundaries[2] ?? "",
+      continuity: boundaries[3] ?? ""
+    },
+    errors
+  };
+}
