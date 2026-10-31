@@ -36,7 +36,7 @@ if (!patchedActivity.includes("FloatingWindowPlugin.class")) {
   );
   patchedActivity = patchedActivity.replace(
     /public class MainActivity extends BridgeActivity\s*\{/,
-    match => match + "\n    @Override\n    public void onCreate(Bundle savedInstanceState) {\n        registerPlugin(FloatingWindowPlugin.class);\n        super.onCreate(savedInstanceState);\n    }\n"
+    match => match + "\n    @Override\n    public void onCreate(Bundle savedInstanceState) {\n        registerPlugin(FloatingWindowPlugin.class);\n        super.onCreate(savedInstanceState);\n    }\n    @Override\n    public void onResume() {\n        super.onResume();\n        FloatingWindowPlugin.restoreForForeground();\n    }\n"
   );
   await writeFile(mainActivityPath, patchedActivity);
 }
