@@ -909,6 +909,9 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       const resourceChangesAreCandidates = usableProfile !== null && stateReconciliation.errors.length === 0 && stateReconciliation.changes.every(change => change.status === "candidate");
       const eventFields = new Set(gmProposal.ledger_events.map(event => event.kind === "item" ? "Inventory" : "Wallet (wealth)"));
       const declaredResourceFields = new Set(gmProposal.state_changes.filter(change => change.field === "Inventory" || change.field === "Wallet (wealth)").map(change => change.field));
+      if (declaredResourceFields.size > 0 && gmProposal.ledger_events.length === 0) {
+        throw new Error("Perubahan Inventory/Wallet wajib memiliki rincian peristiwa item atau uang agar notifikasi tidak terlewat.");
+      }
       if (gmProposal.ledger_events.length && (!resourceChangesAreCandidates || [...eventFields].some(field => !declaredResourceFields.has(field)))) {
         throw new Error("Peristiwa item/uang tidak cocok dengan perubahan Inventory/Wallet yang lolos rekonsiliasi.");
       }
