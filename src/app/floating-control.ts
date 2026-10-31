@@ -26,11 +26,11 @@ export function floatingControlMarkup(state: FloatingReadiness): string {
       </article>
       <article class="floating-step ${state.notifications ? "is-ready" : ""}">
         <span class="floating-step-number">02</span><div class="floating-step-copy"><strong>Allowed notifications</strong><small>Show the ongoing notification while the service is active.</small></div>
-        ${state.notifications ? '<span class="floating-check">✓</span>' : '<button data-floating-action="notifications" ${!state.displayOverApps ? "disabled" : ""}>Allow ↗</button>'}
+        ${state.notifications ? '<span class="floating-check">✓</span>' : `<button data-floating-action="notifications" ${!state.displayOverApps ? "disabled" : ""}>Allow ↗</button>`}
       </article>
       <article class="floating-step ${state.batteryExemption ? "is-ready" : ""}">
         <span class="floating-step-number">03</span><div class="floating-step-copy"><strong>Allow background activity / battery</strong><small>Reduce the chance that HiOS stops the floating service.</small></div>
-        ${state.batteryExemption ? '<span class="floating-check">✓</span>' : '<button data-floating-action="battery" ${!state.notifications ? "disabled" : ""}>Allow ↗</button>'}
+        ${state.batteryExemption ? '<span class="floating-check">✓</span>' : `<button data-floating-action="battery" ${!state.notifications ? "disabled" : ""}>Allow ↗</button>`}
       </article>
       <article class="floating-step manual-step">
         <span class="floating-step-number">04</span><div class="floating-step-copy"><strong>Set up return link for Google Play</strong><small>Requires a Google Play Console app entry and verified signing / redirect configuration.</small></div>
