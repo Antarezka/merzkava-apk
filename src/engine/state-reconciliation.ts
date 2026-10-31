@@ -36,6 +36,55 @@ function normalizeFieldValue(value: string): string {
   return noteStart > 0 ? normalized.slice(0, noteStart).trim() : normalized;
 }
 
+type WalletDenomination = "xc" | "xs" | "xg" | "zj" | "az";
+const WALLET_ORDER: WalletDenomination[] = ["xc", "xs", "xg", "zj", "az"];
+
+function parseWalletBalance(value: string): Record<WalletDenomination, number> | null {
+  const match = value.match(/^(\\d+)\\s*xc\\s*\\|\\s*(\\d+)\\s*xs\\s*\\|\\s*(\\d+)\\s*xg\\s*\\|\\s*(\\d+)\\s*zj\\s*\\|\\s*(\\d+)\\s*az$/i);
+  if (!match) return null;
+  const amounts = match.slice(1).map(Number);
+  if (amounts.some(amount => !Number.isSafeInteger(amount) || amount < 0)) return null;
+  return Object.fromEntries(WALLET_ORDER.map((currency, index) => [currency, amounts[index]])) as Record<WalletDenomination, number>;
+}
+
+function validateWalletLedger(proposal: GMProposal, errors: string[]): void {
+  const walletChange = proposal.state_changes.find(change => change.field === "Wallet (wealth)");
+  const currencyEvents = proposal.ledger_events.filter(event => event.kind === "currency");
+  if (!walletChange && currencyEvents.length) {
+    errors.push("Peristiwa uang tidak memiliki perubahan Wallet (wealth) yang cocok.");
+    return;
+  }
+  if (walletChange && !currencyEvents.length) {
+    errors.push("Perubahan Wallet (wealth) wajib memiliki rincian transaksi mata uang.");
+    return;
+  }
+  if (!walletChange) return;
+  const before = parseWalletBalance(normalizeFieldValue(walletChange.before));
+  const after = parseWalletBalance(normalizeFieldValue(walletChange.after));
+  if (!before || !after) {
+    errors.push("Saldo Wallet sebelum/sesudah tidak dapat dibaca untuk rekonsiliasi transaksi.");
+    return;
+  }
+  const expected = { ...before };
+  for (const event of currencyEvents) {
+    const currency = event.currency;
+    const amount = event.amount;
+    if (!currency || !WALLET_ORDER.includes(currency) || !Number.isSafeInteger(amount) || !amount || amount < 1) {
+      errors.push("Peristiwa mata uang memiliki denominasi atau nominal yang tidak valid.");
+      continue;
+    }
+    expected[currency] += event.direction === "in" ? amount : -amount;
+    if (expected[currency] < 0 || !Number.isSafeInteger(expected[currency])) {
+      errors.push("Transaksi uang membuat saldo denominasi " + currency + " negatif atau di luar batas aman.");
+    }
+  }
+  for (const currency of WALLET_ORDER) {
+    if (expected[currency] !== after[currency]) {
+      errors.push("Ledger " + currency + " tidak cocok dengan perubahan Wallet (wealth): saldo akhir yang diusulkan tidak dapat direkonsiliasi.");
+    }
+  }
+}
+
 function validateAfterValue(field: string, value: string): string | null {
   if (!value.trim()) return "Nilai sesudah tidak boleh kosong.";
   if (field === "HP") {
@@ -139,6 +188,11 @@ export function reconcileGMProposal(profile: ParsedCharacterProfile | null, prop
       }
     }
   }
+  validateWalletLedger(proposal, errors);
+  const inventoryChange = proposal.state_changes.some(change => change.field === "Inventory");
+  const itemEvents = proposal.ledger_events.filter(event => event.kind === "item");
+  if (inventoryChange && itemEvents.length === 0) errors.push("Perubahan Inventory wajib memiliki rincian peristiwa item.");
+  if (!inventoryChange && itemEvents.length > 0) errors.push("Peristiwa item tidak memiliki perubahan Inventory yang cocok.");
   const status = changes.some(change => change.status === "rejected")
     ? "rejected"
     : changes.some(change => change.status === "needs-review") || errors.length
