@@ -19,6 +19,7 @@ import { GatewayGMProvider, isGMGatewayConfigured } from "./engine/gateway-gm-pr
 import { getLedgerLog, initializeLedgerNotifications, showLedgerProposalBubble } from "./ui/ledger-log";
 import { startFloatingMode, requestFloatingOverlayPermission, getFloatingReadiness, requestFloatingNotifications, requestFloatingBatteryExemption, showFloatingBubble, stopFloatingService, type FloatingReadiness } from "./native/floating-window";
 import { floatingControlMarkup } from "./app/floating-control";
+import { animateOpeningSplash } from "./ui/splash-animation";
 
 const app = document.querySelector<HTMLDivElement>("#app");
 if (!app) throw new Error("App root element was not found.");
@@ -63,6 +64,10 @@ function showOpeningSplash(): HTMLDivElement {
     if (event.target === splash.querySelector(".splash-content") && event.animationName === "splash-depart") splash.remove();
   });
   document.body.append(splash);
+  const stopSplashAnimation = animateOpeningSplash(splash);
+  splash.addEventListener("animationend", event => {
+    if (event.target === splash && event.animationName === "splash-curtain") stopSplashAnimation();
+  });
   return splash;
 }
 
