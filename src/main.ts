@@ -76,6 +76,57 @@ let gmProposal: GMProposal | null = null;
 let authMessage = "";
 let authBusy = false;
 
+function localDayStamp(date = new Date()): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+const noticeboardStorageKey = `merzkava-noticeboard-dismissed:${localDayStamp()}`;
+let noticeboardVisible = (() => {
+  try { return localStorage.getItem(noticeboardStorageKey) !== "1"; }
+  catch { return true; }
+})();
+let conversationStartedAt = new Date();
+
+function noticeboardMarkup(): string {
+  return `<div class="noticeboard-backdrop" data-noticeboard-backdrop>
+    <section class="noticeboard-panel" role="dialog" aria-modal="true" aria-labelledby="noticeboard-title">
+      <div class="noticeboard-topline"><span>MERZKAVA UNIVERSE</span><span>DAILY BULLETIN · 001</span></div>
+      <button class="noticeboard-close" data-notice-dismiss="once" aria-label="Close noticeboard">×</button>
+      <div class="noticeboard-seal">M</div>
+      <p class="noticeboard-kicker">A NOTE FROM THE ARCHIVE</p>
+      <h2 id="noticeboard-title">Today's<br><em>Noticeboard</em></h2>
+      <div class="noticeboard-rule"></div>
+      <p class="noticeboard-copy">The world is waiting beyond these pages. Review your records, prepare your character, and let the next chapter begin.</p>
+      <div class="noticeboard-entry"><span>01</span><div><strong>YOUR JOURNEY</strong><small>Characters, memories, and discoveries belong to your own archive.</small></div></div>
+      <div class="noticeboard-actions">
+        <button class="noticeboard-today" data-notice-dismiss="today">Close for today</button>
+        <button class="noticeboard-ignore" data-notice-dismiss="once">Dismiss</button>
+      </div>
+      <p class="noticeboard-footnote">Tap outside this notice to close it.</p>
+    </section>
+  </div>`;
+}
+
+function updateSessionCalendar(): void {
+  if (activeScreen !== "gameplay") return;
+  const now = new Date();
+  const weekday = root.querySelector<HTMLElement>("#session-weekday");
+  const day = root.querySelector<HTMLElement>("#session-day");
+  const monthYear = root.querySelector<HTMLElement>("#session-month-year");
+  const clock = root.querySelector<HTMLElement>("#session-clock");
+  const timezone = root.querySelector<HTMLElement>("#session-timezone");
+  const started = root.querySelector<HTMLElement>("#session-started");
+  if (weekday) weekday.textContent = new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(now).toUpperCase();
+  if (day) day.textContent = new Intl.DateTimeFormat("en-US", { day: "2-digit" }).format(now);
+  if (monthYear) monthYear.textContent = new Intl.DateTimeFormat("en-US", { month: "long", year: "numeric" }).format(now).toUpperCase();
+  if (clock) clock.textContent = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(now);
+  if (timezone) timezone.textContent = Intl.DateTimeFormat().resolvedOptions().timeZone || "DEVICE LOCAL";
+  if (started) started.textContent = new Intl.DateTimeFormat("en-GB", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(conversationStartedAt);
+}
+
 function escapeHtml(value: string): string {
   return value.replace(/[&<>"']/g, char => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" })[char] ?? char);
 }
@@ -109,7 +160,9 @@ function render(): void {
     <main class="main-content">${notice ? `<p class="notice" role="status">${escapeHtml(notice)}</p>` : ""}${renderScreen(activeScreen, characters)}${activeScreen === "settings" ? authPanel() + canonPanel() : ""}</main>
     <nav class="bottom-nav" aria-label="Main navigation">${navigation.map(item => `<button class="nav-item ${activeScreen === item.id ? "active" : ""}" data-screen="${item.id}" ${activeScreen === item.id ? 'aria-current="page"' : ""}><span>${item.icon}</span><small>${item.label}</small></button>`).join("")}</nav>
     <div class="storage-status"><span class="status-dot"></span>${databaseMessage}</div>
+    ${activeScreen === "home" && noticeboardVisible ? noticeboardMarkup() : ""}
   </div>`;
+  updateSessionCalendar();
 }
 
 async function refreshCharacters(): Promise<void> {
@@ -151,6 +204,22 @@ root.addEventListener("click", async (event: MouseEvent) => {
     "button:not(:disabled), a[href], [role='button'], [role='tab'], [role='menuitem'], input:not([type='hidden']):not(:disabled), select:not(:disabled), textarea:not(:disabled), summary"
   );
   if (interactive) playButtonSound();
+
+  const noticeDismissButton = target.closest<HTMLElement>("[data-notice-dismiss]");
+  if (noticeDismissButton) {
+    if (noticeDismissButton.dataset.noticeDismiss === "today") {
+      try { localStorage.setItem(noticeboardStorageKey, "1"); } catch { /* Session-only dismissal still works. */ }
+    }
+    noticeboardVisible = false;
+    render();
+    return;
+  }
+  if (target.classList.contains("noticeboard-backdrop")) {
+    noticeboardVisible = false;
+    render();
+    return;
+  }
+
   const refreshCanonButton = target.closest<HTMLButtonElement>("[data-refresh-canon]");
   if (refreshCanonButton && !canonBusy) {
     canonBusy = true; canonMessage = "Memeriksa pin README dan mengambil INDEX…"; render();
@@ -186,6 +255,7 @@ root.addEventListener("click", async (event: MouseEvent) => {
   const button = target.closest<HTMLButtonElement>("[data-screen]");
   const nextScreen = button?.dataset.screen as ScreenId | undefined;
   if (!nextScreen || !navigation.some(item => item.id === nextScreen)) return;
+  if (nextScreen === "gameplay" && activeScreen !== "gameplay") conversationStartedAt = new Date();
   activeScreen = nextScreen;
   notice = "";
   render();
@@ -336,6 +406,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
 });
 
 render();
+window.setInterval(updateSessionCalendar, 1000);
 void initializeDatabase().then(async status => {
   databaseMessage = status.message;
   await refreshCharacters();
