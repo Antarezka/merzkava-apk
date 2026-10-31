@@ -80,6 +80,45 @@ const EMPTY_WORLD_TIME: WorldTimeState = { era:"", year:"", season:"", date:"", 
 let activeCharacterId = "";
 let worldTime: WorldTimeState = { ...EMPTY_WORLD_TIME };
 let blindOpen = false;
+type ChatMessage = { role: "player" | "gm"; text: string; createdAt: string };
+type CharacterChat = { messages: ChatMessage[]; started: boolean; showOptions: boolean };
+const CHAT_STORE_KEY = "merzkava.chat-by-character.v1";
+let activeChat: CharacterChat = { messages: [], started: false, showOptions: false };
+function readChatStore(): Record<string, CharacterChat> {
+  try { return JSON.parse(localStorage.getItem(CHAT_STORE_KEY) ?? "{}") as Record<string, CharacterChat>; }
+  catch { return {}; }
+}
+function saveCharacterChat(): void {
+  if (!activeCharacterId) return;
+  const store = readChatStore();
+  store[activeCharacterId] = activeChat;
+  try { localStorage.setItem(CHAT_STORE_KEY, JSON.stringify(store)); } catch { notice = "Penyimpanan percakapan tidak tersedia."; }
+}
+function loadCharacterChat(characterId: string): void {
+  const saved = characterId ? readChatStore()[characterId] : undefined;
+  activeChat = saved ? { messages: Array.isArray(saved.messages) ? saved.messages : [], started: Boolean(saved.started), showOptions: Boolean(saved.showOptions) } : { messages: [], started: false, showOptions: false };
+  renderChat();
+}
+function renderChat(): void {
+  if (activeScreen !== "gameplay") return;
+  const feed = root.querySelector<HTMLElement>("#conversation-feed");
+  if (feed) {
+    feed.innerHTML = activeChat.messages.length
+      ? activeChat.messages.map(message => '<article class="chat-message ' + message.role + '"><small>' + (message.role === "gm" ? "GAME MASTER" : "AKSI PEMAIN") + '</small><p>' + escapeHtml(message.text).replace(/\\n/g, "<br>") + '</p></article>').join("")
+      : '<div class="conversation-empty"><span class="conversation-ornament">✧</span><h3>Your story begins here</h3><p>Mulai sesi baru atau lanjutkan perjalanan yang tersimpan untuk karakter ini.</p></div>';
+    feed.scrollTop = feed.scrollHeight;
+  }
+  const setting = root.querySelector<HTMLSelectElement>("#gm-options-setting");
+  if (setting) setting.value = activeChat.showOptions ? "yes" : "no";
+  const status = root.querySelector<HTMLElement>("#session-status");
+  if (status) status.textContent = activeChat.started ? "Sesi tersimpan di perangkat" : "Belum ada sesi aktif";
+  const character = characters.find(item => item.id === activeCharacterId);
+  const record = root.querySelector<HTMLElement>("#player-character-record");
+  if (record) record.innerHTML = character
+    ? '<dl><dt>Nama</dt><dd>' + escapeHtml(character.name) + '</dd><dt>Usia</dt><dd>' + character.age + '</dd><dt>Asal</dt><dd>' + escapeHtml(character.origin) + '</dd><dt>Spirit Realm</dt><dd>' + escapeHtml(character.realm) + '</dd><dt>Cultivation</dt><dd>' + character.cultivationLevel + '</dd><dt>Awakening</dt><dd>' + (character.awakened ? "Awakened" : "Not awakened") + '</dd><dt>Background</dt><dd>' + escapeHtml(character.background || "—") + '</dd></dl><p>Data mekanik lain ditampilkan setelah state kanonis karakter tersedia.</p>'
+    : "Pilih karakter untuk melihat catatan lokalnya.";
+}
+
 const WORLD_TIME_KEY = "merzkava.world-time-by-character.v1";
 type CharacterSessionRecord = { worldTime: WorldTimeState; snapshot: string; version: string };
 function readWorldTimeStore(): Record<string, CharacterSessionRecord> {
@@ -270,6 +309,18 @@ root.addEventListener("click", async (event: MouseEvent) => {
   );
   if (interactive) playButtonSound();
 
+  const startSessionButton = target.closest<HTMLButtonElement>("[data-start-session]");
+  if (startSessionButton) {
+    const characterId = root.querySelector<HTMLSelectElement>("#gameplay-character")?.value ?? "";
+    if (!characterId) { notice = "Pilih karakter terlebih dahulu."; render(); return; }
+    activeCharacterId = characterId;
+    activeChat = { messages: [], started: false, showOptions: activeChat.showOptions };
+    saveCharacterChat();
+    const form = root.querySelector<HTMLFormElement>("#gameplay-route-form");
+    if (form) form.dataset.sessionMode = "new";
+    form?.requestSubmit();
+    return;
+  }
   const noticeDismissButton = target.closest<HTMLElement>("[data-notice-dismiss]");
   if (noticeDismissButton) {
     if (noticeDismissButton.dataset.noticeDismiss === "today") {
@@ -335,6 +386,7 @@ root.addEventListener("click", async (event: MouseEvent) => {
   if (nextScreen === "gameplay" && activeScreen !== "gameplay") {
     const selected = root.querySelector<HTMLSelectElement>("#gameplay-character")?.value ?? activeCharacterId;
     loadCharacterWorldTime(selected);
+    loadCharacterChat(selected);
     blindOpen = false;
   }
   activeScreen = nextScreen;
@@ -346,7 +398,12 @@ root.addEventListener("change", event => {
   const target = event.target;
   if (target instanceof HTMLSelectElement && target.id === "gameplay-character") {
     loadCharacterWorldTime(target.value);
+    loadCharacterChat(target.value);
     updateSessionCalendar();
+  }
+  if (target instanceof HTMLSelectElement && target.id === "gm-options-setting") {
+    activeChat.showOptions = target.value === "yes";
+    saveCharacterChat();
   }
 });
 
@@ -374,55 +431,57 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
   }
   if (form.id === "gameplay-route-form") {
     event.preventDefault();
-    const formData = new FormData(form);
-    const activity = String(formData.get("activity") ?? "").trim();
-    const characterId = String(formData.get("characterId") ?? "");
-    if (!activity || gameplayContextBusy) return;
+    const data = new FormData(form);
+    const typedActivity = String(data.get("activity") ?? "").trim();
+    const characterId = String(data.get("characterId") ?? "");
+    const mode = form.dataset.sessionMode === "new" ? "new" : "continue";
+    if (gameplayContextBusy || !characterId || (mode === "continue" && !typedActivity)) return;
+    const character = characters.find(item => item.id === characterId);
+    if (!character) { notice = "Karakter tidak ditemukan."; render(); return; }
+    activeCharacterId = characterId;
     loadCharacterWorldTime(characterId);
+    if (mode === "new") activeChat = { messages: [], started: false, showOptions: activeChat.showOptions };
+    const status = getCanonStatus();
+    if (status.status !== "ready" && status.status !== "cached") { notice = "Canon belum terverifikasi. Refresh canon terlebih dahulu."; render(); return; }
+    const trigger = "analisis link berikut ini secara penuh dan pelajari dengan seksama untuk memulai permainan roleplay ini : https://raw.githubusercontent.com/Antarezka/merzkava-universe/" + status.commitSha + "/INDEX.md?v=1 dan https://raw.githubusercontent.com/Antarezka/merzkava-universe/" + status.commitSha + "/players.md?v=1 untuk Memulai permainan sebagai " + character.name + "!";
+    const activity = mode === "new" ? trigger : typedActivity;
+    const routeQuery = mode === "new" ? "new session character introduction starting location initial character state" : activity;
     gameplayContextBusy = true;
-    gameplayContextMessage = "Mengambil modul canon yang relevan…";
-    gameplayContextText = "";
-    render();
+    const sendButton = root.querySelector<HTMLButtonElement>("#gameplay-route-form button[type=submit]");
+    if (sendButton) sendButton.disabled = true;
     try {
-      const route = await routeCanonActivity(activity, 5);
-      const status = getCanonStatus();
-      const selectedCharacter = characters.find(character => character.id === characterId) ?? null;
-      loadCharacterWorldTime(characterId);
-      const context = assembleGameplayContext(route, selectedCharacter, status.commitSha, status.version);
-      context.prompt += "\n\n## LAST GM-REPORTED WORLD TIME (PER CHARACTER SESSION)\n" +
-        (Object.values(worldTime).some(Boolean)
-          ? JSON.stringify(worldTime)
-          : "No world-time fields have been reported by the GM yet. Leave them unset until the GM explicitly states them.") +
-        "\nOnly continue from this recorded GM time. Do not use the device clock or invent missing fields. In your response, return a world_time object containing only explicitly stated fields; use null for fields not stated. The GM decides flexible action duration and resulting hour.";
-
-      gameplaySnapshot = context.snapshot;
-      gameplayVersion = context.version;
-      gmProposal = null;
-      gameplayContextText = buildGMInstruction(context);
-      gameplayContextMessage = `Context siap: ${context.documents.length} modul dimasukkan, ${context.omittedModules.length} dilewati karena batas ukuran. Snapshot ${context.snapshot || "tidak terverifikasi"}.${route.skipped.length ? " Modul gagal: " + route.skipped.join(" | ") : ""}`;
-      const output = root.querySelector<HTMLElement>("#gameplay-context");
-      if (output && isGMGatewayConfigured() && getAuthSession()) {
-        output.innerHTML = "<p class=\"canon-status\" role=\"status\">Canon ready. Contacting the authenticated AI Gateway…</p>";
-        try {
-          const result = await requestGMProposal(new GatewayGMProvider(), context);
-          if (!result.valid) throw new Error(result.errors.join(" "));
-          gmProposal = result.proposal;
-          applyGMWorldTime(gmProposal);
-          const list = (items: string[]) => items.length ? "<ul>" + items.map(item => "<li>" + escapeHtml(item) + "</li>").join("") + "</ul>" : "<p class=\"muted\">None</p>";
-          output.innerHTML = "<article class=\"record-card\"><div class=\"record-top\"><span>AI GAME MASTER</span><span class=\"record-status\">VALIDATED · NOT APPLIED</span></div><p class=\"canon-status\" role=\"status\">Response validated against snapshot " + escapeHtml(context.snapshot) + ".</p><h3>Story response</h3><p>" + escapeHtml(gmProposal.narration) + "</p><h3>Outcome</h3><p>" + escapeHtml(gmProposal.outcome) + "</p><h3>Canon basis</h3>" + list(gmProposal.canon_basis) + "<h3>Proposed changes (not applied)</h3>" + list(gmProposal.proposed_changes) + "<h3>Unresolved questions</h3>" + list(gmProposal.unresolved_questions) + "<p class=\"canon-status\">No character or save data was changed.</p></article>";
-        } catch (error) {
-          const message = error instanceof Error ? error.message : "Gateway request failed.";
-          output.innerHTML = "<p class=\"canon-status\" role=\"alert\">AI Gateway: " + escapeHtml(message) + "</p><p class=\"muted\">Manual fallback. No state changes were made.</p><label for=\"gameplay-context-output\">GM prompt</label><textarea id=\"gameplay-context-output\" rows=\"8\" readonly>" + escapeHtml(gameplayContextText) + "</textarea><label for=\"gm-response\">Paste the AI Game Master JSON response</label><form id=\"gm-response-form\"><textarea id=\"gm-response\" name=\"response\" rows=\"8\" maxlength=\"24000\" required></textarea><button class=\"action-button\" type=\"submit\">Validate GM response ↗</button></form><div id=\"gm-result\" aria-live=\"polite\"></div>";
-        }
-      } else if (output) {
-      output.innerHTML = `<p class="canon-status" role="status">${escapeHtml(gameplayContextMessage)}</p><h3>GM instruction ready</h3><p class="muted">Copy this instruction into your AI provider. The app does not send data to an AI service yet.</p><label for="gameplay-context-output">GM prompt (read-only)</label><textarea id="gameplay-context-output" rows="10" readonly>${escapeHtml(gameplayContextText)}</textarea><label for="gm-response">Paste the AI Game Master's JSON response</label><form id="gm-response-form"><textarea id="gm-response" name="response" rows="8" maxlength="24000" placeholder='{"snapshot":"…","version":"…","narration":"…","outcome":"…","canon_basis":[],"proposed_changes":[],"unresolved_questions":[]}' required></textarea><button class="action-button" type="submit">Validate GM response ↗</button></form><div id="gm-result" aria-live="polite"></div><p class="muted">${gameplayContextText.length.toLocaleString()} characters · no game state changes performed</p>`;
-      }
+      const route = await routeCanonActivity(routeQuery, 7);
+      const context = assembleGameplayContext({ ...route, query: activity }, character, status.commitSha, status.version);
+      const previous = mode === "new" ? [] : activeChat.messages;
+      context.prompt += "\n\n## SESSION MODE\n" + (mode === "new" ? "NEW SESSION: initialize from the exact trigger below." : "CONTINUING SESSION: continue without resetting established state.") +
+        "\n\n## EXACT TRIGGER\n" + (mode === "new" ? trigger : "Not applicable; continuation.") +
+        "\n\n## CHRONOLOGICAL PLAYER/GM TRANSCRIPT\n" + (previous.length ? previous.map(item => (item.role === "player" ? "PLAYER: " : "GM: ") + item.text).join("\n\n") : "No previous turns.") +
+        "\n\n## PLAYER PRESENTATION\n" + (activeChat.showOptions ? "Include concise optional GM suggestions at the end." : "Do not provide suggested action options.") +
+        "\n\n## LAST GM WORLD TIME\n" + (Object.values(worldTime).some(Boolean) ? JSON.stringify(worldTime) : "No time reported. Do not invent missing fields.") +
+        "\nOnly use GM-reported world time. Never use device time. Preserve all established character state.";
+      gameplaySnapshot = status.commitSha;
+      gameplayVersion = status.version;
+      if (!isGMGatewayConfigured() || !getAuthSession()) throw new Error("AI Game Master belum siap. Periksa login dan konfigurasi Gateway di Settings.");
+      const result = await requestGMProposal(new GatewayGMProvider(), context);
+      if (!result.valid) throw new Error(result.errors.join(" "));
+      gmProposal = result.proposal;
+      applyGMWorldTime(gmProposal);
+      activeChat.messages.push({ role: "player", text: mode === "new" ? "Memulai sesi baru sebagai " + character.name + "." : typedActivity, createdAt: new Date().toISOString() });
+      activeChat.messages.push({ role: "gm", text: gmProposal.narration + (gmProposal.outcome ? "\n\n" + gmProposal.outcome : ""), createdAt: new Date().toISOString() });
+      activeChat.started = true;
+      form.dataset.sessionMode = "continue";
+      saveCharacterChat();
+      renderChat();
+      const action = root.querySelector<HTMLTextAreaElement>("#gameplay-action");
+      if (action) action.value = "";
     } catch (error) {
-      gameplayContextMessage = error instanceof Error ? error.message : "Context gagal disusun.";
-      const output = root.querySelector<HTMLElement>("#gameplay-context");
-      if (output) output.innerHTML = `<p class="canon-status" role="alert">${escapeHtml(gameplayContextMessage)}</p>`;
+      notice = error instanceof Error ? error.message : "Game Master gagal merespons.";
+      const feed = root.querySelector<HTMLElement>("#conversation-feed");
+      if (feed) feed.insertAdjacentHTML("beforeend", '<p class="canon-status" role="alert">' + escapeHtml(notice) + '</p>');
+    } finally {
+      gameplayContextBusy = false;
+      if (sendButton) sendButton.disabled = false;
     }
-    gameplayContextBusy = false;
     return;
   }
   if (form.id === "gm-response-form") {
