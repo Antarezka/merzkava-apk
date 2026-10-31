@@ -1,11 +1,10 @@
-type AudioContextConstructor = typeof AudioContext;
-
 let soundEnabled = true;
 let openingPlayed = false;
 let openingCancelled = false;
 let openingAudio: HTMLAudioElement | null = null;
 let voiceAudio: HTMLAudioElement | null = null;
 let pendingAudioFinish: (() => void) | null = null;
+let buttonAudio: HTMLAudioElement | null = null;
 
 const openingChimes = [
   "/audio/A_delicate_Japanese__%231-1793404302182.mp3"
@@ -72,7 +71,16 @@ export function cancelOpeningSequence(): void {
 export function playButtonSound(): void {
   if (!soundEnabled) return;
   const path = buttonSounds[Math.floor(Math.random() * buttonSounds.length)];
-  void playAudio(path, 0.48, true);
+  if (!buttonAudio) {
+    buttonAudio = new Audio(path);
+    buttonAudio.preload = "auto";
+  }
+  buttonAudio.pause();
+  buttonAudio.currentTime = 0;
+  buttonAudio.volume = 0.48;
+  void buttonAudio.play().catch(error => {
+    console.warn("Merzkava tap sound could not play:", error);
+  });
 }
 
 export function setSoundEnabled(enabled: boolean): void {
