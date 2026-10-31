@@ -4,7 +4,19 @@ on:
   workflow_dispatch:
   push:
     branches:
+      - feature/opening-splash-screen
+      - feature/floating-mode-ledger
       - feature/archive-experience
+    paths:
+      - "src/**"
+      - "public/**"
+      - "native/**"
+      - "scripts/**"
+      - ".github/workflows/build-android.yml"
+      - "package.json"
+      - "package-lock.json"
+      - "capacitor.config.ts"
+      - "vite.config.ts"
 
 permissions:
   contents: read
