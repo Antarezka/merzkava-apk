@@ -443,7 +443,11 @@ function render(): void {
     lastPlayWarningNotice = "";
   }
   const isControl = activeScreen === "control";
-  const currentProfile = latestGameplayProfile();
+  const selectedCharacter = availableCharacters().find(item => item.id === activeCharacterId);
+  const sourceProfile = selectedCharacter?.profileMarkdown ? parseCharacterProfile(selectedCharacter.profileMarkdown) : null;
+  const currentProfile = latestGameplayProfile() ?? (sourceProfile?.valid
+    ? { profile: sourceProfile.profile, panels: { character: "", inventory: "", techniques: "", continuity: "" }, errors: [] }
+    : null);
   const inventorySnapshot = currentProfile ? { inventory: currentProfile.profile.fields.Inventory, assets: currentProfile.profile.fields["Assets Bangunan"], wallet: currentProfile.profile.fields["Wallet (wealth)"] } : undefined;
   const content = isControl
     ? floatingControlMarkup(floatingReadiness)
