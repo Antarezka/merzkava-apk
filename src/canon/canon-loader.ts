@@ -130,13 +130,15 @@ export interface RegisteredPlayer {
   path: string;
   age: number | null;
   realm: string;
+  background: string;
+  profileMarkdown: string;
 }
 
 export async function refreshLatestPlayerRegistry(activeSha: string): Promise<{ commitSha: string; players: RegisteredPlayer[] }> {
   const fullSha = activeSha.toLowerCase();
   if (!/^[a-f0-9]{40}$/.test(fullSha) || currentStatus.commitSha !== fullSha) throw new Error("Registry harus dimuat dari ACTIVE_SHA penuh yang sedang aktif.");
   const registry = await fetchPinnedDocument("players.md", fullSha);
-  const rows = [...registry.content.matchAll(/^\|\s*([^|]+?)\s*\|\s*\[([^\]]+)\]\(([^)]+)\)\s*\|\s*([^|]+?)\s*\|$/gm)];
+  const rows = [...registry.content.matchAll(/^\\|\\s*([^|]+?)\\s*\\|\\s*\\[([^\\]]+)\\]\\(([^)]+)\\)\\s*\\|\\s*([^|]+?)\\s*\\|$/gm)];
   const players: RegisteredPlayer[] = [];
   for (const row of rows) {
     const name = row[1].trim();
@@ -144,9 +146,17 @@ export async function refreshLatestPlayerRegistry(activeSha: string): Promise<{ 
     if (!name || !relativePath.startsWith("players/") || !relativePath.endsWith(".md")) continue;
     const path = relativePath.split("/").map(encodeURIComponent).join("/");
     const profile = await fetchText(`https://raw.githubusercontent.com/${CANON_REPOSITORY}/${fullSha}/${path}`);
-    const ageMatch = profile.match(/^-\s*\*\*Usia:\*\*\s*(\d+)/m);
-    const realmMatch = profile.match(/^-\s*\*\*Spirit Realm:\*\*\s*([^\n]+)/m);
-    players.push({ name, path: relativePath, age: ageMatch ? Number(ageMatch[1]) : null, realm: realmMatch?.[1].trim() ?? "Belum ditetapkan" });
+    const ageMatch = profile.match(/^-\\s*\\*\\*Usia:\\*\\*\\s*(\\d+)/m);
+    const realmMatch = profile.match(/^-\\s*\\*\\*Spirit Realm:\\*\\*\\s*([^\\n]+)/m);
+    const backgroundMatch = profile.match(/^## Latar Belakang Orisinal[^\\n]*\\n([\\s\\S]*?)(?=\\n## |$)/m);
+    players.push({
+      name,
+      path: relativePath,
+      age: ageMatch ? Number(ageMatch[1]) : null,
+      realm: realmMatch?.[1].trim() ?? "Belum ditetapkan",
+      background: backgroundMatch?.[1].trim().replace(/\\n{2,}/g, " ") ?? "",
+      profileMarkdown: profile
+    });
   }
   if (!players.length) throw new Error("Tidak ada karakter valid yang ditemukan pada tabel Daftar Karakter di players.md.");
   return { commitSha: fullSha, players };
