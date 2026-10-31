@@ -170,7 +170,7 @@ button {color:inherit;} button:focus-visible {outline-color:#a68d5e;}
 .composer-topline{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;}
 .composer-topline label,.composer-label{color:#89764e;font-size:8px;font-weight:700;letter-spacing:.13em;}
 .composer-topline select{max-width:65%;padding:5px 7px;border:1px solid #c1b79f;background:#f5efdf;color:#34483f;font-size:10px;}
-.conversation-composer textarea{display:block;width:100%;min-height:52px;max-height:120px;resize:vertical;margin-top:5px;padding:10px 11px;border:1px solid #c1b79f;background:#f8f3e8;color:#30463e;font:13px/1.5 inherit;}
+.conversation-composer textarea{display:block;width:100%;min-height:52px;max-height:120px;resize:vertical;margin-top:5px;padding:10px 11px;border:1px solid #c1b79f;background:#f8f3e8;color:#30463e;font-family:inherit;font-size:13px;line-height:1.5;}
 .conversation-composer textarea:focus{outline:1px solid #a68d5e;border-color:#a68d5e;}
 .conversation-composer .action-button{width:100%;margin-top:8px;min-height:39px;}
 /* Roller blind is an independent top overlay; it never participates in chat layout. */
@@ -179,13 +179,16 @@ button {color:inherit;} button:focus-visible {outline-color:#a68d5e;}
 .blind-handle-line{width:24px;height:2px;border-radius:2px;background:#a58e60;}
 .blind-handle-label{font-size:7px;font-weight:700;letter-spacing:.2em;}
 .blind-chevron{font:14px Georgia,serif;}
-.blind-content{display:grid;grid-template-rows:0fr;gap:0;padding:0 14px;overflow:hidden;opacity:0;background:repeating-linear-gradient(0deg,#e7deca 0 24px,#ded4bf 25px);border-bottom:0 solid #a68d5e;box-shadow:0 7px 14px #263c3618;transition:grid-template-rows .32s cubic-bezier(.2,.7,.2,1),padding .32s ease,opacity .2s ease,border-width .32s ease;pointer-events:none;}
+.blind-content{display:grid;grid-template-columns:1fr 1fr;gap:0;max-height:0;padding:0 14px;overflow:hidden;opacity:0;background:repeating-linear-gradient(0deg,#e7deca 0 24px,#ded4bf 25px);border-bottom:0 solid #a68d5e;box-shadow:0 7px 14px #263c3618;transition:max-height .34s cubic-bezier(.2,.7,.2,1),padding .32s ease,opacity .2s ease,border-width .32s ease;pointer-events:none;}
 .blind-content>div{display:flex;min-height:0;flex-direction:column;gap:4px;overflow:hidden;}
 .blind-content small{color:#88764e;font-size:7px;letter-spacing:.14em;}
 .blind-content strong{color:#30463e;font:15px Georgia,serif;overflow-wrap:anywhere;}
-.snapshot-blind.is-open .blind-content{grid-template-rows:1fr;gap:12px;padding:10px 15px 13px;opacity:1;border-bottom-width:1px;}
+.snapshot-blind.is-open .blind-content{max-height:112px;gap:12px;padding:10px 15px 13px;opacity:1;border-bottom-width:1px;}
 .snapshot-blind.is-open .blind-content>div{min-height:32px;}
 .snapshot-blind.is-open .blind-content{pointer-events:auto;}
 @media(min-width:600px){.app-shell:has(.conversation-window){padding-top:60px;padding-bottom:95px}.app-shell:has(.conversation-window) .main-content{min-height:calc(100dvh - 165px)}}
 @media(max-height:650px){.app-shell:has(.conversation-window){padding-bottom:76px}.conversation-feed{min-height:120px}.world-time-panel{padding:7px 11px}.world-time-main{padding:4px 0}.conversation-composer{padding-top:7px}}
 @media(prefers-reduced-motion:reduce){.blind-content{transition:none}.conversation-feed{scroll-behavior:auto}}
+
+/* Keep the expanding shade in the header band, above—not over—the conversation. */
+.app-shell:has(.snapshot-blind.is-open) .app-header{padding-top:100px;}

@@ -81,18 +81,22 @@ let activeCharacterId = "";
 let worldTime: WorldTimeState = { ...EMPTY_WORLD_TIME };
 let blindOpen = false;
 const WORLD_TIME_KEY = "merzkava.world-time-by-character.v1";
-function readWorldTimeStore(): Record<string, WorldTimeState> {
-  try { return JSON.parse(localStorage.getItem(WORLD_TIME_KEY) ?? "{}") as Record<string, WorldTimeState>; }
+type CharacterSessionRecord = { worldTime: WorldTimeState; snapshot: string; version: string };
+function readWorldTimeStore(): Record<string, CharacterSessionRecord> {
+  try { return JSON.parse(localStorage.getItem(WORLD_TIME_KEY) ?? "{}") as Record<string, CharacterSessionRecord>; }
   catch { return {}; }
 }
 function loadCharacterWorldTime(characterId: string): void {
   activeCharacterId = characterId;
-  worldTime = characterId ? { ...EMPTY_WORLD_TIME, ...(readWorldTimeStore()[characterId] ?? {}) } : { ...EMPTY_WORLD_TIME };
+  const saved = characterId ? readWorldTimeStore()[characterId] : undefined;
+  worldTime = saved?.worldTime ? { ...EMPTY_WORLD_TIME, ...saved.worldTime } : { ...EMPTY_WORLD_TIME };
+  gameplaySnapshot = saved?.snapshot ?? "";
+  gameplayVersion = saved?.version ?? "";
 }
 function saveCharacterWorldTime(): void {
   if (!activeCharacterId) return;
   const store = readWorldTimeStore();
-  store[activeCharacterId] = { ...worldTime };
+  store[activeCharacterId] = { worldTime: { ...worldTime }, snapshot: gameplaySnapshot, version: gameplayVersion };
   try { localStorage.setItem(WORLD_TIME_KEY, JSON.stringify(store)); } catch { /* Keep this session in memory if storage is unavailable. */ }
 }
 function applyGMWorldTime(proposal: GMProposal): void {
@@ -338,6 +342,14 @@ root.addEventListener("click", async (event: MouseEvent) => {
   render();
 });
 
+root.addEventListener("change", event => {
+  const target = event.target;
+  if (target instanceof HTMLSelectElement && target.id === "gameplay-character") {
+    loadCharacterWorldTime(target.value);
+    updateSessionCalendar();
+  }
+});
+
 root.addEventListener("submit", async (event: SubmitEvent) => {
   const form = event.target;
   if (!(form instanceof HTMLFormElement)) return;
@@ -377,11 +389,11 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       const selectedCharacter = characters.find(character => character.id === characterId) ?? null;
       loadCharacterWorldTime(characterId);
       const context = assembleGameplayContext(route, selectedCharacter, status.commitSha, status.version);
-      context.prompt += "\\n\\n## LAST GM-REPORTED WORLD TIME (PER CHARACTER SESSION)\\n" +
+      context.prompt += "\n\n## LAST GM-REPORTED WORLD TIME (PER CHARACTER SESSION)\n" +
         (Object.values(worldTime).some(Boolean)
           ? JSON.stringify(worldTime)
           : "No world-time fields have been reported by the GM yet. Leave them unset until the GM explicitly states them.") +
-        "\\nOnly continue from this recorded GM time. Do not use the device clock or invent missing fields. In your response, return a world_time object containing only explicitly stated fields; use null for fields not stated. The GM decides flexible action duration and resulting hour.");
+        "\nOnly continue from this recorded GM time. Do not use the device clock or invent missing fields. In your response, return a world_time object containing only explicitly stated fields; use null for fields not stated. The GM decides flexible action duration and resulting hour.");
 
       gameplaySnapshot = context.snapshot;
       gameplayVersion = context.version;

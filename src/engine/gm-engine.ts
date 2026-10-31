@@ -104,7 +104,8 @@ export function validateGMResponse(raw: string, expectedSnapshot: string, expect
       outcome: (item.outcome as string).trim(),
       canon_basis: item.canon_basis as string[],
       proposed_changes: item.proposed_changes as string[],
-      unresolved_questions: item.unresolved_questions as string[]
+      unresolved_questions: item.unresolved_questions as string[],
+      world_time: worldTime as GMProposal["world_time"]
     }
   };
 }
