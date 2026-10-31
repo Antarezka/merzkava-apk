@@ -19,6 +19,7 @@ import { getLedgerLog, initializeLedgerNotifications, showLedgerProposalBubble }
 import { startFloatingMode, requestFloatingOverlayPermission, getFloatingReadiness, requestFloatingNotifications, requestFloatingBatteryExemption, showFloatingBubble, stopFloatingService, type FloatingReadiness } from "./native/floating-window";
 import { floatingControlMarkup } from "./app/floating-control";
 import { animateOpeningSplash } from "./ui/splash-animation";
+import { closeLoreEntry, openLoreEntry, setLoreCategory, setLoreSearch, renderLoreResults } from "./lore/lore-library";
 
 const app = document.querySelector<HTMLDivElement>("#app");
 if (!app) throw new Error("App root element was not found.");
@@ -103,7 +104,7 @@ async function playEntrySplash(): Promise<void> {
 const navigation: { id: ScreenId; label: string; icon: string }[] = [
   { id: "home", label: "Home", icon: "⌂" }, { id: "gameplay", label: "Play", icon: "✧" },
   { id: "character", label: "Character", icon: "◉" }, { id: "inventory", label: "Inventory", icon: "▤" },
-  { id: "map", label: "Map", icon: "⌖" }, { id: "journal", label: "Journal", icon: "☷" },
+  { id: "map", label: "Lore", icon: "⌘" }, { id: "journal", label: "Journal", icon: "☷" },
   { id: "settings", label: "Settings", icon: "⚙" }
 ];
 
@@ -875,6 +876,22 @@ root.addEventListener("click", async (event: MouseEvent) => {
     }
     return;
   }
+  const loreOpen = target.closest<HTMLElement>("[data-lore-open]");
+  if (loreOpen?.dataset.loreOpen) {
+    if (openLoreEntry(loreOpen.dataset.loreOpen)) render();
+    return;
+  }
+  if (target.closest("[data-lore-back]")) {
+    closeLoreEntry();
+    render();
+    return;
+  }
+  const loreCategory = target.closest<HTMLElement>("[data-lore-category]");
+  if (loreCategory?.dataset.loreCategory) {
+    setLoreCategory(loreCategory.dataset.loreCategory);
+    render();
+    return;
+  }
   const button = target.closest<HTMLButtonElement>("[data-screen]");
   const nextScreen = button?.dataset.screen as ScreenId | undefined;
   if (!nextScreen || !navigation.some(item => item.id === nextScreen)) return;
@@ -887,6 +904,15 @@ root.addEventListener("click", async (event: MouseEvent) => {
   activeScreen = nextScreen;
   notice = "";
   render();
+});
+
+root.addEventListener("input", event => {
+  const target = event.target;
+  if (target instanceof HTMLInputElement && target.id === "lore-search") {
+    setLoreSearch(target.value);
+    const results = root.querySelector<HTMLElement>("#lore-results");
+    if (results) results.innerHTML = renderLoreResults();
+  }
 });
 
 root.addEventListener("change", event => {
