@@ -165,6 +165,127 @@ export const LORE_ENTRIES: LoreEntry[] = [
     ],
     sourcePath: "world/HISTORY.md", sourceLabel: "World History"
   }
+
+  {
+    id: "jun-haotian", title: "Jun Haotian", aliases: ["君昊天", "Emperor Jun Haotian"],
+    category: "PEOPLES", eyebrow: "IMPERIAL HOUSEHOLD · CHARACTER FILE", summary: "Kaisar Golden Dragon Empire dan kepala keluarga kekaisaran Jun.",
+    paragraphs: [
+      "Jun Haotian tercatat sebagai Kaisar Golden Dragon Empire. Kedudukannya menempatkannya pada pusat pemerintahan kekaisaran di Longyuan.",
+      "Register karakter resmi mencatatnya sebagai ayah Jun Ruiyuan dan Jun Yuejin, serta suami Shen Yuehua. Kediaman kekaisaran yang tepat belum ditetapkan dalam catatan publik.",
+      "Detail kepribadian, agenda pribadi, dan keputusan yang belum tercatat tidak boleh disimpulkan hanya dari gelar kekaisarannya."
+    ],
+    sourcePath: "regions/golden-dragon-empire/npcs/JUN_HAOTIAN.md", sourceLabel: "Jun Haotian · Canonical NPC Profile"
+  },
+  {
+    id: "shen-yuehua", title: "Shen Yuehua", aliases: ["沈月华", "Empress Shen Yuehua"],
+    category: "PEOPLES", eyebrow: "IMPERIAL HOUSEHOLD · CHARACTER FILE", summary: "Permaisuri Golden Dragon Empire dan anggota cabang utama keluarga Shen.",
+    paragraphs: [
+      "Shen Yuehua tercatat sebagai Permaisuri Golden Dragon Empire dan anggota cabang utama keluarga Shen.",
+      "Ia merupakan istri Jun Haotian serta ibu Jun Ruiyuan dan Jun Yuejin. Longyuan adalah wilayah afiliasi keluarga kekaisaran; lokasi kediaman pribadinya tidak ditentukan secara rinci.",
+      "Informasi yang belum tercatat mengenai watak, agenda, dan aktivitas pribadinya tetap dibiarkan terbuka."
+    ],
+    sourcePath: "regions/golden-dragon-empire/npcs/SHEN_YUEHUA.md", sourceLabel: "Shen Yuehua · Canonical NPC Profile"
+  },
+  {
+    id: "jun-ruiyuan", title: "Jun Ruiyuan", aliases: ["君睿渊", "Crown Prince Jun Ruiyuan"],
+    category: "PEOPLES", eyebrow: "IMPERIAL HOUSEHOLD · CHARACTER FILE", summary: "Putra tertua keluarga kekaisaran Jun dan Putra Mahkota Golden Dragon Empire.",
+    paragraphs: [
+      "Jun Ruiyuan tercatat sebagai Putra Mahkota dan anak tertua Jun Haotian serta Shen Yuehua.",
+      "Afiliasi wilayahnya adalah Longyuan. Catatan resmi tidak menetapkan kediaman persis maupun seluruh kegiatan hariannya.",
+      "Gelar Putra Mahkota menjelaskan kedudukan publiknya, bukan bukti otomatis tentang sifat, kemampuan, atau keputusan yang belum tercatat."
+    ],
+    sourcePath: "regions/golden-dragon-empire/npcs/JUN_RUIYUAN.md", sourceLabel: "Jun Ruiyuan · Canonical NPC Profile"
+  },
+  {
+    id: "jun-yuejin", title: "Jun Yuejin", aliases: ["君月瑾", "Princess Jun Yuejin"],
+    category: "PEOPLES", eyebrow: "IMPERIAL HOUSEHOLD · CHARACTER FILE", summary: "Putri kekaisaran Golden Dragon Empire, anak kedua Jun Haotian dan Shen Yuehua.",
+    paragraphs: [
+      "Jun Yuejin adalah putri kekaisaran dan anak kedua Jun Haotian serta Shen Yuehua. Usianya tercatat 16 tahun.",
+      "Ia memiliki Martial Soul Golden Celestial Crane — Myth. Rincian Spirit Realm, Spirit Ring, teknik, dan kemampuan lainnya belum ditetapkan dalam profil yang tersedia.",
+      "Longyuan merupakan wilayah rumah keluarganya. Lokasi kediaman kekaisaran secara tepat belum dicatat."
+    ],
+    sourcePath: "regions/golden-dragon-empire/npcs/JUN_YUEJIN.md", sourceLabel: "Jun Yuejin · Canonical NPC Profile"
+  },
+  {
+    id: "ji-haoyuan", title: "Ji Haoyuan", aliases: ["姬浩远", "Maharaja Ji Haoyuan"],
+    category: "PEOPLES", eyebrow: "TIANHAI RULING FAMILY · CHARACTER FILE", summary: "Maharaja Tianhai Yunzhou dari keluarga penguasa Ji.",
+    paragraphs: [
+      "Ji Haoyuan tercatat sebagai Maharaja Tianhai Yunzhou dan anggota keluarga penguasa Ji.",
+      "Yunxiao Terrace merupakan kawasan pemerintahan resmi Tianhai. Namun, lokasi keberadaan pribadinya saat ini tidak otomatis dapat disimpulkan dari kedudukan tersebut.",
+      "Profil kanonis menjadi rujukan untuk fakta publik tentang dirinya. Detail yang belum ditetapkan tidak diisi dengan dugaan."
+    ],
+    sourcePath: "regions/tianhai-yunzhou/npcs/JI_HAOYUAN.md", sourceLabel: "Ji Haoyuan · Canonical NPC Profile"
+  },
+  {
+    id: "bai-xuanyin", title: "Bai Xuanyin", aliases: ["白玄音"],
+    category: "PEOPLES", eyebrow: "TIANHAI HISTORY · CHARACTER FILE", summary: "Arcanist Grade 10 yang dikenang sebagai tokoh penting Tianhai dan pencipta Artificial Artifact; telah wafat.",
+    paragraphs: [
+      "Bai Xuanyin tercatat sebagai Arcanist Grade 10 dan tokoh perempuan yang dikenang dalam sejarah Tianhai Yunzhou.",
+      "Ia dikenal sebagai pencipta Artificial Artifact dan wafat pada masa Great Tianhai War. Riwayatnya menjadi bagian dari ingatan sejarah serta perkembangan pengetahuan artefak di Tianhai.",
+      "Rincian karya, blueprint, dan peristiwa sejarah yang berkaitan dengannya harus mengikuti profil serta dokumen artefak resmi."
+    ],
+    sourcePath: "regions/tianhai-yunzhou/npcs/BAI_XUANYIN.md", sourceLabel: "Bai Xuanyin · Canonical NPC Profile"
+  },
+  {
+    id: "ji-zhaoning", title: "Ji Zhaoning", aliases: ["姬昭宁"],
+    category: "PEOPLES", eyebrow: "TIANHAI RULING FAMILY · CHARACTER FILE", summary: "Putri kembar yang lebih tua dalam keluarga penguasa Ji, dengan fokus pada pengembangan Arcanist.",
+    paragraphs: [
+      "Ji Zhaoning adalah putri kembar yang lebih tua dalam keluarga penguasa Tianhai Yunzhou. Registry mencatatnya belum mengalami Awakening.",
+      "Fokus yang tercatat untuknya adalah pengembangan Arcanist. Detail institusi, Grade, agenda pribadi, dan lokasi terkini tidak boleh diasumsikan bila belum tercatat.",
+      "Hubungan keluarganya dan status publiknya mengikuti profil kanonis."
+    ],
+    sourcePath: "regions/tianhai-yunzhou/npcs/JI_ZHAONING.md", sourceLabel: "Ji Zhaoning · Canonical NPC Profile"
+  },
+  {
+    id: "ji-ningzhao", title: "Ji Ningzhao", aliases: ["姬宁昭"],
+    category: "PEOPLES", eyebrow: "TIANHAI RULING FAMILY · CHARACTER FILE", summary: "Putri kembar yang lebih muda dalam keluarga penguasa Ji dan seorang kultivator yang telah Awakening.",
+    paragraphs: [
+      "Ji Ningzhao adalah putri kembar yang lebih muda dalam keluarga penguasa Tianhai Yunzhou. Registry mencatatnya sebagai kultivator yang telah mengalami Awakening.",
+      "Rincian Spirit Realm, Martial Soul, Spirit Ring, teknik, serta agenda pribadinya harus diperiksa pada profil kanonis, bukan disimpulkan dari status keluarga."
+    ],
+    sourcePath: "regions/tianhai-yunzhou/npcs/JI_NINGZHAO.md", sourceLabel: "Ji Ningzhao · Canonical NPC Profile"
+  },
+  {
+    id: "beiming-han", title: "Beiming Han", aliases: ["北冥寒", "Leluhur Utara"],
+    category: "PEOPLES", eyebrow: "BEIMING GU · CHARACTER FILE", summary: "Leluhur Utara dan figur tertinggi Beiming Gu yang dikenal dalam catatan publik.",
+    paragraphs: [
+      "Beiming Han dikenal dengan gelar Leluhur Utara dan tercatat sebagai figur tertinggi Beiming Gu. Ia merupakan bagian dari garis pendiri kekuasaan utara.",
+      "Profil publiknya menyebut Martial Soul Blue-Flame Silver Tiger. Ia juga dikenal sebagai ayah angkat Beiming Xenhwa dan Beiming Jingheng.",
+      "Keberadaan afiliasi Beiming Gu tidak memastikan lokasi fisiknya setiap saat. Informasi yang secara khusus dibatasi untuk GM tidak ditampilkan dalam arsip publik ini."
+    ],
+    sourcePath: "regions/beiming-gu/npcs/BEIMING_HAN.md", sourceLabel: "Beiming Han · Canonical NPC Profile"
+  },
+  {
+    id: "beiming-xenhwa", title: "Beiming Xenhwa", aliases: ["北冥玄华"],
+    category: "PEOPLES", eyebrow: "BEIMING GU · CHARACTER FILE", summary: "Putri angkat Beiming Han, berusia 17 tahun, dengan garis keturunan half-beast rubah berekor sembilan putih.",
+    paragraphs: [
+      "Beiming Xenhwa tercatat sebagai putri angkat Beiming Han. Usianya 17 tahun dan ia merupakan half-beast dengan ciri white nine-tailed fox.",
+      "Profil resmi membedakan api putih miliknya dari api biru milik Beiming Han. Afiliasinya adalah Beiming Gu, tetapi keberadaan fisiknya saat ini tidak boleh ditebak.",
+      "Detail kemampuan, batas pribadi, dan hubungan lain harus mengikuti profil lengkapnya."
+    ],
+    sourcePath: "regions/beiming-gu/npcs/BEIMING_XENHWA.md", sourceLabel: "Beiming Xenhwa · Canonical NPC Profile"
+  },
+  {
+    id: "floating-island-artifact", title: "Floating Island Support System", aliases: ["Tier 9 Artificial Artifact", "Floating Island Support Artifact", "Tianhai floating island"],
+    category: "ARCHIVES", eyebrow: "ARTIFICIAL ARTIFACT · OBJECT FILE", summary: "Artefak buatan Tier 9 yang menopang keberadaan pulau terapung Tianhai Yunzhou.",
+    paragraphs: [
+      "Tianhai Yunzhou ditopang oleh sebuah Artificial Artifact Tier 9. Fungsi yang telah dikonfirmasi adalah mempertahankan keberadaan pulau raksasa terapung tersebut.",
+      "Artefak ini merupakan aset strategis bagi kekuasaan maritim. Sumber lore mengaitkan sistem penopangnya dengan energi cair hasil pemurnian Tianhai dari material energi tertentu.",
+      "Pembuat, susunan internal, kebutuhan perawatan, titik lemah, dan fungsi tambahan yang belum dicatat tetap tidak diketahui. Fungsi penopang pulau tidak boleh diperluas menjadi kemampuan tempur atau teleportasi tanpa bukti."
+    ],
+    sourcePath: "world/ARTIFICIAL_ARTIFACTS.md", sourceLabel: "Artificial Artifacts"
+  },
+  {
+    id: "world-knowledge-tower", title: "World Knowledge Tower", aliases: ["Tower Relic", "Menara Pengetahuan Dunia"],
+    category: "ARCHIVES", eyebrow: "ANCIENT RELIC · OBJECT FILE", summary: "Relik ilahi kuno dari Early Golden Age yang terhubung dengan jaringan pengetahuan dan penilaian ancaman dunia.",
+    paragraphs: [
+      "World Knowledge Tower dikenal sebagai relik ilahi kuno dari Early Golden Age. Ia memiliki kedudukan penting dalam jaringan pengetahuan dan respons terhadap ancaman yang dapat membahayakan dunia.",
+      "Menara ini tidak dimiliki oleh satu keluarga atau organisasi. Administrasi, perlindungan, pemeliharaan, dan studi yang diizinkan memiliki pembagian tanggung jawab tersendiri.",
+      "Asal-usul lengkap, mekanisme, dan seluruh kemampuan relik tidak boleh diasumsikan hanya dari statusnya sebagai peninggalan ilahi."
+    ],
+    sourcePath: "world/RUINED_ARCHIVER.md", sourceLabel: "Ruined Archiver & World Knowledge Tower"
+  }
+
 ];
 
 const CATEGORY_LABELS: Record<LoreCategory | "ALL", string> = {
