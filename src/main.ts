@@ -5,7 +5,7 @@ import { initializeDatabase } from "./database/database";
 import { createCharacter, deleteCharacter, listCharacters, type Character } from "./characters/character-repository";
 import { validateCharacterDraft } from "./engine/character-validation";
 import { renderScreen, type ScreenId } from "./app/screens";
-import { getCanonIndex, getCanonStatus, loadCanonModule, loadPlayerRegistry, refreshCanon, type CanonDocument } from "./canon/canon-loader";
+import { activateCanonSnapshot, getCanonIndex, getCanonStatus, loadCanonModule, loadPlayerRegistry, refreshCanon, type CanonDocument } from "./canon/canon-loader";
 import { routeCanonActivity } from "./canon/canon-router";
 import { assembleGameplayContext } from "./canon/context-assembler";
 import { requestGMProposal, validateGMResponse, type GMProposal } from "./engine/gm-engine";
