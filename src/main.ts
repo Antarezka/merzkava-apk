@@ -748,7 +748,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
         snapshotSha: activeSha,
         canonVersion: activeStatus.version,
         profileMarkdown: activeProfileMarkdown,
-        stateJson: JSON.stringify({ status: "unverified", worldTime: { ...worldTime }, lastProposal: { snapshot: gmProposal.snapshot, version: gmProposal.version, proposedChanges: gmProposal.proposed_changes }, note: "GM proposals are not authoritative state; deterministic reconciliation is not implemented yet." }),
+        stateJson: JSON.stringify({ status: "unverified", worldTime: { ...worldTime }, transcript: activeChat.messages, lastProposal: { snapshot: gmProposal.snapshot, version: gmProposal.version, proposedChanges: gmProposal.proposed_changes }, note: "GM proposals are not authoritative state; deterministic reconciliation is not implemented yet." }),
         stateVerified: false,
         updatedAt: new Date().toISOString()
       });
