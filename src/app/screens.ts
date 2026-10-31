@@ -32,6 +32,7 @@ function ledgerLogMarkup(entries: LedgerEntry[]): string {
     <li class="ledger-log-entry tone-${entry.tone}">
       <div class="ledger-log-meta"><span>${escapeHtml(entry.title)}</span><time datetime="${escapeHtml(entry.createdAt)}">${escapeHtml(new Date(entry.createdAt).toLocaleString())}</time></div>
       <strong>${escapeHtml(entry.change)}</strong>
+      ${entry.labelCategory && entry.label ? canonLabelMarkup(entry.labelCategory, entry.label, entry.stage) : ""}
       ${entry.before || entry.after ? `<p>${escapeHtml(entry.before ?? "")}${entry.before && entry.after ? " → " : ""}${escapeHtml(entry.after ?? "")}</p>` : ""}
       ${entry.detail ? `<small>${escapeHtml(entry.detail)}</small>` : ""}
     </li>`).join("") + "</ol>";
