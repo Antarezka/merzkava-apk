@@ -268,6 +268,53 @@ function snapshotBlindMarkup(): string {
     </div>
   </section>`;
 }
+type BugReport = { title: string; stage: string; message: string; stack: string; timestamp: string; source: string };
+let bugReport: BugReport | null = null;
+let bugPanelMinimized = false;
+function recordBug(error: unknown, stage: string, source = "Merzkava"): void {
+  const message = error instanceof Error ? error.message : String(error ?? "Unknown error");
+  bugReport = {
+    title: stage,
+    stage,
+    message,
+    stack: error instanceof Error ? (error.stack ?? "") : "",
+    timestamp: new Date().toISOString(),
+    source
+  };
+  bugPanelMinimized = false;
+}
+function bugReportText(): string {
+  if (!bugReport) return "";
+  return [
+    "MERZKAVA BUG REPORT",
+    "Stage: " + bugReport.stage,
+    "Source: " + bugReport.source,
+    "Time: " + bugReport.timestamp,
+    "Error: " + bugReport.message,
+    "App screen: " + activeScreen,
+    "Android/WebView: " + navigator.userAgent,
+    "Viewport: " + window.innerWidth + "x" + window.innerHeight,
+    "Floating readiness: " + JSON.stringify(floatingReadiness),
+    bugReport.stack ? "Stack:\\n" + bugReport.stack : ""
+  ].filter(Boolean).join("\\n");
+}
+function bugPanelMarkup(): string {
+  if (!bugReport) return "";
+  if (bugPanelMinimized) return '<button class="bug-report-minimized" data-bug-restore type="button">⚠ Bug report · Open</button>';
+  return `<div class="bug-report-backdrop" role="presentation">
+    <section class="bug-report-panel" role="alertdialog" aria-modal="false" aria-labelledby="bug-report-title">
+      <div class="bug-report-heading"><span>MERZKAVA · DIAGNOSTICS</span><span>ERROR</span></div>
+      <h2 id="bug-report-title">${escapeHtml(bugReport.title)}</h2>
+      <p class="bug-report-message">${escapeHtml(bugReport.message)}</p>
+      <p class="bug-report-hint">Salin laporan ini lalu kirimkan ke developer. Laporan berisi detail teknis perangkat dan error, bukan isi percakapan.</p>
+      <div class="bug-report-actions">
+        <button type="button" data-bug-copy>Salin laporan</button>
+        <button type="button" data-bug-minimize>Minimize</button>
+        <button type="button" data-bug-dismiss>OK</button>
+      </div>
+    </section>
+  </div>`;
+}
 function render(): void {
   const isControl = activeScreen === "control";
   const content = isControl
@@ -376,6 +423,35 @@ root.addEventListener("click", async (event: MouseEvent) => {
     "button:not(:disabled), a[href], [role='button'], [role='tab'], [role='menuitem'], input:not([type='hidden']):not(:disabled), select:not(:disabled), textarea:not(:disabled), summary"
   );
   if (interactive) playButtonSound();
+
+  const bugCopyButton = target.closest<HTMLButtonElement>("[data-bug-copy]");
+  if (bugCopyButton) {
+    const report = bugReportText();
+    try {
+      if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(report);
+      else {
+        const field = document.createElement("textarea");
+        field.value = report;
+        field.setAttribute("readonly", "");
+        field.style.position = "fixed";
+        field.style.opacity = "0";
+        document.body.append(field);
+        field.select();
+        const copied = document.execCommand("copy");
+        field.remove();
+        if (!copied) throw new Error("Clipboard API tidak tersedia di perangkat ini.");
+      }
+      bugCopyButton.textContent = "Tersalin ✓";
+    } catch (error) {
+      bugCopyButton.textContent = "Gagal menyalin";
+      recordBug(error, "Copy bug report", "Diagnostics");
+      render();
+    }
+    return;
+  }
+  if (target.closest("[data-bug-minimize]")) { bugPanelMinimized = true; render(); return; }
+  if (target.closest("[data-bug-restore]")) { bugPanelMinimized = false; render(); return; }
+  if (target.closest("[data-bug-dismiss]")) { bugReport = null; render(); return; }
 
   const floatingAction = target.closest<HTMLButtonElement>("[data-floating-action]");
   if (floatingAction) {
@@ -489,7 +565,7 @@ root.addEventListener("click", async (event: MouseEvent) => {
       await signOut();
       authMessage = "Signed out successfully.";
     } catch (error) {
-      authMessage = error instanceof Error ? error.message : "Could not clear the local session.";
+      recordBug(error, "Sign out", "Authentication");\n    authMessage = error instanceof Error ? error.message : "Could not clear the local session.";
     }
     authBusy = false;
     render();
@@ -560,7 +636,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       const session = await signInWithPassword(email, password);
       authMessage = "Signed in as " + (session.user.email ?? session.user.id) + ".";
     } catch (error) {
-      authMessage = error instanceof Error ? error.message : "Sign-in failed.";
+      recordBug(error, "Sign in", "Authentication");\n      authMessage = error instanceof Error ? error.message : "Sign-in failed.";
     }
     authBusy = false;
     render();
@@ -631,7 +707,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       const action = root.querySelector<HTMLTextAreaElement>("#gameplay-action");
       if (action) action.value = "";
     } catch (error) {
-      notice = error instanceof Error ? error.message : "Game Master gagal merespons.";
+      recordBug(error, "Game Master response", "Gameplay");\n      notice = error instanceof Error ? error.message : "Game Master gagal merespons.";
       const feed = root.querySelector<HTMLElement>("#conversation-feed");
       if (feed) feed.insertAdjacentHTML("beforeend", '<p class="canon-status" role="alert">' + escapeHtml(notice) + '</p>');
     } finally {
@@ -675,7 +751,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
         ? `Router memilih ${result.modules.length} modul dan berhasil memuat ${result.loaded.length} dari snapshot ${result.loaded[0].commitSha.slice(0,7)}.${result.skipped.length ? " Gagal: " + result.skipped.join(" | ") : ""}`
         : `Tidak ada modul yang cocok atau modul gagal dimuat.${result.skipped.length ? " " + result.skipped.join(" | ") : ""}`;
     } catch (error) {
-      canonRouteMessage = error instanceof Error ? error.message : "Canon Router gagal.";
+      recordBug(error, "Canon Router", "Canon");\n      canonRouteMessage = error instanceof Error ? error.message : "Canon Router gagal.";
     }
     canonRouteBusy = false;
     render();
@@ -690,7 +766,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       canonDocument = await loadCanonModule(path);
       canonMessage = `Modul ${canonDocument.path} berhasil dimuat.`;
     } catch (error) {
-      canonMessage = error instanceof Error ? error.message : "Modul gagal dimuat.";
+      recordBug(error, "Load canon module", "Canon");\n      canonMessage = error instanceof Error ? error.message : "Modul gagal dimuat.";
     }
     render();
     return;
@@ -716,7 +792,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     notice = "Character created and saved on this device.";
     render();
   } catch (error) {
-    if (errorNode) errorNode.textContent = error instanceof Error ? error.message : "Could not save character.";
+    recordBug(error, "Save character", "Character storage");\n    if (errorNode) errorNode.textContent = error instanceof Error ? error.message : "Could not save character.";
   }
 });
 
