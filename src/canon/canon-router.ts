@@ -11,6 +11,7 @@ export interface CanonRouteResult {
   modules: CanonModule[];
   loaded: CanonDocument[];
   skipped: string[];
+  requiredPaths: string[];
 }
 
 const MODULE_PATH = /(?:[A-Za-z0-9_.-]+\/)*[A-Za-z0-9_.-]+\.md/g;
@@ -96,8 +97,12 @@ export async function routeCanonActivity(activity: string, limit = 5): Promise<C
     try {
       loaded.push(await loadCanonModule(module.path));
     } catch (error) {
-      skipped.push(`${module.path}: ${error instanceof Error ? error.message : "gagal dimuat"}`);
+      const detail = `${module.path}: ${error instanceof Error ? error.message : "gagal dimuat"}`;
+      skipped.push(detail);
+      if (REQUIRED_GAMEPLAY_PATHS.includes(module.path)) throw new Error(`BOOTSTRAP FAIL-CLOSED — sumber wajib tidak tersedia: ${detail}`);
     }
   }
-  return { query: activity, modules: selected, loaded, skipped };
+  const missing = REQUIRED_GAMEPLAY_PATHS.filter(path => !loaded.some(document => document.path === path));
+  if (missing.length) throw new Error("BOOTSTRAP FAIL-CLOSED — modul wajib belum lengkap: " + missing.join(", "));
+  return { query: activity, modules: selected, loaded, skipped, requiredPaths: [...REQUIRED_GAMEPLAY_PATHS] };
 }
