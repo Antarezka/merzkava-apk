@@ -126,8 +126,23 @@ export function parseGameplayResponseProfile(response: string): GameplayResponse
   for (let i = 0; i < 3; i++) {
     if (!boundaries[i]) continue;
     const parsed = findFieldLines(boundaries[i], panelFields[i]);
+    const fieldPositions = panelFields[i].map(field => boundaries[i].indexOf(field + ":"));
+    if (fieldPositions.some((position, index) => position < 0 || (index > 0 && position <= fieldPositions[index - 1]))) {
+      errors.push("Urutan field pada panel ke-" + (i + 1) + " tidak sesuai template resmi.");
+    }
     Object.assign(values, parsed.values);
     errors.push(...parsed.errors);
+  }
+  const requiredFrames = [
+    ["╱━━━━━━━━━━━━━━━━━━━━━━╲", "╲━━━━━━━━━━━━━━━━━━━━━━╱"],
+    ["╱━━━━━━━━━━━━━━━━━━━━━━╲", "╲━━━━━━━━━━━━━━━━━━━━━━╱"],
+    ["╱━━━━━━━━━━━━━━━━━━━━╲", "╲━━━━━━━━━━━━━━━━━━━━╱"],
+    ["╱━━━━━━━━━━━━━━━━━━━━━━╲", "╲━━━━━━━━━━━━━━━━━━━━━━╱"]
+  ];
+  for (let i = 0; i < 4; i++) {
+    if (boundaries[i] && requiredFrames[i].some(frame => !boundaries[i].includes(frame))) {
+      errors.push("Bingkai panel ke-" + (i + 1) + " tidak sama dengan kerangka literal.");
+    }
   }
   if (boundaries[3] && !/╲━━━━━━━━━━━━━━━━━━━━━━╱/.test(boundaries[3])) {
     errors.push("Panel CATATAN PEMAIN & KONSISTENSI tidak memiliki bingkai penutup resmi.");
