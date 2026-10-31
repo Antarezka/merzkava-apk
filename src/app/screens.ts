@@ -1,6 +1,13 @@
 import type { LedgerEntry } from "../ui/ledger-log";
 import { canonLabelMarkup } from "../ui/canon-labels";
 import type { Character } from "../characters/character-repository";
+import { PROFILE_FIELDS, parseCharacterProfile } from "../engine/profile-parser";
+
+const PROFILE_FIELD_GROUPS = [
+  { title: "PROFIL KARAKTER", fields: PROFILE_FIELDS.slice(0, 13) },
+  { title: "INV & KEUANGAN", fields: PROFILE_FIELDS.slice(13, 16) },
+  { title: "TEKNIK & TUJUAN", fields: PROFILE_FIELDS.slice(16, 18) }
+] as const;
 
 export type ScreenId = "home" | "gameplay" | "character" | "inventory" | "map" | "journal" | "settings";
 
@@ -9,6 +16,12 @@ function escapeHtml(value: string): string {
 }
 
 function registryProfileMarkup(character: Character): string {
+  if (!character.profileMarkdown) return "";
+  const parsed = parseCharacterProfile(character.profileMarkdown);
+  const fields = parsed.valid ? parsed.profile.fields : null;
+  const read = (label: keyof typeof PROFILE_FIELD_GROUPS[number]["fields"]): string => {
+    if (fields) return fields[label] || "Belum tercatat";
+    const escaped = String(label).replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\function registryProfileMarkup(character: Character): string {
   if (!character.profileMarkdown) return "";
   const read = (label: string): string => {
     const line = character.profileMarkdown?.split(/\r?\n/).find(item => item.trimStart().startsWith("- **" + label + ":**"));
@@ -19,11 +32,26 @@ function registryProfileMarkup(character: Character): string {
     field("Martial Soul") + field("Arcanist Grade") + field("Arcanist Focus") +
     field("Equipment") + field("Inventory") + field("Assets Bangunan") + field("Wallet (wealth)") +
     '</dl></details>';
+}");
+    const match = character.profileMarkdown?.match(new RegExp("^\\\\s*-\\\\s+\\\\*\\\\*" + escaped + ":\\\\*\\\\*\\\\s*(.*?)\\\\s*$", "m"));
+    return match?.[1]?.trim() || "Belum tercatat";
+  };
+  const display = (value: string) => value
+    .replace(/``([^\`]+)``/g, "$1")
+    .replace(/\\*\\*([^*]+)\\*\\*/g, "$1")
+    .replace(/\\*([^*]+)\\*/g, "$1");
+  const groups = PROFILE_FIELD_GROUPS.map(group =>
+    '<section class="registry-profile-group"><h4>' + group.title + '</h4><dl>' +
+    group.fields.map(label => "<dt>" + escapeHtml(label) + "</dt><dd>" + escapeHtml(display(read(label))) + "</dd>").join("") +
+    '</dl></section>'
+  ).join("");
+  const warning = parsed.valid ? "" : '<p class="registry-profile-warning">Profil belum lengkap atau formatnya tidak sesuai: ' + escapeHtml(parsed.errors.join(" ")) + '</p>';
+  return '<details class="registry-profile"><summary>FULL CHARACTER PROFILE · players.md · 18 FIELDS</summary>' + warning + groups + '</details>';
 }
 
 function characterView(characters: Character[], registryStatus: string): string {
   const cards = characters.length
-    ? characters.map(character => `<article class="character-card"><div class="record-top"><span>${escapeHtml(character.origin)}</span><span class="record-status">${character.awakened ? "AWAKENED" : "NOT AWAKENED"}</span></div><h3>${escapeHtml(character.name)}</h3><p class="muted">Age ${character.age ? character.age : "—"} · ${canonLabelMarkup("spirit-realm", character.realm)} · Cultivation ${character.cultivationLevel}</p><p class="muted">${escapeHtml(character.background || "No background recorded.")}</p>${character.registryPath ? `<span class="record-status">REGISTERED · players.md</span>${registryProfileMarkup(character)}` : `<button class="text-button danger" data-delete-character="${escapeHtml(character.id)}">Delete character</button>`}</article>`).join("")
+    ? characters.map(character => `<article class="character-card"><div class="record-top"><span>${escapeHtml(character.origin)}</span><span class="record-status">${character.registryPath ? "PINNED PROFILE" : character.awakened ? "AWAKENED" : "NOT AWAKENED"}</span></div><h3>${escapeHtml(character.name)}</h3><p class="muted">Age ${character.age ? character.age : "—"} · ${canonLabelMarkup("spirit-realm", character.realm)}${character.registryPath ? "" : " · Cultivation " + character.cultivationLevel}</p><p class="muted">${escapeHtml(character.background || "No background recorded.")}</p>${character.registryPath ? `<span class="record-status">REGISTERED · players.md</span>${registryProfileMarkup(character)}` : `<button class="text-button danger" data-delete-character="${escapeHtml(character.id)}">Delete character</button>`}</article>`).join("")
     : `<div class="empty-state compact"><h3>No character yet</h3><p>Create your first adventurer using the form above.</p></div>`;
   return `<div class="page-heading"><p class="eyebrow">YOUR IDENTITY</p><h2>Character</h2><p class="muted">Create a local character, or refresh the official players.md registry below to select a registered character.</p></div>
   <form id="character-form" class="record-card character-form">
