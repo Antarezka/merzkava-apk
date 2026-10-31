@@ -81,7 +81,7 @@ gameplay:`<section class="world-time-panel" aria-label="Waktu Merzkava Universe"
         <div id="composer-format-panel" class="composer-format-panel" hidden>
           <button type="button" data-action-format="italic" aria-label="Italic" title="Italic"><span>*</span><small>Italic</small></button>
           <button type="button" data-action-format="bold" aria-label="Bold" title="Bold"><span>**</span><small>Bold</small></button>
-          <button type="button" data-action-format="code" aria-label="Code" title="Code"><span>`</span><small>Code</small></button>
+          <button type="button" data-action-format="code" aria-label="Code" title="Code"><span>&#96;</span><small>Code</small></button>
         </div>
       </div>
     </div>
