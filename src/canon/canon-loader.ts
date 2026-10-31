@@ -136,7 +136,7 @@ export async function refreshLatestPlayerRegistry(activeSha: string): Promise<{ 
     const relativePath = decodeURIComponent(row[3].trim());
     if (!name || !relativePath.startsWith("players/") || !relativePath.endsWith(".md")) continue;
     const path = relativePath.split("/").map(encodeURIComponent).join("/");
-    const profile = await fetchText(`https://raw.githubusercontent.com/${CANON_REPOSITORY}/${shortHash}/${path}`);
+    const profile = await fetchText(`https://raw.githubusercontent.com/${CANON_REPOSITORY}/${fullSha}/${path}`);
     const ageMatch = profile.match(/^-\s*\*\*Usia:\*\*\s*(\d+)/m);
     const realmMatch = profile.match(/^-\s*\*\*Spirit Realm:\*\*\s*([^\n]+)/m);
     players.push({ name, path: relativePath, age: ageMatch ? Number(ageMatch[1]) : null, realm: realmMatch?.[1].trim() ?? "Belum ditetapkan" });
