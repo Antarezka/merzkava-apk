@@ -393,7 +393,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
         (Object.values(worldTime).some(Boolean)
           ? JSON.stringify(worldTime)
           : "No world-time fields have been reported by the GM yet. Leave them unset until the GM explicitly states them.") +
-        "\nOnly continue from this recorded GM time. Do not use the device clock or invent missing fields. In your response, return a world_time object containing only explicitly stated fields; use null for fields not stated. The GM decides flexible action duration and resulting hour.");
+        "\nOnly continue from this recorded GM time. Do not use the device clock or invent missing fields. In your response, return a world_time object containing only explicitly stated fields; use null for fields not stated. The GM decides flexible action duration and resulting hour.";
 
       gameplaySnapshot = context.snapshot;
       gameplayVersion = context.version;
