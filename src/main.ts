@@ -1,4 +1,5 @@
 import "./style.css";
+import "./ui/floating-ledger.css";
 import { cancelOpeningSequence, playButtonSound, playOpeningSequence } from "./audio/sound-effects";
 const splashLogoUrl = new URL("../Untitled78_20261030213901.png", import.meta.url).href;
 import { initializeDatabase } from "./database/database";
@@ -11,10 +12,12 @@ import { assembleGameplayContext } from "./canon/context-assembler";
 import { requestGMProposal, validateGMResponse, type GMProposal } from "./engine/gm-engine";
 import { getAuthSession, isSupabaseConfigured, restoreAuthSession, signInWithPassword, signOut } from "./auth/supabase-auth";
 import { GatewayGMProvider, isGMGatewayConfigured } from "./engine/gateway-gm-provider";
+import { initializeLedgerNotifications } from "./ui/ledger-log";
 
 const app = document.querySelector<HTMLDivElement>("#app");
 if (!app) throw new Error("App root element was not found.");
 const root = app;
+initializeLedgerNotifications();
 
 function showOpeningSplash(): HTMLDivElement {
   const splash = document.createElement("div");
