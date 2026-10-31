@@ -21,17 +21,6 @@ function registryProfileMarkup(character: Character): string {
     '</dl></details>';
 }
 
-function characterView(characters: Character[], registryStatus: string): string {");
-    const match = character.profileMarkdown?.match(new RegExp("^-\\\\s*\\\\*\\\\*" + escaped + ":\\\\*\\\\*\\\\s*(.*)$", "m"));
-    return match?.[1]?.trim() ?? "Belum tercatat";
-  };
-  const field = (label: string) => "<dt>" + escapeHtml(label) + "</dt><dd>" + escapeHtml(read(label)) + "</dd>";
-  return '<details class="registry-profile"><summary>INITIAL PROFILE · players.md</summary><dl>' +
-    field("Martial Soul") + field("Arcanist Grade") + field("Arcanist Focus") +
-    field("Equipment") + field("Inventory") + field("Assets Bangunan") + field("Wallet (wealth)") +
-    '</dl></details>';
-}
-
 function characterView(characters: Character[], registryStatus: string): string {
   const cards = characters.length
     ? characters.map(character => `<article class="character-card"><div class="record-top"><span>${escapeHtml(character.origin)}</span><span class="record-status">${character.awakened ? "AWAKENED" : "NOT AWAKENED"}</span></div><h3>${escapeHtml(character.name)}</h3><p class="muted">Age ${character.age ? character.age : "—"} · ${canonLabelMarkup("spirit-realm", character.realm)} · Cultivation ${character.cultivationLevel}</p><p class="muted">${escapeHtml(character.background || "No background recorded.")}</p>${character.registryPath ? `<span class="record-status">REGISTERED · players.md</span>${registryProfileMarkup(character)}` : `<button class="text-button danger" data-delete-character="${escapeHtml(character.id)}">Delete character</button>`}</article>`).join("")
