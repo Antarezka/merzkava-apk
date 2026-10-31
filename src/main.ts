@@ -272,7 +272,7 @@ function render(): void {
   const isControl = activeScreen === "control";
   const content = isControl
     ? floatingControlMarkup(floatingReadiness)
-    : renderScreen(activeScreen, availableCharacters(), playerRegistryMessage, activeCharacterId ? getLedgerLog(activeCharacterId) : []);
+    : renderScreen(activeScreen as ScreenId, availableCharacters(), playerRegistryMessage, activeCharacterId ? getLedgerLog(activeCharacterId) : []);
   root.innerHTML = `<div class="app-shell ${isControl ? "control-shell" : ""}">
     ${isControl ? "" : '<header class="app-header"><button class="brand" data-screen="home" aria-label="Merzkava home"><span class="brand-mark">M</span><span><small>MERZKAVA UNIVERSE</small><strong>Merzkava</strong></span></button><button class="header-settings" data-screen="settings" aria-label="Settings">⚙</button></header>'}
     ${notice ? `<p class="notice" role="status">${escapeHtml(notice)}</p>` : ""}
