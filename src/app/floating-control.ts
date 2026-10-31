@@ -15,7 +15,7 @@ export function floatingControlMarkup(state: FloatingReadiness): string {
       <div class="floating-health-row"><span>Display over the app</span>${status(state.displayOverApps)}</div>
       <div class="floating-health-row"><span>Notifications</span>${status(state.notifications)}</div>
       <div class="floating-health-row"><span>Battery exemption</span>${status(state.batteryExemption)}</div>
-      <div class="floating-health-row"><span>Service</span>${state.serviceRunning ? '<span class="floating-status ready"><i></i>RUNNING</span>' : '<span class="floating-status not-ready"><i></i>NOT RUNNING</span>'}</div>
+      <div class="floating-health-row"><span>Foreground service</span>${state.serviceRunning ? '<span class="floating-status ready"><i></i>RUNNING</span>' : '<span class="floating-status not-ready"><i></i>NOT RUNNING</span>'}</div>
     </section>
 
     <section class="floating-setup">
