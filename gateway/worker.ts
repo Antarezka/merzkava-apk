@@ -14,8 +14,8 @@ interface GMRequest {
   version: string;
 }
 
-const MAX_BODY_BYTES = 70000;
-const MAX_PROMPT_CHARS = 64000;
+const MAX_BODY_BYTES = 180000;
+const MAX_PROMPT_CHARS = 160000;
 
 function response(body: unknown, status: number, origin: string | null, env: Env): Response {
   const allowed = (env.ALLOWED_ORIGINS ?? "").split(",").map(value => value.trim()).filter(Boolean);
