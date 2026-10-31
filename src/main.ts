@@ -471,9 +471,9 @@ root.addEventListener("click", async (event: MouseEvent) => {
       } else if (action === "start-bubble") {
         await refreshFloatingReadiness();
         if (!floatingSetupComplete()) throw new Error("Selesaikan tiga izin pertama secara berurutan sebelum memulai bubble mode.");
-        activeScreen = "gameplay";
-        loadCharacterWorldTime(activeCharacterId);
-        loadCharacterChat(activeCharacterId);
+        // Run the opening scene before entering Bubble Mode, then leave the WebView on the main menu.
+        await playEntrySplash();
+        activeScreen = "home";
         render();
         await showFloatingBubble();
       } else if (action === "open-game") {
