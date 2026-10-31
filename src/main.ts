@@ -1,5 +1,5 @@
 import "./style.css";
-import { playButtonSound, playOpeningSequence } from "./audio/sound-effects";
+import { cancelOpeningSequence, playButtonSound, playOpeningSequence } from "./audio/sound-effects";
 const splashLogoUrl = new URL("../Untitled78_20261030213901.png", import.meta.url).href;
 import { initializeDatabase } from "./database/database";
 import { createCharacter, deleteCharacter, listCharacters, type Character } from "./characters/character-repository";
@@ -16,7 +16,7 @@ const app = document.querySelector<HTMLDivElement>("#app");
 if (!app) throw new Error("App root element was not found.");
 const root = app;
 
-function showOpeningSplash(): void {
+function showOpeningSplash(): HTMLDivElement {
   const splash = document.createElement("div");
   splash.className = "opening-splash";
   splash.setAttribute("role", "status");
@@ -30,15 +30,26 @@ function showOpeningSplash(): void {
       <small class="splash-tagline">THE WORLD AWAITS</small>
     </div>`;
   splash.addEventListener("animationend", event => {
-    if (event.target === splash && event.animationName === "splash-curtain") {
-      splash.remove();
-    }
+    if (event.target === splash && event.animationName === "splash-curtain") splash.remove();
   });
   document.body.append(splash);
+  return splash;
 }
 
-showOpeningSplash();
-playOpeningSequence();
+const openingSplash = showOpeningSplash();
+let openingSplashClosed = false;
+function closeOpeningSplash(): void {
+  if (openingSplashClosed) return;
+  openingSplashClosed = true;
+  openingSplash.classList.add("is-closing");
+}
+openingSplash.addEventListener("click", () => {
+  if (openingSplashClosed) return;
+  cancelOpeningSequence();
+  playButtonSound();
+  closeOpeningSplash();
+});
+void playOpeningSequence().then(closeOpeningSplash);
 
 const navigation: { id: ScreenId; label: string; icon: string }[] = [
   { id: "home", label: "Home", icon: "⌂" }, { id: "gameplay", label: "Play", icon: "✧" },

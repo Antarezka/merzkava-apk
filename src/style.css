@@ -36,7 +36,7 @@ button{font:inherit;color:inherit;cursor:pointer} button:focus-visible{outline:2
 
 
 /* Opening sequence — a quiet visual-novel-style entrance on every cold app launch. */
-.opening-splash{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;overflow:hidden;background:#090807;animation:splash-curtain 3.6s cubic-bezier(.76,0,.24,1) forwards;pointer-events:auto}
+.opening-splash{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;overflow:hidden;background:#090807;pointer-events:auto}.opening-splash.is-closing{animation:splash-curtain .48s cubic-bezier(.76,0,.24,1) forwards}
 .opening-splash::before,.opening-splash::after{position:absolute;content:"";width:min(78vw,420px);aspect-ratio:1;border:1px solid #8b603a22;border-radius:50%;pointer-events:none}
 .opening-splash::after{width:min(58vw,310px);border-color:#d39a5b18}
 .splash-content{position:relative;display:grid;justify-items:center;text-align:center;opacity:0;transform:translateY(10px);animation:splash-arrive .9s .35s ease-out forwards}
@@ -47,7 +47,7 @@ button{font:inherit;color:inherit;cursor:pointer} button:focus-visible{outline:2
 .splash-tagline{color:#88796b;font-size:8px;letter-spacing:.3em}
 @keyframes splash-arrive{to{opacity:1;transform:translateY(0)}}
 @keyframes splash-curtain{0%,78%{opacity:1}100%{opacity:0;visibility:hidden}}
-@media(prefers-reduced-motion:reduce){.opening-splash{animation-duration:1.4s}.splash-content{animation-duration:.2s;animation-delay:0s}}
+@media(prefers-reduced-motion:reduce){.opening-splash.is-closing{animation-duration:.2s}.splash-content{animation-duration:.2s;animation-delay:0s}}
 
 
 /* Canon source panel */
