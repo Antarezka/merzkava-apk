@@ -7,6 +7,8 @@ import android.content.pm.PackageManager;
 import android.app.NotificationManager;
 import android.os.PowerManager;
 import android.content.Intent;
+import android.content.Context;
+import android.os.Bundle;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -64,6 +66,7 @@ public class FloatingWindowPlugin extends Plugin {
     private static float touchRawX;
     private static float touchRawY;
     private static boolean dragged;
+    private static boolean suppressNextForegroundRestore;
     private static int resizeStartWidth;
     private static int resizeStartHeight;
 
@@ -82,7 +85,7 @@ public class FloatingWindowPlugin extends Plugin {
         result.put("displayOverApps", overlay);
         result.put("notifications", notificationReady);
         result.put("batteryExemption", batteryReady);
-        result.put("serviceRunning", isServiceRunning(context));
+        result.put("serviceRunning", FloatingKeepAliveService.isActive());
         call.resolve(result);
     }
 
@@ -147,13 +150,14 @@ public class FloatingWindowPlugin extends Plugin {
             webView = getBridge().getWebView();
             windowManager = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
             Intent service = new Intent(activity, FloatingKeepAliveService.class);
+            service.setAction(FloatingKeepAliveService.ACTION_START_BUBBLE);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) activity.startForegroundService(service);
             else activity.startService(service);
-            showBubbleMode();
+            MAIN.postDelayed(() -> activity.moveTaskToBack(true), 180);
             call.resolve();
         } catch (Exception error) {
             activity.stopService(new Intent(activity, FloatingKeepAliveService.class));
-            call.reject("Could not show the Kitty bubble: " + error.getMessage());
+            call.reject("Could not start the Kitty bubble service: " + error.getMessage());
         }
     }
 
@@ -202,21 +206,16 @@ public class FloatingWindowPlugin extends Plugin {
             activityRef = new WeakReference<>(activity);
             webView = getBridge().getWebView();
             windowManager = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
-            attachWebViewToFloatingRoot(activity);
             Intent service = new Intent(activity, FloatingKeepAliveService.class);
+            service.setAction(FloatingKeepAliveService.ACTION_HIDE_BUBBLE);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) activity.startForegroundService(service);
             else activity.startService(service);
             showWindowMode();
             webView.evaluateJavascript("document.body.classList.add('native-floating-mode')", null);
-            // Keep the host Activity alive while the overlay is attached.
-            // Moving the task to the background here can trigger an immediate
-            // onResume/restore cycle on some Android launchers, causing the
-            // floating window to blink and disappear.
             call.resolve();
         } catch (Exception error) {
             restoreToActivity();
-            activity.stopService(new Intent(activity, FloatingKeepAliveService.class));
-            call.reject("Could not open Floating Mode: " + error.getMessage());
+            call.reject("Could not open Floating Mini Window: " + error.getMessage());
         }
     }
 
@@ -358,13 +357,20 @@ public class FloatingWindowPlugin extends Plugin {
 
     private static void showWindowMode() {
         Activity activity = getActivityRef();
-        if (activity == null) return;
-        if (floatingRoot == null) {
-            if (webView == null) return;
-            attachWebViewToFloatingRoot(activity);
+        if (activity == null || webView == null) return;
+        try {
+            Intent hideBubble = new Intent(activity, FloatingKeepAliveService.class);
+            hideBubble.setAction(FloatingKeepAliveService.ACTION_HIDE_BUBBLE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) activity.startForegroundService(hideBubble);
+            else activity.startService(hideBubble);
+            if (floatingRoot == null || webView.getParent() != contentFrame) attachWebViewToFloatingRoot(activity);
+            mode = MODE_WINDOW;
+            addOverlay(floatingRoot, windowWidth, windowHeight);
+            MAIN.postDelayed(() -> activity.moveTaskToBack(true), 180);
+        } catch (Exception error) {
+            android.util.Log.e("MerzkavaFloating", "Could not attach floating mini window", error);
+            restoreToActivity();
         }
-        mode = MODE_WINDOW;
-        addOverlay(floatingRoot, windowWidth, windowHeight);
     }
 
     private static void showStripMode() {
@@ -393,20 +399,23 @@ public class FloatingWindowPlugin extends Plugin {
     private static void showBubbleMode() {
         Activity activity = getActivityRef();
         if (activity == null) return;
-        mode = MODE_BUBBLE;
-        if (bubbleView == null) {
-            bubbleView = new KittyBubbleView(activity);
-            bubbleView.setBackground(background("#263c36", "#d4af37", dp(activity, 40)));
-            bubbleView.setElevation(dp(activity, 8));
-            bubbleView.setOnTouchListener((view, event) -> {
-                if (handleDrag(view, event, false)) {
-                    if (event.getAction() == MotionEvent.ACTION_UP && !dragged) showWindowMode();
-                    return true;
-                }
-                return false;
-            });
+        try {
+            removeCurrentOverlay();
+            if (webView != null && originalParent != null && webView.getParent() != originalParent) {
+                if (webView.getParent() instanceof ViewGroup) ((ViewGroup) webView.getParent()).removeView(webView);
+                int index = Math.max(0, Math.min(originalIndex, originalParent.getChildCount()));
+                originalParent.addView(webView, index, originalLayoutParams);
+                webView.evaluateJavascript("document.body.classList.remove('native-floating-mode')", null);
+            }
+            Intent service = new Intent(activity, FloatingKeepAliveService.class);
+            service.setAction(FloatingKeepAliveService.ACTION_START_BUBBLE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) activity.startForegroundService(service);
+            else activity.startService(service);
+            mode = MODE_BUBBLE;
+            MAIN.postDelayed(() -> activity.moveTaskToBack(true), 180);
+        } catch (Exception error) {
+            android.util.Log.e("MerzkavaFloating", "Could not minimize to Kitty bubble", error);
         }
-        addOverlay(bubbleView, dp(activity, 64), dp(activity, 64));
     }
 
     private static boolean handleDrag(View view, MotionEvent event, boolean resize) {
@@ -493,22 +502,35 @@ public class FloatingWindowPlugin extends Plugin {
         }
     }
 
+    public static void onBubbleTapped(Activity activity) {
+        if (activity == null) return;
+        activityRef = new WeakReference<>(activity);
+        windowManager = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
+        suppressNextForegroundRestore = true;
+        MAIN.post(() -> showWindowMode());
+    }
+
     public static void restoreForForeground() {
+        if (suppressNextForegroundRestore) {
+            suppressNextForegroundRestore = false;
+            return;
+        }
         restoreToActivity();
     }
 
     private static void restoreToActivity() {
         Activity activity = getActivityRef();
-        if (activity == null || webView == null || originalParent == null) return;
-        if (currentOverlay == null && webView.getParent() == originalParent) return;
+        if (activity == null) return;
         MAIN.post(() -> {
             removeCurrentOverlay();
-            if (webView.getParent() instanceof ViewGroup) {
-                ((ViewGroup) webView.getParent()).removeView(webView);
+            if (webView != null && originalParent != null && webView.getParent() != originalParent) {
+                if (webView.getParent() instanceof ViewGroup) {
+                    ((ViewGroup) webView.getParent()).removeView(webView);
+                }
+                int index = Math.max(0, Math.min(originalIndex, originalParent.getChildCount()));
+                originalParent.addView(webView, index, originalLayoutParams);
+                webView.evaluateJavascript("document.body.classList.remove('native-floating-mode')", null);
             }
-            int index = Math.max(0, Math.min(originalIndex, originalParent.getChildCount()));
-            originalParent.addView(webView, index, originalLayoutParams);
-            webView.evaluateJavascript("document.body.classList.remove('native-floating-mode')", null);
             try {
                 List<ActivityManager.AppTask> tasks = ((ActivityManager) activity.getSystemService(Context.ACTIVITY_SERVICE)).getAppTasks();
                 if (!tasks.isEmpty()) tasks.get(0).moveToFront();
