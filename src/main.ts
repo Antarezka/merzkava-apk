@@ -15,7 +15,7 @@ import { getAuthSession, isSupabaseConfigured, restoreAuthSession, signInWithPas
 import { GatewayGMProvider, isGMGatewayConfigured } from "./engine/gateway-gm-provider";
 import { getLedgerLog, initializeLedgerNotifications } from "./ui/ledger-log";
 import { canonLabelMarkup } from "./ui/canon-labels";
-import { startFloatingMode, requestFloatingOverlayPermission, getFloatingReadiness, requestFloatingNotifications, requestFloatingBatteryExemption, showFloatingBubble, stopFloatingService, type FloatingReadiness } from "./native/floating-window";
+import { startFloatingMode, requestFloatingOverlayPermission, getFloatingReadiness, requestFloatingNotifications, requestFloatingBatteryExemption, openFloatingAppLinksSettings, showFloatingBubble, stopFloatingService, type FloatingReadiness } from "./native/floating-window";
 import { floatingControlMarkup } from "./app/floating-control";
 
 const app = document.querySelector<HTMLDivElement>("#app");
@@ -391,7 +391,7 @@ root.addEventListener("click", async (event: MouseEvent) => {
       } else if (action === "battery") {
         await requestFloatingBatteryExemption();
       } else if (action === "play-return") {
-        notice = "Google Play return link belum dapat diaktifkan otomatis. Tahap ini membutuhkan aplikasi terdaftar di Play Console, SHA-1 signing certificate, dan redirect URI resmi. Izin bubble tetap dapat diuji tanpa tahap ini.";
+        await openFloatingAppLinksSettings();
       } else if (action === "start-bubble") {
         await refreshFloatingReadiness();
         if (!floatingSetupComplete()) throw new Error("Selesaikan tiga izin pertama secara berurutan sebelum memulai bubble mode.");
