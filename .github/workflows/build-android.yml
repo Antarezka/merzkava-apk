@@ -96,6 +96,8 @@ jobs:
           MERZKAVA_VERSION_CODE: ${{ github.run_number }}
         run: |
           set -euo pipefail
+          export MERZKAVA_VERSION_NAME="v.1.01.${GITHUB_RUN_NUMBER}-${GITHUB_SHA:0:3}"
+          echo "MERZKAVA_VERSION_NAME=$MERZKAVA_VERSION_NAME" >> "$GITHUB_ENV"
           for name in MERZKAVA_KEYSTORE_BASE64 MERZKAVA_KEYSTORE_PASSWORD MERZKAVA_KEY_ALIAS MERZKAVA_KEY_PASSWORD; do
             if [ -z "${!name:-}" ]; then
               echo "::error::Missing GitHub Actions secret: $name. Add all four MERZKAVA signing secrets before building an update APK."
@@ -112,7 +114,7 @@ jobs:
           s, n = re.subn(r'versionCode\s+\d+', 'versionCode Integer.parseInt(System.getenv("MERZKAVA_VERSION_CODE") ?: "1")', s, count=1)
           if n != 1:
               raise SystemExit("Could not locate app versionCode in android/app/build.gradle")
-          s, n = re.subn(r'versionName\s+"[^"]+"', 'versionName "1.0." + (System.getenv("MERZKAVA_VERSION_CODE") ?: "1")', s, count=1)
+          s, n = re.subn(r'versionName\s+"[^"]+"', 'versionName System.getenv("MERZKAVA_VERSION_NAME") ?: "v.1.01.0-000"', s, count=1)
           if n != 1:
               raise SystemExit("Could not locate app versionName in android/app/build.gradle")
           signing = '''
@@ -149,6 +151,7 @@ jobs:
           MERZKAVA_VERSION_CODE: ${{ github.run_number }}
         run: |
           set -euo pipefail
+          EXPECTED_VERSION_NAME="v.1.01.${GITHUB_RUN_NUMBER}-${GITHUB_SHA:0:3}"
           APK="android/app/build/outputs/apk/debug/app-debug.apk"
           BUILD_TOOLS="$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -n 1)"
           test -s "$APK"
@@ -160,7 +163,9 @@ jobs:
           echo "APK manifest metadata:"
           "$BUILD_TOOLS/aapt" dump badging "$APK" | head -n 20
           "$BUILD_TOOLS/aapt" dump badging "$APK" | grep -q "versionCode='$MERZKAVA_VERSION_CODE'"
+          "$BUILD_TOOLS/aapt" dump badging "$APK" | grep -q "versionName='$EXPECTED_VERSION_NAME'"
           echo "Verified versionCode: $MERZKAVA_VERSION_CODE"
+          echo "Verified versionName: $EXPECTED_VERSION_NAME"
           echo "APK alignment:"
           "$BUILD_TOOLS/zipalign" -c -v 4 "$APK"
           echo "APK signature:"

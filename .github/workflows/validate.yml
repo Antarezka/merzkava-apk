@@ -20,6 +20,8 @@ jobs:
           node-version: 22
       - name: Install dependencies
         run: npm install
+      - name: Validate Android smoke-test shell syntax
+        run: bash -n scripts/emulator-smoke-test.sh
       - name: Run gameplay engine tests
         run: npm run test
       - name: Type-check and build
