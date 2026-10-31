@@ -75,6 +75,38 @@ let gameplayVersion = "";
 let gmProposal: GMProposal | null = null;
 let authMessage = "";
 let authBusy = false;
+type WorldTimeState = { era: string; year: string; season: string; date: string; weekday: string; weather: string; hour: string; cycle: string };
+const EMPTY_WORLD_TIME: WorldTimeState = { era:"", year:"", season:"", date:"", weekday:"", weather:"", hour:"", cycle:"" };
+let activeCharacterId = "";
+let worldTime: WorldTimeState = { ...EMPTY_WORLD_TIME };
+let blindOpen = false;
+const WORLD_TIME_KEY = "merzkava.world-time-by-character.v1";
+function readWorldTimeStore(): Record<string, WorldTimeState> {
+  try { return JSON.parse(localStorage.getItem(WORLD_TIME_KEY) ?? "{}") as Record<string, WorldTimeState>; }
+  catch { return {}; }
+}
+function loadCharacterWorldTime(characterId: string): void {
+  activeCharacterId = characterId;
+  worldTime = characterId ? { ...EMPTY_WORLD_TIME, ...(readWorldTimeStore()[characterId] ?? {}) } : { ...EMPTY_WORLD_TIME };
+}
+function saveCharacterWorldTime(): void {
+  if (!activeCharacterId) return;
+  const store = readWorldTimeStore();
+  store[activeCharacterId] = { ...worldTime };
+  try { localStorage.setItem(WORLD_TIME_KEY, JSON.stringify(store)); } catch { /* Keep this session in memory if storage is unavailable. */ }
+}
+function applyGMWorldTime(proposal: GMProposal): void {
+  if (proposal.world_time) {
+    for (const key of Object.keys(EMPTY_WORLD_TIME) as (keyof WorldTimeState)[]) {
+      const value = proposal.world_time[key];
+      if (typeof value === "string" && value.trim()) worldTime[key] = value.trim();
+    }
+  }
+  gameplaySnapshot = proposal.snapshot;
+  gameplayVersion = proposal.version;
+  saveCharacterWorldTime();
+  updateSessionCalendar();
+}
 
 function localDayStamp(date = new Date()): string {
   const year = date.getFullYear();
@@ -88,7 +120,6 @@ let noticeboardVisible = (() => {
   try { return localStorage.getItem(noticeboardStorageKey) !== "1"; }
   catch { return true; }
 })();
-let conversationStartedAt = new Date();
 
 function noticeboardMarkup(): string {
   return `<div class="noticeboard-backdrop" data-noticeboard-backdrop>
@@ -112,19 +143,20 @@ function noticeboardMarkup(): string {
 
 function updateSessionCalendar(): void {
   if (activeScreen !== "gameplay") return;
-  const now = new Date();
-  const weekday = root.querySelector<HTMLElement>("#session-weekday");
-  const day = root.querySelector<HTMLElement>("#session-day");
-  const monthYear = root.querySelector<HTMLElement>("#session-month-year");
-  const clock = root.querySelector<HTMLElement>("#session-clock");
-  const timezone = root.querySelector<HTMLElement>("#session-timezone");
-  const started = root.querySelector<HTMLElement>("#session-started");
-  if (weekday) weekday.textContent = new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(now).toUpperCase();
-  if (day) day.textContent = new Intl.DateTimeFormat("en-US", { day: "2-digit" }).format(now);
-  if (monthYear) monthYear.textContent = new Intl.DateTimeFormat("en-US", { month: "long", year: "numeric" }).format(now).toUpperCase();
-  if (clock) clock.textContent = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(now);
-  if (timezone) timezone.textContent = Intl.DateTimeFormat().resolvedOptions().timeZone || "DEVICE LOCAL";
-  if (started) started.textContent = new Intl.DateTimeFormat("en-GB", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(conversationStartedAt);
+  const set = (id: string, value: string) => {
+    const node = root.querySelector<HTMLElement>(id);
+    if (node) node.textContent = value;
+  };
+  set("#session-era", worldTime.era);
+  set("#session-year", worldTime.year);
+  set("#session-season", worldTime.season);
+  set("#session-day", worldTime.date);
+  set("#session-weekday", worldTime.weekday);
+  set("#session-weather", worldTime.weather);
+  set("#session-clock", worldTime.hour);
+  set("#session-cycle", worldTime.cycle);
+  set("#blind-hash", gameplaySnapshot ? gameplaySnapshot.slice(0, 7) : "");
+  set("#blind-version", gameplayVersion);
 }
 
 function escapeHtml(value: string): string {
@@ -154,12 +186,24 @@ function authPanel(): string {
     : "<form id=\"auth-form\"><label for=\"auth-email\">Email</label><input id=\"auth-email\" name=\"email\" type=\"email\" autocomplete=\"username\" maxlength=\"254\" required /><label for=\"auth-password\">Password</label><input id=\"auth-password\" name=\"password\" type=\"password\" autocomplete=\"current-password\" minlength=\"6\" maxlength=\"128\" required /><button class=\"action-button\" type=\"submit\" " + (authBusy || !configured ? "disabled" : "") + ">" + (authBusy ? "Signing in…" : "Sign in ↗") + "</button></form>";
   return "<section class=\"section-block record-card\"><div class=\"record-top\"><span>SUPABASE AUTH</span><span class=\"record-status\">" + statusLabel + "</span></div><p class=\"muted\">" + status + "</p>" + (authMessage ? "<p class=\"canon-status\" role=\"status\">" + escapeHtml(authMessage) + "</p>" : "") + configWarning + controls + "<p class=\"muted\">Create or confirm the account in your Supabase Authentication dashboard. The app never stores passwords. Native Android sessions use Android Keystore-backed secure storage; browser preview does not persist sessions.</p></section>";
 }
+function snapshotBlindMarkup(): string {
+  return `<section class="snapshot-blind ${blindOpen ? "is-open" : ""}" data-snapshot-blind aria-label="Session snapshot">
+    <button class="blind-handle" type="button" data-blind-toggle aria-expanded="${blindOpen}" aria-controls="blind-content">
+      <span class="blind-handle-line"></span><span class="blind-handle-label">SESSION SNAPSHOT</span><span class="blind-chevron">${blindOpen ? "⌃" : "⌄"}</span>
+    </button>
+    <div class="blind-content" id="blind-content">
+      <div><small>HASH · ACTIVE SNAPSHOT</small><strong id="blind-hash">${escapeHtml(gameplaySnapshot ? gameplaySnapshot.slice(0,7) : "")}</strong></div>
+      <div><small>VERSION · GM SESSION</small><strong id="blind-version">${escapeHtml(gameplayVersion)}</strong></div>
+    </div>
+  </section>`;
+}
 function render(): void {
   root.innerHTML = `<div class="app-shell">
     <header class="app-header"><button class="brand" data-screen="home" aria-label="Merzkava home"><span class="brand-mark">M</span><span><small>MERZKAVA UNIVERSE</small><strong>Merzkava</strong></span></button><button class="header-settings" data-screen="settings" aria-label="Settings">⚙</button></header>
     <main class="main-content">${notice ? `<p class="notice" role="status">${escapeHtml(notice)}</p>` : ""}${renderScreen(activeScreen, characters)}${activeScreen === "settings" ? authPanel() + canonPanel() : ""}</main>
     <nav class="bottom-nav" aria-label="Main navigation">${navigation.map(item => `<button class="nav-item ${activeScreen === item.id ? "active" : ""}" data-screen="${item.id}" ${activeScreen === item.id ? 'aria-current="page"' : ""}><span>${item.icon}</span><small>${item.label}</small></button>`).join("")}</nav>
     <div class="storage-status"><span class="status-dot"></span>${databaseMessage}</div>
+    ${activeScreen === "gameplay" ? snapshotBlindMarkup() : ""}
     ${activeScreen === "home" && noticeboardVisible ? noticeboardMarkup() : ""}
   </div>`;
   updateSessionCalendar();
@@ -173,7 +217,9 @@ async function refreshCharacters(): Promise<void> {
 let pointerStart: { x: number; y: number } | null = null;
 let suppressNextPointerClick = false;
 
+let blindDragStartY: number | null = null;
 root.addEventListener("pointerdown", event => {
+  if ((event.target as Element).closest?.("[data-blind-toggle]")) blindDragStartY = event.clientY;
   pointerStart = { x: event.clientX, y: event.clientY };
   suppressNextPointerClick = false;
 }, { passive: true });
@@ -184,11 +230,26 @@ root.addEventListener("pointermove", event => {
   if (distance > 10) suppressNextPointerClick = true;
 }, { passive: true });
 
-root.addEventListener("pointerup", () => {
+root.addEventListener("pointerup", event => {
+  if (blindDragStartY !== null) {
+    const delta = event.clientY - blindDragStartY;
+    if (Math.abs(delta) > 24) {
+      blindOpen = delta > 0;
+      const blind = root.querySelector<HTMLElement>("[data-snapshot-blind]");
+      const handle = blind?.querySelector<HTMLButtonElement>("[data-blind-toggle]");
+      blind?.classList.toggle("is-open", blindOpen);
+      handle?.setAttribute("aria-expanded", String(blindOpen));
+      const chevron = handle?.querySelector<HTMLElement>(".blind-chevron");
+      if (chevron) chevron.textContent = blindOpen ? "⌃" : "⌄";
+      suppressNextPointerClick = true;
+    }
+    blindDragStartY = null;
+  }
   pointerStart = null;
 }, { passive: true });
 
 root.addEventListener("pointercancel", () => {
+  blindDragStartY = null;
   pointerStart = null;
   suppressNextPointerClick = false;
 }, { passive: true });
@@ -252,10 +313,26 @@ root.addEventListener("click", async (event: MouseEvent) => {
     } catch (error) { notice = error instanceof Error ? error.message : "Could not delete character."; render(); }
     return;
   }
+  const blindButton = target.closest<HTMLButtonElement>("[data-blind-toggle]");
+  if (blindButton) {
+    blindOpen = !blindOpen;
+    const blind = root.querySelector<HTMLElement>("[data-snapshot-blind]");
+    if (blind) {
+      blind.classList.toggle("is-open", blindOpen);
+      blindButton.setAttribute("aria-expanded", String(blindOpen));
+      const chevron = blindButton.querySelector<HTMLElement>(".blind-chevron");
+      if (chevron) chevron.textContent = blindOpen ? "⌃" : "⌄";
+    }
+    return;
+  }
   const button = target.closest<HTMLButtonElement>("[data-screen]");
   const nextScreen = button?.dataset.screen as ScreenId | undefined;
   if (!nextScreen || !navigation.some(item => item.id === nextScreen)) return;
-  if (nextScreen === "gameplay" && activeScreen !== "gameplay") conversationStartedAt = new Date();
+  if (nextScreen === "gameplay" && activeScreen !== "gameplay") {
+    const selected = root.querySelector<HTMLSelectElement>("#gameplay-character")?.value ?? activeCharacterId;
+    loadCharacterWorldTime(selected);
+    blindOpen = false;
+  }
   activeScreen = nextScreen;
   notice = "";
   render();
@@ -289,6 +366,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     const activity = String(formData.get("activity") ?? "").trim();
     const characterId = String(formData.get("characterId") ?? "");
     if (!activity || gameplayContextBusy) return;
+    loadCharacterWorldTime(characterId);
     gameplayContextBusy = true;
     gameplayContextMessage = "Mengambil modul canon yang relevan…";
     gameplayContextText = "";
@@ -297,7 +375,14 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       const route = await routeCanonActivity(activity, 5);
       const status = getCanonStatus();
       const selectedCharacter = characters.find(character => character.id === characterId) ?? null;
+      loadCharacterWorldTime(characterId);
       const context = assembleGameplayContext(route, selectedCharacter, status.commitSha, status.version);
+      context.prompt += "\\n\\n## LAST GM-REPORTED WORLD TIME (PER CHARACTER SESSION)\\n" +
+        (Object.values(worldTime).some(Boolean)
+          ? JSON.stringify(worldTime)
+          : "No world-time fields have been reported by the GM yet. Leave them unset until the GM explicitly states them.") +
+        "\\nOnly continue from this recorded GM time. Do not use the device clock or invent missing fields. In your response, return a world_time object containing only explicitly stated fields; use null for fields not stated. The GM decides flexible action duration and resulting hour.");
+
       gameplaySnapshot = context.snapshot;
       gameplayVersion = context.version;
       gmProposal = null;
@@ -310,6 +395,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
           const result = await requestGMProposal(new GatewayGMProvider(), context);
           if (!result.valid) throw new Error(result.errors.join(" "));
           gmProposal = result.proposal;
+          applyGMWorldTime(gmProposal);
           const list = (items: string[]) => items.length ? "<ul>" + items.map(item => "<li>" + escapeHtml(item) + "</li>").join("") + "</ul>" : "<p class=\"muted\">None</p>";
           output.innerHTML = "<article class=\"record-card\"><div class=\"record-top\"><span>AI GAME MASTER</span><span class=\"record-status\">VALIDATED · NOT APPLIED</span></div><p class=\"canon-status\" role=\"status\">Response validated against snapshot " + escapeHtml(context.snapshot) + ".</p><h3>Story response</h3><p>" + escapeHtml(gmProposal.narration) + "</p><h3>Outcome</h3><p>" + escapeHtml(gmProposal.outcome) + "</p><h3>Canon basis</h3>" + list(gmProposal.canon_basis) + "<h3>Proposed changes (not applied)</h3>" + list(gmProposal.proposed_changes) + "<h3>Unresolved questions</h3>" + list(gmProposal.unresolved_questions) + "<p class=\"canon-status\">No character or save data was changed.</p></article>";
         } catch (error) {
@@ -339,6 +425,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       return;
     }
     gmProposal = result.proposal;
+    applyGMWorldTime(gmProposal);
     const list = (items: string[]) => items.length
       ? "<ul>" + items.map(item => "<li>" + escapeHtml(item) + "</li>").join("") + "</ul>"
       : "<p class=\"muted\">None</p>";
@@ -406,7 +493,6 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
 });
 
 render();
-window.setInterval(updateSessionCalendar, 1000);
 void initializeDatabase().then(async status => {
   databaseMessage = status.message;
   await refreshCharacters();

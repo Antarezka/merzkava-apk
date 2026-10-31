@@ -1,6 +1,6 @@
 import type { GameplayContext } from "../canon/context-assembler";
 
-export interface GMProposal {
+export interface GMWorldTime { era: string | null; year: string | null; season: string | null; date: string | null; weekday: string | null; weather: string | null; hour: string | null; cycle: string | null; }\n\nexport interface GMProposal {
   snapshot: string;
   version: string;
   narration: string;
@@ -40,7 +40,8 @@ export function buildGMInstruction(context: GameplayContext): string {
       outcome: "A concise, factual description of what happened.",
       canon_basis: ["Exact canon module paths used, or explain that no relevant rule was found."],
       proposed_changes: ["Human-readable proposed change; never claim it is applied."],
-      unresolved_questions: ["Questions that must be answered before resolving an uncertain outcome."]
+      unresolved_questions: ["Questions that must be answered before resolving an uncertain outcome."],
+      world_time: { era: null, year: null, season: null, date: null, weekday: null, weather: null, hour: null, cycle: null }
     }, null, 2),
     "",
     "Keep narration immersive but concise. Use empty arrays when there are no entries.",
@@ -76,6 +77,15 @@ export function validateGMResponse(raw: string, expectedSnapshot: string, expect
   for (const field of ["narration", "outcome"] as const) {
     if (typeof item[field] !== "string" || !(item[field] as string).trim()) errors.push("Field " + field + " wajib berupa teks.");
     else if ((item[field] as string).length > 12000) errors.push("Field " + field + " terlalu panjang.");
+  }
+  const timeKeys = ["era","year","season","date","weekday","weather","hour","cycle"] as const;
+  const rawTime = item.world_time && typeof item.world_time === "object" && !Array.isArray(item.world_time)
+    ? item.world_time as Record<string, unknown> : {};
+  const worldTime = {} as Record<(typeof timeKeys)[number], string | null>;
+  for (const key of timeKeys) {
+    const fieldValue = rawTime[key];
+    if (fieldValue !== undefined && fieldValue !== null && typeof fieldValue !== "string") errors.push("Field world_time." + key + " harus berupa teks atau null.");
+    worldTime[key] = typeof fieldValue === "string" && fieldValue.trim() ? fieldValue.trim() : null;
   }
   for (const field of ["canon_basis", "proposed_changes", "unresolved_questions"] as const) {
     if (!Array.isArray(item[field]) || !(item[field] as unknown[]).every(entry => typeof entry === "string")) {

@@ -138,3 +138,54 @@ button {color:inherit;} button:focus-visible {outline-color:#a68d5e;}
 .calendar-footer {padding-top:10px;border-top:1px solid #d2bd883b;color:#c7c9b7;font-size:8px;letter-spacing:.1em;}
 .calendar-footer time {color:#d2bd88;font-size:9px;letter-spacing:.04em;}
 @media(max-width:360px) {.noticeboard-panel {padding:20px 17px 16px;}.calendar-main {gap:8px;}.calendar-time strong {font-size:29px;}}
+
+
+/* Conversation-first workspace: the chat owns the screen; metadata stays secondary. */
+.app-shell:has(.conversation-window){width:100%;max-width:900px;min-height:100dvh;padding:54px 10px calc(82px + env(safe-area-inset-bottom));}
+.app-shell:has(.conversation-window) .app-header{padding:4px 2px 9px;}
+.app-shell:has(.conversation-window) .main-content{display:flex;flex-direction:column;min-height:calc(100dvh - 140px);padding:10px 0 0;}
+.app-shell:has(.conversation-window) .bottom-nav{width:100%;max-width:900px;}
+.world-time-panel{flex:0 0 auto;margin:0 0 9px;padding:10px 13px;border:1px solid #9c927a;background:linear-gradient(120deg,#e9e1cf,#f2ecde);color:#30463e;box-shadow:0 3px 12px #33483d0c;}
+.world-time-heading,.world-time-main,.world-time-details{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.world-time-heading{color:#89764e;font-size:8px;font-weight:700;letter-spacing:.16em;}
+.gm-source{color:#758174;font-size:7px;letter-spacing:.1em;}
+.world-time-main{padding:7px 0 5px;}
+.world-time-era,.world-time-clock{display:grid;gap:2px;}
+.world-time-era small,.world-time-clock small{color:#7d806f;font-size:7px;letter-spacing:.13em;}
+.world-time-era strong{font:17px Georgia,serif;color:#30463e;}
+.world-time-era span,.world-time-clock span{font-size:9px;color:#788072;}
+.world-time-era b{font-weight:600;color:#4b6054;}
+.world-time-clock{justify-items:end;}
+.world-time-clock strong{font:30px/1 Georgia,serif;font-variant-numeric:tabular-nums;color:#30463e;min-width:70px;text-align:right;}
+.world-time-details{justify-content:flex-start;flex-wrap:wrap;padding-top:7px;border-top:1px solid #c9bea7;color:#6d766b;font-size:8px;letter-spacing:.04em;}
+.conversation-window{display:flex;flex:1 1 auto;flex-direction:column;min-height:0;overflow:hidden;border:1px solid #bdb39d;background:#eee7d7;box-shadow:0 7px 22px #34473b0d;}
+.conversation-heading{display:flex;justify-content:space-between;align-items:center;flex:0 0 auto;padding:10px 13px;border-bottom:1px solid #c9bea7;color:#89764e;font-size:8px;font-weight:700;letter-spacing:.16em;}
+.conversation-heading span:last-child{color:#7c8478;font-size:7px;}
+.conversation-feed{flex:1 1 auto;min-height:180px;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:14px 13px 20px;scrollbar-width:thin;scrollbar-color:#b5a786 transparent;}
+.conversation-empty{display:grid;justify-items:center;align-content:center;min-height:180px;padding:18px 12px;text-align:center;}
+.conversation-ornament{color:#a68d5e;font:26px Georgia,serif;}
+.conversation-empty h3{margin:9px 0 5px;color:#354a40;font:22px Georgia,serif;font-weight:400;}
+.conversation-empty p{max-width:330px;margin:0;color:#788074;font-size:11px;line-height:1.65;}
+.conversation-composer{flex:0 0 auto;padding:10px 11px max(11px,env(safe-area-inset-bottom));border-top:1px solid #c9bea7;background:#e8dfcd;}
+.composer-topline{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;}
+.composer-topline label,.composer-label{color:#89764e;font-size:8px;font-weight:700;letter-spacing:.13em;}
+.composer-topline select{max-width:65%;padding:5px 7px;border:1px solid #c1b79f;background:#f5efdf;color:#34483f;font-size:10px;}
+.conversation-composer textarea{display:block;width:100%;min-height:52px;max-height:120px;resize:vertical;margin-top:5px;padding:10px 11px;border:1px solid #c1b79f;background:#f8f3e8;color:#30463e;font:13px/1.5 inherit;}
+.conversation-composer textarea:focus{outline:1px solid #a68d5e;border-color:#a68d5e;}
+.conversation-composer .action-button{width:100%;margin-top:8px;min-height:39px;}
+/* Roller blind is an independent top overlay; it never participates in chat layout. */
+.snapshot-blind{position:fixed;z-index:18;top:0;left:50%;width:min(100%,900px);transform:translateX(-50%);pointer-events:none;}
+.blind-handle{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;height:23px;padding:2px 10px;border:0;border-bottom:1px solid #8e7a51;background:linear-gradient(180deg,#e9e1cf,#d7cbb2);color:#6e674f;pointer-events:auto;touch-action:pan-y;}
+.blind-handle-line{width:24px;height:2px;border-radius:2px;background:#a58e60;}
+.blind-handle-label{font-size:7px;font-weight:700;letter-spacing:.2em;}
+.blind-chevron{font:14px Georgia,serif;}
+.blind-content{display:grid;grid-template-rows:0fr;gap:0;padding:0 14px;overflow:hidden;opacity:0;background:repeating-linear-gradient(0deg,#e7deca 0 24px,#ded4bf 25px);border-bottom:0 solid #a68d5e;box-shadow:0 7px 14px #263c3618;transition:grid-template-rows .32s cubic-bezier(.2,.7,.2,1),padding .32s ease,opacity .2s ease,border-width .32s ease;pointer-events:none;}
+.blind-content>div{display:flex;min-height:0;flex-direction:column;gap:4px;overflow:hidden;}
+.blind-content small{color:#88764e;font-size:7px;letter-spacing:.14em;}
+.blind-content strong{color:#30463e;font:15px Georgia,serif;overflow-wrap:anywhere;}
+.snapshot-blind.is-open .blind-content{grid-template-rows:1fr;gap:12px;padding:10px 15px 13px;opacity:1;border-bottom-width:1px;}
+.snapshot-blind.is-open .blind-content>div{min-height:32px;}
+.snapshot-blind.is-open .blind-content{pointer-events:auto;}
+@media(min-width:600px){.app-shell:has(.conversation-window){padding-top:60px;padding-bottom:95px}.app-shell:has(.conversation-window) .main-content{min-height:calc(100dvh - 165px)}}
+@media(max-height:650px){.app-shell:has(.conversation-window){padding-bottom:76px}.conversation-feed{min-height:120px}.world-time-panel{padding:7px 11px}.world-time-main{padding:4px 0}.conversation-composer{padding-top:7px}}
+@media(prefers-reduced-motion:reduce){.blind-content{transition:none}.conversation-feed{scroll-behavior:auto}}
