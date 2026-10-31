@@ -73,18 +73,48 @@ echo "Verifying installed package..."
 adb shell pm path com.antarezka.merzkava | tee "$DIAG_DIR/installed-package-path.txt"
 adb shell dumpsys package com.antarezka.merzkava | grep -E "versionName|versionCode|primaryCpuAbi|secondaryCpuAbi" > "$DIAG_DIR/installed-package-info.txt" || true
 
-echo "Launching Merzkava..."
-adb shell monkey -p com.antarezka.merzkava 1
-sleep 15
-if [[ -z "$(adb shell pidof com.antarezka.merzkava 2>/dev/null | tr -d '\r')" ]]; then
-  echo "Merzkava process did not remain alive after launch."
+echo "Resolving Merzkava launcher activity..."
+adb shell cmd package resolve-activity --brief \
+  -a android.intent.action.MAIN \
+  -c android.intent.category.LAUNCHER \
+  com.antarezka.merzkava > "$DIAG_DIR/launcher-activity.txt" 2>&1 || true
+cat "$DIAG_DIR/launcher-activity.txt"
+
+echo "Clearing old logcat entries and launching Merzkava directly..."
+adb logcat -c || true
+if ! timeout 30s adb shell am start \
+  -a android.intent.action.MAIN \
+  -c android.intent.category.LAUNCHER \
+  -p com.antarezka.merzkava > "$DIAG_DIR/launch.txt" 2>&1; then
+  cat "$DIAG_DIR/launch.txt"
+  echo "Android ActivityManager could not launch Merzkava."
+  collect_diagnostics
+  exit 1
+fi
+cat "$DIAG_DIR/launch.txt"
+
+echo "Waiting for Merzkava process (up to 60 seconds)..."
+APP_PID=""
+for attempt in $(seq 1 12); do
+  APP_PID="$(timeout 10s adb shell pidof com.antarezka.merzkava 2>/dev/null | tr -d '\r' || true)"
+  if [[ -n "$APP_PID" ]]; then
+    echo "Merzkava is running with PID $APP_PID (attempt $attempt)."
+    break
+  fi
+  sleep 5
+done
+
+adb logcat -d -t 6000 > "$DIAG_DIR/launch-logcat.txt" 2>&1 || true
+adb shell dumpsys activity activities > "$DIAG_DIR/activities.txt" 2>&1 || true
+
+if [[ -z "$APP_PID" ]]; then
+  echo "Merzkava process did not appear within 60 seconds."
   collect_diagnostics
   exit 1
 fi
 
-adb shell dumpsys activity activities > "$DIAG_DIR/activities.txt" 2>&1 || true
-if adb logcat -d -t 4000 | grep -E "FATAL EXCEPTION|Process: com.antarezka.merzkava" | grep -q "com.antarezka.merzkava"; then
-  echo "App crash detected in emulator logcat."
+if grep -E -A 8 "FATAL EXCEPTION|Fatal signal" "$DIAG_DIR/launch-logcat.txt" | grep -q "com.antarezka.merzkava"; then
+  echo "Merzkava-specific fatal crash detected in emulator logcat."
   collect_diagnostics
   exit 1
 fi
