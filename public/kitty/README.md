@@ -1,14 +1,12 @@
 # Kitty Layered Assets
 
-Place Kitty's separated transparent PNG layers in this folder.
+Upload Kitty's separated transparent PNG layers into these folders:
 
-Recommended filenames:
-- `body.png` — main body, head, face, hair and outfit
-- `ears.png` — cat ears
-- `tail.png` — separate tail layer
-- `shadow.png` — soft ground shadow
-- `hair-front.png` — optional loose/front hair layer
+- `body/` — complete body layer (do not create a separate `badan/` layer)
+- `kepala/` — head, face, hair and ears, unless supplied as separately approved layers
+- `ekor/` — tail for independent movement
+- `shadow/` — soft ground shadow
 
-**Important:** Keep every layer on the same canvas dimensions and preserve its original alignment. Export each layer as a transparent PNG; do not crop each part tightly. This lets the app stack and animate the layers without shifting Kitty's proportions.
+**Important:** Keep every layer on the same canvas dimensions and preserve its original alignment. Export transparent PNGs without tightly cropping individual parts, so the app can stack them without shifting Kitty's proportions.
 
-The current splash image remains unchanged until the layered assets are integrated.
+The current splash image remains unchanged until the uploaded layers are integrated and tested.
