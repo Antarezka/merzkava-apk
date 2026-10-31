@@ -113,9 +113,12 @@ jobs:
           MERZKAVA_KEYSTORE_PASSWORD: ${{ secrets.MERZKAVA_KEYSTORE_PASSWORD }}
           MERZKAVA_KEY_ALIAS: ${{ secrets.MERZKAVA_KEY_ALIAS }}
           MERZKAVA_KEY_PASSWORD: ${{ secrets.MERZKAVA_KEY_PASSWORD }}
+          MERZKAVA_VERSION_CODE: ${{ github.run_number }}
         run: ./gradlew assembleDebug
 
-      - name: Verify APK package, alignment, and signature
+      - name: Verify APK package, version, alignment, and signature
+        env:
+          MERZKAVA_VERSION_CODE: ${{ github.run_number }}
         run: |
           set -euo pipefail
           APK="android/app/build/outputs/apk/debug/app-debug.apk"
@@ -128,6 +131,8 @@ jobs:
           sha256sum "$APK"
           echo "APK manifest metadata:"
           "$BUILD_TOOLS/aapt" dump badging "$APK" | head -n 20
+          "$BUILD_TOOLS/aapt" dump badging "$APK" | grep -q "versionCode='$MERZKAVA_VERSION_CODE'"
+          echo "Verified versionCode: $MERZKAVA_VERSION_CODE"
           echo "APK alignment:"
           "$BUILD_TOOLS/zipalign" -c -v 4 "$APK"
           echo "APK signature:"
