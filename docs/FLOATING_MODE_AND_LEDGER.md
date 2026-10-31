@@ -6,9 +6,11 @@ Floating Mode uses the existing Capacitor WebView inside an Android TYPE_APPLICA
 
 ### User flow
 
-1. Open Settings and choose **Start Floating Mode**.
-2. On first use, grant Android's **Display over other apps** permission for Merzkava, return to the app, and press the action again.
-3. The mini window appears above other apps.
+1. The app opens on **Floating Control**, before the game splash screen.
+2. Complete the readiness steps in order: **Display over other apps**, **Notifications**, then **Background activity / battery**.
+3. The **Google Play return link** is a separate manual integration step and must not be marked ready until the Play Console signing certificate and redirect URI are configured.
+4. Choose **Start bubble mode** to start the foreground service and show the Kitty bubble, **Open game / continue playing** for the normal app, or **Open floating mini window** for the resizable gameplay window.
+5. **Stop service and close window** removes the overlay and stops the foreground service.
 4. Drag the title area in the native header to move the window.
 5. Drag the bottom-right grip to resize it. Width and height are bounded so the window remains usable.
 6. Use the header controls:
