@@ -8,9 +8,9 @@ function escapeHtml(value: string): string {
 
 function characterView(characters: Character[]): string {
   const cards = characters.length
-    ? characters.map(character => `<article class="character-card"><div class="record-top"><span>${escapeHtml(character.origin)}</span><span class="record-status">${character.awakened ? "AWAKENED" : "NOT AWAKENED"}</span></div><h3>${escapeHtml(character.name)}</h3><p class="muted">Age ${character.age} · ${escapeHtml(character.realm)} · Cultivation ${character.cultivationLevel}</p><p class="muted">${escapeHtml(character.background || "No background recorded.")}</p><button class="text-button danger" data-delete-character="${escapeHtml(character.id)}">Delete character</button></article>`).join("")
+    ? characters.map(character => `<article class="character-card"><div class="record-top"><span>${escapeHtml(character.origin)}</span><span class="record-status">${character.awakened ? "AWAKENED" : "NOT AWAKENED"}</span></div><h3>${escapeHtml(character.name)}</h3><p class="muted">Age ${${character.age ? character.age : "—"} · ${escapeHtml(character.realm)} · Cultivation ${character.cultivationLevel}</p><p class="muted">${escapeHtml(character.background || "No background recorded.")}</p>${character.registryPath ? `<span class="record-status">REGISTERED · players.md</span>` : `<button class="text-button danger" data-delete-character="${escapeHtml(character.id)}">Delete character</button>`}</article>`).join("")
     : `<div class="empty-state compact"><h3>No character yet</h3><p>Create your first adventurer using the form above.</p></div>`;
-  return `<div class="page-heading"><p class="eyebrow">YOUR IDENTITY</p><h2>Character</h2><p class="muted">Create a character. Its starting state is validated by the local game engine.</p></div>
+  return `<div class="page-heading"><p class="eyebrow">YOUR IDENTITY</p><h2>Character</h2><p class="muted">Create a local character, or refresh the official players.md registry below to select a registered character.</p></div>
   <form id="character-form" class="record-card character-form">
     <div class="record-top"><span>NEW CHARACTER</span><span class="record-status">MORTAL / NOT AWAKENED</span></div>
     <label for="character-name">Character name</label><input id="character-name" name="name" maxlength="40" minlength="2" placeholder="Enter a name" required />
@@ -20,7 +20,7 @@ function characterView(characters: Character[]): string {
     <p id="character-error" class="form-message" aria-live="polite"></p>
     <button class="action-button" type="submit">Create character <span>↗</span></button>
   </form>
-  <section class="section-block"><div class="section-heading"><span>YOUR CHARACTERS</span><small>${characters.length} SAVED</small></div><div class="character-list">${cards}</div></section>`;
+  <section class="section-block"><div class="section-heading"><span>PLAYER REGISTRY · players.md</span><button class="text-button" type="button" data-refresh-players>↻ Refresh players</button></div><p class="muted" id="player-registry-status">Registered characters are loaded from the pinned players.md snapshot.</p><div class="section-heading"><span>YOUR CHARACTERS</span><small>${characters.length} AVAILABLE</small></div><div class="character-list">${cards}</div></section>`;
 }
 
 const views: Record<Exclude<ScreenId, "character">, string> = {
@@ -35,7 +35,7 @@ gameplay:`<section class="world-time-panel" aria-label="Waktu Merzkava Universe"
   <div id="conversation-feed" class="conversation-feed" aria-live="polite"><div class="conversation-empty"><span class="conversation-ornament">✧</span><h3>Your story begins here</h3><p>Pilih karakter, lalu mulai sesi baru. Riwayat percakapan tersimpan terpisah untuk setiap karakter.</p></div></div>
   <div class="player-tools"><details class="player-record"><summary>Catatan karakter & status</summary><div id="player-character-record" class="player-record-content">Pilih karakter untuk melihat catatan lokalnya.</div></details><label class="gm-options-toggle"><span>Show GM options</span><select id="gm-options-setting"><option value="no">No</option><option value="yes">Yes</option></select></label></div>
   <form id="gameplay-route-form" class="conversation-composer" data-session-mode="continue">
-    <div class="composer-topline"><label for="gameplay-character">ACTIVE CHARACTER</label><select id="gameplay-character" name="characterId"><option value="">No character selected</option>{{CHARACTER_OPTIONS}}</select></div>
+    <div class="composer-topline"><label for="gameplay-character">ACTIVE CHARACTER</label><button class="text-button" type="button" data-refresh-players>↻</button><select id="gameplay-character" name="characterId"><option value="">No character selected</option>{{CHARACTER_OPTIONS}}</select></div>
     <div class="session-actions"><button class="text-button" type="button" data-start-session>＋ New session</button><span id="session-status" class="composer-status">Pilih karakter</span></div>
     <label class="composer-label" for="gameplay-action">Aksiku</label><textarea id="gameplay-action" name="activity" rows="2" maxlength="1200" placeholder="Ceritakan tindakan karaktermu…"></textarea>
     <button class="action-button" type="submit">Kirim <span>↗</span></button>
