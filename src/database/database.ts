@@ -13,7 +13,7 @@ const schema = [
   `CREATE TABLE IF NOT EXISTS gameplay_logs (id TEXT PRIMARY KEY NOT NULL, character_id TEXT NOT NULL, category TEXT NOT NULL, content TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE);`,
   `CREATE TABLE IF NOT EXISTS canon_documents (path TEXT PRIMARY KEY NOT NULL, commit_sha TEXT NOT NULL, content TEXT NOT NULL, fetched_at TEXT NOT NULL);`,
   `CREATE TABLE IF NOT EXISTS canon_documents_snapshot (path TEXT NOT NULL, commit_sha TEXT NOT NULL, content TEXT NOT NULL, fetched_at TEXT NOT NULL, PRIMARY KEY (path, commit_sha));`,
-  `CREATE TABLE IF NOT EXISTS gameplay_sessions (character_id TEXT PRIMARY KEY NOT NULL, snapshot_sha TEXT NOT NULL, canon_version TEXT NOT NULL, profile_markdown TEXT NOT NULL DEFAULT '', state_json TEXT NOT NULL DEFAULT '{}', state_verified INTEGER NOT NULL DEFAULT 0 CHECK(state_verified IN (0,1)), updated_at TEXT NOT NULL, FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE);`
+  `CREATE TABLE IF NOT EXISTS gameplay_sessions (character_id TEXT PRIMARY KEY NOT NULL, snapshot_sha TEXT NOT NULL, canon_version TEXT NOT NULL, profile_markdown TEXT NOT NULL DEFAULT '', state_json TEXT NOT NULL DEFAULT '{}', state_verified INTEGER NOT NULL DEFAULT 0 CHECK(state_verified IN (0,1)), updated_at TEXT NOT NULL);`
 ];
 
 export type DatabaseStatus = { mode: "sqlite" | "preview" | "error"; message: string };
