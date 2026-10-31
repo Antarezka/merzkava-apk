@@ -12,14 +12,13 @@ on:
       - "package-lock.json"
       - "capacitor.config.ts"
       - "vite.config.ts"
-      - ".github/workflows/build-android.yml"
 
 permissions:
   contents: read
 
 concurrency:
   group: merzkava-android-build
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   build-android:
@@ -59,6 +58,55 @@ jobs:
 
       - name: Sync Capacitor Android project
         run: npx cap sync android
+
+      - name: Configure permanent update signing and version
+        env:
+          MERZKAVA_KEYSTORE_BASE64: ${{ secrets.MERZKAVA_KEYSTORE_BASE64 }}
+          MERZKAVA_KEYSTORE_PASSWORD: ${{ secrets.MERZKAVA_KEYSTORE_PASSWORD }}
+          MERZKAVA_KEY_ALIAS: ${{ secrets.MERZKAVA_KEY_ALIAS }}
+          MERZKAVA_KEY_PASSWORD: ${{ secrets.MERZKAVA_KEY_PASSWORD }}
+          MERZKAVA_VERSION_CODE: ${{ github.run_number }}
+        run: |
+          set -euo pipefail
+          for name in MERZKAVA_KEYSTORE_BASE64 MERZKAVA_KEYSTORE_PASSWORD MERZKAVA_KEY_ALIAS MERZKAVA_KEY_PASSWORD; do
+            if [ -z "${!name:-}" ]; then
+              echo "::error::Missing GitHub Actions secret: $name. Add all four MERZKAVA signing secrets before building an update APK."
+              exit 1
+            fi
+          done
+          echo "$MERZKAVA_KEYSTORE_BASE64" | base64 --decode > android/merzkava-upload.jks
+          test -s android/merzkava-upload.jks
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          p = Path("android/app/build.gradle")
+          s = p.read_text()
+          s, n = re.subn(r'versionCode\\s+\\d+', 'versionCode Integer.parseInt(System.getenv("MERZKAVA_VERSION_CODE") ?: "1")', s, count=1)
+          if n != 1:
+              raise SystemExit("Could not locate app versionCode in android/app/build.gradle")
+          s, n = re.subn(r'versionName\\s+"[^"]+"', 'versionName "1.0." + (System.getenv("MERZKAVA_VERSION_CODE") ?: "1")', s, count=1)
+          if n != 1:
+              raise SystemExit("Could not locate app versionName in android/app/build.gradle")
+          signing = '''
+              signingConfigs {
+                  debug {
+                      storeFile file("$rootDir/merzkava-upload.jks")
+                      storePassword System.getenv("MERZKAVA_KEYSTORE_PASSWORD")
+                      keyAlias System.getenv("MERZKAVA_KEY_ALIAS")
+                      keyPassword System.getenv("MERZKAVA_KEY_PASSWORD")
+                  }
+              }
+          '''
+          if "signingConfigs {" not in s:
+              s = s.replace("android {", "android {\\n" + signing, 1)
+          if re.search(r'buildTypes\\s*\\{', s) is None:
+              raise SystemExit("Could not locate buildTypes in android/app/build.gradle")
+          s, n = re.subn(r'(buildTypes\\s*\\{)', r'\\1\\n        debug { signingConfig signingConfigs.debug }', s, count=1)
+          if n != 1:
+              raise SystemExit("Could not configure debug signing")
+          p.write_text(s)
+          print("Configured stable Merzkava signing and versionCode", __import__("os").environ["MERZKAVA_VERSION_CODE"])
+          PY
 
       - name: Build debug APK
         working-directory: android
