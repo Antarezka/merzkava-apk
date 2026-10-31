@@ -229,7 +229,7 @@ function escapeNoticeText(value: string): string {
 function highlightNoticeKeywords(value: string): string {
   let safe = escapeNoticeText(value).replace(/\*\*(.+?)\*\*/g, '<mark class="noticeboard-highlight">$1</mark>').replace(/`([^`]+)`/g, '<mark class="noticeboard-highlight">$1</mark>');
   const keywords = ["Golden Dragon Empire", "Tianhai Yunzhou", "Beiming Gu", "Merzkava Universe", "World Map", "Investigation Board", "Spirit Realms", "Spirit Rings", "Spirit Beasts", "Martial Souls", "Arcanists", "Artificial Artifacts", "character records", "regional maps", "maritime routes", "coastal shelves", "deep-sea bathymetry", "Spirit systems", "ancient ruins", "factions"];
-  const pattern = new RegExp("<[^>]+>|\\\\b(" + keywords.join("|") + ")\\\\b", "gi");
+  const pattern = new RegExp("<[^>]+>|\\b(" + keywords.join("|") + ")\\b", "gi");
   safe = safe.replace(pattern, (match, keyword: string | undefined) => keyword ? '<mark class="noticeboard-highlight">' + match + '</mark>' : match);
   return safe;
 }
