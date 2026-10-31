@@ -210,3 +210,22 @@ button {color:inherit;} button:focus-visible {outline-color:#a68d5e;}
 @media(prefers-reduced-motion:reduce) {
   .opening-splash.is-closing .splash-content,.app-shell.is-entering { animation-duration:.18s; }
 }
+
+
+/* Play warnings: a restrained red pulse on the outline only. */
+.app-shell:has(.conversation-window) > .notice,
+.conversation-window .canon-status[role="alert"] {
+  border:1px solid #7d3030;
+  background:#f2e5dc;
+  color:#743b35;
+  box-shadow:0 0 0 1px #7d303022;
+  animation:play-warning-outline 1.35s ease-in-out infinite alternate;
+}
+@keyframes play-warning-outline {
+  from { border-color:#6e2929; box-shadow:0 0 0 1px #6e292933, 0 0 3px #8e30301a; }
+  to { border-color:#e04b4b; box-shadow:0 0 0 1px #e04b4b88, 0 0 9px #d9434344; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .app-shell:has(.conversation-window) > .notice,
+  .conversation-window .canon-status[role="alert"] { animation:none; border-color:#b74343; }
+}
