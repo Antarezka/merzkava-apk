@@ -440,9 +440,10 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     activeCharacterId = characterId;
     loadCharacterWorldTime(characterId);
     if (mode === "new") activeChat = { messages: [], started: false, showOptions: activeChat.showOptions };
-    const status = getCanonStatus();
-    if (status.status !== "ready" && status.status !== "cached") { notice = "Canon belum terverifikasi. Refresh canon terlebih dahulu."; render(); return; }
-    const activeSha = status.commitSha.slice(0, 7);
+    let activeStatus = getCanonStatus();
+    if (mode === "new" && activeStatus.status !== "ready") { notice = "Sesi baru memerlukan canon aktif yang baru diverifikasi. Refresh canon terlebih dahulu."; render(); return; }
+    if (mode === "continue" && !gameplaySnapshot) { notice = "Belum ada sesi tersimpan untuk karakter ini. Tekan New session terlebih dahulu."; render(); return; }
+    const activeSha = mode === "new" ? activeStatus.commitSha.slice(0, 7) : gameplaySnapshot.slice(0, 7);
     const trigger = "analisis link berikut ini secara penuh dan pelajari dengan seksama untuk memulai permainan roleplay ini : https://raw.githubusercontent.com/Antarezka/merzkava-universe/" + activeSha + "/INDEX.md?v=1 dan https://raw.githubusercontent.com/Antarezka/merzkava-universe/" + activeSha + "/players.md?v=1 untuk Memulai permainan sebagai " + character.name + "!";
     const activity = mode === "new" ? trigger : typedActivity;
     const routeQuery = mode === "new" ? "new session character introduction starting location initial character state" : activity;
@@ -450,11 +451,12 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     const sendButton = root.querySelector<HTMLButtonElement>("#gameplay-route-form button[type=submit]");
     if (sendButton) sendButton.disabled = true;
     try {
+      if (mode === "continue") activeStatus = await activateCanonSnapshot(activeSha);
       const route = await routeCanonActivity(routeQuery, 7);
       const indexDocument = await getCanonIndex();
       if (!indexDocument || indexDocument.commitSha.slice(0, 7) !== activeSha) throw new Error("Bootstrap gagal: INDEX.md pada ACTIVE_SHA tidak tersedia.");
       const playerRegistry = mode === "new" ? await loadPlayerRegistry(activeSha) : null;
-      const context = assembleGameplayContext({ ...route, query: activity }, character, activeSha, status.version, 140000);
+      const context = assembleGameplayContext({ ...route, query: activity }, character, activeSha, activeStatus.version, 140000);
       context.prompt += "\n\n## FULL INDEX.md · HARD GATE · ACTIVE_SHA " + activeSha + "\n" + indexDocument.content;
       if (playerRegistry) context.prompt += "\n\n## FULL players.md · ACTIVE_SHA " + activeSha + "\n" + playerRegistry.content;
       const previous = mode === "new" ? [] : activeChat.messages;
@@ -465,7 +467,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
         "\n\n## LAST GM WORLD TIME\n" + (Object.values(worldTime).some(Boolean) ? JSON.stringify(worldTime) : "No time reported. Do not invent missing fields.") +
         "\nOnly use GM-reported world time. Never use device time. Preserve all established character state.";
       gameplaySnapshot = status.commitSha;
-      gameplayVersion = status.version;
+      gameplayVersion = activeStatus.version;
       if (!isGMGatewayConfigured() || !getAuthSession()) throw new Error("AI Game Master belum siap. Periksa login dan konfigurasi Gateway di Settings.");
       const result = await requestGMProposal(new GatewayGMProvider(), context);
       if (!result.valid) throw new Error(result.errors.join(" "));
