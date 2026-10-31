@@ -50,7 +50,6 @@ function validateAfterValue(field: string, value: string): string | null {
  * Candidate means structurally consistent only; canon mechanics and player approval are still required.
  */
 export function reconcileGMProposal(profile: ParsedCharacterProfile | null, proposal: GMProposal, responseProfile?: ParsedCharacterProfile | null): StateReconciliation {
-  if (!proposal.state_changes.length) return { status: "no-changes", changes: [], errors: [] };
   if (!profile) {
     return {
       status: "review-required",
@@ -112,5 +111,5 @@ export function reconcileGMProposal(profile: ParsedCharacterProfile | null, prop
     : changes.some(change => change.status === "needs-review") || errors.length
       ? "review-required"
       : "review-required";
-  return { status, changes, errors };
+  return { status: proposal.state_changes.length === 0 && errors.length === 0 ? "no-changes" : status, changes, errors };
 }
