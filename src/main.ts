@@ -11,7 +11,7 @@ import { getCanonIndex, getCanonStatus, loadCanonModule, loadPlayerRegistry, loa
 import { routeCanonActivity } from "./canon/canon-router";
 import { assembleGameplayContext } from "./canon/context-assembler";
 import { requestGMProposal, validateGMResponse, type GMProposal } from "./engine/gm-engine";
-import { parseCharacterProfile, validateCharacterProfile } from "./engine/profile-parser";
+import { parseCharacterProfile, parseGameplayResponseProfile, validateCharacterProfile } from "./engine/profile-parser";
 import { reconcileGMProposal } from "./engine/state-reconciliation";
 import { getAuthSession, isSupabaseConfigured, restoreAuthSession, signInWithPassword, signOut } from "./auth/supabase-auth";
 import { GatewayGMProvider, isGMGatewayConfigured } from "./engine/gateway-gm-provider";
@@ -737,14 +737,18 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       const savedSession = mode === "continue" ? await getGameplaySessionRecord(characterId) : null;
       if (mode === "continue" && savedSession && savedSession.snapshotSha !== activeSha) throw new Error("Save sesi dan ACTIVE_SHA berbeda. Sesi tidak boleh mencampur snapshot canon.");
       activeProfileMarkdown = mode === "new" ? (registeredProfile?.content ?? "") : (savedSession?.profileMarkdown ?? "");
-      const profileParse = parseCharacterProfile(activeProfileMarkdown);
-      const profileValidationErrors = profileParse.valid ? validateCharacterProfile(profileParse.profile) : profileParse.errors;
-      const usableProfile = profileParse.valid && profileValidationErrors.length === 0 ? profileParse.profile : null;
+      const previous = mode === "new" ? [] : activeChat.messages;
+      const latestGMMessage = [...previous].reverse().find(item => item.role === "gm");
+      const latestGMPanel = latestGMMessage ? parseGameplayResponseProfile(latestGMMessage.text) : null;
+      const baselineParse = latestGMPanel && latestGMPanel.errors.length === 0
+        ? { valid: true as const, profile: latestGMPanel.profile }
+        : parseCharacterProfile(activeProfileMarkdown);
+      const profileValidationErrors = baselineParse.valid ? validateCharacterProfile(baselineParse.profile) : baselineParse.errors;
+      const usableProfile = baselineParse.valid && profileValidationErrors.length === 0 ? baselineParse.profile : null;
       const context = assembleGameplayContext({ ...route, query: activity }, contextCharacter, activeSha, activeStatus.version, 220000);
       context.prompt = "## FULL INDEX.md · HARD GATE · ACTIVE_SHA " + activeSha + "\n" + indexDocument.content + "\n\n" + context.prompt;
       if (playerRegistry) context.prompt += "\n\n## FULL players.md · ACTIVE_SHA " + activeSha + "\n" + playerRegistry.content;
       if (registeredProfile) context.prompt += "\n\n## FULL REGISTERED CHARACTER PROFILE · " + registeredProfile.path + " · ACTIVE_SHA " + activeSha + "\n" + registeredProfile.content;
-      const previous = mode === "new" ? [] : activeChat.messages;
       context.prompt += "\n\n## VERIFIED CHARACTER PROFILE SOURCE\n" + (activeProfileMarkdown || (mode === "new" ? "No registered profile markdown is available; use the official new-character bootstrap template and preserve unknowns." : "Legacy session has no persisted verified profile source. Use its chronological transcript only as unverified continuity; do not reset the character or invent state. Ask for a verified save/profile when an action depends on missing state.")) +
         "\n\n## PERSISTED STATE TRUST\n" + (mode === "new" ? "New-session profile source is the baseline. Do not invent missing values." : (savedSession?.stateVerified ? "The persisted state record is marked verified." : "The persisted record is NOT mechanically verified. Preserve only source-backed facts; do not promote prior GM proposals or unverified changes into facts. If an action depends on an unverified value, stop and ask for reconciliation.")) +
         "\n\n## SESSION MODE\n" + (mode === "new" ? "NEW SESSION: initialize from the exact trigger below." : "CONTINUING SESSION: continue without resetting established state.") +
@@ -758,10 +762,14 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       const result = await requestGMProposal(new GatewayGMProvider(), context);
       if (!result.valid) throw new Error(result.errors.join(" "));
       gmProposal = result.proposal;
-      const stateReconciliation = reconcileGMProposal(usableProfile, gmProposal);
+      const responsePanels = parseGameplayResponseProfile(gmProposal.player_response);
+      if (responsePanels.errors.length) throw new Error("Respons GM ditolak karena tidak sesuai empat panel resmi: " + responsePanels.errors.join(" "));
+      const responseProfileErrors = validateCharacterProfile(responsePanels.profile);
+      if (responseProfileErrors.length) throw new Error("Nilai panel profil GM tidak valid: " + responseProfileErrors.join(" "));
+      const stateReconciliation = reconcileGMProposal(usableProfile, gmProposal, responsePanels.profile);
       applyGMWorldTime(gmProposal);
       activeChat.messages.push({ role: "player", text: mode === "new" ? "Memulai sesi baru sebagai " + character.name + "." : typedActivity, createdAt: new Date().toISOString() });
-      activeChat.messages.push({ role: "gm", text: gmProposal.narration + (gmProposal.outcome ? "\n\n" + gmProposal.outcome : ""), createdAt: new Date().toISOString() });
+      activeChat.messages.push({ role: "gm", text: gmProposal.player_response, createdAt: new Date().toISOString() });
       activeChat.started = true;
       form.dataset.sessionMode = "continue";
       saveCharacterChat();
@@ -770,7 +778,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
         snapshotSha: activeSha,
         canonVersion: activeStatus.version,
         profileMarkdown: activeProfileMarkdown,
-        stateJson: JSON.stringify({ status: "unverified", worldTime: { ...worldTime }, transcript: activeChat.messages, profileValidation: { valid: profileValidationErrors.length === 0, errors: profileValidationErrors }, lastProposal: { snapshot: gmProposal.snapshot, version: gmProposal.version, proposedChanges: gmProposal.proposed_changes, stateChanges: gmProposal.state_changes }, reconciliation: stateReconciliation, note: "Reconciliation checks exact profile baselines and basic field formats only. No proposal is applied; canon-mechanics verification and explicit player approval are still required." }),
+        stateJson: JSON.stringify({ status: "unverified", worldTime: { ...worldTime }, transcript: activeChat.messages, profileValidation: { valid: profileValidationErrors.length === 0, errors: profileValidationErrors }, responseProfile: responsePanels.profile.fields, lastProposal: { snapshot: gmProposal.snapshot, version: gmProposal.version, proposedChanges: gmProposal.proposed_changes, stateChanges: gmProposal.state_changes }, reconciliation: stateReconciliation, note: "Player-facing response is the exact four-panel template output. Panel fields are parsed and cross-checked against structured deltas and the prior profile. No proposal is applied; canon-mechanics verification and explicit player approval are still required." }),
         stateVerified: false,
         updatedAt: new Date().toISOString()
       });
