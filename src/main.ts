@@ -11,6 +11,8 @@ import { getCanonIndex, getCanonStatus, loadCanonModule, loadPlayerRegistry, loa
 import { routeCanonActivity } from "./canon/canon-router";
 import { assembleGameplayContext } from "./canon/context-assembler";
 import { requestGMProposal, validateGMResponse, type GMProposal } from "./engine/gm-engine";
+import { parseCharacterProfile, validateCharacterProfile } from "./engine/profile-parser";
+import { reconcileGMProposal } from "./engine/state-reconciliation";
 import { getAuthSession, isSupabaseConfigured, restoreAuthSession, signInWithPassword, signOut } from "./auth/supabase-auth";
 import { GatewayGMProvider, isGMGatewayConfigured } from "./engine/gateway-gm-provider";
 import { getLedgerLog, initializeLedgerNotifications } from "./ui/ledger-log";
@@ -735,6 +737,9 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       const savedSession = mode === "continue" ? await getGameplaySessionRecord(characterId) : null;
       if (mode === "continue" && savedSession && savedSession.snapshotSha !== activeSha) throw new Error("Save sesi dan ACTIVE_SHA berbeda. Sesi tidak boleh mencampur snapshot canon.");
       activeProfileMarkdown = mode === "new" ? (registeredProfile?.content ?? "") : (savedSession?.profileMarkdown ?? "");
+      const profileParse = parseCharacterProfile(activeProfileMarkdown);
+      const profileValidationErrors = profileParse.valid ? validateCharacterProfile(profileParse.profile) : profileParse.errors;
+      const usableProfile = profileParse.valid && profileValidationErrors.length === 0 ? profileParse.profile : null;
       const context = assembleGameplayContext({ ...route, query: activity }, contextCharacter, activeSha, activeStatus.version, 220000);
       context.prompt = "## FULL INDEX.md · HARD GATE · ACTIVE_SHA " + activeSha + "\n" + indexDocument.content + "\n\n" + context.prompt;
       if (playerRegistry) context.prompt += "\n\n## FULL players.md · ACTIVE_SHA " + activeSha + "\n" + playerRegistry.content;
@@ -753,6 +758,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       const result = await requestGMProposal(new GatewayGMProvider(), context);
       if (!result.valid) throw new Error(result.errors.join(" "));
       gmProposal = result.proposal;
+      const stateReconciliation = reconcileGMProposal(usableProfile, gmProposal);
       applyGMWorldTime(gmProposal);
       activeChat.messages.push({ role: "player", text: mode === "new" ? "Memulai sesi baru sebagai " + character.name + "." : typedActivity, createdAt: new Date().toISOString() });
       activeChat.messages.push({ role: "gm", text: gmProposal.narration + (gmProposal.outcome ? "\n\n" + gmProposal.outcome : ""), createdAt: new Date().toISOString() });
@@ -764,7 +770,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
         snapshotSha: activeSha,
         canonVersion: activeStatus.version,
         profileMarkdown: activeProfileMarkdown,
-        stateJson: JSON.stringify({ status: "unverified", worldTime: { ...worldTime }, transcript: activeChat.messages, lastProposal: { snapshot: gmProposal.snapshot, version: gmProposal.version, proposedChanges: gmProposal.proposed_changes }, note: "GM proposals are not authoritative state; deterministic reconciliation is not implemented yet." }),
+        stateJson: JSON.stringify({ status: "unverified", worldTime: { ...worldTime }, transcript: activeChat.messages, profileValidation: { valid: profileValidationErrors.length === 0, errors: profileValidationErrors }, lastProposal: { snapshot: gmProposal.snapshot, version: gmProposal.version, proposedChanges: gmProposal.proposed_changes, stateChanges: gmProposal.state_changes }, reconciliation: stateReconciliation, note: "Reconciliation checks exact profile baselines and basic field formats only. No proposal is applied; canon-mechanics verification and explicit player approval are still required." }),
         stateVerified: false,
         updatedAt: new Date().toISOString()
       });
