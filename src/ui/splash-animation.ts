@@ -40,6 +40,7 @@ export function animateOpeningSplash(splash: HTMLElement): () => void {
     translateY: [-3, 3],
     rotate: [-0.55, 0.55],
     duration: 2600,
+    delay: 1500,
     ease: "inOutSine",
     alternate: true,
     loop: true
