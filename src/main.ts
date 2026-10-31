@@ -2,7 +2,6 @@ import "./style.css";
 import "./ui/floating-ledger.css";
 import "./ui/floating-control.css";
 import { cancelOpeningSequence, playButtonSound, playOpeningSequence, playSnapshotSlideSound, playWarningBeep, setSoundEnabled } from "./audio/sound-effects";
-const splashLogoUrl = new URL("../Untitled78_20261030213901.png", import.meta.url).href;
 import { getGameplaySessionRecord, initializeDatabase, saveGameplaySessionRecord } from "./database/database";
 import { createCharacter, deleteCharacter, listCharacters, type Character } from "./characters/character-repository";
 import { validateCharacterDraft } from "./engine/character-validation";
@@ -54,7 +53,12 @@ function showOpeningSplash(): HTMLDivElement {
   splash.setAttribute("aria-label", "Opening Merzkava Universe");
   splash.innerHTML = `
     <div class="splash-content">
-      <img class="splash-logo" src="${splashLogoUrl}" alt="Black Kitty, the Merzkava mascot" />
+      <div class="splash-mascot" role="img" aria-label="Black Kitty, the Merzkava mascot">
+        <img class="kitty-layer kitty-shadow" src="/kitty/shadow/kitty-shadow.png" alt="" />
+        <img class="kitty-layer kitty-tail" src="/kitty/ekor/kitty-tail.png" alt="" />
+        <img class="kitty-layer kitty-body" src="/kitty/body/kitty-body.png" alt="" />
+        <img class="kitty-layer kitty-head" src="/kitty/kepala/kitty-head.png" alt="" />
+      </div>
       <p class="splash-kicker">MERZKAVA UNIVERSE</p>
       <h1>Merzkava</h1>
       <span class="splash-rule" aria-hidden="true"></span>
