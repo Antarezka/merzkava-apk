@@ -164,8 +164,7 @@ export const LORE_ENTRIES: LoreEntry[] = [
       "Arcanistry memiliki sejarah, institusi, dan budaya keilmuan sendiri. Penjelasan dalam arsip ini berfokus pada konteks dunia; proses, syarat, tingkatan, dan hasil mekaniknya tetap berada di dokumen aturan resmi."
     ],
     sourcePath: "world/HISTORY.md", sourceLabel: "World History"
-  }
-
+  },
   {
     id: "jun-haotian", title: "Jun Haotian", aliases: ["君昊天", "Emperor Jun Haotian"],
     category: "PEOPLES", eyebrow: "IMPERIAL HOUSEHOLD · CHARACTER FILE", summary: "Kaisar Golden Dragon Empire dan kepala keluarga kekaisaran Jun.",
