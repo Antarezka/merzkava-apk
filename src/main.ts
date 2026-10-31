@@ -15,7 +15,8 @@ async function refreshPlayerRegistry(): Promise<void> {
       cultivationLevel: 0,
       awakened: false,
       createdAt: "",
-      registryPath: player.path
+      registryPath: player.path,
+      registryCommitSha: result.commitSha
     }));
     playerRegistryMessage = `${registeredCharacters.length} karakter dari players.md · snapshot ${result.commitSha}`;
     const statusNode = root.querySelector<HTMLElement>("#player-registry-status");
@@ -485,6 +486,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     loadCharacterWorldTime(characterId);
     if (mode === "new") activeChat = { messages: [], started: false, showOptions: activeChat.showOptions };
     let activeStatus = getCanonStatus();
+    if (mode === "new" && character.registryCommitSha) activeStatus = await activateCanonSnapshot(character.registryCommitSha);
     if (mode === "new" && activeStatus.status !== "ready") { notice = "Sesi baru memerlukan canon aktif yang baru diverifikasi. Refresh canon terlebih dahulu."; render(); return; }
     if (mode === "continue" && !gameplaySnapshot) { notice = "Belum ada sesi tersimpan untuk karakter ini. Tekan New session terlebih dahulu."; render(); return; }
     const activeSha = mode === "new" ? activeStatus.commitSha.slice(0, 7) : gameplaySnapshot.slice(0, 7);
@@ -500,9 +502,11 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       const indexDocument = await getCanonIndex();
       if (!indexDocument || indexDocument.commitSha.slice(0, 7) !== activeSha) throw new Error("Bootstrap gagal: INDEX.md pada ACTIVE_SHA tidak tersedia.");
       const playerRegistry = mode === "new" ? await loadPlayerRegistry(activeSha) : null;
+      const registeredProfile = mode === "new" && character.registryPath ? await loadRegisteredPlayerProfile(activeSha, character.registryPath) : null;
       const context = assembleGameplayContext({ ...route, query: activity }, character, activeSha, activeStatus.version, 140000);
       context.prompt += "\n\n## FULL INDEX.md · HARD GATE · ACTIVE_SHA " + activeSha + "\n" + indexDocument.content;
       if (playerRegistry) context.prompt += "\n\n## FULL players.md · ACTIVE_SHA " + activeSha + "\n" + playerRegistry.content;
+      if (registeredProfile) context.prompt += "\n\n## FULL REGISTERED CHARACTER PROFILE · " + registeredProfile.path + " · ACTIVE_SHA " + activeSha + "\n" + registeredProfile.content;
       const previous = mode === "new" ? [] : activeChat.messages;
       context.prompt += "\n\n## SESSION MODE\n" + (mode === "new" ? "NEW SESSION: initialize from the exact trigger below." : "CONTINUING SESSION: continue without resetting established state.") +
         "\n\n## EXACT TRIGGER\n" + (mode === "new" ? trigger : "Not applicable; continuation.") +
