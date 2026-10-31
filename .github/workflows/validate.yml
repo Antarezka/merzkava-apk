@@ -20,5 +20,7 @@ jobs:
           node-version: 22
       - name: Install dependencies
         run: npm install
+      - name: Run gameplay engine tests
+        run: npm run test
       - name: Type-check and build
         run: npm run build
