@@ -64,9 +64,19 @@ public class FloatingWindowPlugin extends Plugin {
     private static float touchRawX;
     private static float touchRawY;
     private static boolean dragged;
-    private static boolean suppressNextForegroundRestore;
     private static int resizeStartWidth;
     private static int resizeStartHeight;
+
+    @Override
+    public void load() {
+        super.load();
+        Activity activity = getActivity();
+        if (activity != null) {
+            activityRef = new WeakReference<>(activity);
+            webView = getBridge().getWebView();
+            windowManager = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
+        }
+    }
 
     @PluginMethod
     public void getReadiness(PluginCall call) {
@@ -151,8 +161,15 @@ public class FloatingWindowPlugin extends Plugin {
             service.setAction(FloatingKeepAliveService.ACTION_START_BUBBLE);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) activity.startForegroundService(service);
             else activity.startService(service);
-            MAIN.postDelayed(() -> activity.moveTaskToBack(true), 180);
-            call.resolve();
+            MAIN.postDelayed(() -> {
+                if (FloatingKeepAliveService.isBubbleVisible()) {
+                    activity.moveTaskToBack(true);
+                    call.resolve();
+                } else {
+                    activity.stopService(new Intent(activity, FloatingKeepAliveService.class));
+                    call.reject("Kitty bubble gagal ditampilkan. Periksa izin overlay dan status service.");
+                }
+            }, 450);
         } catch (Exception error) {
             activity.stopService(new Intent(activity, FloatingKeepAliveService.class));
             call.reject("Could not start the Kitty bubble service: " + error.getMessage());
@@ -265,14 +282,11 @@ public class FloatingWindowPlugin extends Plugin {
         header.addView(title, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1));
         title.setOnTouchListener((view, event) -> handleDrag(view, event, false));
 
-        TextView minimize = control(activity, "—");
-        TextView kitty = control(activity, "🐈‍⬛");
+        TextView minimize = control(activity, "🐈‍⬛");
         TextView fullscreen = control(activity, "□");
-        header.addView(minimize, new LinearLayout.LayoutParams(dp(activity, 34), ViewGroup.LayoutParams.MATCH_PARENT));
-        header.addView(kitty, new LinearLayout.LayoutParams(dp(activity, 38), ViewGroup.LayoutParams.MATCH_PARENT));
+        header.addView(minimize, new LinearLayout.LayoutParams(dp(activity, 42), ViewGroup.LayoutParams.MATCH_PARENT));
         header.addView(fullscreen, new LinearLayout.LayoutParams(dp(activity, 34), ViewGroup.LayoutParams.MATCH_PARENT));
-        minimize.setOnClickListener(view -> showStripMode());
-        kitty.setOnClickListener(view -> showBubbleMode());
+        minimize.setOnClickListener(view -> showBubbleMode());
         fullscreen.setOnClickListener(view -> restoreToActivity());
 
         contentFrame = new FrameLayout(activity);
@@ -346,11 +360,14 @@ public class FloatingWindowPlugin extends Plugin {
 
     private static void addOverlay(View view, int width, int height) {
         Activity activity = getActivityRef();
-        if (activity == null || windowManager == null) return;
+        if (activity == null || windowManager == null) {
+            throw new IllegalStateException("Floating overlay host is unavailable.");
+        }
         removeCurrentOverlay();
-        overlayParams = params(activity, width, height);
+        WindowManager.LayoutParams nextParams = params(activity, width, height);
+        windowManager.addView(view, nextParams);
+        overlayParams = nextParams;
         currentOverlay = view;
-        windowManager.addView(view, overlayParams);
     }
 
     private static void showWindowMode() {
@@ -504,15 +521,10 @@ public class FloatingWindowPlugin extends Plugin {
         if (activity == null) return;
         activityRef = new WeakReference<>(activity);
         windowManager = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
-        suppressNextForegroundRestore = true;
         MAIN.post(() -> showWindowMode());
     }
 
     public static void restoreForForeground() {
-        if (suppressNextForegroundRestore) {
-            suppressNextForegroundRestore = false;
-            return;
-        }
         restoreToActivity();
     }
 
