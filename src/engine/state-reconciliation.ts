@@ -49,7 +49,7 @@ function validateAfterValue(field: string, value: string): string | null {
  * Reconcile a proposal against the exact parsed profile baseline.
  * Candidate means structurally consistent only; canon mechanics and player approval are still required.
  */
-export function reconcileGMProposal(profile: ParsedCharacterProfile | null, proposal: GMProposal): StateReconciliation {
+export function reconcileGMProposal(profile: ParsedCharacterProfile | null, proposal: GMProposal, responseProfile?: ParsedCharacterProfile | null): StateReconciliation {
   if (!proposal.state_changes.length) return { status: "no-changes", changes: [], errors: [] };
   if (!profile) {
     return {
@@ -60,6 +60,7 @@ export function reconcileGMProposal(profile: ParsedCharacterProfile | null, prop
   }
   const changes: ReconciledChange[] = [];
   const errors: string[] = [];
+  if (!responseProfile) errors.push("Panel profil pada player_response tidak berhasil diparse.");
   const seen = new Set<string>();
   for (const change of proposal.state_changes) {
     const field = change.field as ProfileField;
@@ -80,6 +81,11 @@ export function reconcileGMProposal(profile: ParsedCharacterProfile | null, prop
       changes.push({ field, before: change.before, after: change.after, status: "rejected", reason: "Baseline mismatch; perubahan ditolak." });
       continue;
     }
+    if (responseProfile && responseProfile.fields[field] !== change.after) {
+      errors.push("Nilai panel respons tidak cocok dengan state_changes.after untuk " + field + ".");
+      changes.push({ field, before: change.before, after: change.after, status: "rejected", reason: "Panel profil dan delta terstruktur berbeda." });
+      continue;
+    }
     const invalid = validateAfterValue(field, change.after);
     if (invalid) {
       errors.push(field + ": " + invalid);
@@ -92,6 +98,14 @@ export function reconcileGMProposal(profile: ParsedCharacterProfile | null, prop
       continue;
     }
     changes.push({ field, before: change.before, after: change.after, status: "candidate", reason: "Baseline cocok dan format dasar valid; belum diterapkan, belum disahkan mekanik, dan menunggu persetujuan pemain." });
+  }
+  if (responseProfile) {
+    for (const field of deterministicFields) {
+      if (profile.fields[field] !== responseProfile.fields[field] && !seen.has(field)) {
+        errors.push("Panel mengubah " + field + " tanpa state_changes dan Ledger Log yang dapat direkonsiliasi.");
+        changes.push({ field, before: profile.fields[field], after: responseProfile.fields[field], status: "rejected", reason: "Perubahan panel tanpa delta terstruktur." });
+      }
+    }
   }
   const status = changes.some(change => change.status === "rejected")
     ? "rejected"
