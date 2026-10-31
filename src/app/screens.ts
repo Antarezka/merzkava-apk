@@ -6,9 +6,9 @@ function escapeHtml(value: string): string {
   return value.replace(/[&<>"']/g, char => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" })[char] ?? char);
 }
 
-function characterView(characters: Character[]): string {
+function characterView(characters: Character[], registryStatus: string): string {
   const cards = characters.length
-    ? characters.map(character => `<article class="character-card"><div class="record-top"><span>${escapeHtml(character.origin)}</span><span class="record-status">${character.awakened ? "AWAKENED" : "NOT AWAKENED"}</span></div><h3>${escapeHtml(character.name)}</h3><p class="muted">Age ${${character.age ? character.age : "—"} · ${escapeHtml(character.realm)} · Cultivation ${character.cultivationLevel}</p><p class="muted">${escapeHtml(character.background || "No background recorded.")}</p>${character.registryPath ? `<span class="record-status">REGISTERED · players.md</span>` : `<button class="text-button danger" data-delete-character="${escapeHtml(character.id)}">Delete character</button>`}</article>`).join("")
+    ? characters.map(character => `<article class="character-card"><div class="record-top"><span>${escapeHtml(character.origin)}</span><span class="record-status">${character.awakened ? "AWAKENED" : "NOT AWAKENED"}</span></div><h3>${escapeHtml(character.name)}</h3><p class="muted">Age ${character.age ? character.age : "—"} · ${escapeHtml(character.realm)} · Cultivation ${character.cultivationLevel}</p><p class="muted">${escapeHtml(character.background || "No background recorded.")}</p>${character.registryPath ? `<span class="record-status">REGISTERED · players.md</span>` : `<button class="text-button danger" data-delete-character="${escapeHtml(character.id)}">Delete character</button>`}</article>`).join("")
     : `<div class="empty-state compact"><h3>No character yet</h3><p>Create your first adventurer using the form above.</p></div>`;
   return `<div class="page-heading"><p class="eyebrow">YOUR IDENTITY</p><h2>Character</h2><p class="muted">Create a local character, or refresh the official players.md registry below to select a registered character.</p></div>
   <form id="character-form" class="record-card character-form">
@@ -20,7 +20,7 @@ function characterView(characters: Character[]): string {
     <p id="character-error" class="form-message" aria-live="polite"></p>
     <button class="action-button" type="submit">Create character <span>↗</span></button>
   </form>
-  <section class="section-block"><div class="section-heading"><span>PLAYER REGISTRY · players.md</span><button class="text-button" type="button" data-refresh-players>↻ Refresh players</button></div><p class="muted" id="player-registry-status">Registered characters are loaded from the pinned players.md snapshot.</p><div class="section-heading"><span>YOUR CHARACTERS</span><small>${characters.length} AVAILABLE</small></div><div class="character-list">${cards}</div></section>`;
+  <section class="section-block"><div class="section-heading"><span>PLAYER REGISTRY · players.md</span><button class="text-button" type="button" data-refresh-players>↻ Refresh players</button></div><p class="muted" id="player-registry-status">${escapeHtml(registryStatus)}</p><div class="section-heading"><span>YOUR CHARACTERS</span><small>${characters.length} AVAILABLE</small></div><div class="character-list">${cards}</div></section>`;
 }
 
 const views: Record<Exclude<ScreenId, "character">, string> = {
