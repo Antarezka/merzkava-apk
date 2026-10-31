@@ -68,16 +68,14 @@ for attempt in $(seq 1 48); do
   WINDOW_STATE="$(timeout 8s adb shell dumpsys window windows 2>/dev/null || true)"
   APP_RESUMED=0
   FIRST_DRAW=0
-  APP_WINDOW=0
   printf '%s' "$ACTIVITY_STATE" | grep -q 'ResumedActivity:.*com.antarezka.merzkava/.MainActivity' && APP_RESUMED=1 || true
-  printf '%s' "$ACTIVITY_STATE" | grep -qE 'reportedDrawn=true|firstWindowDrawn=true' && FIRST_DRAW=1 || true
-  printf '%s' "$WINDOW_STATE" | grep -qE 'Window\\{.*com.antarezka.merzkava/.MainActivity|mCurrentFocus=.*com.antarezka.merzkava.*MainActivity' && APP_WINDOW=1 || true
-  if [[ "$APP_RESUMED" -eq 1 && "$FIRST_DRAW" -eq 1 && "$APP_WINDOW" -eq 1 ]] && ! printf '%s' "$WINDOW_STATE" | grep -q 'Splash Screen com.antarezka.merzkava'; then
+  if printf '%s' "$ACTIVITY_STATE" | grep -A 45 'ActivityRecord.*com.antarezka.merzkava/.MainActivity' | grep -qE 'reportedDrawn=true|firstWindowDrawn=true'; then FIRST_DRAW=1; fi
+  if [[ "$APP_RESUMED" -eq 1 && "$FIRST_DRAW" -eq 1 ]] && ! printf '%s' "$WINDOW_STATE" | grep -q 'Splash Screen com.antarezka.merzkava'; then
     ACTIVITY_READY=1
     echo "Merzkava MainActivity has drawn its real app window (attempt $attempt)."
     break
   fi
-  if (( attempt % 6 == 0 )); then echo "Still waiting for first app draw ($((attempt * 5)) seconds elapsed; resumed=$APP_RESUMED drawn=$FIRST_DRAW window=$APP_WINDOW)."; fi
+  if (( attempt % 6 == 0 )); then echo "Still waiting for first app draw ($((attempt * 5)) seconds elapsed; resumed=$APP_RESUMED drawn=$FIRST_DRAW)."; fi
   sleep 5
 done
 if [[ "$ACTIVITY_READY" -ne 1 ]]; then
