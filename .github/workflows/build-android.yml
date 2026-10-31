@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - feature/opening-splash-screen
+      - feature/floating-mode-ledger
     paths:
       - "src/**"
       - "public/**"
