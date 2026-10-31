@@ -11,6 +11,7 @@ export interface Character {
   cultivationLevel: number;
   awakened: boolean;
   createdAt: string;
+  registryPath?: string;
 }
 
 export interface CharacterDraft {
