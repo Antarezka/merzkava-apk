@@ -456,7 +456,7 @@ button {color:inherit;} button:focus-visible {outline-color:#a68d5e;}
 .splash-kicker { position:relative; z-index:2; margin:0 0 5px; color:#9d8968; font-size:8px; letter-spacing:.28em; }
 .splash-stage { position:relative; width:min(94vw,430px); height:clamp(340px,72vh,510px); margin:0 auto; isolation:isolate; }
 .splash-wordmark { position:absolute; z-index:1; top:34%; left:50%; width:100%; transform:translate(-50%,-50%); color:#eee5d3; text-align:center; white-space:nowrap; font:500 clamp(37px,10.8vw,58px)/1 Cinzel,Georgia,serif; letter-spacing:.09em; text-shadow:0 2px 0 #78684e, 0 8px 24px #1c1710aa; }
-.splash-reflection { position:absolute; z-index:2; left:50%; top:5%; width:clamp(190px,56vw,270px); height:90%; transform:translateX(-50%) scale(1.08); opacity:.0; filter:brightness(0) saturate(100%) invert(77%) sepia(18%) saturate(650%) hue-rotate(356deg) blur(1px) drop-shadow(0 0 13px #c4a36a); pointer-events:none; animation:kitty-reflection 4.8s ease-in-out infinite; }
+.splash-reflection { position:absolute; z-index:0; left:50%; top:5%; width:clamp(190px,56vw,270px); height:90%; transform:translateX(-50%) scale(1.08); opacity:.0; filter:brightness(0) saturate(100%) invert(77%) sepia(18%) saturate(650%) hue-rotate(356deg) blur(1px) drop-shadow(0 0 13px #c4a36a); pointer-events:none; animation:kitty-reflection 4.8s ease-in-out infinite; }
 .splash-reflection .kitty-layer { opacity:.78; }
 .splash-mascot { position:absolute; z-index:3; left:50%; bottom:0; width:clamp(205px,59vw,285px); height:88%; margin:0; transform:translateX(-50%); filter:drop-shadow(0 12px 18px #18130e45); }
 .splash-mascot:before { display:none; }
