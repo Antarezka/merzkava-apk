@@ -62,7 +62,7 @@ if (!lifecycleActivity.includes("FloatingWindowPlugin.onBubbleTapped")) {
 }
 
 let manifest = await readFile(manifestPath, "utf8");
-if (!manifest.includes('android:launchMode="singleTop"')) {
+if (!manifest.includes("android:launchMode=")) {
   manifest = manifest.replace(/<activity\b([^>]*)>/, (match, attributes) =>
     '<activity' + attributes + ' android:launchMode="singleTop">'
   );
