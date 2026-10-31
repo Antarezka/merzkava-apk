@@ -3,7 +3,6 @@ package com.antarezka.merzkava;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Build;
@@ -27,10 +26,6 @@ public class FloatingKeepAliveService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Intent launch = getPackageManager().getLaunchIntentForPackage(getPackageName());
-        PendingIntent pending = launch == null ? null : PendingIntent.getActivity(
-            this, 2301, launch,
-            PendingIntent.FLAG_UPDATE_CURRENT | (Build.VERSION.SDK_INT >= 23 ? PendingIntent.FLAG_IMMUTABLE : 0));
         Notification.Builder builder = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
             ? new Notification.Builder(this, CHANNEL_ID)
             : new Notification.Builder(this);
@@ -39,7 +34,6 @@ public class FloatingKeepAliveService extends Service {
             .setContentText("Tap the Kitty bubble or window to return to your session.")
             .setOngoing(true)
             .setCategory(Notification.CATEGORY_SERVICE);
-        if (pending != null) builder.setContentIntent(pending);
         startForeground(NOTIFICATION_ID, builder.build());
         return START_NOT_STICKY;
     }
