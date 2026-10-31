@@ -30,6 +30,10 @@ const deterministicFields = new Set<ProfileField>([
   "Teknik / Kemampuan", "Tujuan Saat Ini"
 ]);
 
+function normalizeFieldValue(value: string): string {
+  return value.trim().replace(/^``([\\s\\S]*)``$/, "$1").replace(/^\\*\\*([\\s\\S]*)\\*\\*$/, "$1").trim();
+}
+
 function validateAfterValue(field: string, value: string): string | null {
   if (!value.trim()) return "Nilai sesudah tidak boleh kosong.";
   if (field === "HP") {
@@ -75,23 +79,23 @@ export function reconcileGMProposal(profile: ParsedCharacterProfile | null, prop
       continue;
     }
     seen.add(field);
-    if (change.before.trim() === change.after.trim()) {
+    if (normalizeFieldValue(change.before) === normalizeFieldValue(change.after)) {
       errors.push("state_changes untuk " + field + " tidak boleh mencatat perubahan tanpa perubahan nilai.");
       changes.push({ field, before: change.before, after: change.after, status: "rejected", reason: "Nilai sebelum dan sesudah identik." });
       continue;
     }
     const actual = profile.fields[field];
-    if (change.before.trim() !== actual.trim()) {
+    if (normalizeFieldValue(change.before) !== normalizeFieldValue(actual)) {
       errors.push("Nilai before tidak cocok dengan profil untuk " + field + ".");
       changes.push({ field, before: change.before, after: change.after, status: "rejected", reason: "Baseline mismatch; perubahan ditolak." });
       continue;
     }
-    if (responseProfile && responseProfile.fields[field] !== change.after) {
+    if (responseProfile && normalizeFieldValue(responseProfile.fields[field]) !== normalizeFieldValue(change.after)) {
       errors.push("Nilai panel respons tidak cocok dengan state_changes.after untuk " + field + ".");
       changes.push({ field, before: change.before, after: change.after, status: "rejected", reason: "Panel profil dan delta terstruktur berbeda." });
       continue;
     }
-    const invalid = validateAfterValue(field, change.after);
+    const invalid = validateAfterValue(field, normalizeFieldValue(change.after));
     if (invalid) {
       errors.push(field + ": " + invalid);
       changes.push({ field, before: change.before, after: change.after, status: "rejected", reason: invalid });
