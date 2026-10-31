@@ -76,6 +76,7 @@ function showOpeningSplash(): HTMLDivElement {
 }
 
 async function playEntrySplash(): Promise<void> {
+  const splashStartedAt = Date.now();
   const splash = showOpeningSplash();
   let closed = false;
   const close = () => {
@@ -85,6 +86,8 @@ async function playEntrySplash(): Promise<void> {
   };
   splash.addEventListener("click", () => { cancelOpeningSequence(); close(); }, { once: true });
   await playOpeningSequence();
+  const remainingEntrance = 2400 - (Date.now() - splashStartedAt);
+  if (remainingEntrance > 0) await new Promise<void>(resolve => window.setTimeout(resolve, remainingEntrance));
   await new Promise<void>(resolve => {
     splash.addEventListener("animationend", event => {
       if (event.target === splash.querySelector(".splash-content") && event.animationName === "splash-depart") resolve();
