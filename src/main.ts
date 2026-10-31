@@ -1,7 +1,7 @@
 import "./style.css";
 import "./ui/floating-ledger.css";
 import "./ui/floating-control.css";
-import { cancelOpeningSequence, playButtonSound, playOpeningSequence } from "./audio/sound-effects";
+import { cancelOpeningSequence, playButtonSound, playOpeningSequence, playSnapshotSlideSound } from "./audio/sound-effects";
 const splashLogoUrl = new URL("../Untitled78_20261030213901.png", import.meta.url).href;
 import { initializeDatabase } from "./database/database";
 import { createCharacter, deleteCharacter, listCharacters, type Character } from "./characters/character-repository";
@@ -403,6 +403,7 @@ root.addEventListener("pointerup", event => {
     const delta = event.clientY - blindDragStartY;
     if (Math.abs(delta) > 24) {
       blindOpen = delta > 0;
+      playSnapshotSlideSound(blindOpen ? "down" : "up");
       const blind = root.querySelector<HTMLElement>("[data-snapshot-blind]");
       const handle = blind?.querySelector<HTMLButtonElement>("[data-blind-toggle]");
       blind?.classList.toggle("is-open", blindOpen);
