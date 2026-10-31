@@ -75,6 +75,14 @@ export async function getCanonIndex(): Promise<CanonDocument | null> {
   return getCachedCanonDocument("INDEX.md");
 }
 
+export async function loadPlayerRegistry(activeSha: string): Promise<CanonDocument> {
+  const expected = activeSha.slice(0, 7);
+  if (!currentStatus.commitSha || currentStatus.commitSha.slice(0, 7) !== expected) {
+    throw new Error("ACTIVE_SHA tidak cocok dengan canon yang sedang diverifikasi.");
+  }
+  return fetchPinnedDocument("players.md", expected);
+}
+
 export async function loadCanonModule(path: string): Promise<CanonDocument> {
   if (!currentStatus.commitSha) throw new Error("Muat atau perbarui INDEX canon terlebih dahulu.");
   const safePath = validateCanonPath(path);
