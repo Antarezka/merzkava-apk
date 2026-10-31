@@ -1,0 +1,1 @@
+Trigger Android build after correcting Gradle signing script escaping.
