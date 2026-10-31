@@ -216,26 +216,35 @@ public class FloatingWindowPlugin extends Plugin {
 
     @PluginMethod
     public void show(PluginCall call) {
-        Activity activity = getActivity();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(activity)) {
-            call.reject("Display over other apps permission is not enabled.");
-            return;
-        }
-        try {
-            activityRef = new WeakReference<>(activity);
-            webView = getBridge().getWebView();
-            windowManager = (WindowManager) activity.getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
-            Intent service = new Intent(activity, FloatingKeepAliveService.class);
-            service.setAction(FloatingKeepAliveService.ACTION_HIDE_BUBBLE);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) activity.startForegroundService(service);
-            else activity.startService(service);
-            showWindowMode();
-            webView.evaluateJavascript("document.body.classList.add('native-floating-mode')", null);
-            call.resolve();
-        } catch (Exception error) {
-            restoreToActivity();
-            call.reject("Could not open Floating Mini Window: " + error.getMessage());
-        }
+        // Capacitor invokes plugin methods on its plugin executor. Every operation
+        // touching Activity, View, or WebView must run on Android's main thread.
+        final Activity activity = getActivity();
+        MAIN.post(() -> {
+            if (activity == null || activity.isFinishing()) {
+                call.reject("The app window is not available.");
+                return;
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(activity)) {
+                call.reject("Display over other apps permission is not enabled.");
+                return;
+            }
+            try {
+                activityRef = new WeakReference<>(activity);
+                webView = getBridge().getWebView();
+                if (webView == null) throw new IllegalStateException("The application WebView is unavailable.");
+                windowManager = (WindowManager) activity.getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
+                Intent service = new Intent(activity, FloatingKeepAliveService.class);
+                service.setAction(FloatingKeepAliveService.ACTION_HIDE_BUBBLE);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) activity.startForegroundService(service);
+                else activity.startService(service);
+                showWindowMode();
+                webView.evaluateJavascript("document.body.classList.add('native-floating-mode')", null);
+                call.resolve();
+            } catch (Exception error) {
+                restoreToActivity();
+                call.reject("Could not open Floating Mini Window: " + error.getMessage());
+            }
+        });
     }
 
     @PluginMethod
@@ -375,6 +384,10 @@ public class FloatingWindowPlugin extends Plugin {
     }
 
     private static void showWindowMode() {
+        if (Looper.myLooper() != Looper.getMainLooper()) {
+            MAIN.post(FloatingWindowPlugin::showWindowMode);
+            return;
+        }
         Activity activity = getActivityRef();
         if (activity == null || activity.isFinishing() || webView == null) return;
         if (transitionInProgress) return;
