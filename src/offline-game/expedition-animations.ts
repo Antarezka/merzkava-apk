@@ -28,7 +28,7 @@ function mountSceneParticles(root: HTMLElement): void {
   }else if(kind==="snow"){
     animate(nodes,{translateY:["-18px","360px"],translateX:(_,i)=>(((i%7)-3)*12)+"px",scale:[.7,1.15],opacity:[0,.82,.12],duration:7200,ease:"inOutSine",delay:stagger(180),loop:true});
   }else{
-    animate(nodes,{translateY:["-12px","360px"],translateX:[0,(_,i)=>(((i%7)-3)*23)+"px"],rotate:[-35,110],scale:[.65,1],opacity:[0,.82,0],duration:kind==="petal"?9200:11800,ease:"inOutSine",delay:stagger(260),loop:true});
+    animate(nodes,{translateY:["-12px","360px"],translateX:(_,i)=>(((i%7)-3)*23)+"px",rotate:[-35,110],scale:[.65,1],opacity:[0,.82,0],duration:kind==="petal"?9200:11800,ease:"inOutSine",delay:stagger(260),loop:true});
   }
 }
 /** Anime.js owns Eternal Path presentation motion; game state never depends on animation callbacks. */
