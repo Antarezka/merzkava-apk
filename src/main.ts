@@ -7,7 +7,7 @@ import { createCharacter, deleteCharacter, listCharacters, type Character } from
 import { validateCharacterDraft } from "./convo/engine/character-validation";
 import { renderScreen, type ScreenId } from "./app/screens";
 import { animateExpeditionChoiceModal, animateExpeditionPanel, mountExpeditionAnimations } from "./offline-game/expedition-animations";
-import { chooseEternalOption, deleteEternalSave, exportEternalSave, importEternalSave, loadEternalSave, renameEternalSave, resetEternalGame, startEternalGame, unloadEternalGame, type EternalRegion } from "./offline-game/expedition-game";
+import { chooseEternalOption, deleteEternalSave, exportEternalSave, importEternalSave, loadEternalSave, renameEternalSave, startEternalGame, unloadEternalGame, type EternalRegion } from "./offline-game/expedition-game";
 import { getCanonIndex, getCanonStatus, loadCanonModule, loadPlayerRegistry, loadRegisteredPlayerProfile, refreshCanon, refreshLatestPlayerRegistry, type CanonDocument } from "./convo/canon/canon-loader";
 import { routeCanonActivity } from "./convo/canon/canon-router";
 import { assembleGameplayContext } from "./convo/canon/context-assembler";
@@ -677,7 +677,7 @@ root.addEventListener("click", async (event: MouseEvent) => {
   const deleteJourney=target.closest<HTMLButtonElement>("[data-eternal-save-delete]");
   if(deleteJourney){const id=deleteJourney.dataset.eternalSaveDelete??"";if(id&&window.confirm("Delete this journey and all of its non-canon data? This cannot be undone.")){deleteEternalSave(id);notice="Journey deleted.";render();}return;}
   const renameToggle=target.closest<HTMLButtonElement>("[data-eternal-save-rename-toggle]");
-  if(renameToggle){const form=root.querySelector<HTMLElement>(`[data-eternal-rename-form="${CSS.escape(renameToggle.dataset.eternalSaveRenameToggle??"")}"]`);if(form){form.hidden=!form.hidden;if(!form.hidden){animateExpeditionPanel(form);form.querySelector<HTMLInputElement>("input")?.focus();}}return;}
+  if(renameToggle){const form=renameToggle.closest<HTMLElement>("[data-save-card]")?.querySelector<HTMLElement>("[data-eternal-rename-form]");if(form){form.hidden=!form.hidden;if(!form.hidden){animateExpeditionPanel(form);form.querySelector<HTMLInputElement>("input")?.focus();}}return;}
   const exportJourney=target.closest<HTMLButtonElement>("[data-eternal-save-export]");
   if(exportJourney){const payload=exportEternalSave(exportJourney.dataset.eternalSaveExport??"");if(payload){const blob=new Blob([payload],{type:"application/json"});const url=URL.createObjectURL(blob);const link=document.createElement("a");link.href=url;link.download="merzkava-eternal-path-"+(exportJourney.dataset.eternalSaveExport??"journey")+".json";link.click();URL.revokeObjectURL(url);}return;}
   if (target.closest("[data-eternal-end]")) { unloadEternalGame(); notice="Journey saved. You can load it again from Journey Manager."; render(); return; }
@@ -1055,7 +1055,7 @@ root.addEventListener("change", async event => {
   if(!(input instanceof HTMLInputElement)||!input.matches("[data-eternal-import]")) return;
   const file=input.files?.[0];if(!file) return;
   try {
-    const id=importEternalSave(await file.text());
+    importEternalSave(await file.text());
     notice="Journey backup imported successfully.";
     render();
   } catch(error) {
