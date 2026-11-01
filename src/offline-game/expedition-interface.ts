@@ -26,6 +26,7 @@ export function renderExpeditionInterface(characters: Character[]): string {
       </header>
 
       <section class="expedition-environment" aria-label="Environment viewport">
+        <div class="expedition-fog-layer" aria-hidden="true"></div>
         <div class="expedition-scene-copy">
           <span class="scene-kicker">ENVIRONMENT · PREVIEW</span>
           <h3>The world awaits.</h3>
