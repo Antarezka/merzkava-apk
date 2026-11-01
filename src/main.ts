@@ -59,8 +59,7 @@ function showOpeningSplash(): HTMLDivElement {
       <div class="splash-stage">
         <div class="splash-wordmark" aria-hidden="true">MERZKAVA</div>
         <div class="splash-light-ray" aria-hidden="true"></div>
-        <div class="splash-mascot" role="img" aria-label="Kitty breathing softly beneath the diagonal Merzkava light">
-          <img class="kitty-layer kitty-shadow" src="/kitty/shadow/kitty-shadow.png" alt="" />
+        <div class="splash-mascot" role="img" aria-label="Kitty, Merzkava’s black-cat mascot">
           <img class="kitty-layer kitty-tail" src="/kitty/ekor/kitty-tail.png" alt="" />
           <img class="kitty-layer kitty-body" src="/kitty/body/kitty-body.png" alt="" />
           <img class="kitty-layer kitty-head" src="/kitty/kepala/kitty-head.png" alt="" />
