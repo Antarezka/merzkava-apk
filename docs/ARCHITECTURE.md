@@ -6,7 +6,7 @@ Merzkava APK is **one Android application with two playable experiences and one 
 
 1. **Convo / AI GM** — connected roleplay. Its active gameplay canon is loaded directly from the official `Antarezka/merzkava-universe` repository using a pinned commit and the repository's `INDEX.md`/authority hierarchy.
 2. **Merzkava: Eternal Path** (current working title; Life Simulation Text RPG) — a standalone local game mode. Its canon-backed world references come from a versioned local **World Archive package**; its adaptations and game-only additions live in a separate versioned Offline Game content pack. It must be playable without AI or network access.
-3. **World Archive** — the reviewed local content library inside the app. Users can browse it offline; its approved package is the content source consumed by Offline Game. It is not a hidden context source for Convo.
+3. **World Archive** — the reviewed local content library inside the app. Users can browse it offline; its approved package supplies canon-backed world references to Offline Game. It is not a hidden context source for Convo.
 
 The app shell, navigation, visual components, assets, and selected infrastructure may be shared. The modes themselves must remain clearly identified and isolated where state or authority differs.
 
@@ -21,6 +21,10 @@ Official merzkava-universe repository
    connected context                |
                                     | local, versioned content
                                     v
+                              + Offline Game content pack
+                              (reviewed adaptations/originals)
+                                      |
+                                      v
                               Offline Game
                               deterministic runtime
 ```
