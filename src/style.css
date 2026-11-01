@@ -906,3 +906,14 @@ button {color:inherit;} button:focus-visible {outline-color:#a68d5e;}
   background: #e2d6c2;
   color: #60452f;
 }
+
+.lore-source-reader h2 {
+  margin: 0 0 13px;
+  color: #f1e6d9;
+  font: 500 clamp(34px, 9vw, 49px)/.98 "Cormorant Garamond", Georgia, serif;
+}
+.lore-source-reader .lore-paragraph {
+  color: #eee4d6;
+  font-size: 15px;
+  line-height: 1.9;
+}
