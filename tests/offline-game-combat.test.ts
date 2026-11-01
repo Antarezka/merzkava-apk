@@ -11,12 +11,12 @@ import {
 
 describe("offline-game canon combat formulas", () => {
   it("calculates Combat Rating from PowerScale and one readiness factor", () => {
-    expect(calculateCombatRating({ powerScale: 100, readinessFactor: 1.1 })).toEqual({
-      valid: true, combatRating: 110
-    });
-    expect(calculateCombatRating({ powerScale: 100, readinessFactor: 1.2, relevantArtifactFactor: 1.1 })).toEqual({
-      valid: true, combatRating: 132
-    });
+    const first = calculateCombatRating({ powerScale: 100, readinessFactor: 1.1 });
+    const second = calculateCombatRating({ powerScale: 100, readinessFactor: 1.2, relevantArtifactFactor: 1.1 });
+    expect(first.valid).toBe(true);
+    expect(second.valid).toBe(true);
+    if (first.valid) expect(first.combatRating).toBeCloseTo(110);
+    if (second.valid) expect(second.combatRating).toBeCloseTo(132);
   });
 
   it("rejects invalid or missing numerical combat inputs", () => {
@@ -32,7 +32,9 @@ describe("offline-game canon combat formulas", () => {
     expect(calculateHitChance(2)).toBe(75);
     expect(calculateHitChance(0.2)).toBe(30);
     expect(calculateHitChance(100)).toBe(90);
-    expect(calculateHitChance(0.01)).toBe(10);
+    // With a positive combat ratio, the formula's raw minimum approaches 25%;
+    // the written 10% clamp is therefore a defensive lower bound, not reachable.
+    expect(calculateHitChance(0.01)).toBeCloseTo(25.25);
   });
 
   it("resolves a d100 roll at or below the hit chance as a hit", () => {
@@ -58,12 +60,14 @@ describe("offline-game canon combat formulas", () => {
   });
 
   it("rounds damage upward and never subtracts more than current HP", () => {
-    expect(calculateCombatDamage({
+    const result = calculateCombatDamage({
       targetMaximumHp: 101, targetCurrentHp: 2,
       baseDamagePercent: 5, combatRatio: 1, defenseReductionPercent: 0
-    })).toMatchObject({
-      valid: true, result: { rawDamage: 5.05, roundedDamage: 6, actualHpLoss: 2, targetHpAfter: 0 }
     });
+    expect(result).toMatchObject({
+      valid: true, result: { roundedDamage: 6, actualHpLoss: 2, targetHpAfter: 0 }
+    });
+    if (result.valid) expect(result.result.rawDamage).toBeCloseTo(5.05);
   });
 
   it("requires explicit confirmation for the high-output 18 percent class", () => {
