@@ -32,14 +32,24 @@ The local world clock can be advanced by any activity through `advanceEternalWor
 
 **The temporary Scene Test Bench has been removed.** The Scene Window always renders live world state. No manual scene, cycle, weather, or fog override is available in normal gameplay.
 
-FX-02 remains a dedicated layer inside `.expedition-environment`, presented as a framed scene window with an inset double-line border and independent scene labels. Scene artwork is rendered as a separate background image; fog is a separate translucent layer. Anime.js targets only the inner fog texture, so it cannot overwrite the parent opacity controlled by live world state. No global fog overlay is used.
+All scene effects are dedicated layers inside `.expedition-environment`, clipped by the Scene Window. The current registry contains 26 existing scenery PNGs across the three major powers, Lawless Territories, and Special Locations; the authored dialogue pool intentionally remains limited to eight compositions until additional location-specific content is reviewed.
+
+**Transparency fallback — preserve this exact method:** when Gemini or another generator cannot produce dependable RGBA alpha, export the effect as a PNG on a pure black `#000000` field and apply CSS `mix-blend-mode: screen` to its isolated overlay layer. This is the same compositing method used by the atmospheric fog plate. Black visually disappears while the brighter fog/cloud/light detail remains. True RGBA is optional, not a blocker. Never move this layer outside the clipped Scene Window.
+
+The stack now includes FX-01 clouds, FX-02 fog, procedural sun and moon glow, light rays, weather texture/particles, and lightning. Anime.js drives cloud/fog drift, glow/ray breathing, rain/snow/seasonal particle movement, and lightning flashes. CSS owns blending, masks, gradients, and particle appearance. Animation remains presentation-only and is cleaned up with the scoped mount lifecycle. No global fog or scene FX overlay is used.
 
 ## 3. Current implementation
 
 | Surface | Motion / behavior | State |
 |---|---|---|
 | Expedition heading and panels | Staggered opacity/vertical entrance | Implemented |
-| FX-02 atmospheric fog | Slow, low-amplitude texture movement inside the live opacity layer | Implemented |
+| FX-01 soft clouds | Screen-blended image layer with slow Anime.js drift | Implemented |
+| FX-02 atmospheric fog | Black-background Screen blend; slow texture movement inside the live opacity layer | Implemented |
+| FX-03 sun / FX-04 moon glow | Cycle-aware radial glow with Anime.js breathing | Procedural implementation |
+| FX-05 light rays | Masked conic-gradient layer with slow Anime.js drift | Procedural implementation |
+| FX-06 rain | Rain streak surface plus Anime.js particles | Procedural implementation |
+| FX-07 snow / petals / leaves | Anime.js particles selected by weather/day-cycle presentation | Procedural implementation |
+| FX-08 lightning | Infrequent procedural flash during Rain weather | Procedural implementation |
 | Scene location | Persisted world location, independent from dialogue metadata | Implemented |
 | Day-cycle lighting | Derived from local world clock | Implemented |
 | Regional atmosphere | Region-specific light treatment | First slice implemented |
@@ -63,7 +73,7 @@ FX-02 remains a dedicated layer inside `.expedition-environment`, presented as a
 Automated tests cover scoped targeting, animation cleanup, reduced-motion behavior, live location binding, world-clock lighting, and daily weather independence from dialogue count.
 
 Still required:
-- Confirm all eight scene PNG paths, crop, live fog alpha, blend, and text contrast on a physical Android device.
+- Confirm all 26 registered scenery PNG paths, crop, Screen-blended overlays, live fog visibility, text contrast, and particle density on a physical Android device.
 - Confirm a future travel action changes the persisted location and scene together.
 - Confirm time advancement from non-dialogue activities changes the day-cycle without changing dialogue progress.
 - Confirm weather changes on world-day transitions, not after a fixed number of dialogue choices.
