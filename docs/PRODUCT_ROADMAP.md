@@ -207,7 +207,7 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 - [ ] Define the offline mode as a standalone experience, separate from connected AI GM conversation and its save/context pipeline.
 - [ ] Finish and review the World Archive content required by the offline mode.
 - [x] Preserve the complete pinned text of all 16 `MECHANICS_REFERENCE` source modules, plus the supplemental GDE governance allocation formula source, in `docs/OFFLINE_GAME_CANON_FORMULA_SNAPSHOT.md`; keep this development snapshot separate from player-facing Archive packaging.
-- [~] Begin porting applicable formulas into deterministic offline engine modules without changing equations, thresholds, dependencies, or explicitly unresolved values. The HP maximum/state-consistency, Satiety interval/intake, Injury recovery, Time/Day-left, Combat, Spirit Ring, Martial Soul Awakening, and Economy modules are implemented and CI-verified; remaining domains are not yet ported.
+- [~] Begin porting applicable formulas into deterministic offline engine modules without changing equations, thresholds, dependencies, or explicitly unresolved values. The HP maximum/state-consistency, Satiety interval/intake, Injury recovery, Time/Day-left, Combat, Spirit Ring, Martial Soul Awakening, Economy, and Arcanistry modules are implemented and CI-verified; remaining domains are not yet ported.
 - [ ] Create a content-to-source traceability map: every offline entry/event/choice/rule must point to an approved Archive document and its official Universe source path + source commit.
 - [ ] Define a curated, approved offline content package derived only from approved Archive material.
 - [ ] Define a blocking rule: missing, contradictory, GM-only, private, or unreviewed Archive material cannot be used; send the gap back to Archive/canon review.
@@ -577,3 +577,14 @@ Before implementing a new feature or changing an existing one:
 - Extreme/custom scarcity and exceptional demand require evidence; disaster multiplier bands are validated separately and are not blindly stacked with seasonal scarcity.
 - Web App Validation #634 passed: 14 test files / 126 tests, TypeScript, gateway type-check, Vite build.
 - Nine deterministic modules are CI-verified. This is not whole-game completion; event/RNG orchestration, persistence, content traceability and other formula domains remain open.
+
+
+### Offline-game implementation checkpoint — Arcanistry (2026-11-01)
+
+- Source: `core/ARCANISTRY_AND_FORMULATION.md` at Universe pin `2f76a864150528afb0e3d26cb16f9396ce610ff6`; blob `ef674a1fba92facd5e521f0fc7f08c7e730c7d2f`.
+- Runtime: `src/offline-game/mechanics/arcanistry.ts`; regression tests: 5.
+- Implements the full Grade 1–10 × Tier 1–10 baseline production-chance matrix, six-stage guided-training schedule, Tier 1–10 production-time/Mortal-Satiety tables, focus-stage/Grade 1 gates, production-experience points, and Artificial Artifact condition score/thresholds.
+- Production success remains a baseline only: canon has not approved a random-resolution procedure or numeric situational modifiers. The module does not simulate either.
+- Web App Validation #653 passed: 15 test files / 133 tests, TypeScript, gateway type-check, and Vite production build.
+- Foundation now has 10 deterministic modules CI-verified. Full offline game remains incomplete; RNG orchestration, event/state engine, persistence, high-grade artifact gates, content traceability, and remaining formula domains remain open.
+- Android Build #340 compiled and verified APK package/version/alignment/signature and uploaded an artifact; Android 14 emulator step was cancelled, so installation/smoke-test success is not claimed.
