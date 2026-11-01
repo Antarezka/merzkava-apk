@@ -24,10 +24,10 @@ describe("Eternal Path live world scene", () => {
   it("binds scene location to persisted world location, not dialogue scene metadata", () => {
     startEternalGame({name:"Nafila",age:14,region:"golden-dragon-empire"});
     const initialLocation=getEternalSave()?.locationId;
-    const firstDialogueScene=getCurrentDialogue()?.sceneId;
     expect(initialLocation).toBe("gde-city");
     expect(getExpeditionScene().id).toBe("gde-city");
-    expect(getExpeditionScene().id).not.toBe(firstDialogueScene);
+    chooseEternalOption(0);
+    expect(getExpeditionScene().id).not.toBe(getCurrentDialogue()?.sceneId);
 
     setEternalLocation("gde-market");
     expect(getExpeditionScene().id).toBe("gde-market");
