@@ -21,7 +21,7 @@ import { GatewayGMProvider, isGMGatewayConfigured } from "./convo/engine/gateway
 import { getLedgerLog, initializeLedgerNotifications, showLedgerProposalBubble } from "./ui/ledger-log";
 import { startFloatingMode, requestFloatingOverlayPermission, getFloatingReadiness, requestFloatingNotifications, requestFloatingBatteryExemption, showFloatingBubble, stopFloatingService, type FloatingReadiness } from "./native/floating-window";
 import { floatingControlMarkup } from "./app/floating-control";
-import { animateOpeningSplash } from "./ui/splash-animation";
+import { animateOpeningSplash, animateSplashCurtain } from "./ui/splash-animation";
 import { animateAppScreen } from "./ui/app-shell-motion";
 import { closeLoreEntry, closeLoreSource, closeLorePlaceholder, openLoreEntry, openLoreSource, openLorePlaceholder, setLoreCategory, setLoreSearch, renderLoreResults } from "./world-archive/lore-library";
 
@@ -52,11 +52,12 @@ applyAppPreferences();
 let menuRevealPending = false;
 let cleanupExpeditionAnimations: (() => void) | undefined;
 let lastAnimatedScreen: AppScreen | null = null;
+const splashAnimationCleanup=new WeakMap<HTMLDivElement,()=>void>();
 initializeLedgerNotifications();
 
 function showOpeningSplash(): HTMLDivElement {
   const splash = document.createElement("div");
-  splash.className = "opening-splash is-arriving";
+  splash.className = "opening-splash";
   splash.setAttribute("role", "status");
   splash.setAttribute("aria-label", "Opening Merzkava Universe");
   splash.innerHTML = `
@@ -75,37 +76,33 @@ function showOpeningSplash(): HTMLDivElement {
       <span class="splash-rule" aria-hidden="true"></span>
       <small class="splash-tagline">THE WORLD AWAITS</small>
     </div>`;
-  splash.addEventListener("animationend", event => {
-    if (event.target === splash.querySelector(".splash-content") && event.animationName === "splash-depart") splash.remove();
-  });
   document.body.append(splash);
-  const stopSplashAnimation = animateOpeningSplash(splash);
-  splash.addEventListener("animationend", event => {
-    if (event.target === splash && event.animationName === "splash-curtain") stopSplashAnimation();
-  });
+  splashAnimationCleanup.set(splash,animateOpeningSplash(splash));
   return splash;
 }
 
 async function playEntrySplash(): Promise<void> {
-  const splashStartedAt = Date.now();
-  const splash = showOpeningSplash();
-  let closed = false;
-  const close = () => {
-    if (closed) return;
-    closed = true;
-    splash.classList.add("is-closing");
-  };
-  splash.addEventListener("click", () => { cancelOpeningSequence(); close(); }, { once: true });
-  await playOpeningSequence();
-  const remainingEntrance = 2400 - (Date.now() - splashStartedAt);
-  if (remainingEntrance > 0) await new Promise<void>(resolve => window.setTimeout(resolve, remainingEntrance));
-  await new Promise<void>(resolve => {
-    splash.addEventListener("animationend", event => {
-      if (event.target === splash.querySelector(".splash-content") && event.animationName === "splash-depart") resolve();
+  const splashStartedAt=Date.now();
+  const splash=showOpeningSplash();
+  let closePromise:Promise<void>|null=null;
+  const close=():Promise<void>=>{
+    if(closePromise) return closePromise;
+    closePromise=new Promise(resolve=>{
+      animateSplashCurtain(splash,()=>{
+        splashAnimationCleanup.get(splash)?.();
+        splashAnimationCleanup.delete(splash);
+        splash.remove();
+        resolve();
+      });
     });
-    close();
-  });
-  menuRevealPending = true;
+    return closePromise;
+  };
+  splash.addEventListener("click",()=>{cancelOpeningSequence();void close();},{once:true});
+  await playOpeningSequence();
+  const remainingEntrance=2400-(Date.now()-splashStartedAt);
+  if(remainingEntrance>0) await new Promise<void>(resolve=>window.setTimeout(resolve,remainingEntrance));
+  await close();
+  menuRevealPending=true;
 }
 
 const navigation: { id: ScreenId; label: string; icon: string }[] = [
