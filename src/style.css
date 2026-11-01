@@ -688,3 +688,56 @@ button {color:inherit;} button:focus-visible {outline-color:#a68d5e;}
 @media(max-width:360px) {
   .opening-splash .splash-wordmark { font-size:29px; letter-spacing:.07em; }
 }
+
+
+/* Merzkava main hall — tactical dossier framing, editorial type, and restrained arcane glass. */
+.home-hero{position:relative;isolation:isolate;overflow:hidden;min-height:290px;padding:34px 22px 25px;border-color:#9a8058;background:radial-gradient(ellipse at 94% 8%,#c5a56a35,transparent 37%),linear-gradient(132deg,#263b36 0%,#1d302d 62%,#192724 100%);box-shadow:inset 0 0 0 5px #e8dfc90b,0 15px 36px #263b3614}
+.home-hero:before,.home-hero:after{position:absolute;z-index:-1;content:"";border:1px solid #d6bd8250;border-radius:50%;pointer-events:none}
+.home-hero:before{width:220px;height:220px;right:-78px;top:-82px;box-shadow:0 0 0 12px #d6bd8210,0 0 0 28px #d6bd8209,0 0 48px #d6bd8212}
+.home-hero:after{width:140px;height:140px;right:-38px;top:-42px;border-style:dashed;opacity:.65}
+.hero-hero-mark{position:absolute;right:28px;top:28px;color:#d5bd86;font:54px/1 Georgia,serif;text-shadow:0 0 24px #d5bd8655;opacity:.82}
+.home-hero .eyebrow{color:#d0b77d;font-size:8px;letter-spacing:.19em}
+.home-hero h2{position:relative;z-index:1;margin-top:25px;color:#f0e8d8;font:400 clamp(49px,13vw,68px)/.88 'Cormorant Garamond',Georgia,serif;letter-spacing:-.035em}
+.home-hero h2 em{color:#d1b77d}
+.home-hero .muted{position:relative;z-index:1;max-width:290px;color:#c1c9b8;font-size:12px}
+.home-hero .action-button{position:relative;z-index:1;border-color:#b69a64;background:linear-gradient(120deg,#e1d0a5,#c4ae7b);color:#263b34;font-weight:700;box-shadow:0 4px 14px #0b171455}
+.hero-edition{display:block;margin-top:24px;padding-top:10px;border-top:1px solid #d1b77d44;color:#b9b99f;font-size:7px;letter-spacing:.18em}
+.faction-section{margin-top:34px}
+.faction-section-heading{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:15px}
+.section-kicker{color:#927b50;font-size:8px;font-weight:700;letter-spacing:.17em}
+.faction-section-heading h2{margin:6px 0 4px;color:#2c443a;font:400 clamp(27px,7vw,35px)/1 'Cormorant Garamond',Georgia,serif}
+.faction-section-heading p{margin:0;color:#72796d;font-size:10px;line-height:1.5}
+.faction-count{display:grid;justify-items:end;color:#8f7950;font:24px Georgia,serif;white-space:nowrap}
+.faction-count small{font:700 7px inherit;letter-spacing:.15em}
+.faction-card-grid{display:grid;gap:12px}
+.faction-card{position:relative;display:grid;grid-template-columns:38% minmax(0,1fr);min-height:174px;width:100%;overflow:hidden;padding:0;border:1px solid #9c947d;background:linear-gradient(112deg,#263b36,#344a40 58%,#263a35);color:#eee7d6;text-align:left;cursor:pointer;isolation:isolate;box-shadow:0 8px 22px #293d3812;transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease}
+.faction-card:before{position:absolute;inset:5px;z-index:-1;border:1px solid #d7c38c38;content:"";pointer-events:none}
+.faction-card:after{position:absolute;right:-42px;bottom:-88px;z-index:-1;width:190px;height:190px;border:1px solid #d7c38c25;border-radius:50%;box-shadow:0 0 0 14px #d7c38c08,0 0 0 29px #d7c38c07;content:"";pointer-events:none}
+.faction-card:active{transform:scale(.985);border-color:#d0b477;box-shadow:0 3px 12px #293d3826}
+.faction-art{position:relative;display:grid;place-items:center;min-width:0;overflow:hidden;border-right:1px solid #d5c28b44;background:radial-gradient(ellipse at 50% 45%,#c9ac6c26,transparent 58%),linear-gradient(160deg,#30483f,#1b2b29)}
+.faction-art:before,.faction-art:after{position:absolute;content:"";width:78%;aspect-ratio:1;border:1px solid #d8c28a55;border-radius:50%;box-shadow:0 0 0 7px #d8c28a0c,0 0 0 15px #d8c28a09}
+.faction-art:after{width:56%;border-style:dashed;opacity:.55;transform:rotate(22deg)}
+.faction-art b{position:relative;z-index:1;color:#e0c88f;font:clamp(38px,11vw,56px) 'Noto Serif CJK SC','Songti SC',serif;text-shadow:0 2px 16px #d8b66a55}
+.faction-orbit{position:absolute;width:110%;height:38%;border:1px solid #d8c28a30;border-radius:50%;transform:rotate(-35deg)}
+.faction-art-line{position:absolute;bottom:15px;width:32px;height:1px;background:#d6bd82}
+.faction-card-content{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;min-width:0;padding:17px 13px 14px}
+.faction-index{margin-bottom:9px;color:#d2bd89;font-size:7px;font-weight:700;letter-spacing:.12em}
+.faction-card-content strong{color:#f2eadb;font:400 clamp(22px,6vw,29px)/.94 'Cormorant Garamond',Georgia,serif}
+.faction-description{margin-top:9px;color:#c0c7b6;font-size:9px;line-height:1.45}
+.faction-open{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;margin-top:13px;padding-top:9px;border-top:1px solid #d8c28a35;color:#d5c18d;font-size:7px;font-weight:700;letter-spacing:.14em}
+.faction-open b{font-size:13px}
+.faction-golden .faction-art{background:radial-gradient(ellipse at 50% 48%,#c9953e48,transparent 62%),linear-gradient(160deg,#54442d,#263b36)}
+.faction-golden .faction-art b{color:#e6c17a;text-shadow:0 0 22px #d7a64d88}
+.faction-tianhai .faction-art{background:radial-gradient(ellipse at 50% 48%,#80aeb044,transparent 62%),linear-gradient(160deg,#34585a,#1c3035)}
+.faction-tianhai .faction-art b{color:#b7d4cf;text-shadow:0 0 22px #8ac3c788}
+.faction-beiming .faction-art{background:radial-gradient(ellipse at 50% 48%,#91aeb744,transparent 62%),linear-gradient(160deg,#3c4b59,#202c35)}
+.faction-beiming .faction-art b{color:#c8d9dd;text-shadow:0 0 22px #9bc5d788}
+.faction-golden:focus-visible,.faction-tianhai:focus-visible,.faction-beiming:focus-visible{outline:2px solid #b79a61;outline-offset:3px}
+.home-quick-access{margin-top:32px;padding-top:19px;border-top:1px solid #bdb49e}
+.home-quick-access .overview-card{position:relative;display:block;width:100%;min-height:112px;border:1px solid #c7bea9;background:#eee7d6;color:#293d38;text-align:left;cursor:pointer;transition:background .2s ease,border-color .2s ease}
+.home-quick-access .overview-card:active{background:#e2d8c3;border-color:#a68d5e}
+.home-quick-access .overview-card h3{color:#2d433c}
+.home-quick-access .overview-card p{color:#737b70}
+.quick-arrow{position:absolute;right:13px;bottom:12px;color:#9d8557;font-size:14px}
+@media(min-width:620px){.faction-card-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.faction-card{grid-template-columns:1fr;grid-template-rows:145px 1fr;min-height:290px}.faction-art{border-right:0;border-bottom:1px solid #d5c28b44}.faction-card-content{padding:15px}.faction-card-content strong{font-size:26px}}
+@media(prefers-reduced-motion:reduce){.faction-card,.home-quick-access .overview-card{transition:none}}
