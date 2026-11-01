@@ -725,3 +725,14 @@ The complete user-approved design and phase backlog now live in [ETERNAL_PATH_BL
 - Anime.js now drives Eternal Path scene drift, fog/light/weather atmosphere, profile and narrative reveals, choice modal transitions, manager panels, app-screen entrances, toolbar movement and button micro-interactions. Reduced-motion is respected and scene animation scope is disposed on rerender.
 - Current save-slot storage is a versioned local-storage bridge, not final SQLite. SQLite transactions/manifests, complete state migration, ordinary-life simulation, NPC/social systems, ownership/family and integrated progression remain upcoming.
 - CI and physical Android QA must pass before this slice is called verified. No new APK is claimed.
+
+---
+
+## 14. Execution log — 2026-11-02
+
+- **EP-0 implementation slice:** compact single-line Eternal Path heading, scene-first layout, compact character summary, save-local disposition line, narrative hierarchy, choice modal, focus trap, Escape/Android Back close handling, click/navigation lock, and centered ornamental toolbar are present in the active branch. The toolbar's final CSS correction restores horizontal scrolling so every destination remains reachable while preserving gesture-safe margins.
+- **EP-1 groundwork:** schema-v3 journey records include a per-save ID, canon/content package manifest, deterministic seed, disposition state, location, world clock, and separate save slots. Journey create/load/rename/delete/export/import controls are present. This is still a localStorage bridge, not the final transactional SQLite store; atomic crash recovery and robust storage quota handling remain open.
+- **Disposition foundation:** seven hidden axes, public derived label, internal Lawfulness bands and evidence-window transition logic exist. The initial Lawfulness band mismatch was corrected. Choice outcomes are not yet wired to evidence-based disposition updates; do not imply that the alignment system is already gameplay-complete.
+- **Force-close regression:** added tests/offline-game-force-close.test.ts, which simulates a process restart by discarding/re-importing the game module while retaining persistent localStorage, then checks recovery of the active save, latest choice and multiple save slots. This is a regression test, not a physical-device force-stop result.
+- **Validation state:** the current PR head has no reported combined commit statuses at the time of this update. The new force-close test and latest UI changes still require a fresh CI run. No local Android force-stop, emulator pass, APK build, or physical-device QA is claimed.
+- **Next:** run fresh CI; resolve every failure; inspect the built UI at narrow Android dimensions; then move to EP-1 transactional storage and EP-2 simulation integration. Keep SQLite migration behind a storage-adapter contract so UI/game systems do not depend directly on the database vendor.
