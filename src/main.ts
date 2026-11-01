@@ -447,6 +447,14 @@ function bugPanelMarkup(): string {
   </div>`;
 }
 function render(): void {
+  // Each render replaces the screen DOM. Stop all Anime.js loops/listeners
+  // attached to the previous Eternal Path tree before those nodes are detached.
+  // Without this, route switches and repeated game actions accumulate infinite
+  // scene animations and pointer listeners, which can exhaust Android WebView memory.
+  if (cleanupExpeditionAnimations) {
+    try { cleanupExpeditionAnimations(); }
+    finally { cleanupExpeditionAnimations = undefined; }
+  }
   if (activeScreen === "gameplay" && notice && notice !== lastPlayWarningNotice) {
     playWarningBeep();
     lastPlayWarningNotice = notice;
