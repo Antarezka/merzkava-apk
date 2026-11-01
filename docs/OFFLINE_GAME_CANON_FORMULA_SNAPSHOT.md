@@ -3785,3 +3785,767 @@ The following remain open unless established by a later owner-approved source:
 
 The initial territorial names and totals are established by the administrative atlas, while exact geography and current officeholders remain separate facts. Do not use this module to overwrite established characters, clans, dojos, regional identities, or unrelated world lore. When a new fact conflicts with an existing official source, flag the conflict for owner review rather than silently rewriting either source.
 
+
+
+# Supplemental offline simulation data and procedures
+
+> The following sources are preserved verbatim because they provide economic distribution, social simulation, institutional-service, and non-faction learning context for the future offline game. They are not additional `MECHANICS_REFERENCE` formula modules. Apply the authority and privacy boundaries stated in each source.
+
+
+---
+
+<!-- SOURCE world/WEALTH_DISTRIBUTION.md | upstream blob 81d43375005547a10d865bd305939f7a36598ea8 -->
+
+# Merzkava Universe — Global Xuan Gold Distribution
+
+**Status:** Official economic worldbuilding baseline.
+**Scope:** Estimated distribution of global Xuan Gold wealth by territory and primary holder group. Social classes and living conditions are defined separately in `world/SOCIAL_STRATIFICATION.md`.
+**Authority:** This module defines global distribution only. Currency exchange rates, pricing, and transactions remain in `core/10_ECONOMY_SYSTEM.md`.
+
+## 1. Total World Wealth
+
+**400.463.763.789.849 Xuan Gold (xg)** — approximately **400,46 triliun Xuan Gold**.
+
+This is the setting's total accounted wealth pool for this model, not a claim that every unit is a physical coin or that all wealth is liquid and available to spend. It may include currency reserves and financial claims valued in Xuan Gold. This figure is not automatically known to ordinary characters.
+
+Do not count Zun Jade or Ancient Zun a second time on top of this total; use official nominal exchange rates in `core/10_ECONOMY_SYSTEM.md` for conversion.
+
+## 2. Territorial Distribution
+
+Shares follow the requested priority: Golden Dragon Empire, Tianhai Yunzhou, Beiming Gu, then Lawless Territories.
+
+| Rank | Territory | Share | Allocated Xuan Gold |
+|---:|---|---:|---:|
+| 1 | Golden Dragon Empire | 45% | 180.208.693.705.432 xg |
+| 2 | Tianhai Yunzhou | 27% | 108.125.216.223.259 xg |
+| 3 | Beiming Gu | 18% | 72.083.477.482.172 xg |
+| 4 | Lawless Territories | 10% | 40.046.376.378.986 xg |
+
+**Total: 400.463.763.789.849 xg (100%).**
+
+- **Golden Dragon Empire — 45%:** largest concentrated economy, supported by its population, administration, agriculture, inland commerce, industry, clans, and dojos.
+- **Tianhai Yunzhou — 27%:** maritime trade, shipping, sea resources, advanced Arcanistry knowledge, and cross-regional exchange.
+- **Beiming Gu — 18%:** northern resources, mining, rare materials preserved by the cold, and difficult trade routes. Its smaller economic share does not negate its ruler's exceptional individual combat strength.
+- **Lawless Territories — 10%:** dispersed wealth in independent settlements, criminal organizations, smuggling, dangerous expeditions, hidden caches, and unregulated trade. This wealth is fragmented and not controlled by one ruler or unified faction.
+
+These are accounting allocations, not literal piles of cash. They do not establish the exact treasury balance of a named ruler, bank, guild, faction, or market.
+
+## 3. Wealth Concentration by Social Holder
+
+This is the primary ownership view of the same global total. The defining feature of the Merzkava economy is **extreme wealth concentration**: a tiny number of rulers, high-tier clans and sects, and major trade institutions control most recorded wealth. The common population collectively holds only a small fraction.
+
+| Rank | Primary holder group | Share | Allocated Xuan Gold |
+|---:|---|---:|---:|
+| 1 | Penguasa, keluarga penguasa, dan kas negara | 28% | 112.129.853.861.157 xg |
+| 2 | Klan dan sekte tingkat tinggi | 25% | 100.115.940.947.462 xg |
+| 3 | Serikat dagang besar dan konglomerat lintas wilayah | 18% | 72.083.477.482.172 xg |
+| 4 | Bank dan lembaga keuangan besar | 12% | 48.055.651.654.781 xg |
+| 5 | Organisasi/faksi kuat dan pemilik aset skala besar lain | 7% | 28.032.463.465.289 xg |
+| 6 | Sindikat black market besar | 4% | 16.018.550.551.593 xg |
+| 7 | Pedagang/kultivator independen yang sangat kaya | 2% | 8.009.275.275.796 xg |
+| 8 | Rumah lelang resmi: modal operasional milik rumah lelang | 2% | 8.009.275.275.796 xg |
+| 9 | Rakyat jelata: kekayaan pribadi agregat | 1% | 4.004.637.637.898 xg |
+| 10 | Lelang underworld: modal operasional jaringan lelang | 1% | 4.004.637.637.905 xg |
+
+**Total: 400.463.763.789.849 xg (100%).**
+
+The percentages are aggregate accounting shares, not the exact balances of any named ruler, clan, sect, bank, guild, or auction house. The commoner share represents wealth held by the population collectively, not a typical person's personal balance.
+
+### Social classes are not extra wealth categories
+
+The broad social layers—elite, established middle class, lower-income commoners, slum and precarious-housing residents, and homeless or displaced people—are defined in `world/SOCIAL_STRATIFICATION.md`. These layers describe social position and living conditions; they are **not additional ownership shares**. The 1% commoner allocation above remains one aggregate pool. Do not divide it among those layers or add another share without an explicit canon revision.
+
+### What this inequality looks like in everyday life
+
+- **Commoners:** most day-to-day transactions are in Xuan Copper (`xc`) and Xuan Silver (`xs`). Even silver can be important enough to budget carefully. A commoner holding Xuan Gold (`xg`) may attract attention, suspicion, envy, or theft risk; it is not a routine pocket coin for ordinary people.
+- **Xuan Gold:** 1 xg equals 100 xs under the official exchange rate. For many ordinary households, a single gold coin represents a substantial store of value rather than casual spending money.
+- **Zun Jade:** 1 Zun Jade (`zj`) equals 1,000 xg. An ordinary person suddenly producing a Zun Jade is extraordinary and likely to draw scrutiny. It can trigger rumors about hidden patronage, a windfall, theft, or a dangerous background; it does not automatically prove any one explanation.
+- **Rulers and elite lineages:** hold concentrated treasuries, estates, tribute, rare assets, and political-economic leverage. Their wealth is often collective or state-controlled, not entirely personal spending money.
+- **High-tier clans and sects:** possess accumulated reserves, territory, businesses, rare materials, and assets built over generations. Their economic power can dwarf that of entire ordinary towns.
+- **Major trade guilds and banks:** control huge flows of capital, credit, deposits, logistics, and access to distant markets. The value they administer is not necessarily all their own equity; use the primary-holder ledger consistently to prevent double counting.
+- **Exceptions:** a poor-looking traveler may be secretly wealthy, and a commoner may inherit or earn a gold coin. Such exceptions are possible but unusual and should have a credible source; do not treat them as the norm.
+
+Currency conversion rates do not change because a person is poor. Social inequality is expressed through access, savings, credit, property, opportunities, and risk—not through a different official exchange rate for each social class.
+
+## 4. Markets and Trading Channels (Not Additional Wealth Shares)
+
+Land, sea, and air markets, along with ordinary auctions and underworld auctions, are **transaction channels**, not extra ownership categories. The money and goods passing through them already belong to rulers, guilds, banks, organizations, merchants, or individuals counted above. Do not allocate a separate percentage of the global total to a market channel and then add it to the ownership table.
+
+- **Land markets:** caravan routes, city bazaars, inland wholesalers, rural markets, and overland trade.
+- **Sea markets:** ports, shipping exchanges, maritime merchants, island trade, and sea-route wholesalers.
+- **Air markets:** aerial trade routes and sky markets where such infrastructure exists.
+- **Official and high-tier auctions:** the auction house charges fees and holds operating capital; the full sale value of an item belongs to its seller until the transaction rules record the transfer.
+- **Underworld auctions:** concealed auction circuits may handle rare, illegal, stolen, or politically sensitive goods. Their gross transaction volume is not equivalent to the auction network's own wealth.
+- **Large black markets:** these are primarily networks and operators holding their own capital, not a synonym for all Lawless Territories commerce.
+
+Market size should be described through recorded transaction volume, inventory, fees, and reach when those data exist. Do not invent a market's exact annual turnover or balance from this global ownership table.
+## 5. Economic Geography
+
+1. **Golden Dragon Empire** holds the largest aggregate share and broadest concentration of wealth.
+2. **Tianhai Yunzhou** is second and disproportionately important to maritime and cross-regional exchange.
+3. **Beiming Gu** is third overall, but specific northern materials may still command very high prices due to scarcity and transport risk.
+4. **Lawless Territories** hold the smallest aggregate share, yet individual hidden caches or criminal networks may control exceptional fortunes. Such cases must be established individually.
+
+Territorial wealth does not directly determine combat strength, cultivation level, political control, technology, or whether a particular item is available. A region's share does not establish the wealth of every resident.
+
+## 6. GM Rules
+
+1. Treat the global total and percentages as the setting's baseline unless the repository owner explicitly revises them.
+2. The territorial table and holder table are two views of the **same total**. Never add the two tables together.
+3. Do not divide a territory's allocation among named rulers, guilds, banks, factions, or markets without an additional canon record.
+4. Do not assume a ruler personally owns every unit assigned to their territory.
+5. Do not assume all wealth is liquid, safe, transferable, publicly known, or available in a local market.
+6. Prices, exchange rates, scarcity, transaction costs, and character balances follow `core/10_ECONOMY_SYSTEM.md`.
+7. Do not invent a named organization's exact balance, a ruler's private fortune, or a specific vault's contents during gameplay. These require an official record or a clearly labeled provisional estimate where bootstrap rules permit one.
+8. Rumors about hidden wealth, black-market reserves, or underworld auction funds are not proof. Character knowledge must have a plausible source.
+
+## 7. Canon Boundaries
+
+This module does not establish the exact treasury balance of any named ruler or state; the ownership share of each guild, bank, faction, or auction house; physical coins versus ledger claims; annual income, taxes, debt, inflation, money-supply growth, or minting rates; or the amount held in a particular market, vault, ship, or hidden cache.
+
+Those details remain `???` until explicitly established.
+
+
+
+---
+
+<!-- SOURCE world/SOCIAL_STRATIFICATION.md | upstream blob bf52823288b147c01b349e1e7a20c98e2fd22ed5 -->
+
+# Merzkava Universe — Social Stratification
+
+**Status:** Official social-worldbuilding baseline.  
+**Scope:** Social classes, economic vulnerability, living conditions, and social mobility.  
+**Related modules:** `world/WORLD.md`, `world/WEALTH_DISTRIBUTION.md`, `world/MAP_AND_REGIONS.md`, `world/FACTIONS.md`, `core/10_ECONOMY_SYSTEM.md`.
+
+This module defines broad social layers, not a universal legal caste code. A region, city, clan, sect, or occupation may have its own hierarchy, privileges, and terminology. Do not assume that every territory uses the same formal ranks.
+
+## 1. Core Principle
+
+Merzkava Universe has **extreme inequality**. Political authority, cultivation strength, family background, land ownership, access to education, connections, and control of resources can reinforce one another. Wealth and social standing overlap, but they are not identical: a powerful cultivator may be poor, while a wealthy merchant may lack combat power.
+
+A prosperous city is not a prosperous life for everyone. Luxury districts, wealthy institutions, busy markets, crowded worker housing, slums, and people sleeping on the street can coexist within the same city.
+
+## 2. Broad Social Layers
+
+These are descriptive layers, not guaranteed fixed ranks or a promise that every person fits neatly into one category.
+
+### A. Elite and Ruling Houses
+
+Examples include rulers and their families, senior officials, high-tier clans and sects, major guild leaders, powerful financiers, and owners of exceptionally valuable assets.
+
+- They have disproportionate access to property, capital, protection, cultivation resources, education, healthcare, and political influence.
+- Their wealth may be held collectively by a state, family, clan, sect, guild, or institution; it is not automatically the personal spending money of one individual.
+- Elite status does not guarantee personal strength, competence, loyalty, or safety.
+
+### B. Upper and Established Middle Class
+
+Examples may include successful merchants, established shopkeepers, master artisans, respected physicians, skilled administrators, landholding farmers, and independent cultivators with stable resources.
+
+- They may own a home, productive assets, a business, savings, or a reliable source of income.
+- They can afford more choices than poor households, but major illness, debt, business failure, conflict, or loss of a patron can sharply reduce their standing.
+- A stable middle-class household should not automatically be treated as wealthy enough to casually spend Xuan Gold.
+
+### C. Lower-Income Commoners and the Working Poor
+
+Examples may include day laborers, tenant farmers, porters, servants, low-paid workshop workers, miners, and households with little property or savings.
+
+- Income is often spent on food, rent, clothing, transport, medicine, and family needs.
+- Missed wages, a failed harvest, injury, or sudden fees can cause immediate hardship.
+- Xuan Copper and Xuan Silver are important in ordinary budgets. A Xuan Gold coin may represent substantial savings rather than casual pocket money.
+
+### D. Slum and Precarious-Housing Residents
+
+**Slum residence is a living condition, not a separate occupation or a single moral category.** Residents may include employed laborers, migrants, displaced families, low-income artisans, indebted households, and people who have recently lost stable housing.
+
+- Housing may be crowded, unsafe, poorly maintained, or lacking reliable sanitation and services.
+- Residents can have jobs and social ties while still living in severe deprivation.
+- Slums can exist beside wealthy markets, ports, sect compounds, and elite districts, including in prosperous cities.
+- Do not assume every resident is homeless, criminal, unemployed, or poor in exactly the same way.
+
+### E. Homeless, Displaced, and Abandoned People
+
+This includes people without stable shelter or reliable protection, such as some beggars, refugees, displaced families, abandoned children, people expelled from their homes, and those ruined by debt or disaster.
+
+- Their circumstances vary: some may work irregularly, rely on charity, receive help from a temple or organization, or survive through informal networks.
+- They face heightened exposure to hunger, illness, violence, exploitation, and coercion.
+- Homelessness does not prove laziness, criminality, or personal failure. It may follow war, disaster, family rejection, illness, debt, discrimination, or loss of livelihood.
+- Do not assume all homeless people have zero possessions or no useful skills.
+
+## 3. Status Is Not a Single Ladder
+
+Track these dimensions separately when relevant:
+
+- **Social standing:** recognition, family name, rank, legal status, and reputation.
+- **Personal wealth:** money, property, savings, productive assets, liabilities, and debts.
+- **Living conditions:** shelter, food security, sanitation, healthcare, and personal safety.
+- **Power and access:** cultivation, combat ability, education, patrons, institutional membership, and political connections.
+
+A person can be wealthy but socially distrusted, high-ranked but indebted, talented but unable to afford training, or employed while living in a slum. Do not collapse these differences into one label.
+
+## 4. Currency and Everyday Inequality
+
+Use the official exchange rates in `core/10_ECONOMY_SYSTEM.md`; poverty does not create a different exchange rate.
+
+- Xuan Copper (`xc`) and Xuan Silver (`xs`) are the ordinary working denominations for many commoners.
+- Even Xuan Silver may be carefully budgeted by low-income households.
+- Xuan Gold (`xg`) is extraordinary money for many ordinary households. Someone openly carrying it may attract attention, envy, suspicion, or theft risk depending on the place and circumstances.
+- One Zun Jade (`zj`) is worth 1,000 Xuan Gold under the official rate. An ordinary person suddenly producing one is unusual and may prompt questions or rumors, but it does not prove a specific origin.
+- Ancient Zun (`az`) is rarer still; its official exchange rate is 10 Zun Jade for 1 Ancient Zun. Do not treat either high denomination as ordinary spending money.
+- These are social expectations, not absolute prohibitions. Credible exceptions include inheritance, wages from unusual work, rewards, patronage, windfalls, hidden assets, or theft.
+
+Do not invent a typical balance for an entire class unless a separate canon rule establishes it. Character balances must follow their recorded profile and transactions.
+
+## 5. Social Mobility and Vulnerability
+
+Movement between layers is possible but unequal and never automatic. Possible causes include successful trade, skilled work, cultivation achievement, examination or service, marriage, inheritance, patronage, military reward, debt, illness, disaster, war, expulsion, or loss of a sponsor.
+
+- Wealth and connections often let elites recover from setbacks more easily.
+- Poor households may face cascading losses when one essential worker becomes ill or injured.
+- A talented commoner does not automatically receive training, protection, or social acceptance.
+- A wealthy newcomer does not automatically gain noble status, political legitimacy, or trust.
+- A prosperous city may offer opportunities while also having high rents, exploitative employers, exclusionary institutions, and severe poverty.
+
+## 6. Regional and Local Variation
+
+The broad layers apply across Merzkava Universe, but their visibility and boundaries vary by region, city, village, port, sect territory, and local law. The Lawless Territories may have different forms of protection and status, but should not be treated as uniformly lawless or uniformly poor.
+
+Do not infer a named city's poverty rate, slum size, homeless population, class percentages, or exact household incomes from its prosperity or territorial wealth share. Those details remain `???` until established by canon or clearly labeled as a local provisional estimate when permitted.
+
+## 7. GM Rules
+
+1. Use this module when describing ordinary NPC backgrounds, housing, class differences, access to services, and social consequences of money.
+2. Use `world/WEALTH_DISTRIBUTION.md` for the global wealth baseline; its **1% commoner share is aggregate**, not a separate allocation for each commoner layer.
+3. Do not divide that 1% among middle-class, poor, slum-resident, or homeless groups without a future explicit canon decision. Do not double-count wealth.
+4. Use `core/10_ECONOMY_SYSTEM.md` for prices, exchange rates, transactions, and character balances.
+5. Do not treat slum residents or homeless people as a uniform group, and do not assume prosperity removes local poverty.
+6. Do not assign a social layer solely from cultivation rank, clothing, occupation, or one visible coin; consider the available evidence and character knowledge.
+7. Unknown local statistics, named households' wealth, and individual backstories remain `???` unless established by recorded events or a permitted, clearly labeled provisional estimate.
+
+---
+
+**Canon boundary:** This module establishes the broad social structure and expectations above, not exact class population shares, formal caste laws for every territory, poverty statistics, or individual NPC biographies.
+
+
+
+---
+
+<!-- SOURCE world/GOLDEN_DRAGON_EMPIRE_POPULATION_SERVICES.md | upstream blob af9c0b1c5a7d13742d7d1493ad43930ab75b8325 -->
+
+# Golden Dragon Empire — Population Services and Institutional Branch Register
+
+**Status:** Owner-authorized worldbuilding addition.  
+**Scope:** Named branch network for the Golden Dragon Empire's residents: Ninefold Concord Bank, Myriad Ledger Exchange, Medicine Hall Society, Cultivator Academies, and Ordo Suci Tianming's public knowledge libraries.  
+**Administrative source:** `world/GOLDEN_DRAGON_EMPIRE_ADMINISTRATIVE_ATLAS.md` remains authoritative for regional and prefectural names, seats, population planning estimates, and jurisdiction counts.  
+**Institutional source:** `world/WORLD.md`, `world/FACTIONS.md`, `world/WANLUO_SACRED_EXPANSE.md`, and `core/CULTIVATOR_ACADEMIES.md`.
+
+## 1. What already existed, and what this file adds
+
+Already established in the repository:
+- The Golden Dragon Empire's baseline population is **320 million**, with regional planning estimates in the administrative atlas.
+- **Ninefold Concord Bank** is an interregional financial institution; its services may include deposits, transfers, debt records, and trade financing. It seeks operational neutrality, but branches can face pressure or crime.
+- **Myriad Ledger Exchange** brokers information, contacts, buyers/sellers, and market information. Its reports can be incomplete or wrong.
+- **Medicine Hall Society** is a neutral medical network spread across the world; its specific branches and hierarchy were not previously named.
+- **Cultivator Academies** were an established educational concept; this revision now names two central institutions and establishes their boarding model. Admission rules, fees, and detailed school policies remain undefined.
+- **Ordo Suci Tianming** is a world-spanning religious organization headquartered at the Sanctum of Ten Thousand Vows in Wanluo. Its broad network includes religious houses and observation/assessment facilities; its individual branch names were not specified.
+
+This register fills selected missing *institution names and locations* for the Golden Dragon Empire. Specific branch names, academy names, and locations below are new worldbuilding additions. The academy and library lists are intentionally selective, not a uniform network across the Golden Dragon Empire.
+
+## 2. Population and access principles
+
+- The Golden Dragon Empire's **320 million** remains a planning baseline, not a precise census known to every resident. Regional totals and counts remain in the atlas.
+- The two academies are both in Huanglongcheng; only three Ordo public libraries are named here. Banks, Exchange offices, and Medicine Hall Society service points are **not equally capable everywhere**: a listed branch is not a promise of capital-city service, specialist staff, large reserves, or immediate assistance.
+- Development follows a center-to-periphery gradient. Huanglongcheng and the Longyuan core have the broadest selection of services, skilled staff, infrastructure, and reliable access. Major regional seats provide useful but narrower services. Remote rural areas may have no permanent branch at all and depend on travelling traders, local practitioners, family networks, or occasional service visits.
+- Broad service tiers: **Longyuan** — flagship and most complete; **Canglan and Tianfeng** — strong regional hubs with more limited rural reach; **Jinyue, Yanling, and Xingluo** — capable specialist hubs around mines, furnaces, and ports but uneven inland coverage; **Baiyue** — frontier-limited service, smaller stocks, fewer specialists, and slower support away from garrison routes. Prosperous trade enclaves may be exceptions within otherwise neglected regions.
+- One listed institution does not mean it has unlimited funds, staff, stock, or influence. Branch staffing, opening hours, service fees, individual workers, and local operating conditions remain scene-level details until established.
+- A branch's presence does not mean the governor, prefect, clan, or local military commands it. Institutional governance and civil authority remain separate.
+- The roster names public-facing institutions. Secret facilities, hidden branches, internal ranks, and restricted archives are not added here.
+
+
+### Regional service gradient for all listed networks
+
+| Tier | Area | Expected availability |
+|---|---|---|
+| Core | Huanglongcheng and the Longyuan heartland | Broadest hours and services, deeper staff and stock, easiest access to central authorities and specialist referrals |
+| Inner regional hubs | Canglan and Tianfeng regional seats and main corridors | Reliable core services in major seats; noticeably thinner availability outside principal routes |
+| Outer specialist hubs | Jinyue, Yanling, and Xingluo major mining, furnace, and port centers | Strong services tied to local industries; fewer general services and uneven coverage in remote hinterlands |
+| Frontier periphery | Baiyue, especially remote passes and rural settlements | Basic or intermittent services, smaller stocks, fewer specialists, and slower resupply; defense routes may receive priority over ordinary civilian needs |
+
+A service point in a prefectural seat does not mean its surrounding villages have a branch. In remote settlements, access may require travel to the seat or waiting for a travelling provider. Treat individual availability as a scene-level fact rather than assuming uniform national coverage.
+
+## 3. Ninefold Concord Bank — prefectural branch network
+
+Ninefold Concord Bank has named public branches in the listed major service settlements. Some branches remain in former prefectural seats; those places remain towns/cities and service hubs, not separate prefectures. The table is a service network, not a claim that every prefecture or village has equal access. Its network supports deposits, withdrawals where funds are available, verified transfers, debt and contract records, and trade finance according to branch capacity. A branch's balance sheet is not the same as all customer deposits it administers.
+
+| Region | Prefecture | Branch / seat | Main local service emphasis |
+|---|---|---|---|
+| Longyuan | Huanglong Prefecture | Ninefold Concord Bank — Huanglongcheng Branch | istana, administrasi, dan bangsawan |
+| Longyuan | Jade Seal Prefecture | Ninefold Concord Bank — Yuxi Branch | istana, administrasi, dan bangsawan |
+| Longyuan | Huanglong Prefecture (Zhuque settlement) | Ninefold Concord Bank — Zhuque Branch | istana, administrasi, dan bangsawan |
+| Longyuan | Jade Seal Prefecture | Ninefold Concord Bank — Jintai Branch | istana, administrasi, dan bangsawan |
+| Longyuan | Huanglong Prefecture (Guanhe settlement) | Ninefold Concord Bank — Guanhe Branch | istana, administrasi, dan bangsawan |
+| Longyuan | Jade Seal Prefecture (former White Stag district) | Ninefold Concord Bank — Bailu Branch | istana, administrasi, dan bangsawan |
+| Canglan | Qinghe Prefecture | Ninefold Concord Bank — Qinghe Branch | sungai, irigasi, pertanian, dan pangan |
+| Canglan | Jiangbei Prefecture | Ninefold Concord Bank — Jiangbei Branch | sungai, irigasi, pertanian, dan pangan |
+| Canglan | Qinghe Prefecture (Lianzhou settlement) | Ninefold Concord Bank — Lianzhou Branch | sungai, irigasi, pertanian, dan pangan |
+| Canglan | Jiangbei Prefecture (Mingchuan settlement) | Ninefold Concord Bank — Mingchuan Branch | sungai, irigasi, pertanian, dan pangan |
+| Canglan | Qinghe Prefecture (Yunshui settlement) | Ninefold Concord Bank — Yunshui Branch | sungai, irigasi, pertanian, dan pangan |
+| Canglan | Jiangbei Prefecture (Shuangjiang settlement) | Ninefold Concord Bank — Shuangjiang Branch | sungai, irigasi, pertanian, dan pangan |
+| Canglan | Jiangbei Prefecture (former Lotus Ford district; Lianjin service hub) | Ninefold Concord Bank — Lianjin Branch | sungai, irigasi, pertanian, dan pangan |
+| Canglan | Qinghe Prefecture (former Granary Plain district) | Ninefold Concord Bank — Cangping Branch | sungai, irigasi, pertanian, dan pangan |
+| Jinyue | Jadevein Prefecture | Ninefold Concord Bank — Yumai Branch | pertambangan, logam spiritual, dan bahan artefak |
+| Jinyue | Ironcloud Prefecture | Ninefold Concord Bank — Tieyun Branch | pertambangan, logam spiritual, dan bahan artefak |
+| Jinyue | Ironcloud Prefecture (former Deepstone district) | Ninefold Concord Bank — Shenshi Branch | pertambangan, logam spiritual, dan bahan artefak |
+| Jinyue | Jadevein Prefecture (Jinsha settlement) | Ninefold Concord Bank — Jinsha Branch | pertambangan, logam spiritual, dan bahan artefak |
+| Jinyue | Ironcloud Prefecture (Lingkuang settlement) | Ninefold Concord Bank — Lingkuang Branch | pertambangan, logam spiritual, dan bahan artefak |
+| Tianfeng | Heavenly Script Prefecture | Ninefold Concord Bank — Tianshu Branch | tradisi keilmuan, literasi, dan arsip (bukan lokasi akademi) |
+| Tianfeng | Cloud Summit Prefecture | Ninefold Concord Bank — Yunding Branch | tradisi keilmuan, literasi, dan arsip (bukan lokasi akademi) |
+| Tianfeng | Heavenly Script Prefecture (Wenchuan settlement) | Ninefold Concord Bank — Wenchuan Branch | tradisi keilmuan, literasi, dan arsip (bukan lokasi akademi) |
+| Tianfeng | Cloud Summit Prefecture (Songmo settlement) | Ninefold Concord Bank — Songmo Branch | tradisi keilmuan, literasi, dan arsip (bukan lokasi akademi) |
+| Tianfeng | Heavenly Script Prefecture (former Hundred Schools district; Baixue service hub) | Ninefold Concord Bank — Baixue Branch | tradisi keilmuan, literasi, dan arsip (bukan lokasi akademi) |
+| Tianfeng | Heavenly Script Prefecture (former Jade Lecture district) | Ninefold Concord Bank — Yuyan Branch | tradisi keilmuan, literasi, dan arsip (bukan lokasi akademi) |
+| Yanling | Red Furnace Prefecture | Ninefold Concord Bank — Honglu Branch | pandai besi, tungku, dan industri spiritual |
+| Yanling | Ashen Peak Prefecture | Ninefold Concord Bank — Huifeng Branch | pandai besi, tungku, dan industri spiritual |
+| Yanling | Red Furnace Prefecture (Rongjiang settlement) | Ninefold Concord Bank — Rongjiang Branch | pandai besi, tungku, dan industri spiritual |
+| Yanling | Ashen Peak Prefecture (Heitie settlement) | Ninefold Concord Bank — Heitie Branch | pandai besi, tungku, dan industri spiritual |
+| Yanling | Red Furnace Prefecture (former Emberstone district) | Ninefold Concord Bank — Huoshi Branch | pandai besi, tungku, dan industri spiritual |
+| Yanling | Red Furnace Prefecture (former Flame Basin district; Yanpen service hub) | Ninefold Concord Bank — Yanpen Branch | pandai besi, tungku, dan industri spiritual |
+| Baiyue | Northwatch Prefecture | Ninefold Concord Bank — Beiguan Branch | benteng, jalur militer, dan perbatasan |
+| Baiyue | Northwatch Prefecture (Tieguan settlement) | Ninefold Concord Bank — Tieguan Branch | benteng, jalur militer, dan perbatasan |
+| Baiyue | Northwatch Prefecture (Shibi settlement) | Ninefold Concord Bank — Shibi Branch | benteng, jalur militer, dan perbatasan |
+| Baiyue | Northwatch Prefecture (Yingshan settlement) | Ninefold Concord Bank — Yingshan Branch | benteng, jalur militer, dan perbatasan |
+| Baiyue | Northwatch Prefecture (former Storm Banner district) | Ninefold Concord Bank — Fengqi Branch | benteng, jalur militer, dan perbatasan |
+| Baiyue | Northwatch Prefecture (Changguan settlement) | Ninefold Concord Bank — Changguan Branch | benteng, jalur militer, dan perbatasan |
+| Baiyue | Northwatch Prefecture (former Pine Shield district; Songdun service hub) | Ninefold Concord Bank — Songdun Branch | benteng, jalur militer, dan perbatasan |
+| Xingluo | Eastern Star Prefecture | Ninefold Concord Bank — Dongxing Branch | pelabuhan, perdagangan laut, dan diplomasi |
+| Xingluo | Eastern Star Prefecture (Mingzhu settlement) | Ninefold Concord Bank — Mingzhu Branch | pelabuhan, perdagangan laut, dan diplomasi |
+| Xingluo | Eastern Star Prefecture (Lanfan settlement) | Ninefold Concord Bank — Lanfan Branch | pelabuhan, perdagangan laut, dan diplomasi |
+| Xingluo | Eastern Star Prefecture (Chaoguan settlement) | Ninefold Concord Bank — Chaoguan Branch | pelabuhan, perdagangan laut, dan diplomasi |
+| Xingluo | Eastern Star Prefecture (Yanfeng settlement) | Ninefold Concord Bank — Yanfeng Branch | pelabuhan, perdagangan laut, dan diplomasi |
+| Xingluo | Eastern Star Prefecture (former Jade Coast district) | Ninefold Concord Bank — Yuhai Branch | pelabuhan, perdagangan laut, dan diplomasi |
+| Xingluo | Eastern Star Prefecture (former Far Lantern district; Yuandeng service hub) | Ninefold Concord Bank — Yuandeng Branch | pelabuhan, perdagangan laut, dan diplomasi |
+| Xingluo | Eastern Star Prefecture (former Dragonwake district; Longchao service hub) | Ninefold Concord Bank — Longchao Branch | pelabuhan, perdagangan laut, dan diplomasi |
+
+**Banking rules**
+- Branches share the institution's stated goal of practical neutrality; neutrality does not prevent bribery attempts, robbery, fraud, coercion, or political pressure.
+- Deposits, credit, transfers, and identity verification depend on actual branch procedures and resources. No automatic loan approval, instant cross-world transfer, or guaranteed confidentiality beyond established policy is implied.
+- The existence of a branch does not establish its manager, fee schedule, vault size, or exact cash reserve.
+
+## 4. Myriad Ledger Exchange — information offices
+
+The Exchange has named offices across major service settlements. Offices in former prefectural seats remain valid local offices, but their host settlements are not separate prefectures. This is a selective network, not a claim that every prefecture or village has an office. These offices connect local buyers and sellers, help locate specialists and contacts, and broker market or event information. The Exchange sells access and leads—not guaranteed truth.
+
+| Region | Prefecture | Office / seat | Local information focus |
+|---|---|---|---|
+| Longyuan | Huanglong Prefecture | Myriad Ledger Exchange — Huanglongcheng Office | istana, administrasi, dan bangsawan |
+| Longyuan | Jade Seal Prefecture | Myriad Ledger Exchange — Yuxi Office | istana, administrasi, dan bangsawan |
+| Longyuan | Huanglong Prefecture (Zhuque settlement) | Myriad Ledger Exchange — Zhuque Office | istana, administrasi, dan bangsawan |
+| Longyuan | Jade Seal Prefecture | Myriad Ledger Exchange — Jintai Office | istana, administrasi, dan bangsawan |
+| Longyuan | Huanglong Prefecture (Guanhe settlement) | Myriad Ledger Exchange — Guanhe Office | istana, administrasi, dan bangsawan |
+| Longyuan | Jade Seal Prefecture (former White Stag district) | Myriad Ledger Exchange — Bailu Office | istana, administrasi, dan bangsawan |
+| Canglan | Qinghe Prefecture | Myriad Ledger Exchange — Qinghe Office | sungai, irigasi, pertanian, dan pangan |
+| Canglan | Jiangbei Prefecture | Myriad Ledger Exchange — Jiangbei Office | sungai, irigasi, pertanian, dan pangan |
+| Canglan | Qinghe Prefecture (Lianzhou settlement) | Myriad Ledger Exchange — Lianzhou Office | sungai, irigasi, pertanian, dan pangan |
+| Canglan | Jiangbei Prefecture (Mingchuan settlement) | Myriad Ledger Exchange — Mingchuan Office | sungai, irigasi, pertanian, dan pangan |
+| Canglan | Qinghe Prefecture (Yunshui settlement) | Myriad Ledger Exchange — Yunshui Office | sungai, irigasi, pertanian, dan pangan |
+| Canglan | Jiangbei Prefecture (Shuangjiang settlement) | Myriad Ledger Exchange — Shuangjiang Office | sungai, irigasi, pertanian, dan pangan |
+| Canglan | Jiangbei Prefecture (Shuangjiang settlement) (former Lotus Ford district) | Myriad Ledger Exchange — Lianjin Office | sungai, irigasi, pertanian, dan pangan |
+| Canglan | Qinghe Prefecture (former Granary Plain district) | Myriad Ledger Exchange — Cangping Office | sungai, irigasi, pertanian, dan pangan |
+| Jinyue | Jadevein Prefecture | Myriad Ledger Exchange — Yumai Office | pertambangan, logam spiritual, dan bahan artefak |
+| Jinyue | Ironcloud Prefecture | Myriad Ledger Exchange — Tieyun Office | pertambangan, logam spiritual, dan bahan artefak |
+| Jinyue | Ironcloud Prefecture (former Deepstone district) | Myriad Ledger Exchange — Shenshi Office | pertambangan, logam spiritual, dan bahan artefak |
+| Jinyue | Jadevein Prefecture (Jinsha settlement) | Myriad Ledger Exchange — Jinsha Office | pertambangan, logam spiritual, dan bahan artefak |
+| Jinyue | Ironcloud Prefecture (Lingkuang settlement) | Myriad Ledger Exchange — Lingkuang Office | pertambangan, logam spiritual, dan bahan artefak |
+| Tianfeng | Heavenly Script Prefecture | Myriad Ledger Exchange — Tianshu Office | tradisi keilmuan, literasi, dan arsip (bukan lokasi akademi) |
+| Tianfeng | Cloud Summit Prefecture | Myriad Ledger Exchange — Yunding Office | tradisi keilmuan, literasi, dan arsip (bukan lokasi akademi) |
+| Tianfeng | Heavenly Script Prefecture (Wenchuan settlement) | Myriad Ledger Exchange — Wenchuan Office | tradisi keilmuan, literasi, dan arsip (bukan lokasi akademi) |
+| Tianfeng | Cloud Summit Prefecture (Songmo settlement) | Myriad Ledger Exchange — Songmo Office | tradisi keilmuan, literasi, dan arsip (bukan lokasi akademi) |
+| Tianfeng | Heavenly Script Prefecture (Wenchuan settlement) (former Hundred Schools district) | Myriad Ledger Exchange — Baixue Office | tradisi keilmuan, literasi, dan arsip (bukan lokasi akademi) |
+| Tianfeng | Heavenly Script Prefecture (former Jade Lecture district) | Myriad Ledger Exchange — Yuyan Office | tradisi keilmuan, literasi, dan arsip (bukan lokasi akademi) |
+| Yanling | Red Furnace Prefecture | Myriad Ledger Exchange — Honglu Office | pandai besi, tungku, dan industri spiritual |
+| Yanling | Ashen Peak Prefecture | Myriad Ledger Exchange — Huifeng Office | pandai besi, tungku, dan industri spiritual |
+| Yanling | Red Furnace Prefecture (Rongjiang settlement) | Myriad Ledger Exchange — Rongjiang Office | pandai besi, tungku, dan industri spiritual |
+| Yanling | Ashen Peak Prefecture (Heitie settlement) | Myriad Ledger Exchange — Heitie Office | pandai besi, tungku, dan industri spiritual |
+| Yanling | Red Furnace Prefecture (former Emberstone district) | Myriad Ledger Exchange — Huoshi Office | pandai besi, tungku, dan industri spiritual |
+| Yanling | Red Furnace Prefecture (Rongjiang settlement) (former Flame Basin district) | Myriad Ledger Exchange — Yanpen Office | pandai besi, tungku, dan industri spiritual |
+| Baiyue | Northwatch Prefecture | Myriad Ledger Exchange — Beiguan Office | benteng, jalur militer, dan perbatasan |
+| Baiyue | Northwatch Prefecture (Tieguan settlement) | Myriad Ledger Exchange — Tieguan Office | benteng, jalur militer, dan perbatasan |
+| Baiyue | Northwatch Prefecture (Shibi settlement) | Myriad Ledger Exchange — Shibi Office | benteng, jalur militer, dan perbatasan |
+| Baiyue | Northwatch Prefecture (Yingshan settlement) | Myriad Ledger Exchange — Yingshan Office | benteng, jalur militer, dan perbatasan |
+| Baiyue | Northwatch Prefecture (former Storm Banner district) | Myriad Ledger Exchange — Fengqi Office | benteng, jalur militer, dan perbatasan |
+| Baiyue | Northwatch Prefecture (Changguan settlement) | Myriad Ledger Exchange — Changguan Office | benteng, jalur militer, dan perbatasan |
+| Baiyue | Northwatch Prefecture (Changguan settlement) (former Pine Shield district) | Myriad Ledger Exchange — Songdun Office | benteng, jalur militer, dan perbatasan |
+| Xingluo | Eastern Star Prefecture | Myriad Ledger Exchange — Dongxing Office | pelabuhan, perdagangan laut, dan diplomasi |
+| Xingluo | Eastern Star Prefecture (Mingzhu settlement) | Myriad Ledger Exchange — Mingzhu Office | pelabuhan, perdagangan laut, dan diplomasi |
+| Xingluo | Eastern Star Prefecture (Lanfan settlement) | Myriad Ledger Exchange — Lanfan Office | pelabuhan, perdagangan laut, dan diplomasi |
+| Xingluo | Eastern Star Prefecture (Chaoguan settlement) | Myriad Ledger Exchange — Chaoguan Office | pelabuhan, perdagangan laut, dan diplomasi |
+| Xingluo | Eastern Star Prefecture (Yanfeng settlement) | Myriad Ledger Exchange — Yanfeng Office | pelabuhan, perdagangan laut, dan diplomasi |
+| Xingluo | Eastern Star Prefecture (former Jade Coast district) | Myriad Ledger Exchange — Yuhai Office | pelabuhan, perdagangan laut, dan diplomasi |
+| Xingluo | Eastern Star Prefecture (Chaoguan settlement) (former Far Lantern district) | Myriad Ledger Exchange — Yuandeng Office | pelabuhan, perdagangan laut, dan diplomasi |
+| Xingluo | Eastern Star Prefecture (Lanfan settlement) (former Dragonwake district) | Myriad Ledger Exchange — Longchao Office | pelabuhan, perdagangan laut, dan diplomasi |
+
+**Information-service limits**
+- A report should carry an appropriate confidence label: verified by multiple credible sources, single-source report, rumor, or disputed claim.
+- Offices may decline inquiries that are too risky, too expensive, or outside their reach.
+- An office's existence does not prove it knows every event in the region, and payment does not turn an unverified rumor into fact.
+
+## 5. Medicine Hall Society — regional halls and prefectural clinics
+
+Medicine Hall Society remains a neutral medical network. This register adds one regional hall in each of the seven regions and selected named public clinics across established settlements. Clinics located in former prefectural seats remain service locations; they do not create extra prefectures. The Society is not the only source of medical care; independent healers and other institutions can also operate.
+
+| Region | Regional hall | Named clinic locations (service hubs, not administrative units) |
+|---|---|---|
+| Longyuan | Medicine Hall Society — Huanglongcheng Regional Hall | Huanglongcheng, Yuxi, Zhuque, Jintai, Guanhe, Bailu |
+| Canglan | Medicine Hall Society — Qinghe Regional Hall | Qinghe, Jiangbei, Lianzhou, Mingchuan, Yunshui, Shuangjiang, Lianjin, Cangping |
+| Jinyue | Medicine Hall Society — Yumai Regional Hall | Yumai, Tieyun, Shenshi, Jinsha, Lingkuang |
+| Tianfeng | Medicine Hall Society — Tianshu Regional Hall | Tianshu, Yunding, Wenchuan, Songmo, Baixue, Yuyan |
+| Yanling | Medicine Hall Society — Honglu Regional Hall | Honglu, Huifeng, Rongjiang, Heitie, Huoshi, Yanpen |
+| Baiyue | Medicine Hall Society — Beiguan Regional Hall | Beiguan, Tieguan, Shibi, Yingshan, Fengqi, Changguan, Songdun |
+| Xingluo | Medicine Hall Society — Dongxing Regional Hall | Dongxing, Mingzhu, Lanfan, Chaoguan, Yanfeng, Yuhai, Yuandeng, Longchao |
+
+**Medical network principles**
+- Regional halls coordinate referrals, medical knowledge, and supplies within their means; prefectural clinics provide a local point of contact.
+- Neutrality is a declared institutional principle, not a guarantee that every practitioner is honest or that treatment is free.
+- Special treatments, rare medicines, emergency capacity, prices, and individual doctors must be established in context. Do not infer a cure from the Society's name. A listed clinic is a service hub/referral point, not a guarantee of a particular specialist, stock, immediate attendance, or successful treatment. Apply `core/INJURY_SYSTEM.md` for injury recovery and `core/HP_SYSTEM.md` for HP; do not derive treatment rates from branch status.
+
+## 6. Cultivator Academies — two central boarding academies
+
+The Golden Dragon Empire has **two named Cultivator Academies established in this register**, both located in **Huanglongcheng, the imperial capital in Longyuan**. They are central institutions rather than a prefecture-by-prefecture school network. Families outside the capital must arrange travel and may face substantial costs or practical barriers; the academies do not imply universal access to formal cultivation education.
+
+| Academy | Location | General focus | Student residence |
+|---|---|---|---|
+| Imperial Foundation Academy | Huanglongcheng, Longyuan | Foundational literacy, civic knowledge, cultivation theory, Martial Soul and Spirit Beast fundamentals | Boarding dormitories on campus |
+| Imperial Cultivation Academy | Huanglongcheng, Longyuan | Structured cultivation education and supervised practical foundations for admitted students | Boarding dormitories on campus |
+
+### Binding academy placement note
+
+The two named academies in Huanglongcheng are the Golden Dragon Empire's only established Cultivator Academies. Tianfeng's identity as the Scholarly Heights and a source of talented people does not establish an academy there; gifted students may travel from Tianfeng and other regions to the two central academies. Do not add academy branches or regional academies unless the owner explicitly revises this canon.
+
+### Boarding and admissions
+
+- Both academies operate on a **dormitory-based boarding model**. Enrolled students normally reside on campus during the academic term and follow the academy's schedule and campus rules.
+- Dormitory assignment, room sharing, supervision, meals, leave, visiting hours, discipline, and student safety are administered by each academy. Specific policies have not yet been established.
+- Admission is not automatic. Entrance criteria, age limits, examination formats, tuition, scholarships, living expenses, and available places remain undefined; do not invent them as settled canon.
+- The two academies do not represent the Golden Dragon Empire's only possible forms of learning. Family instruction, tutors, local mentors, dojo training, and self-study may exist, but are not equivalent to enrollment in either academy.
+- Their curricula follow core/CULTIVATOR_ACADEMIES.md and the official mechanics modules. Neither academy guarantees awakening, a Spirit Ring, breakthrough, high Spirit Realm, or a particular career.
+
+### Common foundational scope
+
+- Basic cultivation concepts and the nine official Spirit Realms.
+- Martial Soul fundamentals and the general purpose of awakening; awakening usually occurs at age four or later, but awakening does not automatically grant a Spirit Ring.
+- Introductory Spirit Beast identification, habitat awareness, danger signs, and basic Spirit Ring theory.
+- General physical preparation and safe training principles.
+- Basic history, geography, civic knowledge, and the difference between theory and demonstrated skill.
+- Introductory Arcanist concepts and Artificial Artifact awareness; this does **not** qualify a student as an Arcanist or authorize formulation/manufacturing.
+
+A particular lesson or advanced course must be established from the academy's actual curriculum and official rules. No exclusive technique, rare curriculum, guaranteed breakthrough, or advanced restricted knowledge is implied.
+
+## 7. Ordo Suci Tianming — selected public knowledge libraries
+
+The Ordo Suci Tianming, headquartered at the Sanctum of Ten Thousand Vows in Wanluo, maintains a **small number of named public knowledge libraries** in the Golden Dragon Empire. This is a selective register, **not** a uniform branch network. Many prefectures, counties, towns, and villages have no established Ordo public library in this canon; local access may instead depend on tutors, private collections, schools, temples, or other institutions that must be established in context.
+
+The libraries listed here are public-facing educational branches of the Ordo, not branches of the World Knowledge Tower and not independent relics.
+
+| Region | Location | Public library | Responsible organization |
+|---|---|---|---|
+| Longyuan | Huanglongcheng, imperial capital | Tianming Public Knowledge Library — Huanglongcheng Hall | Ordo Suci Tianming |
+| Tianfeng | Tianshu, regional seat | Tianming Public Knowledge Library — Tianshu Hall | Ordo Suci Tianming |
+| Xingluo | Dongxing, regional seat | Tianming Public Knowledge Library — Dongxing Hall | Ordo Suci Tianming |
+
+These three locations are known public facilities, not proof that every resident can conveniently reach them. No other Ordo public library inside the Golden Dragon Empire should be assumed to exist unless it is added to canon. The Ordo's headquarters and other established religious or observation facilities in Wanluo remain distinct from this public-library list.
+
+### 7.1 Public collection: what ordinary visitors can learn
+
+The basic collection is designed for the general public, including commoners and young people who have not attended a Cultivator Academy. It covers:
+
+1. **Spirit Beasts — introductory knowledge:** broad categories, common signs of danger, respectful distance, why habitats matter, and why an unfamiliar beast must not be judged from appearance alone. Local species catalogues vary; a book is not a substitute for field expertise.
+2. **Martial Soul awakening:** the general concept of Martial Souls, the usual awakening age of four or later, what an awakening ceremony can reveal, and the distinction between awakening and obtaining a Spirit Ring.
+3. **Nine Spirit Realms:** the canonical order—Spirit Initiate, Spirit Adept, Spirit Elder, Spirit Monarch, Spirit King, Spirit Ancestor, Spirit Emperor, Spirit Sovereign, Spirit Primordial—and the fact that each Spirit Realm has Early, Middle, Late, and Peak stages. The collection explains the terms; it does not teach secret breakthrough methods.
+4. **Spirit Rings:** basic role, broad color/age categories where officially published, the need for compatibility and preparation, and the danger of attempted absorption. It does not promise a successful ring or reveal a specific beast's hidden capabilities.
+5. **Arcanists:** a general introduction to Arcanists, Arcanist Grades as a separate measure from Spirit Realm, and the social use of Artificial Artifacts. It does not grant an Arcanist Grade, formulation skill, or access to restricted production patterns.
+6. **Public safety and civic life:** how to seek help, recognize common hazards, find local public services, and distinguish verified information from rumor.
+
+### 7.2 Access and knowledge boundaries
+
+- The basic reading room is intended to be publicly accessible under ordinary local rules. A reader need not be a noble, cultivator, academy student, or Ordo member merely to consult introductory material.
+- Copying manuscripts, borrowing rare books, specialist instruction, and restricted collections may follow local rules. This file does not establish a universal fee schedule or unrestricted take-home borrowing.
+- Public collections contain **general knowledge, not omniscience**. They may be incomplete, regionally outdated, or wrong on a disputed topic; catalogue date and provenance matter.
+- Advanced cultivation methods, restricted Spirit Beast research, private family techniques, sensitive military information, dangerous formulations, and confidential Ordo threat reports are not part of the ordinary public collection.
+- The libraries teach concepts, not automatic abilities. Reading about a Spirit Beast does not make a reader able to defeat it; learning the names of the Spirit Realms does not grant cultivation; reading Arcanistry theory does not confer Arcanist expertise.
+- The Ordo's religious authority does not give it ownership of local civil administration or of the World Knowledge Tower.
+
+## 8. Grand Martial Soul Awakening Hall — public service note
+
+The Grand Martial Soul Awakening Hall is a centralized imperial institution, not a network of permanent branches assumed to exist in every region. Generally once every two years after New Year, designated officials/practitioners travel on scheduled public visits to villages according to local quotas and schedules. The Imperial subsidy covers the service fee, service tax, and documentation; each recipient pays only the 10 xs proof-token fee. If the recipient cannot afford that token fee, follow the existing external-lender/debt-note rules. Do not invent additional charges or charge the recipient for costs already subsidized. Exact fees and records are governed by `core/10_ECONOMY_SYSTEM.md` and `core/MARTIAL_SOUL_AWAKENING.md`. The public visit does not imply a permanent Hall branch or guarantee that every village is visited on the same date.
+
+## 9. Other organizations and existing institutions
+
+- **Five established Golden Dragon Empire dojos:** Golden Dragon Martial Hall, Iron Mountain Dojo, Cloudstep Dojo, Azure River Dojo, and Flameforge Dojo. Their identities remain valid, but this register does not invent extra branches, owners, or formal control by similarly named clans.
+- **Existing clans:** the twelve major clans remain as recorded in world/FACTIONS.md. A clan's regional influence does not automatically mean it runs a bank, academy, clinic, library, or local government office.
+- **Ordo Suci Tianming headquarters:** Sanctum of Ten Thousand Vows in Wanluo, separate from the World Knowledge Tower. Its three listed Golden Dragon Empire libraries are selective public facilities; they do not replace its observation halls, assessment halls, or response facilities.
+- **Independent learning:** family instruction, village tutors, local mentors, and other routes may exist, but this register does not claim a particular unnamed school or teacher has been established.
+
+## 10. Canon, scale, and future expansion rules
+
+1. The institution names and branch locations in this file are newly established additions requested for the worldbuilding project.
+2. The administrative atlas controls the official spellings of regions, prefectures, and seats. If a seat is renamed, update this register as well.
+3. A listed branch is a known service point, not proof that it is fully staffed, well-funded, safe, open at the moment of a scene, or able to fulfil every request.
+4. The bank, Exchange, and Medicine Hall Society lists use prefecture seats as service hubs. Only two academies and three Ordo public libraries are specifically established in this register; it does not claim that those institutions exist in every prefecture, city, town, or village.
+5. Branch managers, academy principals, librarians, physicians, prices, admission rules, branch capacity, and local controversies may be established later through owner-approved NPC profiles or gameplay.
+7. For public knowledge, use `core/CULTIVATION_SYSTEM.md`, `core/MARTIAL_SOUL_AWAKENING.md`, `bestiary/SPIRIT_BEAST_RULES.md`, and `core/ARCANISTRY_AND_FORMULATION.md`. If a detail is absent or restricted in those sources, do not invent it as authoritative textbook content.
+
+## 11. Related sources
+
+- Population and regional identities: `world/WORLD.md`, `world/GOLDEN_DRAGON_EMPIRE_ADMINISTRATIVE_ATLAS.md`
+- Organizations: `world/FACTIONS.md`
+- Wanluo and Ordo Suci Tianming headquarters: `world/WANLUO_SACRED_EXPANSE.md`
+- Foundational academy concept: `core/CULTIVATOR_ACADEMIES.md`
+- Spirit Realms and awakening: `core/CULTIVATION_SYSTEM.md`, `core/MARTIAL_SOUL_AWAKENING.md`
+- Spirit Beast rules: `bestiary/SPIRIT_BEAST_RULES.md`
+- Arcanist basics and limits: `core/ARCANISTRY_AND_FORMULATION.md`
+- Official public settlement/jurisdiction register: `world/GOLDEN_DRAGON_EMPIRE_ADMINISTRATIVE_ATLAS.md`
+
+
+
+---
+
+<!-- SOURCE world/OPEN_LEARNING_PATHS_AND_WANDERING_INSTRUCTORS.md | upstream blob ba0e88eb868f2d0b163be47d878ce489f1b6c865 -->
+
+# Merzkava Universe — Open Learning Paths & Wandering Instructors
+
+**Status:** Canonical world-access framework approved by the world owner.
+**Scope:** Teaching materials and non-faction learning routes for Spirit Realm cultivation and Arcanist development across established institutions, independent teachers, and chance encounters.
+**Authority:** Existing faction identities and geography remain governed by `world/FACTIONS.md`, `world/WORLD.md`, `world/MAP_AND_REGIONS.md`, regional references, and `world/CANON_DECISIONS_AND_PRECEDENCE.md`. Cultivation and Arcanist progression remain governed by their official mechanics. This module creates access routes and teaching categories; it does not grant free abilities, ranks, resources, or examination passes.
+
+## 1. Core Promise: Joining a Faction Is Optional
+
+A player may enter the world's cultivation or Arcanist life without swearing allegiance to a clan, sect, dojo, empire, guild, academy, or other organization. Faction membership can offer stable facilities, teachers, records, equipment, contacts, and structured practice, but it is never the only legitimate path.
+
+Available routes include:
+- **Institutional study:** apply to an established academy, dojo, clan school, sect, or specialist organization when its rules and access permit.
+- **Short-term instruction:** pay for a lesson, attend an open lecture, hire a qualified tutor, exchange services, or complete a task for a teacher where plausible.
+- **Independent apprenticeship:** learn from a wandering master, retired instructor, itinerant Arcanist, craftsperson, hunter, healer, or other qualified individual.
+- **Self-directed study:** obtain legitimate manuals, notes, public demonstrations, or supervised practice. Reading alone does not grant mastery or replace required training, focus time, production, or official examinations.
+- **Mixed route:** learn foundations from one source and continue elsewhere. Knowledge and relationships may travel with the student; institutional privileges, confidential material, and access rights do not automatically transfer.
+
+A teacher may refuse instruction, demand payment or a service, teach only a narrow subject, test the student's conduct, or lack the means to help. No route is guaranteed to be cheap, safe, available everywhere, or equally effective.
+
+## 2. Teaching Categories
+
+Every listed school or instructor must be classified according to its established role and demonstrated expertise, not assigned universal expertise merely to give the player access.
+
+| Category | Permitted teaching focus |
+|---|---|
+| **Spirit Realm** | Martial Soul fundamentals after legitimate awakening, Qi foundations, cultivation practice, Spirit Realm theory, combat discipline, Spirit Ring preparation and compatibility principles, Spirit Beast knowledge, survival, and technique practice within the teacher's competence. |
+| **Arcanist** | Arcanist fundamentals, mental focus, formulation/mixing, materials, formation theory, engraving practice, artifact assessment, and the official staged path toward Arcanist Grades, within the teacher's actual competence. |
+| **Dual-path** | Both categories, taught by separate qualified instructors or by a person whose expertise in each is established. Teaching both does not merge the systems or waive their separate requirements. |
+| **Support / trade** | Relevant practical knowledge—medicine, materials, navigation, appraisal, logistics, survival, or research—that can support either path but does not itself count as Spirit Realm or Arcanist progression. |
+
+A school can host guest teachers from another category without changing its primary identity. A combat dojo is not automatically an Arcanist school; a workshop is not automatically qualified to teach Spirit Realm progression; a religious house is not automatically a cultivation academy. Classify only what the canon and teacher's evidence support.
+
+
+**Spirit Realm tradition classification:** Spirit Realm instruction may teach shared foundations or be associated with **Soul-Nyuma** or **Soul-Zoun** when the actual teacher, curriculum, method, or institutional doctrine supports that classification. Soul-Nyuma studies the intrinsic/natural order; Soul-Zoun studies aberration and departures from that order. These are not regional labels, moral alignments, or separate mechanical progression systems. Do not infer a school's tradition from its region or reputation. When uncertain, leave it as general Spirit Realm instruction. Full doctrine: `core/SPIRIT_REALM_TRADITIONS.md`.
+
+## 3. Existing Institutions: Assign Material by Established Fit
+
+The following curriculum map uses already established organizations and their known spheres of influence. It defines the likely material they can offer, not a new guarantee of admission, a new facility, a named instructor, or an exclusive monopoly.
+
+### 3.1 Golden Dragon Empire
+
+| Existing institution | Default category | Suitable student material |
+|---|---|---|
+| Two central Cultivator Academies in Huanglongcheng | **Spirit Realm** | Formal foundations, Martial Soul and Qi education, Spirit Realm theory, safe practice, Spirit Ring and Spirit Beast preparation, combat discipline, and supervised cultivation study. Their exact admissions and detailed curriculum remain governed by the academy canon. |
+| Jinlong Clan | Spirit Realm / **Dual-path only when a qualified teacher is present** | Elite martial foundations and conduct around central power; do not assume every branch teaches Arcanist studies. |
+| Xuanyuan Clan | Support; possible Arcanist tutoring only with evidence | Strategy, administration, political literacy, and planning; these subjects are not themselves Arcanist Grades. |
+| Cangyue Clan | Support | River trade, distribution, logistics, and commercial arithmetic. |
+| Yunlan Clan | **Spirit Realm** | Educational foundations and cultivation learning networks; specialist access depends on the actual teacher. |
+| Tieyan Clan | Support; possible Arcanist materials/craft instruction with evidence | Mining, metals, material identification, and practical preparation relevant to artifact work, without automatic engraving qualification. |
+| Baihu Clan | **Spirit Realm** | Defense, combat conditioning, and practical martial training. |
+| Linghe Clan | Support | Transport, routes, trade logistics, and travel preparation. |
+| Shenmu Clan | Support; possible dual-path guest lessons | Natural resources, herbs, and material knowledge useful to medicine or formulation, without automatic Arcanist progression. |
+| Heiyu Clan | Support | Intelligence tradecraft and information evaluation where a willing, qualified instructor actually offers it; no automatic access to secrets. |
+| Zhenhai Clan | **Spirit Realm** | Coastal defense and combat preparation. |
+| Qingluan Clan | Support | Diplomacy, negotiation, and inter-family relations. |
+| Longxi Clan | Category follows the actual instructor | Western imperial interests; do not infer a fixed curriculum from its political sphere. |
+| Golden Dragon Martial Hall | **Spirit Realm** | Martial training, combat technique, discipline, and practice. |
+| Iron Mountain Dojo | **Spirit Realm** | Body durability, close combat, conditioning, and defensive practice. |
+| Cloudstep Dojo | **Spirit Realm** | Footwork, movement, mobility, and evasion practice. |
+| Azure River Dojo | **Spirit Realm** | Flowing movement and Qi-control practice. |
+| Flameforge Dojo | **Spirit Realm** | Combat discipline, heat-related techniques, and destructive-power control. |
+
+The imperial institutions above are not automatically open to every applicant. Access may depend on region, fees, recommendation, age or readiness rules in the relevant institution, available instructors, and current political conditions.
+
+### 3.2 Tianhai Yunzhou
+
+| Existing institution | Default category | Suitable student material |
+|---|---|---|
+| Four cardinal-area Cultivator Academies, including Tianlan Supreme Academy in the South | **Spirit Realm** | Foundational Martial Soul, Spirit Realm, Spirit Ring, Spirit Beast, and related cultivation subjects; methods are comparatively flexible, but exact admissions remain institution-specific. |
+| Tianhai Arcanist Institute | **Arcanist** | Advanced Arcanist research, Formation Engraver development, materials, formulation/mixing, complex engraving for Tier 6+, and optimization for Tier 5 and below, subject to its actual access rules and official mechanics. |
+| Haiyuan Clan | Support; possible Spirit Realm guest instruction with evidence | Sailing and maritime affairs. |
+| Tianjing Clan | Support | Administration and central interests. |
+| Yunhai Clan | Support | Trade and transportation. |
+| Canglong Clan | **Spirit Realm** | Combat and defense. |
+| Bihai Clan | Support | Coastal resources and their practical identification. |
+| Xuanchao Clan | Support; possible Spirit Realm instruction with evidence | Security and maritime surveillance; do not infer access to restricted methods. |
+| Lingfan Clan | Support | Navigation and expeditions. |
+| Haijing Clan | Support | Information and port relations. |
+| Yunzhou Clan | Category follows the actual instructor | Main-island interests; no automatic specialist curriculum. |
+| Mingzhu Clan | Support | High-value commodities, value awareness, and commercial assessment. |
+| Shuijing Clan | Support; possible **Arcanist** guest instruction with evidence | Materials processing and craftsmanship. Craft skill alone does not certify a Formation Engraver. |
+| Leiyu Clan | **Spirit Realm** | Combat techniques and offensive training. |
+| Skywhale Dojo | **Spirit Realm** | Martial training and strength development. |
+| Tidal Current Dojo | **Spirit Realm** | Flowing movement, defense, and adaptation. |
+| Stormwake Dojo | **Spirit Realm** | Mobility and offensive techniques. |
+| Azure Sail Dojo | **Spirit Realm** | Movement, coordination, and sailing-related physical techniques. |
+| Deepwater Dojo | **Spirit Realm** | Durability and techniques adapted to aquatic conditions. |
+| Haiyue Merchants' Association | Support | Commerce, commodity-quality disputes, and bulk-order coordination. |
+| Cangqiong Shipowners and Freight Union | Support | Freight, cargo-handling, and shipping-risk knowledge. |
+| Linggong Artisans' Trade Association | Support; possible **Arcanist** workshops led by qualified practitioners | Craft procurement and repair coordination; association membership alone does not grant engraving competence or an Arcanist Grade. |
+| Misty Shoals Fishers and Pilots Association | Support | Fishing-market knowledge, pilot availability, and local-weather observation. |
+
+Tianhai's historical and institutional advantage in Arcanist research does **not** make it the only place where Arcanists may exist or learn. It is the established high-level center, not a global monopoly on all Arcanistry knowledge.
+
+### 3.3 Beiming Gu
+
+| Existing institution | Default category | Suitable student material |
+|---|---|---|
+| Beiming Clan | **Spirit Realm** | Northern cultivation tradition, defense, and survival-related martial foundations, subject to actual instructors and access. |
+| Xuanbing Clan | **Spirit Realm** | Cold techniques and defense. |
+| Yinshan Clan | Support; possible Spirit Realm instruction with evidence | Mountain routes and highland survival. |
+| Cangxue Clan | Support; possible Spirit Realm instruction with evidence | Harsh-environment survival and northern resources. |
+| Hanyue Clan | **Spirit Realm** | Cold-energy techniques. |
+| Lingfeng Clan | **Spirit Realm** | Mobility and reconnaissance practice. |
+| Xuansong Clan | Support | Forest resources and natural knowledge. |
+| Yaochi Clan | Support | Herbs and medical knowledge; no automatic cure or Arcanist qualification. |
+| Tieshi Clan | Support; possible Arcanist materials instruction with evidence | Minerals and materials processing. |
+| Minghu Clan | Support | Reconnaissance and remote-route knowledge. |
+| Binghe Clan | Support | Rivers and local transport. |
+| Xuanye Clan | **Spirit Realm** | Combat techniques and strategic practice. |
+| Blue-Flame Dojo | **Spirit Realm** | Blue-flame-related techniques. |
+| Frostpeak Dojo | **Spirit Realm** | Durability and combat in cold environments. |
+| Silver Tiger Dojo | **Spirit Realm** | Combat techniques and offensive capability. |
+| Silent Snow Dojo | **Spirit Realm** | Concealment, silent movement, and reconnaissance. |
+| Ironroot Dojo | **Spirit Realm** | Body strength, durability, and solid combat techniques. |
+
+Northern material should reflect cold, difficult routes, local resources, and defensive practice where relevant. Do not invent a universal Arcanist school in Beiming Gu; a qualified independent Arcanist or visiting instructor may still teach there.
+
+### 3.4 Lawless Territories and Other Established Organizations
+
+| Existing group or institution | Default category | Suitable student material and limits |
+|---|---|---|
+| Blood Vow Sect | **Spirit Realm** | Blood-oath practices, contracts, and high-risk cultivation methods; instruction can be dangerous and ethically contested. |
+| Ashen Bone Hall | **Spirit Realm** | Body techniques and unconventional cultivation; dangerous experimentation is not a safe default. Unconventional practice alone does not establish Soul-Zoun affiliation. |
+| Black Scripture Sect | Support; restricted knowledge | Text collection, forbidden/restricted records, and appraisal practice. A text may be incomplete, dangerous, or wrong; access is not guaranteed. |
+| Hollow Fang Alliance | **Spirit Realm** | Practical combat, bounty work, and arena experience where a particular member actually teaches. It is a shifting alliance, not a standardized academy. |
+| Dreadtide Sect | **Spirit Realm** | Maritime combat, pressure adaptation, and surprise attacks. |
+| Abyssal Moon Sect | **Spirit Realm** | Dark-energy cultivation methods; risk and local hostility vary. Do not assign Soul-Zoun without evidence that its doctrine investigates aberration. |
+| Sea of Graves Hall | Support; possible dual-path expedition instruction with qualified guides | Expedition practice, dangerous sea routes, ruins, and handling exploration finds. |
+| Crimson Keel Brotherhood | Support; possible Spirit Realm instruction with evidence | Seamanship, smuggling, piracy, and illegal escort practices; never present criminal instruction as safe or universally available. |
+| Crimson Sovereign Court | **Spirit Realm** where a qualified teacher is actually accessible | Concealed high-level influence; its hidden structure and access restrictions remain intact. Do not make its instruction casually available. |
+| Frozen Blood Sect | **Spirit Realm** | Cold-energy and blood-based cultivation regarded as dangerous by some local groups; this social judgment does not establish a Soul-Zoun affiliation. |
+| Black Frost Palace | **Spirit Realm** | Freezing techniques, defense, and secrecy. |
+| Corpse Lantern Sect | **Spirit Realm** | Death-energy and corpse-related study, taboo or restricted in many places. |
+| Silent Maw Hall | Support | Discreet brokerage and risk awareness, not automatic assassin training or guaranteed access to contracts. |
+| Spirit Hunters Guild | Support; **Spirit Realm** field practice only where qualified and authorized | Contracts, tracking, escort, reconnaissance, Spirit Beast field safety, and temporary team coordination. A contract is not a substitute for formal cultivation progression. |
+| Medicine Hall Society | Support | Medicine, triage, herbs, and patient care within the healer's competence; not automatically a cultivation or Arcanist school. |
+| Ordo Suci Tianming | Support; specialist study only when a real facility/instructor permits it | Religious learning, anomaly reports, observation, verification, and threat awareness. Its mandate does not imply open access to confidential archives or automatic cultivation instruction. |
+| Ruined Archiver | Support | Expedition registration, verified mapping, ruin documentation, evidence handling, and anomaly reporting. It does not grant unrestricted ruin access. |
+| Ancient Shamanism clan/sect | **Spirit Realm** according to established tradition | Instruction follows its own established philosophy, hierarchy, and encounter limits in `world/ANCIENT_SHAMANISM_AND_BUDDHIST_CLANS.md`; do not invent a public campus. |
+| Separate hidden Buddhist clan | **Spirit Realm** according to established tradition | Instruction follows its own established philosophy and encounter limits; do not invent its formal name, location, or open recruitment. |
+| Independent craftsperson or workshop | Support; **Arcanist** only if their actual qualification is established | Materials, tool care, craft safety, and possibly supervised engraving; ordinary craft skill is not proof of Arcanist Grade. |
+
+### 3.5 Classification Rule for Every Other Existing Group
+
+When an existing group appears in a regional registry, NPC profile, or canon module but is not individually listed above:
+1. Use its established sphere of influence to identify a **support subject** it can plausibly teach.
+2. Assign **Spirit Realm** only if its actual martial/cultivation role or a qualified instructor supports it.
+3. Assign **Arcanist** only when a qualified Arcanist or a legitimate Arcanist teaching program is established.
+4. Assign **dual-path** only when both are actually supported. Do not infer it from wealth, power, scholarly reputation, clan status, or access to materials.
+5. If evidence is insufficient, record the teaching category as **unconfirmed** and use a qualified independent teacher or another established route instead.
+
+## 4. Arcanist Teaching Must Preserve Official Progression
+
+All Arcanist learning—whether at Tianhai Arcanist Institute, with a qualified independent tutor, or through a mixed route—must obey `core/ARCANISTRY_AND_FORMULATION.md`. A private teacher can provide legitimate foundations and staged focus training, but cannot replace mandatory examinations, Grade prerequisites, time and Satiety requirements, Condition Score rules, competitive caps, ownership/provenance checks, or Grade 7–10 personal-blueprint requirements.
+
+**Personal-blueprint hard rule:** for the relevant Grade 7–10 examinations, the required engraver must be designed from the player's own blueprint. A teacher may explain principles, critique the student's design, or supervise safe practice; the teacher must not supply a ready-made blueprint as if it were the player's own design. Artificial Artifacts retain their embedded series code. That code cannot be altered unless the artifact is dismantled or remade under the official mechanics. Learning access never bypasses these rules.
+
+## 5. Wandering Teachers and Unaffiliated Practitioners
+
+Wandering instructors are a world-wide alternative to joining a faction. They can be encountered in towns, villages, market streets, inns, roads, ferry/airship terminals, caravan stops, ports, border settlements, public libraries, workshops, pilgrimage routes, hunting camps, or other locations where their presence is geographically and socially plausible. The world may also contain a wanderer with no interest in teaching, or one who teaches only after trust, payment, a favor, or a demonstration of good judgment.
+
+### 5.1 Instructor archetypes
+
+- **Spirit Realm wanderer:** retired dojo instructor, travelling cultivator, former academy assistant, independent martial artist, Spirit Beast tracker, caravan guard, mountain survivalist, or a cultivator who teaches one narrow technique.
+- **Arcanist wanderer:** itinerant Arcanist, independent Formation Engraver, materials assessor, travelling lecturer, researcher, repair specialist, or a retired institutional practitioner.
+- **Dual-path wanderer:** uncommon; use only when both qualifications are supported. The two curricula remain separate.
+- **Support specialist:** healer, herbalist, appraiser, craftsperson, navigator, archivist, or field researcher who may help a student reach a legitimate teacher without personally advancing their Spirit Realm or Arcanist Grade.
+
+A generated instructor is a new situational NPC, not automatically a permanent named canon character. Give them a plausible identity, current purpose, knowledge limits, temperament, resources, and reason to be present. Persist their identity and consequential relationship if the player interacts with them meaningfully; do not silently replace them with a new person on every encounter.
+
+### 5.2 Random appearance procedure
+
+When the scene offers a genuine opportunity for an unplanned encounter—travel, exploration, public activity, a new settlement scene, a search for instruction, or an appropriate time skip—resolve one encounter check rather than inserting a teacher automatically.
+
+Use a virtual d100:
+- **01–10:** a wandering instructor or independent practitioner is present, *only if* the location and current scene plausibly support one.
+- **11–30:** a non-teacher traveller, merchant, worker, hunter, courier, pilgrim, or other ordinary encounter may occur.
+- **31–100:** no notable new encounter is required; continue the scene normally.
+
+This is a narrative encounter table, not a guarantee of contact or recruitment. On 01–10, randomly select one of the applicable categories—Spirit Realm, Arcanist, dual-path, or support—weighted by local activity and known regional fit. Do not force a category that the location cannot plausibly support. An Arcanist is more plausible near workshops, markets, ports, research centers, trade routes, or scholarly facilities; a Spirit Realm instructor is more plausible near dojos, academies, hunting routes, martial communities, or travel corridors. Either can appear elsewhere if a credible reason exists.
+
+**Location and continuity constraints:**
+- Do not teleport an NPC into a sealed room, private residence, secure compound, inaccessible floating island, remote peak, ruin interior, Dead Zone, hostile territory, or dangerous wilderness without a plausible route and survival reason.
+- A low encounter roll does not make a hidden clan public or reveal a secret base. Hidden traditions remain subject to their own canon.
+- In a settlement, the teacher may be passing through, working, buying supplies, repairing equipment, attending a public event, or pursuing a personal objective; they need not be waiting for the player.
+- In wilderness, check terrain, route, weather, travel time, danger, and the NPC's ability to be there. The encounter may be brief, distant, wary, or non-interactive.
+- Do not reroll solely because the result is inconvenient. A check may be skipped when the scene has no genuine encounter opportunity or a confirmed event already determines who is present.
+- This procedure does not replace the separate ambush check or emergency rescue check in `gameplay/TRAVEL_ENCOUNTER_AMBUSH_RESCUE.md`.
+
+### 5.3 Making Contact Meaningful: Wandering Teachers Are Hard to Recruit
+
+**A chance encounter is not an invitation to become a teacher.** Most wandering practitioners value their independence, conceal their capabilities, protect their methods, or have urgent personal aims. They are deliberately harder to recruit than an ordinary academy tutor or an organization that publicly accepts students. Even a respectful request can be refused without explanation.
+
+Apply these rules whenever a player tries to recruit, pressure, corner, threaten, deceive, follow persistently, or force a wandering practitioner to teach:
+
+1. **Refusal is a valid and common outcome.** The wanderer may ignore the request, decline briefly, conceal their identity or expertise, end the conversation, leave, or refuse all future contact. Do not convert every meeting into a recruitment opportunity.
+2. **Read the situation and the NPC.** Resolve the practitioner's temperament, motives, risk tolerance, current task, local laws, power gap, witnesses, escape routes, and what the player actually did. A teacher who is busy, secretive, suspicious, traumatized, hunted, or protecting a method may react very differently from a sociable traveller.
+3. **No guaranteed persuasion.** Repeated requests, gifts, payment, flattery, high player status, or a successful social roll do not automatically create trust or agreement. Payment only helps if the practitioner is willing to sell that service. Trust must be earned through consistent conduct and meaningful interaction.
+4. **Coercion can have severe, lasting consequences.** If the player threatens, restrains, attacks, blackmails, stalks, or otherwise forces the wanderer, resolve the response according to the NPC's actual capability, personality, resources, and surroundings. Plausible outcomes include the practitioner escaping, injuring the player, setting a trap, deceiving the player with false or incomplete instruction, taking payment under false pretences, disabling a limb or otherwise causing a lasting injury, calling allies or local authorities, exposing the player's conduct, or becoming a persistent enemy. A severe response—including permanent disability or death—is possible only where the established capability, intent, and mechanics support it; it is never an automatic punishment.
+5. **Deception is not free progress.** A wanderer may deliberately teach an incorrect method, omit a critical warning, supply a misleading map or manual, or accept payment without delivering the promised service. Whether the player detects the deception depends on available evidence, expertise, checks, and official mechanics. Never secretly award valid mastery for a fraudulent lesson.
+6. **Consequences must be resolved and recorded.** Apply official combat, HP, injury, time, economy, law, and ledger rules. Record injuries, lost items, debts, evidence, witnesses, reputation, hostile relationships, and lasting disability when actually established. Do not announce a severe consequence and then leave its mechanical effects untracked.
+7. **Do not force the NPC to win or lose.** A powerful wanderer may choose to withdraw rather than fight; a weaker one may escape through planning or allies. Neither a guaranteed player victory nor an omnipotent teacher is permitted. Keep the NPC's knowledge, capabilities, resources, and motives consistent.
+8. **The player retains agency.** Present the NPC's observable response and resulting situation, then allow the player to choose their next action. Never decide that the player willingly accepts a deal, confesses, joins a faction, or submits to training.
+
+**Escalation principle:** a polite first request usually risks refusal, not violence. Persistent harassment increases distrust; threats or coercion may trigger immediate defensive action; physical restraint or an attempted assault can provoke serious retaliation. Calibrate the response to the actual act and context—do not punish a player merely for asking once, and do not soften credible consequences just to preserve a convenient teaching route.
+
+### 5.4 Making Contact Meaningful
+
+Finding a teacher is only the start. Resolve whether the teacher notices the player, chooses to speak, is willing and able to teach, has time and materials, and can safely demonstrate the subject. Instruction may require payment, work, travel, trust, an assessment, or a reciprocal exchange. Costs must use `core/10_ECONOMY_SYSTEM.md`; training time and Satiety must follow the official mechanics.
+
+The teacher may offer only a first lesson, a basic manual, a referral, a practice task, or a chance to observe. The player can decline, leave, negotiate, or seek another route. No NPC may decide that the player's character accepts an apprenticeship or joins a faction.
+
+
+
+Finding a teacher is only the start. Resolve whether the teacher notices the player, chooses to speak, is willing and able to teach, has time and materials, and can safely demonstrate the subject. Instruction may require payment, work, travel, trust, an assessment, or a reciprocal exchange. Costs must use `core/10_ECONOMY_SYSTEM.md`; training time and Satiety must follow the official mechanics.
+
+The teacher may offer only a first lesson, a basic manual, a referral, a practice task, or a chance to observe. The player can decline, leave, negotiate, or seek another route. No NPC may decide that the player's character accepts an apprenticeship or joins a faction.
+
+## 6. GM Operating Checklist
+
+Before presenting a learning opportunity:
+1. Verify the current location and relevant regional/faction canon.
+2. Choose the actual subject: Spirit Realm, Arcanist, both (only if justified), or support.
+3. Identify what the teacher can genuinely teach and what remains outside their competence.
+4. Preserve official cultivation/Arcanist progression, costs, time, Satiety, risks, and examinations.
+5. Offer the route as an opportunity, not a compulsory plot hook; preserve player agency.
+6. Persist meaningful NPC, lesson, payment, item, reputation, and relationship changes through the normal state/ledger rules.
+
+## 7. Spirit Realm Traditions in Teaching and Mentorship
+
+A teacher, academy, dojo, clan, sect, or independent learning route may teach Soul-Nyuma, Soul-Zoun, comparative study, or shared foundational Spirit Realm instruction. The actual curriculum and teacher's competence must support the classification; unfamiliar techniques, regional identity, reputation, or an institution's name are not enough.
+
+A teacher's tradition can shape how they explain soul continuity and Spirit Beast soul treatment; how they teach Spirit Ring formation and absorption theory; whether they favor natural development or aberrant intervention; how they interpret Spirit Ability characteristics and Qi efficiency; and which historical achievements, risks, and criticisms they emphasize.
+
+Teachers and institutions may hold strong local opinions about the opposing tradition. A Soul-Nyuma instructor may condemn soul weakening or sealing; a Soul-Zoun instructor may criticize Nyuma as overly conservative. These are perspectives belonging to the speaker or institution, not objective world narration. Students may agree, disagree, question, or eventually leave the teaching route.
+
+Do not grant a student an ability, tradition mastery, absorption advantage, Sync increase, or special Qi efficiency merely for attending a lesson. Apply official training, time, Satiety, costs, progression, Spirit Ring, and Qi rules. For the binding doctrine and GM distinction between fact, teaching, and local perspective, use `core/SPIRIT_REALM_TRADITIONS.md`.
+
