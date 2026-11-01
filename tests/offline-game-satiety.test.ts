@@ -88,9 +88,7 @@ describe("offline-game canon Satiety interval engine", () => {
     expect(result.valid).toBe(true);
     if (!result.valid) return;
     expect(result.result.actualDrain).toBeCloseTo((24 / 8760) * 100 * 1.25);
-    expect(result.result.warnings).toContain(
-      expect.stringContaining("SOURCE_EXAMPLE_CONFLICT")
-    );
+    expect(result.result.warnings[0]).toContain("SOURCE_EXAMPLE_CONFLICT");
   });
 
   it("uses explicit portion values and applies only the amount actually consumed", () => {
