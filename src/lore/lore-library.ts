@@ -448,6 +448,17 @@ export function getLoreBacklinks(id: string): LoreEntry[] {
 let activeLoreCategory: LoreCategory | "ALL" = "ALL";
 let activeLoreQuery = "";
 let activeLoreId: string | null = null;
+let activeLoreSourceId: string | null = null;
+
+const PARTIAL_PUBLIC_SOURCE_PATHS = new Set([
+  "world/WORLD.md",
+  "world/LAWLESS_TERRITORIES.md",
+  "world/MAP_AND_REGIONS.md",
+  "world/FACTIONS.md",
+  "world/RUINED_ARCHIVER.md",
+  "world/ARTIFACTS_AND_RELICS.md",
+  "world/ARTIFICIAL_ARTIFACTS.md"
+]);
 
 function escapeLore(value: string): string {
   return value.replace(/[&<>"']/g, char => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" })[char] ?? char);
@@ -496,7 +507,21 @@ export function openLoreEntry(id: string): boolean {
   activeLoreId = id;
   return true;
 }
-export function closeLoreEntry(): void { activeLoreId = null; }
+export function closeLoreEntry(): void { activeLoreId = null; activeLoreSourceId = null; }
+
+export function getLoreSourceDisposition(id: string): "PUBLISHED" | "PARTIAL_PUBLIC" | undefined {
+  const entry = getPublicLoreEntries().find(item => item.id === id);
+  if (!entry) return undefined;
+  return PARTIAL_PUBLIC_SOURCE_PATHS.has(entry.sourcePath) ? "PARTIAL_PUBLIC" : "PUBLISHED";
+}
+
+export function openLoreSource(id: string): boolean {
+  if (!getPublicLoreEntries().some(entry => entry.id === id)) return false;
+  activeLoreSourceId = id;
+  return true;
+}
+
+export function closeLoreSource(): void { activeLoreSourceId = null; }
 
 export function renderLoreResults(): string {
   const query = activeLoreQuery.trim().toLocaleLowerCase();
@@ -515,6 +540,31 @@ export function renderLoreResults(): string {
   ).join("") + '</div>';
 }
 
+function renderLoreSourceReader(entry: LoreEntry): string {
+  const disposition = getLoreSourceDisposition(entry.id);
+  const scopeNotice = disposition === "PARTIAL_PUBLIC"
+    ? "This source has mixed publication scope. Only the reviewed public-safe extract below is bundled; the raw Markdown is intentionally not copied into the player Archive."
+    : "This reader contains only claims selected for this public dossier. It is not a verbatim copy of the canonical Markdown file; claim-level review remains the boundary for publication.";
+  return '<article class="lore-source-reader">' +
+    '<button class="lore-back" type="button" data-lore-source-back>← BACK TO DOSSIER</button>' +
+    '<div class="lore-detail-top"><span>OFFLINE SOURCE READER</span><span>REVIEWED EXTRACT</span></div>' +
+    '<h2>' + escapeLore(entry.sourceLabel) + '</h2>' +
+    '<p class="lore-source-reader-lede">A locally bundled, player-safe reading extract from the official Universe source.</p>' +
+    '<section class="lore-source-metadata"><span class="lore-source-kicker">SOURCE PROVENANCE</span>' +
+      '<strong>' + escapeLore(entry.title) + '</strong>' +
+      '<code>' + escapeLore(entry.sourcePath) + '</code>' +
+      '<small>Source classification: ' + escapeLore(disposition ?? "REVIEW_REQUIRED") + '</small>' +
+      '<small>Universe commit: ' + escapeLore(entry.sourceCommit) + '</small>' +
+      '<small>Reviewed: ' + escapeLore(entry.reviewedAt) + '</small>' +
+    '</section>' +
+    '<aside class="lore-source-scope-note">' + escapeLore(scopeNotice) + '</aside>' +
+    '<h3 class="lore-source-section-title">PUBLICLY REVIEWED CONTENT</h3>' +
+    '<p class="lore-lede">' + loreLinks(entry.summary, entry.id) + '</p>' +
+    entry.paragraphs.map((paragraph, index) => '<p class="lore-paragraph"><span class="lore-paragraph-mark">' + String(index + 1).padStart(2, "0") + '</span><span>' + loreLinks(paragraph, entry.id) + '</span></p>').join("") +
+    '<button class="lore-back lore-source-return" type="button" data-lore-source-back>← RETURN TO ' + escapeLore(entry.title.toLocaleUpperCase()) + '</button>' +
+    '</article>';
+}
+
 function renderLoreDetail(entry: LoreEntry): string {
   const relatedRecords = entry.crossReferenceIds
     .map(id => getPublicLoreEntries().find(item => item.id === id))
@@ -527,7 +577,7 @@ function renderLoreDetail(entry: LoreEntry): string {
     '<h2>' + escapeLore(entry.title) + '</h2>' +
     '<p class="lore-lede">' + loreLinks(entry.summary, entry.id) + '</p>' +
     entry.paragraphs.map((paragraph, index) => '<p class="lore-paragraph"><span class="lore-paragraph-mark">' + String(index + 1).padStart(2, "0") + '</span><span>' + loreLinks(paragraph, entry.id) + '</span></p>').join("") +
-    '<div class="lore-source-card"><span class="lore-source-kicker">CANON REFERENCE</span><strong>' + escapeLore(entry.sourceLabel) + '</strong><code>' + escapeLore(entry.sourcePath) + '</code><small>Reviewed ' + escapeLore(entry.reviewedAt) + ' · Universe snapshot ' + escapeLore(entry.sourceCommit.slice(0, 7)) + '. Arsip lokal ini adalah ringkasan lore; aturan dan resolusi gameplay tetap merujuk repo canon.</small></div>' +
+    '<div class="lore-source-card"><span class="lore-source-kicker">CANON REFERENCE</span><strong>' + escapeLore(entry.sourceLabel) + '</strong><code>' + escapeLore(entry.sourcePath) + '</code><small>Reviewed ' + escapeLore(entry.reviewedAt) + ' · Universe snapshot ' + escapeLore(entry.sourceCommit.slice(0, 7)) + '. Arsip lokal ini adalah ringkasan lore; aturan dan resolusi gameplay tetap merujuk repo canon.</small><button class="lore-source-open" type="button" data-lore-source-open="' + entry.id + '">OPEN REVIEWED SOURCE EXTRACT ↗</button></div>' +
     '<div class="lore-related"><span class="lore-source-kicker">RELATED RECORDS</span>' +
     relatedRecords.map(item => '<button type="button" data-lore-open="' + item.id + '">' + escapeLore(item.title) + ' <b>↗</b></button>').join("") +
     '</div>' +
@@ -539,6 +589,8 @@ function renderLoreDetail(entry: LoreEntry): string {
 
 export function renderLoreLibrary(): string {
   const active = activeLoreId ? getPublicLoreEntries().find(entry => entry.id === activeLoreId) : null;
+  const sourceEntry = activeLoreSourceId ? getPublicLoreEntries().find(entry => entry.id === activeLoreSourceId) : null;
+  if (sourceEntry) return renderLoreSourceReader(sourceEntry);
   if (active) return renderLoreDetail(active);
   const publicEntries = getPublicLoreEntries();
   const categories = (Object.keys(CATEGORY_LABELS) as Array<keyof typeof CATEGORY_LABELS>)
