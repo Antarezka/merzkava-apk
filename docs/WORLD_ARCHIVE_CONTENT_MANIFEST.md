@@ -10,8 +10,9 @@
 - APK repository: `Antarezka/merzkava-apk`
 - APK branch: `feature/archive-experience`
 - APK lore catalogue path: `src/lore/lore-library.ts`
-- APK lore catalogue blob SHA: `8c365dfafa7d320f1a191accb8d54d474a2ae400`
+- APK lore catalogue blob SHA: `4560c528dc9f4bb59c964bbf9ff6f53d04aaa8a1`
 - Current local entries: **32**
+- Offline source reader: **reviewed public-safe extracts bundled in the app code; raw source Markdown is not bundled**
 - Unique local source files: **28**
 - Missing local source paths in Universe tree: **0**
 - Universe Markdown inventory: **140 files**
