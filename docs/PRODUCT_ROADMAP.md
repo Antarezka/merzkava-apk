@@ -19,8 +19,8 @@ There is **one master roadmap only**: this file, `docs/PRODUCT_ROADMAP.md`. Syst
 Merzkava APK is **one Android application containing two playable experiences and one shared content/reference layer**:
 
 1. **Convo / AI GM:** connected conversation roleplay. Its active gameplay canon is read directly from the official `Antarezka/merzkava-universe` repository through the pinned commit, `INDEX.md`, canon loader/router, and context assembler.
-2. **Merzkava: Eternal Path** (current working title; **Life Simulation Text RPG**): a standalone local game mode. Its world content, lore, places, people, events, choices, and approved game-facing reference data are sourced from the versioned, approved **World Archive package**. It must not depend on AI or a network connection to play.
-3. **World Archive:** the in-app reviewed content library that users can browse offline and that supplies the approved content package consumed by Offline Game. It is not appended to Convo's AI GM prompt or used as Convo's canon loader.
+2. **Merzkava: Eternal Path** (current working title; **Life Simulation Text RPG**): a standalone local game mode. Its canon-backed world facts and references are sourced from the versioned, approved **World Archive package**; game-facing adaptations and original gameplay additions are managed in a separate, versioned Offline Game content pack. It must not depend on AI or a network connection to play.
+3. **World Archive:** the in-app reviewed content library that users can browse offline and that supplies canon-backed world references to Offline Game. It is not appended to Convo's AI GM prompt or used as Convo's canon loader.
 
 Both modes live in the same APK and may share app shell, navigation, visual components, and infrastructure. They must retain separate mode identity, save/session state, and source-version records; switching modes must not silently merge state or context.
 
