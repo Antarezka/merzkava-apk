@@ -946,7 +946,7 @@ The source-disposition model remains distinct from dossier publication: six of t
 
 `docs/OFFLINE_GAME_CANON_FORMULA_SNAPSHOT.md` now preserves all 16/16 `MECHANICS_REFERENCE` modules verbatim from Universe commit `2f76a864150528afb0e3d26cb16f9396ce610ff6`, plus the complete `world/GOLDEN_DRAGON_EMPIRE_GOVERNANCE.md` source containing the supplemental Strategic Awakening regional-allocation formula. Four additional source modules—global wealth distribution, social stratification, Golden Dragon population services, and open learning paths—are preserved verbatim as supporting offline-simulation data/procedures, not mislabelled as formula modules. The snapshot retains upstream blob SHAs and source boundaries. It is a development-only reference: do not expose the full snapshot through the player Archive or treat it as a replacement for the canonical Universe repository.
 
-The new dossier tests are committed but have not yet been executed in this environment. No new APK build is claimed by this content update.
+At the time of this dossier expansion, the new tests had not yet been executed and no APK build was claimed. Later full-suite Web App Validation #653 passed 15 test files / 133 tests; Android Build #340 produced a verified APK artifact, but emulator installation/smoke success remains unverified.
 
 
 ### Offline-game code milestone — Martial Soul Awakening (2026-11-01)
