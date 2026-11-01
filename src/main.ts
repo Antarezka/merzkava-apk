@@ -7,6 +7,7 @@ import { createCharacter, deleteCharacter, listCharacters, type Character } from
 import { validateCharacterDraft } from "./convo/engine/character-validation";
 import { renderScreen, type ScreenId } from "./app/screens";
 import { mountExpeditionAnimations } from "./offline-game/expedition-animations";
+import { chooseEternalOption, resetEternalGame, resetExpeditionPreview, setExpeditionPreview, startEternalGame, toggleExpeditionPreview, type EternalRegion, type EternalCycle, type EternalWeather } from "./offline-game/expedition-game";
 import { getCanonIndex, getCanonStatus, loadCanonModule, loadPlayerRegistry, loadRegisteredPlayerProfile, refreshCanon, refreshLatestPlayerRegistry, type CanonDocument } from "./convo/canon/canon-loader";
 import { routeCanonActivity } from "./convo/canon/canon-router";
 import { assembleGameplayContext } from "./convo/canon/context-assembler";
@@ -637,6 +638,12 @@ root.addEventListener("click", async (event: MouseEvent) => {
   );
   if (interactive) playButtonSound();
 
+  const eternalTestToggle = target.closest<HTMLButtonElement>("[data-eternal-test-toggle]");
+  if (eternalTestToggle) { toggleExpeditionPreview(eternalTestToggle.getAttribute("aria-expanded") !== "true"); render(); return; }
+  if (target.closest("[data-eternal-preview-reset]")) { resetExpeditionPreview(); render(); return; }
+  const eternalChoice = target.closest<HTMLButtonElement>("[data-eternal-choice]");
+  if (eternalChoice) { chooseEternalOption(Number(eternalChoice.dataset.eternalChoice)); render(); return; }
+  if (target.closest("[data-eternal-end]")) { resetEternalGame(); render(); return; }
   const saveCopyButton = target.closest<HTMLButtonElement>("[data-save-copy]");
   if (saveCopyButton) {
     const message = activeChat.messages[Number(saveCopyButton.dataset.saveCopy)];
@@ -994,6 +1001,11 @@ root.addEventListener("input", event => {
 });
 
 root.addEventListener("change", event => {
+  const previewTarget = event.target;
+  if (previewTarget instanceof HTMLSelectElement && previewTarget.matches("[data-eternal-preview-scene]")) { setExpeditionPreview({sceneId:previewTarget.value}); render(); return; }
+  if (previewTarget instanceof HTMLSelectElement && previewTarget.matches("[data-eternal-preview-cycle]")) { setExpeditionPreview({cycle:previewTarget.value as EternalCycle}); render(); return; }
+  if (previewTarget instanceof HTMLSelectElement && previewTarget.matches("[data-eternal-preview-weather]")) { setExpeditionPreview({weather:previewTarget.value as EternalWeather}); render(); return; }
+  if (previewTarget instanceof HTMLInputElement && previewTarget.matches("[data-eternal-preview-fog]")) { setExpeditionPreview({fog:Number(previewTarget.value)/100}); render(); return; }
   const target = event.target;
   if (target instanceof HTMLSelectElement && target.id === "gameplay-character") {
     loadCharacterWorldTime(target.value);
@@ -1009,6 +1021,18 @@ root.addEventListener("change", event => {
 root.addEventListener("submit", async (event: SubmitEvent) => {
   const form = event.target;
   if (!(form instanceof HTMLFormElement)) return;
+  if (form.id === "eternal-start-form") {
+    event.preventDefault();
+    const data = new FormData(form);
+    const name = String(data.get("name") ?? "").trim();
+    const age = Number(data.get("age"));
+    const region = String(data.get("region")) as EternalRegion;
+    if (name.length < 2 || !Number.isInteger(age) || age < 1 || age > 120) return;
+    startEternalGame({name,age,region});
+    notice = "";
+    render();
+    return;
+  }
   if (form.id === "auth-form") {
     event.preventDefault();
     if (authBusy) return;
