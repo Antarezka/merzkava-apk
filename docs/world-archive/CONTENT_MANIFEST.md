@@ -13,7 +13,7 @@
 - Universe commit: `2f76a864150528afb0e3d26cb16f9396ce610ff6`
 - APK repository: `Antarezka/merzkava-apk`
 - APK branch: `feature/archive-experience`
-- APK lore catalogue path: `src/lore/lore-library.ts`
+- APK lore catalogue path: `src/world-archive/lore-library.ts`
 - APK lore catalogue blob SHA: `7067dfcc1d874a5bc4fbcd45da46ba886a3ab3ce`
 - Current curated local dossiers: **87**
 - Explicit entity placeholders: **3 (`ON_PLAN`)**
@@ -814,7 +814,7 @@ This update changes only the APK repository. It does not modify the official Uni
 ### Implementation checkpoint — linked entity status registry
 
 - **Implementation commit:** `511ae764f49550a31e8cf42266e9d96eee9ce0f2` on `feature/archive-experience`.
-- `src/lore/lore-library.ts` now contains the explicit placeholder registry and the `ON_PLAN` / `NON_CANON` status model. `src/main.ts` handles placeholder navigation, and `src/style.css` gives the statuses distinct labels and readable light-theme styling.
+- `src/world-archive/lore-library.ts` now contains the explicit placeholder registry and the `ON_PLAN` / `NON_CANON` status model. `src/main.ts` handles placeholder navigation, and `src/style.css` gives the statuses distinct labels and readable light-theme styling.
 - The current curated examples are Huanglongcheng and Cangqiong Harbor, both `ON_PLAN`. `NON-CANON` is supported by the model and renderer, but no unverified example has been fabricated.
 - `tests/lore-library.test.ts` includes regression coverage for both linked examples, detail navigation, search, and separation from ordinary canon dossier resolution.
 - **Verification:** the later Web App Validation #653 passed the full recorded suite (15 test files / 133 tests), TypeScript, gateway type-check, and Vite build. Physical-device graph/navigation checks remain pending.

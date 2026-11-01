@@ -231,7 +231,7 @@ These percentages measure **source-path coverage**, not claim-by-claim completen
 3. Read `docs/world-archive/CONTENT_MANIFEST.md` for detailed source findings.
 4. Inspect the actual branch HEAD and working tree; the SHA above is only the pre-documentation baseline.
 5. Verify the Universe source pin; refresh this matrix if `main` moved.
-6. Inspect `src/lore/lore-library.ts`, its event handlers, types, tests and local asset bundling.
+6. Inspect `src/world-archive/lore-library.ts`, its event handlers, types, tests and local asset bundling.
 7. Continue the next unchecked roadmap task. Do not redo completed light-theme typography work. Do not modify the Universe repo unless explicitly asked.
 8. Before claiming a build, verify exact versionName/versionCode, source SHA, workflow run, artifact, signature/alignment and emulator/device smoke result.
 
@@ -256,7 +256,7 @@ These percentages measure **source-path coverage**, not claim-by-claim completen
 
 The existing catalogue derives each dossier's outbound `crossReferenceIds` from exact public titles and aliases mentioned in its summary/body. `loreLinks` turns those mentions into local `data-lore-open` buttons; targets are selected from `PUBLISHED` entries only. This pass adds `getLoreBacklinks(id)` and renders inbound **MENTIONED IN** dossier links. Regression tests cover outgoing clickable mentions, public-only targets, inbound links and invalid IDs.
 
-- Runtime implementation: `src/lore/lore-library.ts`, commit `3dd0b21f32bdd383737da48d52248b96c623535a`.
+- Runtime implementation: `src/world-archive/lore-library.ts`, commit `3dd0b21f32bdd383737da48d52248b96c623535a`.
 - Regression tests: `tests/lore-library.test.ts`, commit `4ce04c872d39611b6fa782b8e2199f4157aa3b0f`.
 - Web App Validation #653 passed 15 test files / 133 tests, TypeScript, gateway type-check, and Vite build. On-device graph/navigation/source-reader QA remains open.
 - Source citation is still provenance text, not an in-app local source reader. The source reader remains a required task.
