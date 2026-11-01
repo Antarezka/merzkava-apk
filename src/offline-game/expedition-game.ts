@@ -134,22 +134,30 @@ function writeSlots(slots:EternalSaveSlot[]):void {
 function normalizeSave(value:unknown):EternalSave|null {
   if(!value||typeof value!=="object") return null;
   const parsed=value as Partial<EternalSave>&{schemaVersion?:number;character?:EternalSave["character"]};
-  if(![1,2,3].includes(Number(parsed.schemaVersion))||!parsed.character?.name||!Number.isInteger(parsed.eventIndex)) return null;
+  if(![1,2,3].includes(Number(parsed.schemaVersion))||!parsed.character?.name||!Number.isInteger(parsed.eventIndex)||Number(parsed.eventIndex)<0) return null;
   const region=["golden-dragon-empire","tianhai-yunzhou","beiming-gu"].includes(parsed.character.region)?parsed.character.region:"golden-dragon-empire";
   const locationId=typeof parsed.locationId==="string"&&ETERNAL_SCENES.some(scene=>scene.id===parsed.locationId)?parsed.locationId:defaultSceneForRegion(region).id;
   const now=new Date().toISOString();
+  const saveId=typeof parsed.saveId==="string"&&parsed.saveId.length<=80?parsed.saveId:makeSaveId();
+  const candidate=parsed.manifest as Partial<EternalSave["manifest"]>|undefined;
+  const manifest:EternalSave["manifest"]={
+    universeRepository:candidate?.universeRepository==="Antarezka/merzkava-universe"?candidate.universeRepository:"Antarezka/merzkava-universe",
+    universeCommit:typeof candidate?.universeCommit==="string"&&/^[a-f0-9]{40}$/i.test(candidate.universeCommit)?candidate.universeCommit:ETERNAL_SCENES[0].universeCommit,
+    contentPackVersion:typeof candidate?.contentPackVersion==="string"&&candidate.contentPackVersion.length<=32?candidate.contentPackVersion:"0.1.0",
+    deterministicSeed:typeof candidate?.deterministicSeed==="string"&&candidate.deterministicSeed.length<=128?candidate.deterministicSeed:saveId,
+  };
+  const age=Number.isInteger(parsed.character.age)&&parsed.character.age>=1&&parsed.character.age<=120?parsed.character.age:14;
   return {
-    ...parsed,schemaVersion:3,saveId:typeof parsed.saveId==="string"?parsed.saveId:makeSaveId(),
-    manifest:parsed.manifest&&typeof parsed.manifest==="object"?parsed.manifest:{universeRepository:"Antarezka/merzkava-universe",universeCommit:ETERNAL_SCENES[0].universeCommit,contentPackVersion:"0.1.0",deterministicSeed:typeof parsed.saveId==="string"?parsed.saveId:"legacy-seed"},
-    saveName:typeof parsed.saveName==="string"&&parsed.saveName.trim()?parsed.saveName.trim():parsed.character.name,
+    ...parsed,schemaVersion:3,saveId,manifest,
+    saveName:typeof parsed.saveName==="string"&&parsed.saveName.trim()?parsed.saveName.trim().slice(0,48):parsed.character.name.trim().slice(0,48),
     createdAt:typeof parsed.createdAt==="string"?parsed.createdAt:now,updatedAt:typeof parsed.updatedAt==="string"?parsed.updatedAt:now,
-    character:{name:parsed.character.name.trim(),age:Number.isInteger(parsed.character.age)?parsed.character.age:14,region},
+    character:{name:parsed.character.name.trim().slice(0,32),age,region},
     disposition:createDispositionState(parsed.disposition),locationId,
     day:Number.isInteger(parsed.day)&&Number(parsed.day)>0?Number(parsed.day):1,
     hour:Number.isInteger(parsed.hour)&&Number(parsed.hour)>=0&&Number(parsed.hour)<24?Number(parsed.hour):8,
     minute:Number.isInteger(parsed.minute)&&Number(parsed.minute)>=0&&Number(parsed.minute)<60?Number(parsed.minute):0,
     weather:resolveDailyWeather(ETERNAL_SCENES.find(scene=>scene.id===locationId)?.region??region,Number(parsed.day)||1),
-    eventIndex:Number(parsed.eventIndex)||0,energy:Number(parsed.energy)||0,insight:Number(parsed.insight)||0,bonds:Number(parsed.bonds)||0,completed:Number(parsed.completed)||0,
+    eventIndex:Number(parsed.eventIndex)||0,energy:Math.max(0,Math.min(100,Number(parsed.energy)||0)),insight:Math.max(0,Number(parsed.insight)||0),bonds:Math.max(0,Number(parsed.bonds)||0),completed:Math.max(0,Number(parsed.completed)||0),
   } as EternalSave;
 }
 function ensureLegacyMigration():EternalSaveSlot[] {
