@@ -28,8 +28,9 @@
 - Stable local dossier IDs are primary keys; display names are not.
 - Every mention of an approved public entity in a dossier must be a clickable local link to the correct dossier, matching the current `data-lore-open` interaction.
 - Canonical title takes precedence over aliases. Search, body links, related records and backlinks must use the same resolver.
-- Ambiguous, unreviewed, GM-only, private or unknown entities remain plain text and must not enter search, suggestions, autocomplete, backlinks or the public entity graph.
+- Ambiguous, GM-only, private, or unreviewed identities remain excluded from the entity graph. A deliberately under-specified but intentionally indexable name may instead receive a curated placeholder record and remain clickable; do not mistake this for permission to expose restricted identities.
 - Relationships are claim-level facts. Shared surnames do not prove kinship; titles do not prove current office; links must not invent relationships.
+- Entity development status is separate from source-review disposition. `ON_PLAN` means the entity is intentionally under-specified and reserved for GM narrative development; its known references may be shown, but the app must not invent details or promote improvisation to canon. `NON_CANON` means explicitly non-canonical material; it must be visibly labelled and must never be presented as official Universe fact. Both may be clickable only through an explicit, reviewed placeholder registry; unknown names do not become placeholders automatically.
 - Each entity record should retain ID, canonical name, aliases, entity type, visibility, source path(s) and related public dossier IDs.
 - Every source citation must open a bundled local, player-safe reviewed extract inside the APK. The reader must show exact source path, source commit, review date, and source classification. Do not bundle raw canonical Markdown merely because a file-level disposition is `PUBLISHED`: individual NPC/source files can contain location, whereabouts, or other claims that need claim-level review. Mixed-scope sources expose only the curated dossier extract; restricted claims never enter the player reader.
 
