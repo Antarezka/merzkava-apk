@@ -176,23 +176,35 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 
 ## 7. Workstream 5 — Standalone offline life/adventure game mode
 
-**Goal:** When connected AI conversation is unavailable, offer a separate offline game experience with a life-simulation and progression-system atmosphere inspired by the user's stated Play Store reference and Solo Leveling-style system fantasy.
+<badge>DESIGN DEFINITION IN PROGRESS — IMPLEMENTATION NOT STARTED</badge>
+
+**Goal:** Build a separate offline life/adventure game whose world, lore, events, available choices, progression rules, terminology, factions, places, creatures, items, and outcomes are derived exclusively from approved Merzkava Universe material published through the World Archive. The mode must feel like living inside Merzkava, not like a generic life simulator wearing Merzkava names.
+
+**Canon/content rule — 100% Merzkava:** BitLife and Solo Leveling are presentation/design references only. They contribute no world facts, lore, terminology, characters, factions, items, abilities, progression rules, or story content. All such content must come from the official `Antarezka/merzkava-universe` repository, be reviewed for player visibility, and be included in the approved World Archive package before the offline mode can use it. If the Archive does not contain a needed fact or rule, mark that feature BLOCKED and send the gap through the Universe/Archive review process; never let AI invent a substitute.
+
+**Current progress:** The separate-mode boundary and the 100% Merzkava content requirement are now defined. BitLife is confirmed only as a high-level life-simulation reference; Solo Leveling is only a UI/progression-presentation reference. No offline game loop, event engine, or playable offline mode has been implemented or verified.
 
 **This is a separate mode, not an offline replacement for AI GM conversation.** Confirmed reference: [BitLife — Life Simulator (Candywriter)](https://play.google.com/store/apps/details?id=com.candywriter.bitlife). Use it as a high-level design reference for choice-driven life simulation, not as a source to copy proprietary text, art, branding, or exact content.
 
 ### 5A. Reference and mode boundary
 
-- [x] Reference confirmed: [BitLife — Life Simulator](https://play.google.com/store/apps/details?id=com.candywriter.bitlife).
+**Purpose:** Prevent reference games from leaking their own content into Merzkava, and prevent offline mode from being confused with connected AI GM play.
+
+- [x] Reference confirmed: [BitLife — Life Simulator](https://play.google.com/store/apps/details?id=com.candywriter.bitlife), design-pattern reference only.
 - [ ] Study the reference at the level of general design patterns; create original Merzkava systems, writing, art, names, and interface rather than copying proprietary expression.
 - [ ] Define the offline mode as a standalone experience, separate from connected AI GM conversation and its save/context pipeline.
 - [ ] Finish and review the World Archive content required by the offline mode.
-- [ ] Define a curated, approved offline content package derived from Archive material.
+- [ ] Create a content-to-source traceability map: every offline entry/event/choice/rule must point to an approved Archive document and its official Universe source path + source commit.
+- [ ] Define a curated, approved offline content package derived only from approved Archive material.
+- [ ] Define a blocking rule: missing, contradictory, GM-only, private, or unreviewed Archive material cannot be used; send the gap back to Archive/canon review.
 - [ ] Keep the offline mode's content snapshot/version separate from the connected gameplay canon SHA.
 - [ ] Do not use Archive text as hidden context for connected AI GM conversations.
 - [ ] Do not promise live NPC behavior, remote events, or online conversation while offline.
 - [ ] Define what happens when the user returns online; mode switching must not overwrite or merge incompatible states.
 
 ### 5B. Offline gameplay concept
+
+**Purpose:** Translate approved Merzkava material into a deterministic, replayable local life/adventure loop without changing canon.
 
 - [ ] Choice-driven life simulation: character life stages, background, daily decisions, relationships, education/training, occupations/roles, resources, reputation, and long-term consequences, adapted to Merzkava canon.
 - [ ] Year/season/day progression with events and meaningful decisions; define the time scale so it works with Merzkava's world rules.
@@ -208,6 +220,8 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 - [ ] Add clear mode identity so users know whether they are in connected AI gameplay or standalone offline gameplay.
 
 ### 5C. Offline reliability and QA
+
+**Purpose:** Prove the mode is genuinely standalone and cannot contaminate connected gameplay or saves.
 
 - [ ] Test cold launch with airplane mode enabled.
 - [ ] Test full gameplay loop without network or login.
@@ -280,15 +294,121 @@ The workstreams describe product scope; this sequence describes safe delivery or
 
 ---
 
-## 11. Progress log
+## 10. How to read this roadmap and follow implementation
+
+This section is the operating manual for a new AI conversation, developer, or reviewer joining the project mid-stream.
+
+### 10A. Read order — mandatory
+
+1. Read this file, `docs/PRODUCT_ROADMAP.md`, first. It defines scope, priorities, progress, dependencies, and acceptance gates.
+2. Read `README.md` for the current product summary and repository entry points.
+3. Read `PROJECT_DIRECTIVES.md` for the engineering contract, source-of-truth hierarchy, and GitHub working protocol.
+4. Read `docs/ARCHITECTURE.md` before changing data flow, AI context, canon loading, persistence, or mode boundaries.
+5. Read `docs/WORLD_ARCHIVE_CONTENT_MANIFEST.md` before changing Archive content, visibility, provenance, or offline content packaging.
+6. Inspect the current branch head, latest commits, source tree, relevant files, and GitHub Actions before deciding what is actually implemented.
+7. Read the relevant source files and tests. A roadmap checkbox is a plan/status signal, not proof that the current code still behaves that way.
+8. Only then plan or change code. Update this roadmap with evidence after the work.
+
+If two documents conflict, follow the source-of-truth hierarchy in PROJECT_DIRECTIVES for technical/canon authority, and use this roadmap as the primary product-planning record. Do not treat an old conversation as stronger evidence than current repository files and verified build results.
+
+### 10B. What each repository reference is for
+
+| Reference | Purpose | What it does not mean |
+|---|---|---|
+| `Antarezka/merzkava-universe` | Official source of world canon, rules, lore, places, factions, entities, and approved game content | It is not the APK source-code repository |
+| APK `docs/PRODUCT_ROADMAP.md` | Master product plan, stage sequence, current progress, dependencies, and acceptance gates | It does not create or override Merzkava canon |
+| APK `docs/ARCHITECTURE.md` | Technical data flow, app components, and system boundaries | It is not the complete feature inventory |
+| APK `docs/WORLD_ARCHIVE_CONTENT_MANIFEST.md` | Archive article catalogue, provenance, visibility, review and publication tracking | A listed article is not automatically approved |
+| APK `PROJECT_DIRECTIVES.md` | Required engineering behavior and source-of-truth hierarchy | It does not replace detailed task acceptance criteria |
+| APK `README.md` | Short project entry point and links to authoritative project documents | It is not the full implementation plan |
+| GitHub Actions runs/artifacts | Evidence of validation, build, packaging, install, launch, and test outcomes | A successful web validation is not proof that an APK build or emulator test passed |
+| ChatGPT conversations | Decision history, user intent, clarifications, and task-specific discussion | Conversation memory is not a substitute for reading the current repo or canon |
+
+### 10C. How progress statuses must be assigned
+
+- Mark `[x] DONE` only when the relevant code/content exists on the current branch and a reproducible test, build, or direct verification supports it.
+- Mark `[~] IN PROGRESS` only when implementation has started and the remaining work is stated.
+- Keep `[?] AUDIT` when the feature may exist but has not been inspected and tested end-to-end.
+- Use `[ ] TODO` when work has not started.
+- Use `[!] BLOCKED` when a named dependency, missing canon decision, missing Archive approval, or technical issue prevents safe progress.
+- Every completed item must cite a commit, test, workflow run, artifact, or verification note. A screenshot or mock-up alone does not prove interaction works.
+- If new evidence contradicts an old status, correct the roadmap immediately. Never preserve a green checkbox just to make progress look better.
+
+### 10D. Required progress note for every workstream
+
+For each workstream, maintain: **purpose**, **current status**, **completed with evidence**, **in progress**, **not started**, **blocked/dependencies**, **next concrete action**, and **exit gate**. Update the progress log when a meaningful stage changes. If no implementation has been inspected, say so plainly rather than guessing.
+
+### 10E. Build tracking and latest-build rules
+
+Always distinguish these identifiers:
+- **Branch head SHA:** newest commit on the working branch; may contain documentation-only changes.
+- **Latest app-code SHA:** newest commit that actually changes app source/assets/build configuration.
+- **Build run:** the GitHub Actions run tied to a specific SHA.
+- **Validation run:** lint/typecheck/unit or web validation; not automatically an APK build.
+- **Artifact:** the actual APK or diagnostic output produced by a run.
+- **Installed/runtime verification:** evidence that the artifact installs, launches, and behaves correctly on a device/emulator.
+
+Before any build-related claim, inspect current branch head and the latest relevant workflow runs. Link the exact run and artifact where available. If a later documentation commit has no APK artifact, do not label it as the latest APK. Never call a build successful solely because a separate validation workflow passed.
+
+### 10F. AI conversation handoff protocol
+
+At the start of a new conversation about this project, the assistant must:
+1. Confirm repository `Antarezka/merzkava-apk` and active branch from GitHub, not from an old message.
+2. Fetch this roadmap, README, PROJECT_DIRECTIVES, and any relevant architecture/Archive documents from that branch.
+3. Check the latest branch SHA, latest app-code SHA, recent commits, and latest validation/build workflow results.
+4. Identify which workstream and exact checklist item the user is discussing.
+5. Read the current implementation and tests for that item before recommending or editing.
+6. State the verified current status, evidence, and next action in plain language.
+7. Preserve all user decisions recorded here; ask only when a real unresolved product decision blocks progress.
+
+Do not assume the newest ChatGPT conversation is the latest repository state. Do not continue from a stale build, stale branch, or remembered commit without checking GitHub again.
+
+### 10G. Conversation decision references
+
+Use the current project conversation as decision context for these points:
+- Master roadmap request and six workstreams.
+- Confirmation that BitLife is the life-simulation design reference.
+- Confirmation that the offline game must be 100% based on Merzkava Universe content through World Archive.
+- Clarification that World Archive is a local offline reference library and must not be inserted into connected AI GM context.
+- Clarification that offline game is a separate standalone mode, not an offline fallback for connected AI GM conversation.
+
+The repository is the durable handoff. When a future conversation adds a new decision, record the decision here (or in the relevant technical document) with its date and commit. Do not invent ChatGPT conversation URLs; add a link only when the actual share/conversation URL is supplied and verified.
+
+---
+
+## 11. Verified project baseline — 2026-11-01
+
+This is a dated snapshot, not a permanent claim. Recheck GitHub before every later task.
+
+| Item | Verified state | Evidence / interpretation |
+|---|---|---|
+| Working repository | `Antarezka/merzkava-apk` | GitHub repository |
+| Working branch | `feature/archive-experience` | Branch head inspected |
+| Current branch head | `232bdec0722ccbe9293d136ac2afb798d7f6b856` | Latest commit at time of this update; documentation change |
+| Latest app-code baseline found | `02e114270ec4a0ebe35314434b0dd07951f56ef4` | Latest identified app-code commit before roadmap-only commits; splash wordmark positioning |
+| Latest APK build run found | Build #292, run `41286968526` | Run on app-code SHA `02e1142`; overall run conclusion was failure because emulator verification stage failed; APK build/sign/verification/upload steps had succeeded according to run diagnostics. Do not call the full run successful. |
+| Latest web validation | #495, run `41289709639` | Passed on branch head `232bdec`; documentation/web validation only, not an APK build |
+| Feature audit | Not completed | Existing feature register below remains `[?] AUDIT` |
+| World Archive | Content audit/review still pending | Existing manifest/catalogue is a starting inventory, not approval of all entries |
+| Faction cards and new service features | Not implemented/verified in this roadmap | Remain planned until source and runtime evidence says otherwise |
+| Standalone offline game | Design boundary defined; implementation not started | Requires approved Archive package first |
+
+**Recent app-code work visible in commit history:** Kitty splash idle motion and occasional head movement, warm light/wordmark reveal, launcher icon resource cleanup, splash shadow handling, and CI foreground-capture adjustments. The latest identified app-code commit is the centered wordmark change at `02e1142`. Later roadmap commits are documentation-only. This summary does not certify that every splash detail is visually perfect; inspect the current asset and runtime screenshot when working on splash again.
+
+**Build interpretation:** Build #292 is not a clean pass. The APK packaging/signing/verification/upload portion succeeded, but the emulator/device verification stage failed. The separate Web App Validation #495 passed. These results must remain separate in future status reports.
+
+---
+
+## 13. Progress log
 
 Add a dated entry for each meaningful roadmap change. Keep entries concise and link commits or tests when available.
 
 | Date | Change | Evidence / commit |
 |---|---|---|
-| 2026-11-01 | Established master roadmap and six workstreams; current feature inventory remains pending audit. | Initial roadmap commit |
+| 2026-11-01 | Established master roadmap and six workstreams; current feature inventory remains pending audit. | `feb0391` |
+| 2026-11-01 | Confirmed BitLife as a design-pattern reference only; added Merzkava-only content boundary, AI handoff/read-order guide, status rules, and verified build baseline. | `232bdec` (baseline evidence recorded above) |
 
-## 12. Change-control rule
+## 14. Change-control rule
 
 Before implementing a new feature or changing an existing one:
 
