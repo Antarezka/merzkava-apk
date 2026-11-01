@@ -249,7 +249,7 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 - [ ] Provide meaningful choices and consequences without requiring AI or network access.
 - [ ] Define offline quests/events, encounter pools, and replayability.
 - [ ] Define save slots/state boundaries and safe persistence.
-- [ ] Add clear mode identity so users know whether they are in connected AI gameplay or standalone offline gameplay.
+- [~] Add clear mode identity so users know whether they are in connected AI gameplay or standalone offline gameplay; the first-pass Eternal Path route and screen label now exist, while the full mode-switch and save-boundary experience remains open.
 
 ### 5C. Offline reliability and QA
 
