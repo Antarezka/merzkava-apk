@@ -33,6 +33,11 @@ describe("Eternal Path live world scene", () => {
     expect(getExpeditionScene().id).toBe("gde-market");
     expect(getEternalSave()?.locationId).toBe("gde-market");
     expect(getEternalSave()?.character.region).toBe("golden-dragon-empire");
+
+    setEternalLocation("ty-city");
+    expect(getExpeditionScene().region).toBe("tianhai-yunzhou");
+    expect(getEternalSave()?.character.region).toBe("golden-dragon-empire");
+    expect(getRegionalDialogueCount()).toBe(60);
   });
 
   it("derives day cycle from world clock independently of dialogue progression", () => {
