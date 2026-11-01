@@ -42,6 +42,7 @@ describe("Eternal Path scene and prologue", () => {
     expect(ETERNAL_DIALOGUES).toHaveLength(240);
     expect(ETERNAL_SCENES).toHaveLength(8);
     expect(ETERNAL_DIALOGUES.every(node=>node.provenance==="IN_GAME_ORIGINAL" && node.choices.length===2)).toBe(true);
+    expect(ETERNAL_DIALOGUES.every(node=>node.sourceRefs.length===1 && node.sourceRefs[0].universeCommit==="2f76a864150528afb0e3d26cb16f9396ce610ff6")).toBe(true);
     expect(new Set(ETERNAL_DIALOGUES.map(node=>node.id)).size).toBe(240);
   });
 });
