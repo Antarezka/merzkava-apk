@@ -888,7 +888,7 @@ The first deterministic mechanic module has been added to the APK repository wit
 - Validation: [Web App Validation #584](https://github.com/Antarezka/merzkava-apk/actions/runs/41306800435) passed: 9 test files / 66 tests, TypeScript, gateway type-check, and Vite build.
 - Implemented: fallback calendar and seasons, date/time rollover, action-duration limits, protected night sleep, pure-cultivation eligibility and 30-day cap, verified Satiety accounting, cooldown accumulation excluding cultivation, and Day-left ceiling.
 - Explicit boundary: session era, initial date/weather/weekday anchor, travel durations, and actual action success are inputs/decisions from the session/game world; this utility does not invent them.
-- Current foundation: **7 modules implemented and CI-verified (HP + Satiety + Injury + Time/Day-left + Combat + Spirit Ring compatibility + Spirit Ring progression)**. The full game engine remains incomplete; no overall percentage is assigned.
+- Current foundation: **8 modules implemented and CI-verified (HP + Satiety + Injury + Time/Day-left + Combat + Spirit Ring compatibility + Spirit Ring progression + Martial Soul Awakening)**. The full game engine remains incomplete; no overall percentage is assigned.
 - Android Build #322 is still a separate build/emulator run. It targets the Time module commit before the test-fixture-only follow-up; no final APK status is implied here.
 
 
@@ -946,3 +946,13 @@ The source-disposition model remains distinct from dossier publication: six of t
 `docs/OFFLINE_GAME_CANON_FORMULA_SNAPSHOT.md` now preserves all 16/16 `MECHANICS_REFERENCE` modules verbatim from Universe commit `2f76a864150528afb0e3d26cb16f9396ce610ff6`, plus the complete `world/GOLDEN_DRAGON_EMPIRE_GOVERNANCE.md` source containing the supplemental Strategic Awakening regional-allocation formula. The snapshot retains upstream blob SHAs and source boundaries. It is a development-only reference: do not expose the full snapshot through the player Archive or treat it as a replacement for the canonical Universe repository.
 
 The new dossier tests are committed but have not yet been executed in this environment. No new APK build is claimed by this content update.
+
+
+### Offline-game code milestone — Martial Soul Awakening (2026-11-01)
+
+- Source: `core/MARTIAL_SOUL_AWAKENING.md` at Universe pin `2f76a864150528afb0e3d26cb16f9396ce610ff6`; blob `fe56339b8c8fb2d70597c8a03891b7cf947a9cf8`.
+- Runtime: `src/offline-game/mechanics/martial-soul-awakening.ts`; 22 regression tests.
+- Implements rarity 1–100, player STOP/CONTINUE mutation decision, one 10% mutation roll, age eligibility, and separate evidence-based inherent-quality score.
+- Web App Validation #610 passed: 13 test files / 114 tests, TypeScript, gateway type-check, Vite production build.
+- The resolver consumes supplied rolls; an auditable offline RNG, state orchestration, and persistence remain separate tasks.
+- Eight deterministic modules are CI-verified; no full-game completion percentage is assigned.
