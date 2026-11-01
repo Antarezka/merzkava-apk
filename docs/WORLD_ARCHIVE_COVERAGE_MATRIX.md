@@ -244,10 +244,10 @@ These percentages measure **source-path coverage**, not claim-by-claim completen
 - [ ] Re-verify against current recursive Universe tree before expanding.
 - [~] Public entity graph, backlinks, placeholder routing, and search/navigation regression tests are implemented; Web App Validation #653 passed 15 test files / 133 tests. Physical-device graph QA remains open.
 - [x] Implement offline local source reader for reviewed public-safe extracts; raw canonical Markdown remains excluded.
-- [ ] Expand approved public coverage.
+- [x] Approved player-facing source-path coverage reached 71/71; claim-level review and source freshness remain separate gates.
 - [ ] Build and perform device navigation QA.
 
-**Status:** Phase 1 source inventory + handoff baseline established. World Archive itself remains incomplete.
+**Status:** Phase 1 source inventory, 87/71 catalogue coverage, public-only graph, and reviewed-extract source reader are implemented. CI validation is recorded; physical-device navigation, offline/isolation, accessibility, and claim-level QA remain release gates.
 
 
 ## Implementation checkpoint — clickable public entity graph (2026-11-01)
