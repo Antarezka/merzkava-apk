@@ -86,7 +86,7 @@ describe("World Archive visibility and entity routing", () => {
     const entry = getPublicLoreEntries().find(item => item.id === "beiming-xenhwa");
     expect(entry).toBeDefined();
     const publicText = JSON.stringify(entry);
-    expect(publicText).not.toMatch(/\\b17\\b|api putih|white flame/i);
+    expect(publicText).not.toMatch(/\b17\b|api putih|white flame|half-beast|nine-tailed fox|rubah berekor sembilan/i);
   });
 
   it("has no ambiguous title or alias collisions in the public entity index", () => {
