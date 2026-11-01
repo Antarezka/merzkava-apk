@@ -92,8 +92,11 @@ const variations = [
   { suffix:"Practice patience", first:"You remain patient and let the other person finish explaining.", second:"You volunteer to demonstrate the task slowly and clearly." },
   { suffix:"Make a careful choice", first:"You choose the least risky next step and observe the result.", second:"You bring the nearby people into the decision instead of acting alone." },
 ];
+// Narrative content is intentionally authored for the original eight scene compositions only.
+const ETERNAL_DIALOGUE_SCENE_IDS = new Set(["gde-city","gde-street","gde-market","gde-village","ty-city","ty-skyport","bg-north","bg-settlement"]);
+const ETERNAL_DIALOGUE_SCENES = ETERNAL_SCENES.filter(scene=>ETERNAL_DIALOGUE_SCENE_IDS.has(scene.id));
 export const ETERNAL_DIALOGUES: EternalDialogue[] = chapters.flatMap((chapter, chapterIndex) =>
-  ETERNAL_SCENES.flatMap((scene, sceneIndex) =>
+  ETERNAL_DIALOGUE_SCENES.flatMap((scene, sceneIndex) =>
     variations.map((variation, variantIndex) => {
       const prompt = chapter.prompts[(sceneIndex + variantIndex) % chapter.prompts.length];
       const subject = chapter.subjects[(sceneIndex * 2 + variantIndex) % chapter.subjects.length];
