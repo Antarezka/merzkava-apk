@@ -604,8 +604,8 @@ function loreLinks(text: string, currentId: string): string {
   const crossReferences = new Set(currentEntry?.crossReferenceIds ?? []);
   const references = [
     ...getPublicLoreEntries().filter(entry => crossReferences.has(entry.id)).flatMap(entry => [
-      { label: entry.title, id: entry.id, priority: 2, placeholder: false },
-      ...entry.aliases.map(label => ({ label, id: entry.id, priority: 1, placeholder: false }))
+      { label: entry.title, id: entry.id, priority: 2, placeholder: false, status: undefined },
+      ...entry.aliases.map(label => ({ label, id: entry.id, priority: 1, placeholder: false, status: undefined }))
     ]),
     ...LORE_PLACEHOLDERS.flatMap(item => [
       { label: item.title, id: item.id, priority: 2, placeholder: true, status: item.status },
