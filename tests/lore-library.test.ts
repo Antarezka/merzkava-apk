@@ -199,6 +199,34 @@ describe("World Archive visibility and entity routing", () => {
     expect(html).not.toContain("Buddhist Mountain Clan");
   });
 
+  it("connects public regional and official names through clickable dossier mentions", () => {
+    expect(openLoreEntry("golden-dragon")).toBe(true);
+    let html = renderLoreLibrary();
+    for (const id of [
+      "official-xuanyuan-wenyuan", "official-shen-mingde", "official-yunlan-qingzhi",
+      "official-baihu-zhengyang", "official-gu-jingheng", "official-cangyue-yucheng",
+      "official-heiyu-zhaolin", "official-xuanyuan-haoran", "official-cangyue-yunhe",
+      "official-tieyan-mingxuan", "official-yunlan-qinglan", "official-yanling-zhenyu",
+      "official-baihu-xuefeng", "official-zhenhai-haixiu", "luo-zhenkai", "shen-yunting"
+    ]) expect(html).toContain('data-lore-open="' + id + '"');
+
+    expect(openLoreEntry("beiming")).toBe(true);
+    html = renderLoreLibrary();
+    for (const id of [
+      "beiming-jingheng", "beiming-xuanyu", "binghe-chuanliu", "lan-feng",
+      "cangxue-beiran", "cangxue-tielan", "shuang-yue", "hanyue-mingzhao",
+      "tie-song", "lingfeng-yujin", "minghu-yanshu", "mo-xueyan",
+      "bai-yushen", "tieshi-beiyue", "xuanbing-lingsu", "xuanbing-yue",
+      "xuansong-qinghe", "xuanye-zhenbei", "yaochi-suwen", "yinshan-qiaofeng"
+    ]) expect(html).toContain('data-lore-open="' + id + '"');
+
+    expect(openLoreEntry("tianhai")).toBe(true);
+    html = renderLoreLibrary();
+    expect(html).toContain('data-lore-open="duan-haicheng"');
+    expect(html).toContain('data-lore-open="lin-qiaoyu"');
+    expect(getLoreBacklinks("official-xuanyuan-haoran").some(entry => entry.id === "golden-dragon")).toBe(true);
+  });
+
   it("keeps Black Tide Expanse distinct from Black Tide Sea", () => {
     expect(resolveLoreEntry("Black Tide Expanse")?.id).toBe("black-tide-expanse");
     expect(resolveLoreEntry("Black Tide Sea")?.id).toBe("seas");
