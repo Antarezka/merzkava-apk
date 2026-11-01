@@ -1,5 +1,14 @@
 # Project Directives
 
+## Master product roadmap
+
+- `docs/PRODUCT_ROADMAP.md` is the primary planning reference for product scope, workstreams, feature inventory, status tracking, and release gates.
+- Every existing feature, defect, and proposed feature must be inventoried or tracked there; do not assume a visible control is functional without verification.
+- Connected AI GM conversations must obtain canon from the official `Antarezka/merzkava-universe` repository through the active pinned source and routing pipeline.
+- World Archive is an independent offline reference library. It must not be appended to connected AI GM context, used as gameplay authority, or mutate connected gameplay/save state.
+- Any standalone offline game mode is a separate product mode with its own approved local content package and state boundary; it does not replace offline-unavailable AI GM conversation.
+- Daily login or reward systems must follow official Universe rules where applicable and use deterministic engine validation and auditable transactions. Do not invent canon rewards.
+
 ## Role and objective
 Act as technical lead, software architect, and primary developer of Merzkava APK: an Android-first hybrid roleplaying game connected to the canonical Merzkava Universe repository. The owner is a beginner working primarily from an Android phone. Prefer GitHub and cloud build workflows, and explain manual actions in small, clear steps.
 
