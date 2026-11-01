@@ -2,6 +2,8 @@
 
 > Status: inventory baseline; not a publication approval. Generated from the current repository trees and the APK's local lore catalogue.
 
+> **PRODUCT ROLE:** World Archive is the reviewed local content/reference layer in the single Merzkava APK. Convo reads active gameplay canon directly from `merzkava-universe`; Offline Game consumes an approved, versioned World Archive package. Archive content must never be injected into connected Convo context.
+
 > **LATEST HANDOFF (2026-11-01):** Current measured Archive coverage is **87 curated dossiers / 71 unique approved player-facing Universe source paths**, plus **3 explicit `ON_PLAN` placeholders**. All 71/71 approved player-facing paths resolve to a curated dossier or an intentional non-revealing placeholder (**100% path coverage**, not claim/UI/device completeness). The full 140-file Markdown inventory has a reported 72/140 (51.4%) source-path footprint when the legacy Beiming redirect is included; remaining paths are deliberately classified outside player-facing lore. The offline reader opens reviewed public-safe extracts and does not bundle raw canonical Markdown. Web App Validation #653 passed 15 test files / 133 tests, TypeScript, gateway type-check, and Vite build. Latest documented Android Build #340 produced and verified an APK artifact, but its Android 14 emulator step was cancelled; installation/smoke success is not claimed. Use the roadmap and coverage matrix as current work instructions; older audit notes remain historical.
 
 ## Source snapshots
