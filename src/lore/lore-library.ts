@@ -644,10 +644,11 @@ export function setLoreCategory(value: string): void {
 export function openLoreEntry(id: string): boolean {
   if (!getPublicLoreEntries().some(entry => entry.id === id)) return false;
   activeLoreSourceId = null;
+  activeLorePlaceholderId = null;
   activeLoreId = id;
   return true;
 }
-export function closeLoreEntry(): void { activeLoreId = null; activeLoreSourceId = null; }
+export function closeLoreEntry(): void { activeLoreId = null; activeLoreSourceId = null; activeLorePlaceholderId = null; }
 
 export function getLoreSourceDisposition(id: string): "PUBLISHED" | "PARTIAL_PUBLIC" | "PUBLIC_CANDIDATE" | undefined {
   const entry = getPublicLoreEntries().find(item => item.id === id);
@@ -660,6 +661,7 @@ export function getLoreSourceDisposition(id: string): "PUBLISHED" | "PARTIAL_PUB
 export function openLoreSource(id: string): boolean {
   if (!getPublicLoreEntries().some(entry => entry.id === id)) return false;
   activeLoreId = id;
+  activeLorePlaceholderId = null;
   activeLoreSourceId = id;
   return true;
 }
