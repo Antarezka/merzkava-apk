@@ -3,7 +3,7 @@ export type DispositionScores = Record<DispositionAxis, number>;
 export type DispositionLabel = "Lawful Good" | "Neutral Good" | "Chaotic Good" | "Lawful Neutral" | "True Neutral" | "Chaotic Neutral" | "Lawful Evil" | "Neutral Evil" | "Chaotic Evil";
 export type LawfulnessBand = "Chaotic" | "Lawful Low" | "Lawful Normal" | "Lawful High" | "Lawful Dedicated" | "Lawful Absolute";
 export interface DispositionState { scores: DispositionScores; evidenceCount: number; lastUpdatedDay: number; label: DispositionLabel; lawfulnessBand: LawfulnessBand; }
-export const INITIAL_DISPOSITION: DispositionState = { scores:{order:50,morality:50,motive:50,method:50,loyalty:50,empathy:50,ambition:50},evidenceCount:0,lastUpdatedDay:1,label:"True Neutral",lawfulnessBand:"Normal" };
+export const INITIAL_DISPOSITION: DispositionState = { scores:{order:50,morality:50,motive:50,method:50,loyalty:50,empathy:50,ambition:50},evidenceCount:0,lastUpdatedDay:1,label:"True Neutral",lawfulnessBand:"Lawful Normal" };
 const clamp=(value:number)=>Math.max(0,Math.min(100,value));
 function side(score:number,low:string,high:string):string { return score<=35?low:score>=65?high:"neutral"; }
 export function deriveDispositionLabel(scores:DispositionScores):DispositionLabel {
