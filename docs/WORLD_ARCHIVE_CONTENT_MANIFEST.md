@@ -665,3 +665,62 @@ A direct name-and-seat comparison was run between the current atlas prefecture r
 - This validates the 12 active appointments against the current register. It does not establish current physical whereabouts, public familiarity, or authority beyond the stated office.
 
 **Roster correction boundary:** the current 12 active prefecture entries may be linked to their canonical public regional offices after individual NPC visibility review. The 21 retained local administrators may be shown only with their reconciled current role wording; never revive their former prefecture as an active administrative unit.
+
+
+## Eighth pass — complete regional NPC visibility review and Archive publication controls
+
+**Source snapshot:** `Antarezka/merzkava-universe` `main` at `2f76a864150528afb0e3d26cb16f9396ce610ff6` (2026-10-30). The source repository was not modified by this APK-side audit.
+
+### Regional NPC files — all reviewed
+
+All **39** Markdown files under `regions/*/npcs/` were reviewed: **35 individual profiles, 3 regional registries, and 1 Tianhai power-structure roster**.
+
+- No regional NPC registry or profile was imported wholesale.
+- Beiming Nerva's concealed identity, family connection, and student-cover information remain excluded from the player corpus and entity graph.
+- Beiming Jingheng's concealed criminal connection remains excluded; any public identity or adoptive-family facts are separately scoped.
+- Beiming Xenhwa's public dossier is limited to the public identity and broad appearance facts. Her undisclosed age and profile-only flame capability are not player-facing facts and have been removed from the Archive entry.
+- Beiming Han's hidden Azerion history and non-public capability fields are excluded.
+- Tianhai and Golden Dragon entries use public titles and family relationships only; progression state, private agenda, unrevealed whereabouts, and capability fields are not imported.
+- Bai Xuanyin's public historical remembrance may be used; Arcanist grade, artifact-production procedures, and restricted wartime device details are excluded.
+- The three regional registries and Tianhai power structure remain source-navigation aids, not public NPC biographies. Anonymous placeholders, secret liaisons, unconfirmed officeholders, and inferred relationships are not imported.
+
+### Public Archive corpus — publication gate implemented
+
+The local Archive now contains **32 curated dossiers**, each explicitly marked `PUBLISHED`. The entries use **28 distinct source paths**; all referenced paths were checked against the current Universe tree and exist in the source snapshot.
+
+- Every dossier stores its source path, source label, full source commit, review date, and generated cross-reference IDs.
+- The local entity graph includes only `PUBLISHED` dossiers. Search, inline highlights, related records, and open-entry actions all use the same public-only corpus.
+- Exact canonical titles take precedence over aliases. Duplicate title/alias collisions are rejected by automated tests; ambiguous or incorrect aliases have been removed.
+- The Black Tide Expanse is a separate dossier from Black Tide Sea and from the wider Lawless Territories.
+- Public summaries were added for Black Tide Expanse, Ashen Borderlands, Nine Frost Wastes, Southwake Port and Lanternhook Isles, Wanluo Sacred Expanse, Ordo Suci Tianming, and Spirit Hunters Guild. These retain only established public geography or institutional scope; hidden leadership, restricted identities, operational criminal details, prices, routes, and unconfirmed control are omitted.
+- The generic Spirit Beast dossier was removed because its only source was a gameplay-mechanics bestiary. No public Bestiary article is published until a separate descriptive, non-mechanical source is reviewed.
+- The public Xenhwa entry no longer exposes her undisclosed age or profile-only flame capability.
+- Empty categories are hidden. A category appears only when at least one public dossier uses it.
+
+### Automated checks added
+
+- `tests/lore-library.test.ts`: public visibility, hidden-identity exclusion, canonical title/alias routing, Black Tide geography disambiguation, source provenance, cross-reference integrity, duplicate-name prevention, Xenhwa disclosure boundary, and populated-category rendering.
+- `tests/profile-baseline.test.ts`: new-session source profile acceptance, verified continuation gate, rejection of unverified continuation baselines, and required-field validation.
+- Current validation on commit `adbc47e3e39fbe57bb2508d606afc60d46b264e5`: **27/27 tests pass** across four test files. TypeScript, gateway type-check, and Vite production build pass in the same validation run.
+
+### Gameplay-state safety boundary
+
+A separate continuity defect was fixed: a previous GM response panel can no longer be used as the baseline for a later turn unless a persisted profile checkpoint is explicitly marked verified. The original registered profile is labelled as historical when the current session state is unverified.
+
+This is a safety correction, **not** a completed state-approval workflow. The APK still has no player-facing approval action that commits proposed changes into a verified profile checkpoint; GM proposals remain uncommitted and the app must not imply that wallet, inventory, HP, or other state changes have been applied. The local Ledger Log remains a separate local-storage record rather than a confirmed SQLite transaction ledger.
+
+### Android build status at this audit point
+
+- Build `269`, source `2b89a00de2e75cccd3b335ff7b5ae4a38ce52f3d`, version `v.1.01.269-2b8`: APK build, signing, alignment, signature verification, artifact upload, Android 14 emulator installation, and real MainActivity first-draw smoke test all passed.
+- A newer build, run number `272`, is building the Archive provenance and privacy corrections from source commit `a77570eb56680bc4eb7063f4eaf5a0e37c87667b`. Its emulator result is not yet recorded in this manifest.
+- CI dependency installation has reported **7 npm advisories (5 moderate, 2 critical)**. Package-level advisory details have not yet been captured; do not treat this as resolved or assume all findings affect production dependencies.
+
+### Remaining canon quarantine (not an Archive publication blocker)
+
+- The legacy officials roster still contains stale administrative text and thirteen rows with literal `undefined`; the authoritative atlas/governance precedence and all twelve active prefecture appointments have been reconciled. The roster source itself remains unedited.
+- The roster's `Badan Pengawasan Kekaisaran` and the separately documented `Komite Auditor Keuangan Khusus Kekaisaran` have no established equivalence. Keep them distinct and do not assign the roster official as committee head.
+- Exact boundaries, coordinates, and travel durations for partially developed Lawless regions remain unknown. Their dossiers preserve that uncertainty.
+- Long mixed-source documents contain GM-only sections; public dossiers are curated excerpts, not permission to expose the underlying full source files.
+- No local Archive article grants gameplay authority. Mechanics continue to resolve only through the official Universe repository's INDEX and authoritative core/gameplay modules.
+
+**Audit disposition:** the regional NPC inventory, source-path coverage, public entity index, and automated visibility/link gates are complete for the current 32-dossier corpus. Canon facts that remain unknown or contradictory are explicitly quarantined rather than guessed. This does not certify the separate gameplay state-approval workflow or npm dependency advisory set as complete.
