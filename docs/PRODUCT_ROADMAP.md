@@ -46,7 +46,7 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 
 ## 3. Workstream 1 — World Archive, typography, and reference experience
 
-**Progress now:** `[~] PHASE 1 INVENTORY + HANDOFF BASELINE ESTABLISHED`. The app has 39 curated dossiers / 35 unique source paths. A 140-path source coverage matrix and AI continuation instructions are recorded in `docs/WORLD_ARCHIVE_COVERAGE_MATRIX.md`. Entity-graph expansion, additional public content review, offline/isolation proof and final QA remain open. A local reader for reviewed public-safe extracts is implemented; CI and on-device verification remain open. Do not describe the Archive as complete or all articles as approved.
+**Progress now:** `[~] PHASE 1 INVENTORY + HANDOFF BASELINE ESTABLISHED`. The app has 39 curated dossiers / 35 unique source paths plus a small explicit placeholder registry for intentionally under-specified entities. A 140-path source coverage matrix and AI continuation instructions are recorded in `docs/WORLD_ARCHIVE_COVERAGE_MATRIX.md`. Entity-graph expansion, additional public content review, offline/isolation proof and final QA remain open. The local reviewed-extract reader and clickable `ON_PLAN` / `NON_CANON` entity-status pages are implemented; CI and on-device verification remain open. Do not describe the Archive as complete or all articles as approved.
 
 **Goal:** Make the offline Archive complete, trustworthy, easy to navigate, and visually polished. Typography improvements belong to this workstream.
 
@@ -58,6 +58,7 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 - [ ] Mark each article as approved, needs revision, blocked, or excluded; do not treat catalogue presence as publication approval.
 - [~] Expand coverage only from verified Universe sources; the seven Golden Dragon regional dossiers now use reviewed foundation/administrative claims only. Remaining regional detail, public institutions, and settlement-level entities still require claim-level review.
 - [ ] Verify all local links, aliases, cross-references, backlinks, source-reader navigation, and search results resolve to the correct local document in CI and on-device.
+- [~] Keep deliberately under-specified names clickable through an explicit placeholder registry. `ON_PLAN` preserves GM narrative room without inventing canon; `NON_CANON` labels non-official material. These statuses are distinct from source-review classes such as `PUBLIC_CANDIDATE`; CI and on-device behavior still need verification.
 - [x] Track source path, source commit, review date, source visibility class, and local document ID for every public article.
 - [ ] Add a repeatable audit for stale source paths and changed Universe files.
 
