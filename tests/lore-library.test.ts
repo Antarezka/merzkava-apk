@@ -73,6 +73,11 @@ describe("World Archive visibility and entity routing", () => {
     expect(openLoreEntry("golden-dragon")).toBe(true);
     const html = renderLoreLibrary();
     for (const id of regionIds) expect(html).toContain('data-lore-open="' + id + '"');
+
+    expect(openLoreSource("region-baiyue")).toBe(true);
+    const sourceHtml = renderLoreLibrary();
+    expect(sourceHtml).toContain("PUBLIC_CANDIDATE");
+    expect(sourceHtml).not.toMatch(/Baihu Xuefeng|Sepatu Salju|Serigala Abu|Crimson Keel Brotherhood/);
   });
 
   it("keeps Black Tide Expanse distinct from Black Tide Sea", () => {
