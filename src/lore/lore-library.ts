@@ -2,6 +2,19 @@ export type LoreCategory = "WORLD" | "POWERS" | "GEOGRAPHY" | "HISTORY" | "PEOPL
 
 export type LoreVisibility = "PUBLISHED" | "REVIEW_REQUIRED" | "GM_ONLY";
 
+export type LoreEntityStatus = "ON_PLAN" | "NON_CANON";
+
+export interface LorePlaceholder {
+  id: string;
+  title: string;
+  aliases: string[];
+  status: LoreEntityStatus;
+  category: LoreCategory;
+  summary: string;
+  detail: string;
+  relatedIds: string[];
+}
+
 export interface LoreEntry {
   id: string;
   visibility: LoreVisibility;
@@ -509,6 +522,13 @@ export function getPublicLoreEntries(): LoreEntry[] {
   return LORE_ENTRIES.filter(entry => entry.visibility === "PUBLISHED");
 }
 
+export function resolveLorePlaceholder(label: string): LorePlaceholder | undefined {
+  const query = label.trim().toLocaleLowerCase();
+  if (!query) return undefined;
+  return LORE_PLACEHOLDERS.find(item => item.title.toLocaleLowerCase() === query)
+    ?? LORE_PLACEHOLDERS.find(item => item.aliases.some(alias => alias.toLocaleLowerCase() === query));
+}
+
 export function resolveLoreEntry(label: string, currentId?: string): LoreEntry | undefined {
   const query = label.trim().toLocaleLowerCase();
   if (!query) return undefined;
@@ -518,6 +538,15 @@ export function resolveLoreEntry(label: string, currentId?: string): LoreEntry |
 }
 
 /** Public dossiers that mention this dossier by an approved title or alias. */
+export function openLorePlaceholder(id: string): boolean {
+  if (!LORE_PLACEHOLDERS.some(item => item.id === id)) return false;
+  activeLoreSourceId = null;
+  activeLorePlaceholderId = id;
+  return true;
+}
+
+export function closeLorePlaceholder(): void { activeLorePlaceholderId = null; }
+
 export function getLoreBacklinks(id: string): LoreEntry[] {
   if (!getPublicLoreEntries().some(entry => entry.id === id)) return [];
   return getPublicLoreEntries().filter(entry =>
@@ -529,6 +558,7 @@ let activeLoreCategory: LoreCategory | "ALL" = "ALL";
 let activeLoreQuery = "";
 let activeLoreId: string | null = null;
 let activeLoreSourceId: string | null = null;
+let activeLorePlaceholderId: string | null = null;
 
 const PUBLIC_CANDIDATE_SOURCE_PATHS = new Set([
   "world/REGION_LONGYUAN.md",
@@ -539,6 +569,21 @@ const PUBLIC_CANDIDATE_SOURCE_PATHS = new Set([
   "world/REGION_BAIYUE.md",
   "world/REGION_XINGLUO.md"
 ]);
+
+export const LORE_PLACEHOLDERS: LorePlaceholder[] = [
+  {
+    id: "placeholder-huanglongcheng", title: "Huanglongcheng", aliases: [], status: "ON_PLAN", category: "GEOGRAPHY",
+    summary: "Ibu kota Golden Dragon Empire sekaligus pusat administrasi Longyuan; rincian kotanya sengaja tetap terbuka.",
+    detail: "Nama dan kedudukan Huanglongcheng sudah disebut dalam referensi kanon. Namun, distrik, bangunan, tokoh lokal, kehidupan sehari-hari, dan banyak rincian kota belum dikunci. Status ON PLAN berarti ruang pengembangan ini disengaja, bukan data yang hilang atau kesalahan arsip. GM dalam percakapan Merzkava Universe dapat mengembangkan narasi sesuai konteks tanpa menganggap tambahan itu otomatis menjadi kanon permanen.",
+    relatedIds: ["golden-dragon", "region-longyuan"]
+  },
+  {
+    id: "placeholder-cangqiong-harbor", title: "Cangqiong Harbor", aliases: [], status: "ON_PLAN", category: "GEOGRAPHY",
+    summary: "Pelabuhan di Tianhai Yunzhou yang disebut dalam hubungan pelayaran; detail spesifiknya sengaja belum ditetapkan.",
+    detail: "Cangqiong Harbor sudah dikenal sebagai titik pelabuhan dalam referensi jalur laut Merzkava. Tata letak, fasilitas, pengelola, distrik, tokoh, dan rincian operasionalnya belum dikunci. Status ON PLAN menjaga ruang bagi GM untuk membangun adegan dan narasi sesuai kebutuhan percakapan; detail improvisasi tidak otomatis menjadi fakta kanon.",
+    relatedIds: ["tianhai", "seas"]
+  }
+];
 
 const PARTIAL_PUBLIC_SOURCE_PATHS = new Set([
   "world/WORLD.md",
@@ -557,36 +602,40 @@ function escapeLore(value: string): string {
 function loreLinks(text: string, currentId: string): string {
   const currentEntry = getPublicLoreEntries().find(entry => entry.id === currentId);
   const crossReferences = new Set(currentEntry?.crossReferenceIds ?? []);
-  const references = getPublicLoreEntries().filter(entry => crossReferences.has(entry.id))
-    .flatMap(entry => [
-      { label: entry.title, id: entry.id, priority: 2 },
-      ...entry.aliases.map(label => ({ label, id: entry.id, priority: 1 }))
+  const references = [
+    ...getPublicLoreEntries().filter(entry => crossReferences.has(entry.id)).flatMap(entry => [
+      { label: entry.title, id: entry.id, priority: 2, placeholder: false },
+      ...entry.aliases.map(label => ({ label, id: entry.id, priority: 1, placeholder: false }))
+    ]),
+    ...LORE_PLACEHOLDERS.flatMap(item => [
+      { label: item.title, id: item.id, priority: 2, placeholder: true },
+      ...item.aliases.map(label => ({ label, id: item.id, priority: 1, placeholder: true }))
     ])
-    .sort((a, b) => b.label.length - a.label.length || b.priority - a.priority || a.id.localeCompare(b.id));
+  ].sort((a, b) => b.label.length - a.label.length || b.priority - a.priority || a.id.localeCompare(b.id));
   let result = "";
   let cursor = 0;
   while (cursor < text.length) {
-    let match: { index: number; label: string; id: string; priority: number } | null = null;
+    let match: { index: number; label: string; id: string; priority: number; placeholder: boolean } | null = null;
     for (const reference of references) {
       const index = text.toLocaleLowerCase().indexOf(reference.label.toLocaleLowerCase(), cursor);
       if (index < 0) continue;
       const before = index > 0 ? text[index - 1] : "";
       const after = text[index + reference.label.length] ?? "";
-      const wordLike = /[\p{L}\p{N}_]/u;
+      const wordLike = /[\\p{L}\\p{N}_]/u;
       if ((before && wordLike.test(before) && wordLike.test(reference.label[0])) ||
           (after && wordLike.test(after) && wordLike.test(reference.label[reference.label.length - 1]))) continue;
       if (!match || index < match.index || (index === match.index && (reference.priority > match.priority || (reference.priority === match.priority && reference.label.length > match.label.length)))) {
-        match = { index, label: reference.label, id: reference.id, priority: reference.priority };
+        match = { index, label: reference.label, id: reference.id, priority: reference.priority, placeholder: reference.placeholder };
       }
     }
     if (!match) { result += escapeLore(text.slice(cursor)); break; }
     result += escapeLore(text.slice(cursor, match.index));
-    result += '<button class="lore-inline-link" type="button" data-lore-open="' + match.id + '">' + escapeLore(match.label) + '</button>';
+    const attribute = match.placeholder ? "data-lore-placeholder-open" : "data-lore-open";
+    result += '<button class="lore-inline-link' + (match.placeholder ? ' lore-inline-link-placeholder' : '') + '" type="button" ' + attribute + '="' + match.id + '">' + escapeLore(match.label) + (match.placeholder ? ' <span class="lore-inline-status">ON PLAN</span>' : '') + '</button>';
     cursor = match.index + match.label.length;
   }
   return result;
 }
-
 export function setLoreSearch(value: string): void { activeLoreQuery = value; }
 export function setLoreCategory(value: string): void {
   activeLoreCategory = value in CATEGORY_LABELS ? value as LoreCategory | "ALL" : "ALL";
@@ -623,7 +672,11 @@ export function renderLoreResults(): string {
     (activeLoreCategory === "ALL" || entry.category === activeLoreCategory) &&
     (!query || [entry.title, entry.summary, entry.eyebrow, ...entry.aliases, ...entry.paragraphs].join(" ").toLocaleLowerCase().includes(query))
   );
-  if (!entries.length) return '<div class="lore-empty"><span>⌕</span><h3>No matching records</h3><p>Coba kata kunci lain atau pilih kategori berbeda.</p></div>';
+  const placeholders = LORE_PLACEHOLDERS.filter(item =>
+    (activeLoreCategory === "ALL" || item.category === activeLoreCategory) &&
+    (!query || [item.title, item.summary, item.status, ...item.aliases].join(" ").toLocaleLowerCase().includes(query))
+  );
+  if (!entries.length && !placeholders.length) return '<div class="lore-empty"><span>⌕</span><h3>No matching records</h3><p>Coba kata kunci lain atau pilih kategori berbeda.</p></div>';
   return '<div class="lore-card-grid">' + entries.map((entry, index) =>
     '<button class="lore-entry-card" type="button" data-lore-open="' + entry.id + '">' +
       '<span class="lore-card-index">' + String(index + 1).padStart(2, "0") + ' / ' + entry.category + '</span>' +
@@ -631,9 +684,34 @@ export function renderLoreResults(): string {
       '<span class="lore-card-summary">' + escapeLore(entry.summary) + '</span>' +
       '<span class="lore-card-foot">' + escapeLore(entry.sourceLabel) + '<b>↗</b></span>' +
     '</button>'
+  ).join("") + placeholders.map(item =>
+    '<button class="lore-entry-card lore-placeholder-card" type="button" data-lore-placeholder-open="' + item.id + '">' +
+      '<span class="lore-card-index">' + escapeLore(item.category) + ' / <b class="lore-status-tag lore-status-' + item.status.toLowerCase() + '">' + escapeLore(item.status.replace("_", " ")) + '</b></span>' +
+      '<span class="lore-card-title">' + escapeLore(item.title) + '</span>' +
+      '<span class="lore-card-summary">' + escapeLore(item.summary) + '</span>' +
+      '<span class="lore-card-foot">DEVELOPMENT NOTE<b>↗</b></span>' +
+    '</button>'
   ).join("") + '</div>';
 }
 
+function renderLorePlaceholder(item: LorePlaceholder): string {
+  const related = item.relatedIds
+    .map(id => getPublicLoreEntries().find(entry => entry.id === id))
+    .filter((entry): entry is LoreEntry => Boolean(entry));
+  const statusLabel = item.status.replace("_", " ");
+  const statusNote = item.status === "ON_PLAN"
+    ? "The entity is intentionally under-specified. Known references remain valid, while additional details are left open for narrative development by the GM. This is not missing data and does not authorize the app to invent canon."
+    : "This material is explicitly non-canonical. It may be used as a narrative or illustrative reference, but it does not establish or modify official Merzkava Universe canon.";
+  return '<article class="lore-detail lore-placeholder-detail">' +
+    '<button class="lore-back" type="button" data-lore-placeholder-back>← BACK TO ARCHIVE</button>' +
+    '<div class="lore-detail-top"><span>ENTITY DEVELOPMENT REGISTER</span><span class="lore-status-tag lore-status-' + item.status.toLowerCase() + '">' + escapeLore(statusLabel) + '</span></div>' +
+    '<h2>' + escapeLore(item.title) + '</h2>' +
+    '<p class="lore-lede">' + escapeLore(item.summary) + '</p>' +
+    '<aside class="lore-placeholder-note"><strong>' + escapeLore(statusLabel) + '</strong><p>' + escapeLore(statusNote) + '</p></aside>' +
+    '<p class="lore-paragraph">' + escapeLore(item.detail) + '</p>' +
+    (related.length ? '<div class="lore-related"><span class="lore-source-kicker">RELATED CANON RECORDS</span>' + related.map(entry => '<button type="button" data-lore-open="' + entry.id + '">' + escapeLore(entry.title) + ' <b>↗</b></button>').join("") + '</div>' : '') +
+    '</article>';
+}
 function renderLoreSourceReader(entry: LoreEntry): string {
   const disposition = getLoreSourceDisposition(entry.id);
   const scopeNotice = disposition === "PARTIAL_PUBLIC"
@@ -683,8 +761,10 @@ function renderLoreDetail(entry: LoreEntry): string {
 
 export function renderLoreLibrary(): string {
   const active = activeLoreId ? getPublicLoreEntries().find(entry => entry.id === activeLoreId) : null;
+  const activePlaceholder = activeLorePlaceholderId ? LORE_PLACEHOLDERS.find(item => item.id === activeLorePlaceholderId) : null;
   const sourceEntry = activeLoreSourceId ? getPublicLoreEntries().find(entry => entry.id === activeLoreSourceId) : null;
   if (sourceEntry) return renderLoreSourceReader(sourceEntry);
+  if (activePlaceholder) return renderLorePlaceholder(activePlaceholder);
   if (active) return renderLoreDetail(active);
   const publicEntries = getPublicLoreEntries();
   const categories = (Object.keys(CATEGORY_LABELS) as Array<keyof typeof CATEGORY_LABELS>)
