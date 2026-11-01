@@ -300,9 +300,7 @@ export const LORE_ENTRIES: LoreEntry[] = [
       "Asal-usul lengkap, mekanisme, dan seluruh kemampuan relik tidak boleh diasumsikan hanya dari statusnya sebagai peninggalan ilahi."
     ],
     sourcePath: "world/RUINED_ARCHIVER.md", sourceLabel: "Ruined Archiver & World Knowledge Tower"
-  }
-
-
+  },
   {
     id: "black-tide-expanse", title: "Black Tide Expanse", aliases: [],
     visibility: "PUBLISHED",
