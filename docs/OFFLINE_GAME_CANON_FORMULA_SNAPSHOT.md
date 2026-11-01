@@ -2831,3 +2831,509 @@ Jumlah slot mengikuti Spirit Realm. Informasi ring yang telah diperoleh—sumber
 - Jangan mengubah keputusan dalam modul ini hanya karena WORLD.md tidak memuat setiap detail mekanik.
 - Jika aturan baru bertentangan dengan aturan ini, tandai konflik dan minta keputusan pemilik; jangan menghapus aturan yang sudah disepakati secara diam-diam.
 
+
+
+---
+
+<!-- SOURCE core/TIER_ASSESSMENT_AND_APPRAISAL.md | upstream blob 74f3ecdf2c6d01635b50bab1dfd0acd954abfead -->
+
+# Merzkava Universe — Universal Tier Assessment & Appraisal
+
+**Authority and scope:** This module governs *specialist fallback classification* for goods, artifacts, creatures, and the worldwide appraisal authority. It is not a mandatory step in routine pricing, purchases, sales, or consumption. Ordinary goods are handled first through the economic quality categories and pricing method in `core/10_ECONOMY_SYSTEM.md`; Martial Soul score calculation and its integration with awakening rarity/mutation chances are governed separately by `core/MARTIAL_SOUL_AWAKENING.md`. This module never replaces a known canon classification or the ordinary economic pricing formula.
+
+## Display rule for unidentified items
+
+When an item's identity, exact type, or relevant properties have not yet been established by canon or the GM, display the item as ``Unknown`` **membutuhkan appraisal untuk lebih pastinya** wherever the player-facing item name/details are shown. Use this exact wording consistently in Inventory, Equipment, loot, item descriptions, and appraisal-related gameplay narration. Do not use this label for ordinary items whose identity and relevant details are already established. The label does not imply rarity, value, danger, a hidden power, or guaranteed appraisal success. Keep the actual unknown facts unresolved until valid evidence or appraisal establishes them. After appraisal, replace the label only for the facts the ruling actually establishes; any remaining unknown properties stay undisclosed/unconfirmed.
+
+**Explicit exclusion — Martial Soul:** This item-identification display rule does **not** apply to Martial Souls. Never label a Martial Soul ``*Unknown*`` under this rule, and do not use the generic item/beast appraisal score or item-appraisal wording to resolve its identity, score, rarity, or uncertainty. Follow `core/MARTIAL_SOUL_AWAKENING.md` and `core/MARTIAL_SOUL.md` for Martial Soul-specific handling. This exclusion does not change any Martial Soul awakening, scoring, rarity, or mutation mechanics.
+
+## 1. Priority Order
+
+1. **Existing official canon:** use the exact tier recorded by the relevant official module, catalog, approved discovery, or owner-confirmed canon decision. Do not recalculate it.
+2. **Completed MAA ruling:** when this exact specimen/item has actually been examined, its valid ruling takes priority over estimates, seller claims, rumors, and ordinary records.
+3. **Routine economic classification:** for ordinary goods whose description and market role are clear (for example, standard roadside food, basic snacks, common materials, or ordinary herbs), use the fitting category in `core/10_ECONOMY_SYSTEM.md` and its pricing formula. This is a practical market classification, not a specialist appraisal; do not run the nine-dimension score or demand an MAA record just to complete an everyday transaction.
+4. **GM provisional assessment:** use the scoring method below only when a meaningful unresolved classification is needed for a special, unusual, disputed, or consequential item/specimen and there is enough concrete evidence. Mark the result ``*Prediksi GM*``, never official canon.
+5. **Insufficient evidence:** if a special classification is genuinely necessary but evidence is inadequate, record ``*Tier belum ditetapkan*`` — bukti belum cukup and arrange appraisal when practical. Do not fabricate facts to force a score.
+
+An appraisal ruling concerns only the specific examined specimen, batch, or item identity. It does not automatically establish the tier of every member of a species, every artifact of the same model, or every object with a similar name. The need for a specialist classification depends on the scene and the item's significance; routine pricing or consumption alone does not trigger it.
+
+## 2. Universal Provisional Score
+
+Use a total from **0–134 points**. Score each of the nine dimensions from **0–15**, using only observed, documented, or reliably tested evidence; then cap a total of 135 at 134. Do not award points merely because a detail is unknown, rumored, ancient-looking, expensive, or described as rare.
+
+| Dimension | What to evaluate |
+|---|---|
+| 1. Effect / practical impact | Demonstrated usefulness, harm, protection, or influence |
+| 2. Potency | Strength, efficiency, or intensity of the demonstrated effect |
+| 3. Scope | Reach, area, number of targets, or scale of influence |
+| 4. Complexity | Technical, biological, spiritual, or operational complexity supported by evidence |
+| 5. Resilience | Durability, endurance, stability, or resistance to failure |
+| 6. Autonomy | Independent operation, self-directed behavior, or sustained function |
+| 7. Adaptability | Ability to respond to different conditions or situations |
+| 8. Special properties | Verified unusual properties not already counted in another dimension |
+| 9. Verified exceptional evidence | Direct test results, provenance, or corroborated records that establish a higher/lower classification beyond the dimensions above |
+
+**Scoring discipline**
+- Score only dimensions relevant to the subject. For a dimension that truly does not apply, write N/A and exclude it from the average; do not treat absence of evidence as proof of weakness.
+- Each applicable dimension is scored 0–15: 0 = tested/verified negligible; 1–3 = minor; 4–6 = limited; 7–9 = substantial; 10–12 = very high; 13–15 = exceptional within the relevant comparison class.
+- Calculate the **mean of applicable dimensions**, multiply by 9, and round to the nearest whole number; cap the result at 134. This normalizes subjects with different relevant dimensions onto one common 0–134 scale.
+- If fewer than three dimensions have reliable evidence, do not issue a numerical prediction. If a special classification is needed, mark **Tier belum ditetapkan — bukti belum cukup; appraisal diperlukan**. Do not use this fallback for ordinary goods that can be priced through the routine economic categories.
+- Do not double-count one feat across several dimensions. Record the evidence behind each score.
+- For beasts, assess demonstrated capability, threat, defenses, range, behavior, and special abilities; the name/category alone does not determine a score. For items, assess actual function, effectiveness, construction, stability, operation, and verified properties.
+- This score is a fallback classification aid, not a combat formula, economic price formula, Martial Soul tier, Spirit Realm, Spirit Ring tier, Arcanist Grade, age rating, or rarity/quantity rating.
+
+## 3. Tier Bands
+
+| Score | Provisional tier |
+|---:|---|
+| 0–14 | Tier 1 |
+| 15–29 | Tier 2 |
+| 30–44 | Tier 3 |
+| 45–59 | Tier 4 |
+| 60–74 | Tier 5 |
+| 75–89 | Tier 6 |
+| 90–104 | Tier 7 |
+| 105–119 | Tier 8 |
+| 120–134 | Tier 9 |
+
+Example: a valid score of 68 gives ****``*Tier 5*`` (``*Prediksi GM*`` · 68 poin)****. This is not an official ruling until an authorized appraisal is completed or canon is updated.
+
+## 4. World Appraisal Institution
+
+The worldwide institution is the **Merzkava Appraisal Authority (MAA)**, commonly called the **Appraisal Office** or **Kantor Appraisal**. Its service is recognized throughout the world: every settled region can access appraisal through a branch, accredited local desk, scheduled examiner route, or referral to a mobile specialist. Major powers and established settlements have recognized service points; remote villages, dangerous frontiers, hidden territories, and unusual specimens are served through field examiners or specialist referrals. Worldwide availability does not guarantee an office building in every village or immediate service at every location.
+
+The MAA may examine and classify when specialist identification or a formal ruling is warranted:
+- goods with disputed, unusual, hidden, or mechanically consequential quality;
+- Relics, Ancient Artifacts, Artificial Artifacts, unidentified objects, and unusual loot;
+- beasts/specimens whose identity, threat, mutation, or classification materially matters to the scene; use the canonical Beast categories and behavioral baselines in `bestiary/SPIRIT_BEAST_RULES.md` (Ordinary Beast, Spirit Beast, Supreme Beast, Demonic Beast, and Heavenly Beast);
+- rarity, mutation, or corruption are additional traits, not automatic replacements for a Beast's main category;
+- Martial Souls, referred to the specialist procedure in `core/MARTIAL_SOUL_AWAKENING.md` rather than the generic goods/beast score.
+
+This service list does not require routine appraisal of every meal, ordinary herb, common material, or everyday purchase. Such goods use the relevant market's normal economic category unless concrete evidence makes their quality or identity meaningfully uncertain.
+
+### Appraisal procedure
+1. Register the specimen/item and its provenance when known.
+2. Check official catalogs and existing canon first.
+3. Examine, test, compare, and record evidence without assuming an unknown property.
+4. Issue a written or sealed appraisal record with identity, category, assigned tier, evidence basis, confidence/limitations, examiner/office, date, and record identifier.
+5. For dangerous, divine, concealed, sentient, or high-risk objects/specimens, apply containment and specialist referral appropriate to the established scene; do not invent a guaranteed safe test.
+
+### Authority of a completed ruling
+A valid MAA ruling is the **highest-priority classification for the specific examined subject** when prior canon had no definitive tier or was explicitly uncertain. For Martial Souls, the examiner must use the dedicated Martial Soul method in `core/MARTIAL_SOUL_AWAKENING.md`; the MAA must not derive classification from the generic item/beast score or overwrite an actual rarity draw. Use only the six official rarity terms: Common, Uncommon, Rare, Epic, Legendary, or Myth. In gameplay, characters, markets, guilds, institutions, and GM logs must use the ruling for the specific examined subject. It cannot be casually contradicted by a seller, rumor, or fresh GM estimate.
+
+The ruling does not grant ownership, prove lawful provenance, reveal every hidden function, guarantee safety, or override unrelated mechanics. If strong new evidence suggests fraud, specimen substitution, contamination, a damaged state, or examiner error, record the discrepancy and seek formal re-examination; do not silently discard the ruling. Existing owner-confirmed canon remains unchanged unless the owner explicitly revises it.
+
+### Fees and access
+The institution is a recognized worldwide service, but exact fees, service times, office addresses, political ownership, and the availability of specialist examiners are not globally fixed unless a local source establishes them. Do not invent a price or claim an office is immediately accessible. A character may seek an office, request a field examiner, or be referred to a specialist; resolve travel, cost, risk, and waiting time from the actual scene and relevant rules.
+
+## 5. Logging Format
+
+- Canon tier known: **Tier 6 (Kanon: [source])**.
+- Routine ordinary good: **Kategori ekonomi Tier 1 (barang umum; dasar: [deskripsi/pasar])** — no specialist appraisal implied.
+- Provisional GM result when a special classification is needed: **Tier 5 (Prediksi GM · 68 poin; bukti: [ringkasan])**.
+- Insufficient evidence for a necessary special classification: **Tier belum ditetapkan — bukti belum cukup; appraisal dapat diperlukan**.
+- Official appraisal completed: **Tier 5 (Appraisal resmi MAA · [ID catatan])**.
+
+For an appraisal-related state change or discovery, record the event in the appropriate gameplay/loot/item ledger. The ledger records what was actually examined and ruled; it does not itself make a GM estimate official. Do not change the tier of previously recorded items or creatures unless the ruling applies to that exact subject or the owner confirms a canon update.
+
+
+
+---
+
+<!-- SOURCE gameplay/COMBAT_SYSTEM.md | upstream blob bc7d85a0e3521c30716b1859f5fdf070417d684c -->
+
+# Merzkava Universe — Combat System
+
+**Status:** Combat baseline v1.  
+**Purpose:** Give the GM one repeatable method for resolving varied fights without inventing abilities or overloading every scene with calculations.
+
+## 1. Core Rules
+
+**Player-facing result formatting:** whenever a resolved combat outcome or formula-derived combat value is reported, wrap the final result in four asterisks on both sides, using `****<hasil final>****`. This includes hit/miss, initiative roll outcome, hit chance/roll outcome, damage, HP loss, injury severity/classification, and final combat status. Apply the universal classification-label format from `templates/GAMEPLAY_RESPONSE_TEMPLATE.md` to any displayed tier, grade, quality, or similar label.
+
+- Use this module for combat resolution, `core/SPIRIT_RING_RULES.md` for PowerScale/Qi, `core/HP_SYSTEM.md` for maximum HP, `core/INJURY_SYSTEM.md` for injury classification and recovery, `gameplay/TIME_AND_ACTION_RULES.md` for elapsed time, and `core/HUNGER_AND_METABOLISM.md` for Satiety.
+- PowerScale is a baseline comparison, not a guaranteed hit or victory.
+- A turn is a combatant's opportunity to perform **one declared action**, not a limit of one physical hit. One action may contain multiple strikes or a combo when the move, declared intent, and circumstances support them.
+- Use §5 for the default combo rule. Do not invent additional hits, damage bonuses, techniques, equipment, resource costs, or effects beyond that rule or a documented ability.
+- Resolve actions in order and apply consequences. Do not decide the whole fight with one roll.
+- Death is permanent unless an established official mechanic says otherwise.
+
+## 2. Resolve Each Turn
+
+Follow this short sequence:
+
+1. **Initiative:** Respect an attack already underway, an ambush, or a clear established advantage. If neither side has initiative, both roll virtual d100; higher result acts first, ties reroll.
+2. **Action and feasibility:** Identify the declared action, its target, range, required ability, current resources, and whether the character can perform it in the current situation.
+3. **Compare combat readiness:** Use the PowerScale baseline and only relevant, evidenced advantages or disadvantages. Do not count the same advantage twice.
+4. **Resolve the action:** Determine hit/miss, defense, damage, and any documented special effect.
+5. **Update state:** Record HP/Qi or stamina changes, injuries, position, equipment, and elapsed time when they actually change. If awake time passes, resolve Satiety using `core/HUNGER_AND_METABOLISM.md`; if a protected night-sleep period occurs, keep Satiety locked for that period. Stop at a natural decision point.
+
+Initiative determines who acts first; it does not guarantee a hit. A defender may block, evade, counter, or be interrupted only when the situation and established abilities support it.
+
+## 3. Combat Rating and Hit Chance
+
+When both characters have a valid PowerScale:
+
+**Combat Rating = PowerScale × Readiness Factor × Relevant Artifact Factor**
+
+- **Readiness Factor:** choose one overall factor based on current usable energy, applicable technique, equipment, and tactical position.
+- Use **0.80** for a clear severe disadvantage, **0.90** for a disadvantage, **1.00** when neither side has a clear evidenced advantage, **1.10** for an advantage, and **1.20** for a decisive advantage.
+- This is one combined assessment, not a separate bonus for each category. Do not add another multiplier or accuracy bonus for the same facts.
+- **Relevant Artifact Factor:** use **1.00** unless an owned, available artifact has a documented effect relevant to this specific action. A higher tier alone is not a universal combat bonus.
+- Missing information is not proof of an advantage or disadvantage. If a missing key value prevents a fair comparison, do not claim an exact numeric result; resolve only what the evidence supports.
+
+Calculate the ratio:
+
+`R = Attacker Combat Rating / Defender Combat Rating`
+
+**Hit chance = clamp(10%, 90%, 50% + 25% × (R − 1))**
+
+Roll d100. The attack hits if the roll is at or below the hit chance. If the combat rating cannot be calculated, do not invent a numeric hit chance; resolve the supported parts qualitatively.
+
+## 4. Damage and Defense
+
+Use the move's documented effect when it exists. If no specific damage value exists, use this baseline:
+
+| Action type | Base damage |
+|---|---:|
+| Basic physical attack | 5% of target maximum HP |
+| Trained combat technique | 8% |
+| Spirit Ring ability or documented special technique | 12% |
+| Documented high-output/decisive technique | 18% |
+
+These are baseline classes, not permission to invent a move. Choose the lowest class that accurately fits the documented action. The 18% class requires a clearly established technique and sufficient ability/resources to use it.
+
+**Power adjustment:** `Damage = Target Max HP × Base Damage % × clamp(0.50, 1.50, √R)`
+
+Then apply only a defense that is actually present and relevant:
+
+| Defense demonstrated against the attack | Reduction |
+|---|---:|
+| None or ineffective | 0% |
+| Limited | 10% |
+| Moderate | 25% |
+| Strong | 40% |
+| Exceptional, explicitly supported | 50% maximum |
+
+Round final damage up to a whole HP; a successful damaging hit deals at least 1 HP. Record damage as `****HP lost: N (X% of target maximum HP)****`. Use target maximum HP as the damage base, but subtract the result from current HP. If current or maximum HP is unknown, do not fabricate it; consult `core/HP_SYSTEM.md`.
+
+## 5. Multiple Hits and Combos
+
+- One declared action can contain multiple hits. Never force every strike into a separate turn solely because the action contains more than one hit.
+- **Default combo:** when the player declares a combo, or the established move clearly supports a chained attack, the first strike must hit to unlock **one bonus follow-up strike** in the same action. The character must have a plausible technique, opening, and physical ability to continue the chain; a combo label alone cannot bypass those requirements.
+- Resolve the follow-up as a separate hit: make a separate hit roll using the same combat-rating method, then calculate its damage using **50% of the original strike's base-damage percentage** before the normal Power adjustment and applicable defense. Round damage normally; a successful damaging hit still deals at least 1 HP.
+- The default rule grants at most **one bonus follow-up strike per declared action**. More hits or a different bonus are allowed only when a documented move or ability explicitly supports them. Do not stack an extra general damage bonus on top of the follow-up hit.
+- If the opening strike misses, the default combo follow-up does not occur. A follow-up may be interrupted, blocked, or evaded only when the situation and established abilities support that response; resolve each strike and its consequences before continuing.
+- For a documented multi-hit move, use its stated number of hits and effects instead of the default one-follow-up limit when the move explicitly provides a different rule. If its hit resolution is undefined, use the default rule where applicable and do not invent further precision.
+- Control, piercing, area attacks, damage over time, healing, counters, and other special effects use their documented effects. Do not force them into a damage formula when their main effect is not HP damage.
+- Do not apply a full single-target damage value to every target of an area attack unless its documented rules support that result.
+
+## 6. Spirit Realm Difference and Injury
+
+A fighter at a lower Spirit Realm can defeat an opponent at a higher Spirit Realm when the recorded situation and relevant advantages support it; Spirit Realm level alone does not determine the outcome.
+
+When the combatants differ by **one Spirit Realm level**, a damaging hit from the higher Spirit Realm combatant is expected to cause at least a light injury to the lower Spirit Realm combatant. Record the injury supported by the event and classify it using `core/INJURY_SYSTEM.md`. This is an injury expectation, not a rule that every hit causes a severe or different injury. Injury severity depends on the attack mechanism, hit location, defense, actual circumstances, and documented effects—not HP loss alone. Avoiding injury requires clear evidence of an overall advantage that addresses all three:
+1. Better equipment readiness.
+2. More usable Qi/energy for the relevant action.
+3. A meaningful Spirit Ring age/quality or relevant ability advantage.
+
+Tactics and technique may contribute, but do not silently replace all three conditions. If the evidence is incomplete, apply at least a light injury and scale severity to the actual event. For all combat, use these cues rather than fixed HP thresholds: superficial bruising/abrasion or mild strain may support Class I; a deep wound, moderate sprain/burn, or tissue tear may support Class II; a clearly established fracture, dislocation, or major tendon/ligament damage supports Class III; a life-threatening wound, severe internal bleeding, organ damage, or severe poisoning supports Class IV only when the event supports that conclusion. If evidence is insufficient, mark the injury unclassified rather than inventing a diagnosis. For combos, assess each hit and their cumulative consequences; a later hit may worsen an existing injury or create another injury only when its mechanism supports that result. Do not infer injury class from damage numbers alone. Do not extrapolate the one Spirit Realm rule into an invented universal multiplier for larger Spirit Realm gaps.
+
+## 7. PowerScale, Spirit Rings, and Arcanist
+
+- PowerScale comes only from `core/SPIRIT_RING_RULES.md`; it already includes total Spirit Ring age and overall ring compatibility. Do not multiply those factors again.
+- A Spirit Ring ability affects combat only through its established ability and actual use.
+- The production chance matrix in `core/ARCANISTRY_AND_FORMULATION.md` governs artifact creation, **not** attack accuracy.
+- Before applying an Artificial Artifact, confirm ownership/access, tier, documented function, limitations, and whether that function applies to the current action. Relics, Ancient Artifacts, and Artificial Artifacts remain distinct categories.
+- If artifact effects or other required values are undefined, mark them unknown instead of making up a number.
+
+## 8. State and Missing Rules
+
+After each resolved action, update only changes caused by the action: current HP, usable Qi/stamina, injury, position, equipment, inventory, and time. Resolve Satiety for elapsed awake time using `core/HUNGER_AND_METABOLISM.md`; do not reduce it during protected night sleep. When an injury appears or changes, use `core/INJURY_SYSTEM.md` for its class, recovery requirements, and progress. Do not restore HP, refill resources, or remove consequences without an established cause.
+
+If a rule or input is missing:
+- Do not invent numerical precision or claim an undefined rule is official.
+- Resolve the parts that are supported by the current sources.
+- Keep undefined special damage or effects qualitative.
+- Flag the missing rule so it can be added deliberately to this module later.
+
+**GM quick check:** initiative → action feasibility → combat rating/hit → defense/damage/effects → state update.
+
+
+---
+
+<!-- SOURCE gameplay/TIME_AND_ACTION_RULES.md | upstream blob f4ad8b2e1afc0bc9ef25f8f9d97eb541ab7ea29f -->
+
+# Merzkava Universe — Time and Action Rules
+
+Status: Official gameplay procedure module.
+Scope: Timestamp continuity, session calendar, action duration, protected night sleep, time skips, cultivation duration, and separation of meditation, cultivation, and Spirit Ring absorption.
+
+## 1. Timestamp Format and Authority
+
+The exact timestamp line format and its position in every gameplay response are defined only in `templates/GAMEPLAY_RESPONSE_TEMPLATE.md`. Do not create a second timestamp layout in this module. This module defines how to establish, advance, and validate the timestamp values.
+
+- Fill every timestamp field with a concrete value once gameplay begins. Do not leave placeholders in a live gameplay timestamp.
+- The displayed year and era are session-calendar details unless established as global canon. **If the player has not established a year, the GM must choose a concrete, plausible session year; do not wait for player confirmation.** This fills a session gap and does not establish global history.
+- **New session without a prior timestamp:** establish one plausible starting timestamp, including year, era, season, date, weekday, weather, and local time. During this bootstrap, choose the session era randomly. The choice may be guided by the player's background, origin, or relevant world context when that makes the result more coherent, but it must remain a genuine GM selection rather than a deterministic era forced by the character's background.
+- Era names may include, but are not limited to, **Era Naga Emas**, **Era Bulan Darah**, **Era Paus Surgawi**, and **Era Kebangkitan Raja**. These are illustrative options, not a closed canon list. The GM may select another era name that fits the world's established lore; do not invent detailed historical facts merely from the name.
+- In the initial template, `Era ???` means the session era has not yet been selected. Replace it with the selected era before sending the first live gameplay response; never leave `Era ???` in an actual gameplay timestamp after bootstrap.
+- Treat the chosen era as the fixed era for that session. Do not randomly reroll it on each turn or on recall. A session-era selection is a session starting context, not automatic authorization to rewrite global history or contradict established world chronology.
+- **Continuing session:** use the last valid timestamp and era in the conversation as the sole starting point. Never reroll or restart the calendar or era merely because a new turn begins.
+- If the player explicitly supplies a valid starting timestamp, use it unless it conflicts with already recorded events.
+- If timestamps conflict, flag the conflict and do not silently overwrite established history.
+- A session calendar created to fill a canon gap is a working session calendar, not automatically global world canon.
+
+## 2. Working Calendar When No Canon Calendar Is Available
+
+Use this consistent fallback only when no prior session calendar exists:
+
+- 12 months per year; 30 days per month.
+- Months 1–3: Semi.
+- Months 4–6: Panas.
+- Months 7–9: Gugur.
+- Months 10–12: Dingin.
+- Weekday cycle: Senin, Selasa, Rabu, Kamis, Jumat, Sabtu, Minggu, repeating continuously.
+
+When a date passes day 30, advance to day 1 of the next month. After month 12, advance to the next year and month 1. Calculate weekday and season using the same session calendar. Do not replace an already established calendar mid-session. If an official calendar is later found to conflict, flag it instead of silently rewriting past timestamps.
+
+## 3. Time Advancement and Weather
+
+- Advance time only for actions or events that actually occur.
+- Keep duration plausible for the action, travel, conversation, rest, transaction, or environmental event described.
+- If no meaningful time passes, do not make an unexplained large time skip.
+- When an action takes 20 minutes, advance the clock by 20 minutes and roll over the date only if necessary.
+- Keep hour, date, weekday, month, season, and elapsed duration mathematically consistent.
+- Set initial weather plausibly for the location and season. Keep it stable until an event or plausible passage of time justifies a change; do not reroll weather every turn.
+- Location changes require a supported travel/action event. Do not invent distances or travel times where the map/world modules do not support them.
+
+## 4. Action Duration Limits
+
+- An ordinary player action may advance no more than **3 hours per turn**. **Exception: normal night sleep is a protected biological need and may advance beyond 3 hours in one turn.** Do not force normal sleep to be split into multiple actions.
+- Do not combine unrelated independent activities into one long time skip to bypass the ordinary-action limit.
+- If a declared action contains several independent activities, resolve the main action and stop at a natural point when further action requires another player decision.
+- Apply relevant location, safety, resources, physical condition, weather, and interruptions when deciding whether the declared duration is possible.
+- Do not treat a player's stated duration as proof that every intended activity succeeded.
+- Normal night sleep is the explicit exception to the 3-hour limit. During protected night sleep, Satiety is locked at its value when sleep begins; do not reduce Satiety or count meal windows as missed while the character is asleep. Apply `core/HUNGER_AND_METABOLISM.md` when the character is awake.
+
+## 5. Pure Cultivation Time Skip
+
+Pure cultivation may advance up to **1 month** in a single turn only when every condition below is verified:
+
+1. The declared activity is pure cultivation; it does not bundle travel, shopping, combat, training unrelated to cultivation, or other independent activities.
+2. The character remains in a safe, stationary location for the full period.
+3. Food, water, shelter, and other required logistics are sufficient and supported by the character's recorded resources or environment.
+4. The GM records reasonable progress checkpoints across the period and accounts for interruptions, changes in condition, and relevant consequences.
+5. The total duration does not exceed one month.
+6. Account for hunger/metabolism using `core/HUNGER_AND_METABOLISM.md`: reduce Satiety only for active/awake time, with protected night-sleep periods excluded. The one-month cultivation allowance does not suspend other applicable systems.
+
+If any condition is not met or cannot be verified, apply the ordinary-action limit or ask for clarification. Do not assume that a long period is safe merely because the character says they will cultivate.
+
+## 6. Keep These Processes Separate
+
+- **Meditation** is not automatically cultivation and does not automatically increase Sync progress.
+- **Cultivation** increases Sync progress only according to the official cultivation rules and the character's current compatibility cap.
+- **Spirit Ring absorption** is a separate process governed by the official Spirit Ring and Spirit Beast modules.
+- Defeating a Spirit Beast and causing its ring to appear does not mean the ring has automatically been absorbed.
+- Do not award progress, absorb a ring, or trigger a breakthrough solely because time passed.
+
+`templates/CHARACTER_PROFILE_TEMPLATE.md` adalah satu-satunya sumber pemetaan status dan format field `Spirit Ring Absorption`. Sebelum setiap percobaan penyerapan, periksa state aktual terhadap `core/SPIRIT_RING_RULES.md`, `core/CULTIVATION_SYSTEM.md`, dan `bestiary/SPIRIT_BEAST_RULES.md`. Untuk ring pertama, Mortal wajib telah mengalami Martial Soul Awakening; tidak ada jeda antar-ring atau bottleneck breakthrough untuk ring pertama. Untuk ring berikutnya sebelum puncak, verifikasi semua syarat resmi termasuk Sync progress/bottleneck, jeda minimum, item wajib, toleransi tubuh, dan syarat lain yang berlaku. Di Spirit Realm 9, jangan hitung kelayakan atau cooldown untuk ring kesepuluh. Ketersediaan ring fisik adalah syarat terpisah: jangan menyatakan karakter tidak eligible hanya karena ring target tidak sedang tersedia, tetapi jangan pernah menarasikan penyerapan selesai tanpa ring yang tersedia melalui proses sah.
+
+If the character is not eligible and the player still insists, do not bypass the gate or award success. Resolve only a forced attempt, using the existing deviation and HP formula in `core/SPIRIT_RING_RULES.md` and the Injury System for any injury supported by the event. Do not invent missing numerical formulas, damage, odds, or permanent disabilities. Severe or life-threatening consequences are possible when supported by the official formula and the actual event; no specific injury or death is automatic.
+
+**Formulasi kanonis `Day left` (wajib):**
+
+Setiap kali penyerapan Spirit Ring berhasil dan masih ada ring berikutnya yang dapat diserap (Ring 1–8), **inisialisasi `Day left` saat itu juga** berdasarkan interval minimum resmi menuju ring berikutnya. Tetapkan titik awal baru: `T_eligible = 0` tepat setelah keberhasilan tersebut. Pengecualian: setelah ring kesembilan tercapai di Spirit Realm 9, jangan inisialisasi cooldown lanjutan; status menjadi `max | ∞ Day left`. Jangan menunggu giliran berikutnya atau meminta riwayat tambahan untuk memulai hitung mundur.
+
+Definisikan:
+- `T_min` = interval minimum resmi untuk penyerapan berikutnya, sesuai jumlah ring yang telah berhasil diserap dan tabel interval di `bestiary/SPIRIT_BEAST_RULES.md`. Konversi interval ke durasi memakai kalender sesi yang berlaku; pada kalender fallback §2, 1 bulan = 30 hari.
+- `T_eligible` = total durasi waktu dunia yang benar-benar dijalani secara normal di luar Kultivasi sejak penyerapan Spirit Ring terakhir yang berhasil; nilainya dimulai dari `0` tepat saat ring berhasil diserap.
+- `T_remaining` = sisa interval yang harus dipenuhi.
+
+Rumus:
+```text
+T_remaining = max(0, T_min - T_eligible)
+
+Jika T_remaining = 0:
+    Day left = 0
+Jika T_remaining > 0:
+    Day left = ceil(T_remaining / 24 jam)
+```
+
+`T_eligible` adalah akumulasi durasi yang memenuhi syarat, bukan selisih timestamp mentah. Waktu dari aksi normal, aktivitas harian, perjalanan, istirahat, atau tidur hanya dihitung selama waktu dunia benar-benar berlalu dan tidak tumpang tindih dengan durasi lain. **Semua durasi yang diklasifikasikan sebagai Kultivasi dikecualikan sepenuhnya dari `T_eligible`**, termasuk time skip Kultivasi hingga satu bulan. Timestamp dan kalender dunia tetap maju selama Kultivasi, tetapi `T_eligible` dan `Day left` tidak berubah akibat durasi tersebut.
+
+Pembulatan dilakukan pada sisa interval: sisa 1 jam hingga 24 jam = `1 Day left`; sisa lebih dari 24 jam hingga 48 jam = `2 Day left`. Angka hanya menjadi `0 Day left` saat `T_eligible >= T_min`. Jangan mengurangi satu hari penuh hanya karena giliran berganti atau tanggal kalender berubah.
+
+Jika karakter belum pernah berhasil menyerap Spirit Ring, jeda antarpenyerapan belum dimulai dan gunakan `??? Day left` bersama status tahap yang tepat menurut `templates/CHARACTER_PROFILE_TEMPLATE.md` (termasuk `not eligible yet | ??? Day left` untuk Mortal tanpa Awakening aktif dan `pending | ??? Day left` selama Awakening aktif). Dalam kondisi ini, `???` bukan data cooldown yang hilang; tidak ada cooldown yang perlu dihitung. Setelah penyerapan pertama berhasil, langsung inisialisasi `Day left` dari `T_min` dan `T_eligible = 0`; jangan gunakan `???` atau `Belum ditetapkan` untuk penyerapan yang baru berhasil. Gunakan `Belum ditetapkan Day left` hanya untuk state lama yang **pernah memiliki penyerapan berhasil** tetapi catatan waktu/riwayatnya tidak cukup untuk merekonstruksi cooldown secara andal. Jangan menebak atau menganggap cooldown selesai. Untuk ring kedua hingga kesembilan sebelum Spirit Realm 9, `Day left = 0` adalah gerbang wajib yang terpisah dari Sync/bottleneck, ketersediaan ring, item, toleransi tubuh, dan syarat resmi lainnya.
+
+## Rujukan Status Spirit Ring Absorption
+
+Gunakan satu-satunya pemetaan status kanonis di `templates/CHARACTER_PROFILE_TEMPLATE.md`. Modul ini adalah sumber tunggal untuk rumus dan akumulasi waktu `Day left`, bukan pemetaan status alternatif. Status `eligible` tidak menjamin ring fisik tersedia atau penyerapan berhasil; Spirit Realm 9 selalu `max | ∞ Day left`.
+
+## 7. Anti-cheat enforcement for time and action bypass
+
+Player-declared duration is not proof of completed activity. Validate time passage, the three-hour ordinary-action limit, pure-cultivation time skip, travel, activity separation, Satiety, cooldown accumulation, and all state changes under this module before accepting a claimed result. A player-authored alternative that bypasses these gates is not canon and cannot advance time/state. For a confirmed deliberate bypass or repeated claim of success against a rejected rule, stop and follow `templates/ANTI_CHEAT_HARD_GATE.md`: mandatory WARNING before reprimand, rollback to the last valid state, and the recorded escalation procedure. Do not classify a good-faith question or unresolved attempt as cheating. The anti-cheat second-violation death sanction is a special exception to normal emergency rescue; it does not alter rescue rules for ordinary gameplay incidents.
+
+## 8. Required Continuity Check
+
+Before sending each gameplay response, verify:
+
+- The timestamp follows the last valid timestamp.
+- Duration matches the declared action and the applicable limit.
+- Date, weekday, season, and year rollovers are consistent.
+- Weather and location changes have a plausible cause.
+- Long cultivation satisfies all five conditions in §5.
+- Time passage has not automatically changed HP, Qi, Sync progress, Satiety, inventory, currency, or breakthrough status without an applicable rule and recorded cause.
+- `Day left` was not reduced by any duration classified as Kultivasi; only qualifying normal-life elapsed time was counted, and the interval is not marked complete unless its accumulated eligible duration reaches the official minimum.
+- Every interval of awake time has been classified as exactly one activity category and resolved against `core/HUNGER_AND_METABOLISM.md`; do not double-count elapsed time. Each latest activity response must state Satiety change or explicitly state that it remained unchanged and why. Protected night sleep locks Satiety and does not count as a missed meal window.
+- The final response follows the exact order and visual layout in `templates/GAMEPLAY_RESPONSE_TEMPLATE.md`.
+
+
+
+---
+
+<!-- SOURCE gameplay/TRAVEL_ENCOUNTER_AMBUSH_RESCUE.md | upstream blob b25b5d7e6fd4c56f5a4a671960ec07497383a5da -->
+
+# Merzkava Universe — Travel Encounter, Ambush & Emergency Rescue
+
+**Status:** Official gameplay procedure.
+**Scope:** Travel-segment encounter checks, separate ambush checks, and emergency rescue attempts involving wandering Medicine Hall Society healers.
+**Authority:** This module governs these procedures and probabilities only. It does not override canon routes, dynamic events, combat, HP, injury, time, economy, faction lore, or character-state rules.
+
+## 0. Wandering Teacher Encounters
+
+For unplanned encounters with potential teachers or independent practitioners, also apply `world/OPEN_LEARNING_PATHS_AND_WANDERING_INSTRUCTORS.md`. This check is distinct from ambush and emergency rescue checks: do not combine their rolls, reuse their outcomes, or trigger them merely because the player is injured. Consider a single wandering-teacher/general encounter check when a scene provides a genuine opportunity—travel, exploration, public activity, entering a settlement, seeking instruction, or an appropriate time skip. The learning-path module defines the virtual d100 procedure and location-fit constraints.
+
+A wandering teacher may appear without belonging to any faction, but must have a plausible route, purpose, knowledge, and reason to be present. Do not place one inside sealed/private/secure locations or hidden and dangerous areas without grounded access. Do not make a teacher automatically willing, able, safe, affordable, or personally invested in the player. Finding one does not grant techniques, Spirit Realm progress, Arcanist Grades, artifacts, or examination passes; all official mechanics and character-state rules remain binding. Wandering practitioners are deliberately difficult to recruit: one request may simply be refused, while persistent pressure, threats, restraint, or coercion can provoke deception, escape, retaliation, lasting injury or disability, loss of property, legal consequences, or death when supported by the NPC's established capability and official mechanics. Follow the escalation and continuity rules in `world/OPEN_LEARNING_PATHS_AND_WANDERING_INSTRUCTORS.md`; do not punish a polite request automatically, and do not soften credible consequences merely to preserve a teaching route.
+
+## 1. Mandatory Use
+
+Whenever a player travels outside a settlement or through a route segment where an encounter could reasonably occur, consult this module. Before resolving travel, verify the confirmed route, terrain, transport, duration, intermediate stops, restrictions, and relevant events using `world/LOCATION_AND_ROUTE_NETWORK.md`, `world/MAP_AND_REGIONS.md`, `world/GEOGRAPHY_AND_TRAVEL.md`, relevant regional modules, `world/DYNAMIC_EVENTS.md`, and `gameplay/TIME_AND_ACTION_RULES.md`.
+
+Do not invent routes, exact distances, travel times, local threats, named NPCs, medical stations, or confirmed presence from an unverified map gap. The probabilities below are GM mechanics, not evidence that a particular encounter, threat, healer, or route exists.
+
+## 2. General Travel Encounter Check
+
+Run one General Encounter check when the player genuinely enters a new, confirmed route segment. An encounter is not automatically hostile and does not automatically start combat.
+
+| Confirmed segment character | Base chance |
+|---|---:|
+| Busy road outside a settlement | 5% |
+| Regular intercity or trade route | 10% |
+| Quiet village route | 15% |
+| River crossing or forest route | 20% |
+| Dense forest or remote mountain route | 25% |
+| Wild zone with confirmed danger | 35% |
+
+`P_E = clamp(0%, 60%, B_E + M_E)`
+
+- `P_E`: final encounter probability.
+- `B_E`: base chance from the table.
+- `M_E`: evidence-supported modifiers in percentage points, such as recorded trade activity, a relevant active event, or a known local condition.
+- Clamp the final chance to 0–60%. Do not add modifiers merely to make a scene more exciting.
+
+Roll virtual d100 once; the check succeeds if the result is at or below `P_E`. Possible outcomes include a helpful, neutral, or friendly wandering NPC; a merchant, caravan, hunter, courier, or passing group; conversation, rumor, services, trade or help offers; signs of a Spirit Beast; environmental obstacles; or a suspicious/opportunistic person where the circumstances support it.
+
+An encounter does not guarantee a reward, threat, or interaction the player must accept. NPCs act according to established traits, knowledge, affiliations, goals, relationships, resources, and circumstances. Do not make a neutral NPC hostile solely to force combat.
+
+## 3. Separate Ambush Check
+
+Ambush is checked separately from General Encounter. Run the check only when there is a plausible, evidence-supported basis for an ambush-capable threat, such as a recorded hostile group, credible local warning, relevant active threat, or a location/threat combination supported by canon. A dangerous-looking place alone does not prove that a specific attacker is present.
+
+| Threat evidence before the check | Base chance |
+|---|---:|
+| No qualifying threat evidence | 0%; do not roll |
+| Potential threat with limited evidence | 5% |
+| Plausible ambush risk supported by context | 10% |
+| Confirmed hostile threat nearby, outcome unresolved | 20% |
+| Ambush already confirmed and underway | Do not reroll its existence |
+
+`P_A = clamp(0%, 50%, B_A + M_A)`
+
+`P_A` is the final ambush probability, `B_A` the base chance, and `M_A` evidence-supported modifiers in percentage points. Clamp to 0–50%. Terrain, weather, time, escort, or alertness can modify the chance only where they materially affect the threat's ability to attack or be detected. Do not double-count one condition. Roll virtual d100 once; success occurs at or below `P_A`.
+
+Ambush means an active hostile or emergency threat, not merely an unfriendly conversation. Supported outcomes may include forced combat against hostile NPCs or a Spirit Beast, coercion under a credible threat demanding money or player-owned items, traps, natural disasters, sudden hazards, or another dangerous event supported by canon.
+
+Probability alone does not determine attacker identity, number, strength, motives, loot, damage, or outcome. For combat use `gameplay/COMBAT_SYSTEM.md`; for injuries use `core/HP_SYSTEM.md` and `core/INJURY_SYSTEM.md`; resolve time using `gameplay/TIME_AND_ACTION_RULES.md` and `core/HUNGER_AND_METABOLISM.md` where relevant.
+
+### Property and currency changes
+
+Do not automatically subtract money or delete inventory because an extortion attempt occurs. Resolve the player's response and the NPC's actual actions. Record only currency or items truly surrendered, seized, lost, recovered, or otherwise changed, following `templates/AUTHORITY_ORDER.md` and `core/10_ECONOMY_SYSTEM.md`. Do not invent an automatic payment or guaranteed escape.
+
+## 4. Segment Procedure and Continuity
+
+1. Verify route, terrain, transport, duration, restrictions, and relevant active events.
+2. Run one General Encounter check.
+3. Separately run one Ambush check only if qualifying threat evidence exists.
+4. If an ambush occurs, resolve it as the principal event. Do not automatically add a second unrelated encounter from the same check cycle.
+5. If no ambush occurs, resolve a successful General Encounter, if any.
+6. If neither check triggers, travel continues without a forced event.
+7. If the player enters a genuine emergency, follow Section 5.
+
+A segment is a confirmed route edge, not an arbitrary GM-created time slice. If travel across it takes multiple gameplay turns due to the action-duration limit, preserve its check status and results; do not reroll because a turn passed or narration continued. A new check cycle starts only when the player actually enters the next confirmed segment. A new material event may change the current situation but does not automatically reroll an old check.
+
+Keep unresolved results in session continuity. If the result is unavailable in the current conversation, do not pretend to remember it or silently reroll; disclose the gap and reconcile from the latest verifiable state.
+
+## 5. Emergency Rescue — Wandering Medicine Hall Society Healer
+
+### 5.1 Activation and chance
+
+Emergency Rescue becomes eligible when a resolved event leaves the player alive but in a genuine emergency requiring prompt assistance: for example, a life-threatening injury, incapacitation, dangerous exposure, severe poisoning, being trapped, or another urgent condition supported by the event. Do not trigger it for every minor wound or ordinary fatigue. Use official HP and injury rules; do not infer a diagnosis from an HP number alone. Under `core/HP_SYSTEM.md`, HP reaching 0 means death; this rescue procedure does not revive a dead character. The sole anti-cheat second-violation death rule is an absolute exception to all normal rescue.
+
+This check is independent of General Encounter and Ambush. An emergency does not guarantee that a healer is nearby or that rescue succeeds.
+
+| Current situation and location | Base chance to encounter a wandering healer |
+|---|---:|
+| Busy route or near a populated settlement | 20% |
+| Ordinary interregional or intercity route | 10% |
+| Remote forest or dangerous mountain wilderness | 5% |
+| Concrete evidence of a nearby healer, medical mission, or Society activity | Add 10–20 percentage points |
+
+`P_R = clamp(0%, 50%, B_R + M_R)`
+
+`P_R` is the final probability of encountering a wandering healer, `B_R` is the single base chance selected from the location row, and `M_R` is the sum of distinct, evidence-supported modifiers in percentage points. The evidence row is a modifier, not an alternative base chance. Calculate `P_R = min(50%, max(0%, B_R + M_R))`. Do not infer a healer's presence just because the player needs one. The Medicine Hall Society is a neutral medical network, but universal staffing, free treatment, guaranteed supplies, and a healer at every location are not established. Consult `world/FACTIONS.md` and the relevant regional/service module when a specific branch or service point matters. If the character is already at a confirmed clinic or regional hall, use that service point's established location/staffing context rather than rolling to invent a wandering healer.
+
+Perform one rescue check when the emergency first becomes established. Do not reroll every turn while the player remains injured or unconscious. A new check is allowed only when a materially new circumstance creates a legitimate new opportunity, such as reaching a populated route or a medical party newly entering the area. If a healer's presence is already confirmed, do not roll to decide whether they exist; resolve whether they can detect, reach, and assist the player. Never reroll whether an ongoing ambush exists.
+
+### 5.2 Rescue and medical effort
+
+On a successful check, the GM may introduce a wandering NPC affiliated with the Medicine Hall Society if consistent with the location and canon. Select or generate traits without contradicting established profiles, registries, or lore. Once introduced, the NPC's identity and personality persist.
+
+At minimum, the healer attempts to move the player away from the ambush point or conceal them in a comparatively safer location, if their ability and circumstances permit. This is an attempt, not guaranteed extraction: attackers, terrain, the player's condition, the healer's capability, or other hazards may prevent or interrupt it.
+
+After immediate safety is addressed, the healer provides care according to demonstrated/established competence, available medicine and tools, the patient's condition, time, surrounding danger, and personality. The rescue encounter roll is **not** a roll for treatment success. Resolve extraction, diagnosis, stabilization, procedures, and recovery as distinct steps supported by the scene and official rules. Finding a healer does not guarantee full recovery, freedom from injury, or survival. If the attempt fails, resolve the consequences fairly rather than granting automatic protection.
+
+Personality is randomized by the GM when appropriate, while respecting known NPC canon. Suggested patterns:
+- **Compassionate:** helps willingly and makes a sincere effort with available supplies.
+- **Professional/pragmatic:** stabilizes the patient and provides appropriate care; may request a reasonable fee if consistent with the NPC.
+- **Reluctant/indifferent:** offers limited aid, conserves scarce supplies, or avoids risky further treatment.
+- **Materialistic:** may request payment or a guarantee before continuing treatment.
+- **Exploitative:** may use the patient's vulnerability to demand money or items in exchange for further care.
+
+These are behavior guides, not a closed list. Do not assume all Society members share one temperament. Personality affects willingness and effort, not automatic medical success: a compassionate healer can lack skill or supplies for a grave injury, while a reluctant healer may successfully perform a simple procedure.
+
+A healer may stabilize the player, then demand payment for further treatment. If the player refuses, the healer may negotiate, limit further voluntary care, or leave if consistent with the established character. Do not retroactively erase aid already given. If the healer threatens or forcibly takes property, resolve that as an actual NPC action. Society affiliation does not prove the Society endorses extortion.
+
+### 5.3 Medical and economic continuity
+
+Apply treatment only to the extent supported by the healer's established ability, actual resources, and official HP/injury rules. For injury progress, use `core/INJURY_SYSTEM.md` and its class-specific rates per 24 in-world hours; use the treated rate only when the treatment and any structural/stabilization prerequisites are actually completed. For HP, use `core/HP_SYSTEM.md`: no numerical HP recovery may be invented, and injury progress never converts into HP. Stabilization is not a cure and does not itself restore HP unless an explicit official effect says so. Do not invent instant cures, rare medicine, or guaranteed outcomes. Record medicines used, injuries treated, residual symptoms, treatment time, and recovery requirements. Record fees, debts, item transfers, or property seizure only when they actually occur; currency and item state must match the continuous ledger and character profile. Preserve the healer's identity, affiliation, personality, knowledge, actions, promises, and relationship in later scenes.
+
+If rescue or treatment creates a lasting world-level effect, follow the proposal workflow in `world/DYNAMIC_EVENTS.md`. Ordinary private treatment or a character-only injury change does not automatically qualify as a world event.
+
+## 6. Fairness and Source Priority
+
+- A probability is a chance, not a guarantee. Respect the roll; never reroll solely to obtain a preferred result.
+- Do not force every encounter to be hostile, every ambush to be winnable, or every emergency to receive rescue.
+- Do not create a healer solely to protect the player or suppress a plausible rescue solely to punish the player.
+- Do not change currency, inventory, HP, injuries, time, or relationships without a resolved cause.
+- A successful healer-encounter check only establishes a plausible encounter; it does not guarantee extraction, treatment success, HP recovery, injury recovery, or survival.
+- Never use normal emergency rescue to override HP 0 death or the permanent death sanction defined in `templates/ANTI_CHEAT_HARD_GATE.md`.
+- Preserve NPC agendas, knowledge boundaries, and established traits.
+- This module does not override canon decisions, regional rules, combat, HP/injury, economy, time, or recorded dynamic events. When a conflict appears, follow the established source hierarchy and flag unresolved contradictions.
+
+## 7. GM Quick Checklist
+
+**Travel:** verify route and events → General Encounter check → separate Ambush check only when justified → resolve one coherent outcome → preserve segment state.
+
+**Emergency:** verify genuine emergency → check rescue chance once → if successful, establish a plausible wandering Medicine Hall Society healer → attempt safety/extraction → resolve care, effort, payment, injuries, time, and continuity under official rules.
+
