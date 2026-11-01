@@ -877,6 +877,15 @@ root.addEventListener("click", async (event: MouseEvent) => {
     }
     return;
   }
+  const factionEntry = target.closest<HTMLButtonElement>("[data-faction-entry]");
+  if (factionEntry?.dataset.factionEntry) {
+    if (openLoreEntry(factionEntry.dataset.factionEntry)) {
+      activeScreen = "map";
+      notice = "";
+      render();
+    }
+    return;
+  }
   const loreOpen = target.closest<HTMLElement>("[data-lore-open]");
   if (loreOpen?.dataset.loreOpen) {
     if (openLoreEntry(loreOpen.dataset.loreOpen)) render();
