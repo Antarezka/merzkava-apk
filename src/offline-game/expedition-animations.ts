@@ -70,22 +70,25 @@ export function animateExpeditionChoiceModal(modal: HTMLElement, open: boolean, 
   const sheet = modal.querySelector<HTMLElement>(".expedition-choice-sheet");
   const backdrop = modal.querySelector<HTMLElement>(".expedition-choice-backdrop");
   if (reducedMotion()) {
-    if (!open) modal.hidden = true;
+    if (!open) { modal.hidden = true; delete modal.dataset.closing; }
     onComplete?.();
     return;
   }
   if (open) {
+    delete modal.dataset.closing;
     modal.hidden = false;
     if (backdrop) animate(backdrop, { opacity: [0, 1], duration: 240, ease: "outQuad" });
     if (sheet) animate(sheet, { opacity: [0, 1], translateY: [34, 0], duration: 430, ease: "outCubic" });
     return;
   }
+  if (modal.dataset.closing === "true") return;
+  modal.dataset.closing = "true";
   if (backdrop) animate(backdrop, { opacity: [1, 0], duration: 190, ease: "inQuad" });
   if (sheet) animate(sheet, {
     opacity: [1, 0], translateY: [0, 24], duration: 220, ease: "inCubic",
-    onComplete: () => { modal.hidden = true; onComplete?.(); },
+    onComplete: () => { modal.hidden = true; delete modal.dataset.closing; onComplete?.(); },
   });
-  else { modal.hidden = true; onComplete?.(); }
+  else { modal.hidden = true; delete modal.dataset.closing; onComplete?.(); }
 }
 
 export function animateExpeditionPanel(panel:HTMLElement):void {
