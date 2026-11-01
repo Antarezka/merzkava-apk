@@ -6,6 +6,7 @@ import { getGameplaySessionRecord, initializeDatabase, saveGameplaySessionRecord
 import { createCharacter, deleteCharacter, listCharacters, type Character } from "./convo/characters/character-repository";
 import { validateCharacterDraft } from "./convo/engine/character-validation";
 import { renderScreen, type ScreenId } from "./app/screens";
+import { mountExpeditionAnimations } from "./offline-game/expedition-animations";
 import { getCanonIndex, getCanonStatus, loadCanonModule, loadPlayerRegistry, loadRegisteredPlayerProfile, refreshCanon, refreshLatestPlayerRegistry, type CanonDocument } from "./convo/canon/canon-loader";
 import { routeCanonActivity } from "./convo/canon/canon-router";
 import { assembleGameplayContext } from "./convo/canon/context-assembler";
@@ -48,6 +49,7 @@ function saveAppPreferences(): void {
 }
 applyAppPreferences();
 let menuRevealPending = false;
+let cleanupExpeditionAnimations: (() => void) | undefined;
 let lastAnimatedScreen: AppScreen | null = null;
 initializeLedgerNotifications();
 
@@ -464,6 +466,8 @@ function render(): void {
   const content = isControl
     ? floatingControlMarkup(floatingReadiness)
     : renderScreen(activeScreen as ScreenId, availableCharacters(), playerRegistryMessage, activeCharacterId ? getLedgerLog(activeCharacterId) : [], inventorySnapshot);
+  cleanupExpeditionAnimations?.();
+  cleanupExpeditionAnimations = undefined;
   root.innerHTML = `<div class="app-shell ${isControl ? "control-shell" : ""} ${menuRevealPending ? "is-entering" : ""}">
     ${isControl ? "" : `<header class="app-header"><button class="brand" data-screen="home" aria-label="Merzkava home"><span class="brand-mark">M</span><span class="brand-wordmark"><small>MERZKAVA UNIVERSE</small><strong>Merzkava</strong></span></button><div class="header-context"><small>TACTICAL ACADEMY</small><strong>${navigation.find(item => item.id === activeScreen)?.label ?? "Command Hall"}</strong></div><div class="header-tools"><button class="header-settings" data-floating-action="start-bubble" aria-label="Start Bubble Mode" title="Start Bubble Mode">◉</button><button class="header-settings" data-screen="settings" aria-label="Settings">⚙</button></div></header>`}
     ${notice ? `<p class="notice" role="status">${escapeHtml(notice)}</p>` : ""}
@@ -476,6 +480,10 @@ function render(): void {
   </div>`;
   menuRevealPending = false;
   if (shouldAnimateScreen) animateAppScreen(root.querySelector<HTMLElement>(".app-shell"));
+  if (activeScreen === "offline-game") {
+    const expeditionPage = root.querySelector<HTMLElement>(".expedition-page");
+    if (expeditionPage) cleanupExpeditionAnimations = mountExpeditionAnimations(expeditionPage);
+  }
   if (!isControl) lastAnimatedScreen = activeScreen;
   updateSessionCalendar();
   renderChat();
