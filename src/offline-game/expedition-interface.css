@@ -64,7 +64,7 @@
 .expedition-dialogue-card,.expedition-dialogue-locked{padding:16px;border:1px solid #5d4a34;background:linear-gradient(145deg,#2b261f,#1d1b18)}
 .expedition-start-form label{display:block;margin:12px 0 6px;color:#d8c6a8;font-size:10px;letter-spacing:.06em}
 .expedition-start-form input,.expedition-start-form select{width:100%;min-height:42px;padding:9px 10px;border:1px solid #65523d;border-radius:3px;background:#171614;color:#f0e5d4;font:inherit;font-size:12px}
-.expedition-test-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.expedition-form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .expedition-start-form{margin-top:12px}
 .expedition-player-name{margin:10px 0 4px;color:#f0e5d4;font:400 25px Georgia,serif}
 .expedition-dialogue{display:grid;gap:10px}
