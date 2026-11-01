@@ -105,7 +105,7 @@ function currentWorldRegion(current:EternalSave|null=getEternalSave()):EternalRe
 function readSave(): EternalSave | null {
   try {
     const raw=localStorage.getItem(SAVE_KEY); if(!raw) return null;
-    const parsed=JSON.parse(raw) as EternalSave & {schemaVersion:number};
+    const parsed=JSON.parse(raw) as Omit<EternalSave,"schemaVersion"> & {schemaVersion:number};
     if((parsed.schemaVersion!==1 && parsed.schemaVersion!==2) || !parsed.character?.name || !Number.isInteger(parsed.eventIndex)) return null;
     // Migrate the original single-save schema without discarding the player's journey.
     parsed.schemaVersion=2;
