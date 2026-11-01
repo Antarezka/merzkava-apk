@@ -1,9 +1,9 @@
 import { animate, createTimeline } from "animejs";
 
 /**
- * Animate the original, registered PNG layers without changing their shared
- * 1024x1024 canvas alignment. Ears are painted into kitty-head.png, so their
- * movement is a very small head/ear-root tilt rather than a detached flap.
+ * Animate Kitty's three visible PNG layers without changing their shared
+ * 1024x1024 canvas alignment. The separate floor shadow is intentionally omitted.
+ * Ears are painted into kitty-head.png, so movement stays at the head/ear root.
  */
 export function animateOpeningSplash(splash: HTMLElement): () => void {
   const content = splash.querySelector<HTMLElement>(".splash-content");
