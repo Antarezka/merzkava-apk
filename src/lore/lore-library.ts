@@ -475,6 +475,104 @@ const LORE_ENTRY_DRAFTS: Omit<LoreEntry, "sourceCommit" | "reviewedAt" | "crossR
     sourcePath: "world/SPIRIT_HUNTERS_GUILD.md", sourceLabel: "Spirit Hunters Guild"
   },
 
+
+  {
+    id: "imperial-governance", title: "Golden Dragon — Imperial Governance", aliases: ["Imperial Governance", "Golden Dragon Government", "Pemerintahan Kekaisaran Naga Emas"],
+    visibility: "PUBLISHED", category: "POWERS", eyebrow: "CIVIL & MILITARY ADMINISTRATION · 21",
+    summary: "Kerangka pemerintahan sipil dan militer Golden Dragon Empire, dari kaisar hingga layanan lokal, dengan pemisahan kewenangan yang tegas.",
+    paragraphs: [
+      "Kaisar adalah pemegang kedaulatan tertinggi. Urusan sehari-hari dijalankan melalui Imperial Council, Grand Secretariat, kementerian pusat, tujuh gubernur wilayah, dua belas prefektur, dan enam county circuit. Setiap county circuit mengoordinasikan dua prefektur; ia bukan lapisan county tambahan.",
+      "Register administrasi saat ini menetapkan tujuh wilayah, dua belas prefektur, enam county circuit, dan tiga belas desa resmi. Kota, town, township, district office, serta household register memiliki fungsi layanan atau pencatatan dan tidak otomatis menjadi jenjang pemerintahan baru.",
+      "Pemerintahan sipil dan komando militer adalah dua rantai kewenangan berbeda. Gubernur tidak otomatis memimpin setiap garnisun, sedangkan komandan militer tidak otomatis mengelola urusan warga. Gelar bangsawan, afiliasi klan, Spirit Realm, atau kekuatan pribadi juga tidak otomatis memberikan jabatan maupun yurisdiksi.",
+      "Nama unit administratif dan kursinya mengikuti Administrative Atlas. Batas survei, koordinat, kode hukum lengkap, susunan rinci dewan, dan pejabat yang belum tercatat tetap terbuka; jangan mengisi kekosongan itu dengan asumsi."
+    ],
+    sourcePath: "world/GOLDEN_DRAGON_EMPIRE_GOVERNANCE.md", sourceLabel: "Golden Dragon Empire Governance"
+  },
+  {
+    id: "imperial-public-services", title: "Golden Dragon — Public Services & Institutions", aliases: ["Imperial Public Services", "Ninefold Concord Bank", "Myriad Ledger Exchange", "Golden Dragon institutions"],
+    visibility: "PUBLISHED", category: "FACTIONS", eyebrow: "PUBLIC INSTITUTIONS · 22",
+    summary: "Jaringan layanan penduduk dan institusi lintas wilayah Golden Dragon, dengan ketersediaan yang berbeda menurut pusat kota, koridor, dan daerah perbatasan.",
+    paragraphs: [
+      "Golden Dragon memiliki jaringan layanan yang mencakup Ninefold Concord Bank, Myriad Ledger Exchange, Medicine Hall Society, dua Cultivator Academies pusat, perpustakaan pengetahuan publik Ordo Suci Tianming, dan Grand Martial Soul Awakening Hall. Register ini menetapkan cabang dan titik layanan tertentu; ia bukan jaminan bahwa setiap kota memiliki semua layanan.",
+      "Ketersediaan layanan mengikuti gradien wilayah. Huanglongcheng dan jantung Longyuan memiliki jam layanan, staf, stok, dan akses rujukan paling luas. Pusat regional utama memiliki layanan inti yang lebih terbatas; kota industri dan pelabuhan memiliki spesialisasi lokal; daerah terpencil Baiyue cenderung memiliki stok lebih kecil, lebih sedikit spesialis, dan pasokan lebih lambat.",
+      "Dua Cultivator Academies pusat berada di Huanglongcheng. Tianfeng merupakan sumber pelajar berbakat dan tradisi keilmuan, bukan lokasi akademi kultivator regional. Ordo Suci Tianming menyediakan koleksi pengetahuan publik dengan batas akses; perpustakaan publik tidak berarti semua arsip organisasi terbuka.",
+      "Nama cabang, lokasi, dan layanan yang dipilih mengikuti Population Services Register. Cabang yang tidak tercatat, jam buka, staf yang sedang bertugas, persediaan, antrean, dan hasil layanan tidak boleh diasumsikan tersedia secara otomatis."
+    ],
+    sourcePath: "world/GOLDEN_DRAGON_EMPIRE_POPULATION_SERVICES.md", sourceLabel: "Population Services & Institutional Branch Register"
+  },
+  {
+    id: "open-learning-paths", title: "Learning Beyond Factions", aliases: ["Open Learning Paths", "Wandering Instructors", "Independent Teachers", "Belajar tanpa Faksi"],
+    visibility: "PUBLISHED", category: "CULTURE", eyebrow: "EDUCATION & MENTORSHIP · 23",
+    summary: "Jalur belajar Spirit Realm, Arcanist, dan keterampilan pendukung yang tidak mewajibkan seseorang bergabung dengan klan, sekte, akademi, atau guild.",
+    paragraphs: [
+      "Seseorang dapat menempuh kehidupan kultivasi atau Arcanist tanpa bersumpah setia kepada organisasi. Faksi dapat menyediakan fasilitas, guru, catatan, perlengkapan, kontak, dan latihan terstruktur, tetapi bukan satu-satunya jalan yang sah.",
+      "Pengajaran dibedakan menjadi Spirit Realm, Arcanist, dual-path, dan support/trade. Kategori Spirit Realm mencakup dasar Martial Soul setelah awakening yang sah, Qi, teori kultivasi, disiplin tempur, persiapan Spirit Ring, pengetahuan Spirit Beast, dan survival. Kategori Arcanist mencakup fokus mental, formulasi, material, formation theory, engraving, appraisal artefak, dan jalur Grade resmi. Kedua sistem tetap terpisah.",
+      "Guru hanya dapat mengajarkan hal yang sesuai dengan kompetensi dan aksesnya. Mereka dapat menolak, meminta bayaran atau jasa, menguji murid, mengajar bidang terbatas, atau tidak memiliki sumber daya. Pertemuan dengan guru pengembara bukan jaminan memperoleh kemampuan, rank, sumber daya, atau kelulusan.",
+      "Rincian peluang kemunculan NPC pengajar dan prosedur GM tidak ditampilkan di dossier publik. Kurikulum, syarat masuk, sertifikasi, dan progres tetap tunduk pada modul mekanik serta aturan resmi institusi."
+    ],
+    sourcePath: "world/OPEN_LEARNING_PATHS_AND_WANDERING_INSTRUCTORS.md", sourceLabel: "Open Learning Paths & Wandering Instructors"
+  },
+  {
+    id: "social-stratification", title: "Society & Social Stratification", aliases: ["Social Classes", "Social Inequality", "Struktur Sosial Merzkava", "Kelas Sosial"],
+    visibility: "PUBLISHED", category: "CULTURE", eyebrow: "SOCIETY & EVERYDAY LIFE · 24",
+    summary: "Gambaran lapisan sosial, ketimpangan, kerentanan ekonomi, dan mobilitas masyarakat di berbagai wilayah Merzkava.",
+    paragraphs: [
+      "Merzkava memiliki ketimpangan sosial yang ekstrem. Kekuasaan politik, kekuatan kultivasi, latar keluarga, kepemilikan tanah, akses pendidikan, jaringan, dan kendali sumber daya dapat saling memperkuat. Kekayaan dan status sosial berkaitan, tetapi tidak identik.",
+      "Lapisan masyarakat mencakup elite dan keluarga penguasa, kelompok mapan dan kelas menengah, pekerja berpenghasilan rendah, penghuni permukiman rentan, serta orang-orang terlantar atau kehilangan tempat tinggal. Ini adalah gambaran sosial, bukan satu kode kasta resmi yang berlaku seragam di seluruh dunia.",
+      "Kota makmur tetap dapat memiliki pekerja miskin, hunian padat, kawasan kumuh, dan orang yang tidur di jalan. Kondisi setiap wilayah, kota, desa, pelabuhan, atau wilayah faksi dapat berbeda sesuai hukum dan keadaan setempat.",
+      "Jangan menyimpulkan persentase kemiskinan, jumlah penghuni kawasan kumuh, pendapatan rumah tangga, atau tingkat tunawisma sebuah kota dari reputasi dan kemakmurannya. Angka lokal semacam itu belum ditetapkan kecuali ada sumber khusus."
+    ],
+    sourcePath: "world/SOCIAL_STRATIFICATION.md", sourceLabel: "Social Stratification"
+  },
+  {
+    id: "three-power-routes", title: "Three Powers — Connected Route Maps", aliases: ["Three-Power Maps", "Route Maps", "Peta Tiga Kekuasaan", "Interregional Routes"],
+    visibility: "PUBLISHED", category: "GEOGRAPHY", eyebrow: "WORLD ROUTE FRAMEWORK · 25",
+    summary: "Kerangka peta perjalanan dari perspektif Golden Dragon Empire, Tianhai Yunzhou, dan Beiming Gu, termasuk koridor darat, laut, wilayah liar, dan tiga jalur udara.",
+    paragraphs: [
+      "Peta ini merupakan skema hubungan geografis, bukan peta berskala. Ia membantu memahami orientasi dan koridor antarkawasan, tetapi tidak menetapkan koordinat, jarak, durasi perjalanan, batas survei, atau keselamatan setiap rute.",
+      "Golden Dragon berada di timur, Beiming Gu di utara, dan Tianhai Yunzhou mengapung di atas Yunmeng Sea di barat daya. Jalur laut menghubungkan kawasan pesisir yang tercatat; perjalanan darat melalui wilayah liar dapat memerlukan eksplorasi, dan tidak semua segmen merupakan jalan umum.",
+      "Tiga koridor udara langsung yang telah ditetapkan menghubungkan terminal Longyuan, Cangqiong Harbor, dan Beiming Heartland. Tarif pulang-pergi adalah 25 xc per penumpang, dengan layanan terminal pada 05:00–21:00 waktu setempat. Durasi, frekuensi, kapasitas, dan jadwal keberangkatan spesifik belum ditentukan.",
+      "Kapal terbang Qi biasa merupakan alternatif terpisah dengan tarif pulang-pergi sebanding 86 xc per penumpang dalam kondisi operasi dan akses normal. Jangan mengarang tarif sekali jalan, jadwal pasti, atau jaminan kursi. Rute yang belum memiliki sambungan lokal tetap harus diselesaikan melalui sumber wilayah atau eksplorasi."
+    ],
+    sourcePath: "world/THREE_POWER_PERSPECTIVE_MAPS.md", sourceLabel: "Three-Power Perspective Maps"
+  },
+  {
+    id: "geography-travel", title: "Geography, Seas & Travel", aliases: ["Geography and Travel", "World Geography", "Lautan dan Perjalanan", "Physical Geography"],
+    visibility: "PUBLISHED", category: "GEOGRAPHY", eyebrow: "PHYSICAL WORLD & TRANSPORT · 26",
+    summary: "Orientasi geografis Merzkava, sistem laut, wilayah liar, habitat Spirit Beast, reruntuhan, dan prinsip transportasi.",
+    paragraphs: [
+      "Kerangka geografis Merzkava bersifat relatif, bukan peta koordinat. Posisi umum wilayah dan hubungan laut telah ditetapkan, tetapi jarak, batas presisi, nama beberapa sungai, jalur lokal, dan waktu tempuh tetap tidak diketahui jika belum dicatat oleh sumber wilayah.",
+      "Sistem laut utama mencakup Frostmirror Sea di pesisir utara Beiming, Eastern Azure Sea di pesisir timur Golden Dragon, Yunmeng Sea di perairan Tianhai, Wufeng Sea yang tenang tanpa angin, ombak, atau arus, Black Tide Sea di sekitar Lawless Territories, serta Guixu Canghai di ujung selatan melewati batas luar Black Tide Sea.",
+      "Azerion Forest membentang dari Lawless Territories ke wilayah Golden Dragon. Pintu masuk termudah yang dikenal berada di Lawless; kawasan dalam tersembunyi oleh kabut ilusi. Reruntuhan dan Mega Colossal Labyrinth di sekitar danau merupakan zona berbahaya, bukan simpul transportasi umum. Hubungan keluar menuju pantai utara Beiming adalah jalur reruntuhan yang belum dipetakan.",
+      "Transportasi mencakup perjalanan darat, kapal, dan layanan artefak/udara yang ditetapkan. Keberadaan koridor tidak berarti rute aman, gratis, cepat, terbuka untuk semua orang, atau selalu tersedia. Risiko, akses, dan segmen lokal harus mengikuti catatan geografis serta keadaan perjalanan."
+    ],
+    sourcePath: "world/GEOGRAPHY_AND_TRAVEL.md", sourceLabel: "Geography and Travel"
+  },
+  {
+    id: "tianhai-academies", title: "Tianhai — Four Academies & Arcanist Institute", aliases: ["Tianhai Academies", "Tianhai Arcanist Institute", "Beichen Cultivator Academy", "Tianlan Supreme Academy", "Cangfan Maritime Academy", "Haiyue Academy"],
+    visibility: "PUBLISHED", category: "ARCHIVES", eyebrow: "TIANHAI EDUCATION · 27",
+    summary: "Empat akademi kultivator di empat area Tianhai Yunzhou dan lembaga riset serta sertifikasi Arcanist tingkat tinggi.",
+    paragraphs: [
+      "Pulau terapung Tianhai dibagi menjadi empat area arah: Utara, Selatan, Barat, dan Timur. Pembagian ini berbeda dari tujuh distrik formal pulau. Utara berorientasi pada keamanan dan pengawasan maritim; Selatan pada pemerintahan, pendidikan, kerajinan, dan pengembangan Arcanist; Barat pada pelayaran; Timur pada perdagangan.",
+      "Empat akademinya adalah Beichen Cultivator Academy di Utara, Tianlan Supreme Academy di Selatan, Cangfan Maritime Academy di Barat, dan Haiyue Academy di Timur. Tianlan Supreme Academy merupakan yang paling unggul dan prestisius di antara empat akademi Tianhai, dengan pengajaran luas, fleksibel, dan praktik intensif. Hal itu tidak menjamin penerimaan atau Grade Arcanist tinggi.",
+      "Tianhai Arcanist Institute merupakan lembaga riset tingkat tinggi sekaligus otoritas ujian, sertifikasi, dan verifikasi kredensial Grade Arcanist. Perannya tidak menggantikan mekanik progresi dan produksi resmi; seluruh prasyarat, urutan tahap, dan formula tetap tunduk pada core Arcanistry.",
+      "Dossier ini merangkum struktur pendidikan. Daftar klan, akses khusus, prosedur ujian, kontribusi, dan aturan internal yang belum ditetapkan tidak boleh disimpulkan dari lokasi akademi."
+    ],
+    sourcePath: "world/TIANHAI_ACADEMIES_AND_ARCANIST_INSTITUTE.md", sourceLabel: "Tianhai Academies & Arcanist Institute"
+  },
+  {
+    id: "world-wealth", title: "Wealth Distribution of Merzkava", aliases: ["Global Wealth Distribution", "World Wealth", "Distribusi Kekayaan Dunia"],
+    visibility: "PUBLISHED", category: "WORLD", eyebrow: "GLOBAL ECONOMIC MODEL · 28",
+    summary: "Model akuntansi estimasi kekayaan dunia dan distribusi antarkawasan serta kelompok pemegang aset; bukan saldo uang tunai yang bebas dibelanjakan.",
+    paragraphs: [
+      "Model global mencatat total kekayaan sebesar 400.463.763.789.849 Xuan Gold (xg). Angka ini merupakan estimasi pool kekayaan terakuntansi, bukan klaim bahwa seluruh nilainya berupa koin fisik atau aset likuid yang bisa langsung dibelanjakan.",
+      "Alokasi wilayah dalam model adalah Golden Dragon Empire 45%, Tianhai Yunzhou 27%, Beiming Gu 18%, dan Lawless Territories 10%. Angka ini merupakan alokasi akuntansi, bukan saldo kas aktual setiap penguasa, bank, guild, faksi, atau pasar.",
+      "Distribusi berdasarkan pemegang aset menunjukkan konsentrasi terbesar pada penguasa dan kas negara, klan serta sekte tingkat tinggi, serikat dagang besar, dan bank. Kekayaan agregat rakyat jelata jauh lebih kecil dalam model tersebut; lapisan sosial dan kondisi hidup dijelaskan terpisah dalam dossier Social Stratification.",
+      "Jangan menghitung Zun Jade atau Ancient Zun sekali lagi di luar total tersebut; konversi nominal mengikuti sistem mata uang resmi. Angka agregat dunia tidak otomatis diketahui oleh karakter biasa dan tidak menentukan uang di Wallet milik individu."
+    ],
+    sourcePath: "world/WEALTH_DISTRIBUTION.md", sourceLabel: "Global Xuan Gold Distribution"
+  },
+
 ];
 
 const ARCHIVE_SOURCE_COMMIT = "2f76a864150528afb0e3d26cb16f9396ce610ff6";
