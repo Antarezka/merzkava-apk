@@ -8,6 +8,8 @@ describe("Eternal Path Expedition Interface", () => {
     expect(html).toContain('class="expedition-environment"');
     expect(html).toContain("ENVIRONMENT · PREVIEW");
     expect(html).toContain('class="expedition-fog-layer"');
+    expect(html).toContain('class="expedition-window-frame"');
+    expect(html).toContain("SCENE WINDOW");
     expect(html).toContain('id="expedition-character"');
     expect(html).toContain("GAMEPLAY SYSTEMS NOT YET ACTIVE");
     expect(html).toContain("<strong>—</strong>");
