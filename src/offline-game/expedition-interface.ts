@@ -1,6 +1,6 @@
 import "./expedition-interface.css";
 import {
-  ETERNAL_DIALOGUES, getCurrentDialogue, getEternalSave, getExpeditionAtmosphere, getExpeditionScene, getRegionalDialogueCount,
+  getCurrentDialogue, getEternalSave, getExpeditionAtmosphere, getExpeditionScene, getRegionalDialogueCount,
 } from "./expedition-game";
 
 function escapeHtml(value:string):string {
