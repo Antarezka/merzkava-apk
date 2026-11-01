@@ -8,11 +8,14 @@
 .expedition-environment{position:relative;isolation:isolate;display:flex;min-height:clamp(220px,58vw,330px);align-items:flex-end;overflow:hidden;padding:20px;border:1px solid #786044;border-radius:5px;background:linear-gradient(180deg,#24302d 0%,#39443d 42%,#171b19 100%);box-shadow:inset 0 0 0 4px #e4c58b0c,0 12px 28px #0004}
 .expedition-fog-layer{position:absolute;z-index:0;inset:-8%;background-image:url("/game/scenery/shared/fx-02-atmospheric-fog.png");background-position:center;background-size:cover;background-repeat:no-repeat;mix-blend-mode:screen;opacity:.72;pointer-events:none;will-change:transform,opacity}
 .expedition-environment:after{position:absolute;z-index:1;inset:0;content:"";background:linear-gradient(180deg,#10161405 25%,#111713d9 100%);pointer-events:none}
+.expedition-window-frame{position:absolute;z-index:3;inset:8px;border:1px solid #d5b47a88;box-shadow:inset 0 0 0 1px #161511aa,inset 0 0 22px #090b0a66;pointer-events:none}
+.expedition-window-frame:before{position:absolute;inset:5px;content:"";border:1px solid #ead4a52e}
+.expedition-window-label{position:absolute;z-index:4;top:17px;left:19px;padding:4px 7px;border:1px solid #d5b47a55;background:#171915a8;color:#e7c99a;font:600 7px/1.2 system-ui,sans-serif;letter-spacing:.17em;pointer-events:none}
 .expedition-scene-copy{position:relative;z-index:2;max-width:440px}
 .expedition-scene-copy .scene-kicker,.expedition-coordinate,.scene-coordinate{color:#e5c99b;font:600 8px/1.4 system-ui,sans-serif;letter-spacing:.18em}
 .expedition-scene-copy h3{margin:8px 0 4px;color:#f3e7d2;font:400 clamp(29px,8vw,40px)/1 Georgia,serif}
 .expedition-scene-copy p{margin:0;color:#d1c9b9;font-size:12px;line-height:1.6}
-.scene-coordinate{position:absolute;z-index:2;top:13px;right:14px;color:#e1d5bd;font-size:7px}
+.scene-coordinate{position:absolute;z-index:4;top:17px;right:19px;color:#e1d5bd;font-size:7px}
 .expedition-character-panel,.expedition-feature{padding:15px;border:1px solid var(--line,#51483e);border-radius:4px;background:linear-gradient(145deg,#292521eF,#211f1cF2)}
 .expedition-character-panel label{display:block;margin:13px 0 6px;color:#d7c8ae;font-size:11px}
 .expedition-character-panel select{width:100%;min-height:43px;padding:9px 11px;border:1px solid #67513b;border-radius:3px;background:#171614;color:#f0e5d4;font:inherit}
