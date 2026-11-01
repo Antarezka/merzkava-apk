@@ -46,7 +46,7 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 
 ## 3. Workstream 1 — World Archive, typography, and reference experience
 
-**Progress now:** `[~] PHASE 1 INVENTORY + HANDOFF BASELINE ESTABLISHED`. The app has 32 curated dossiers / 28 unique source paths. A 140-path source coverage matrix and AI continuation instructions are recorded in `docs/WORLD_ARCHIVE_COVERAGE_MATRIX.md`. Entity-graph expansion, additional public content review, offline/isolation proof and final QA remain open. A local reader for reviewed public-safe extracts is implemented; CI and on-device verification remain open. Do not describe the Archive as complete or all articles as approved.
+**Progress now:** `[~] PHASE 1 INVENTORY + HANDOFF BASELINE ESTABLISHED`. The app has 39 curated dossiers / 35 unique source paths. A 140-path source coverage matrix and AI continuation instructions are recorded in `docs/WORLD_ARCHIVE_COVERAGE_MATRIX.md`. Entity-graph expansion, additional public content review, offline/isolation proof and final QA remain open. A local reader for reviewed public-safe extracts is implemented; CI and on-device verification remain open. Do not describe the Archive as complete or all articles as approved.
 
 **Goal:** Make the offline Archive complete, trustworthy, easy to navigate, and visually polished. Typography improvements belong to this workstream.
 
@@ -56,7 +56,7 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 - [ ] Review every entry's visibility: player-public, GM-only, mechanics reference, private player data, review-required, or legacy.
 - [ ] Exclude GM-only secrets, private player data, unrevealed identities, hidden agendas, and restricted outcomes from player-facing Archive.
 - [ ] Mark each article as approved, needs revision, blocked, or excluded; do not treat catalogue presence as publication approval.
-- [ ] Expand coverage only from verified Universe sources; preserve unknown/conflicting facts instead of inventing missing details.
+- [~] Expand coverage only from verified Universe sources; the seven Golden Dragon regional dossiers now use reviewed foundation/administrative claims only. Remaining regional detail, public institutions, and settlement-level entities still require claim-level review.
 - [ ] Verify all local links, aliases, cross-references, backlinks, source-reader navigation, and search results resolve to the correct local document in CI and on-device.
 - [x] Track source path, source commit, review date, source visibility class, and local document ID for every public article.
 - [ ] Add a repeatable audit for stale source paths and changed Universe files.
@@ -75,7 +75,7 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 
 - [ ] Audit Archive landing page, categories, article pages, search, filters, bookmarks, and back navigation.
 - [ ] Improve search relevance, aliases, and ambiguous-name handling.
-- [x] Make approved public entity mentions open the correct local dossier; automatic public mention links and inbound backlinks are rendered from the public dossier graph.
+- [x] Make approved public entity mentions open the correct local dossier; automatic public mention links and inbound backlinks are rendered from the public dossier graph. Seven Golden Dragon regional dossiers now resolve separately; misleading aliases that previously routed Longyuan/Huanglongcheng to the Empire dossier were removed.
 - [x] Add an offline source reader for reviewed public-safe extracts, with exact source path, source commit, review date, and source classification. Raw source Markdown is deliberately not bundled; mixed-scope files and claim-level details require further review.
 - [ ] Verify entity links, backlinks, and source-reader navigation in CI and on-device; regression tests are committed but have not yet been executed.
 - [ ] Add useful empty, loading, unavailable, and no-result states.
