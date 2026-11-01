@@ -28,7 +28,10 @@ describe("Eternal Path scene and prologue", () => {
     const save=getEternalSave();
     expect(save?.character.name).toBe("Nafila");
     expect(renderExpeditionInterface()).toContain("Nafila");
-    expect(renderExpeditionInterface()).toContain("Observe and listen");\n    chooseEternalOption(0);\n    expect(getEternalSave()?.completed).toBe(1);\n    expect(getEternalSave()?.insight).toBe(2);
+    expect(renderExpeditionInterface()).toContain("Observe and listen");
+    chooseEternalOption(0);
+    expect(getEternalSave()?.completed).toBe(1);
+    expect(getEternalSave()?.insight).toBe(2);
   });
   it("ships 240 deterministic branching dialogue nodes across eight scene compositions", () => {
     expect(ETERNAL_DIALOGUES).toHaveLength(240);
