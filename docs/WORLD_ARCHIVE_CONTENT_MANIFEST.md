@@ -341,3 +341,60 @@ The existing local catalogue is not safe to expose as a complete player-facing i
 - All regional NPC profiles: not yet complete; first ten Beiming Gu profiles have initial identity/access review only.
 - Full 140-file line-by-line approval: **not complete**.
 - Player-facing publication approval: **not granted by this audit pass**.
+
+
+## Regional NPC audit — second pass
+
+**Audit source snapshot:** `Antarezka/merzkava-universe` commit `2f76a864150528afb0e3d26cb16f9396ce610ff6`. This pass reviewed the complete Beiming Gu NPC registry and all remaining Beiming Gu canonical profiles, the Golden Dragon Empire registry and its six canonical profile files, and the Tianhai Yunzhou registry, power-structure roster, regional index, and six canonical profile files. This is a content/access review, not publication approval.
+
+### Beiming Gu — registry and 23-profile roster
+
+- The registry confirms 23 entries: four major/adoptive-family figures, two youth-circle figures, twelve clan heads, and five dojo masters. It explicitly warns that circle ties do not prove a prior physical meeting, and that visits/disguises must not be confused with residence or official membership.
+- **Beiming Nerva — `GM_ONLY` identity.** The registry itself contains her true family identity, Spirit Realm/Arcanist Grade, Martial Soul, recurring Tianhai visits, and student disguise at Beichen Cultivator Academy. The Tianhai registry independently repeats those details. Do not ingest either registry row into player-facing search, autocomplete, backlinks, related-entity suggestions, or public profile metadata. A public-facing entity may only be created after an in-world discovery record authorizes the revealed identity; do not expose her cover pattern in advance.
+- **Beiming Jingheng — split visibility.** Public identity and adoptive-family role may be considered separately, but the registry explicitly marks a concealed criminal connection GM-sensitive. Never import that connection, associated aliases, or relationship clues into public search metadata.
+- **Beiming Han — review required.** Public title/name may be usable; exact age and whereabouts are intentionally unknown. Do not infer current presence or a district residence.
+- **Beiming Xenhwa — review required.** Public identity and broad description may be usable; avoid importing private profile fields without a complete claim-level pass.
+- **Youth-circle profiles — selective publication only.** Xuanbing Yue and Cangxue Beiran include baseline relationships. Those are relationship facts, not proof that the characters have met in person. Xuanbing Yue's age (16) and human identity are explicit, but her appearance, cultivation, Martial Soul, Arcanist Grade, and dojo affiliation are unestablished.
+- **Clan-head and dojo-master profiles — selective public institutional facts only.** The reviewed roster profiles establish names, roles, broad public personalities, Martial Souls and specialties. Exact residences, district locations, current presence, named techniques, Spirit Rings, and private relationships are generally unestablished. Do not create those details. Spirit Realm, Stage, Arcanist Grade, and other progression/capability numbers are mechanics-linked data and must not be duplicated as an Archive authority.
+- The remaining Beiming profiles reviewed in this pass: Hanyue Mingzhao, Tie Song, Lingfeng Yujin, Minghu Yanshu, Mo Xueyan, Bai Yushen, Tieshi Beiyue, Xuanbing Lingsu, Xuansong Qinghe, Xuanye Zhenbei, Yaochi Suwen, and Yinshan Qiaofeng. No profile is approved for wholesale publication.
+
+### Golden Dragon Empire — registry and six profile files
+
+- The registry identifies the imperial family, youth-circle figures, and an additional public-facing business identity with a concealed criminal identity.
+- **Ying Wuxin — split visibility, concealed identity `GM_ONLY`.** The public role as an elite clothing-pavilion owner may be considered only as a separate public claim if supported by a player-facing source. The concealed criminal identity, leadership, aliases, and links to `world/NPC_YING_WUXIN.md` must not enter player search, automatic highlighting, backlinks, suggestions, or public graph metadata.
+- Jun Haotian, Shen Yuehua, Jun Ruiyuan, and Jun Yuejin have explicit public imperial titles and family relationships. Their unspecified appearance/personality/motives must remain unknown. The source profiles contain Martial Soul and cultivation/capability fields; do not copy numerical progression or combat data into the Archive as a parallel rules source.
+- Shen Yunting and Luo Zhenkai are owner-approved youth-circle additions. Their profiles establish broad public personalities and baseline circle relationships, but a circle relationship does not prove a prior meeting, current physical presence, exact academy, shop, guild, or institutional appointment.
+- The official roster in `world/GOLDEN_DRAGON_EMPIRE_OFFICIALS.md` remains a separate high-volume source requiring deduplication and individual claim review; this NPC registry is not a complete census.
+
+### Tianhai Yunzhou — registry, profiles, and power structure
+
+- The regional index confirms canonical navigation through the regional module, NPC registry, and officeholder roster. The six reviewed canonical profile files are Ji Haoyuan, Bai Xuanyin, Ji Zhaoning, Ji Ningzhao, Lin Qiaoyu, and Duan Haicheng.
+- **Beiming Nerva — `GM_ONLY` identity and cover behavior.** The Tianhai registry directly exposes her true identity and student-disguise pattern. Exclude the entire Nerva entry from player-facing datasets until discovery; do not even use her true name as an automatic highlight or backlink.
+- Ji Haoyuan's profile contains a detailed GM-sensitive account of his World Knowledge Tower service and absence during the Great Tianhai War. The public Archive may describe only separately established historical facts about the war and his public role; do not expose private timing, reactions, or sensitive service details without an explicit public source.
+- Bai Xuanyin's broad historical legacy and public remembrance may be considered for a historical article. Artifact design framework details, mass-produced concealment device operation, and wartime deployment details require separate claim-level review; do not turn them into technical instructions or mechanics.
+- Ji Zhaoning and Ji Ningzhao have public family roles and limited established biographical facts. Their current whereabouts, private response to their mother's death, personal goals, and unrecorded capabilities remain unknown.
+- Lin Qiaoyu and Duan Haicheng are youth-circle profiles. Their interests and baseline rivalry are recorded, but their institution, current location, formal grade/certification, and any actual prior meeting remain unestablished.
+- `POWER_STRUCTURE.md` is an owner-approved institutional roster, not a set of complete biographies and not a census. It contains named public officeholders, authority boundaries, capability/progression fields, anonymous placeholders for rare Grade 8+ roles, and explicit rules against inferring secret alliances or personal motives. It may support a carefully filtered public institution directory, but must not be imported wholesale. Omit anonymous placeholders as named entities; do not invent identities for them. Do not duplicate Arcanist Grade, Spirit Realm, Stage, or combat/progression mechanics into Archive articles.
+- The roster explicitly says the Tianji Core liaison is not its maker, owner, or sole operator; the exact access rules and operators remain governed by separate artifact/security canon. Do not imply access or control from the office title.
+- Tianhai officeholder names and public remit may be indexed only after checking their corresponding institution/region source and confirming there is no restricted claim attached. A roster listing alone does not establish current physical presence.
+
+### Cross-regional implementation gates added by this pass
+
+1. Entity visibility must be claim-level, not only document-level. A single profile or registry can contain both public and GM-only claims.
+2. Search/highlighting/backlinks/suggestions must be generated from the approved public entity index only. Filtering article text at render time is insufficient.
+3. Separate a public name/role claim from hidden aliases, true identity, cover identity, criminal connection, secret affiliation, private whereabouts, and GM continuity.
+4. NPC baseline relationships must carry a clear “relationship established; prior meeting not implied” distinction where the source says so.
+5. Current presence, residence, office, visit location, and cover location are distinct fields. Never collapse them into one map pin or location label.
+6. Do not treat a registry as a census or a power-structure table as a complete biography.
+7. Numerical progression and capability mechanics remain linked to the Universe canon; do not replicate them as local Archive rules or authoritative derived stats.
+
+### Updated review progress
+
+- Repository tree inventory: complete for source commit `2f76a864150528afb0e3d26cb16f9396ce610ff6`.
+- First-pass world module review: partial; detailed dispositions for the first 30 world Markdown sources are recorded above.
+- Beiming Gu NPC registry and all 23 listed profile paths: registry reviewed; first ten profiles received initial access review in the prior pass; remaining profile files reviewed in this pass. No wholesale publication approval.
+- Golden Dragon Empire NPC registry and six canonical profile files: reviewed; concealed identity split recorded. The large civil officials roster remains a separate unreviewed source.
+- Tianhai Yunzhou NPC registry, six canonical profile files, regional index, and power-structure roster: reviewed. The power-structure source is a roster-level review, not a complete individual biography audit of every listed officeholder.
+- Remaining regional modules and other regional NPC registries/profiles: not yet fully reviewed.
+- Full 140-file line-by-line approval: **not complete**.
+- Player-facing publication approval: **not granted by this audit pass**.
