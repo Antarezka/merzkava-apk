@@ -21,7 +21,7 @@ Merzkava APK is an Android-first application with two deliberately separate expe
 - [x] The app's deterministic engine/database, not the AI, validates mechanics and authoritative state changes.
 - [x] World Archive is defined as an offline reference layer, separate from gameplay authority.
 - [ ] Add automated or inspectable tests proving Archive content is never appended to AI GM context.
-- [ ] Add a clear source/provenance display for Archive articles: source path, source commit, review date, visibility, and local document ID.
+- [x] Show source path, source commit, review date, source classification, and local dossier ID in the Archive; a dedicated offline reader now opens the reviewed public-safe extract.
 - [ ] Keep separate revision records for the active gameplay canon SHA and the Archive content source SHA. Never imply they are the same snapshot.
 - [ ] Verify offline and reconnect behavior without mixing stale or unapproved canon snapshots.
 - [ ] Document this separation in the app's architecture and release checks.
@@ -57,7 +57,7 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 - [ ] Exclude GM-only secrets, private player data, unrevealed identities, hidden agendas, and restricted outcomes from player-facing Archive.
 - [ ] Mark each article as approved, needs revision, blocked, or excluded; do not treat catalogue presence as publication approval.
 - [ ] Expand coverage only from verified Universe sources; preserve unknown/conflicting facts instead of inventing missing details.
-- [ ] Verify all local links, aliases, cross-references, backlinks, and search results resolve to the correct local document in CI and on-device.
+- [ ] Verify all local links, aliases, cross-references, backlinks, source-reader navigation, and search results resolve to the correct local document in CI and on-device.
 - [ ] Track source path, source commit, review date, visibility class, and local document ID for every article.
 - [ ] Add a repeatable audit for stale source paths and changed Universe files.
 
@@ -75,7 +75,9 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 
 - [ ] Audit Archive landing page, categories, article pages, search, filters, bookmarks, and back navigation.
 - [ ] Improve search relevance, aliases, and ambiguous-name handling.
-- [x] Make approved public entity mentions open the correct local dossier; automatic public mention links and inbound backlinks are now rendered from the public dossier graph. Test coverage has been added; CI/runtime verification remains open.
+- [x] Make approved public entity mentions open the correct local dossier; automatic public mention links and inbound backlinks are rendered from the public dossier graph.
+- [x] Add an offline source reader for reviewed public-safe extracts, with exact source path, source commit, review date, and source classification. Raw source Markdown is deliberately not bundled; mixed-scope files and claim-level details require further review.
+- [ ] Verify entity links, backlinks, and source-reader navigation in CI and on-device; regression tests are committed but have not yet been executed.
 - [ ] Add useful empty, loading, unavailable, and no-result states.
 - [ ] Verify the Archive remains fully readable with network disabled.
 - [ ] Ensure Archive browsing cannot modify player inventory, wallet, character state, quests, or gameplay history.
