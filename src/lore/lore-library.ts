@@ -1,4 +1,4 @@
-export type LoreCategory = "WORLD" | "POWERS" | "GEOGRAPHY" | "HISTORY" | "PEOPLES" | "FACTIONS" | "ARCHIVES";
+export type LoreCategory = "WORLD" | "POWERS" | "GEOGRAPHY" | "HISTORY" | "PEOPLES" | "FACTIONS" | "ARCHIVES" | "CULTURE";
 
 export type LoreVisibility = "PUBLISHED" | "REVIEW_REQUIRED" | "GM_ONLY";
 
@@ -422,7 +422,7 @@ for (const entry of LORE_ENTRIES) {
 const CATEGORY_LABELS: Record<LoreCategory | "ALL", string> = {
   ALL: "All files", WORLD: "World", POWERS: "Powers", GEOGRAPHY: "Geography",
   HISTORY: "History", PEOPLES: "Peoples", FACTIONS: "Factions",
-  ARCHIVES: "Archives"
+  ARCHIVES: "Archives", CULTURE: "Culture"
 };
 
 export function getPublicLoreEntries(): LoreEntry[] {
