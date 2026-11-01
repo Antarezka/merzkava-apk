@@ -792,3 +792,17 @@ The current APK catalogue is **39 dossiers across 35 unique Universe source path
 This supersedes earlier statements in this manifest that the current catalogue contains 26 entries / 23 source files. The present app has a public-only 39-dossier graph with generated cross-reference IDs and tested title/alias routing. It has a reviewed-extract source reader and inbound backlinks, but still needs a broader entity graph, full Universe coverage, and final offline/isolation QA. Earlier audit notes remain historical evidence for the stages at which they were written; use the Phase 1 matrix and current roadmap checkpoint as the latest handoff.
 
 The Phase 1 documentation update does not modify the Universe repository and is not itself an APK build. Android Build #300 remains a baseline artifact only; see the matrix for its smoke-test caveat and required build re-verification.
+
+
+## Entity development placeholders — 2026-11-01
+
+The Archive now distinguishes entity-development status from source-review disposition. Names that are intentionally left open for GM-led narrative development remain clickable through an explicit placeholder registry rather than degrading to unlinked plain text.
+
+- `Huanglongcheng` and `Cangqiong Harbor` are registered as `ON_PLAN`. Their already-established high-level references remain visible, while additional city/harbor details are deliberately not asserted by the APK.
+- `ON_PLAN` means intentionally under-specified, not missing data and not permission for the app to invent facts. The GM may develop context-specific narrative details in conversation; those additions do not automatically become official canon.
+- `NON_CANON` is a supported distinct status for explicitly non-official material. No additional named non-canon entities are being invented in this update.
+- Placeholder entries have their own local IDs and detail screens, appear in search, and can be opened from mentions in dossiers. They do not become published lore dossiers, source extracts, or gameplay authority.
+- Source-review classifications such as `PUBLIC_CANDIDATE` and `PARTIAL_PUBLIC` remain separate and unchanged.
+- Regression coverage has been added for placeholder lookup, inline linking, search, detail navigation, related canon links, and status separation. Tests are committed but have not yet been executed in this environment.
+
+This update changes only the APK repository. It does not modify the official Universe repository or convert GM improvisation into canon.
