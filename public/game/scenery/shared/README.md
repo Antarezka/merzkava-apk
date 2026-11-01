@@ -14,6 +14,10 @@ When RGBA transparency cannot be produced reliably (for example, by Gemini), use
 
 Black becomes visually transparent under Screen blending while the bright fog/cloud/light details remain. True RGBA is optional, not a blocker.
 
+## FX image-generation prompts
+
+See [FX_GENERATION_PROMPTS.md](./FX_GENERATION_PROMPTS.md) for the next asset prompts (sun glow, moon glow, light rays, rain streaks, snow, petals, autumn leaves, and lightning). Every prompt follows the proven pure-black `#000000` background + CSS `mix-blend-mode: screen` workflow. Generated files remain optional enhancements; keep the procedural CSS/Anime.js implementation until each image is reviewed and integrated.
+
 ## Existing assets
 
 - `fx-01-soft-cloud-layer.png` — cloud overlay, mounted in its own Screen-blended layer and moved with Anime.js.
