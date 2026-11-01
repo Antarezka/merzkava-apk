@@ -449,7 +449,7 @@ Before implementing a new feature or changing an existing one:
 **Phase 1 objective:** establish a complete source-coverage baseline and a safe continuation point for a new AI/developer. This is documentation/audit groundwork, not a claim that the Archive content is complete or that a new APK has been built.
 
 - [x] Create `docs/WORLD_ARCHIVE_COVERAGE_MATRIX.md`: classify all 140 Markdown paths in Universe snapshot `2f76a864150528afb0e3d26cb16f9396ce610ff6`, map current published dossier IDs/source paths, and record exclusions and next candidates.
-- [x] Reconcile the current catalogue count: **32 dossiers / 28 unique source paths**. Older 26/23 figures in the manifest are stale and superseded.
+- [x] Reconcile the current catalogue count: **39 dossiers / 35 unique source paths**. Older 26/23 figures in the manifest are stale and superseded.
 - [x] Specify the entity-link contract: stable local IDs, canonical names and aliases, clickable mentions, related records/backlinks, ambiguity-safe resolution, public-only graph, and no links to GM-only/private entities.
 - [x] Record the AI handoff sequence, branch baseline, Universe source snapshot, current implementation gaps, and last known Android build reference in the matrix.
 - [~] Implement public entity mention links and inbound backlinks; regression tests are committed but still need CI execution and on-device navigation QA.
