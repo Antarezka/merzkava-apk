@@ -620,12 +620,20 @@ root.addEventListener("scroll", event => {
   navigationIntentTimer = window.setTimeout(() => { navigationScrollIntent = false; }, 650);
 }, true);
 
+window.addEventListener("popstate", () => {
+  const modal=root.querySelector<HTMLElement>(".expedition-choice-modal:not([hidden])");
+  if(!modal) return;
+  modal.hidden=true;
+  document.body.classList.remove("eternal-choice-open");
+  root.querySelector<HTMLButtonElement>("[data-eternal-open-choices]")?.focus();
+});
 root.addEventListener("keydown", event => {
   const modal=root.querySelector<HTMLElement>(".expedition-choice-modal:not([hidden])");
   if(!modal) return;
   if(event.key==="Escape") {
     modal.hidden=true;
     document.body.classList.remove("eternal-choice-open");
+    if(history.state?.eternalChoiceModal) history.back();
     root.querySelector<HTMLButtonElement>("[data-eternal-open-choices]")?.focus();
     return;
   }
@@ -652,9 +660,9 @@ root.addEventListener("click", async (event: MouseEvent) => {
   if (interactive) playButtonSound();
 
   const eternalChoice = target.closest<HTMLButtonElement>("[data-eternal-choice]");
-  if (target.closest("[data-eternal-choice-dismiss]")) { const modal=root.querySelector<HTMLElement>("[data-eternal-choice-modal]"); if(modal) modal.hidden=true; document.body.classList.remove("eternal-choice-open"); return; }
-  if (eternalChoice) { document.body.classList.remove("eternal-choice-open"); chooseEternalOption(Number(eternalChoice.dataset.eternalChoice)); render(); return; }
-  if (target.closest("[data-eternal-open-choices]")) { const modal=root.querySelector<HTMLElement>("[data-eternal-choice-modal]"); if(modal){modal.hidden=false;document.body.classList.add("eternal-choice-open");modal.querySelector<HTMLButtonElement>(".expedition-choice-close")?.focus();} return; }
+  if (target.closest("[data-eternal-choice-dismiss]")) { const modal=root.querySelector<HTMLElement>("[data-eternal-choice-modal]"); if(modal) modal.hidden=true; document.body.classList.remove("eternal-choice-open"); if(history.state?.eternalChoiceModal) history.back(); root.querySelector<HTMLButtonElement>("[data-eternal-open-choices]")?.focus(); return; }
+  if (eternalChoice) { document.body.classList.remove("eternal-choice-open"); if(history.state?.eternalChoiceModal) history.back(); chooseEternalOption(Number(eternalChoice.dataset.eternalChoice)); render(); return; }
+  if (target.closest("[data-eternal-open-choices]")) { const modal=root.querySelector<HTMLElement>("[data-eternal-choice-modal]"); if(modal){modal.hidden=false;document.body.classList.add("eternal-choice-open");history.pushState({eternalChoiceModal:true},"");modal.querySelector<HTMLButtonElement>(".expedition-choice-close")?.focus();} return; }
 
   if (target.closest("[data-eternal-end]")) { resetEternalGame(); render(); return; }
   const saveCopyButton = target.closest<HTMLButtonElement>("[data-save-copy]");
