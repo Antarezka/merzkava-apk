@@ -6,13 +6,13 @@
 .expedition-heading .muted{margin:0}
 .expedition-mode-mark{display:grid;place-items:center;flex:0 0 48px;width:48px;height:48px;border:1px solid #9a754b;color:#dfb879;font:600 16px Georgia,serif;letter-spacing:.08em}
 .expedition-environment{position:relative;isolation:isolate;display:flex;min-height:clamp(220px,58vw,330px);align-items:flex-end;overflow:hidden;padding:20px;border:1px solid #786044;border-radius:5px;background:linear-gradient(180deg,#24302d 0%,#39443d 42%,#171b19 100%);box-shadow:inset 0 0 0 4px #e4c58b0c,0 12px 28px #0004}
-.expedition-environment:before{position:absolute;z-index:-1;inset:-8%;content:"";background-image:url("/game/scenery/shared/fx-02-atmospheric-fog.png");background-position:center;background-size:cover;background-repeat:no-repeat;mix-blend-mode:screen;opacity:.82;pointer-events:none;animation:expedition-fog-drift 34s ease-in-out infinite alternate}
-.expedition-environment:after{position:absolute;z-index:-1;inset:0;content:"";background:linear-gradient(180deg,#10161405 25%,#111713d9 100%);pointer-events:none}
-.expedition-scene-copy{max-width:440px}
+.expedition-fog-layer{position:absolute;z-index:0;inset:-8%;background-image:url("/game/scenery/shared/fx-02-atmospheric-fog.png");background-position:center;background-size:cover;background-repeat:no-repeat;mix-blend-mode:screen;opacity:.72;pointer-events:none;will-change:transform,opacity}
+.expedition-environment:after{position:absolute;z-index:1;inset:0;content:"";background:linear-gradient(180deg,#10161405 25%,#111713d9 100%);pointer-events:none}
+.expedition-scene-copy{position:relative;z-index:2;max-width:440px}
 .expedition-scene-copy .scene-kicker,.expedition-coordinate,.scene-coordinate{color:#e5c99b;font:600 8px/1.4 system-ui,sans-serif;letter-spacing:.18em}
 .expedition-scene-copy h3{margin:8px 0 4px;color:#f3e7d2;font:400 clamp(29px,8vw,40px)/1 Georgia,serif}
 .expedition-scene-copy p{margin:0;color:#d1c9b9;font-size:12px;line-height:1.6}
-.scene-coordinate{position:absolute;top:13px;right:14px;color:#e1d5bd;font-size:7px}
+.scene-coordinate{position:absolute;z-index:2;top:13px;right:14px;color:#e1d5bd;font-size:7px}
 .expedition-character-panel,.expedition-feature{padding:15px;border:1px solid var(--line,#51483e);border-radius:4px;background:linear-gradient(145deg,#292521eF,#211f1cF2)}
 .expedition-character-panel label{display:block;margin:13px 0 6px;color:#d7c8ae;font-size:11px}
 .expedition-character-panel select{width:100%;min-height:43px;padding:9px 11px;border:1px solid #67513b;border-radius:3px;background:#171614;color:#f0e5d4;font:inherit}
@@ -27,9 +27,7 @@
 .expedition-feature h3{margin:8px 0 5px;color:#e9dfd0;font:400 19px Georgia,serif}
 .expedition-feature p{margin:0;color:#a99f91;font-size:11px;line-height:1.55}
 .expedition-footer{display:flex;justify-content:space-between;gap:10px;padding-top:10px;border-top:1px solid var(--line);color:#8e8375;font-size:7px;letter-spacing:.1em}
-@keyframes expedition-fog-drift{from{transform:translate3d(-1.5%,0,0) scale(1.02)}to{transform:translate3d(1.5%,-1%,0) scale(1.06)}}
 @media(max-width:360px){.expedition-status-grid{gap:5px}.expedition-stat{padding:10px 4px}.expedition-stat strong{font-size:20px}.expedition-feature-grid{gap:7px}.expedition-feature{padding:12px 10px}.expedition-footer{font-size:6px}}
-@media(prefers-reduced-motion:reduce){.expedition-environment:before{animation:none}}
 
 /* Keep the expanded eight-destination bottom navigation usable on narrow phones. */
 .bottom-nav:has(.nav-item:nth-child(8)) .nav-item{padding-inline:0}
