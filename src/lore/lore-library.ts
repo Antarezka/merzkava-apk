@@ -742,6 +742,129 @@ const LORE_ENTRY_DRAFTS: Omit<LoreEntry, "sourceCommit" | "reviewedAt" | "crossR
     sourcePath: "regions/tianhai-yunzhou/npcs/LIN_QIAOYU.md", sourceLabel: "LIN QIAOYU"
   },
 
+  {
+    id: "official-xuanyuan-wenyuan", title: "Xuanyuan Wenyuan", aliases: ["Xuanyuan Wenyuan"],
+    visibility: "PUBLISHED", category: "POWERS", eyebrow: "GOLDEN DRAGON CIVIL OFFICIAL · MINISTER OF PERSONNEL",
+    summary: "Xuanyuan Wenyuan tercatat sebagai Minister of Personnel dalam roster pejabat Golden Dragon Empire pada sumber kanon yang dipatok.",
+    paragraphs: ["Xuanyuan Wenyuan memegang jabatan Minister of Personnel. Dossier ini hanya menampilkan penetapan jabatan yang tercatat; tidak memuat agenda pribadi, disposisi politik, kemampuan tempur, Martial Soul, atau informasi privat. Pemisahan kewenangan dan struktur jabatan mengikuti modul Governance serta Administrative Atlas."],
+    sourcePath: "world/GOLDEN_DRAGON_EMPIRE_OFFICIALS.md", sourceLabel: "Named Civil Officials & Political Dispositions"
+  },
+  {
+    id: "official-shen-mingde", title: "Shen Mingde", aliases: ["Shen Mingde"],
+    visibility: "PUBLISHED", category: "POWERS", eyebrow: "GOLDEN DRAGON CIVIL OFFICIAL · MINISTER OF FINANCE",
+    summary: "Shen Mingde tercatat sebagai Minister of Finance dalam roster pejabat Golden Dragon Empire pada sumber kanon yang dipatok.",
+    paragraphs: ["Shen Mingde memegang jabatan Minister of Finance. Dossier ini hanya menampilkan penetapan jabatan yang tercatat; tidak memuat agenda pribadi, disposisi politik, kemampuan tempur, Martial Soul, atau informasi privat. Pemisahan kewenangan dan struktur jabatan mengikuti modul Governance serta Administrative Atlas."],
+    sourcePath: "world/GOLDEN_DRAGON_EMPIRE_OFFICIALS.md", sourceLabel: "Named Civil Officials & Political Dispositions"
+  },
+  {
+    id: "official-yunlan-qingzhi", title: "Yunlan Qingzhi", aliases: ["Yunlan Qingzhi"],
+    visibility: "PUBLISHED", category: "POWERS", eyebrow: "GOLDEN DRAGON CIVIL OFFICIAL · MINISTER OF EDUCATION AND RITES",
+    summary: "Yunlan Qingzhi tercatat sebagai Minister of Education and Rites dalam roster pejabat Golden Dragon Empire pada sumber kanon yang dipatok.",
+    paragraphs: ["Yunlan Qingzhi memegang jabatan Minister of Education and Rites. Dossier ini hanya menampilkan penetapan jabatan yang tercatat; tidak memuat agenda pribadi, disposisi politik, kemampuan tempur, Martial Soul, atau informasi privat. Pemisahan kewenangan dan struktur jabatan mengikuti modul Governance serta Administrative Atlas."],
+    sourcePath: "world/GOLDEN_DRAGON_EMPIRE_OFFICIALS.md", sourceLabel: "Named Civil Officials & Political Dispositions"
+  },
+  {
+    id: "official-baihu-zhengyang", title: "Baihu Zhengyang", aliases: ["Baihu Zhengyang"],
+    visibility: "PUBLISHED", category: "POWERS", eyebrow: "GOLDEN DRAGON CIVIL OFFICIAL · MINISTER OF MILITARY AFFAIRS",
+    summary: "Baihu Zhengyang tercatat sebagai Minister of Military Affairs dalam roster pejabat Golden Dragon Empire pada sumber kanon yang dipatok.",
+    paragraphs: ["Baihu Zhengyang memegang jabatan Minister of Military Affairs. Dossier ini hanya menampilkan penetapan jabatan yang tercatat; tidak memuat agenda pribadi, disposisi politik, kemampuan tempur, Martial Soul, atau informasi privat. Pemisahan kewenangan dan struktur jabatan mengikuti modul Governance serta Administrative Atlas."],
+    sourcePath: "world/GOLDEN_DRAGON_EMPIRE_OFFICIALS.md", sourceLabel: "Named Civil Officials & Political Dispositions"
+  },
+  {
+    id: "official-gu-jingheng", title: "Gu Jingheng", aliases: ["Gu Jingheng"],
+    visibility: "PUBLISHED", category: "POWERS", eyebrow: "GOLDEN DRAGON CIVIL OFFICIAL · MINISTER OF JUSTICE",
+    summary: "Gu Jingheng tercatat sebagai Minister of Justice dalam roster pejabat Golden Dragon Empire pada sumber kanon yang dipatok.",
+    paragraphs: ["Gu Jingheng memegang jabatan Minister of Justice. Dossier ini hanya menampilkan penetapan jabatan yang tercatat; tidak memuat agenda pribadi, disposisi politik, kemampuan tempur, Martial Soul, atau informasi privat. Pemisahan kewenangan dan struktur jabatan mengikuti modul Governance serta Administrative Atlas."],
+    sourcePath: "world/GOLDEN_DRAGON_EMPIRE_OFFICIALS.md", sourceLabel: "Named Civil Officials & Political Dispositions"
+  },
+  {
+    id: "official-cangyue-yucheng", title: "Cangyue Yucheng", aliases: ["Cangyue Yucheng"],
+    visibility: "PUBLISHED", category: "POWERS", eyebrow: "GOLDEN DRAGON CIVIL OFFICIAL · MINISTER OF PUBLIC WORKS",
+    summary: "Cangyue Yucheng tercatat sebagai Minister of Public Works dalam roster pejabat Golden Dragon Empire pada sumber kanon yang dipatok.",
+    paragraphs: ["Cangyue Yucheng memegang jabatan Minister of Public Works. Dossier ini hanya menampilkan penetapan jabatan yang tercatat; tidak memuat agenda pribadi, disposisi politik, kemampuan tempur, Martial Soul, atau informasi privat. Pemisahan kewenangan dan struktur jabatan mengikuti modul Governance serta Administrative Atlas."],
+    sourcePath: "world/GOLDEN_DRAGON_EMPIRE_OFFICIALS.md", sourceLabel: "Named Civil Officials & Political Dispositions"
+  },
+  {
+    id: "official-heiyu-zhaolin", title: "Heiyu Zhaolin", aliases: ["Heiyu Zhaolin"],
+    visibility: "PUBLISHED", category: "POWERS", eyebrow: "GOLDEN DRAGON CIVIL OFFICIAL · HEAD OF THE IMPERIAL OVERSIGHT AGENCY",
+    summary: "Heiyu Zhaolin tercatat sebagai Head of the Imperial Oversight Agency dalam roster pejabat Golden Dragon Empire pada sumber kanon yang dipatok.",
+    paragraphs: ["Heiyu Zhaolin memegang jabatan Head of the Imperial Oversight Agency. Dossier ini hanya menampilkan penetapan jabatan yang tercatat; tidak memuat agenda pribadi, disposisi politik, kemampuan tempur, Martial Soul, atau informasi privat. Pemisahan kewenangan dan struktur jabatan mengikuti modul Governance serta Administrative Atlas."],
+    sourcePath: "world/GOLDEN_DRAGON_EMPIRE_OFFICIALS.md", sourceLabel: "Named Civil Officials & Political Dispositions"
+  },
+  {
+    id: "official-xuanyuan-haoran", title: "Xuanyuan Haoran", aliases: ["Xuanyuan Haoran"],
+    visibility: "PUBLISHED", category: "POWERS", eyebrow: "GOLDEN DRAGON CIVIL OFFICIAL · GOVERNOR OF LONGYUAN",
+    summary: "Xuanyuan Haoran tercatat sebagai Governor of Longyuan dalam roster pejabat Golden Dragon Empire pada sumber kanon yang dipatok.",
+    paragraphs: ["Xuanyuan Haoran memegang jabatan Governor of Longyuan. Dossier ini hanya menampilkan penetapan jabatan yang tercatat; tidak memuat agenda pribadi, disposisi politik, kemampuan tempur, Martial Soul, atau informasi privat. Pemisahan kewenangan dan struktur jabatan mengikuti modul Governance serta Administrative Atlas."],
+    sourcePath: "world/GOLDEN_DRAGON_EMPIRE_OFFICIALS.md", sourceLabel: "Named Civil Officials & Political Dispositions"
+  },
+  {
+    id: "official-cangyue-yunhe", title: "Cangyue Yunhe", aliases: ["Cangyue Yunhe"],
+    visibility: "PUBLISHED", category: "POWERS", eyebrow: "GOLDEN DRAGON CIVIL OFFICIAL · GOVERNOR OF CANGLAN",
+    summary: "Cangyue Yunhe tercatat sebagai Governor of Canglan dalam roster pejabat Golden Dragon Empire pada sumber kanon yang dipatok.",
+    paragraphs: ["Cangyue Yunhe memegang jabatan Governor of Canglan. Dossier ini hanya menampilkan penetapan jabatan yang tercatat; tidak memuat agenda pribadi, disposisi politik, kemampuan tempur, Martial Soul, atau informasi privat. Pemisahan kewenangan dan struktur jabatan mengikuti modul Governance serta Administrative Atlas."],
+    sourcePath: "world/GOLDEN_DRAGON_EMPIRE_OFFICIALS.md", sourceLabel: "Named Civil Officials & Political Dispositions"
+  },
+  {
+    id: "official-tieyan-mingxuan", title: "Tieyan Mingxuan", aliases: ["Tieyan Mingxuan"],
+    visibility: "PUBLISHED", category: "POWERS", eyebrow: "GOLDEN DRAGON CIVIL OFFICIAL · GOVERNOR OF JINYUE",
+    summary: "Tieyan Mingxuan tercatat sebagai Governor of Jinyue dalam roster pejabat Golden Dragon Empire pada sumber kanon yang dipatok.",
+    paragraphs: ["Tieyan Mingxuan memegang jabatan Governor of Jinyue. Dossier ini hanya menampilkan penetapan jabatan yang tercatat; tidak memuat agenda pribadi, disposisi politik, kemampuan tempur, Martial Soul, atau informasi privat. Pemisahan kewenangan dan struktur jabatan mengikuti modul Governance serta Administrative Atlas."],
+    sourcePath: "world/GOLDEN_DRAGON_EMPIRE_OFFICIALS.md", sourceLabel: "Named Civil Officials & Political Dispositions"
+  },
+  {
+    id: "official-yunlan-qinglan", title: "Yunlan Qinglan", aliases: ["Yunlan Qinglan"],
+    visibility: "PUBLISHED", category: "POWERS", eyebrow: "GOLDEN DRAGON CIVIL OFFICIAL · GOVERNOR OF TIANFENG",
+    summary: "Yunlan Qinglan tercatat sebagai Governor of Tianfeng dalam roster pejabat Golden Dragon Empire pada sumber kanon yang dipatok.",
+    paragraphs: ["Yunlan Qinglan memegang jabatan Governor of Tianfeng. Dossier ini hanya menampilkan penetapan jabatan yang tercatat; tidak memuat agenda pribadi, disposisi politik, kemampuan tempur, Martial Soul, atau informasi privat. Pemisahan kewenangan dan struktur jabatan mengikuti modul Governance serta Administrative Atlas."],
+    sourcePath: "world/GOLDEN_DRAGON_EMPIRE_OFFICIALS.md", sourceLabel: "Named Civil Officials & Political Dispositions"
+  },
+  {
+    id: "official-yanling-zhenyu", title: "Yanling Zhenyu", aliases: ["Yanling Zhenyu"],
+    visibility: "PUBLISHED", category: "POWERS", eyebrow: "GOLDEN DRAGON CIVIL OFFICIAL · GOVERNOR OF YANLING",
+    summary: "Yanling Zhenyu tercatat sebagai Governor of Yanling dalam roster pejabat Golden Dragon Empire pada sumber kanon yang dipatok.",
+    paragraphs: ["Yanling Zhenyu memegang jabatan Governor of Yanling. Dossier ini hanya menampilkan penetapan jabatan yang tercatat; tidak memuat agenda pribadi, disposisi politik, kemampuan tempur, Martial Soul, atau informasi privat. Pemisahan kewenangan dan struktur jabatan mengikuti modul Governance serta Administrative Atlas."],
+    sourcePath: "world/GOLDEN_DRAGON_EMPIRE_OFFICIALS.md", sourceLabel: "Named Civil Officials & Political Dispositions"
+  },
+  {
+    id: "official-baihu-xuefeng", title: "Baihu Xuefeng", aliases: ["Baihu Xuefeng"],
+    visibility: "PUBLISHED", category: "POWERS", eyebrow: "GOLDEN DRAGON CIVIL OFFICIAL · GOVERNOR OF BAIYUE",
+    summary: "Baihu Xuefeng tercatat sebagai Governor of Baiyue dalam roster pejabat Golden Dragon Empire pada sumber kanon yang dipatok.",
+    paragraphs: ["Baihu Xuefeng memegang jabatan Governor of Baiyue. Dossier ini hanya menampilkan penetapan jabatan yang tercatat; tidak memuat agenda pribadi, disposisi politik, kemampuan tempur, Martial Soul, atau informasi privat. Pemisahan kewenangan dan struktur jabatan mengikuti modul Governance serta Administrative Atlas."],
+    sourcePath: "world/GOLDEN_DRAGON_EMPIRE_OFFICIALS.md", sourceLabel: "Named Civil Officials & Political Dispositions"
+  },
+  {
+    id: "official-zhenhai-haixiu", title: "Zhenhai Haixiu", aliases: ["Zhenhai Haixiu"],
+    visibility: "PUBLISHED", category: "POWERS", eyebrow: "GOLDEN DRAGON CIVIL OFFICIAL · GOVERNOR OF XINGLUO",
+    summary: "Zhenhai Haixiu tercatat sebagai Governor of Xingluo dalam roster pejabat Golden Dragon Empire pada sumber kanon yang dipatok.",
+    paragraphs: ["Zhenhai Haixiu memegang jabatan Governor of Xingluo. Dossier ini hanya menampilkan penetapan jabatan yang tercatat; tidak memuat agenda pribadi, disposisi politik, kemampuan tempur, Martial Soul, atau informasi privat. Pemisahan kewenangan dan struktur jabatan mengikuti modul Governance serta Administrative Atlas."],
+    sourcePath: "world/GOLDEN_DRAGON_EMPIRE_OFFICIALS.md", sourceLabel: "Named Civil Officials & Political Dispositions"
+  },
+
+  {
+    id: "imperial-audit-committee", title: "Imperial Special Financial Audit Committee", aliases: ["Komite Auditor Keuangan Khusus Kekaisaran", "Imperial Audit Committee"],
+    visibility: "PUBLISHED", category: "POWERS", eyebrow: "IMPERIAL OVERSIGHT INSTITUTION",
+    summary: "Lembaga pengawasan internal Golden Dragon Empire yang memeriksa kementerian dan badan pemerintahan di bawahnya.",
+    paragraphs: [
+      "Komite Auditor Keuangan Khusus Kekaisaran menjalankan pengawasan internal lintas kementerian dan badan pemerintahan yang berada di bawahnya. Mandatnya lebih luas daripada pemeriksaan rekening atau belanja publik, tetapi tetap dibatasi oleh yurisdiksi dan prosedur yang sah.",
+      "Komite tidak otomatis memiliki kewenangan menuntut pidana, menjatuhkan hukuman, mengesampingkan pengadilan, memerintah militer, atau melewati lembaga hukum lain. Temuan harus didasarkan pada dokumen, kesaksian, bukti pendukung, dan prosedur yang berlaku.",
+      "Identitas kepala, wakil, personel, alamat kantor, cabang, jadwal layanan, dan penempatan terkini belum ditetapkan untuk publik. Tidak ada dasar untuk menghubungkan komite dengan perkara keluarga Luca sebagai aktor terkonfirmasi."
+    ],
+    sourcePath: "world/IMPERIAL_SPECIAL_FINANCIAL_AUDIT_COMMITTEE.md", sourceLabel: "Imperial Special Financial Audit Committee"
+  },
+  {
+    id: "prison-bound-items", title: "Prison Systems & Bound Items", aliases: ["Prison Restraints", "Bound Items", "Sistem Penjara dan Alat Pengikat"],
+    visibility: "PUBLISHED", category: "ARCHIVES", eyebrow: "CUSTODY SYSTEMS & RESTRAINTS",
+    summary: "Jenis alat pengikat yang digunakan dalam konteks penahanan, dari borgol tradisional hingga artefak khusus yang membatasi fungsi tertentu.",
+    paragraphs: [
+      "Bound item adalah benda yang dipasang, dikenakan, atau diikatkan kepada tahanan untuk membatasi gerak, akses, kekuatan, atau perilaku. Asalnya dapat berupa alat tradisional, Artificial Artifact, Ancient Artifact, atau Relic; kategori tersebut tidak boleh disamakan.",
+      "Jenis yang tercatat meliputi rantai penekan aktivasi Martial Soul, collar penyamaran restraint, rantai penekan fisik, token pengikat batas, restraint pemicu rasa takut, whisper-seal atau delirium restraint, segel penekan Qi/Spirit Realm, serta borgol, tali, dan belenggu tradisional.",
+      "Fungsi satu alat tidak otomatis mencakup fungsi lain. Penekan Martial Soul tidak selalu menekan kekuatan fisik; segel batas tidak otomatis mencegah bicara, berpikir, atau semua cara melarikan diri. Beberapa alat dapat digabung hanya jika fungsinya kompatibel.",
+      "Tidak ada penalti numerik universal atau efek terjamin untuk seluruh kategori. Efek spesifik harus berasal dari entri item kanon, appraisal terverifikasi, atau penemuan yang benar-benar terjadi dalam adegan. Dossier ini tidak memuat prosedur GM, status tahanan, atau detail penyalahgunaan."
+    ],
+    sourcePath: "world/PRISON_AND_BOUND_ITEMS.md", sourceLabel: "Prison Systems and Bound Items"
+  },
+
 ];
 
 const ARCHIVE_SOURCE_COMMIT = "2f76a864150528afb0e3d26cb16f9396ce610ff6";
