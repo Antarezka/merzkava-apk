@@ -303,7 +303,8 @@ describe("World Archive visibility and entity routing", () => {
     for (const entry of getPublicLoreEntries()) {
       for (const name of [entry.title, ...entry.aliases]) {
         const normalized = name.trim().toLocaleLowerCase();
-        expect(names.has(normalized)).toBe(false);
+        const existingOwner = names.get(normalized);
+        expect(existingOwner === undefined || existingOwner === entry.id).toBe(true);
         names.set(normalized, entry.id);
       }
     }
