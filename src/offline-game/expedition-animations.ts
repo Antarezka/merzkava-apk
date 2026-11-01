@@ -12,7 +12,7 @@ export function mountExpeditionAnimations(root: HTMLElement): () => void {
       reduceMotion: "(prefers-reduced-motion: reduce)",
     },
   }).add(self => {
-    if (self.matches.reduceMotion) return;
+    if (self?.matches.reduceMotion) return;
 
     const entranceTargets = root.querySelectorAll<HTMLElement>(
       ".expedition-heading, .expedition-character-panel, .expedition-status-grid, .expedition-feature, .expedition-footer",
