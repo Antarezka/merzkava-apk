@@ -64,8 +64,18 @@ export function animateOpeningSplash(splash: HTMLElement): () => void {
     scaleX: [1, 1.045], scaleY: [1, 0.965], opacity: [0.68, 0.92],
     duration: 2050, ease: "inOutSine", alternate: true, loop: true, delay: 520
   });
+
+  // Kitty occasionally shakes her head like a cat flicking off water:
+  // three quick, diminishing side-to-side snaps, then a long relaxed pause.
+  // The timeline repeats as a whole, so the shake never becomes constant motion.
+  const headShake = createTimeline({ defaults: { ease: "outCubic" }, loop: true });
+  headShake
+    .add(head, { rotate: [0, -8, 7, -5, 3, 0], duration: 560 }, 1800)
+    .add(head, { rotate: 0, duration: 1 }, 6000);
+
+  // Keep the gentle breathing drift independent from the occasional head shake.
   const headIdle = animate(head, {
-    rotate: [-0.62, 0.78], translateY: [0, -1.35], translateX: [0.35, -0.35], duration: 2550,
+    translateY: [0, -1.1], translateX: [0.25, -0.25], duration: 2550,
     ease: "inOutSine", alternate: true, loop: true, delay: 760
   });
   const tailSway = animate(tail, {
@@ -99,6 +109,7 @@ export function animateOpeningSplash(splash: HTMLElement): () => void {
     entrance.pause();
     bodyBreath.pause();
     shadowBreath.pause();
+    headShake.pause();
     headIdle.pause();
     tailSway.pause();
     lightBreath.pause();
