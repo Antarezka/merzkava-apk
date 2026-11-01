@@ -152,6 +152,9 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 
 ### 3B. Shared interaction and visual system
 
+- [~] Keep the bottom navigation rail anchored to the viewport across every route. The rail itself must not inherit screen-transition transforms; route selection must not auto-shift its horizontal scroll position. Manual horizontal scrolling remains available. Fix committed in the current branch; verify on Android across Home, Convo, Eternal Path, Archive, and Settings.
+- [ ] Add a navigation regression check for route changes, fixed viewport anchoring, scroll position stability, and the four-visible-item rail on narrow Android screens.
+
 - [ ] Define reusable styles for glass panels, image cards, icon buttons, chips, dividers, and navigation controls.
 - [ ] Define consistent interaction feedback: tap, press, selection, loading, success, and failure.
 - [ ] Keep animations purposeful and lightweight; respect reduced-motion/accessibility settings where supported.
@@ -234,7 +237,34 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 - [x] Define the Offline Game as a Life Simulation Text RPG under the current working title `Merzkava: Eternal Path`; keep BitLife/Solo Leveling as design references only.
 - [ ] Define what happens when the user returns online; mode switching must not overwrite or merge incompatible states.
 
-### 5B. Offline gameplay concept
+### 5B. Eternal Path — dedicated game design blueprint
+
+**Purpose:** Design the actual game as a coherent life simulation before expanding dialogue volume or adding disconnected screens. This is a required design stage, not permission to start implementing every listed system immediately.
+
+- [ ] Write a complete Game Design Document (GDD) for **Merzkava: Eternal Path — Life Simulation Text RPG**, including player fantasy, target experience, design pillars, scope boundaries, and explicit non-goals.
+- [ ] Define the core gameplay loop from waking/day planning through activities, time/resource costs, encounters/events, consequences, rest, and long-term advancement.
+- [ ] Define the life-simulation layer: character origin/background, age and life stages, personality/aptitudes, needs, health, fatigue, satiety, injury, daily routine, and meaningful non-combat choices.
+- [ ] Define the activity catalogue and rules: rest/sleep, meals, training, study, work/service, crafting, social visits, travel, exploration, and recovery. Each activity needs prerequisites, duration, costs, risks, outcomes, and interruption rules.
+- [ ] Define the world clock and calendar: date/year/season/day-cycle, time advancement, regional schedules, festivals, weather, travel duration, and how missed opportunities or deadlines resolve.
+- [ ] Define NPC simulation: individual identities, schedules, needs/goals, relationship dimensions, trust/affinity/conflict, memory of player actions, availability, and deterministic offline behavior. Do not reduce every relationship to one global Bonds counter.
+- [ ] Define education, vocation, social standing, reputation, household/clan/sect affiliations, and how these evolve without inventing canon institutions or rules.
+- [ ] Define character status and progression: attributes, HP, energy, satiety, injury, cultivation, Martial Soul awakening, Spirit Rings, Thinker/Arcanistry progression, titles, achievements, and age-related transitions. Every mechanic must map to an approved source formula or a clearly labelled game-only rule.
+- [ ] Define inventory, equipment, materials, structures/assets, wallet, prices, scarcity, trade, rewards, and an auditable transaction ledger. Canon currency and economy rules must be preserved.
+- [ ] Define the world map and location model: settlements, districts, routes, travel modes, access requirements, regional hazards, points of interest, and encounter pools. Canon place data must be supplied by the approved Archive package.
+- [ ] Define quests, errands, personal goals, timed opportunities, discoveries, and long-running story arcs with explicit states, prerequisites, failure/expiry behavior, and rewards.
+- [ ] Define the event/choice engine: authored event schemas, conditional triggers, weighted/seeded selection, branching outcomes, consequence persistence, replay prevention, and deterministic save/replay behavior.
+- [ ] Define encounters and combat as one part of life—not the entire game—including danger signalling, escape, injury/death rules, enemy intent, combat resolution, loot, and post-encounter recovery.
+- [ ] Define the System/Chronicle UI as an original Merzkava interface: status, calendar, activity planner, relationships, quests, map, inventory, notifications, codex, and history. Each screen must read authoritative engine state rather than placeholder text.
+- [ ] Define save architecture and migrations: versioned schema, save slots, atomic transactions, recovery after process death, deterministic seeds, event history, and isolation from Convo.
+- [ ] Create a system dependency map and data ownership matrix before implementation; identify which system owns each field and which systems may request validated changes.
+- [ ] Create a content matrix mapping every canon-backed record to an approved Archive dossier and pinned Universe source SHA; keep `CANON`, `CANON_ADAPTATION`, and `IN_GAME_ORIGINAL` distinct.
+- [ ] Define progression pacing, economy balance, activity costs, age/time scale, difficulty, accessibility, and anti-softlock rules. Use test simulations rather than arbitrary hand-tuning.
+- [ ] Break the GDD into implementable vertical slices with acceptance criteria, test coverage, UI states, offline behavior, and explicit dependencies.
+- [ ] Approve the GDD and architecture baseline before large-scale content authoring or implementation. Keep the current 240-node prologue as a prototype/content sample until its role in the final structure is decided.
+
+**Design-stage exit gate:** A reviewed GDD, gameplay loop, system/data dependency map, content provenance plan, save model, and vertical-slice backlog exist. No major system is considered designed merely because a screen or formula module exists.
+
+### 5C. Offline gameplay concept
 
 **Purpose:** Translate approved Merzkava material into a deterministic, replayable local life/adventure loop without changing canon.
 
@@ -252,7 +282,7 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 - [ ] Define save slots/state boundaries and safe persistence.
 - [~] Add clear mode identity so users know whether they are in connected AI gameplay or standalone offline gameplay; the first-pass Eternal Path route and screen label now exist, while the full mode-switch and save-boundary experience remains open.
 
-### 5C. Offline reliability and QA
+### 5D. Offline reliability and QA
 
 **Purpose:** Prove Offline Game is genuinely standalone inside the shared APK and cannot contaminate connected Convo context, sessions, or saves.
 
@@ -268,7 +298,49 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 
 ---
 
-## 8. Workstream 6 — Future expansion backlog
+## 8. Workstream 7 — App performance, responsiveness, and resource efficiency
+
+**Progress now:** `[?] BASELINE NOT MEASURED`. Performance optimization is an app-wide workstream. No speed or memory improvement may be claimed without a before/after measurement on a named build and device profile.
+
+**Goal:** Keep the app responsive on supported Android hardware, including lower-memory devices, while preserving the approved visual design, Eternal Path scene-window quality, Floating Control behavior, and offline reliability.
+
+### 7A. Performance baseline and profiling
+
+- [ ] Record baseline cold-start, warm-start, route-transition, input-response, and long-screen scroll timings.
+- [ ] Measure JavaScript heap, WebView memory, image memory, SQLite query latency, CPU use, battery impact, and APK/download size where tooling permits.
+- [ ] Profile on a representative low-memory Android device and a modern Android emulator; record OS, device class, build SHA, and test conditions.
+- [ ] Identify the largest contributors before optimizing: bundle chunks, synchronous work, repeated DOM rendering, expensive selectors/layout, image decode, animation, and database access.
+- [ ] Establish budgets and regression thresholds for startup, route changes, memory, image assets, and interaction latency.
+
+### 7B. Rendering, navigation, and animation
+
+- [ ] Audit full-root `innerHTML` rerenders and avoid rebuilding unaffected UI where practical; preserve user input, focus, scroll, and navigation state.
+- [ ] Ensure fixed controls (bottom navigation, Floating Control, overlays) are not transformed or clipped by animated ancestors.
+- [ ] Keep animations scoped to the component that owns them; clean up Anime.js timelines/listeners on route exit and honor reduced motion.
+- [ ] Prefer transform/opacity animation over layout-triggering properties; avoid simultaneous heavy effects on low-end devices.
+- [ ] Use route-appropriate lazy mounting for expensive Archive, Convo, and Eternal Path modules without delaying essential first interaction.
+
+### 7C. Assets, storage, and data work
+
+- [ ] Audit scene art, fog textures, mascot layers, fonts, and Archive imagery for dimensions, formats, compression, duplicate downloads, and decode cost.
+- [ ] Add responsive image sizing and safe fallbacks; avoid decoding large assets before their screen is needed.
+- [ ] Audit SQLite/local storage access for repeated reads, unbounded histories, large JSON payloads, and non-atomic writes.
+- [ ] Add bounded caches and invalidation rules only where measurements show benefit; do not cache stale canon or authoritative game state unsafely.
+- [ ] Keep offline startup and gameplay functional when network requests fail or are unavailable.
+
+### 7D. Verification and release gate
+
+- [ ] Add repeatable performance smoke tests for startup, route switching, horizontal navigation, Eternal Path scene rendering, and long Archive pages.
+- [ ] Run regression tests after optimizations to confirm navigation, Convo, Archive, Eternal Path, scene-window FX-02, and Floating Control still work.
+- [ ] Record before/after metrics and the exact build SHA; reject optimizations that improve one screen by materially degrading another.
+- [ ] Verify no memory leaks from repeated route changes, animation mounts, event listeners, or image-heavy screens.
+- [ ] Complete physical-device profiling before describing the app as optimized.
+
+**Exit gate:** Performance budgets are defined, representative device measurements meet them, route/animation cleanup is verified, and no existing core feature regresses.
+
+---
+
+## 9. Workstream 6 — Future expansion backlog
 
 **Progress now:** `[x] PLACEHOLDER ESTABLISHED`. No specific feature is approved yet; future ideas must be scoped before being promoted into implementation.
 
@@ -308,12 +380,14 @@ When the audit discovers additional screens or components, add them to this regi
 The workstreams describe product scope; this sequence describes safe delivery order. Priorities may be adjusted when the audit finds a critical defect.
 
 1. **Roadmap and architecture lock:** document the one-app / two-mode / shared-Archive architecture, link it from project entry points, and verify all source, context, and save boundaries.
-2. **Existing-feature audit:** inventory screens and controls before adding more surface area.
+2. **Existing-feature audit:** inventory screens and controls; fix route/navigation defects before adding more surface area.
 3. **World Archive:** content review, offline navigation/search, then typography and visual refinement.
 4. **UI feature expansion:** faction cards/buttons and shared glass/art interaction system.
 5. **App services:** canon review first, then daily check-in and validated reward transactions.
-6. **Merzkava: Eternal Path design:** approve/version the World Archive content package, implement provenance-aware game-only content, then build the Life Simulation Text RPG as the second playable mode inside the same APK.
-7. **Future expansion:** prioritize new proposals through Workstream 6.
+6. **Eternal Path design:** complete and review the dedicated GDD, gameplay loop, system/data dependency map, content package plan, and vertical-slice backlog before major gameplay implementation.
+7. **Eternal Path implementation:** integrate mechanics into the life-simulation loop, then add events, relationships, RPG/cultivation, exploration, quests, and progression in tested slices.
+8. **Performance and reliability:** profile the app on representative Android hardware, optimize measured bottlenecks, and run regression/offline/device QA.
+9. **Future expansion:** prioritize new proposals through Workstream 6.
 
 ### Release checklist
 
