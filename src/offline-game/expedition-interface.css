@@ -78,7 +78,7 @@
 .expedition-choice strong{font-size:11px;font-weight:600}
 .expedition-choice small{color:#a99e8d;font-size:10px;line-height:1.45}
 .expedition-choice:active{background:#3b2c1e;border-color:#c18b45}
-@media(max-width:360px){.expedition-test-row{gap:6px}.expedition-dialogue-card{padding:12px}.expedition-choice{padding:9px}}
+@media(max-width:360px){.expedition-form-row{gap:6px}.expedition-dialogue-card{padding:12px}.expedition-choice{padding:9px}}
 @media(prefers-reduced-motion:reduce){.expedition-light-layer,.expedition-weather-layer{transition:none}.expedition-fog-motion{transform:none!important}}
 
 /* The window reads world region, clock cycle and weather from the local save. */
