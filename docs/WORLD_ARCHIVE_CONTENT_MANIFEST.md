@@ -750,3 +750,13 @@ The initial seven-advisory report was followed by an upgrade of the direct Vites
 ### Xenhwa public-profile boundary tightened
 
 A final claim-level check of `BEIMING_XENHWA.md` confirmed that her public profile establishes appearance, passive natural fragrance, and unusually sensitive senses. Age, species/lineage, and the white-flame capability are recorded elsewhere in the full NPC profile, not in its public-profile section. The Archive dossier has therefore been narrowed to the public-profile facts and adoptive relationship only; age, half-beast/white-fox identity, flame capability, and GM-sensitive family history are excluded. A regression test now checks all four disclosure boundaries.
+
+
+### Final build supersession — Xenhwa lineage boundary and patched test toolchain
+
+The subsequent claim-level review tightened Beiming Xenhwa's public entry further: age, half-beast/white-fox lineage, flame capability, and restricted family history are all excluded. The public dossier retains only her public-profile traits and adoptive relationship. The regression test now checks age, lineage, and flame disclosure.
+
+- Direct dev dependency `vitest` is now `^5.0.5`.
+- Validation on commit `97f04c199bb385abeeefb068aad08125f3f63a6c`: **27/27 tests pass**, TypeScript/gateway type-check and Vite production build pass.
+- Full npm audit: **0 vulnerabilities**. Production-only audit: **0 vulnerabilities**.
+- Android build `275`, source `6c64df88df589bcf832f4f1709eb2822569a0ec5`, expected version `v.1.01.275-6c6`: build/signature/emulator result pending. This is the current candidate APK build; it supersedes the earlier in-progress/cancelled intermediate runs.
