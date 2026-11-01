@@ -717,3 +717,11 @@ The complete user-approved design and phase backlog now live in [ETERNAL_PATH_BL
 
 **Not yet implemented:** multi-slot save manager and export/import; activity/world simulation; NPC schedules and relationship graph; Social Link progression; choice consequence tagging and atomic transactions; full sensory content authoring; ordinary-life activity catalogue; property/territory ownership/control; organizations; family/children/naming dialogs; complete Spirit Realm/Arcanistry path integration. These remain EP-1 through EP-6 work, not completed features.
 
+
+
+### 13M. Eternal Path implementation update — EP-1 save library and Anime.js (2026-11-02)
+
+- Save schema v3 now supports multiple isolated local journeys, legacy migration, load/unload, rename, single-slot delete, JSON export and validated import. Journey Manager UI is wired to these operations.
+- Anime.js now drives Eternal Path scene drift, fog/light/weather atmosphere, profile and narrative reveals, choice modal transitions, manager panels, app-screen entrances, toolbar movement and button micro-interactions. Reduced-motion is respected and scene animation scope is disposed on rerender.
+- Current save-slot storage is a versioned local-storage bridge, not final SQLite. SQLite transactions/manifests, complete state migration, ordinary-life simulation, NPC/social systems, ownership/family and integrated progression remain upcoming.
+- CI and physical Android QA must pass before this slice is called verified. No new APK is claimed.
