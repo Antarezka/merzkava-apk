@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { renderExpeditionInterface } from "../../src/offline-game/expedition-interface";
-import { chooseEternalOption, ETERNAL_DIALOGUES, ETERNAL_SCENES, getCurrentDialogue, getEternalSave, getExpeditionScene, resetEternalGame, resetExpeditionPreview, setExpeditionPreview, startEternalGame } from "../../src/offline-game/expedition-game";
+import { chooseEternalOption, ETERNAL_DIALOGUES, ETERNAL_SCENES, getCurrentDialogue, getEternalSave, getExpeditionScene, getRegionalDialogueCount, resetEternalGame, resetExpeditionPreview, setExpeditionPreview, startEternalGame } from "../../src/offline-game/expedition-game";
 
 describe("Eternal Path scene and prologue", () => {
   beforeEach(() => { resetEternalGame(); resetExpeditionPreview(); });
@@ -36,6 +36,7 @@ describe("Eternal Path scene and prologue", () => {
   it("keeps the live scene and dialogue aligned with the selected starting power", () => {
     startEternalGame({name:"Nafila",age:14,region:"tianhai-yunzhou"});
     expect(getExpeditionScene().region).toBe("tianhai-yunzhou");
+    expect(getRegionalDialogueCount()).toBe(60);
     expect(ETERNAL_SCENES.find(scene=>scene.id===getCurrentDialogue()?.sceneId)?.region).toBe("tianhai-yunzhou");
   });
   it("ships 240 deterministic branching dialogue nodes across eight scene compositions", () => {
