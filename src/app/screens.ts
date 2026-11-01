@@ -3,6 +3,7 @@ import { canonLabelMarkup } from "../ui/canon-labels";
 import type { Character } from "../convo/characters/character-repository";
 import { PROFILE_FIELDS, parseCharacterProfile, type ProfileField } from "../convo/engine/profile-parser";
 import { renderLoreLibrary } from "../world-archive/lore-library";
+import { renderExpeditionInterface } from "../offline-game/expedition-interface";
 
 const PROFILE_FIELD_GROUPS = [
   { title: "PROFIL KARAKTER", fields: PROFILE_FIELDS.slice(0, 13) },
@@ -10,7 +11,7 @@ const PROFILE_FIELD_GROUPS = [
   { title: "TEKNIK & TUJUAN", fields: PROFILE_FIELDS.slice(16, 18) }
 ] as const;
 
-export type ScreenId = "home" | "gameplay" | "character" | "inventory" | "map" | "journal" | "settings";
+export type ScreenId = "home" | "gameplay" | "offline-game" | "character" | "inventory" | "map" | "journal" | "settings";
 
 function escapeHtml(value: string): string {
   return value.replace(/[&<>"']/g, char => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" })[char] ?? char);
@@ -122,6 +123,7 @@ journal:`<div class="page-heading"><p class="eyebrow">YOUR RECORDED HISTORY</p><
 settings:`<div class="page-heading"><p class="eyebrow">APPLICATION</p><h2>Settings</h2><p class="muted">Appearance, sound, local storage, and AI configuration.</p></div><section class="section-block preference-panel"><div class="section-heading"><span>APPEARANCE</span><small>DISPLAY MODE</small></div><p class="muted">The Academy Obsidian theme is the default command-hall palette. Parchment mode switches to a warmer, light reading surface.</p><div class="preference-choice" role="group" aria-label="Appearance"><button type="button" data-theme-mode="light" aria-pressed="true">☼ &nbsp; Parchment Light</button><button type="button" data-theme-mode="dark" aria-pressed="false">☾ &nbsp; Academy Obsidian</button></div></section><section class="section-block preference-panel"><div class="section-heading"><span>SOUND</span><small>APP AUDIO</small></div><div class="setting-row"><div><h3>Sound effects & voice</h3><p>Opening chime, spoken title, interface clicks, and subtle interface sounds.</p></div><button class="preference-toggle" type="button" data-sound-toggle aria-pressed="true">Sound On</button></div></section><section class="section-block floating-mode-settings"><div class="section-heading"><span>FLOATING MODE</span><small>ANDROID OVERLAY</small></div><p class="muted">Keep the same interactive Merzkava session in a movable mini window above other apps. Android will ask for permission the first time.</p><button class="action-button" type="button" data-floating-start>Start Floating Mode <span>↗</span></button></section><div class="setting-row"><div><h3>Save location</h3><p>Local device database</p></div><span class="setting-value">SQLITE</span></div><div class="setting-row"><div><h3>AI Game Master</h3><p>Sign in with Supabase to use the authenticated AI Gateway.</p></div><span class="setting-value">GATEWAY</span></div><div class="setting-row"><div><h3>Canon source</h3><p>Antarezka / merzkava-universe</p></div><span class="setting-value">ACTIVE</span></div>`
 };
 export function renderScreen(screen: ScreenId, characters: Character[] = [], registryStatus = "Registered characters are loaded from the pinned players.md snapshot.", ledgerEntries: LedgerEntry[] = [], inventorySnapshot?: InventorySnapshot): string {
+  if (screen === "offline-game") return renderExpeditionInterface(characters);
   if (screen === "character") return characterView(characters, registryStatus);
   if (screen === "inventory") return inventoryView(ledgerEntries, inventorySnapshot);
   if (screen === "map") return renderLoreLibrary();
