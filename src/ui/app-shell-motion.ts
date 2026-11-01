@@ -16,6 +16,24 @@ export function animateAppScreen(shell: HTMLElement | null): void {
   if (nav) {
     animate(nav, { opacity: [0, 1], translateY: [18, 0], duration: 520, delay: 90, ease: "outCubic" });
     const items = nav.querySelectorAll<HTMLElement>(".nav-item");
-    if (items.length) animate(items, { opacity: [0, 1], translateY: [7, 0], duration: 340, delay: stagger(32, { start: 150 }), ease: "outQuad" });
+    if (items.length) {
+      animate(items, { opacity: [0, 1], translateY: [7, 0], duration: 340, delay: stagger(32, { start: 150 }), ease: "outQuad" });
+      items.forEach(item => {
+        const enter=()=>animate(item,{scale:[1,1.055],duration:160,ease:"outQuad"});
+        const leave=()=>animate(item,{scale:[1.055,1],duration:190,ease:"outQuad"});
+        item.addEventListener("pointerenter",enter);
+        item.addEventListener("pointerleave",leave);
+      });
+      const active=nav.querySelector<HTMLElement>(".nav-item.active");
+      const activeIcon=active?.querySelector<HTMLElement>(".nav-icon");
+      if(activeIcon) animate(activeIcon,{scale:[.82,1.12,1],rotate:["-8deg","0deg"],duration:540,ease:"outBack"});
+    }
   }
+  const controls=shell.querySelectorAll<HTMLElement>("button:not(.nav-item)");
+  controls.forEach(button=>{
+    const enter=()=>animate(button,{scale:[1,1.018],duration:150,ease:"outQuad"});
+    const leave=()=>animate(button,{scale:[1.018,1],duration:190,ease:"outQuad"});
+    button.addEventListener("pointerenter",enter);
+    button.addEventListener("pointerleave",leave);
+  });
 }
