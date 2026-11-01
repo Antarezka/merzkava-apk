@@ -597,3 +597,59 @@ A separate arithmetic check was run on both ownership tables:
 - This validates arithmetic consistency only. It does not verify the fictional economic assumptions, liquidity, real-world plausibility, or whether characters know these figures.
 
 **Disposition:** arithmetic check passed; public disclosure/infographic approval remains pending claim-level knowledge review.
+
+
+## Seventh pass — repository-wide source disposition and full roster diagnostics
+
+**Current upstream snapshot:** `Antarezka/merzkava-universe` `main` at `2f76a864150528afb0e3d26cb16f9396ce610ff6`, commit date 2026-10-30 09:57 UTC. The recursive tree contains **140 Markdown files**. Every file has now been assigned a content/authority disposition in this audit inventory; this is not a claim that every long file has been proofread line-by-line.
+
+### Complete inventory disposition (140 Markdown files)
+
+| Source group | Count | Archive disposition |
+|---|---:|---|
+| Root documentation (excluding player registry) | 5 | README/version/recovery/entrypoint are repository controls, not lore articles. INDEX is a gameplay router and not an Archive authority. |
+| `core/` | 12 | `MECHANICS_REFERENCE`; do not reproduce rules, numerical formulas, progression, costs, chances, or state logic as Archive content. |
+| `gameplay/` | 3 | `MECHANICS_REFERENCE`; procedures only, never public lore articles. |
+| `bestiary/` | 1 | `MECHANICS_REFERENCE`; descriptive creature knowledge may be extracted only from independently established public lore, without age/tier/ring/combat/absorption mechanics. |
+| `templates/` | 9 | GM/player invocation, output, character, NPC, regional and event templates; not lore articles. Never expose prompt/anti-cheat/internal GM instructions as player Archive content. |
+| `players.md` + `players/*.md` | 7 | `PRIVATE_PLAYER_DATA`; exclude player registry, identities as player records, snapshots, balances, session notes, and private state from Archive search and article ingestion. |
+| Regional `INDEX.md` files | 3 | Navigation/routing metadata; may inform internal source resolution but are not standalone lore biographies. |
+| Regional NPC registry/profile files | 39 | Individual claim-level visibility review required; public dossier facts may be considered only after GM-only identity, private whereabouts, secrets, and unrevealed relationships are filtered. No wholesale profile ingestion. |
+| `world/` modules | 61 | Mixed public lore, mechanics references, GM-only records, legacy pointers, and review-required material; apply the file-specific dispositions recorded in the earlier passes. No whole-folder import. |
+| **Total** | **140** | **All 140 have an assigned disposition; publication approval is separate and has not been granted.** |
+
+### Root, bootstrap, and version controls
+
+- `INDEX.md` and `templates/AUTHORITY_ORDER.md` are gameplay bootstrap/authority routers. They are not world-encyclopedia articles and their operational GM instructions must not enter player-facing search.
+- `templates/GAMEPLAY_RESPONSE_TEMPLATE.md`, `templates/CHARACTER_PROFILE_TEMPLATE.md`, `templates/NARRATIVE_DYNAMICS.md`, and `templates/ANTI_CHEAT_HARD_GATE.md` define internal gameplay output, profile semantics, narrative procedure, and enforcement. Keep all out of public lore.
+- `templates/NPC_PROFILE_TEMPLATE.md`, `templates/REGIONAL_MODULE_TEMPLATE.md`, and `templates/WORLD_EVENT_UPDATE_TEMPLATE.md` are blank/administrative scaffolds, not evidence that their placeholder content is canon.
+- `players.md` and all six player profile snapshots are private player data. They are not NPC records and must not appear in Archive autocomplete, entity graph, backlinks, or article suggestions.
+- `NIGHTLY_VERSION.md` currently states `v4.0.15`; `STABLE_VERSION.md` states `v4.0.1`; `SAFE_VERSION.md` identifies a protected rollback snapshot. Version/recovery records are software governance, not in-world chronology.
+- **Upstream pin discrepancy:** the current `main` commit is `2f76a864150528afb0e3d26cb16f9396ce610ff6`, while the README's visible pinned RP source remains `58693e1`. The Archive audit uses the verified full `main` commit above as its source snapshot. Do not silently treat the README pin as equivalent to current `main`, and do not change the Universe repository as part of this APK manifest update.
+
+### Full Golden Dragon officials roster diagnostics
+
+The complete 486-line, 112,016-character `world/GOLDEN_DRAGON_EMPIRE_OFFICIALS.md` was checked structurally, including all Markdown table rows and the final relationship/administrative section.
+
+- The file contains **353 data rows**, with **336 distinct named people** and no duplicate names detected in the parsed name column. This does not mean 336 people currently hold active offices.
+- The roster explicitly distinguishes 7 central heads, 7 regional governors, 12 active prefectural offices, and 21 retained regional/circuit officers. The remainder are retained former prefect/county/local NPC records; do not infer active appointments from legacy table headings.
+- Thirteen retained-officer rows contain a literal `undefined` in an extra trailing table cell. Treat this as a source-data formatting defect, not as an in-world field or canon value. It must not be rendered or indexed as an attribute.
+- The final §5 administrative-names bullet still says the atlas governs **33 prefectures and 268 county jurisdictions**, directly contradicting the current atlas and governance file. This is stale text in the legacy roster; the source-precedence decision remains: atlas `CANONICAL_LATEST`, governance `CURRENT_FRAMEWORK`, officials `LEGACY_REFERENCE` for NPC data.
+- A second office-mapping issue needs owner/source reconciliation: the officials roster names a **Kepala Badan Pengawasan Kekaisaran** among its seven central officials, while the current governance portfolio lists the **Komite Auditor Keuangan Khusus Kekaisaran** as its oversight institution. The committee dossier leaves its head unnamed and does not identify it as the same body as the Badan Pengawasan. Do not merge these institutions, infer that the named roster official heads the committee, or create a public officeholder link until the source owner resolves the relationship.
+- The governance file lists the Grand Martial Soul Awakening Hall as a central institution but the officials roster does not give it a named head. Do not invent one.
+- The roster's stated current administrative model and 21 consolidated officers are retained as its NPC data where consistent with governance; stale count claims and unresolved institution mapping are not authoritative. The source file has not been edited.
+
+### Mechanics and narrative source separation
+
+- All twelve `core/` modules were checked for their declared authority boundaries. They remain the sole authority for economy, Arcanistry, cultivation, academies, HP, hunger/metabolism, injury, Martial Soul, awakening, Spirit Realm traditions, Spirit Rings, and appraisal. Archive entries may explain public concepts in plain language only when they do not duplicate formulas, progression gates, prices, probabilities, or mechanics.
+- All three `gameplay/` modules remain procedure references for combat, time/action, and travel/encounter/rescue. Do not turn their probabilities, action durations, or resolution steps into in-world public facts.
+- `bestiary/SPIRIT_BEAST_RULES.md` is not an Archive mechanics source. If public creature dossiers are later approved, use only descriptive species facts that are independently known in-world; exclude Spirit Realm output estimates, beast-age grades, ring eligibility, absorption, combat behavior formulas, and appraisal scoring.
+- The 9 template files have been classified as internal scaffolds/procedures. None is an Archive article source.
+
+### Audit completion status
+
+- **Inventory coverage:** 140/140 Markdown paths have a disposition.
+- **Source-level/section-level review:** completed across all 140 paths, using full reads for shorter documents and targeted ranges/structural checks for long sources.
+- **Deep verification still outstanding:** exhaustive line-by-line semantic review of every long source, final row-by-row officeholder appointment reconciliation, and owner decision on the Badan Pengawasan ↔ Komite Auditor relationship.
+- **Publication approval:** not granted. Existing 26-entry APK catalogue remains a preliminary UI/content scaffold, not an approved canon corpus. Do not add or expose source text solely because its path exists in the catalogue.
+- **Implementation gate:** no public entity index, automatic highlights, autocomplete, backlinks, or source reader should be treated as canon-safe until visibility filtering and local-document resolution are implemented and tested end-to-end.
