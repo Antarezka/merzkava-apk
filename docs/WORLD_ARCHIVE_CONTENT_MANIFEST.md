@@ -11,9 +11,10 @@
 - APK branch: `feature/archive-experience`
 - APK lore catalogue path: `src/lore/lore-library.ts`
 - APK lore catalogue blob SHA: `4560c528dc9f4bb59c964bbf9ff6f53d04aaa8a1`
-- Current local entries: **32**
+- Current local entries: **39**
 - Offline source reader: **reviewed public-safe extracts bundled in the app code; raw source Markdown is not bundled**
-- Unique local source files: **28**
+- Added public dossiers: seven Golden Dragon regions (`Longyuan`, `Canglan`, `Jinyue`, `Tianfeng`, `Yanling`, `Baiyue`, `Xingluo`), using only reviewed foundation and administrative claims.
+- Unique local source files: **35**
 - Missing local source paths in Universe tree: **0**
 - Universe Markdown inventory: **140 files**
 
