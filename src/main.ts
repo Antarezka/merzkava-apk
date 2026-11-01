@@ -6,8 +6,8 @@ import { getGameplaySessionRecord, initializeDatabase, saveGameplaySessionRecord
 import { createCharacter, deleteCharacter, listCharacters, type Character } from "./convo/characters/character-repository";
 import { validateCharacterDraft } from "./convo/engine/character-validation";
 import { renderScreen, type ScreenId } from "./app/screens";
-import { animateExpeditionChoiceModal, mountExpeditionAnimations } from "./offline-game/expedition-animations";
-import { chooseEternalOption, resetEternalGame, startEternalGame, type EternalRegion } from "./offline-game/expedition-game";
+import { animateExpeditionChoiceModal, animateExpeditionPanel, mountExpeditionAnimations } from "./offline-game/expedition-animations";
+import { chooseEternalOption, deleteEternalSave, exportEternalSave, importEternalSave, loadEternalSave, renameEternalSave, resetEternalGame, startEternalGame, unloadEternalGame, type EternalRegion } from "./offline-game/expedition-game";
 import { getCanonIndex, getCanonStatus, loadCanonModule, loadPlayerRegistry, loadRegisteredPlayerProfile, refreshCanon, refreshLatestPlayerRegistry, type CanonDocument } from "./convo/canon/canon-loader";
 import { routeCanonActivity } from "./convo/canon/canon-router";
 import { assembleGameplayContext } from "./convo/canon/context-assembler";
@@ -662,7 +662,25 @@ root.addEventListener("click", async (event: MouseEvent) => {
   if (eternalChoice) { const modal=root.querySelector<HTMLElement>("[data-eternal-choice-modal]"); document.body.classList.remove("eternal-choice-open"); if(history.state?.eternalChoiceModal) history.back(); if(modal) animateExpeditionChoiceModal(modal,false,()=>{chooseEternalOption(Number(eternalChoice.dataset.eternalChoice));render();}); else {chooseEternalOption(Number(eternalChoice.dataset.eternalChoice));render();} return; }
   if (target.closest("[data-eternal-open-choices]")) { const modal=root.querySelector<HTMLElement>("[data-eternal-choice-modal]"); if(modal){animateExpeditionChoiceModal(modal,true);document.body.classList.add("eternal-choice-open");history.pushState({eternalChoiceModal:true},"");modal.querySelector<HTMLButtonElement>(".expedition-choice-close")?.focus();} return; }
 
-  if (target.closest("[data-eternal-end]")) { resetEternalGame(); render(); return; }
+  if (target.closest("[data-eternal-manager-toggle]")) {
+    const panel=root.querySelector<HTMLElement>("[data-eternal-manager-content]");
+    if(panel){panel.hidden=!panel.hidden;if(!panel.hidden) animateExpeditionPanel(panel);}
+    return;
+  }
+  if (target.closest("[data-eternal-new-form]")) {
+    const form=root.querySelector<HTMLElement>("#eternal-start-form");
+    if(form){form.hidden=!form.hidden;if(!form.hidden){animateExpeditionPanel(form);form.querySelector<HTMLInputElement>("#eternal-name")?.focus();}}
+    return;
+  }
+  const loadJourney=target.closest<HTMLButtonElement>("[data-eternal-save-load]");
+  if(loadJourney){if(loadEternalSave(loadJourney.dataset.eternalSaveLoad??"")){notice="Journey loaded.";render();}return;}
+  const deleteJourney=target.closest<HTMLButtonElement>("[data-eternal-save-delete]");
+  if(deleteJourney){const id=deleteJourney.dataset.eternalSaveDelete??"";if(id&&window.confirm("Delete this journey and all of its non-canon data? This cannot be undone.")){deleteEternalSave(id);notice="Journey deleted.";render();}return;}
+  const renameToggle=target.closest<HTMLButtonElement>("[data-eternal-save-rename-toggle]");
+  if(renameToggle){const form=root.querySelector<HTMLElement>(`[data-eternal-rename-form="${CSS.escape(renameToggle.dataset.eternalSaveRenameToggle??"")}"]`);if(form){form.hidden=!form.hidden;if(!form.hidden){animateExpeditionPanel(form);form.querySelector<HTMLInputElement>("input")?.focus();}}return;}
+  const exportJourney=target.closest<HTMLButtonElement>("[data-eternal-save-export]");
+  if(exportJourney){const payload=exportEternalSave(exportJourney.dataset.eternalSaveExport??"");if(payload){const blob=new Blob([payload],{type:"application/json"});const url=URL.createObjectURL(blob);const link=document.createElement("a");link.href=url;link.download="merzkava-eternal-path-"+(exportJourney.dataset.eternalSaveExport??"journey")+".json";link.click();URL.revokeObjectURL(url);}return;}
+  if (target.closest("[data-eternal-end]")) { unloadEternalGame(); notice="Journey saved. You can load it again from Journey Manager."; render(); return; }
   const saveCopyButton = target.closest<HTMLButtonElement>("[data-save-copy]");
   if (saveCopyButton) {
     const message = activeChat.messages[Number(saveCopyButton.dataset.saveCopy)];
@@ -1032,9 +1050,29 @@ root.addEventListener("change", event => {
   }
 });
 
-root.addEventListener("submit", async (event: SubmitEvent) => {
+root.addEventListener("change", async event => {
+  const input=event.target;
+  if(!(input instanceof HTMLInputElement)||!input.matches("[data-eternal-import]")) return;
+  const file=input.files?.[0];if(!file) return;
+  try {
+    const id=importEternalSave(await file.text());
+    notice="Journey backup imported successfully.";
+    render();
+  } catch(error) {
+    notice=error instanceof Error?error.message:"Could not import this journey backup.";
+    render();
+  }
+});
+\nroot.addEventListener("submit", async (event: SubmitEvent) => {
   const form = event.target;
   if (!(form instanceof HTMLFormElement)) return;
+  if (form.matches("[data-eternal-rename-form]")) {
+    event.preventDefault();
+    const id=form.getAttribute("data-eternal-rename-form")??"";
+    const name=String(new FormData(form).get("name")??"");
+    if(renameEternalSave(id,name)){notice="Journey name updated.";render();}
+    return;
+  }
   if (form.id === "eternal-start-form") {
     event.preventDefault();
     const data = new FormData(form);
