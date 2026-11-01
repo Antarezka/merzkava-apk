@@ -567,3 +567,13 @@ Before implementing a new feature or changing an existing one:
 - **RNG boundary:** this resolver consumes explicit rolls and does not generate randomness. The offline game's auditable seeded RNG and save/replay policy remain separate implementation work.
 - **Foundation status:** 8 deterministic modules are implemented and CI-verified: HP, Satiety, Injury, Time/Day-left, Combat, Spirit Ring compatibility, Spirit Ring progression, and Martial Soul Awakening. This is not whole-game completion.
 - **Android Build #330:** targets the Awakening module code commit; APK packaging, verification, and Android 14 emulator smoke test remain in progress.
+
+
+### Offline-game implementation checkpoint — Economy formulas (2026-11-01)
+
+- Source: `core/10_ECONOMY_SYSTEM.md` at Universe pin `2f76a864150528afb0e3d26cb16f9396ce610ff6` (blob `0cc74b40d07ad8b2fe9fd2e4c37cdad1c0269456`).
+- Runtime: `economy-wallet.ts` and `economy-pricing.ts`; regression tests: 9.
+- Implements the five-currency conversion/normalization and unified item price formula, including tier, condition, effective scarcity, demand, distribution and local-market adjustments.
+- Extreme/custom scarcity and exceptional demand require evidence; disaster multiplier bands are validated separately and are not blindly stacked with seasonal scarcity.
+- Web App Validation #634 passed: 14 test files / 126 tests, TypeScript, gateway type-check, Vite build.
+- Nine deterministic modules are CI-verified. This is not whole-game completion; event/RNG orchestration, persistence, content traceability and other formula domains remain open.
