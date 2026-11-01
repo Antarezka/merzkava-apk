@@ -5,7 +5,7 @@
 - Audited: 2026-11-01
 - Universe source: `Antarezka/merzkava-universe` / `main` / `2f76a864150528afb0e3d26cb16f9396ce610ff6`
 - APK: `Antarezka/merzkava-apk` / `feature/archive-experience`; pre-documentation baseline `67c5186ffac266fde41ddf82fd2fd3042d412486`
-- Current app catalogue: **32 dossiers / 28 unique source paths**.
+- Current app catalogue: **39 dossiers / 35 unique source paths**.
 
 ## Phase 1 inventory
 
@@ -221,7 +221,7 @@
 ## Phase 1 exit checklist
 
 - [x] 140/140 source paths assigned a disposition.
-- [x] Existing 32 dossiers and 28 source paths reconciled.
+- [x] Existing 39 dossiers and 35 source paths reconciled.
 - [x] Stable-ID/public-only linking contract documented.
 - [x] AI start order and build caveat recorded.
 - [ ] Re-verify against current recursive Universe tree before expanding.
