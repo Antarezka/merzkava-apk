@@ -49,6 +49,7 @@ export interface ActionDurationInput {
     sufficientLogistics: boolean;
     checkpointsRecorded: boolean;
     interruptionsAccounted: boolean;
+    satietyAccountingVerified: boolean;
   };
 }
 
@@ -133,7 +134,8 @@ export function validateActionDuration(input: ActionDurationInput): ActionDurati
     conditions.safeStationaryLocation &&
     conditions.sufficientLogistics &&
     conditions.checkpointsRecorded &&
-    conditions.interruptionsAccounted;
+    conditions.interruptionsAccounted &&
+    conditions.satietyAccountingVerified;
 
   if (!verified) {
     return { allowed: false, maxMinutes: MAX_ORDINARY_ACTION_MINUTES, reason: "PURE_CULTIVATION_PREREQUISITES_NOT_ALL_VERIFIED." };
