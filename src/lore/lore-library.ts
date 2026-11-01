@@ -17,7 +17,7 @@ export interface LoreEntry {
 
 export const LORE_ENTRIES: LoreEntry[] = [
   {
-    id: "world-atlas", title: "Merzkava Universe", aliases: ["Merzkava", "Eastern Realms", "dunia Merzkava"],
+    id: "world-atlas", title: "Merzkava Universe", aliases: ["Merzkava", "dunia Merzkava"],
     visibility: "PUBLISHED",
     category: "WORLD", eyebrow: "WORLD DOSSIER · 00", summary: "Sebuah dunia luas yang tumbuh dari tiga pusat kekuasaan, jalur laut, wilayah liar, dan peradaban dengan sejarah yang belum seluruhnya terungkap.",
     paragraphs: [
@@ -41,7 +41,7 @@ export const LORE_ENTRIES: LoreEntry[] = [
     sourcePath: "world/GOLDEN_DRAGON_EMPIRE_ADMINISTRATIVE_ATLAS.md", sourceLabel: "Golden Dragon Administrative Atlas"
   },
   {
-    id: "tianhai", title: "Tianhai Yunzhou", aliases: ["Yunzhou", "Pulau Terapung", "Yunmeng Sea", "Cangqiong Harbor", "Tianji Core"],
+    id: "tianhai", title: "Tianhai Yunzhou", aliases: ["Yunzhou", "Pulau Terapung", "Cangqiong Harbor", "Tianji Core"],
     visibility: "PUBLISHED",
     category: "POWERS", eyebrow: "SOUTHWESTERN MARITIME POWER · 02", summary: "Kekuasaan maritim yang berpusat pada pulau raksasa terapung di atas Yunmeng Sea, terkenal dengan pelayaran, perdagangan, pendidikan, dan tradisi Arcanistry.",
     paragraphs: [
@@ -53,7 +53,7 @@ export const LORE_ENTRIES: LoreEntry[] = [
     sourcePath: "world/REGION_TIANHAI_YUNZHOU.md", sourceLabel: "Tianhai Yunzhou Regional Dossier"
   },
   {
-    id: "beiming", title: "Beiming Gu", aliases: ["Beiming", "Frostmirror Sea", "Beiming Heartland"],
+    id: "beiming", title: "Beiming Gu", aliases: ["Beiming"],
     visibility: "PUBLISHED",
     category: "POWERS", eyebrow: "NORTHERN POWER · 03", summary: "Kekuasaan utara yang terlindungi pegunungan dan iklim ekstrem, dengan warisan spiritual serta lingkungan alam yang keras.",
     paragraphs: [
@@ -149,7 +149,7 @@ export const LORE_ENTRIES: LoreEntry[] = [
     sourcePath: "world/FACTIONS.md", sourceLabel: "Factions & Organizations"
   },
   {
-    id: "artifacts", title: "Artifacts & Relics", aliases: ["Ancient Artifacts", "Artificial Artifacts", "Relic", "artefak kuno", "artefak buatan"],
+    id: "artifacts", title: "Artifacts & Relics", aliases: ["Ancient Artifacts", "Artificial Artifact", "Artificial Artifacts", "Relic", "artefak kuno", "artefak buatan"],
     visibility: "PUBLISHED",
     category: "ARCHIVES", eyebrow: "OBJECTS OF INTEREST · 11", summary: "Benda peninggalan peradaban lampau dan artefak buatan yang memiliki sejarah, fungsi, serta asal-usul berbeda.",
     paragraphs: [
@@ -160,7 +160,7 @@ export const LORE_ENTRIES: LoreEntry[] = [
     sourcePath: "world/ARTIFACTS_AND_RELICS.md", sourceLabel: "Artifacts & Relics"
   },
   {
-    id: "arcanistry", title: "Arcanistry & the Art of Making", aliases: ["Arcanist", "Arcanistry", "Artificial Artifact"],
+    id: "arcanistry", title: "Arcanistry & the Art of Making", aliases: ["Arcanist", "Arcanistry"],
     visibility: "PUBLISHED",
     category: "CULTURE", eyebrow: "KNOWLEDGE & CRAFT · 13", summary: "Tradisi keilmuan dan teknologi artefak yang berakar di Tianhai Yunzhou dan berkembang melalui pertukaran pengetahuan.",
     paragraphs: [
@@ -280,7 +280,7 @@ export const LORE_ENTRIES: LoreEntry[] = [
     sourcePath: "regions/beiming-gu/npcs/BEIMING_XENHWA.md", sourceLabel: "Beiming Xenhwa · Canonical NPC Profile"
   },
   {
-    id: "floating-island-artifact", title: "Floating Island Support System", aliases: ["Tier 9 Artificial Artifact", "Floating Island Support Artifact", "Tianhai floating island"],
+    id: "floating-island-artifact", title: "Floating Island Support Artifact", aliases: ["Tianhai floating island"],
     visibility: "PUBLISHED",
     category: "ARCHIVES", eyebrow: "ARTIFICIAL ARTIFACT · OBJECT FILE", summary: "Artefak buatan yang menopang keberadaan pulau terapung Tianhai Yunzhou.",
     paragraphs: [
@@ -304,7 +304,7 @@ export const LORE_ENTRIES: LoreEntry[] = [
 
 
   {
-    id: "black-tide-expanse", title: "Black Tide Expanse", aliases: ["Black Tide Expanse"],
+    id: "black-tide-expanse", title: "Black Tide Expanse", aliases: [],
     visibility: "PUBLISHED",
     category: "GEOGRAPHY", eyebrow: "LAWLESS MARITIME REGION · 14", summary: "Kawasan pulau-pulau terpencil dan jalur laut di luar kendali langsung Tianhai Yunzhou.",
     paragraphs: [
@@ -359,7 +359,7 @@ export const LORE_ENTRIES: LoreEntry[] = [
     sourcePath: "world/WANLUO_SACRED_EXPANSE.md", sourceLabel: "Wanluo Sacred Expanse"
   },
   {
-    id: "ordo-suci-tianming", title: "Ordo Suci Tianming", aliases: ["Ordo"],
+    id: "ordo-suci-tianming", title: "Ordo Suci Tianming", aliases: [],
     visibility: "PUBLISHED",
     category: "FACTIONS", eyebrow: "WORLD RELIGIOUS ORGANIZATION · 19", summary: "Organisasi keagamaan terbesar berdasarkan jumlah pengikut, dengan mandat pelayanan spiritual dan deteksi dini ancaman dunia.",
     paragraphs: [
