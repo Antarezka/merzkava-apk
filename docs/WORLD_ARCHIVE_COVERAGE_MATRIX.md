@@ -2,6 +2,8 @@
 
 > AI/developer handoff baseline. This matrix covers every Markdown path in the pinned Universe tree. A disposition is a handling decision, **not** publication permission.
 
+> **Product boundary:** World Archive is the reviewed local content/reference layer in the same APK as Convo and Offline Game. Convo reads canon directly from `merzkava-universe`; Offline Game consumes only an approved, versioned Archive package. This matrix's player-facing coverage percentage is not the Offline Game's implementation percentage or package approval status.
+
 - Audited: 2026-11-01
 - Universe source: `Antarezka/merzkava-universe` / `main` / `2f76a864150528afb0e3d26cb16f9396ce610ff6`
 - APK: `Antarezka/merzkava-apk` / `feature/archive-experience`; pre-documentation baseline `67c5186ffac266fde41ddf82fd2fd3042d412486`
