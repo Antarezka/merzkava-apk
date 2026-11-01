@@ -869,3 +869,40 @@ button {color:inherit;} button:focus-visible {outline-color:#a68d5e;}
 .lore-source-scope-note{margin:14px 0 22px;padding:12px 14px;border-left:2px solid #b98953;background:#282119;color:#c5bbae;font-size:11px;line-height:1.75}
 .lore-source-section-title{margin:22px 0 12px;color:#d19a61;font:600 10px Cinzel,Georgia,serif;letter-spacing:.14em}
 .lore-source-return{margin-top:18px}
+
+
+:root[data-theme="light"] .lore-source-reader .lore-paragraph,
+:root[data-theme="light"] .lore-source-reader .lore-source-reader-lede,
+:root[data-theme="light"] .lore-source-reader .lore-lede {
+  color: #493326;
+  -webkit-text-stroke: .12px #493326;
+}
+:root[data-theme="light"] .lore-source-reader .lore-paragraph-mark {
+  color: #8a603b;
+}
+:root[data-theme="light"] .lore-source-reader .lore-source-scope-note {
+  border-left-color: #98734e;
+  background: #e2d6c2;
+  color: #624a38;
+}
+:root[data-theme="light"] .lore-source-reader .lore-source-metadata strong {
+  color: #f1e6d9;
+}
+:root[data-theme="light"] .lore-source-reader .lore-source-metadata code {
+  color: #e1c7a7;
+}
+:root[data-theme="light"] .lore-source-reader .lore-source-metadata small {
+  color: #d3c5b4;
+}
+:root[data-theme="light"] .lore-source-reader .lore-source-section-title {
+  color: #80502d;
+}
+:root[data-theme="light"] .lore-source-reader .lore-inline-link {
+  color: #80502d;
+  border-bottom-color: #9b7049;
+}
+:root[data-theme="light"] .lore-source-open {
+  border-color: #98734e;
+  background: #e2d6c2;
+  color: #60452f;
+}
