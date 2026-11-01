@@ -1,4 +1,4 @@
-export type LoreCategory = "WORLD" | "POWERS" | "GEOGRAPHY" | "HISTORY" | "PEOPLES" | "FACTIONS" | "ARCHIVES" | "BEASTS" | "CULTURE";
+export type LoreCategory = "WORLD" | "POWERS" | "GEOGRAPHY" | "HISTORY" | "PEOPLES" | "FACTIONS" | "ARCHIVES";
 
 export type LoreVisibility = "PUBLISHED" | "REVIEW_REQUIRED" | "GM_ONLY";
 
@@ -13,9 +13,12 @@ export interface LoreEntry {
   paragraphs: string[];
   sourcePath: string;
   sourceLabel: string;
+  sourceCommit: string;
+  reviewedAt: string;
+  crossReferenceIds: string[];
 }
 
-export const LORE_ENTRIES: LoreEntry[] = [
+const LORE_ENTRY_DRAFTS: Omit<LoreEntry, "sourceCommit" | "reviewedAt" | "crossReferenceIds">[] = [
   {
     id: "world-atlas", title: "Merzkava Universe", aliases: ["Merzkava", "dunia Merzkava"],
     visibility: "PUBLISHED",
@@ -271,10 +274,10 @@ export const LORE_ENTRIES: LoreEntry[] = [
   {
     id: "beiming-xenhwa", title: "Beiming Xenhwa", aliases: ["北冥玄华"],
     visibility: "PUBLISHED",
-    category: "PEOPLES", eyebrow: "BEIMING GU · CHARACTER FILE", summary: "Putri angkat Beiming Han, berusia 17 tahun, dengan garis keturunan half-beast rubah berekor sembilan putih.",
+    category: "PEOPLES", eyebrow: "BEIMING GU · CHARACTER FILE", summary: "Putri angkat Beiming Han, seorang half-beast dengan ciri rubah berekor sembilan putih.",
     paragraphs: [
       "Beiming Xenhwa tercatat sebagai putri angkat Beiming Han dan merupakan half-beast dengan ciri white nine-tailed fox.",
-      "Profil resmi membedakan api putih miliknya dari api biru milik Beiming Han. Afiliasinya adalah Beiming Gu, tetapi keberadaan fisiknya saat ini tidak boleh ditebak.",
+      "Afiliasinya adalah Beiming Gu, tetapi keberadaan fisiknya saat ini tidak boleh ditebak.",
       "Detail kemampuan, batas pribadi, dan hubungan lain harus mengikuti profil lengkapnya."
     ],
     sourcePath: "regions/beiming-gu/npcs/BEIMING_XENHWA.md", sourceLabel: "Beiming Xenhwa · Canonical NPC Profile"
@@ -299,7 +302,7 @@ export const LORE_ENTRIES: LoreEntry[] = [
       "Menara ini tidak dimiliki oleh satu keluarga atau organisasi. Administrasi, perlindungan, pemeliharaan, dan studi yang diizinkan memiliki pembagian tanggung jawab tersendiri.",
       "Asal-usul lengkap, mekanisme, dan seluruh kemampuan relik tidak boleh diasumsikan hanya dari statusnya sebagai peninggalan ilahi."
     ],
-    sourcePath: "world/RUINED_ARCHIVER.md", sourceLabel: "Ruined Archiver & World Knowledge Tower"
+    sourcePath: "world/WANLUO_SACRED_EXPANSE.md", sourceLabel: "Wanluo Sacred Expanse & World Knowledge Tower"
   },
   {
     id: "black-tide-expanse", title: "Black Tide Expanse", aliases: [],
@@ -381,10 +384,45 @@ export const LORE_ENTRIES: LoreEntry[] = [
 
 ];
 
+const ARCHIVE_SOURCE_COMMIT = "2f76a864150528afb0e3d26cb16f9396ce610ff6";
+const ARCHIVE_REVIEWED_AT = "2026-11-01";
+
+export const LORE_ENTRIES: LoreEntry[] = LORE_ENTRY_DRAFTS.map(entry => ({
+  ...entry,
+  sourceCommit: ARCHIVE_SOURCE_COMMIT,
+  reviewedAt: ARCHIVE_REVIEWED_AT,
+  crossReferenceIds: []
+}));
+
+function hasLoreReference(text: string, label: string): boolean {
+  const lowerText = text.toLocaleLowerCase();
+  const lowerLabel = label.toLocaleLowerCase();
+  const wordLike = /[\\p{L}\\p{N}_]/u;
+  let cursor = 0;
+  while (cursor < lowerText.length) {
+    const index = lowerText.indexOf(lowerLabel, cursor);
+    if (index < 0) return false;
+    const before = index > 0 ? text[index - 1] : "";
+    const after = text[index + label.length] ?? "";
+    if (!((before && wordLike.test(before) && wordLike.test(label[0])) ||
+          (after && wordLike.test(after) && wordLike.test(label[label.length - 1])))) return true;
+    cursor = index + 1;
+  }
+  return false;
+}
+
+for (const entry of LORE_ENTRIES) {
+  const articleText = entry.summary + " " + entry.paragraphs.join(" ");
+  entry.crossReferenceIds = LORE_ENTRIES
+    .filter(candidate => candidate.visibility === "PUBLISHED" && candidate.id !== entry.id)
+    .filter(candidate => [candidate.title, ...candidate.aliases].some(label => hasLoreReference(articleText, label)))
+    .map(candidate => candidate.id);
+}
+
 const CATEGORY_LABELS: Record<LoreCategory | "ALL", string> = {
   ALL: "All files", WORLD: "World", POWERS: "Powers", GEOGRAPHY: "Geography",
   HISTORY: "History", PEOPLES: "Peoples", FACTIONS: "Factions",
-  ARCHIVES: "Archives", BEASTS: "Bestiary", CULTURE: "Culture"
+  ARCHIVES: "Archives"
 };
 
 export function getPublicLoreEntries(): LoreEntry[] {
@@ -408,7 +446,9 @@ function escapeLore(value: string): string {
 }
 
 function loreLinks(text: string, currentId: string): string {
-  const references = getPublicLoreEntries().filter(entry => entry.id !== currentId)
+  const currentEntry = getPublicLoreEntries().find(entry => entry.id === currentId);
+  const crossReferences = new Set(currentEntry?.crossReferenceIds ?? []);
+  const references = getPublicLoreEntries().filter(entry => crossReferences.has(entry.id))
     .flatMap(entry => [
       { label: entry.title, id: entry.id, priority: 2 },
       ...entry.aliases.map(label => ({ label, id: entry.id, priority: 1 }))
@@ -468,24 +508,31 @@ export function renderLoreResults(): string {
 }
 
 function renderLoreDetail(entry: LoreEntry): string {
+  const relatedRecords = entry.crossReferenceIds
+    .map(id => getPublicLoreEntries().find(item => item.id === id))
+    .filter((item): item is LoreEntry => Boolean(item))
+    .slice(0, 5);
   return '<article class="lore-detail">' +
     '<button class="lore-back" type="button" data-lore-back>← ARCHIVE INDEX</button>' +
     '<div class="lore-detail-top"><span>' + escapeLore(entry.eyebrow) + '</span><span>LOCAL DOSSIER</span></div>' +
     '<h2>' + escapeLore(entry.title) + '</h2>' +
     '<p class="lore-lede">' + loreLinks(entry.summary, entry.id) + '</p>' +
     entry.paragraphs.map((paragraph, index) => '<p class="lore-paragraph"><span class="lore-paragraph-mark">' + String(index + 1).padStart(2, "0") + '</span><span>' + loreLinks(paragraph, entry.id) + '</span></p>').join("") +
-    '<div class="lore-source-card"><span class="lore-source-kicker">CANON REFERENCE</span><strong>' + escapeLore(entry.sourceLabel) + '</strong><code>' + escapeLore(entry.sourcePath) + '</code><small>Arsip lokal ini adalah ringkasan lore untuk dibaca. Aturan dan resolusi gameplay tetap merujuk snapshot canon Merzkava Universe.</small></div>' +
+    '<div class="lore-source-card"><span class="lore-source-kicker">CANON REFERENCE</span><strong>' + escapeLore(entry.sourceLabel) + '</strong><code>' + escapeLore(entry.sourcePath) + '</code><small>Reviewed ' + escapeLore(entry.reviewedAt) + ' · Universe snapshot ' + escapeLore(entry.sourceCommit.slice(0, 7)) + '. Arsip lokal ini adalah ringkasan lore; aturan dan resolusi gameplay tetap merujuk repo canon.</small></div>' +
     '<div class="lore-related"><span class="lore-source-kicker">RELATED RECORDS</span>' +
-    getPublicLoreEntries().filter(item => item.id !== entry.id && (entry.paragraphs.join(" ") + " " + entry.summary).toLocaleLowerCase().includes(item.title.toLocaleLowerCase())).slice(0, 5).map(item => '<button type="button" data-lore-open="' + item.id + '">' + escapeLore(item.title) + ' <b>↗</b></button>').join("") +
+    relatedRecords.map(item => '<button type="button" data-lore-open="' + item.id + '">' + escapeLore(item.title) + ' <b>↗</b></button>').join("") +
     '</div></article>';
 }
 
 export function renderLoreLibrary(): string {
   const active = activeLoreId ? getPublicLoreEntries().find(entry => entry.id === activeLoreId) : null;
   if (active) return renderLoreDetail(active);
-  const categories = (Object.keys(CATEGORY_LABELS) as Array<keyof typeof CATEGORY_LABELS>).map(category =>
-    '<button type="button" class="lore-category ' + (activeLoreCategory === category ? "is-active" : "") + '" data-lore-category="' + category + '">' + CATEGORY_LABELS[category] + '</button>'
-  ).join("");
+  const publicEntries = getPublicLoreEntries();
+  const categories = (Object.keys(CATEGORY_LABELS) as Array<keyof typeof CATEGORY_LABELS>)
+    .filter(category => category === "ALL" || publicEntries.some(entry => entry.category === category))
+    .map(category =>
+      '<button type="button" class="lore-category ' + (activeLoreCategory === category ? "is-active" : "") + '" data-lore-category="' + category + '">' + CATEGORY_LABELS[category] + '</button>'
+    ).join("");
   return '<section class="lore-hero">' +
     '<div class="lore-hero-copy"><span class="lore-overline">MERZKAVA UNIVERSE · INTELLIGENCE ARCHIVE</span><h2>WORLD<br><em>ARCHIVE.</em></h2><p>Catatan tentang dunia, wilayah, bangsa, organisasi, dan kisah yang membentuk Merzkava.</p><div class="lore-hero-stamp"><span>LOCAL LIBRARY</span><b>FIELD NOTES · 001</b></div></div>' +
     '<div class="lore-hero-seal" aria-hidden="true"><span>✧</span><small>THE<br>KNOWN<br>WORLD</small></div>' +
