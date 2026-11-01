@@ -7,6 +7,7 @@ describe("Eternal Path Expedition Interface", () => {
     const html = renderExpeditionInterface([]);
     expect(html).toContain('class="expedition-environment"');
     expect(html).toContain("ENVIRONMENT · PREVIEW");
+    expect(html).toContain('class="expedition-fog-layer"');
     expect(html).toContain('id="expedition-character"');
     expect(html).toContain("GAMEPLAY SYSTEMS NOT YET ACTIVE");
     expect(html).toContain("<strong>—</strong>");
@@ -16,7 +17,6 @@ describe("Eternal Path Expedition Interface", () => {
     const character = { id: "local-1", name: "Nafila" } as Character;
     const html = renderExpeditionInterface([character]);
     expect(html).toContain('<option value="local-1">Nafila</option>');
-    expect(html).toContain("Offline Game save data and progression are not connected yet.");
     expect(html).toContain("Offline Game save data and progression are not connected yet.");
   });
 });
