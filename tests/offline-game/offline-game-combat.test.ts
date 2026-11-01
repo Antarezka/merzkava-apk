@@ -7,7 +7,7 @@ import {
   canResolveDefaultComboFollowup,
   getComboFollowupBaseDamagePercent,
   resolveD100Hit
-} from "../src/offline-game/mechanics/combat";
+} from "../../src/offline-game/mechanics/combat";
 
 describe("offline-game canon combat formulas", () => {
   it("calculates Combat Rating from PowerScale and one readiness factor", () => {

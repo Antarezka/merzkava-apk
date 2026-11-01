@@ -5,7 +5,7 @@ import {
   getFallbackSeason,
   getSpiritRingDayLeft,
   validateActionDuration
-} from "../src/offline-game/mechanics/time";
+} from "../../src/offline-game/mechanics/time";
 
 describe("offline-game canon time and cooldown rules", () => {
   it("uses the official four three-month seasons", () => {

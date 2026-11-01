@@ -7,7 +7,7 @@ import {
   getForcedAbsorptionMultiplier,
   getForcedAbsorptionRisk,
   getQiState
-} from "../src/offline-game/mechanics/spirit-ring-progression";
+} from "../../src/offline-game/mechanics/spirit-ring-progression";
 
 describe("canon Spirit Ring progression formulas", () => {
   it("calculates geometric compatibility, total ring age, and PowerScale", () => {

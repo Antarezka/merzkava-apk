@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { reconcileGMProposal } from "../src/engine/state-reconciliation";
-import type { GMProposal } from "../src/engine/gm-engine";
-import type { ParsedCharacterProfile, ProfileField } from "../src/engine/profile-parser";
+import { reconcileGMProposal } from "../../src/convo/engine/state-reconciliation";
+import type { GMProposal } from "../../src/convo/engine/gm-engine";
+import type { ParsedCharacterProfile, ProfileField } from "../../src/convo/engine/profile-parser";
 
 const profileFields: Record<ProfileField, string> = {
   "Nama": "Yuha",

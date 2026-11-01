@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { normalizeCopper, walletToCopper } from "../src/offline-game/mechanics/economy-wallet";
-import { calculateItemPrice, disasterMultiplierAllowed } from "../src/offline-game/mechanics/economy-pricing";
+import { normalizeCopper, walletToCopper } from "../../src/offline-game/mechanics/economy-wallet";
+import { calculateItemPrice, disasterMultiplierAllowed } from "../../src/offline-game/mechanics/economy-pricing";
 
 describe("canon five-currency wallet arithmetic", () => {
   it("normalizes every official denomination without changing value", () => {

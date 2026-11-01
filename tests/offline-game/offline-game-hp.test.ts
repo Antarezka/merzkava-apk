@@ -4,7 +4,7 @@ import {
   initializeHpState,
   updateHpMaximum,
   type HpState
-} from "../src/offline-game/mechanics/hp";
+} from "../../src/offline-game/mechanics/hp";
 
 describe("offline-game canon HP module", () => {
   it("uses the exact official maximum HP table for every Spirit Realm and Stage", () => {

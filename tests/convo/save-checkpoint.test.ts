@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildSaveCheckpointPrompt } from "../src/engine/save-checkpoint";
+import { buildSaveCheckpointPrompt } from "../../src/convo/engine/save-checkpoint";
 
 describe("Merzkava Save checkpoint prompt", () => {
   it("uses the canonical Merzkava profile order and preserves the gameplay transcript", () => {

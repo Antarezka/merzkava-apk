@@ -3,7 +3,7 @@ import {
   calculateArtificialArtifactCondition, getArtificialArtifactExperiencePoints,
   getArtifactProductionPlan, getBaselineProductionChance, getFocusTrainingPlan,
   validateArcanistGradeOneAward, validateFocusStageAward
-} from "../src/offline-game/mechanics/arcanistry";
+} from "../../src/offline-game/mechanics/arcanistry";
 
 describe("Arcanistry canon formulas", () => {
   it("matches all 100 baseline grade/tier cells", () => {

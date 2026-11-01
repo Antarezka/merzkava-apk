@@ -4,7 +4,7 @@ import {
   isAwakeningAgeEligible,
   resolveMartialSoulMutation,
   resolveMartialSoulRarityDraw
-} from "../src/offline-game/mechanics/martial-soul-awakening";
+} from "../../src/offline-game/mechanics/martial-soul-awakening";
 
 describe("canon Martial Soul awakening protocol", () => {
   it.each([

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { selectTrustedProfileBaseline } from "../src/engine/profile-baseline";
-import type { ProfileField } from "../src/engine/profile-parser";
+import { selectTrustedProfileBaseline } from "../../src/convo/engine/profile-baseline";
+import type { ProfileField } from "../../src/convo/engine/profile-parser";
 
 const values: Record<ProfileField, string> = {
   "Nama": "Yuha",

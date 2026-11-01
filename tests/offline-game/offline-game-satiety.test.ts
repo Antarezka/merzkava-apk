@@ -5,7 +5,7 @@ import {
   displaySatiety,
   getMissedMealMultiplier,
   getPortionSatietyGain
-} from "../src/offline-game/mechanics/satiety";
+} from "../../src/offline-game/mechanics/satiety";
 
 describe("offline-game canon Satiety interval engine", () => {
   it("uses the official awake-time base rates for Mortal through Spirit Primordial", () => {

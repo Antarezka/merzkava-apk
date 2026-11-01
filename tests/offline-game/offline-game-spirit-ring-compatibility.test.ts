@@ -3,7 +3,7 @@ import {
   calculateAgePressure,
   calculateAbsorptionFormulas,
   calculateAnomalousWorldRejection
-} from "../src/offline-game/mechanics/spirit-ring-compatibility";
+} from "../../src/offline-game/mechanics/spirit-ring-compatibility";
 
 describe("canon Spirit Ring compatibility and absorption formulas", () => {
   it("calculates age pressure and EAG from actual Beast age and recipient Spirit Realm", () => {

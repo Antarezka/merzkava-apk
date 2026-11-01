@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { calculateInjuryRecovery } from "../src/offline-game/mechanics/injury";
+import { calculateInjuryRecovery } from "../../src/offline-game/mechanics/injury";
 
 describe("canon injury recovery", () => {
   it("uses natural Class I and II rates proportionally", () => {

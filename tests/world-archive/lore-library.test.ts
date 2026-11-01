@@ -16,7 +16,7 @@ import {
   renderLoreResults,
   resolveLoreEntry,
   setLoreSearch
-} from "../src/lore/lore-library";
+} from "../../src/world-archive/lore-library";
 
 afterEach(() => {
   closeLoreEntry();
