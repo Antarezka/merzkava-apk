@@ -318,5 +318,5 @@ The existing catalogue derives each dossier's outbound `crossReferenceIds` from 
 - Runtime modules: `src/offline-game/mechanics/spirit-ring-compatibility.ts` and `spirit-ring-progression.ts`; 15 focused tests.
 - Implements age pressure/EAG, Sync cap, eligible-only success/defect formulas, AWR, geometric compatibility, AgeTotal/PowerScale, Qi, ring eligibility, deviation HP loss, multipliers, and risk classification.
 - Web App Validation #600 passed on commit `9799378bddcd7bafb775ec37ed49b550ec014bf5`: 12 test files / 91 tests, TypeScript, gateway type-check, Vite build.
-- Foundation now **7 deterministic modules CI-verified** (HP, Satiety, Injury, Time/Day-left, Combat, Spirit Ring compatibility, Spirit Ring progression). This is not a whole-game completion percentage.
+- Foundation now **8 deterministic modules CI-verified** (HP, Satiety, Injury, Time/Day-left, Combat, Spirit Ring compatibility, Spirit Ring progression). This is not a whole-game completion percentage.
 - Android Build #327 package/signature verification passed; Android 14 emulator installation/smoke test is still running.
