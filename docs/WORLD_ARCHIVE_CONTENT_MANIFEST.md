@@ -760,3 +760,22 @@ The subsequent claim-level review tightened Beiming Xenhwa's public entry furthe
 - Validation on commit `97f04c199bb385abeeefb068aad08125f3f63a6c`: **27/27 tests pass**, TypeScript/gateway type-check and Vite production build pass.
 - Full npm audit: **0 vulnerabilities**. Production-only audit: **0 vulnerabilities**.
 - Android build `275`, source `6c64df88df589bcf832f4f1709eb2822569a0ec5`, expected version `v.1.01.275-6c6`: build/signature/emulator result pending. This is the current candidate APK build; it supersedes the earlier in-progress/cancelled intermediate runs.
+
+
+### Final APK 275 — build and emulator smoke test passed
+
+<badge>Run: 41259241219</badge>
+
+- **Result:** workflow completed successfully.
+- **Source commit:** `6c64df88df589bcf832f4f1709eb2822569a0ec5`.
+- **Version:** `v.1.01.275-6c6`; Android `versionCode=275`; package `com.antarezka.merzkava`.
+- **APK file size:** 25,753,633 bytes.
+- **APK SHA-256:** `c17795990a4f2839827ff2de733964f8d250bd93701e8c58800065382ee844d5`.
+- ZIP alignment and v2 APK signature verification passed; signing certificate uses RSA 4096-bit key. The verifier also emitted a non-blocking warning that `META-INF/com/android/build/gradle/app-metadata.properties` is not protected by the APK signature; this is recorded rather than silently ignored.
+- Transparent Kitty launcher icon generation passed. The launcher-icon generator uses the Kitty body artwork without the separate shadow layer; splash assets and animation checks also passed.
+- Android 14 emulator test passed: APK installed, `MainActivity` drew its real app window (attempt 6), app process remained available, and early/mid Kitty splash frames were captured at 1080×1920.
+- The initial ActivityManager launch wait timed out, but the smoke script continued to inspect the actual activity and first-draw state; the real window appeared and the install-and-launch test passed.
+- APK artifact: [`merzkava-debug-apk`](https://github.com/Antarezka/merzkava-apk/actions/runs/41259241219/artifacts/13065080211) (15,012,515-byte artifact archive).
+- Emulator diagnostics: [`merzkava-emulator-diagnostics`](https://github.com/Antarezka/merzkava-apk/actions/runs/41259241219/artifacts/13064489199) (216,953 bytes).
+
+**Final disposition:** the 32-dossier offline Archive corpus, visibility filter, source provenance, and cross-reference graph are included in this APK candidate. The latest build is green through compilation, signing, package verification, installation, MainActivity first draw, and splash capture.
