@@ -20,7 +20,7 @@ import { getLedgerLog, initializeLedgerNotifications, showLedgerProposalBubble }
 import { startFloatingMode, requestFloatingOverlayPermission, getFloatingReadiness, requestFloatingNotifications, requestFloatingBatteryExemption, showFloatingBubble, stopFloatingService, type FloatingReadiness } from "./native/floating-window";
 import { floatingControlMarkup } from "./app/floating-control";
 import { animateOpeningSplash } from "./ui/splash-animation";
-import { closeLoreEntry, closeLoreSource, openLoreEntry, openLoreSource, setLoreCategory, setLoreSearch, renderLoreResults } from "./lore/lore-library";
+import { closeLoreEntry, closeLoreSource, closeLorePlaceholder, openLoreEntry, openLoreSource, openLorePlaceholder, setLoreCategory, setLoreSearch, renderLoreResults } from "./lore/lore-library";
 
 const app = document.querySelector<HTMLDivElement>("#app");
 if (!app) throw new Error("App root element was not found.");
@@ -884,6 +884,16 @@ root.addEventListener("click", async (event: MouseEvent) => {
       notice = "";
       render();
     }
+    return;
+  }
+  const lorePlaceholderOpen = target.closest<HTMLElement>("[data-lore-placeholder-open]");
+  if (lorePlaceholderOpen?.dataset.lorePlaceholderOpen) {
+    if (openLorePlaceholder(lorePlaceholderOpen.dataset.lorePlaceholderOpen)) render();
+    return;
+  }
+  if (target.closest("[data-lore-placeholder-back]")) {
+    closeLorePlaceholder();
+    render();
     return;
   }
   const loreSourceOpen = target.closest<HTMLElement>("[data-lore-source-open]");
