@@ -840,3 +840,16 @@ This update changes only the APK repository. It does not modify the official Uni
 ### Formula domains preserved
 
 Spirit Beast age/interval rules; economy and item pricing/scarcity; Arcanist progression, production chance and artifact condition; cultivation and progression gates; academy education constraints; HP; Satiety/metabolism; injury recovery; Martial Soul awakening, rarity, assessment and mutation; Soul-Nyuma/Soul-Zoun doctrinal boundaries; Spirit Ring age pressure, compatibility, Sync, absorption, defects, AWR, Qi and PowerScale; universal tier appraisal; combat rating/hit/damage/defense; time advancement and `Day left`; travel encounter, ambush and rescue probabilities; and the supplemental imperial regional funding allocation formula.
+
+
+### Offline-game code milestone — HP state foundation (2026-11-01)
+
+The first deterministic mechanic module has been added to the APK repository without changing the official Universe source:
+
+- Source: `core/HP_SYSTEM.md` at `2f76a864150528afb0e3d26cb16f9396ce610ff6`; upstream blob `efef616efa7ad9c44c81470da6dc52bddc813204`.
+- Code: `src/offline-game/mechanics/hp.ts`.
+- Tests: `tests/offline-game-hp.test.ts`.
+- Implemented behavior: exact maximum HP table, Mortal/0, session bootstrap semantics, unresolved-versus-dead distinction, HP validation, and no-auto-heal maximum reconciliation.
+- Validation: [Web App Validation #565](https://github.com/Antarezka/merzkava-apk/actions/runs/41305346595) passed, including the test and TypeScript/Vite build steps.
+- Explicitly not included: combat damage, healing rates, injury progression, save persistence, event logic, or UI integration. These require their own source/dependency audits and tests.
+- No Android APK build was produced by this validation run.
