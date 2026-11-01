@@ -26,7 +26,7 @@ describe("Eternal Path live world scene", () => {
     const initialLocation=getEternalSave()?.locationId;
     expect(initialLocation).toBe("gde-city");
     expect(getExpeditionScene().id).toBe("gde-city");
-    chooseEternalOption(0);
+    for(let index=0;index<5;index+=1) chooseEternalOption(0);
     expect(getExpeditionScene().id).not.toBe(getCurrentDialogue()?.sceneId);
 
     setEternalLocation("gde-market");
