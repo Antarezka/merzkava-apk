@@ -19,7 +19,7 @@ export function renderExpeditionInterface():string {
     <span class="scene-coordinate">${save? `DAY ${save.day} · ${String(save.hour).padStart(2,"0")}:${String(save.minute).padStart(2,"0")}`:"WORLD SCENE PREVIEW"}</span>
   </section>`;
   const startPanel=save?`<section class="expedition-character-panel expedition-profile-compact" aria-label="Your adventurer profile">
-    <div class="expedition-profile-identity"><div><span class="expedition-profile-kicker">YOUR ADVENTURER</span><h3 class="expedition-player-name">${escapeHtml(save.character.name)}</h3><p class="expedition-note">Age ${save.character.age} · ${escapeHtml(regionNames[scene.region])} · Day ${save.day}</p></div><span class="expedition-disposition" aria-label="Disposition">${escapeHtml(save.disposition.label.toUpperCase())}</span></div>
+    <div class="expedition-profile-identity"><div><span class="expedition-profile-kicker">YOUR ADVENTURER</span><h3 class="expedition-player-name">${escapeHtml(save.character.name)}</h3><p class="expedition-note">Age ${save.character.age} · ${escapeHtml(regionNames[scene.region])} · Day ${save.day}</p></div></div>
     <div class="expedition-profile-meta"><span>SPIRIT REALM <b>Not recorded</b></span><span>MARTIAL SOUL <b>Not recorded</b></span><span>SPIRIT RING <b>Not recorded</b></span><span>SYNC PROGRESS <b>Not recorded</b></span><span>ARCANIST GRADE <b>Not recorded</b></span><span>ARCANIST FOCUS <b>Not recorded</b></span><span>HP <b>Not recorded</b></span><span>SATIETY <b>Not recorded</b></span></div>
     <button type="button" class="text-button danger" data-eternal-end>End local journey</button></section>`
     :`<section class="expedition-character-panel"><div class="section-heading"><span>BEGIN A SEPARATE JOURNEY</span><small>OFFLINE · LOCAL SAVE</small></div><p class="expedition-note">This character is created for Eternal Path only. It does not import or alter Convo characters.</p>
@@ -44,6 +44,7 @@ export function renderExpeditionInterface():string {
   </div>`:"";
   return `<section class="expedition-page" aria-label="Merzkava Eternal Path"><header class="expedition-heading"><div><p class="eyebrow">STANDALONE</p><h2>✦ MERZKAVA: ETERNAL PATH</h2></div></header>
     ${sceneWindow}${startPanel}
+    ${save?`<div class="expedition-disposition-line"><span>DISPOSITION</span><strong>${escapeHtml(save.disposition.label)}</strong></div>`:""}
     ${story}${choiceModal}
     <footer class="expedition-footer"><span>ETERNAL PATH · LOCAL CONTENT PACK</span><span>WORLD ARCHIVE · READ ONLY</span></footer></section>`;
 }
