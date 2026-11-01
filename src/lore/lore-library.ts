@@ -504,6 +504,7 @@ export function setLoreCategory(value: string): void {
 }
 export function openLoreEntry(id: string): boolean {
   if (!getPublicLoreEntries().some(entry => entry.id === id)) return false;
+  activeLoreSourceId = null;
   activeLoreId = id;
   return true;
 }
@@ -517,6 +518,7 @@ export function getLoreSourceDisposition(id: string): "PUBLISHED" | "PARTIAL_PUB
 
 export function openLoreSource(id: string): boolean {
   if (!getPublicLoreEntries().some(entry => entry.id === id)) return false;
+  activeLoreId = id;
   activeLoreSourceId = id;
   return true;
 }
