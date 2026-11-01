@@ -35,7 +35,7 @@ export function animateOpeningSplash(splash: HTMLElement): () => void {
   }
 
   const particles: HTMLSpanElement[] = [];
-  for (let index = 0; index < 6; index += 1) {
+  for (let index = 0; index < 8; index += 1) {
     const particle = document.createElement("span");
     particle.className = "splash-spark";
     particle.setAttribute("aria-hidden", "true");
@@ -57,40 +57,40 @@ export function animateOpeningSplash(splash: HTMLElement): () => void {
 
   // A subtle contact shadow breathes with Kitty, grounding her on the splash stage.
   const bodyBreath = animate(body, {
-    scaleY: [1, 1.009], translateY: [0, -1.1], duration: 2850,
-    ease: "inOutSine", alternate: true, loop: true, delay: 1050
+    scaleY: [1, 1.014], translateY: [0, -1.8], rotate: [0, 0.22], duration: 2050,
+    ease: "inOutSine", alternate: true, loop: true, delay: 520
   });
   const shadowBreath = animate(shadow, {
-    scaleX: [1, 1.035], scaleY: [1, 0.975], opacity: [0.72, 0.9],
-    duration: 2850, ease: "inOutSine", alternate: true, loop: true, delay: 1050
+    scaleX: [1, 1.045], scaleY: [1, 0.965], opacity: [0.68, 0.92],
+    duration: 2050, ease: "inOutSine", alternate: true, loop: true, delay: 520
   });
   const headIdle = animate(head, {
-    rotate: [-0.38, 0.42], translateY: [0, -0.8], duration: 3650,
-    ease: "inOutSine", alternate: true, loop: true, delay: 1320
+    rotate: [-0.62, 0.78], translateY: [0, -1.35], translateX: [0.35, -0.35], duration: 2550,
+    ease: "inOutSine", alternate: true, loop: true, delay: 760
   });
   const tailSway = animate(tail, {
-    rotate: [-2.8, 3.6], duration: 2850,
-    ease: "inOutSine", alternate: true, loop: true, delay: 720
+    rotate: [-5.2, 5.8], translateY: [0, -1.4], duration: 1850,
+    ease: "inOutSine", alternate: true, loop: true, delay: 420
   });
   // A warm diagonal reflection travels from the wordmark down toward Kitty
   // and the same diagonal floor-shadow direction.
   const lightBreath = animate(lightRay, {
-    opacity: [0.12, 0.42, 0.18],
-    scale: [0.985, 1.035, 0.995],
-    translateX: [5, -4, 2],
-    duration: 4700, ease: "inOutSine", alternate: true, loop: true, delay: 650
+    opacity: [0.1, 0.48, 0.16],
+    scale: [0.975, 1.045, 0.99],
+    translateX: [7, -6, 2],
+    duration: 3400, ease: "inOutSine", alternate: true, loop: true, delay: 380
   });
   const wordmarkGlow = animate(title, {
-    opacity: [0.94, 1, 0.96],
-    duration: 4700, ease: "inOutSine", alternate: true, loop: true, delay: 650
+    opacity: [0.9, 1, 0.94],
+    duration: 3400, ease: "inOutSine", alternate: true, loop: true, delay: 380
   });
 
   const sparkAnimations = particles.map((particle, index) => animate(particle, {
-    opacity: [0, 0.42, 0],
-    scale: [0.65, 1, 0.65],
-    translateY: [5, -12],
-    duration: 3000 + (index % 3) * 450,
-    delay: index * 330,
+    opacity: [0, 0.5, 0],
+    scale: [0.5, 1.15, 0.65],
+    translateY: [7, -18],
+    duration: 2450 + (index % 4) * 280,
+    delay: index * 220,
     ease: "inOutSine",
     loop: true
   }));
