@@ -3,6 +3,7 @@ import {
   LORE_ENTRIES,
   closeLoreEntry,
   getPublicLoreEntries,
+  getLoreBacklinks,
   openLoreEntry,
   renderLoreLibrary,
   renderLoreResults,
@@ -69,6 +70,29 @@ describe("World Archive visibility and entity routing", () => {
     expect(renderLoreLibrary()).toContain('data-lore-open="black-tide-expanse"');
   });
 
+
+  it("makes every approved public entity mention clickable and exposes backlinks", () => {
+    const publicIds = new Set(getPublicLoreEntries().map(entry => entry.id));
+    for (const entry of getPublicLoreEntries()) {
+      expect(entry.crossReferenceIds.every(id => publicIds.has(id))).toBe(true);
+      expect(new Set(entry.crossReferenceIds).size).toBe(entry.crossReferenceIds.length);
+      expect(openLoreEntry(entry.id)).toBe(true);
+      const html = renderLoreLibrary();
+      for (const targetId of entry.crossReferenceIds) {
+        expect(html).toContain('data-lore-open="' + targetId + '"');
+      }
+      closeLoreEntry();
+    }
+
+    const tianhaiBacklinks = getLoreBacklinks("tianhai");
+    expect(tianhaiBacklinks.some(entry => entry.id === "world-atlas")).toBe(true);
+    expect(tianhaiBacklinks.every(entry => publicIds.has(entry.id))).toBe(true);
+    expect(getLoreBacklinks("not-a-public-dossier")).toEqual([]);
+
+    expect(openLoreEntry("tianhai")).toBe(true);
+    expect(renderLoreLibrary()).toContain('class="lore-related lore-backlinks"');
+    expect(renderLoreLibrary()).toContain('data-lore-open="world-atlas"');
+  });
 
   it("retains source provenance and valid cross-reference IDs on every dossier", () => {
     const publicIds = new Set(getPublicLoreEntries().map(entry => entry.id));
