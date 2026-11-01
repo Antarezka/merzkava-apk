@@ -100,6 +100,13 @@ export function startEternalGame(input:{name:string;age:number;region:EternalReg
   persist();
 }
 export function resetEternalGame(): void { save=null; try{localStorage.removeItem(SAVE_KEY);}catch{/* no-op */} }
+export function getRegionalDialogueCount(): number {
+  const current=getEternalSave();
+  if(!current) return ETERNAL_DIALOGUES.length;
+  return ETERNAL_DIALOGUES.filter(node =>
+    ETERNAL_SCENES.find(scene=>scene.id===node.sceneId)?.region===current.character.region
+  ).length;
+}
 export function getCurrentDialogue(): EternalDialogue | null {
   const current=getEternalSave(); if(!current) return null;
   const regionalEvents=ETERNAL_DIALOGUES.filter(node =>
