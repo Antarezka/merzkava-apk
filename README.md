@@ -6,13 +6,13 @@ Android-first hybrid roleplaying game for **Merzkava Universe**.
 
 **The master product roadmap is [docs/PRODUCT_ROADMAP.md](./docs/PRODUCT_ROADMAP.md).** It is the primary planning reference for the app's workstreams, existing-feature audit, priorities, progress checklist, and release gates.
 
-The app contains **two playable experiences in one APK**: (1) **Convo / AI GM**, which reads its active gameplay canon directly from the official [merzkava-universe](https://github.com/Antarezka/merzkava-universe) repository; and (2) **Offline Game** (working name), which uses the approved local **World Archive** content package as its world/content source and runs without AI or network access. World Archive is also browsable as an offline reference library. Archive content must never be silently injected into connected Convo context.
+The app contains **two playable experiences in one APK**: (1) **Convo / AI GM**, which reads its active gameplay canon directly from the official [merzkava-universe](https://github.com/Antarezka/merzkava-universe) repository; and (2) **Merzkava: Eternal Path** (current working title; a Life Simulation Text RPG), which uses the approved local **World Archive** content package as its world/content source and runs without AI or network access. World Archive is also browsable as an offline reference library. Archive content must never be silently injected into connected Convo context.
 
 ## Core architecture
 
 - **Convo / AI GM:** connected conversation experience; reads current pinned canon directly from `merzkava-universe` through the canon loader.
 - **World Archive:** reviewed, versioned local content library; browsable offline and the approved content source for Offline Game.
-- **Offline Game:** standalone local experience (working name); consumes an approved World Archive package and uses deterministic local mechanics without AI/network dependency.
+- **Merzkava: Eternal Path:** standalone Life Simulation Text RPG (current working title); consumes an approved World Archive package and uses deterministic local mechanics without AI/network dependency.
 - **Shared app foundation:** Android shell, navigation, UI components, assets, and app services shared by both experiences where appropriate.
 - **Separate mode state:** Convo and Offline Game keep distinct session/save state and source-version records; no implicit state or context crossover.
 - **Deterministic engine and local database:** validate mechanics and persist authoritative local state; SQLite remains the planned save store.
@@ -34,7 +34,7 @@ See [PROJECT_DIRECTIVES.md](./PROJECT_DIRECTIVES.md) for the working contract, [
 
 - **Convo / AI GM:** `src/convo/` — connected canon, character, auth, and GM runtime.
 - **World Archive:** [content manifest](./docs/world-archive/CONTENT_MANIFEST.md) and [coverage matrix](./docs/world-archive/COVERAGE_MATRIX.md).
-- **Offline Game:** [canonical formula snapshot](./docs/offline-game/CANON_FORMULA_SNAPSHOT.md); implementation lives in `src/offline-game/`.
+- **Merzkava: Eternal Path:** [content provenance contract](./docs/offline-game/CONTENT_PROVENANCE.md) and [canonical formula snapshot](./docs/offline-game/CANON_FORMULA_SNAPSHOT.md); implementation lives in `src/offline-game/`.
 - **Shared infrastructure:** `src/shared/`; app composition: `src/app/`.
 - **Tests:** grouped by system under `tests/`.
 
