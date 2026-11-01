@@ -5,7 +5,7 @@
 Merzkava APK is **one Android application with two playable experiences and one shared content/reference layer**:
 
 1. **Convo / AI GM** — connected roleplay. Its active gameplay canon is loaded directly from the official `Antarezka/merzkava-universe` repository using a pinned commit and the repository's `INDEX.md`/authority hierarchy.
-2. **Merzkava: Eternal Path** (current working title; Life Simulation Text RPG) — a standalone local game mode. Its world content and approved game-facing data are consumed from a versioned local **World Archive package**. It must be playable without AI or network access.
+2. **Merzkava: Eternal Path** (current working title; Life Simulation Text RPG) — a standalone local game mode. Its canon-backed world references come from a versioned local **World Archive package**; its adaptations and game-only additions live in a separate versioned Offline Game content pack. It must be playable without AI or network access.
 3. **World Archive** — the reviewed local content library inside the app. Users can browse it offline; its approved package is the content source consumed by Offline Game. It is not a hidden context source for Convo.
 
 The app shell, navigation, visual components, assets, and selected infrastructure may be shared. The modes themselves must remain clearly identified and isolated where state or authority differs.
@@ -27,7 +27,7 @@ Official merzkava-universe repository
 
 - Convo reads its active gameplay canon directly from the official Universe repository. It must not silently consume World Archive articles or package data as prompt context.
 - World Archive content is curated from the official Universe repository. It is a distribution/reference layer, not a competing canon repository.
-- Offline Game consumes only the approved, versioned World Archive package at runtime. It must not fetch raw Universe files or rely on live AI to fill missing content.
+- Offline Game consumes a shipped, versioned release package that pins the approved World Archive package plus its reviewed Offline Game content pack. The Archive supplies canon-backed world references; the game pack supplies game-facing adaptations and labelled original content. It must not fetch raw Universe files or rely on live AI to fill missing content.
 - If required content is absent, contradictory, private, GM-only, or unreviewed, block that feature and route the gap through Universe review → Archive curation → package release.
 - Deterministic formula implementations must retain traceability to the approved game-facing Archive data and the exact official source revision from which it was reviewed.
 
@@ -52,7 +52,7 @@ Official merzkava-universe repository
 ## Authority boundary
 
 - The official Universe repository is the ultimate authority for world canon and rules.
-- The approved World Archive package is the runtime content source for Offline Game; it cannot introduce facts that are absent from or conflict with its reviewed Universe sources.
+- The approved World Archive package is the runtime source for canon-backed world references. A separate, versioned Offline Game content pack may add gameplay adaptations and `IN_GAME_ORIGINAL` records, but cannot claim those records as Universe canon or contradict reviewed Universe sources.
 - The deterministic engine validates Offline Game mechanics and all authoritative local state changes. AI output in Convo is narration/proposal only and cannot directly write authoritative state.
 - The AI may suggest a purchase; it may not decide the authoritative price, grant the item, subtract currency, or write a save. The relevant engine validates the transaction before it is committed.
 
@@ -64,7 +64,7 @@ The Offline Game is based on the world documented by Merzkava Universe, but not 
 - `CANON_ADAPTATION` (displayed as **CANON ADAPTATION**): a canon concept translated into game-facing data; adaptation notes separate engine implementation fields from world facts.
 - `IN_GAME_ORIGINAL` (displayed as **IN-GAME ORIGINAL**): newly authored for Eternal Path gameplay; explicitly not official Universe canon.
 
-Every player-visible record has exactly one primary provenance label. The label remains visible in tooltips, details, Spirit Beast and Arcanistry views, Encyclopedia/Codex, search, and relevant notifications. Original content may expand gameplay but may not silently establish new Universe facts or contradict known canon. Canon-backed records retain Archive dossier IDs, exact Universe source paths, and source commit SHAs. The Offline Game package version/SHA remains separate from the Universe commit and Convo's active canon SHA.
+Every player-visible record has exactly one primary provenance label. The label remains visible in tooltips, details, Spirit Beast and Arcanistry views, Encyclopedia/Codex, search, and relevant notifications. Original content may expand gameplay but may not silently establish new Universe facts or contradict known canon. Canon-backed records retain Archive dossier IDs, exact Universe source paths, and source commit SHAs. The release manifest pins the Archive package version/SHA and Offline Game content-pack version/SHA separately from the Universe commit and Convo's active canon SHA.
 
 The game's current working title is **Merzkava: Eternal Path** and its category is **Life Simulation Text RPG**. BitLife and Solo Leveling are high-level design references only, not sources of world facts or proprietary content.
 
