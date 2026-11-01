@@ -19,7 +19,7 @@ There is **one master roadmap only**: this file, `docs/PRODUCT_ROADMAP.md`. Syst
 Merzkava APK is **one Android application containing two playable experiences and one shared content/reference layer**:
 
 1. **Convo / AI GM:** connected conversation roleplay. Its active gameplay canon is read directly from the official `Antarezka/merzkava-universe` repository through the pinned commit, `INDEX.md`, canon loader/router, and context assembler.
-2. **Offline Game (working name):** a standalone local game mode. Its world content, lore, places, people, events, choices, and approved game-facing reference data are sourced from the versioned, approved **World Archive package**. It must not depend on AI or a network connection to play.
+2. **Merzkava: Eternal Path** (current working title; **Life Simulation Text RPG**): a standalone local game mode. Its world content, lore, places, people, events, choices, and approved game-facing reference data are sourced from the versioned, approved **World Archive package**. It must not depend on AI or a network connection to play.
 3. **World Archive:** the in-app reviewed content library that users can browse offline and that supplies the approved content package consumed by Offline Game. It is not appended to Convo's AI GM prompt or used as Convo's canon loader.
 
 Both modes live in the same APK and may share app shell, navigation, visual components, and infrastructure. They must retain separate mode identity, save/session state, and source-version records; switching modes must not silently merge state or context.
@@ -196,13 +196,15 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 
 ---
 
-## 7. Workstream 5 — Standalone offline life/adventure game mode
+## 7. Workstream 5 — Merzkava: Eternal Path (Life Simulation Text RPG)
 
 <badge>DESIGN DEFINITION IN PROGRESS — IMPLEMENTATION NOT STARTED</badge>
 
+**Current game identity:** **Merzkava: Eternal Path** (working title). Category: **Life Simulation Text RPG**. It combines choice-driven character-life simulation with text-RPG exploration, quests, encounters, cultivation, and long-term progression.
+
 **Goal:** Build the Offline Game as the second playable experience inside this same APK. Its world, lore, events, available choices, progression content, terminology, factions, places, creatures, items, and outcomes must be sourced from the approved, versioned World Archive package. The mode must feel like living inside Merzkava, not like a generic life simulator wearing Merzkava names.
 
-**Canon/content rule — 100% Merzkava:** BitLife and Solo Leveling are presentation/design references only. They contribute no world facts, lore, terminology, characters, factions, items, abilities, progression rules, or story content. All such content must first be reviewed against the official `Antarezka/merzkava-universe` canon, approved for the Offline Game, and included in its versioned World Archive package before the mode can use it. At runtime, Offline Game consumes that Archive package rather than independently fetching the Universe repository. If the package does not contain a needed fact or rule, mark that feature BLOCKED and send the gap through the Universe → Archive review/update process; never let AI invent a substitute.
+**World/content authority rule:** Merzkava Universe remains the canon foundation. BitLife and Solo Leveling are high-level design references only; they contribute no world facts, lore, terminology, characters, factions, items, abilities, progression rules, or proprietary story content. Canon-backed content must be reviewed against the official `Antarezka/merzkava-universe` repository and included in the approved, versioned World Archive package. However, the game may create additional items, equipment, materials, Spirit Beast variants, Arcanistry entries, quests, encounters, loot, and other gameplay content when needed. Such additions must carry the `IN-GAME ORIGINAL` label, remain consistent with known canon, and must never be presented or exported as official Universe facts. Canon concepts translated into game-specific records use `CANON ADAPTATION`. At runtime, Offline Game consumes only the approved local package, never raw Universe files. If a missing dependency requires an authoritative world fact or rule, mark that feature BLOCKED and route it through Universe → Archive review; never let AI invent a substitute.
 
 **Current progress:** The separate-mode boundary and the 100% Merzkava content requirement are defined. The full text of all 16 source files classified `MECHANICS_REFERENCE` at the pinned Universe commit has now been preserved verbatim in `docs/offline-game/CANON_FORMULA_SNAPSHOT.md`, alongside the supplemental formula-bearing `world/GOLDEN_DRAGON_EMPIRE_GOVERNANCE.md`. Formula-source preservation is **100% (17/17 source documents)** for this audited set. This is a development reference only. The deterministic HP, Satiety, Injury recovery, Time/Day-left, Combat, Spirit Ring, and Martial Soul Awakening and Economy formula modules are now implemented and CI-verified; other formula domains, player-safe content approval, the event engine, and playable offline mode remain open. Do not assign an overall engine percentage until the complete module inventory and dependencies are baselined. BitLife is only a high-level life-simulation reference; Solo Leveling is only a UI/progression-presentation reference.
 
@@ -220,11 +222,16 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 - [~] Begin porting applicable formulas into deterministic offline engine modules without changing equations, thresholds, dependencies, or explicitly unresolved values. The HP maximum/state-consistency, Satiety interval/intake, Injury recovery, Time/Day-left, Combat, Spirit Ring, Martial Soul Awakening, Economy, and Arcanistry modules are implemented and CI-verified; remaining domains are not yet ported.
 - [ ] Create a content-to-source traceability map: every offline entry/event/choice/rule must point to an approved Archive document and its official Universe source path + source commit.
 - [ ] Define and version a curated Offline Game content package derived only from approved World Archive material, including the game-facing data/formula payloads needed by the mode.
+- [x] Define three explicit content provenance classes in `docs/offline-game/CONTENT_PROVENANCE.md`: `CANON`, `CANON_ADAPTATION`, and `IN_GAME_ORIGINAL`; specify traceability and player-facing explanations.
+- [ ] Implement the provenance fields and validation in the Offline Game content schema/package, including rejection of unknown or missing classifications.
+- [ ] Display provenance labels in tooltips, item details, Spirit Beast and Arcanistry details, Encyclopedia/Codex, search results, and relevant notifications; labels must be readable text, not color alone.
+- [ ] Add package and persistence tests proving provenance survives serialization, updates, and save migrations, and that game-only records cannot be promoted to canon automatically.
 - [ ] Define a blocking rule: missing, contradictory, GM-only, private, or unreviewed Archive material cannot be used; send the gap back to Archive/canon review.
 - [ ] Keep the Offline Game's World Archive package version/SHA separate from the connected Convo gameplay canon SHA.
 - [x] Do not use Archive text as hidden context for connected AI GM conversations.
 - [ ] Keep Offline Game saves, progression, and events separate from Convo characters/sessions unless an explicit, reviewed import/export contract is later approved.
 - [ ] Do not promise live NPC behavior, remote events, or online conversation while offline.
+- [x] Define the Offline Game as a Life Simulation Text RPG under the current working title `Merzkava: Eternal Path`; keep BitLife/Solo Leveling as design references only.
 - [ ] Define what happens when the user returns online; mode switching must not overwrite or merge incompatible states.
 
 ### 5B. Offline gameplay concept
@@ -304,7 +311,7 @@ The workstreams describe product scope; this sequence describes safe delivery or
 3. **World Archive:** content review, offline navigation/search, then typography and visual refinement.
 4. **UI feature expansion:** faction cards/buttons and shared glass/art interaction system.
 5. **App services:** canon review first, then daily check-in and validated reward transactions.
-6. **Offline Game design:** confirm the “Life” reference, approve/version the World Archive content package, then implement the second playable mode inside the same APK.
+6. **Merzkava: Eternal Path design:** approve/version the World Archive content package, implement provenance-aware game-only content, then build the Life Simulation Text RPG as the second playable mode inside the same APK.
 7. **Future expansion:** prioritize new proposals through Workstream 6.
 
 ### Release checklist
