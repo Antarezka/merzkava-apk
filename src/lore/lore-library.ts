@@ -13,6 +13,7 @@ export interface LorePlaceholder {
   summary: string;
   detail: string;
   relatedIds: string[];
+  sourcePath?: string;
 }
 
 export interface LoreEntry {
@@ -997,6 +998,14 @@ export const LORE_PLACEHOLDERS: LorePlaceholder[] = [
     summary: "Ibu kota Golden Dragon Empire sekaligus pusat administrasi Longyuan; rincian kotanya sengaja tetap terbuka.",
     detail: "Nama dan kedudukan Huanglongcheng sudah disebut dalam referensi kanon. Namun, distrik, bangunan, tokoh lokal, kehidupan sehari-hari, dan banyak rincian kota belum dikunci. Status ON PLAN berarti ruang pengembangan ini disengaja, bukan data yang hilang atau kesalahan arsip. GM dalam percakapan Merzkava Universe dapat mengembangkan narasi sesuai konteks tanpa menganggap tambahan itu otomatis menjadi kanon permanen.",
     relatedIds: ["golden-dragon", "region-longyuan"]
+  },
+  {
+    id: "placeholder-remote-mountain-traditions", title: "Remote Mountain Traditions", aliases: ["High Cloud-Sea Mountains"],
+    status: "ON_PLAN", category: "CULTURE",
+    summary: "A reserved index point for future GM-led discovery; no concealed group identity or roster is disclosed.",
+    detail: "This entry preserves a clickable reference without publishing concealed group names, membership, affiliations, capabilities, or exact locations. The underlying source intentionally leaves discovery boundaries to the GM. New details may be developed in the Merzkava Universe conversation when the scene warrants them; improvisation does not automatically become permanent canon.",
+    relatedIds: ["geography-travel", "world-atlas"],
+    sourcePath: "world/ANCIENT_SHAMANISM_AND_BUDDHIST_CLANS.md"
   },
   {
     id: "placeholder-cangqiong-harbor", title: "Cangqiong Harbor", aliases: [], status: "ON_PLAN", category: "GEOGRAPHY",
