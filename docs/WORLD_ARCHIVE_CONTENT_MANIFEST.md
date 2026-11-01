@@ -735,3 +735,13 @@ The validation workflow now prints the exact npm advisory set and separately aud
 - Moderate findings: `@capacitor/cli` (direct dev dependency) and transitive `@vitest/mocker`, `glob`, `minimatch`, and `rimraf`.
 - **Production-only audit: 0 vulnerabilities** across runtime dependencies.
 - npm's suggested automatic fix for `@capacitor/cli` is a major-version downgrade to 4.8.2, which is not an acceptable blind change alongside Capacitor 7. The Vitest toolchain will be moved to a patched compatible release and revalidated; the CLI advisory remains a documented development-tool risk until a compatible Capacitor release or safe dependency override is available.
+
+
+### Dependency advisory recheck — resolved in the latest install graph
+
+The initial seven-advisory report was followed by an upgrade of the direct Vitest dev dependency to `^5.0.5`, the patched version recommended by npm's advisory report.
+
+- Verified on commit `2eea63e69f2117eb769d030fdbcd09df10e10943`: `npm install` succeeded, Vitest 5.0.5 ran all **27/27 tests**, and TypeScript/gateway/Vite production build passed.
+- Full `npm audit` now reports **0 total vulnerabilities**.
+- `npm audit --omit=dev` also reports **0 production vulnerabilities**.
+- The earlier five moderate and two critical findings are therefore no longer present in the dependency graph resolved by the latest CI install. This supersedes the previous advisory note above.
