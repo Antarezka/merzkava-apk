@@ -207,7 +207,7 @@
 7. Continue the next unchecked roadmap task. Do not redo completed light-theme typography work. Do not modify the Universe repo unless explicitly asked.
 8. Before claiming a build, verify exact versionName/versionCode, source SHA, workflow run, artifact, signature/alignment and emulator/device smoke result.
 
-**Last known build reference (not a build of this Phase 1 documentation):** Android Build #300 artifact [merzkava-debug-apk](https://github.com/Antarezka/merzkava-apk/actions/runs/41298609571/artifacts/13080676292). Emulator smoke was interrupted by a system dialog taking focus; the user separately confirmed light-theme text readability on a physical device. Re-check build metadata before selecting the next version/build number.
+**Last known build reference (not a build of this Phase 1 documentation):** Android Build #300 used source SHA `956a0b1fa3b4f04ccca01f7fa7b1942b83bde770`, `versionCode=300`, `versionName=v.1.01.300-956`, package `com.antarezka.merzkava`. Artifact [merzkava-debug-apk](https://github.com/Antarezka/merzkava-apk/actions/runs/41298609571/artifacts/13080676292). APK compilation, package/version verification, alignment, signature verification and artifact upload passed; emulator install/smoke was interrupted by a system dialog taking focus. The user separately confirmed light-theme text readability on a physical device. This is the last known build baseline, not a build of the Phase 1 documentation commits.
 
 ## Phase 1 exit checklist
 
