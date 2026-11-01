@@ -352,7 +352,7 @@ This section is intentionally an open slot for ideas not yet specified. New prop
 
 ---
 
-## 9. Existing feature register
+## 10. Existing feature register
 
 The actual feature inventory has not yet been completed. Until the audit is done, the following are **known product areas from the current project scope**, not claims that every feature is already implemented.
 
@@ -375,7 +375,7 @@ When the audit discovers additional screens or components, add them to this regi
 
 ---
 
-## 10. Suggested implementation order and release gates
+## 11. Suggested implementation order and release gates
 
 The workstreams describe product scope; this sequence describes safe delivery order. Priorities may be adjusted when the audit finds a critical defect.
 
@@ -403,7 +403,7 @@ The workstreams describe product scope; this sequence describes safe delivery or
 
 ---
 
-## 11. How to read this roadmap and follow implementation
+## 12. How to read this roadmap and follow implementation
 
 This section is the operating manual for a new AI conversation, developer, or reviewer joining the project mid-stream.
 
@@ -485,7 +485,7 @@ The repository is the durable handoff. When a future conversation adds a new dec
 
 ---
 
-## 12. Verified project baseline — 2026-11-01
+## 13. Verified project baseline — 2026-11-01
 
 This is a dated snapshot, not a permanent claim. Recheck GitHub before every later task.
 
