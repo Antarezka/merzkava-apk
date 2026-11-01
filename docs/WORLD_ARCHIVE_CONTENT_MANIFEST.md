@@ -25,7 +25,7 @@
 5. Every article must retain canonical source path, source commit, last-reviewed date, visibility class, and cross-reference IDs.
 6. Unknown or conflicting facts stay marked unknown/conflicted. No gap-filling, invented settlements, invented NPCs, guessed distances, or unsupported chronology.
 7. Entity links must resolve to an in-app document ID. A source path displayed as plain text is not a working document link.
-8. Search/highlighting must use a central entity index, not only the aliases of the currently visible 26 entries. Ambiguous names must not link to the wrong entity.
+8. Search/highlighting must use a central entity index, not only the aliases of the currently visible 32 dossiers. Ambiguous names must not link to the wrong entity.
 
 ## Visibility classes
 
@@ -38,7 +38,7 @@
 | `REVIEW_REQUIRED` | Access scope or factual status not yet fully established | Block publication until manually reviewed |
 | `LEGACY_OR_COMPATIBILITY` | Deprecated, superseded, or compatibility pointer | Do not publish as independent canon; resolve to current source |
 
-## Current APK catalogue audit
+## Initial APK catalogue audit — historical 26-dossier baseline (superseded)
 
 | Local ID | Local title | Source path | Initial disposition |
 |---|---|---|---|
@@ -72,7 +72,7 @@
 ### Coverage integrity
 
 - All currently referenced source paths exist in the current Universe tree: **yes**.
-- Source paths currently referenced by the APK:
+- Source paths referenced by that historical 26-dossier baseline:
   - `bestiary/SPIRIT_BEAST_RULES.md`
   - `regions/beiming-gu/npcs/BEIMING_HAN.md`
   - `regions/beiming-gu/npcs/BEIMING_XENHWA.md`
@@ -651,7 +651,7 @@ The complete 486-line, 112,016-character `world/GOLDEN_DRAGON_EMPIRE_OFFICIALS.m
 - **Inventory coverage:** 140/140 Markdown paths have a disposition.
 - **Source-level/section-level review:** completed across all 140 paths, using full reads for shorter documents and targeted ranges/structural checks for long sources.
 - **Deep verification still outstanding:** exhaustive line-by-line semantic review of every long source, final row-by-row officeholder appointment reconciliation, and owner decision on the Badan Pengawasan ↔ Komite Auditor relationship.
-- **Publication approval:** not granted. Existing 26-entry APK catalogue remains a preliminary UI/content scaffold, not an approved canon corpus. Do not add or expose source text solely because its path exists in the catalogue.
+- **Publication approval:** not granted. The current 32-dossier APK catalogue remains a curated starter corpus, not complete coverage or blanket approval of its source files. Do not add or expose source text solely because its path exists in the catalogue.
 - **Implementation gate:** no public entity index, automatic highlights, autocomplete, backlinks, or source reader should be treated as canon-safe until visibility filtering and local-document resolution are implemented and tested end-to-end.
 
 
