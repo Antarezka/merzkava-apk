@@ -81,7 +81,9 @@ jobs:
             if (!js.includes(token)) throw new Error("Built JS is missing Kitty asset reference: " + token);
           }
           if (!js.includes(".splash-wordmark")) throw new Error("Built JS does not include the Kitty splash wordmark selector.");
-          if (js.includes("/kitty/shadow/kitty-shadow.png")) throw new Error("The splash must not render Kitty’s separate floor-shadow layer.");
+          if (!js.includes("/kitty/shadow/kitty-shadow.png")) throw new Error("Built JS is missing Kitty’s splash floor-shadow layer.");
+          const iconScript = readFileSync("scripts/generate-android-icons.py", "utf8");
+          if (iconScript.includes('ASSETS / "shadow"') || iconScript.includes("shadow/kitty-shadow.png")) throw new Error("Launcher icon generator must not include Kitty’s floor-shadow layer.");
           console.log("Kitty asset references and splash selector are present in the web bundle.");
           NODE
 
