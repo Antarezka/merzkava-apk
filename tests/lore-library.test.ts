@@ -25,6 +25,17 @@ afterEach(() => {
 });
 
 describe("World Archive visibility and entity routing", () => {
+  it("makes every published dossier title searchable and every cross-reference target resolvable", () => {
+    const entries = getPublicLoreEntries();
+    const publicIds = new Set(entries.map(entry => entry.id));
+    for (const entry of entries) {
+      expect(resolveLoreEntry(entry.title)?.id).toBe(entry.id);
+      for (const targetId of entry.crossReferenceIds) expect(publicIds.has(targetId)).toBe(true);
+      setLoreSearch(entry.title);
+      expect(renderLoreResults()).toContain('data-lore-open="' + entry.id + '"');
+    }
+  });
+
   it("requires an explicit visibility classification on every dossier", () => {
     expect(LORE_ENTRIES.length).toBeGreaterThan(0);
     expect(LORE_ENTRIES.every(entry =>
