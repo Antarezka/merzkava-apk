@@ -1402,3 +1402,15 @@ button {color:inherit;} button:focus-visible {outline-color:#a68d5e;}
 .nav-item .nav-icon{color:inherit;font-size:16px}
 .nav-item small{font-size:7px;letter-spacing:.02em}
 @media(min-width:600px){.bottom-nav{bottom:12px;width:min(calc(100vw - 64px),620px);border-radius:8px}}
+
+/* Centered ornamental navigation rail with gesture-safe side breathing room. */
+.bottom-nav{left:50%;right:auto;bottom:calc(7px + env(safe-area-inset-bottom));width:min(690px,calc(100% - 40px - env(safe-area-inset-left) - env(safe-area-inset-right)));padding:10px 9px calc(9px + env(safe-area-inset-bottom));border:1px solid #786044;border-bottom:1px solid #786044;border-radius:7px;background:linear-gradient(180deg,#29241ef5,#191714f8);box-shadow:0 8px 28px #0007,inset 0 1px #e8c58c1c;overflow:hidden}
+.bottom-nav:before,.bottom-nav:after{position:absolute;top:0;left:50%;width:34%;height:1px;content:"";transform:translateX(-50%);background:linear-gradient(90deg,transparent,#c79b65aa,transparent);pointer-events:none}
+.nav-item{position:relative;gap:5px;transition:color .2s ease}
+.nav-item:after{position:absolute;right:24%;bottom:-5px;left:24%;height:1px;content:"";transform:scaleX(0);background:#c79b65;transition:transform .22s ease}
+.nav-item.active:after{transform:scaleX(1)}
+.nav-item .nav-index{color:#8e775c;font:7px/1 Georgia,serif;letter-spacing:.12em}
+.nav-item .nav-icon{color:inherit;font-size:17px}
+.nav-item small{font-size:7px;letter-spacing:.04em}
+@media(max-width:380px){.bottom-nav{width:calc(100% - 28px - env(safe-area-inset-left) - env(safe-area-inset-right));padding-inline:4px}.nav-item small{font-size:6px}.nav-item .nav-index{font-size:6px}}
+@media(prefers-reduced-motion:reduce){.nav-item,.nav-item:after{transition:none}}
