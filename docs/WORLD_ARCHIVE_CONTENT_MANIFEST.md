@@ -745,3 +745,8 @@ The initial seven-advisory report was followed by an upgrade of the direct Vites
 - Full `npm audit` now reports **0 total vulnerabilities**.
 - `npm audit --omit=dev` also reports **0 production vulnerabilities**.
 - The earlier five moderate and two critical findings are therefore no longer present in the dependency graph resolved by the latest CI install. This supersedes the previous advisory note above.
+
+
+### Xenhwa public-profile boundary tightened
+
+A final claim-level check of `BEIMING_XENHWA.md` confirmed that her public profile establishes appearance, passive natural fragrance, and unusually sensitive senses. Age, species/lineage, and the white-flame capability are recorded elsewhere in the full NPC profile, not in its public-profile section. The Archive dossier has therefore been narrowed to the public-profile facts and adoptive relationship only; age, half-beast/white-fox identity, flame capability, and GM-sensitive family history are excluded. A regression test now checks all four disclosure boundaries.
