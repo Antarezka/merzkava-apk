@@ -32,7 +32,7 @@ const LORE_ENTRY_DRAFTS: Omit<LoreEntry, "sourceCommit" | "reviewedAt" | "crossR
     sourcePath: "world/WORLD.md", sourceLabel: "World Lore & Political Atlas"
   },
   {
-    id: "golden-dragon", title: "Golden Dragon Empire", aliases: ["Golden Dragon", "Kekaisaran Naga Emas", "Huanglongcheng", "Longyuan"],
+    id: "golden-dragon", title: "Golden Dragon Empire", aliases: ["Golden Dragon", "Kekaisaran Naga Emas"],
     visibility: "PUBLISHED",
     category: "POWERS", eyebrow: "EASTERN POWER · 01", summary: "Kekaisaran timur dengan pusat pemerintahan, jaringan administrasi luas, pertanian, pertambangan, pendidikan, dan pelabuhan.",
     paragraphs: [
@@ -44,7 +44,87 @@ const LORE_ENTRY_DRAFTS: Omit<LoreEntry, "sourceCommit" | "reviewedAt" | "crossR
     sourcePath: "world/GOLDEN_DRAGON_EMPIRE_ADMINISTRATIVE_ATLAS.md", sourceLabel: "Golden Dragon Administrative Atlas"
   },
   {
-    id: "tianhai", title: "Tianhai Yunzhou", aliases: ["Yunzhou", "Pulau Terapung", "Cangqiong Harbor", "Tianji Core"],
+    id: "region-longyuan", title: "Longyuan — Imperial Heartland", aliases: ["Longyuan", "Imperial Heartland"],
+    visibility: "PUBLISHED",
+    category: "GEOGRAPHY", eyebrow: "GOLDEN DRAGON REGION · 01", summary: "Jantung pemerintahan Golden Dragon Empire, pusat istana, administrasi kekaisaran, dan lembaga politik.",
+    paragraphs: [
+      "Longyuan adalah wilayah inti Golden Dragon Empire. Identitasnya berpusat pada istana kekaisaran, administrasi pusat, bangsawan, dan lembaga politik.",
+      "Huanglongcheng menjadi ibu kota kekaisaran sekaligus kursi administrasi Longyuan. Imperial Dragon Road menghubungkan Huanglongcheng dan Yuxi; jarak serta durasi perjalanan belum ditetapkan.",
+      "Estimasi perencanaan mencatat sekitar 44 juta penduduk, luas sekitar 1,26 juta km², dan kepadatan rata-rata sekitar 35 jiwa/km². Luas dan kepadatan merupakan asumsi perencanaan, bukan hasil survei batas atau sensus terukur.",
+      "Longyuan memiliki dua prefektur: Huanglong Prefecture dan Jade Seal Prefecture. Keduanya berada dalam Imperial Heartland Circuit."
+    ],
+    sourcePath: "world/REGION_LONGYUAN.md", sourceLabel: "Longyuan Regional Reference"
+  },
+  {
+    id: "region-canglan", title: "Canglan — Riverlands", aliases: ["Canglan", "Riverlands"],
+    visibility: "PUBLISHED",
+    category: "GEOGRAPHY", eyebrow: "GOLDEN DRAGON REGION · 02", summary: "Wilayah sungai yang dikenal melalui pertanian, irigasi, transportasi sungai, dan perdagangan pedalaman.",
+    paragraphs: [
+      "Canglan merupakan wilayah produktif di Golden Dragon Empire dengan identitas pertanian, irigasi, transportasi sungai, dan perdagangan pedalaman.",
+      "Qinghe menjadi kursi administrasi regional. Qinghe Prefecture dan Jiangbei Prefecture berada dalam Riverlands Circuit; Twin River Route menghubungkan Qinghe dan Jiangbei, sementara kondisi jalur sungai dan jalan lokal dapat berubah menurut musim.",
+      "Estimasi perencanaan mencatat sekitar 64 juta penduduk, luas sekitar 1,42 juta km², dan kepadatan rata-rata sekitar 45 jiwa/km². Luas dan kepadatan merupakan asumsi perencanaan, bukan hasil survei batas atau sensus terukur."
+    ],
+    sourcePath: "world/REGION_CANGLAN.md", sourceLabel: "Canglan Regional Reference"
+  },
+  {
+    id: "region-jinyue", title: "Jinyue — Mineral Lands", aliases: ["Jinyue", "Mineral Lands"],
+    visibility: "PUBLISHED",
+    category: "GEOGRAPHY", eyebrow: "GOLDEN DRAGON REGION · 03", summary: "Wilayah sumber daya yang berpusat pada pertambangan, logam spiritual, dan bahan untuk artefak serta perlengkapan.",
+    paragraphs: [
+      "Jinyue adalah wilayah sumber daya Golden Dragon Empire. Identitasnya bertumpu pada pertambangan, logam spiritual, dan bahan untuk artefak serta perlengkapan.",
+      "Yumai menjadi kursi administrasi regional. Jadevein Prefecture dan Ironcloud Prefecture berada dalam Mineral Lands Circuit. Ore Vein Road menghubungkan Yumai dan Tieyun; jalur cabang pertambangan belum ditetapkan secara rinci.",
+      "Estimasi perencanaan mencatat sekitar 32 juta penduduk, luas sekitar 1,78 juta km², dan kepadatan rata-rata sekitar 18 jiwa/km². Luas dan kepadatan merupakan asumsi perencanaan, bukan hasil survei batas atau sensus terukur."
+    ],
+    sourcePath: "world/REGION_JINYUE.md", sourceLabel: "Jinyue Regional Reference"
+  },
+  {
+    id: "region-tianfeng", title: "Tianfeng — Scholarly Heights", aliases: ["Tianfeng", "Scholarly Heights"],
+    visibility: "PUBLISHED",
+    category: "GEOGRAPHY", eyebrow: "GOLDEN DRAGON REGION · 04", summary: "Wilayah tradisi keilmuan, pengembangan talenta, literasi, arsip, dan pertukaran pengetahuan.",
+    paragraphs: [
+      "Tianfeng dikenal melalui tradisi keilmuan, pengembangan talenta, literasi, arsip, dan pertukaran pengetahuan. Wilayah ini menjadi sumber siswa berbakat bagi dua Cultivator Academies pusat di Huanglongcheng.",
+      "Tidak ada Cultivator Academy yang ditetapkan berada di Tianfeng. Pembelajaran lokal bertumpu pada tradisi keilmuan, tutor, dan kegiatan pendidikan informal yang tercatat dalam sumber regional.",
+      "Tianshu menjadi kursi administrasi regional. Heavenly Script Prefecture dan Cloud Summit Prefecture berada dalam Scholarly Heights Circuit; Cloudstep Scholar Road menghubungkan Tianshu dan Yunding.",
+      "Estimasi perencanaan mencatat sekitar 40 juta penduduk, luas sekitar 1,33 juta km², dan kepadatan rata-rata sekitar 30 jiwa/km². Luas dan kepadatan merupakan asumsi perencanaan, bukan hasil survei batas atau sensus terukur."
+    ],
+    sourcePath: "world/REGION_TIANFENG.md", sourceLabel: "Tianfeng Regional Reference"
+  },
+  {
+    id: "region-yanling", title: "Yanling — Volcanic Mountains", aliases: ["Yanling", "Volcanic Mountains"],
+    visibility: "PUBLISHED",
+    category: "GEOGRAPHY", eyebrow: "GOLDEN DRAGON REGION · 05", summary: "Wilayah industri yang dikenal melalui penempaan, tungku, pengerjaan logam, dan spiritual forging.",
+    paragraphs: [
+      "Yanling memiliki identitas industri yang berpusat pada penempaan, tungku, pengerjaan logam, dan spiritual forging. Kondisi kawasan industri serta jalur pasokan dapat dipengaruhi aktivitas tungku dan keadaan setempat.",
+      "Honglu menjadi kursi administrasi regional. Red Furnace Prefecture dan Ashen Peak Prefecture berada dalam Furnace Mountains Circuit; Furnace Spine Road menghubungkan Honglu dan Huifeng.",
+      "Estimasi perencanaan mencatat sekitar 36 juta penduduk, luas sekitar 1,80 juta km², dan kepadatan rata-rata sekitar 20 jiwa/km². Luas dan kepadatan merupakan asumsi perencanaan, bukan hasil survei batas atau sensus terukur."
+    ],
+    sourcePath: "world/REGION_YANLING.md", sourceLabel: "Yanling Regional Reference"
+  },
+  {
+    id: "region-baiyue", title: "Baiyue — Frontier Marches", aliases: ["Baiyue", "Frontier Marches"],
+    visibility: "PUBLISHED",
+    category: "GEOGRAPHY", eyebrow: "GOLDEN DRAGON REGION · 06", summary: "Wilayah perbatasan yang berorientasi pada benteng, jalur militer, logistik, dan pertahanan.",
+    paragraphs: [
+      "Baiyue merupakan wilayah perbatasan Golden Dragon Empire. Identitasnya berpusat pada benteng, jalur militer, logistik pertahanan, dan pengamanan lintasan.",
+      "Beiguan menjadi kursi administrasi regional dan Northwatch Prefecture adalah satu-satunya prefektur di wilayah ini. Koneksi Frontier–Maritime Relay menuju Dongxing menggunakan tahapan kurir serta perpindahan darat/laut yang berizin; jalur tersebut bukan jalan langsung.",
+      "Estimasi perencanaan mencatat sekitar 32 juta penduduk, luas sekitar 2,67 juta km², dan kepadatan rata-rata sekitar 12 jiwa/km². Luas dan kepadatan merupakan asumsi perencanaan, bukan hasil survei batas atau sensus terukur."
+    ],
+    sourcePath: "world/REGION_BAIYUE.md", sourceLabel: "Baiyue Regional Reference"
+  },
+  {
+    id: "region-xingluo", title: "Xingluo — Eastern Ports", aliases: ["Xingluo", "Eastern Ports"],
+    visibility: "PUBLISHED",
+    category: "GEOGRAPHY", eyebrow: "GOLDEN DRAGON REGION · 07", summary: "Wilayah maritim timur dengan perdagangan laut, pelabuhan, dan hubungan diplomatik lintas kekuasaan.",
+    paragraphs: [
+      "Xingluo adalah wilayah maritim timur Golden Dragon Empire. Identitasnya bertumpu pada perdagangan laut, pelabuhan, diplomasi, dan jalur pelayaran.",
+      "Dongxing menjadi kursi administrasi regional sekaligus pelabuhan utama untuk keberangkatan antarkekuasaan menuju Cangqiong Harbor di Tianhai Yunzhou. Jadwal, tarif, jarak, dan durasi perjalanan belum ditetapkan.",
+      "Eastern Star Prefecture adalah satu-satunya prefektur di Xingluo; wilayah ini berada dalam Frontier–Maritime Circuit bersama Northwatch Prefecture di Baiyue.",
+      "Estimasi perencanaan mencatat sekitar 72 juta penduduk, luas sekitar 1,60 juta km², dan kepadatan rata-rata sekitar 45 jiwa/km². Luas dan kepadatan merupakan asumsi perencanaan, bukan hasil survei batas atau sensus terukur."
+    ],
+    sourcePath: "world/REGION_XINGLUO.md", sourceLabel: "Xingluo Regional Reference"
+  },
+  {
+    id: "tianhai", title: "Tianhai Yunzhou", aliases: ["Yunzhou", "Pulau Terapung"],
     visibility: "PUBLISHED",
     category: "POWERS", eyebrow: "SOUTHWESTERN MARITIME POWER · 02", summary: "Kekuasaan maritim yang berpusat pada pulau raksasa terapung di atas Yunmeng Sea, terkenal dengan pelayaran, perdagangan, pendidikan, dan tradisi Arcanistry.",
     paragraphs: [
@@ -450,6 +530,16 @@ let activeLoreQuery = "";
 let activeLoreId: string | null = null;
 let activeLoreSourceId: string | null = null;
 
+const PUBLIC_CANDIDATE_SOURCE_PATHS = new Set([
+  "world/REGION_LONGYUAN.md",
+  "world/REGION_CANGLAN.md",
+  "world/REGION_JINYUE.md",
+  "world/REGION_TIANFENG.md",
+  "world/REGION_YANLING.md",
+  "world/REGION_BAIYUE.md",
+  "world/REGION_XINGLUO.md"
+]);
+
 const PARTIAL_PUBLIC_SOURCE_PATHS = new Set([
   "world/WORLD.md",
   "world/LAWLESS_TERRITORIES.md",
@@ -510,10 +600,12 @@ export function openLoreEntry(id: string): boolean {
 }
 export function closeLoreEntry(): void { activeLoreId = null; activeLoreSourceId = null; }
 
-export function getLoreSourceDisposition(id: string): "PUBLISHED" | "PARTIAL_PUBLIC" | undefined {
+export function getLoreSourceDisposition(id: string): "PUBLISHED" | "PARTIAL_PUBLIC" | "PUBLIC_CANDIDATE" | undefined {
   const entry = getPublicLoreEntries().find(item => item.id === id);
   if (!entry) return undefined;
-  return PARTIAL_PUBLIC_SOURCE_PATHS.has(entry.sourcePath) ? "PARTIAL_PUBLIC" : "PUBLISHED";
+  if (PARTIAL_PUBLIC_SOURCE_PATHS.has(entry.sourcePath)) return "PARTIAL_PUBLIC";
+  if (PUBLIC_CANDIDATE_SOURCE_PATHS.has(entry.sourcePath)) return "PUBLIC_CANDIDATE";
+  return "PUBLISHED";
 }
 
 export function openLoreSource(id: string): boolean {
