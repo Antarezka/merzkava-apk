@@ -83,6 +83,27 @@ if [[ "$ACTIVITY_READY" -ne 1 ]]; then
   collect_diagnostics
   exit 1
 fi
+echo "Capturing Kitty splash frames immediately after first app draw..."
+FOCUSED_WINDOW="$(timeout 8s adb shell dumpsys window windows 2>/dev/null | grep -E 'mCurrentFocus|mFocusedApp' | head -n 2 || true)"
+if ! grep -q 'com.antarezka.merzkava' <<< "$FOCUSED_WINDOW"; then
+  echo "Merzkava is not the foreground window; refusing to label a system dialog as a splash screenshot."
+  echo "$FOCUSED_WINDOW"
+  collect_diagnostics
+  exit 1
+fi
+adb exec-out screencap -p > "$DIAG_DIR/kitty-splash-early.png"
+sleep 0.45
+FOCUSED_WINDOW="$(timeout 8s adb shell dumpsys window windows 2>/dev/null | grep -E 'mCurrentFocus|mFocusedApp' | head -n 2 || true)"
+if ! grep -q 'com.antarezka.merzkava' <<< "$FOCUSED_WINDOW"; then
+  echo "Merzkava lost foreground focus during splash capture."
+  echo "$FOCUSED_WINDOW"
+  collect_diagnostics
+  exit 1
+fi
+adb exec-out screencap -p > "$DIAG_DIR/kitty-splash-mid.png"
+test -s "$DIAG_DIR/kitty-splash-early.png"
+test -s "$DIAG_DIR/kitty-splash-mid.png"
+file "$DIAG_DIR/kitty-splash-early.png" "$DIAG_DIR/kitty-splash-mid.png"
 echo "Waiting for app process..."
 APP_PID=""
 for attempt in $(seq 1 12); do
@@ -93,14 +114,6 @@ done
 if [[ -z "$APP_PID" ]]; then echo "Merzkava process did not appear."; collect_diagnostics; exit 1; fi
 adb logcat -d -t 6000 > "$DIAG_DIR/launch-logcat.txt" 2>&1 || true
 if grep -E -A 8 "FATAL EXCEPTION|Fatal signal" "$DIAG_DIR/launch-logcat.txt" | grep -q "com.antarezka.merzkava"; then echo "Merzkava-specific fatal crash detected."; collect_diagnostics; exit 1; fi
-echo "Capturing Kitty splash frames..."
-sleep 2
-adb exec-out screencap -p > "$DIAG_DIR/kitty-splash-early.png"
-sleep 2
-adb exec-out screencap -p > "$DIAG_DIR/kitty-splash-mid.png"
-test -s "$DIAG_DIR/kitty-splash-early.png"
-test -s "$DIAG_DIR/kitty-splash-mid.png"
-file "$DIAG_DIR/kitty-splash-early.png" "$DIAG_DIR/kitty-splash-mid.png"
 adb shell dumpsys activity activities > "$DIAG_DIR/activities.txt" 2>&1 || true
 adb shell dumpsys window windows > "$DIAG_DIR/windows.txt" 2>&1 || true
 echo "Emulator install-and-launch smoke test passed."
