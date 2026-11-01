@@ -864,7 +864,7 @@ The first deterministic mechanic module has been added to the APK repository wit
 - Implemented: official base-time rates; activity, missed-meal, body-condition and verified biological multipliers; combined ×8 cap; full internal precision with one-decimal display; verified intake and portion values.
 - Not implemented here: time-window transition logic, meal-opportunity adjudication, sleep-state transitions, persistent Satiety state, injury/HP consequences, or UI.
 - Source discrepancy: the Spirit Primordial 24-hour Light example (≈0.014) conflicts with the stated 365-day base/formula (≈0.342466). Code follows the explicit table/formula and surfaces a warning. Upstream canon remains unchanged.
-- Current foundation: **4 modules implemented and CI-verified (HP + Satiety + Injury + Time/Day-left)**. The full offline engine remains incomplete; no whole-engine percentage is assigned.
+- Current foundation: **5 modules implemented and CI-verified (HP + Satiety + Injury + Time/Day-left + Combat)**. The full offline engine remains incomplete; no whole-engine percentage is assigned.
 - CI dependency audit: four moderate advisories in development tooling (`@capacitor/cli`, `glob`, `minimatch`, `rimraf`); production-only audit reports zero vulnerabilities. The current workflow does not fail on this advisory report. No unsafe major-version downgrade was applied.
 
 
@@ -890,3 +890,16 @@ The first deterministic mechanic module has been added to the APK repository wit
 - Explicit boundary: session era, initial date/weather/weekday anchor, travel durations, and actual action success are inputs/decisions from the session/game world; this utility does not invent them.
 - Current foundation: **4 modules implemented and CI-verified (HP + Satiety + Injury + Time/Day-left)**. The full game engine remains incomplete; no overall percentage is assigned.
 - Android Build #322 is still a separate build/emulator run. It targets the Time module commit before the test-fixture-only follow-up; no final APK status is implied here.
+
+
+### Offline-game code milestone — Combat formulas (2026-11-01)
+
+- Source: `gameplay/COMBAT_SYSTEM.md` at Universe pin `2f76a864150528afb0e3d26cb16f9396ce610ff6`; upstream blob `bc7d85a0e3521c30716b1859f5fdf070417d684c`.
+- Code: `src/offline-game/mechanics/combat.ts`.
+- Tests: `tests/offline-game-combat.test.ts` (10 tests).
+- Validation: [Web App Validation #592](https://github.com/Antarezka/merzkava-apk/actions/runs/41307268016) passed: 10 test files / 76 tests, TypeScript, gateway type-check, and Vite build.
+- Implemented: Combat Rating, combat ratio, hit chance/d100, square-root power adjustment, official damage classes and defense reductions, upward rounding, current HP cap, combo follow-up gating and half-base damage.
+- High-output 18% damage and 9% follow-up require explicit confirmation. The module accepts only the published readiness factors and does not infer tactical advantages, equipment, move access, defense, or injuries.
+- Source observation: for positive combat ratios the hit-chance formula's raw minimum approaches 25%, so the stated 10% lower clamp is unreachable with valid inputs. Code preserves the source formula/clamp; no upstream canon edit was made.
+- Current foundation: **5 modules implemented and CI-verified (HP + Satiety + Injury + Time/Day-left + Combat)**. The full game engine remains incomplete; no overall percentage is assigned.
+- Android Build #324 is a separate build on the Combat implementation commit and remains subject to package/emulator checks.
