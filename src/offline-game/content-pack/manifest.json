@@ -28,7 +28,12 @@
       "bonds",
       "local-clock",
       "session-weather"
-    ]
+    ],
+    "initialSessionState": {
+      "clock": "Day 1 · 08:00",
+      "weather": "Clear",
+      "classification": "IN_GAME_ORIGINAL game-session defaults; not an official Universe date, chronology, or weather report"
+    }
   },
   "limitations": [
     "This is an opening playable slice, not the completed life simulation.",
