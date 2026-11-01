@@ -68,6 +68,10 @@ These are overlays or procedural effects, not separate painted scenery for every
 | FX-08 | Lightning flash | Procedural Anime.js preferred | Not started |
 
 ## Important
-FX-02 is intentionally a black-background PNG, not an alpha-transparent asset. The app currently tests it with CSS `mix-blend-mode: screen` and enables it temporarily by default through `SCENERY_FOG_TEST_ENABLED` in `src/main.ts`.\n\nThe fog asset is uploaded and its intended Screen-blend method is documented. It is not mounted in the app yet: the dedicated Offline Game / Expedition Interface viewport has not been implemented. Do not attach this effect to the global app shell or the Convo screen.
+FX-02 is intentionally a black-background PNG, not an alpha-transparent asset. Composite it with CSS `mix-blend-mode: screen` **inside the dedicated Offline Game environment viewport only**.
+
+**Current implementation status (2026-11-02):** The first Expedition Interface viewport has been added in `src/offline-game/expedition-interface.ts`; its scoped stylesheet mounts FX-02 as the atmospheric layer by default. The effect is not imported by the shared app shell and is not used by Home, World Archive, or Convo. This is a first-pass visual foundation, not proof of full gameplay, device QA, or offline save functionality. Verify the PNG path and blend result in the Android build before calling the effect visually validated.
+
+Never attach FX-02 to the global app shell, shared page background, Home, World Archive, or Convo.
 
 The checklist is an art-production plan, not a claim that all listed scenes or place names are canon. Only the broad realm identities are used here; exact settlement names must be taken from verified World Archive entries. The image marked “Artwork made” is not stored in this repository yet.
