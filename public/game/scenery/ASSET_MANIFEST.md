@@ -59,7 +59,7 @@ These are overlays or procedural effects, not separate painted scenery for every
 | ID | Asset | Target path | Status |
 |---|---|---|---|
 | FX-01 | Soft cloud layer, transparent | `shared/atmosphere/fx-01-cloud-layer.png` | Not started |
-| FX-02 | Atmospheric fog overlay, black background for Screen blend | `shared/fx-02-atmospheric-fog.png` | Uploaded · temporary default test |
+| FX-02 | Atmospheric fog overlay, black background for Screen blend | `shared/fx-02-atmospheric-fog.png` | Uploaded · pending Offline Game viewport |
 | FX-03 | Sun disc / glow, transparent | `shared/lighting/fx-03-sun-glow.png` | Not started |
 | FX-04 | Moon disc / glow, transparent | `shared/lighting/fx-04-moon-glow.png` | Not started |
 | FX-05 | Light rays, transparent | `shared/lighting/fx-05-light-rays.png` | Not started |
@@ -68,4 +68,6 @@ These are overlays or procedural effects, not separate painted scenery for every
 | FX-08 | Lightning flash | Procedural Anime.js preferred | Not started |
 
 ## Important
-FX-02 is intentionally a black-background PNG, not an alpha-transparent asset. The app currently tests it with CSS `mix-blend-mode: screen` and enables it temporarily by default through `SCENERY_FOG_TEST_ENABLED` in `src/main.ts`.\n\nThe checklist is an art-production plan, not a claim that all listed scenes or place names are canon. Only the broad realm identities are used here; exact settlement names must be taken from verified World Archive entries. The image marked “Artwork made” is not stored in this repository yet.
+FX-02 is intentionally a black-background PNG, not an alpha-transparent asset. The app currently tests it with CSS `mix-blend-mode: screen` and enables it temporarily by default through `SCENERY_FOG_TEST_ENABLED` in `src/main.ts`.\n\nThe fog asset is uploaded and its intended Screen-blend method is documented. It is not mounted in the app yet: the dedicated Offline Game / Expedition Interface viewport has not been implemented. Do not attach this effect to the global app shell or the Convo screen.
+
+The checklist is an art-production plan, not a claim that all listed scenes or place names are canon. Only the broad realm identities are used here; exact settlement names must be taken from verified World Archive entries. The image marked “Artwork made” is not stored in this repository yet.
