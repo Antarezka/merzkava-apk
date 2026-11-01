@@ -56,7 +56,9 @@ describe("Eternal Path isolated journey saves",()=>{
   expect(listEternalSaves()).toHaveLength(1);
  });
  it("migrates a legacy single-save record into the save library",()=>{
-  localStorage.setItem("merzkava-eternal-path-save-v1",JSON.stringify({
+  const values=new Map<string,string>();
+  Object.defineProperty(globalThis,"localStorage",{configurable:true,value:{getItem:(key:string)=>values.get(key)??null,setItem:(key:string,value:string)=>values.set(key,value),removeItem:(key:string)=>values.delete(key)}});
+  globalThis.localStorage.setItem("merzkava-eternal-path-save-v1",JSON.stringify({
    schemaVersion:1,character:{name:"Old Journey",age:16,region:"tianhai-yunzhou"},eventIndex:4,day:2,hour:9,minute:15,energy:80,insight:3,bonds:2,completed:4,
   }));
   const slots=listEternalSaves();
@@ -64,5 +66,6 @@ describe("Eternal Path isolated journey saves",()=>{
   expect(slots[0].characterName).toBe("Old Journey");
   expect(getEternalSave()?.schemaVersion).toBe(3);
   expect(getEternalSave()?.eventIndex).toBe(4);
+  delete (globalThis as {localStorage?:Storage}).localStorage;
  });
 });
