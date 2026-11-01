@@ -39,7 +39,8 @@ describe("Eternal Path live world scene", () => {
     startEternalGame({name:"Nafila",age:14,region:"golden-dragon-empire"});
     expect(getExpeditionAtmosphere().cycle).toBe("Morning");
     const completedBefore=getEternalSave()?.completed;
-    advanceEternalWorldTime(600);
+    for(let index=0;index<3;index+=1) advanceEternalWorldTime(180);
+    advanceEternalWorldTime(60);
     expect(getExpeditionAtmosphere().cycle).toBe("Dusk");
     expect(getEternalSave()?.completed).toBe(completedBefore);
     expect(renderExpeditionInterface()).toContain('data-cycle="Dusk"');
@@ -49,7 +50,8 @@ describe("Eternal Path live world scene", () => {
     startEternalGame({name:"Nafila",age:14,region:"beiming-gu"});
     const initialWeather=getExpeditionAtmosphere().weather;
     expect(initialWeather).toBe("Snow");
-    advanceEternalWorldTime(16*60);
+    for(let index=0;index<5;index+=1) advanceEternalWorldTime(180);
+    advanceEternalWorldTime(60);
     expect(getEternalSave()?.day).toBe(2);
     expect(getExpeditionAtmosphere().weather).toBe("Cloudy");
     expect(getEternalSave()?.completed).toBe(0);
