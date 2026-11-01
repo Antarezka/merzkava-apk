@@ -26,7 +26,7 @@ describe("World Archive offline typography", () => {
   });
 
   it("does not request typography from a remote font service", () => {
-    expect(css).not.toMatch(/@import\\s+url\\(['"]https:\\/\\/fonts\\.googleapis\\.com/i);
+    expect(css).not.toMatch(/@import\s+url\(['"]https:\/\/fonts\.googleapis\.com/i);
   });
 
   it("keeps Archive reading text at the mobile readability scale", () => {
