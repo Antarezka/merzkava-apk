@@ -279,7 +279,7 @@ Inventory is exhaustive for `.md` files visible in the recursive Git tree at the
 
 ## Completion definition
 
-The World Archive is not complete until every source in scope has a reviewed disposition, every approved public entity/article has a local document, every restricted source has a documented exclusion/split, and all internal links pass validation. The current 32-dossier / 28-source catalogue is a starter set, not complete coverage. See `docs/WORLD_ARCHIVE_COVERAGE_MATRIX.md` for the full 140-path disposition and AI handoff.
+The World Archive is not complete until every source in scope has a reviewed disposition, every approved public entity/article has a local document, every restricted source has a documented exclusion/split, and all internal links pass validation. The current 32-dossier / 28-source catalogue is a starter set, not complete coverage. See `docs/world-archive/COVERAGE_MATRIX.md` for the full 140-path disposition and AI handoff.
 
 ## Audit limitation
 
@@ -790,7 +790,7 @@ The subsequent claim-level review tightened Beiming Xenhwa's public entry furthe
 
 ## Phase 1 matrix and handoff supersession — 2026-11-01
 
-The current APK catalogue is **87 curated dossiers across 71 approved player-facing Universe source paths, plus 3 `ON_PLAN` placeholders**, on `feature/archive-experience`. The complete 140-path source disposition, stable-ID linking contract, exclusions and handoff order are maintained in [`docs/WORLD_ARCHIVE_COVERAGE_MATRIX.md`](WORLD_ARCHIVE_COVERAGE_MATRIX.md).
+The current APK catalogue is **87 curated dossiers across 71 approved player-facing Universe source paths, plus 3 `ON_PLAN` placeholders**, on `feature/archive-experience`. The complete 140-path source disposition, stable-ID linking contract, exclusions and handoff order are maintained in [`docs/world-archive/COVERAGE_MATRIX.md`](COVERAGE_MATRIX.md).
 
 This supersedes the older 26/39-dossier and 35-source-path handoffs below. The approved player-facing source-path target is now mapped at 71/71 (100%); 3 intentionally under-specified entities remain explicit `ON_PLAN` placeholders rather than fabricated articles. The app has a public-only dossier graph, generated cross-reference IDs, inbound backlinks, and an offline reader for reviewed extracts. Remaining Archive gates are full link/search/backlink/source-reader QA, source freshness, Archive/gameplay isolation proof, accessibility, offline/reconnect behavior, and on-device verification. Earlier audit notes remain historical evidence for their original stage.
 
@@ -833,7 +833,7 @@ This update changes only the APK repository. It does not modify the official Uni
 
 ### Formula source preservation for the future offline game
 
-- **Preserved:** all 16 source files classified `MECHANICS_REFERENCE` in the 140-path matrix, copied verbatim from the same pinned Universe commit into `docs/OFFLINE_GAME_CANON_FORMULA_SNAPSHOT.md`.
+- **Preserved:** all 16 source files classified `MECHANICS_REFERENCE` in the 140-path matrix, copied verbatim from the same pinned Universe commit into `docs/offline-game/CANON_FORMULA_SNAPSHOT.md`.
 - **Supplemental source preserved:** `world/GOLDEN_DRAGON_EMPIRE_GOVERNANCE.md`, which contains the regional public-awakening budget allocation formula and is classified `PUBLIC_CANDIDATE`. Its content remains subject to claim-level player-visibility review.
 - **Formula-source preservation:** 17/17 audited formula/rule source documents = **100% preserved**. The snapshot records the upstream blob SHA beside each source section so later changes can be compared exactly.
 - **Offline engine implementation:** **10 deterministic mechanic modules are implemented and CI-verified** (HP, Satiety, Injury, Time/Day-left, Combat, Spirit Ring compatibility, Spirit Ring progression, Martial Soul Awakening, Economy, and Arcanistry). This is a verified module count, not a whole-engine percentage or a playable game; event/RNG orchestration, persistence, content traceability, remaining formula domains, and complete gameplay integration remain open.
@@ -946,7 +946,7 @@ The source-disposition model remains distinct from dossier publication: six of t
 
 ### Formula source preservation for the future offline game
 
-`docs/OFFLINE_GAME_CANON_FORMULA_SNAPSHOT.md` now preserves all 16/16 `MECHANICS_REFERENCE` modules verbatim from Universe commit `2f76a864150528afb0e3d26cb16f9396ce610ff6`, plus the complete `world/GOLDEN_DRAGON_EMPIRE_GOVERNANCE.md` source containing the supplemental Strategic Awakening regional-allocation formula. Four additional source modules—global wealth distribution, social stratification, Golden Dragon population services, and open learning paths—are preserved verbatim as supporting offline-simulation data/procedures, not mislabelled as formula modules. The snapshot retains upstream blob SHAs and source boundaries. It is a development-only reference: do not expose the full snapshot through the player Archive or treat it as a replacement for the canonical Universe repository.
+`docs/offline-game/CANON_FORMULA_SNAPSHOT.md` now preserves all 16/16 `MECHANICS_REFERENCE` modules verbatim from Universe commit `2f76a864150528afb0e3d26cb16f9396ce610ff6`, plus the complete `world/GOLDEN_DRAGON_EMPIRE_GOVERNANCE.md` source containing the supplemental Strategic Awakening regional-allocation formula. Four additional source modules—global wealth distribution, social stratification, Golden Dragon population services, and open learning paths—are preserved verbatim as supporting offline-simulation data/procedures, not mislabelled as formula modules. The snapshot retains upstream blob SHAs and source boundaries. It is a development-only reference: do not expose the full snapshot through the player Archive or treat it as a replacement for the canonical Universe repository.
 
 At the time of this dossier expansion, the new tests had not yet been executed and no APK build was claimed. Later full-suite Web App Validation #653 passed 15 test files / 133 tests; Android Build #340 produced a verified APK artifact, but emulator installation/smoke success remains unverified.
 

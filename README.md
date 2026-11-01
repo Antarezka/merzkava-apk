@@ -28,4 +28,14 @@ The app contains **two playable experiences in one APK**: (1) **Convo / AI GM**,
 5. Track every existing and planned feature in the [master roadmap](./docs/PRODUCT_ROADMAP.md).
 6. Add features incrementally with tests and documented migrations.
 
-See [PROJECT_DIRECTIVES.md](./PROJECT_DIRECTIVES.md) for the working contract, [docs/PRODUCT_ROADMAP.md](./docs/PRODUCT_ROADMAP.md) for the primary product plan, and [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) for the system design.
+See [PROJECT_DIRECTIVES.md](./PROJECT_DIRECTIVES.md) for the working contract, [docs/PRODUCT_ROADMAP.md](./docs/PRODUCT_ROADMAP.md) for the single master roadmap, and [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) for the system design.
+
+## System documentation
+
+- **Convo / AI GM:** `src/convo/` — connected canon, character, auth, and GM runtime.
+- **World Archive:** [content manifest](./docs/world-archive/CONTENT_MANIFEST.md) and [coverage matrix](./docs/world-archive/COVERAGE_MATRIX.md).
+- **Offline Game:** [canonical formula snapshot](./docs/offline-game/CANON_FORMULA_SNAPSHOT.md); implementation lives in `src/offline-game/`.
+- **Shared infrastructure:** `src/shared/`; app composition: `src/app/`.
+- **Tests:** grouped by system under `tests/`.
+
+Every system-specific note is subordinate to the single [master roadmap](./docs/PRODUCT_ROADMAP.md).

@@ -34,7 +34,7 @@ These percentages measure **source-path coverage**, not claim-by-claim completen
 | Whole-repository source footprint | 72 mapped paths / 140 Markdown paths | **51.4%** | How much of the entire Universe Markdown inventory currently has at least one Archive dossier mapping. |
 | Potential player-facing source scope | 71 mapped / 71 eligible-or-review-needed paths | **100%** | The 71 comprise 21 `PUBLISHED`, 9 `PARTIAL_PUBLIC`, and 41 `PUBLIC_CANDIDATE` source files; no source remains in `REVIEW_REQUIRED`. |
 | Already dispositioned public-scope paths | 71 mapped / 71 `PUBLISHED` + `PARTIAL_PUBLIC` + `PUBLIC_CANDIDATE` paths | **100%** | Coverage among sources already classified into a public-facing disposition; it does not mean every claim is approved. |
-| Canonical mechanics source preservation | 16 / 16 `MECHANICS_REFERENCE` modules copied verbatim, plus the supplemental governance allocation formula | **100% preserved** | Exact development snapshot exists separately in `docs/OFFLINE_GAME_CANON_FORMULA_SNAPSHOT.md`. One supplemental formula-bearing governance source is also preserved. |
+| Canonical mechanics source preservation | 16 / 16 `MECHANICS_REFERENCE` modules copied verbatim, plus the supplemental governance allocation formula | **100% preserved** | Exact development snapshot exists separately in `docs/offline-game/CANON_FORMULA_SNAPSHOT.md`. One supplemental formula-bearing governance source is also preserved. |
 | Initial deterministic mechanic implementation | 7 foundational modules: HP, Satiety, Injury, Time/Day-left, Combat, Spirit Ring compatibility, and Spirit Ring progression | **7 modules implemented; CI verified** | HP state consistency, Satiety interval/intake, Injury recovery, Time/Day-left, Combat, and Spirit Ring formulas are implemented. Overall engine percentage is not baselined; remaining formula domains and dependencies still require an inventory. |
 
 **Current Archive inventory:** 87 curated dossiers / 71 unique player-facing source paths, plus 3 explicit ON_PLAN placeholders and 1 mapped legacy redirect. The 16 mechanics-reference files are intentionally not published as ordinary Archive lore. Claim-level content completeness remains **not yet measured**; do not turn the path ratios above into a claim that the Archive is 51.4% or 100% complete in every dimension.
@@ -228,7 +228,7 @@ These percentages measure **source-path coverage**, not claim-by-claim completen
 
 1. Read `docs/PRODUCT_ROADMAP.md`, especially Workstream 1 and its Phase 1 checkpoint.
 2. Read this matrix in full.
-3. Read `docs/WORLD_ARCHIVE_CONTENT_MANIFEST.md` for detailed source findings.
+3. Read `docs/world-archive/CONTENT_MANIFEST.md` for detailed source findings.
 4. Inspect the actual branch HEAD and working tree; the SHA above is only the pre-documentation baseline.
 5. Verify the Universe source pin; refresh this matrix if `main` moved.
 6. Inspect `src/lore/lore-library.ts`, its event handlers, types, tests and local asset bundling.

@@ -49,3 +49,12 @@ Multiplayer, PvP, guild systems, and cloud synchronization are later milestones.
 
 ## Communication
 Use clear, beginner-friendly explanations. State limitations directly. Do not invent repository state, canon, test results, or implementation progress.
+
+
+## Repository organization
+
+- Keep one master roadmap at `docs/PRODUCT_ROADMAP.md`; all system-specific plans and notes link to it.
+- Keep Convo, World Archive, and Offline Game code in `src/convo/`, `src/world-archive/`, and `src/offline-game/` respectively.
+- Put genuinely cross-mode infrastructure in `src/shared/`; keep app composition in `src/app/`.
+- Mirror those boundaries in `tests/` and `docs/`. Do not create parallel product roadmaps for individual modes.
+- Preserve the source boundary: Convo loads Universe canon directly; Offline Game consumes only approved World Archive packages; neither mode silently imports the other's runtime state or context.

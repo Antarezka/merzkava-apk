@@ -68,3 +68,42 @@ Separate namespaces for Convo sessions/history and Offline Game saves/progressio
 4. Offline Game deterministic mechanics and content runtime
 5. Separate persistence namespaces, migrations, and mode-switch safety
 6. Android packaging, offline end-to-end testing, and repeatable cloud builds
+
+
+## Repository layout contract
+
+The source tree follows system ownership rather than a flat collection of feature folders:
+
+```text
+src/
+  app/                 shared application shell and screen composition
+  shared/              cross-mode platform services and infrastructure
+  convo/               connected Convo / AI GM implementation
+    auth/
+    canon/
+    characters/
+    engine/
+  world-archive/       local archive catalogue, search, links, and reader
+  offline-game/        standalone local game runtime and mechanics
+  assets/              shared app assets
+  audio/ native/ ui/   shared presentation/platform services (keep mode-specific logic out)
+
+tests/
+  convo/
+  world-archive/
+  offline-game/
+
+docs/
+  PRODUCT_ROADMAP.md   single master roadmap for the whole APK
+  ARCHITECTURE.md      shared system architecture and boundaries
+  convo/               Convo-specific technical references
+  world-archive/       Archive inventory and coverage references
+  offline-game/        Offline Game formula/content references
+```
+
+- Keep exactly one product roadmap: `docs/PRODUCT_ROADMAP.md`. System folders may have local README/technical notes, but must link back to the master roadmap and must not create competing roadmap checklists.
+- Each implementation file and test belongs to the system that owns its behavior. Shared code belongs in `src/shared/` only when more than one mode genuinely consumes it.
+- `src/app/` is the composition/presentation boundary. It may call into each system but should not become the home for system rules or persistence logic.
+- Cross-system imports should be deliberate and one-directional: the app shell composes modes; World Archive provides approved content packages to Offline Game; Convo loads canon directly from Universe. Offline Game must not import Convo engines/auth/context, and Convo must not import Archive content as hidden prompt context.
+- Keep tests beside the same ownership boundary under `tests/`. Build/test discovery must include all nested test folders.
+- When a module is moved, update every import and test path in the same commit; do not leave compatibility shims or duplicate source copies unless a documented migration requires them.
