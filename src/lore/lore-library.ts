@@ -608,30 +608,30 @@ function loreLinks(text: string, currentId: string): string {
       ...entry.aliases.map(label => ({ label, id: entry.id, priority: 1, placeholder: false }))
     ]),
     ...LORE_PLACEHOLDERS.flatMap(item => [
-      { label: item.title, id: item.id, priority: 2, placeholder: true },
-      ...item.aliases.map(label => ({ label, id: item.id, priority: 1, placeholder: true }))
+      { label: item.title, id: item.id, priority: 2, placeholder: true, status: item.status },
+      ...item.aliases.map(label => ({ label, id: item.id, priority: 1, placeholder: true, status: item.status }))
     ])
   ].sort((a, b) => b.label.length - a.label.length || b.priority - a.priority || a.id.localeCompare(b.id));
   let result = "";
   let cursor = 0;
   while (cursor < text.length) {
-    let match: { index: number; label: string; id: string; priority: number; placeholder: boolean } | null = null;
+    let match: { index: number; label: string; id: string; priority: number; placeholder: boolean; status?: LoreEntityStatus } | null = null;
     for (const reference of references) {
       const index = text.toLocaleLowerCase().indexOf(reference.label.toLocaleLowerCase(), cursor);
       if (index < 0) continue;
       const before = index > 0 ? text[index - 1] : "";
       const after = text[index + reference.label.length] ?? "";
-      const wordLike = /[\\p{L}\\p{N}_]/u;
+      const wordLike = /[\p{L}\p{N}_]/u;
       if ((before && wordLike.test(before) && wordLike.test(reference.label[0])) ||
           (after && wordLike.test(after) && wordLike.test(reference.label[reference.label.length - 1]))) continue;
       if (!match || index < match.index || (index === match.index && (reference.priority > match.priority || (reference.priority === match.priority && reference.label.length > match.label.length)))) {
-        match = { index, label: reference.label, id: reference.id, priority: reference.priority, placeholder: reference.placeholder };
+        match = { index, label: reference.label, id: reference.id, priority: reference.priority, placeholder: reference.placeholder, status: reference.status };
       }
     }
     if (!match) { result += escapeLore(text.slice(cursor)); break; }
     result += escapeLore(text.slice(cursor, match.index));
     const attribute = match.placeholder ? "data-lore-placeholder-open" : "data-lore-open";
-    result += '<button class="lore-inline-link' + (match.placeholder ? ' lore-inline-link-placeholder' : '') + '" type="button" ' + attribute + '="' + match.id + '">' + escapeLore(match.label) + (match.placeholder ? ' <span class="lore-inline-status">ON PLAN</span>' : '') + '</button>';
+    result += '<button class="lore-inline-link' + (match.placeholder ? ' lore-inline-link-placeholder' : '') + '" type="button" ' + attribute + '="' + match.id + '">' + escapeLore(match.label) + (match.placeholder ? ' <span class="lore-inline-status lore-status-' + (match.status ?? "ON_PLAN").toLowerCase() + '">' + escapeLore((match.status ?? "ON_PLAN").replace("_", " ")) + '</span>' : '') + '</button>';
     cursor = match.index + match.label.length;
   }
   return result;
