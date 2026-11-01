@@ -69,6 +69,43 @@ describe("World Archive visibility and entity routing", () => {
     expect(renderLoreLibrary()).toContain('data-lore-open="black-tide-expanse"');
   });
 
+
+  it("retains source provenance and valid cross-reference IDs on every dossier", () => {
+    const publicIds = new Set(getPublicLoreEntries().map(entry => entry.id));
+    for (const entry of LORE_ENTRIES) {
+      expect(entry.sourceCommit).toMatch(/^[0-9a-f]{40}$/);
+      expect(entry.sourceCommit).toBe("2f76a864150528afb0e3d26cb16f9396ce610ff6");
+      expect(entry.reviewedAt).toBe("2026-11-01");
+      expect(new Set(entry.crossReferenceIds).size).toBe(entry.crossReferenceIds.length);
+      expect(entry.crossReferenceIds).not.toContain(entry.id);
+      for (const target of entry.crossReferenceIds) expect(publicIds.has(target)).toBe(true);
+    }
+  });
+
+  it("keeps Beiming Xenhwa's undisclosed age and flame trait out of the public dossier", () => {
+    const entry = getPublicLoreEntries().find(item => item.id === "beiming-xenhwa");
+    expect(entry).toBeDefined();
+    const publicText = JSON.stringify(entry);
+    expect(publicText).not.toMatch(/\\b17\\b|api putih|white flame/i);
+  });
+
+  it("has no ambiguous title or alias collisions in the public entity index", () => {
+    const names = new Map<string, string>();
+    for (const entry of getPublicLoreEntries()) {
+      for (const name of [entry.title, ...entry.aliases]) {
+        const normalized = name.trim().toLocaleLowerCase();
+        expect(names.has(normalized)).toBe(false);
+        names.set(normalized, entry.id);
+      }
+    }
+  });
+
+  it("only shows categories that contain public dossiers", () => {
+    const html = renderLoreLibrary();
+    expect(html).not.toContain('data-lore-category="BEASTS"');
+    expect(html).not.toContain('data-lore-category="CULTURE"');
+  });
+
   it("does not open a dossier that was removed from the public corpus", () => {
     expect(openLoreEntry("spirit-beasts")).toBe(false);
   });
