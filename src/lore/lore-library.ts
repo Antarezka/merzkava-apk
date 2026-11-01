@@ -397,7 +397,7 @@ export const LORE_ENTRIES: LoreEntry[] = LORE_ENTRY_DRAFTS.map(entry => ({
 function hasLoreReference(text: string, label: string): boolean {
   const lowerText = text.toLocaleLowerCase();
   const lowerLabel = label.toLocaleLowerCase();
-  const wordLike = /[\\p{L}\\p{N}_]/u;
+  const wordLike = /[\p{L}\p{N}_]/u;
   let cursor = 0;
   while (cursor < lowerText.length) {
     const index = lowerText.indexOf(lowerLabel, cursor);
