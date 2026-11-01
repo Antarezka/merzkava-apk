@@ -23,6 +23,22 @@
 | `REVIEW_REQUIRED` | 28 |
 | **Total** | **140** |
 
+## Coverage score — verified source-path metrics (2026-11-01)
+
+These percentages measure **source-path coverage**, not claim-by-claim completeness. A dossier may curate only selected public claims from a source file, so a mapped path is not proof that every paragraph or fact has been reviewed or published.
+
+| Measure | Calculation | Progress | Meaning |
+|---|---:|---:|---|
+| Whole-repository source footprint | 35 mapped paths / 140 Markdown paths | **25.0%** | How much of the entire Universe Markdown inventory currently has at least one Archive dossier mapping. |
+| Potential player-facing source scope | 35 mapped / 72 eligible-or-review-needed paths | **48.6%** | The 72 comprise 21 `PUBLISHED`, 9 `PARTIAL_PUBLIC`, 14 `PUBLIC_CANDIDATE`, and 28 `REVIEW_REQUIRED` source files. |
+| Already dispositioned public-scope paths | 35 mapped / 44 `PUBLISHED` + `PARTIAL_PUBLIC` + `PUBLIC_CANDIDATE` paths | **79.5%** | Coverage among sources already classified into a public-facing disposition; it does not mean every claim is approved. |
+| Canonical mechanics source preservation | 16 / 16 `MECHANICS_REFERENCE` modules copied verbatim | **100% preserved** | Exact development snapshot exists separately in `docs/OFFLINE_GAME_CANON_FORMULA_SNAPSHOT.md`. One supplemental formula-bearing governance source is also preserved. |
+| Offline deterministic formula implementation | Implemented engine modules / required modules | **0%** | No standalone offline gameplay engine exists yet; source preservation is not implementation. |
+
+**Current Archive inventory:** 39 curated dossiers / 35 unique source paths. The 16 mechanics-reference files are intentionally not published as ordinary Archive lore. Claim-level content completeness remains **not yet measured**; do not turn the path ratios above into a claim that the Archive is 25%, 48.6%, or 79.5% complete in every dimension.
+
+**How to read the progress:** use **48.6%** as the current broad source-coverage indicator for the potentially player-facing Archive scope, **25.0%** as the whole-repository footprint, and report formula preservation and game-engine implementation separately. Never combine these into one misleading average.
+
 ## Mandatory entity-link contract
 
 - Stable local dossier IDs are primary keys; display names are not.
