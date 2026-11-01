@@ -318,7 +318,7 @@ The existing catalogue derives each dossier's outbound `crossReferenceIds` from 
 - Runtime modules: `src/offline-game/mechanics/spirit-ring-compatibility.ts` and `spirit-ring-progression.ts`; 15 focused tests.
 - Implements age pressure/EAG, Sync cap, eligible-only success/defect formulas, AWR, geometric compatibility, AgeTotal/PowerScale, Qi, ring eligibility, deviation HP loss, multipliers, and risk classification.
 - Web App Validation #600 passed on commit `9799378bddcd7bafb775ec37ed49b550ec014bf5`: 12 test files / 91 tests, TypeScript, gateway type-check, Vite build.
-- Foundation now **8 deterministic modules CI-verified** (HP, Satiety, Injury, Time/Day-left, Combat, Spirit Ring compatibility, Spirit Ring progression). This is not a whole-game completion percentage.
+- Foundation now **9 deterministic modules CI-verified** (HP, Satiety, Injury, Time/Day-left, Combat, Spirit Ring compatibility, Spirit Ring progression). This is not a whole-game completion percentage.
 - Android Build #327 package/signature verification passed; Android 14 emulator installation/smoke test is still running.
 
 
@@ -329,3 +329,13 @@ The existing catalogue derives each dossier's outbound `crossReferenceIds` from 
 - Rarity draw, explicit mutation decision/10% one-roll resolver, minimum age, and separate evidence-based inherent assessment are implemented.
 - Validation #610 passed: 13 files / 114 tests, TypeScript, gateway type-check, Vite build.
 - Eight deterministic modules are CI-verified; this is not full-game completion. RNG engine, orchestration, persistence, and remaining formulas remain open.
+
+
+## Economy engine milestone — 2026-11-01
+
+- Canon source: `core/10_ECONOMY_SYSTEM.md` at Universe pin `2f76a864150528afb0e3d26cb16f9396ce610ff6` (blob `0cc74b40d07ad8b2fe9fd2e4c37cdad1c0269456`).
+- Runtime: `economy-wallet.ts` and `economy-pricing.ts`; regression tests: 9.
+- Five-currency normalization and unified pricing are implemented, including tier/condition/supply/demand and signed route/local adjustments.
+- One effective scarcity factor prevents double-counting the same seasonal/disaster shortage; extreme/custom scarcity and exceptional demand require evidence.
+- Web App Validation #634 passed: 14 test files / 126 tests, TypeScript, gateway type-check, Vite build.
+- Nine deterministic modules are CI-verified; no whole-game completion percentage is claimed.
