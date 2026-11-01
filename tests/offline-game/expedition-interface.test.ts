@@ -100,9 +100,11 @@ describe("Eternal Path live world scene", () => {
     expect(ETERNAL_SCENES.find(scene=>scene.id===getCurrentDialogue()?.sceneId)?.region).toBe("tianhai-yunzhou");
   });
 
-  it("ships 240 deterministic dialogue nodes across eight scene compositions", () => {
+  it("ships 26 registered scenery assets while retaining 240 authored dialogue nodes across eight scene compositions", () => {
     expect(ETERNAL_DIALOGUES).toHaveLength(240);
-    expect(ETERNAL_SCENES).toHaveLength(8);
+    expect(ETERNAL_SCENES).toHaveLength(26);
+    expect(new Set(ETERNAL_SCENES.map(scene=>scene.image)).size).toBe(26);
+    expect(ETERNAL_SCENES.every(scene=>scene.image.startsWith("/game/scenery/") && scene.provenance==="IN_GAME_ORIGINAL")).toBe(true);
     expect(ETERNAL_DIALOGUES.every(node=>node.provenance==="IN_GAME_ORIGINAL" && node.choices.length===2)).toBe(true);
     expect(ETERNAL_DIALOGUES.every(node=>node.sourceRefs.length===1 && node.sourceRefs[0].universeCommit==="2f76a864150528afb0e3d26cb16f9396ce610ff6")).toBe(true);
     expect(new Set(ETERNAL_DIALOGUES.map(node=>node.id)).size).toBe(240);
