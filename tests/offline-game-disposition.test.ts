@@ -5,7 +5,7 @@ describe("Eternal Path hidden disposition",()=>{
  it("starts from a neutral save-local baseline",()=>{
   const state=createDispositionState();
   expect(state.label).toBe("True Neutral");
-  expect(state.lawfulnessBand).toBe("Normal");
+  expect(state.lawfulnessBand).toBe("Lawful Normal");
   expect(state.scores.order).toBe(50);
  });
  it("derives public labels from order and morality only",()=>{
@@ -15,8 +15,9 @@ describe("Eternal Path hidden disposition",()=>{
  });
  it("keeps the lawfulness band internal and bounded",()=>{
   expect(deriveLawfulnessBand(-10)).toBe("Chaotic");
-  expect(deriveLawfulnessBand(50)).toBe("Normal");
-  expect(deriveLawfulnessBand(100)).toBe("Dedicated");
+  expect(deriveLawfulnessBand(50)).toBe("Lawful Normal");
+  expect(deriveLawfulnessBand(90)).toBe("Lawful Dedicated");
+  expect(deriveLawfulnessBand(100)).toBe("Lawful Absolute");
  });
  it("does not reclassify on one isolated event",()=>{
   const next=applyDispositionEvidence(createDispositionState(),{morality:30},2);
