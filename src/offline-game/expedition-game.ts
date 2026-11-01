@@ -6,6 +6,7 @@ export type EternalWeather = "Clear" | "Cloudy" | "Fog" | "Rain" | "Snow";
 
 export interface EternalScene {
   id: string; region: EternalRegion; label: string; detail: string; image: string;
+  archiveDossierId: string; sourcePath: string; universeCommit: string;
   provenance: "IN_GAME_ORIGINAL";
   note: string;
 }
@@ -24,6 +25,7 @@ export interface EternalChoice { label: string; response: string; effects: { ene
 export interface EternalDialogue {
   id: string; title: string; sceneId: string; chapter: string; speaker: string;
   text: string; provenance: "IN_GAME_ORIGINAL"; originalityNote: string;
+  sourceRefs: {archiveDossierId:string;universeRepository:string;universeCommit:string;sourcePath:string}[];
   choices: [EternalChoice, EternalChoice];
 }
 const chapters = [
