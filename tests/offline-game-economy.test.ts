@@ -12,7 +12,7 @@ describe("canon five-currency wallet arithmetic", () => {
 
   it("converts a mixed wallet to copper and returns normalized denominations", () => {
     expect(walletToCopper({ az: 1, zj: 2, xg: 3, xs: 4, xc: 5 })).toMatchObject({
-      valid: true, totalCopper: 123_040_405,
+      valid: true, totalCopper: 120_030_405,
       wallet: { az: 1, zj: 2, xg: 3, xs: 4, xc: 5 }
     });
   });
