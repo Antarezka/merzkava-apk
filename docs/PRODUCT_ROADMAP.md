@@ -10,23 +10,27 @@ This document is the primary roadmap for the APK. If an older milestone note, RE
 
 ## 1. Product identity and non-negotiable boundaries
 
-Merzkava APK is an Android-first application with two deliberately separate experiences:
+Merzkava APK is **one Android application containing two playable experiences and one shared content/reference layer**:
 
-1. **Connected conversation gameplay:** the AI Game Master obtains its world context from the official Merzkava Universe repository through the active pinned commit, `INDEX.md`, canon loader/router, and context assembler.
-2. **World Archive:** a locally stored, offline reading/reference library inside the app. It is not connected to the AI GM prompt, gameplay context, or save-state authority.
+1. **Convo / AI GM:** connected conversation roleplay. Its active gameplay canon is read directly from the official `Antarezka/merzkava-universe` repository through the pinned commit, `INDEX.md`, canon loader/router, and context assembler.
+2. **Offline Game (working name):** a standalone local game mode. Its world content, lore, places, people, events, choices, and approved game-facing reference data are sourced from the versioned, approved **World Archive package**. It must not depend on AI or a network connection to play.
+3. **World Archive:** the in-app reviewed content library that users can browse offline and that supplies the approved content package consumed by Offline Game. It is not appended to Convo's AI GM prompt or used as Convo's canon loader.
+
+Both modes live in the same APK and may share app shell, navigation, visual components, and infrastructure. They must retain separate mode identity, save/session state, and source-version records; switching modes must not silently merge state or context.
 
 ### Architecture guardrails
 
 - [x] Official Universe repository is the canonical source for world lore and rules.
 - [x] The app's deterministic engine/database, not the AI, validates mechanics and authoritative state changes.
-- [x] World Archive is defined as an offline reference layer, separate from gameplay authority.
-- [ ] Add automated or inspectable tests proving Archive content is never appended to AI GM context.
+- [x] World Archive is defined as the reviewed offline content/reference layer and the approved content source for Offline Game.
+- [ ] Add automated or inspectable tests proving Archive content is never appended to connected Convo / AI GM context.
+- [ ] Keep Convo and Offline Game session/save state isolated, with explicit mode switching and no implicit state import.
 - [x] Show source path, source commit, review date, source classification, and local dossier ID in the Archive; a dedicated offline reader now opens the reviewed public-safe extract.
 - [ ] Keep separate revision records for the active gameplay canon SHA and the Archive content source SHA. Never imply they are the same snapshot.
 - [ ] Verify offline and reconnect behavior without mixing stale or unapproved canon snapshots.
 - [ ] Document this separation in the app's architecture and release checks.
 
-**Hard boundary:** World Archive may inform a future standalone offline game mode only after its content has been reviewed and approved for that mode. It must never silently become the source for connected AI GM conversations.
+**Hard boundaries:** Convo reads its active gameplay canon directly from the official Universe repository; World Archive is not a hidden Convo context source. Offline Game consumes only the approved, versioned World Archive package; it does not fetch raw Universe files or invent missing canon at runtime. World Archive remains browseable in-app. The Archive package is a curated content distribution layer, not a replacement for the official Universe repository as the ultimate canon authority.
 
 ---
 
@@ -190,29 +194,30 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 
 <badge>DESIGN DEFINITION IN PROGRESS — IMPLEMENTATION NOT STARTED</badge>
 
-**Goal:** Build a separate offline life/adventure game whose world, lore, events, available choices, progression rules, terminology, factions, places, creatures, items, and outcomes are derived exclusively from approved Merzkava Universe material published through the World Archive. The mode must feel like living inside Merzkava, not like a generic life simulator wearing Merzkava names.
+**Goal:** Build the Offline Game as the second playable experience inside this same APK. Its world, lore, events, available choices, progression content, terminology, factions, places, creatures, items, and outcomes must be sourced from the approved, versioned World Archive package. The mode must feel like living inside Merzkava, not like a generic life simulator wearing Merzkava names.
 
-**Canon/content rule — 100% Merzkava:** BitLife and Solo Leveling are presentation/design references only. They contribute no world facts, lore, terminology, characters, factions, items, abilities, progression rules, or story content. All such content must come from the official `Antarezka/merzkava-universe` repository, be reviewed for player visibility, and be included in the approved World Archive package before the offline mode can use it. If the Archive does not contain a needed fact or rule, mark that feature BLOCKED and send the gap through the Universe/Archive review process; never let AI invent a substitute.
+**Canon/content rule — 100% Merzkava:** BitLife and Solo Leveling are presentation/design references only. They contribute no world facts, lore, terminology, characters, factions, items, abilities, progression rules, or story content. All such content must first be reviewed against the official `Antarezka/merzkava-universe` canon, approved for the Offline Game, and included in its versioned World Archive package before the mode can use it. At runtime, Offline Game consumes that Archive package rather than independently fetching the Universe repository. If the package does not contain a needed fact or rule, mark that feature BLOCKED and send the gap through the Universe → Archive review/update process; never let AI invent a substitute.
 
 **Current progress:** The separate-mode boundary and the 100% Merzkava content requirement are defined. The full text of all 16 source files classified `MECHANICS_REFERENCE` at the pinned Universe commit has now been preserved verbatim in `docs/OFFLINE_GAME_CANON_FORMULA_SNAPSHOT.md`, alongside the supplemental formula-bearing `world/GOLDEN_DRAGON_EMPIRE_GOVERNANCE.md`. Formula-source preservation is **100% (17/17 source documents)** for this audited set. This is a development reference only. The deterministic HP, Satiety, Injury recovery, Time/Day-left, Combat, Spirit Ring, and Martial Soul Awakening and Economy formula modules are now implemented and CI-verified; other formula domains, player-safe content approval, the event engine, and playable offline mode remain open. Do not assign an overall engine percentage until the complete module inventory and dependencies are baselined. BitLife is only a high-level life-simulation reference; Solo Leveling is only a UI/progression-presentation reference.
 
-**This is a separate mode, not an offline replacement for AI GM conversation.** Confirmed reference: [BitLife — Life Simulator (Candywriter)](https://play.google.com/store/apps/details?id=com.candywriter.bitlife). Use it as a high-level design reference for choice-driven life simulation, not as a source to copy proprietary text, art, branding, or exact content.
+**This is the second playable mode in the same APK, not an offline fallback or replacement for connected Convo.** Confirmed reference: [BitLife — Life Simulator (Candywriter)](https://play.google.com/store/apps/details?id=com.candywriter.bitlife). Use it as a high-level design reference for choice-driven life simulation, not as a source to copy proprietary text, art, branding, or exact content.
 
 ### 5A. Reference and mode boundary
 
-**Purpose:** Prevent reference games from leaking their own content into Merzkava, and prevent offline mode from being confused with connected AI GM play.
+**Purpose:** Prevent reference games from leaking their own content into Merzkava, define World Archive as Offline Game's content source, and keep Offline Game isolated from connected Convo.
 
 - [x] Reference confirmed: [BitLife — Life Simulator](https://play.google.com/store/apps/details?id=com.candywriter.bitlife), design-pattern reference only.
 - [ ] Study the reference at the level of general design patterns; create original Merzkava systems, writing, art, names, and interface rather than copying proprietary expression.
-- [ ] Define the offline mode as a standalone experience, separate from connected AI GM conversation and its save/context pipeline.
-- [ ] Finish and review the World Archive content required by the offline mode.
+- [x] Define Offline Game as a standalone mode inside the same APK, separate from connected Convo and its context/save pipeline.
+- [~] World Archive has 87 curated dossiers / 71 approved player-facing source paths and 3 `ON_PLAN` placeholders; approve and package the specific content needed for Offline Game (coverage completion alone is not game-content approval).
 - [x] Preserve the complete pinned text of all 16 `MECHANICS_REFERENCE` source modules, plus the supplemental GDE governance allocation formula source, in `docs/OFFLINE_GAME_CANON_FORMULA_SNAPSHOT.md`; keep this development snapshot separate from player-facing Archive packaging.
 - [~] Begin porting applicable formulas into deterministic offline engine modules without changing equations, thresholds, dependencies, or explicitly unresolved values. The HP maximum/state-consistency, Satiety interval/intake, Injury recovery, Time/Day-left, Combat, Spirit Ring, Martial Soul Awakening, Economy, and Arcanistry modules are implemented and CI-verified; remaining domains are not yet ported.
 - [ ] Create a content-to-source traceability map: every offline entry/event/choice/rule must point to an approved Archive document and its official Universe source path + source commit.
-- [ ] Define a curated, approved offline content package derived only from approved Archive material.
+- [ ] Define and version a curated Offline Game content package derived only from approved World Archive material, including the game-facing data/formula payloads needed by the mode.
 - [ ] Define a blocking rule: missing, contradictory, GM-only, private, or unreviewed Archive material cannot be used; send the gap back to Archive/canon review.
-- [ ] Keep the offline mode's content snapshot/version separate from the connected gameplay canon SHA.
-- [ ] Do not use Archive text as hidden context for connected AI GM conversations.
+- [ ] Keep the Offline Game's World Archive package version/SHA separate from the connected Convo gameplay canon SHA.
+- [x] Do not use Archive text as hidden context for connected AI GM conversations.
+- [ ] Keep Offline Game saves, progression, and events separate from Convo characters/sessions unless an explicit, reviewed import/export contract is later approved.
 - [ ] Do not promise live NPC behavior, remote events, or online conversation while offline.
 - [ ] Define what happens when the user returns online; mode switching must not overwrite or merge incompatible states.
 
@@ -235,17 +240,17 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 
 ### 5C. Offline reliability and QA
 
-**Purpose:** Prove the mode is genuinely standalone and cannot contaminate connected gameplay or saves.
+**Purpose:** Prove Offline Game is genuinely standalone inside the shared APK and cannot contaminate connected Convo context, sessions, or saves.
 
 - [ ] Test cold launch with airplane mode enabled.
 - [ ] Test full gameplay loop without network or login.
 - [ ] Test app restart and save recovery while offline.
-- [ ] Test switching between offline mode and connected conversation.
-- [ ] Test missing/outdated content package behavior.
-- [ ] Test that offline rewards/state cannot be misrepresented as connected canon events unless an explicit, approved import rule exists.
+- [ ] Test switching between Offline Game and connected Convo without merging their state/context.
+- [ ] Test missing/outdated World Archive package behavior and version pinning.
+- [ ] Test that Offline Game rewards/state cannot be misrepresented as connected Convo canon events unless an explicit, approved import/export rule exists.
 - [ ] Measure storage, memory, battery, and performance on target Android hardware.
 
-**Exit gate:** The mode can be played end-to-end without internet/login, uses approved local content, saves safely, and remains isolated from connected AI GM context and state.
+**Exit gate:** Offline Game can be played end-to-end without internet/login, consumes only its approved versioned World Archive package, saves safely, and remains isolated from connected Convo context and state. Both modes remain discoverable and usable within the same APK.
 
 ---
 
@@ -288,23 +293,23 @@ When the audit discovers additional screens or components, add them to this regi
 
 The workstreams describe product scope; this sequence describes safe delivery order. Priorities may be adjusted when the audit finds a critical defect.
 
-1. **Roadmap and architecture lock:** publish this roadmap, link it from project entry points, and verify the Archive/gameplay boundary.
+1. **Roadmap and architecture lock:** document the one-app / two-mode / shared-Archive architecture, link it from project entry points, and verify all source, context, and save boundaries.
 2. **Existing-feature audit:** inventory screens and controls before adding more surface area.
 3. **World Archive:** content review, offline navigation/search, then typography and visual refinement.
 4. **UI feature expansion:** faction cards/buttons and shared glass/art interaction system.
 5. **App services:** canon review first, then daily check-in and validated reward transactions.
-6. **Offline game design:** confirm the “Life” reference, finish Archive prerequisites, then design and implement a separate playable mode.
+6. **Offline Game design:** confirm the “Life” reference, approve/version the World Archive content package, then implement the second playable mode inside the same APK.
 7. **Future expansion:** prioritize new proposals through Workstream 6.
 
 ### Release checklist
 
 - [ ] Roadmap is linked from README and project directives.
 - [ ] Gameplay canon source and active SHA are visible and verified.
-- [ ] Archive is offline-only and excluded from connected AI GM context.
+- [ ] World Archive is locally browseable, supplies the approved Offline Game package, and is excluded from connected Convo context.
 - [ ] Existing feature register has been populated from source/runtime audit.
 - [ ] No critical visible control is dead or misleading.
 - [ ] Canon-sensitive rewards have written approval and deterministic tests.
-- [ ] Offline game mode passes no-network end-to-end testing before being advertised as playable.
+- [ ] Offline Game passes no-network end-to-end testing and mode/save isolation checks before being advertised as playable.
 - [ ] Save data survives upgrades and migrations.
 - [ ] Build, install, launch, and regression checks have recorded evidence.
 
@@ -384,9 +389,9 @@ Do not assume the newest ChatGPT conversation is the latest repository state. Do
 Use the current project conversation as decision context for these points:
 - Master roadmap request and six workstreams.
 - Confirmation that BitLife is the life-simulation design reference.
-- Confirmation that the offline game must be 100% based on Merzkava Universe content through World Archive.
-- Clarification that World Archive is a local offline reference library and must not be inserted into connected AI GM context.
-- Clarification that offline game is a separate standalone mode, not an offline fallback for connected AI GM conversation.
+- Confirmation that one APK contains connected Convo and a standalone Offline Game, with World Archive as the Offline Game's approved local content source.
+- Clarification that Convo reads the official Universe repository directly and must not receive hidden World Archive context.
+- Clarification that Offline Game is a second playable mode in the same app, not an offline fallback for Convo.
 
 The repository is the durable handoff. When a future conversation adds a new decision, record the decision here (or in the relevant technical document) with its date and commit. Do not invent ChatGPT conversation URLs; add a link only when the actual share/conversation URL is supplied and verified.
 
