@@ -87,3 +87,8 @@ export function animateExpeditionChoiceModal(modal: HTMLElement, open: boolean, 
   });
   else { modal.hidden = true; onComplete?.(); }
 }
+
+export function animateExpeditionPanel(panel:HTMLElement):void {
+  if(reducedMotion()) return;
+  animate(panel,{opacity:[0,1],translateY:[9,0],duration:300,ease:"outCubic"});
+}
