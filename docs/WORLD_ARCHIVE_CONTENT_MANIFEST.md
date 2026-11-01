@@ -977,3 +977,29 @@ All 24 source files are now marked `PUBLIC_CANDIDATE` for the curated extract on
 - Already dispositioned public-scope sources: 67/68 = **98.5%**.
 - Remaining source review: three review-required world modules and one intentionally withheld hidden-group module. The latter is excluded to preserve discovery and GM narrative control, not because it was forgotten.
 - These are path metrics. They do not prove every canon claim, relationship edge, alias, or UI route has been verified.
+
+
+## Player-facing source coverage target reached — 2026-11-01
+
+**Archive catalogue:** 87 curated dossiers / 71 unique player-facing source paths, plus 3 explicit `ON_PLAN` placeholders.
+
+The remaining three previously review-required source files now have claim-reviewed public extracts:
+
+- `world/GOLDEN_DRAGON_EMPIRE_OFFICIALS.md`: 14 named central officeholders and regional governors are individually clickable. Only verified office assignments are shown; political dispositions, private agendas, personal stats, and legacy office records are excluded.
+- `world/IMPERIAL_SPECIAL_FINANCIAL_AUDIT_COMMITTEE.md`: public institutional mandate only. Unnamed personnel, confidential cases, internal procedures, and unconfirmed involvement in Luca's family case are excluded.
+- `world/PRISON_AND_BOUND_ITEMS.md`: high-level restraint categories and functional boundaries only. No universal numeric effects or GM custody procedures are invented.
+
+Two intentionally incomplete/redirecting sources are also handled explicitly:
+
+- `world/ANCIENT_SHAMANISM_AND_BUDDHIST_CLANS.md` maps to the non-revealing `placeholder-remote-mountain-traditions` with status `ON_PLAN`. The app does not disclose group identities, membership, affiliations, capabilities, or discovery details.
+- `world/REGION_BEIMING_HEARTLAND.md` is reclassified as `LEGACY_OR_COMPATIBILITY` and points to the consolidated `beiming` dossier; it is not treated as an independent region.
+
+### Final source-path metrics for this pinned Universe snapshot
+
+- Approved player-facing source scope: 71/71 mapped to curated dossiers or explicit placeholders = **100%**.
+- Whole Universe Markdown inventory: 71/140 paths represented in the player-facing Archive = **50.7%**.
+- Remaining 69/140 paths are intentionally handled outside the player-facing Archive: repository control, mechanics reference, private player data, GM-only content, internal templates, and legacy compatibility.
+- Canonical mechanics preservation: 16/16 mechanics-reference modules copied verbatim, plus the full supplemental Golden Dragon governance source containing the strategic-awakening regional-allocation formula.
+- These metrics certify path disposition/mapping only. They do not certify every link, alias, relationship, claim, search result, UI state, build, or physical-device behavior.
+
+**Important distinction:** 100% means complete coverage of the approved player-facing source scope, not publication of all 140 files and not 100% completion of the future offline game engine.
