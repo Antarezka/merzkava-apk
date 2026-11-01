@@ -2,7 +2,7 @@
 
 > Status: inventory baseline; not a publication approval. Generated from the current repository trees and the APK's local lore catalogue.
 
-> **LATEST HANDOFF (2026-11-01):** The current branch contains **39 curated public dossiers / 35 unique source paths**. Seven Golden Dragon regional dossiers were added from claim-reviewed foundation and administrative facts only. The offline reader displays reviewed public-safe extracts with source provenance; it does not bundle raw canonical Markdown. Automated tests are committed but remain unexecuted, and no new APK build has been produced for these changes. Use the roadmap and coverage matrix as the current work instructions; older audit snapshots below are historical.
+> **LATEST HANDOFF (2026-11-01):** Current measured Archive coverage is **87 curated dossiers / 71 unique approved player-facing Universe source paths**, plus **3 explicit `ON_PLAN` placeholders**. All 71/71 approved player-facing paths resolve to a curated dossier or an intentional non-revealing placeholder (**100% path coverage**, not claim/UI/device completeness). The full 140-file Markdown inventory has a reported 72/140 (51.4%) source-path footprint when the legacy Beiming redirect is included; remaining paths are deliberately classified outside player-facing lore. The offline reader opens reviewed public-safe extracts and does not bundle raw canonical Markdown. Web App Validation #653 passed 15 test files / 133 tests, TypeScript, gateway type-check, and Vite build. Latest documented Android Build #340 produced and verified an APK artifact, but its Android 14 emulator step was cancelled; installation/smoke success is not claimed. Use the roadmap and coverage matrix as current work instructions; older audit notes remain historical.
 
 ## Source snapshots
 
@@ -12,11 +12,12 @@
 - APK repository: `Antarezka/merzkava-apk`
 - APK branch: `feature/archive-experience`
 - APK lore catalogue path: `src/lore/lore-library.ts`
-- APK lore catalogue blob SHA: `58e404e529d42826d0a28df25c90230aa989e90e`
-- Current local entries: **39**
+- APK lore catalogue blob SHA: `7067dfcc1d874a5bc4fbcd45da46ba886a3ab3ce`
+- Current curated local dossiers: **87**
+- Explicit entity placeholders: **3 (`ON_PLAN`)**
 - Offline source reader: **reviewed public-safe extracts bundled in the app code; raw source Markdown is not bundled**
-- Added public dossiers: seven Golden Dragon regions (`Longyuan`, `Canglan`, `Jinyue`, `Tianfeng`, `Yanling`, `Baiyue`, `Xingluo`), using only reviewed foundation and administrative claims.
-- Unique local source files: **35**
+- Coverage includes reviewed regional, institutional, social, route, economic, and NPC public extracts; 24 claim-reviewed NPC public profiles are represented without exposing private or GM-only facts.
+- Unique approved player-facing source paths: **71**
 - Missing local source paths in Universe tree: **0**
 - Universe Markdown inventory: **140 files**
 
@@ -787,23 +788,23 @@ The subsequent claim-level review tightened Beiming Xenhwa's public entry furthe
 
 ## Phase 1 matrix and handoff supersession — 2026-11-01
 
-The current APK catalogue is **39 dossiers across 35 unique Universe source paths**, on `feature/archive-experience`. The complete 140-path source-to-Archive disposition, stable-ID linking contract, next public candidates, exclusions and new-AI start order are maintained in [`docs/WORLD_ARCHIVE_COVERAGE_MATRIX.md`](WORLD_ARCHIVE_COVERAGE_MATRIX.md).
+The current APK catalogue is **87 curated dossiers across 71 approved player-facing Universe source paths, plus 3 `ON_PLAN` placeholders**, on `feature/archive-experience`. The complete 140-path source disposition, stable-ID linking contract, exclusions and handoff order are maintained in [`docs/WORLD_ARCHIVE_COVERAGE_MATRIX.md`](WORLD_ARCHIVE_COVERAGE_MATRIX.md).
 
-This supersedes earlier statements in this manifest that the current catalogue contains 26 entries / 23 source files. The present app has a public-only 39-dossier graph with generated cross-reference IDs and tested title/alias routing. It has a reviewed-extract source reader and inbound backlinks, but still needs a broader entity graph, full Universe coverage, and final offline/isolation QA. Earlier audit notes remain historical evidence for the stages at which they were written; use the Phase 1 matrix and current roadmap checkpoint as the latest handoff.
+This supersedes the older 26/39-dossier and 35-source-path handoffs below. The approved player-facing source-path target is now mapped at 71/71 (100%); 3 intentionally under-specified entities remain explicit `ON_PLAN` placeholders rather than fabricated articles. The app has a public-only dossier graph, generated cross-reference IDs, inbound backlinks, and an offline reader for reviewed extracts. Remaining Archive gates are full link/search/backlink/source-reader QA, source freshness, Archive/gameplay isolation proof, accessibility, offline/reconnect behavior, and on-device verification. Earlier audit notes remain historical evidence for their original stage.
 
-The Phase 1 documentation update does not modify the Universe repository and is not itself an APK build. Android Build #300 remains a baseline artifact only; see the matrix for its smoke-test caveat and required build re-verification.
+The documentation handoff does not modify the official Universe repository and is not itself an APK build. Latest documented Android Build #340 compiled, verified package/version/alignment/signature, and uploaded an artifact; its Android 14 emulator step was cancelled, so installation/smoke success is not claimed. Web App Validation #653 is a separate passing web/CI validation, not APK evidence.
 
 
 ## Entity development placeholders — 2026-11-01
 
 The Archive now distinguishes entity-development status from source-review disposition. Names that are intentionally left open for GM-led narrative development remain clickable through an explicit placeholder registry rather than degrading to unlinked plain text.
 
-- `Huanglongcheng` and `Cangqiong Harbor` are registered as `ON_PLAN`. Their already-established high-level references remain visible, while additional city/harbor details are deliberately not asserted by the APK.
+- `Huanglongcheng`, `Cangqiong Harbor`, and `Remote Mountain Traditions` (alias `High Cloud-Sea Mountains`) are registered as `ON_PLAN`. Their established high-level references remain visible, while additional city, harbor, or hidden-group details are deliberately not asserted by the APK.
 - `ON_PLAN` means intentionally under-specified, not missing data and not permission for the app to invent facts. The GM may develop context-specific narrative details in conversation; those additions do not automatically become official canon.
 - `NON_CANON` is a supported distinct status for explicitly non-official material. No additional named non-canon entities are being invented in this update.
 - Placeholder entries have their own local IDs and detail screens, appear in search, and can be opened from mentions in dossiers. They do not become published lore dossiers, source extracts, or gameplay authority.
 - Source-review classifications such as `PUBLIC_CANDIDATE` and `PARTIAL_PUBLIC` remain separate and unchanged.
-- Regression coverage has been added for placeholder lookup, inline linking, search, detail navigation, related canon links, and status separation. Tests are committed but have not yet been executed in this environment.
+- Regression coverage includes placeholder lookup, inline linking, search, detail navigation, related canon links, and status separation. The later full-suite Web App Validation #653 passed 15 test files / 133 tests; this confirms CI execution, not on-device graph/navigation QA.
 
 This update changes only the APK repository. It does not modify the official Universe repository or convert GM improvisation into canon.
 
@@ -814,7 +815,7 @@ This update changes only the APK repository. It does not modify the official Uni
 - `src/lore/lore-library.ts` now contains the explicit placeholder registry and the `ON_PLAN` / `NON_CANON` status model. `src/main.ts` handles placeholder navigation, and `src/style.css` gives the statuses distinct labels and readable light-theme styling.
 - The current curated examples are Huanglongcheng and Cangqiong Harbor, both `ON_PLAN`. `NON-CANON` is supported by the model and renderer, but no unverified example has been fabricated.
 - `tests/lore-library.test.ts` includes regression coverage for both linked examples, detail navigation, search, and separation from ordinary canon dossier resolution.
-- **Verification:** the latest commit has no associated workflow run. Tests have not been executed; TypeScript/build and device checks remain pending.
+- **Verification:** the later Web App Validation #653 passed the full recorded suite (15 test files / 133 tests), TypeScript, gateway type-check, and Vite build. Physical-device graph/navigation checks remain pending.
 - **APK:** no new build was started. Build #300 remains the previous baseline only; do not present it as containing this change.
 
 ## World Archive coverage and offline formula preservation — 2026-11-01
@@ -822,10 +823,10 @@ This update changes only the APK repository. It does not modify the official Uni
 ### Measured source-path progress
 
 - Universe source snapshot: `main` at `2f76a864150528afb0e3d26cb16f9396ce610ff6`, containing 140 Markdown paths.
-- Current Archive: **39 curated dossiers / 35 unique mapped source paths**.
-- Whole-repository source-path footprint: **35/140 = 25.0%**.
-- Potential player-facing / review-needed scope: **35/72 = 48.6%**. The denominator is 21 `PUBLISHED`, 9 `PARTIAL_PUBLIC`, 14 `PUBLIC_CANDIDATE`, and 28 `REVIEW_REQUIRED` files.
-- Already dispositioned public-scope paths: **35/44 = 79.5%**, where the 44 paths are `PUBLISHED` + `PARTIAL_PUBLIC` + `PUBLIC_CANDIDATE`.
+- Current Archive: **87 curated dossiers / 71 unique approved player-facing source paths**, plus 3 `ON_PLAN` placeholders.
+- Approved player-facing source coverage: **71/71 = 100%** mapped to a dossier or explicit non-revealing placeholder.
+- Whole-repository source-path footprint: **72/140 = 51.4%** when the linked legacy Beiming redirect is included. This broader footprint is not the player-facing coverage denominator.
+- These are source-path disposition metrics only, not claim-level completeness, link correctness, UI quality, or game readiness.
 - These are source-path indicators only. A mapped dossier may contain a curated subset of a source, so claim-level completeness remains unmeasured. Do not describe these figures as a percentage of every fact, paragraph, settlement, NPC, or world mechanic.
 
 ### Formula source preservation for the future offline game
@@ -833,7 +834,7 @@ This update changes only the APK repository. It does not modify the official Uni
 - **Preserved:** all 16 source files classified `MECHANICS_REFERENCE` in the 140-path matrix, copied verbatim from the same pinned Universe commit into `docs/OFFLINE_GAME_CANON_FORMULA_SNAPSHOT.md`.
 - **Supplemental source preserved:** `world/GOLDEN_DRAGON_EMPIRE_GOVERNANCE.md`, which contains the regional public-awakening budget allocation formula and is classified `PUBLIC_CANDIDATE`. Its content remains subject to claim-level player-visibility review.
 - **Formula-source preservation:** 17/17 audited formula/rule source documents = **100% preserved**. The snapshot records the upstream blob SHA beside each source section so later changes can be compared exactly.
-- **Offline engine implementation:** **0%**. No deterministic standalone game engine has been implemented. Copying the source texts is preservation, not a playable or executable rules implementation.
+- **Offline engine implementation:** **10 deterministic mechanic modules are implemented and CI-verified** (HP, Satiety, Injury, Time/Day-left, Combat, Spirit Ring compatibility, Spirit Ring progression, Martial Soul Awakening, Economy, and Arcanistry). This is a verified module count, not a whole-engine percentage or a playable game; event/RNG orchestration, persistence, content traceability, remaining formula domains, and complete gameplay integration remain open.
 - **Packaging boundary:** this is a developer/source-reference snapshot, not a player-facing Archive bundle. Never expose GM-only/private/internal content or use the entire snapshot as runtime lore. Translate each approved mechanic into deterministic engine code, preserve source provenance, and add tests before the offline game can use it.
 - **Canon boundary:** Universe remains the authority. Do not modify or rewrite the Universe source as part of this APK-side preservation work.
 
@@ -1012,3 +1013,12 @@ Two intentionally incomplete/redirecting sources are also handled explicitly:
 - Implements exact official currency ratios and normalization, unified price formula, condition/tier/demand/effective-scarcity factors, distribution/local adjustments, and disaster-band validation.
 - Web App Validation #634 passed: 14 test files / 126 tests, TypeScript, gateway type-check, Vite production build.
 - Nine deterministic modules are CI-verified; whole offline game remains incomplete.
+
+
+### Offline-game code milestone — Arcanistry (2026-11-01)
+
+- Canon source: `core/ARCANISTRY_AND_FORMULATION.md` at Universe pin `2f76a864150528afb0e3d26cb16f9396ce610ff6` (blob `ef674a1fba92facd5e521f0fc7f08c7e730c7d2f`).
+- Runtime: `src/offline-game/mechanics/arcanistry.ts`; regression tests: 5.
+- Implements the Grade 1–10 × Tier 1–10 baseline production-chance matrix, guided-training schedule, production-time and Mortal-Satiety tables, focus-stage/Grade 1 gates, production-experience points, and Artificial Artifact condition score/thresholds. It does not invent random-resolution procedures or numeric situational modifiers.
+- Web App Validation #653 passed: 15 test files / 133 tests, TypeScript, gateway type-check, and Vite production build.
+- Ten deterministic modules are CI-verified. Android Build #340 produced a verified APK artifact, but emulator installation/smoke success is not claimed because the Android 14 emulator step was cancelled.
