@@ -1,13 +1,14 @@
 import { animate, createTimeline } from "animejs";
 
 /**
- * Animate Kitty's three visible PNG layers without changing their shared
- * 1024x1024 canvas alignment. The separate floor shadow is intentionally omitted.
+ * Animate Kitty's visible PNG layers without changing their shared 1024x1024
+ * canvas alignment. The floor shadow belongs in the splash, not the app icon.
  * Ears are painted into kitty-head.png, so movement stays at the head/ear root.
  */
 export function animateOpeningSplash(splash: HTMLElement): () => void {
   const content = splash.querySelector<HTMLElement>(".splash-content");
   const mascot = splash.querySelector<HTMLElement>(".splash-mascot");
+  const shadow = mascot?.querySelector<HTMLElement>(".kitty-shadow");
   const body = mascot?.querySelector<HTMLElement>(".kitty-body");
   const head = mascot?.querySelector<HTMLElement>(".kitty-head");
   const tail = mascot?.querySelector<HTMLElement>(".kitty-tail");
@@ -17,11 +18,11 @@ export function animateOpeningSplash(splash: HTMLElement): () => void {
   const rule = splash.querySelector<HTMLElement>(".splash-rule");
   const tagline = splash.querySelector<HTMLElement>(".splash-tagline");
 
-  if (!content || !mascot || !body || !head || !tail || !title || !lightRay) {
+  if (!content || !mascot || !shadow || !body || !head || !tail || !title || !lightRay) {
     return () => undefined;
   }
 
-  const layers = [body, head, tail];
+  const layers = [shadow, body, head, tail];
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
     content.style.opacity = "1";
     content.style.transform = "none";
@@ -54,10 +55,14 @@ export function animateOpeningSplash(splash: HTMLElement): () => void {
   if (rule) entrance.add(rule, { scaleX: [0, 1], opacity: [0, 1], duration: 620 }, 1040);
   if (tagline) entrance.add(tagline, { opacity: [0, 1], duration: 650 }, 1180);
 
-  // One slow breath shared by torso, head and floor contact shadow.
+  // A subtle contact shadow breathes with Kitty, grounding her on the splash stage.
   const bodyBreath = animate(body, {
     scaleY: [1, 1.009], translateY: [0, -1.1], duration: 2850,
     ease: "inOutSine", alternate: true, loop: true, delay: 1050
+  });
+  const shadowBreath = animate(shadow, {
+    scaleX: [1, 1.035], scaleY: [1, 0.975], opacity: [0.72, 0.9],
+    duration: 2850, ease: "inOutSine", alternate: true, loop: true, delay: 1050
   });
   const headIdle = animate(head, {
     rotate: [-0.38, 0.42], translateY: [0, -0.8], duration: 3650,
@@ -93,6 +98,7 @@ export function animateOpeningSplash(splash: HTMLElement): () => void {
   return () => {
     entrance.pause();
     bodyBreath.pause();
+    shadowBreath.pause();
     headIdle.pause();
     tailSway.pause();
     lightBreath.pause();
