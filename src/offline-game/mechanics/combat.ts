@@ -42,6 +42,7 @@ export interface DamageInput {
   combatRatio: number;
   defenseReductionPercent: DefenseReductionPercent;
   highOutputTechniqueConfirmed?: boolean;
+  isComboFollowup?: boolean;
 }
 
 export interface DamageResolution {
@@ -115,10 +116,11 @@ export function calculateCombatDamage(input: DamageInput): DamageResult {
   if (!Number.isFinite(input.combatRatio) || input.combatRatio <= 0) {
     return { valid: false, error: "INVALID_COMBAT_RATIO" };
   }
-  if (![5, 8, 12, 18].includes(input.baseDamagePercent)) {
+  const allowedBaseDamage = input.isComboFollowup ? [2.5, 4, 6, 9] : [5, 8, 12, 18];
+  if (!allowedBaseDamage.includes(input.baseDamagePercent)) {
     return { valid: false, error: "INVALID_BASE_DAMAGE" };
   }
-  if (input.baseDamagePercent === 18 && !input.highOutputTechniqueConfirmed) {
+  if ((input.baseDamagePercent === 18 || (input.isComboFollowup && input.baseDamagePercent === 9)) && !input.highOutputTechniqueConfirmed) {
     return { valid: false, error: "HIGH_OUTPUT_NOT_CONFIRMED" };
   }
   if (![0, 10, 25, 40, 50].includes(input.defenseReductionPercent)) {
