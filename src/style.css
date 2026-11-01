@@ -1,4 +1,12 @@
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:wght@400;500;600;700&display=swap');
+@font-face{font-family:"Cinzel";src:url("./assets/fonts/cinzel-latin-400-normal.woff2") format("woff2");font-style:normal;font-weight:400;font-display:swap;}
+@font-face{font-family:"Cinzel";src:url("./assets/fonts/cinzel-latin-500-normal.woff2") format("woff2");font-style:normal;font-weight:500;font-display:swap;}
+@font-face{font-family:"Cinzel";src:url("./assets/fonts/cinzel-latin-600-normal.woff2") format("woff2");font-style:normal;font-weight:600;font-display:swap;}
+@font-face{font-family:"Cinzel";src:url("./assets/fonts/cinzel-latin-700-normal.woff2") format("woff2");font-style:normal;font-weight:700;font-display:swap;}
+@font-face{font-family:"Cormorant Garamond";src:url("./assets/fonts/cormorant-garamond-latin-400-normal.woff2") format("woff2");font-style:normal;font-weight:400;font-display:swap;}
+@font-face{font-family:"Cormorant Garamond";src:url("./assets/fonts/cormorant-garamond-latin-500-normal.woff2") format("woff2");font-style:normal;font-weight:500;font-display:swap;}
+@font-face{font-family:"Cormorant Garamond";src:url("./assets/fonts/cormorant-garamond-latin-600-normal.woff2") format("woff2");font-style:normal;font-weight:600;font-display:swap;}
+@font-face{font-family:"Cormorant Garamond";src:url("./assets/fonts/cormorant-garamond-latin-700-normal.woff2") format("woff2");font-style:normal;font-weight:700;font-display:swap;}
+500;600;700&family=Cormorant+Garamond:wght@400;500;600;700&display=swap');
 :root {
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: #f3eee5; background: #171513; font-synthesis: none; text-rendering: optimizeLegibility;
@@ -741,3 +749,39 @@ button {color:inherit;} button:focus-visible {outline-color:#a68d5e;}
 .quick-arrow{position:absolute;right:13px;bottom:12px;color:#9d8557;font-size:14px}
 @media(min-width:620px){.faction-card-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.faction-card{grid-template-columns:1fr;grid-template-rows:145px 1fr;min-height:290px}.faction-art{border-right:0;border-bottom:1px solid #d5c28b44}.faction-card-content{padding:15px}.faction-card-content strong{font-size:26px}}
 @media(prefers-reduced-motion:reduce){.faction-card,.home-quick-access .overview-card{transition:none}}
+
+
+/* World Archive readability pass — retain the dark archival palette, strengthen the reading hierarchy. */
+.lore-overline{color:#e0b77e;font-size:10px;line-height:1.65}
+.lore-hero-copy>p{color:#e0d4c5;font-size:13px;line-height:1.75}
+.lore-hero-stamp{color:#cbbba6;font-size:10px;line-height:1.6}
+.lore-library-head p{color:#c2b6a6;font-size:12px;line-height:1.65}
+.lore-record-count small{font-size:9px}
+.lore-search input{font-size:14px}
+.lore-search input::placeholder{color:#b4a795;opacity:1}
+.lore-search kbd{color:#b4a795;font-size:10px}
+.lore-category{color:#d8c9b4;font-size:11px;min-height:36px}
+.lore-category.is-active{color:#f2d7ae}
+.lore-card-index{color:#d6a36c;font-size:10px}
+.lore-card-title{font-size:24px;line-height:1.12}
+.lore-card-summary{color:#d0c5b8;font-size:13px;line-height:1.7}
+.lore-card-foot{color:#c2b29f;font-size:10px;line-height:1.5;letter-spacing:.04em}
+.lore-footnote{color:#c2b6a6;font-size:10px;line-height:1.75;letter-spacing:.07em}
+.lore-back{font-size:11px;min-height:36px}
+.lore-detail-top{font-size:10px;line-height:1.6}
+.lore-detail-top span+span{color:#b6a894}
+.lore-lede{font-size:17px;line-height:1.65}
+.lore-paragraph{color:#d7ccbe;font-size:14px;line-height:1.85;grid-template-columns:27px minmax(0,1fr);gap:10px}
+.lore-paragraph-mark{color:#d4a16b;font-size:12px}
+.lore-source-kicker{font-size:10px}
+.lore-source-card strong{font-size:21px}
+.lore-source-card code{color:#c8b49a;font-size:11px;line-height:1.6}
+.lore-source-card small{color:#c1b5a6;font-size:11px;line-height:1.7}
+.lore-related>button{color:#e1d2be;font-size:12px;line-height:1.5}
+.lore-empty p{color:#c2b6a6;font-size:12px;line-height:1.65}
+@media(max-width:360px){
+  .lore-hero-copy{max-width:76%}
+  .lore-hero h2{font-size:clamp(35px,10vw,43px)}
+  .lore-paragraph{font-size:14px;grid-template-columns:23px minmax(0,1fr);gap:8px}
+  .lore-card-summary{font-size:13px}
+}

@@ -63,12 +63,12 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 
 ### 1B. Typography and reading comfort
 
-- [ ] Audit current fonts, font weights, sizes, line heights, letter spacing, and fallback behavior.
-- [ ] Improve readability on small Android screens and long-form lore pages.
-- [ ] Establish a consistent type scale for page title, section title, body, metadata, captions, and navigation labels.
+- [x] Audit current fonts, font weights, sizes, line heights, letter spacing, and fallback behavior; local font files and system fallbacks are now explicit.
+- [x] Improve readability on small Android screens and long-form lore pages; mobile type sizes, body leading, and metadata hierarchy have been raised.
+- [x] Establish a consistent type scale for Archive page title, section title, body, metadata, captions, and navigation labels.
 - [ ] Check mixed Latin/CJK/fantasy terms, punctuation, symbols, and special characters for missing glyphs.
 - [ ] Check contrast, text wrapping, clipping, overflow, and dynamic font scaling.
-- [ ] Preserve the established Merzkava visual identity; typography changes must not flatten the existing atmosphere.
+- [x] Preserve the established Merzkava visual identity; the dark archive, aged brass, and parchment palette remain intact.
 - [ ] Verify the reading experience in light/dark themes if both are supported.
 
 ### 1C. Archive navigation and interaction
@@ -429,3 +429,12 @@ Before implementing a new feature or changing an existing one:
 5. Record the commit/build/test evidence when complete.
 
 **Do not mark an item DONE without verification. Do not change the connected-gameplay / offline-Archive boundary without an explicit product decision.**
+
+
+### Typography implementation pass — 2026-11-01
+
+- Removed the Google Fonts runtime import from the app stylesheet. Cinzel and Cormorant Garamond are now bundled as local WOFF2 assets (weights 400, 500, 600, and 700), with `font-display: swap`; Archive typography no longer depends on a live font request.
+- Added the corresponding SIL Open Font License notices under `src/assets/fonts/licenses/`.
+- Raised small-screen Archive copy, summaries, category controls, source metadata, paragraph markers, and footnotes. The dark charcoal archive surfaces, warm brass accents, and parchment-like text palette are retained.
+- Added automated checks for local font asset presence, remote font-import removal, and the minimum Archive text scale.
+- **Still open:** on-device visual verification at narrow widths, Android system font scaling, and offline/reconnect smoke testing. This pass does not close the full Workstream 1 exit gate or certify article-by-article canon review.
