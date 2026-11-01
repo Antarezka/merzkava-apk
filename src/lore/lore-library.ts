@@ -665,7 +665,14 @@ const PUBLIC_CANDIDATE_SOURCE_PATHS = new Set([
   "world/REGION_TIANFENG.md",
   "world/REGION_YANLING.md",
   "world/REGION_BAIYUE.md",
-  "world/REGION_XINGLUO.md"
+  "world/REGION_XINGLUO.md",
+  "world/GOLDEN_DRAGON_EMPIRE_GOVERNANCE.md",
+  "world/GOLDEN_DRAGON_EMPIRE_POPULATION_SERVICES.md",
+  "world/OPEN_LEARNING_PATHS_AND_WANDERING_INSTRUCTORS.md",
+  "world/SOCIAL_STRATIFICATION.md",
+  "world/THREE_POWER_PERSPECTIVE_MAPS.md",
+  "world/TIANHAI_ACADEMIES_AND_ARCANIST_INSTITUTE.md",
+  "world/WEALTH_DISTRIBUTION.md"
 ]);
 
 export const LORE_PLACEHOLDERS: LorePlaceholder[] = [
@@ -690,7 +697,8 @@ const PARTIAL_PUBLIC_SOURCE_PATHS = new Set([
   "world/FACTIONS.md",
   "world/RUINED_ARCHIVER.md",
   "world/ARTIFACTS_AND_RELICS.md",
-  "world/ARTIFICIAL_ARTIFACTS.md"
+  "world/ARTIFICIAL_ARTIFACTS.md",
+  "world/GEOGRAPHY_AND_TRAVEL.md"
 ]);
 
 function formatLoreEntityStatus(status: LoreEntityStatus): string {
