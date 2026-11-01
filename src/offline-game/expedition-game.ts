@@ -335,7 +335,8 @@ export function setEternalLocation(sceneId:string):void {
   const destination=ETERNAL_SCENES.find(scene=>scene.id===sceneId);
   if(!current || !destination) return;
   current.locationId=destination.id;
-  current.weather=resolveDailyWeather(destination.region,current.day);
+  const weatherRegion=destination.region==="golden-dragon-empire"||destination.region==="tianhai-yunzhou"||destination.region==="beiming-gu" ? destination.region : current.character.region;
+  current.weather=resolveDailyWeather(weatherRegion,current.day);
   persist();
 }
 
