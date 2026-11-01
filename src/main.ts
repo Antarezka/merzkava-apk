@@ -479,14 +479,8 @@ function render(): void {
     ${activeScreen === "home" && noticeboardVisible ? noticeboardMarkup() : ""}
     ${bugPanelMarkup()}
   </div>`;
-  const bottomNav = root.querySelector<HTMLElement>(".bottom-nav");
-  if (bottomNav) {
-    const activeIndex = navigation.findIndex(item => item.id === activeScreen);
-    if (activeIndex >= 0) {
-      const pageStart = Math.floor(activeIndex / 4) * 4;
-      bottomNav.scrollLeft = pageStart * (bottomNav.clientWidth / 4);
-    }
-  }
+  // Keep the navigation rail anchored at its initial scroll position on route changes.
+  // Users may still swipe the rail manually; selecting a screen must not move the rail.
   menuRevealPending = false;
   if (shouldAnimateScreen) animateAppScreen(root.querySelector<HTMLElement>(".app-shell"));
   if (activeScreen === "offline-game") {
