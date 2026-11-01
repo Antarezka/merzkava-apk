@@ -1,7 +1,7 @@
 import "./style.css";
 import "./ui/floating-ledger.css";
 import "./ui/floating-control.css";
-import { cancelOpeningSequence, playButtonSound, playOpeningSequence, playSnapshotSlideSound, playWarningBeep, setSoundEnabled } from "./audio/sound-effects";
+import { cancelOpeningSequence, playButtonSound, playNavigationTick, playOpeningSequence, playSnapshotSlideSound, playWarningBeep, setSoundEnabled } from "./audio/sound-effects";
 import { getGameplaySessionRecord, initializeDatabase, saveGameplaySessionRecord } from "./shared/database";
 import { createCharacter, deleteCharacter, listCharacters, type Character } from "./convo/characters/character-repository";
 import { validateCharacterDraft } from "./convo/engine/character-validation";
@@ -478,6 +478,14 @@ function render(): void {
     ${activeScreen === "home" && noticeboardVisible ? noticeboardMarkup() : ""}
     ${bugPanelMarkup()}
   </div>`;
+  const bottomNav = root.querySelector<HTMLElement>(".bottom-nav");
+  if (bottomNav) {
+    const activeIndex = navigation.findIndex(item => item.id === activeScreen);
+    if (activeIndex >= 0) {
+      const pageStart = Math.floor(activeIndex / 4) * 4;
+      bottomNav.scrollLeft = pageStart * (bottomNav.clientWidth / 4);
+    }
+  }
   menuRevealPending = false;
   if (shouldAnimateScreen) animateAppScreen(root.querySelector<HTMLElement>(".app-shell"));
   if (activeScreen === "offline-game") {
@@ -590,6 +598,32 @@ root.addEventListener("pointercancel", () => {
   pointerStart = null;
   suppressNextPointerClick = false;
 }, { passive: true });
+
+let navigationScrollIntent = false;
+let lastNavigationTick = -1;
+let navigationIntentTimer: number | undefined;
+root.addEventListener("pointerdown", event => {
+  if ((event.target as Element | null)?.closest(".bottom-nav")) navigationScrollIntent = true;
+}, { passive: true });
+root.addEventListener("touchstart", event => {
+  if ((event.target as Element | null)?.closest(".bottom-nav")) navigationScrollIntent = true;
+}, { passive: true });
+root.addEventListener("wheel", event => {
+  if ((event.target as Element | null)?.closest(".bottom-nav")) navigationScrollIntent = true;
+}, { passive: true });
+root.addEventListener("scroll", event => {
+  const nav = event.target;
+  if (!(nav instanceof HTMLElement) || !nav.matches(".bottom-nav") || !navigationScrollIntent) return;
+  const itemWidth = nav.clientWidth / 4;
+  if (!itemWidth) return;
+  const tick = Math.round(nav.scrollLeft / itemWidth);
+  if (tick !== lastNavigationTick) {
+    lastNavigationTick = tick;
+    playNavigationTick();
+  }
+  window.clearTimeout(navigationIntentTimer);
+  navigationIntentTimer = window.setTimeout(() => { navigationScrollIntent = false; }, 650);
+}, true);
 
 root.addEventListener("click", async (event: MouseEvent) => {
   const target = event.target;
