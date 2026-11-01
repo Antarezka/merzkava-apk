@@ -888,7 +888,7 @@ The first deterministic mechanic module has been added to the APK repository wit
 - Validation: [Web App Validation #584](https://github.com/Antarezka/merzkava-apk/actions/runs/41306800435) passed: 9 test files / 66 tests, TypeScript, gateway type-check, and Vite build.
 - Implemented: fallback calendar and seasons, date/time rollover, action-duration limits, protected night sleep, pure-cultivation eligibility and 30-day cap, verified Satiety accounting, cooldown accumulation excluding cultivation, and Day-left ceiling.
 - Explicit boundary: session era, initial date/weather/weekday anchor, travel durations, and actual action success are inputs/decisions from the session/game world; this utility does not invent them.
-- Current foundation: **4 modules implemented and CI-verified (HP + Satiety + Injury + Time/Day-left)**. The full game engine remains incomplete; no overall percentage is assigned.
+- Current foundation: **7 modules implemented and CI-verified (HP + Satiety + Injury + Time/Day-left + Combat + Spirit Ring compatibility + Spirit Ring progression)**. The full game engine remains incomplete; no overall percentage is assigned.
 - Android Build #322 is still a separate build/emulator run. It targets the Time module commit before the test-fixture-only follow-up; no final APK status is implied here.
 
 
@@ -903,3 +903,13 @@ The first deterministic mechanic module has been added to the APK repository wit
 - Source observation: for positive combat ratios the hit-chance formula's raw minimum approaches 25%, so the stated 10% lower clamp is unreachable with valid inputs. Code preserves the source formula/clamp; no upstream canon edit was made.
 - Current foundation: **5 modules implemented and CI-verified (HP + Satiety + Injury + Time/Day-left + Combat)**. The full game engine remains incomplete; no overall percentage is assigned.
 - Android Build #324 is a separate build on the Combat implementation commit and remains subject to package/emulator checks.
+
+
+### Offline-game code milestone — Spirit Ring formulas (2026-11-01)
+
+- Source: `core/SPIRIT_RING_RULES.md` at Universe pin `2f76a864150528afb0e3d26cb16f9396ce610ff6`; blob `72666ef29bd5df41364f4727596747606fe581cf`.
+- Runtime: `spirit-ring-compatibility.ts` and `spirit-ring-progression.ts`; regression coverage: 15 tests.
+- Implements age pressure/EAG, Sync cap, gated success/defect chance, AWR, geometric compatibility, PowerScale, Qi, absorption gates, forced deviation damage, and risk classification.
+- Web App Validation #600 passed: 12 test files / 91 tests, TypeScript, gateway type-check, and Vite production build.
+- Seven deterministic modules are CI-verified; full offline game remains incomplete and has no overall completion percentage.
+- Android Build #327: APK package/version/alignment/signature verification passed; Android 14 emulator smoke test remains pending.
