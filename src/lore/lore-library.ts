@@ -437,6 +437,14 @@ export function resolveLoreEntry(label: string, currentId?: string): LoreEntry |
     ?? entries.find(entry => entry.aliases.some(alias => alias.toLocaleLowerCase() === query));
 }
 
+/** Public dossiers that mention this dossier by an approved title or alias. */
+export function getLoreBacklinks(id: string): LoreEntry[] {
+  if (!getPublicLoreEntries().some(entry => entry.id === id)) return [];
+  return getPublicLoreEntries().filter(entry =>
+    entry.id !== id && entry.crossReferenceIds.includes(id)
+  );
+}
+
 let activeLoreCategory: LoreCategory | "ALL" = "ALL";
 let activeLoreQuery = "";
 let activeLoreId: string | null = null;
@@ -512,6 +520,7 @@ function renderLoreDetail(entry: LoreEntry): string {
     .map(id => getPublicLoreEntries().find(item => item.id === id))
     .filter((item): item is LoreEntry => Boolean(item))
     .slice(0, 5);
+  const backlinks = getLoreBacklinks(entry.id);
   return '<article class="lore-detail">' +
     '<button class="lore-back" type="button" data-lore-back>← ARCHIVE INDEX</button>' +
     '<div class="lore-detail-top"><span>' + escapeLore(entry.eyebrow) + '</span><span>LOCAL DOSSIER</span></div>' +
@@ -521,7 +530,11 @@ function renderLoreDetail(entry: LoreEntry): string {
     '<div class="lore-source-card"><span class="lore-source-kicker">CANON REFERENCE</span><strong>' + escapeLore(entry.sourceLabel) + '</strong><code>' + escapeLore(entry.sourcePath) + '</code><small>Reviewed ' + escapeLore(entry.reviewedAt) + ' · Universe snapshot ' + escapeLore(entry.sourceCommit.slice(0, 7)) + '. Arsip lokal ini adalah ringkasan lore; aturan dan resolusi gameplay tetap merujuk repo canon.</small></div>' +
     '<div class="lore-related"><span class="lore-source-kicker">RELATED RECORDS</span>' +
     relatedRecords.map(item => '<button type="button" data-lore-open="' + item.id + '">' + escapeLore(item.title) + ' <b>↗</b></button>').join("") +
-    '</div></article>';
+    '</div>' +
+    (backlinks.length ? '<div class="lore-related lore-backlinks"><span class="lore-source-kicker">MENTIONED IN</span>' +
+      backlinks.map(item => '<button type="button" data-lore-open="' + item.id + '">' + escapeLore(item.title) + ' <b>↗</b></button>').join("") +
+      '</div>' : '') +
+    '</article>';
 }
 
 export function renderLoreLibrary(): string {
