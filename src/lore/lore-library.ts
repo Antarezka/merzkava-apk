@@ -274,10 +274,10 @@ const LORE_ENTRY_DRAFTS: Omit<LoreEntry, "sourceCommit" | "reviewedAt" | "crossR
   {
     id: "beiming-xenhwa", title: "Beiming Xenhwa", aliases: ["北冥玄华"],
     visibility: "PUBLISHED",
-    category: "PEOPLES", eyebrow: "BEIMING GU · CHARACTER FILE", summary: "Putri angkat Beiming Han, seorang half-beast dengan ciri rubah berekor sembilan putih.",
+    category: "PEOPLES", eyebrow: "BEIMING GU · CHARACTER FILE", summary: "Putri angkat Beiming Han yang dikenal karena kecantikan luar biasa, aroma alami, dan indra yang sangat peka.",
     paragraphs: [
-      "Beiming Xenhwa tercatat sebagai putri angkat Beiming Han dan merupakan half-beast dengan ciri white nine-tailed fox.",
-      "Afiliasinya adalah Beiming Gu, tetapi keberadaan fisiknya saat ini tidak boleh ditebak.",
+      "Beiming Xenhwa tercatat sebagai putri angkat Beiming Han. Profil publik menonjolkan kecantikan luar biasa, aroma alami pasif, dan indra yang sangat peka.",
+      "Afiliasinya adalah Beiming Gu, tetapi keberadaan fisiknya saat ini tidak boleh ditebak. Detail usia, garis keturunan, dan kemampuan yang tidak termasuk profil publik tidak disajikan sebagai fakta umum.",
       "Detail kemampuan, batas pribadi, dan hubungan lain harus mengikuti profil lengkapnya."
     ],
     sourcePath: "regions/beiming-gu/npcs/BEIMING_XENHWA.md", sourceLabel: "Beiming Xenhwa · Canonical NPC Profile"
