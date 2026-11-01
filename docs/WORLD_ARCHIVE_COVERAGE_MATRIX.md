@@ -320,3 +320,12 @@ The existing catalogue derives each dossier's outbound `crossReferenceIds` from 
 - Web App Validation #600 passed on commit `9799378bddcd7bafb775ec37ed49b550ec014bf5`: 12 test files / 91 tests, TypeScript, gateway type-check, Vite build.
 - Foundation now **8 deterministic modules CI-verified** (HP, Satiety, Injury, Time/Day-left, Combat, Spirit Ring compatibility, Spirit Ring progression). This is not a whole-game completion percentage.
 - Android Build #327 package/signature verification passed; Android 14 emulator installation/smoke test is still running.
+
+
+## Awakening engine milestone — 2026-11-01
+
+- `core/MARTIAL_SOUL_AWAKENING.md` is pinned to Universe SHA `2f76a864150528afb0e3d26cb16f9396ce610ff6` (blob `fe56339b8c8fb2d70597c8a03891b7cf947a9cf8`).
+- Runtime: `src/offline-game/mechanics/martial-soul-awakening.ts`; tests: 22.
+- Rarity draw, explicit mutation decision/10% one-roll resolver, minimum age, and separate evidence-based inherent assessment are implemented.
+- Validation #610 passed: 13 files / 114 tests, TypeScript, gateway type-check, Vite build.
+- Eight deterministic modules are CI-verified; this is not full-game completion. RNG engine, orchestration, persistence, and remaining formulas remain open.
