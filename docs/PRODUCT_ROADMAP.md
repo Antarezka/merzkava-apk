@@ -178,11 +178,13 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 
 **Goal:** When connected AI conversation is unavailable, offer a separate offline game experience with a life-simulation and progression-system atmosphere inspired by the user's stated Play Store reference and Solo Leveling-style system fantasy.
 
-**This is a separate mode, not an offline replacement for AI GM conversation.** The exact Play Store title/reference called “Life” still needs confirmation before detailed feature matching.
+**This is a separate mode, not an offline replacement for AI GM conversation.** Confirmed reference: [BitLife — Life Simulator (Candywriter)](https://play.google.com/store/apps/details?id=com.candywriter.bitlife). Use it as a high-level design reference for choice-driven life simulation, not as a source to copy proprietary text, art, branding, or exact content.
 
-### 5A. Mode boundary and prerequisites
+### 5A. Reference and mode boundary
 
-- [ ] Confirm the exact reference game titled “Life” with the user before copying or closely matching specific mechanics/UI.
+- [x] Reference confirmed: [BitLife — Life Simulator](https://play.google.com/store/apps/details?id=com.candywriter.bitlife).
+- [ ] Study the reference at the level of general design patterns; create original Merzkava systems, writing, art, names, and interface rather than copying proprietary expression.
+- [ ] Define the offline mode as a standalone experience, separate from connected AI GM conversation and its save/context pipeline.
 - [ ] Finish and review the World Archive content required by the offline mode.
 - [ ] Define a curated, approved offline content package derived from Archive material.
 - [ ] Keep the offline mode's content snapshot/version separate from the connected gameplay canon SHA.
@@ -192,8 +194,12 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 
 ### 5B. Offline gameplay concept
 
+- [ ] Choice-driven life simulation: character life stages, background, daily decisions, relationships, education/training, occupations/roles, resources, reputation, and long-term consequences, adapted to Merzkava canon.
+- [ ] Year/season/day progression with events and meaningful decisions; define the time scale so it works with Merzkava's world rules.
+- [ ] Build an event and choice system with varied outcomes and replayability; outcomes must be deterministic/seeded and locally persisted where appropriate.
 - [ ] Design a self-contained life/adventure loop: character status, daily life, exploration, encounters, progression, and consequences.
-- [ ] Design a system-style interface and progression presentation with a Solo Leveling-like atmosphere, while keeping original Merzkava naming, art, lore, and mechanics.
+- [ ] Add a System layer inspired by Solo Leveling's presentation: status window, quests/objectives, attributes, titles/achievements, notifications, and progression feedback, using original Merzkava naming, art, lore, and mechanics.
+- [ ] Connect life-simulation choices to the System layer without turning every action into combat or a generic level grind.
 - [ ] Use deterministic local rules for rewards, combat, progression, time, inventory, and character state.
 - [ ] Use only content approved for offline player access.
 - [ ] Provide meaningful choices and consequences without requiring AI or network access.
