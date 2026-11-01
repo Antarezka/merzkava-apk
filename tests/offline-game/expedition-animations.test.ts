@@ -33,7 +33,7 @@ describe("Eternal Path Anime.js motion",()=>{
  });
  it("animates the choice sheet in and out without changing game state",()=>{
   const sheet={},backdrop={};
-  const modal={hidden:true,querySelector:vi.fn((selector:string)=>selector.includes("sheet")?sheet:backdrop)} as unknown as HTMLElement;
+  const modal={hidden:true,dataset:{},querySelector:vi.fn((selector:string)=>selector.includes("sheet")?sheet:backdrop)} as unknown as HTMLElement;
   animateExpeditionChoiceModal(modal,true);
   expect(modal.hidden).toBe(false);
   expect(mocks.animate).toHaveBeenCalledWith(sheet,expect.objectContaining({translateY:[34,0]}));
