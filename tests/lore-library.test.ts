@@ -220,6 +220,11 @@ describe("World Archive visibility and entity routing", () => {
       "xuansong-qinghe", "xuanye-zhenbei", "yaochi-suwen", "yinshan-qiaofeng"
     ]) expect(html).toContain('data-lore-open="' + id + '"');
 
+    expect(openLoreEntry("geography-travel")).toBe(true);
+    html = renderLoreLibrary();
+    expect(html).toContain('data-lore-placeholder-open="placeholder-remote-mountain-traditions"');
+    expect(html).toContain("ON PLAN");
+
     expect(openLoreEntry("tianhai")).toBe(true);
     html = renderLoreLibrary();
     expect(html).toContain('data-lore-open="duan-haicheng"');
