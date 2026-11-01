@@ -621,12 +621,21 @@ root.addEventListener("scroll", event => {
 }, true);
 
 root.addEventListener("keydown", event => {
-  if(event.key!=="Escape") return;
   const modal=root.querySelector<HTMLElement>(".expedition-choice-modal:not([hidden])");
   if(!modal) return;
-  modal.hidden=true;
-  document.body.classList.remove("eternal-choice-open");
-  root.querySelector<HTMLButtonElement>("[data-eternal-open-choices]")?.focus();
+  if(event.key==="Escape") {
+    modal.hidden=true;
+    document.body.classList.remove("eternal-choice-open");
+    root.querySelector<HTMLButtonElement>("[data-eternal-open-choices]")?.focus();
+    return;
+  }
+  if(event.key==="Tab") {
+    const focusable=Array.from(modal.querySelectorAll<HTMLElement>('button:not(:disabled),[href],input:not(:disabled),select:not(:disabled),textarea:not(:disabled),[tabindex]:not([tabindex="-1"])'));
+    if(!focusable.length) return;
+    const first=focusable[0],last=focusable[focusable.length-1];
+    if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
+    else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
+  }
 });
 root.addEventListener("click", async (event: MouseEvent) => {
   const target = event.target;
