@@ -1,4 +1,5 @@
 import { advanceFallbackCalendar, type SessionTimestamp } from "./mechanics/time";
+import { createDispositionState, type DispositionState } from "./disposition";
 
 export type EternalRegion = "golden-dragon-empire" | "tianhai-yunzhou" | "beiming-gu";
 export type EternalCycle = "Dawn" | "Morning" | "Day" | "Dusk" | "Night";
@@ -76,7 +77,8 @@ export const ETERNAL_DIALOGUES: EternalDialogue[] = chapters.flatMap((chapter, c
 ).flat();
 
 export interface EternalSave {
-  schemaVersion:1; character:{name:string;age:number;region:EternalRegion};
+  schemaVersion:2; character:{name:string;age:number;region:EternalRegion};
+  disposition:DispositionState;
   /** Stable world location; deliberately independent from the current dialogue node. */
   locationId:string;
   day:number; hour:number; minute:number; weather:EternalWeather;
@@ -103,8 +105,11 @@ function currentWorldRegion(current:EternalSave|null=getEternalSave()):EternalRe
 function readSave(): EternalSave | null {
   try {
     const raw=localStorage.getItem(SAVE_KEY); if(!raw) return null;
-    const parsed=JSON.parse(raw) as EternalSave;
-    if(parsed.schemaVersion!==1 || !parsed.character?.name || !Number.isInteger(parsed.eventIndex)) return null;
+    const parsed=JSON.parse(raw) as EternalSave & {schemaVersion:number};
+    if((parsed.schemaVersion!==1 && parsed.schemaVersion!==2) || !parsed.character?.name || !Number.isInteger(parsed.eventIndex)) return null;
+    // Migrate the original single-save schema without discarding the player's journey.
+    parsed.schemaVersion=2;
+    parsed.disposition=createDispositionState(parsed.disposition);
     // Backward-compatible migration for saves created before world locations were persisted.
     parsed.locationId=typeof parsed.locationId==="string" && ETERNAL_SCENES.some(scene=>scene.id===parsed.locationId)
       ? parsed.locationId : defaultSceneForRegion(parsed.character.region).id;
@@ -116,7 +121,7 @@ function readSave(): EternalSave | null {
 function persist(): void { try { if(save) localStorage.setItem(SAVE_KEY,JSON.stringify(save)); } catch { /* The current session remains playable in memory. */ } }
 export function getEternalSave(): EternalSave | null { if(save===null) save=readSave(); return save; }
 export function startEternalGame(input:{name:string;age:number;region:EternalRegion}): void {
-  save={schemaVersion:1,character:{name:input.name.trim(),age:input.age,region:input.region},locationId:defaultSceneForRegion(input.region).id,day:1,hour:8,minute:0,weather:resolveDailyWeather(input.region,1),eventIndex:0,energy:100,insight:0,bonds:0,completed:0};
+  save={schemaVersion:2,character:{name:input.name.trim(),age:input.age,region:input.region},disposition:createDispositionState(),locationId:defaultSceneForRegion(input.region).id,day:1,hour:8,minute:0,weather:resolveDailyWeather(input.region,1),eventIndex:0,energy:100,insight:0,bonds:0,completed:0};
   persist();
 }
 export function resetEternalGame(): void { save=null; try{localStorage.removeItem(SAVE_KEY);}catch{/* no-op */} }
