@@ -11,8 +11,8 @@
 - APK branch: `feature/archive-experience`
 - APK lore catalogue path: `src/lore/lore-library.ts`
 - APK lore catalogue blob SHA: `8c365dfafa7d320f1a191accb8d54d474a2ae400`
-- Current local entries: **26**
-- Unique local source files: **23**
+- Current local entries: **32**
+- Unique local source files: **28**
 - Missing local source paths in Universe tree: **0**
 - Universe Markdown inventory: **140 files**
 
@@ -272,7 +272,7 @@ Inventory is exhaustive for `.md` files visible in the recursive Git tree at the
 
 ## Completion definition
 
-The World Archive is not complete until every source in scope has a reviewed disposition, every approved public entity/article has a local document, every restricted source has a documented exclusion/split, and all internal links pass validation. The current 26-entry catalogue is a starter set, not complete coverage.
+The World Archive is not complete until every source in scope has a reviewed disposition, every approved public entity/article has a local document, every restricted source has a documented exclusion/split, and all internal links pass validation. The current 32-dossier / 28-source catalogue is a starter set, not complete coverage. See `docs/WORLD_ARCHIVE_COVERAGE_MATRIX.md` for the full 140-path disposition and AI handoff.
 
 ## Audit limitation
 
@@ -779,3 +779,12 @@ The subsequent claim-level review tightened Beiming Xenhwa's public entry furthe
 - Emulator diagnostics: [`merzkava-emulator-diagnostics`](https://github.com/Antarezka/merzkava-apk/actions/runs/41259241219/artifacts/13064489199) (216,953 bytes).
 
 **Final disposition:** the 32-dossier offline Archive corpus, visibility filter, source provenance, and cross-reference graph are included in this APK candidate. The latest build is green through compilation, signing, package verification, installation, MainActivity first draw, and splash capture.
+
+
+## Phase 1 matrix and handoff supersession — 2026-11-01
+
+The current APK catalogue is **32 dossiers across 28 unique Universe source paths**, on `feature/archive-experience`. The complete 140-path source-to-Archive disposition, stable-ID linking contract, next public candidates, exclusions and new-AI start order are maintained in [`docs/WORLD_ARCHIVE_COVERAGE_MATRIX.md`](WORLD_ARCHIVE_COVERAGE_MATRIX.md).
+
+This supersedes earlier statements in this manifest that the current catalogue contains 26 entries / 23 source files. The present app has a public-only 32-dossier graph with generated cross-reference IDs and tested title/alias routing. It does **not** yet have a complete source-document reader, a complete backlink graph for every public entity, full Universe coverage, or final offline/isolation QA. Earlier audit notes remain historical evidence for the stages at which they were written; use the Phase 1 matrix and current roadmap checkpoint as the latest handoff.
+
+The Phase 1 documentation update does not modify the Universe repository and is not itself an APK build. Android Build #300 remains a baseline artifact only; see the matrix for its smoke-test caveat and required build re-verification.
