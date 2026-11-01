@@ -698,3 +698,22 @@ The complete user-approved design and phase backlog now live in [ETERNAL_PATH_BL
 **Non-negotiable boundaries:** player-created names/entities and all journey outcomes are NON-CANON and save-local; World Archive and official Universe data are read-only. Preserve canonical character-profile fields and do not add Disposition to the Universe template. Choices never reveal predicted consequences or internal alignment values. Ordinary life must be a complete viable path, not a waiting room for cultivation.
 
 **Optimization:** indexed event selection; bounded active-NPC simulation; one world clock; deterministic off-screen advancement; transactional deltas plus snapshots; lazy-loaded deep screens; UI/view-model separation; no per-frame world simulation. Do not claim optimized until target-device profiling exists.
+
+
+### 13K. Implementation checkpoint — EP-0 UI foundation and disposition baseline (2026-11-02)
+
+**Implemented on feature/archive-experience:**
+- Added this approved blueprint and linked it from the single master roadmap.
+- Reworked Eternal Path screen hierarchy: compact one-line title; existing scene window remains the same image size and appears immediately below the title; compact character panel; canonical status placeholders for Spirit Realm, Martial Soul, Spirit Ring, Sync progress, Arcanist Grade/Focus, HP and Satiety; narrative-first scene/action/NPC structure.
+- Removed the four former Home feature cards from the Eternal Path renderer.
+- Moved choices into a separate modal. Choices show only their action labels; response/outcome text is not exposed as a preview. While open, delegated app clicks outside the modal are blocked, keyboard focus is trapped, Escape closes it, and browser history is used so Android system Back can dismiss it.
+- Added a hidden multi-axis disposition foundation with bounded internal axes, derived public alignment labels, Lawfulness bands and a three-evidence hysteresis gate. Added save schema v2 migration so existing v1 journeys receive a neutral baseline without losing their existing state.
+- Refined the shared bottom navigation rail to be narrower, centered, ornamental and inset from Android gesture edges. Adjusted screen entrance motion so the Eternal Path modal remains viewport-fixed instead of being trapped by a transformed screen parent.
+- Added disposition unit tests. Existing Eternal Path scene tests remain relevant; the test suite and production build still need execution against the resulting branch head.
+
+**Key implementation files:** `src/offline-game/expedition-interface.ts`, `src/offline-game/expedition-interface.css`, `src/offline-game/disposition.ts`, `src/offline-game/expedition-game.ts`, `src/main.ts`, `src/style.css`, `src/ui/app-shell-motion.ts`, `tests/offline-game-disposition.test.ts`.
+
+**Verification:** GitHub writes completed on the feature branch. This environment could not run npm locally because the GitHub host was unreachable from the container; the available commit-status query returned no status records, so no CI pass is claimed. Physical Android visual QA, safe-area/edge-gesture QA, modal touch/scroll QA, and APK rebuild remain pending.
+
+**Not yet implemented:** multi-slot save manager and export/import; activity/world simulation; NPC schedules and relationship graph; Social Link progression; choice consequence tagging and atomic transactions; full sensory content authoring; ordinary-life activity catalogue; property/territory ownership/control; organizations; family/children/naming dialogs; complete Spirit Realm/Arcanistry path integration. These remain EP-1 through EP-6 work, not completed features.
+
