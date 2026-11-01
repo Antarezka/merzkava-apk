@@ -784,3 +784,25 @@ button {color:inherit;} button:focus-visible {outline-color:#a68d5e;}
   .lore-paragraph{font-size:14px;grid-template-columns:23px minmax(0,1fr);gap:8px}
   .lore-card-summary{font-size:13px}
 }
+
+
+/* World Archive body-copy contrast correction — keep the dark archive, make long-form reading effortless. */
+.lore-detail .lore-paragraph {
+  color: #eee4d6;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.9;
+}
+.lore-detail .lore-lede {
+  color: #f0e3d2;
+}
+.lore-detail .lore-paragraph-mark {
+  color: #e0b477;
+}
+.lore-detail .lore-detail-top span + span {
+  color: #cdbca8;
+}
+.lore-detail .lore-source-card code,
+.lore-detail .lore-source-card small {
+  color: #d3c5b4;
+}
