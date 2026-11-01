@@ -1,0 +1,37 @@
+{
+  "packageId": "merzkava-eternal-path-prologue",
+  "packageVersion": "0.1.0",
+  "status": "APPROVED",
+  "contentType": "dialogue",
+  "dialogueNodeCount": 240,
+  "choicesPerNode": 2,
+  "provenance": "IN_GAME_ORIGINAL",
+  "sourceRefs": [],
+  "originalityNote": "All dialogue text and branching gameplay choices in this pack are authored for Eternal Path. They are not official Merzkava Universe canon.",
+  "worldArchivePackage": {
+    "status": "PENDING",
+    "requiredFor": "Canon-specific quests, NPCs, named settlements, history, factions beyond broad starting-power identity, official items, creatures and rules",
+    "runtimeRule": "Do not invent missing canon. Block any content requiring unreviewed Archive facts."
+  },
+  "sceneArt": {
+    "status": "EXISTING_REPOSITORY_ASSETS",
+    "count": 8,
+    "classification": "IN_GAME_ORIGINAL visual compositions; no new settlement names or geographic claims"
+  },
+  "gameplay": {
+    "deterministic": true,
+    "offline": true,
+    "separateSaveNamespace": "merzkava-eternal-path-save-v1",
+    "effects": [
+      "energy",
+      "insight",
+      "bonds",
+      "local-clock",
+      "session-weather"
+    ]
+  },
+  "limitations": [
+    "This is an opening playable slice, not the completed life simulation.",
+    "Full approved World Archive package pinning, travel, quest chains, combat/reward validation, progression and physical-device QA remain pending."
+  ]
+}
