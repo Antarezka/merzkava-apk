@@ -724,3 +724,14 @@ This is a safety correction, **not** a completed state-approval workflow. The AP
 - No local Archive article grants gameplay authority. Mechanics continue to resolve only through the official Universe repository's INDEX and authoritative core/gameplay modules.
 
 **Audit disposition:** the regional NPC inventory, source-path coverage, public entity index, and automated visibility/link gates are complete for the current 32-dossier corpus. Canon facts that remain unknown or contradictory are explicitly quarantined rather than guessed. This does not certify the separate gameplay state-approval workflow or npm dependency advisory set as complete.
+
+
+### Dependency advisory triage — production scope checked
+
+The validation workflow now prints the exact npm advisory set and separately audits production dependencies.
+
+- Full development/build dependency tree: **7 advisories** — 5 moderate and 2 critical.
+- Critical findings: direct dev dependency `vitest` and transitive `tinypool`; both are in the test toolchain, not in the APK runtime dependency set.
+- Moderate findings: `@capacitor/cli` (direct dev dependency) and transitive `@vitest/mocker`, `glob`, `minimatch`, and `rimraf`.
+- **Production-only audit: 0 vulnerabilities** across runtime dependencies.
+- npm's suggested automatic fix for `@capacitor/cli` is a major-version downgrade to 4.8.2, which is not an acceptable blind change alongside Capacitor 7. The Vitest toolchain will be moved to a patched compatible release and revalidated; the CLI advisory remains a documented development-tool risk until a compatible Capacitor release or safe dependency override is available.
