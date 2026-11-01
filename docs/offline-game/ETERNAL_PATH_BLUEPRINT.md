@@ -140,3 +140,20 @@ Index event lookup by region/location/time/tags. Simulate only active/nearby NPC
 ## 11. Master acceptance gate
 
 Eternal Path is not complete until a player can start/manage isolated journeys, live an ordinary life or pursue optional/hybrid ambitions, experience meaningful NPC/social/event consequences, create/manage player-local names and entities, acquire/control supported assets and organizations, save/load/export/delete safely, and play offline without changing World Archive canon. A mockup, empty screen or isolated formula module does not satisfy this gate.
+
+
+### 13L. EP-1 save manager + Anime.js motion foundation (2026-11-02)
+
+**Implemented on `feature/archive-experience`:**
+- Eternal Path save schema advanced to v3 with unique journey IDs, player-editable journey titles, creation/update timestamps and migration from the previous v1/v2 single-save record.
+- Added multiple isolated local journeys: list, load, leave/unload without deletion, rename, delete one journey, export JSON backup and validate/import JSON backup. Deleting one slot leaves all other journeys intact.
+- Added Journey Manager UI with save cards, inline rename, load/delete/export actions, new-journey form and backup import. Existing single-save data is migrated into the library on first access.
+- Added Anime.js scene composition: slow camera drift on the scene art, atmospheric fog drift, light/weather breathing, staggered profile and narrative reveals, choice-sheet open/close, manager-panel reveal, app-screen transitions, toolbar icon/hover movement and button micro-interactions.
+- Animation scopes are cleaned up when Eternal Path rerenders; reduced-motion preference disables the scene/choice motion.
+- Corrected the previous CI test assertion to match the actual compact profile class list and added save-isolation/backup tests.
+
+**Storage boundary:** the current save-slot implementation uses versioned local WebView/browser storage to preserve offline operation and provide a fast first save-manager slice. It is not yet the final SQLite-backed large-world store. EP-1 still includes migration of the slot repository into the existing Capacitor SQLite database, atomic transactions, recovery/rollback tests and explicit archive/content-pack version pins in each manifest. Do not describe those parts as complete.
+
+**Validation:** earlier CI exposed a failing UI assertion, then a storage-environment failure in the test runner. The latest code has corresponding fixes and new tests, but the newest full validation run is still pending/has not yet been observed. No TypeScript/build pass or physical Android QA is claimed.
+
+**Next vertical slice:** SQLite-backed save repository + versioned manifest, then a minimal ordinary-life activity loop using the existing authoritative world clock and HP/Satiety modules. Continue to keep Anime.js presentation-only: it must never own game time, deterministic RNG, state mutation or NPC simulation.
