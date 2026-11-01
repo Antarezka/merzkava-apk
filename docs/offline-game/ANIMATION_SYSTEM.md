@@ -19,12 +19,12 @@ Anime.js is the motion engine for the standalone **Merzkava: Eternal Path** expe
 | Surface | Motion | State |
 |---|---|---|
 | Expedition heading and panels | Staggered opacity/vertical entrance | Implemented |
-| FX-02 atmospheric fog | Slow horizontal drift, subtle scale and opacity breathing, alternate loop | Implemented |
+| FX-02 atmospheric fog | Separate low-opacity outer layer; Anime.js moves/scales/fades the inner texture without overriding the user-selected transparency | Implemented |\n| Scene atmosphere | Cycle tint and deterministic Clear/Cloudy/Fog/Rain/Snow overlays derived from the local Eternal Path session | First slice implemented |\n| Temporary scene test bench | In-memory scene/cycle/weather/fog controls; never writes to the save or advances game time | Implemented for visual QA |
 | Character/status values | Data-driven number transitions | Pending gameplay data integration |
 | Tabs, journal, inventory, quest panels | Screen/component transitions | Pending functional UI |
 | Weather, day/night and scene transitions | Environment state transitions | Pending world/time runtime |
 
-FX-02 is a dedicated layer inside `.expedition-environment`, which is presented as a framed scene window with an inset double-line border and independent scene labels. The fog remains behind scene copy and inside the viewport frame. Its asset remains static when JavaScript is unavailable or reduced motion is requested; no global fog overlay is used.
+FX-02 is a dedicated layer inside `.expedition-environment`, which is presented as a framed scene window with an inset double-line border and independent scene labels. The scene artwork is rendered as a separate background image; the fog texture is nested inside a parent whose opacity is controlled by the live game or temporary test bench. Anime.js targets only the inner texture, so it cannot overwrite the parent transparency setting. Cycle tint and weather overlays are separate layers. The scene test bench is in-memory only and never changes the local save, game clock, or weather state. No global fog overlay is used.
 
 ## 3. Accessibility and performance
 
@@ -40,7 +40,7 @@ FX-02 is a dedicated layer inside `.expedition-environment`, which is presented 
 Automated tests cover scoped targeting, animation cleanup, reduced-motion behavior, and the presence of the dedicated fog layer.
 
 Still required:
-- Confirm the PNG transparency, scale, blending, and placement on a physical Android device.
+- Confirm all eight scene PNG paths, crop, fog alpha, blend, and text contrast on a physical Android device.\n- Exercise the temporary test bench across all scene/cycle/weather/fog combinations; verify that returning to live mode restores the save-driven atmosphere without changing save data.
 - Confirm no animation runs after navigating away from Eternal Path.
 - Check repeated navigation does not multiply fog loops.
 - Check reduced-motion behavior on Android accessibility settings.
