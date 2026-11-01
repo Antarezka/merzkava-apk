@@ -5,6 +5,10 @@ import {
   getPublicLoreEntries,
   getLoreBacklinks,
   getLoreSourceDisposition,
+  LORE_PLACEHOLDERS,
+  resolveLorePlaceholder,
+  openLorePlaceholder,
+  closeLorePlaceholder,
   openLoreSource,
   closeLoreSource,
   openLoreEntry,
@@ -16,6 +20,7 @@ import {
 
 afterEach(() => {
   closeLoreEntry();
+  closeLorePlaceholder();
   setLoreSearch("");
 });
 
@@ -78,6 +83,37 @@ describe("World Archive visibility and entity routing", () => {
     const sourceHtml = renderLoreLibrary();
     expect(sourceHtml).toContain("PUBLIC_CANDIDATE");
     expect(sourceHtml).not.toMatch(/Baihu Xuefeng|Sepatu Salju|Serigala Abu|Crimson Keel Brotherhood/);
+  });
+
+  it("keeps intentionally under-specified entities linked with explicit status", () => {
+    const city = resolveLorePlaceholder("Huanglongcheng");
+    const harbor = resolveLorePlaceholder("Cangqiong Harbor");
+    expect(city?.id).toBe("placeholder-huanglongcheng");
+    expect(harbor?.id).toBe("placeholder-cangqiong-harbor");
+    expect(city?.status).toBe("ON_PLAN");
+    expect(harbor?.status).toBe("ON_PLAN");
+    expect(LORE_PLACEHOLDERS.every(item => ["ON_PLAN", "NON_CANON"].includes(item.status))).toBe(true);
+    expect(resolveLoreEntry("Huanglongcheng")).toBeUndefined();
+    expect(resolveLoreEntry("Cangqiong Harbor")).toBeUndefined();
+
+    expect(openLoreEntry("golden-dragon")).toBe(true);
+    let html = renderLoreLibrary();
+    expect(html).toContain('data-lore-placeholder-open="placeholder-huanglongcheng"');
+    expect(html).toContain("ON PLAN");
+
+    expect(openLorePlaceholder("placeholder-huanglongcheng")).toBe(true);
+    html = renderLoreLibrary();
+    expect(html).toContain("ENTITY DEVELOPMENT REGISTER");
+    expect(html).toContain("intentionally under-specified");
+    expect(html).toContain("not missing data");
+    expect(html).toContain('data-lore-open="golden-dragon"');
+
+    expect(openLoreEntry("seas")).toBe(true);
+    html = renderLoreLibrary();
+    expect(html).toContain('data-lore-placeholder-open="placeholder-cangqiong-harbor"');
+    setLoreSearch("Huanglongcheng");
+    expect(renderLoreResults()).toContain('data-lore-placeholder-open="placeholder-huanglongcheng"');
+    expect(openLorePlaceholder("not-a-placeholder")).toBe(false);
   });
 
   it("keeps Black Tide Expanse distinct from Black Tide Sea", () => {
