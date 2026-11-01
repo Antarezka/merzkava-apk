@@ -864,5 +864,17 @@ The first deterministic mechanic module has been added to the APK repository wit
 - Implemented: official base-time rates; activity, missed-meal, body-condition and verified biological multipliers; combined ×8 cap; full internal precision with one-decimal display; verified intake and portion values.
 - Not implemented here: time-window transition logic, meal-opportunity adjudication, sleep-state transitions, persistent Satiety state, injury/HP consequences, or UI.
 - Source discrepancy: the Spirit Primordial 24-hour Light example (≈0.014) conflicts with the stated 365-day base/formula (≈0.342466). Code follows the explicit table/formula and surfaces a warning. Upstream canon remains unchanged.
-- Current foundation: **2 modules implemented and CI-verified (HP + Satiety)**. The full offline engine remains incomplete; no whole-engine percentage is assigned.
+- Current foundation: **3 modules implemented and CI-verified (HP + Satiety + Injury)**. The full offline engine remains incomplete; no whole-engine percentage is assigned.
 - CI dependency audit: four moderate advisories in development tooling (`@capacitor/cli`, `glob`, `minimatch`, `rimraf`); production-only audit reports zero vulnerabilities. The current workflow does not fail on this advisory report. No unsafe major-version downgrade was applied.
+
+
+### Offline-game code milestone — Injury recovery (2026-11-01)
+
+- Source: `core/INJURY_SYSTEM.md` at Universe pin `2f76a864150528afb0e3d26cb16f9396ce610ff6`; upstream blob `a90d3d1c58afd3da171d66bc632b23e2a30cbbfd`.
+- Code: `src/offline-game/mechanics/injury.ts`.
+- Tests: `tests/offline-game-injury.test.ts` (5 tests).
+- Validation: [Web App Validation #577](https://github.com/Antarezka/merzkava-apk/actions/runs/41306410019) passed: 8 test files / 57 tests, TypeScript, gateway type-check, and Vite build.
+- Implemented: Class I–IV baseline recovery rates, proportional elapsed-time calculation, full-rest and correct-treatment requirements, structural treatment gate for Class III, stabilization and continuing-care gate for Class IV, 100% cap.
+- Deliberately not implemented: injury diagnosis, class inference from HP damage, activity penalty numbers, treatment quality bonus, complication odds, specific medicine effects, or residual effects. No numeric rule is invented where the canon leaves discretion to GM/evidence.
+- Current foundation: **3 modules implemented and CI-verified (HP + Satiety + Injury)**. This is not a complete game engine, and no overall percentage is assigned.
+- Android Build #320 is currently building earlier source commit `6310974`; it does not include the Injury test file or later documentation updates. A new Android build is required for the latest source once changes are complete.
