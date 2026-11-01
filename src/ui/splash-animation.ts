@@ -11,18 +11,17 @@ export function animateOpeningSplash(splash: HTMLElement): () => void {
   const body = mascot?.querySelector<HTMLElement>(".kitty-body");
   const head = mascot?.querySelector<HTMLElement>(".kitty-head");
   const tail = mascot?.querySelector<HTMLElement>(".kitty-tail");
-  const shadow = mascot?.querySelector<HTMLElement>(".kitty-shadow");
   const kicker = splash.querySelector<HTMLElement>(".splash-kicker");
   const title = splash.querySelector<HTMLElement>(".splash-wordmark");
   const lightRay = splash.querySelector<HTMLElement>(".splash-light-ray");
   const rule = splash.querySelector<HTMLElement>(".splash-rule");
   const tagline = splash.querySelector<HTMLElement>(".splash-tagline");
 
-  if (!content || !mascot || !body || !head || !tail || !shadow || !title || !lightRay) {
+  if (!content || !mascot || !body || !head || !tail || !title || !lightRay) {
     return () => undefined;
   }
 
-  const layers = [body, head, tail, shadow];
+  const layers = [body, head, tail];
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
     content.style.opacity = "1";
     content.style.transform = "none";
@@ -68,11 +67,6 @@ export function animateOpeningSplash(splash: HTMLElement): () => void {
     rotate: [-2.8, 3.6], duration: 2850,
     ease: "inOutSine", alternate: true, loop: true, delay: 720
   });
-  const shadowBreath = animate(shadow, {
-    scaleX: [1, 1.035], scaleY: [1, 0.975], opacity: [0.78, 0.94],
-    duration: 2850, ease: "inOutSine", alternate: true, loop: true, delay: 1050
-  });
-
   // A warm diagonal reflection travels from the wordmark down toward Kitty
   // and the same diagonal floor-shadow direction.
   const lightBreath = animate(lightRay, {
@@ -101,7 +95,6 @@ export function animateOpeningSplash(splash: HTMLElement): () => void {
     bodyBreath.pause();
     headIdle.pause();
     tailSway.pause();
-    shadowBreath.pause();
     lightBreath.pause();
     wordmarkGlow.pause();
     sparkAnimations.forEach(animation => animation.pause());
