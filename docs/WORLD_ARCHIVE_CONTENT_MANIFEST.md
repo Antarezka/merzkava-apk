@@ -436,3 +436,25 @@ The existing local catalogue is not safe to expose as a complete player-facing i
 - Regional modules: first ten named regional modules have now received source-level/section-level review. Several remain candidates only; no region is approved for wholesale publication.
 - Remaining regional modules, world systems, events, factions, official rosters, and the full 140-file line-by-line review remain incomplete.
 - Player-facing publication approval: **not granted**.
+
+
+## Lawless / northern regional audit — fourth pass
+
+**Source snapshot:** Universe `2f76a864150528afb0e3d26cb16f9396ce610ff6`. Reviewed `REGION_ASHEN_BORDERLANDS.md`, `REGION_BEIMING_GU.md`, `REGION_BLACK_TIDE_EXPANSE.md`, `REGION_NINE_FROST_WASTES.md`, and `REGION_SILVERPINE_WILDS.md` at source level.
+
+- `REGION_SILVERPINE_WILDS.md` is a compatibility pointer to the consolidated Beiming Gu source. Do not create a duplicate region article.
+- `REGION_ASHEN_BORDERLANDS.md` and `REGION_NINE_FROST_WASTES.md` are explicitly partially developed. They establish only a limited set of named settlements and associated organizations. Association does not establish unified government, settlement control, routes, services, population, customs, or current faction presence. Preserve all unconfirmed fields; no gap-filling.
+- `REGION_BEIMING_GU.md` is the consolidated source for seven districts. It confirms broad regional geography, a northern maritime connection, two dedicated air corridors, a standard fare of 25 xc each way, and terminal service hours 05:00–21:00; exact coordinates, duration, detailed schedule, intermediate stops, and local road segments remain unknown. These travel/fare values are operational mechanics and should not be reproduced as local Archive authority.
+- The Beiming regional foundation explicitly names Beiming Nerva and gives her family relationship to Beiming Han. Because the linked registry/profile marks her identity and recurring student disguise GM-sensitive, this regional paragraph must not be treated as permission to expose her identity. Public article generation must use claim-level restrictions from the NPC registry/profile, not the regional paragraph in isolation.
+- `REGION_BLACK_TIDE_EXPANSE.md` contains an extensive explicit **Crimson Sovereign Court hidden-authority** section and a second-life section for Ying Wuxin. These sections disclose the concealed leader, hidden chain of authority, true identity, criminal relationship to Crimson Keel Brotherhood, personal family details, daughter’s friendship with Jun Yuejin, and coercive Soul Illusion. This is **strict `GM_ONLY`**. Do not publish the content, the true name as a hidden leader, family identifiers, aliases, ability details, or graph links in player-facing Archive, search, autocomplete, backlinks, or suggestions. The only potentially public fact is Ying Wuxin's separately established civilian clothing-pavilion role, and only if sourced from a public-facing source with no secret linkage.
+- Black Tide's four named settlements and four associated organizations are not proof of current control or open government. Do not infer who controls a site, road, port, or venue. The addendum directs detailed underground-economy and service lore to `world/LAWLESS_TERRITORIES.md`; that module must be reviewed before any Lawless Territory public article is written.
+- Across these modules, current control, exact routes, adjacency, travel duration, hidden NPC lore, and unlisted local institutions are explicitly not to be inferred.
+
+### Updated review progress
+
+- First ten named regional modules received source-level/section-level review.
+- Five additional Lawless/northern regional modules received source-level review in this pass.
+- Explicit compatibility pointers identified: Frostveil Range, Hollowmoon Valley, Ironroot Reach, and Silverpine Wilds all resolve to the consolidated Beiming Gu module.
+- High-risk hidden-identity content found in Black Tide and repeated Nerva identity exposure in Beiming regional text. Both require strict claim-level filtering.
+- Other regional modules, Lawless Territories central addendum, world systems, events, factions, and full 140-file line-by-line approval remain incomplete.
+- Player-facing publication approval: **not granted**.
