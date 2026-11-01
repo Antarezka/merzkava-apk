@@ -41,7 +41,7 @@ describe("Eternal Path Anime.js motion", () => {
     const dispose = mountExpeditionAnimations(root);
 
     expect(mocks.createScope).toHaveBeenCalledWith(expect.objectContaining({ root }));
-    expect(mocks.animate).toHaveBeenCalledTimes(2);
+    expect(mocks.animate).toHaveBeenCalledTimes(3);
     expect(mocks.animate).toHaveBeenNthCalledWith(1, entranceTargets, expect.objectContaining({
       opacity: [0, 1],
       translateY: [12, 0],
