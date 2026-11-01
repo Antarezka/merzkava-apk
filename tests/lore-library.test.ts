@@ -140,6 +140,30 @@ describe("World Archive visibility and entity routing", () => {
     expect(resolveLoreEntry("Open Learning Paths")?.id).toBe("open-learning-paths");
   });
 
+  it("publishes claim-reviewed NPC extracts without private whereabouts or hidden affiliations", () => {
+    const ids = [
+      "beiming-jingheng", "beiming-xuanyu", "binghe-chuanliu", "lan-feng",
+      "cangxue-beiran", "cangxue-tielan", "shuang-yue", "hanyue-mingzhao",
+      "tie-song", "lingfeng-yujin", "minghu-yanshu", "mo-xueyan",
+      "bai-yushen", "tieshi-beiyue", "xuanbing-lingsu", "xuanbing-yue",
+      "xuansong-qinghe", "xuanye-zhenbei", "yaochi-suwen", "yinshan-qiaofeng",
+      "luo-zhenkai", "shen-yunting", "duan-haicheng", "lin-qiaoyu"
+    ];
+    const publicEntries = getPublicLoreEntries();
+    const publicIds = new Set(publicEntries.map(entry => entry.id));
+    for (const id of ids) {
+      expect(publicIds.has(id)).toBe(true);
+      expect(getLoreSourceDisposition(id)).toBe("PUBLIC_CANDIDATE");
+    }
+    const publicText = JSON.stringify(publicEntries.filter(entry => ids.includes(entry.id)));
+    for (const restricted of [
+      "current whereabouts", "exact residence", "secret connection",
+      "high-level criminal organization", "private incident", "cover identity"
+    ]) expect(publicText.toLowerCase()).not.toContain(restricted.toLowerCase());
+    expect(publicText).not.toContain("Beiming Nerva");
+    expect(publicText).not.toContain("Ying Wuxin");
+  });
+
   it("keeps Black Tide Expanse distinct from Black Tide Sea", () => {
     expect(resolveLoreEntry("Black Tide Expanse")?.id).toBe("black-tide-expanse");
     expect(resolveLoreEntry("Black Tide Sea")?.id).toBe("seas");
