@@ -57,7 +57,7 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 - [ ] Exclude GM-only secrets, private player data, unrevealed identities, hidden agendas, and restricted outcomes from player-facing Archive.
 - [ ] Mark each article as approved, needs revision, blocked, or excluded; do not treat catalogue presence as publication approval.
 - [ ] Expand coverage only from verified Universe sources; preserve unknown/conflicting facts instead of inventing missing details.
-- [ ] Verify all local links, aliases, cross-references, and search results resolve to the correct local document.
+- [ ] Verify all local links, aliases, cross-references, backlinks, and search results resolve to the correct local document in CI and on-device.
 - [ ] Track source path, source commit, review date, visibility class, and local document ID for every article.
 - [ ] Add a repeatable audit for stale source paths and changed Universe files.
 
@@ -75,7 +75,7 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 
 - [ ] Audit Archive landing page, categories, article pages, search, filters, bookmarks, and back navigation.
 - [ ] Improve search relevance, aliases, and ambiguous-name handling.
-- [ ] Make internal entity links open the correct local article.
+- [x] Make approved public entity mentions open the correct local dossier; automatic public mention links and inbound backlinks are now rendered from the public dossier graph. Test coverage has been added; CI/runtime verification remains open.
 - [ ] Add useful empty, loading, unavailable, and no-result states.
 - [ ] Verify the Archive remains fully readable with network disabled.
 - [ ] Ensure Archive browsing cannot modify player inventory, wallet, character state, quests, or gameplay history.
@@ -450,7 +450,8 @@ Before implementing a new feature or changing an existing one:
 - [x] Reconcile the current catalogue count: **32 dossiers / 28 unique source paths**. Older 26/23 figures in the manifest are stale and superseded.
 - [x] Specify the entity-link contract: stable local IDs, canonical names and aliases, clickable mentions, related records/backlinks, ambiguity-safe resolution, public-only graph, and no links to GM-only/private entities.
 - [x] Record the AI handoff sequence, branch baseline, Universe source snapshot, current implementation gaps, and last known Android build reference in the matrix.
-- [ ] Implement and test the complete public entity graph across article mentions, aliases, search, related records and backlinks.
+- [~] Implement public entity mention links and inbound backlinks; regression tests are committed but still need CI execution and on-device navigation QA.
+- [ ] Verify the complete public entity graph across aliases, search, related records, backlinks and ambiguity handling.
 - [ ] Implement the local offline source reader; the current dossier source card displays the source path as plain text.
 - [ ] Expand public coverage from `PUBLIC_CANDIDATE` / `PARTIAL_PUBLIC` rows only after claim-level review.
 - [ ] Verify the matrix against the current recursive Universe tree before content expansion.
@@ -463,3 +464,15 @@ Before implementing a new feature or changing an existing one:
 **Mandatory start order for a new AI:** read this roadmap → read `docs/WORLD_ARCHIVE_COVERAGE_MATRIX.md` → read `docs/WORLD_ARCHIVE_CONTENT_MANIFEST.md` → inspect actual branch HEAD and working tree → verify the Universe source pin → inspect `src/lore/lore-library.ts` and tests → continue the next unchecked Phase 1 item. Do not redo completed light-theme typography work. Do not modify `merzkava-universe` unless explicitly requested.
 
 **Phase 1 status:** `[x] INVENTORY + HANDOFF BASELINE`; overall Workstream 1 remains `[~] IN PROGRESS` until graph QA, local source reader, content expansion, isolation proof and release gates are complete.
+
+
+### Implementation update — public entity graph (2026-11-01)
+
+- `src/lore/lore-library.ts` already generated public cross-reference IDs from dossier summaries and paragraphs, and rendered matching title/alias mentions as clickable `data-lore-open` buttons. The resolver filters to `PUBLISHED` entries, so GM-only/private entries cannot become link targets.
+- This implementation pass added exported `getLoreBacklinks(id)` and a **MENTIONED IN** section on dossier pages. Inbound links only include other published dossiers whose text mentions the target through the approved public title/alias graph.
+- Regression coverage was added in `tests/lore-library.test.ts` for public-only targets, clickable outgoing mentions, backlinks, and invalid target IDs.
+- Implementation commit: `3dd0b21f32bdd383737da48d52248b96c623535a`.
+- Test commit: `4ce04c872d39611b6fa782b8e2199f4157aa3b0f`.
+- **Verification state:** test code is committed but has not yet been executed by CI or on an Android device. Do not call graph QA passed until that evidence exists.
+- **Still missing:** a bundled, offline local source-document reader. Source path remains visible as provenance text only.
+
