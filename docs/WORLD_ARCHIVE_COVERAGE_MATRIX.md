@@ -5,7 +5,7 @@
 - Audited: 2026-11-01
 - Universe source: `Antarezka/merzkava-universe` / `main` / `2f76a864150528afb0e3d26cb16f9396ce610ff6`
 - APK: `Antarezka/merzkava-apk` / `feature/archive-experience`; pre-documentation baseline `67c5186ffac266fde41ddf82fd2fd3042d412486`
-- Current app catalogue: **47 dossiers / 43 unique source paths**.
+- Current app catalogue: **71 dossiers / 67 unique source paths**.
 
 ## Phase 1 inventory
 
@@ -17,10 +17,10 @@
 | `MECHANICS_REFERENCE` | 16 |
 | `PARTIAL_PUBLIC` | 9 |
 | `PRIVATE_PLAYER_DATA` | 7 |
-| `PUBLIC_CANDIDATE` | 14 |
+| `PUBLIC_CANDIDATE` | 38 |
 | `PUBLISHED` | 21 |
 | `REPOSITORY_CONTROL` | 17 |
-| `REVIEW_REQUIRED` | 28 |
+| `REVIEW_REQUIRED` | 4 |
 | **Total** | **140** |
 
 ## Coverage score — verified source-path metrics (2026-11-01)
@@ -29,15 +29,15 @@ These percentages measure **source-path coverage**, not claim-by-claim completen
 
 | Measure | Calculation | Progress | Meaning |
 |---|---:|---:|---|
-| Whole-repository source footprint | 43 mapped paths / 140 Markdown paths | **30.7%** | How much of the entire Universe Markdown inventory currently has at least one Archive dossier mapping. |
-| Potential player-facing source scope | 43 mapped / 72 eligible-or-review-needed paths | **59.7%** | The 72 comprise 21 `PUBLISHED`, 9 `PARTIAL_PUBLIC`, 14 `PUBLIC_CANDIDATE`, and 28 `REVIEW_REQUIRED` source files. |
-| Already dispositioned public-scope paths | 43 mapped / 44 `PUBLISHED` + `PARTIAL_PUBLIC` + `PUBLIC_CANDIDATE` paths | **97.7%** | Coverage among sources already classified into a public-facing disposition; it does not mean every claim is approved. |
+| Whole-repository source footprint | 67 mapped paths / 140 Markdown paths | **47.9%** | How much of the entire Universe Markdown inventory currently has at least one Archive dossier mapping. |
+| Potential player-facing source scope | 67 mapped / 72 eligible-or-review-needed paths | **93.1%** | The 72 comprise 21 `PUBLISHED`, 9 `PARTIAL_PUBLIC`, 14 `PUBLIC_CANDIDATE`, and 28 `REVIEW_REQUIRED` source files. |
+| Already dispositioned public-scope paths | 67 mapped / 68 `PUBLISHED` + `PARTIAL_PUBLIC` + `PUBLIC_CANDIDATE` paths | **98.5%** | Coverage among sources already classified into a public-facing disposition; it does not mean every claim is approved. |
 | Canonical mechanics source preservation | 16 / 16 `MECHANICS_REFERENCE` modules copied verbatim, plus the supplemental governance allocation formula | **100% preserved** | Exact development snapshot exists separately in `docs/OFFLINE_GAME_CANON_FORMULA_SNAPSHOT.md`. One supplemental formula-bearing governance source is also preserved. |
 | Initial deterministic mechanic implementation | 7 foundational modules: HP, Satiety, Injury, Time/Day-left, Combat, Spirit Ring compatibility, and Spirit Ring progression | **7 modules implemented; CI verified** | HP state consistency, Satiety interval/intake, Injury recovery, Time/Day-left, Combat, and Spirit Ring formulas are implemented. Overall engine percentage is not baselined; remaining formula domains and dependencies still require an inventory. |
 
-**Current Archive inventory:** 47 curated dossiers / 43 unique source paths. The 16 mechanics-reference files are intentionally not published as ordinary Archive lore. Claim-level content completeness remains **not yet measured**; do not turn the path ratios above into a claim that the Archive is 30.7%, 59.7%, or 97.7% complete in every dimension.
+**Current Archive inventory:** 71 curated dossiers / 67 unique source paths. The 16 mechanics-reference files are intentionally not published as ordinary Archive lore. Claim-level content completeness remains **not yet measured**; do not turn the path ratios above into a claim that the Archive is 47.9%, 93.1%, or 98.5% complete in every dimension.
 
-**How to read the progress:** use **59.7%** as the current broad source-coverage indicator for the potentially player-facing Archive scope, **30.7%** as the whole-repository footprint, and report formula preservation and game-engine implementation separately. Never combine these into one misleading average.
+**How to read the progress:** use **93.1%** as the current broad source-coverage indicator for the potentially player-facing / review-needed Archive scope, **47.9%** as the whole-repository footprint, and report formula preservation and game-engine implementation separately. Never combine these into one misleading average.
 
 ## Mandatory entity-link contract
 
@@ -93,44 +93,44 @@ These percentages measure **source-path coverage**, not claim-by-claim completen
 | `players/Yuha.md` | `PRIVATE_PLAYER_DATA` | — |  |
 | `regions/beiming-gu/INDEX.md` | `REPOSITORY_CONTROL` | — |  |
 | `regions/beiming-gu/npcs/BEIMING_HAN.md` | `PUBLISHED` | `beiming-han` |  |
-| `regions/beiming-gu/npcs/BEIMING_JINGHENG.md` | `REVIEW_REQUIRED` | — |  |
+| `regions/beiming-gu/npcs/BEIMING_JINGHENG.md` | `PUBLIC_CANDIDATE` | `beiming-jingheng` | Claim-reviewed public profile only; private whereabouts, relationships, secret ties, and unconfirmed abilities omitted. |
 | `regions/beiming-gu/npcs/BEIMING_NERVA.md` | `GM_ONLY` | — |  |
 | `regions/beiming-gu/npcs/BEIMING_XENHWA.md` | `PUBLISHED` | `beiming-xenhwa` |  |
-| `regions/beiming-gu/npcs/BEIMING_XUANYU.md` | `REVIEW_REQUIRED` | — |  |
-| `regions/beiming-gu/npcs/BINGHE_CHUANLIU.md` | `REVIEW_REQUIRED` | — |  |
-| `regions/beiming-gu/npcs/BLUE_FLAME_DOJO_MASTER.md` | `REVIEW_REQUIRED` | — |  |
-| `regions/beiming-gu/npcs/CANGXUE_BEIRAN.md` | `REVIEW_REQUIRED` | — |  |
-| `regions/beiming-gu/npcs/CANGXUE_TIELAN.md` | `REVIEW_REQUIRED` | — |  |
-| `regions/beiming-gu/npcs/FROSTPEAK_DOJO_MASTER.md` | `REVIEW_REQUIRED` | — |  |
-| `regions/beiming-gu/npcs/HANYUE_MINGZHAO.md` | `REVIEW_REQUIRED` | — |  |
-| `regions/beiming-gu/npcs/IRONROOT_DOJO_MASTER.md` | `REVIEW_REQUIRED` | — |  |
-| `regions/beiming-gu/npcs/LINGFENG_YUJIN.md` | `REVIEW_REQUIRED` | — |  |
-| `regions/beiming-gu/npcs/MINGHU_YANSHU.md` | `REVIEW_REQUIRED` | — |  |
+| `regions/beiming-gu/npcs/BEIMING_XUANYU.md` | `PUBLIC_CANDIDATE` | `beiming-xuanyu` | Claim-reviewed public profile only; private whereabouts, relationships, secret ties, and unconfirmed abilities omitted. |
+| `regions/beiming-gu/npcs/BINGHE_CHUANLIU.md` | `PUBLIC_CANDIDATE` | `binghe-chuanliu` | Claim-reviewed public profile only; private whereabouts, relationships, secret ties, and unconfirmed abilities omitted. |
+| `regions/beiming-gu/npcs/BLUE_FLAME_DOJO_MASTER.md` | `PUBLIC_CANDIDATE` | `lan-feng` | Claim-reviewed public profile only; private whereabouts, relationships, secret ties, and unconfirmed abilities omitted. |
+| `regions/beiming-gu/npcs/CANGXUE_BEIRAN.md` | `PUBLIC_CANDIDATE` | `cangxue-beiran` | Claim-reviewed public profile only; private whereabouts, relationships, secret ties, and unconfirmed abilities omitted. |
+| `regions/beiming-gu/npcs/CANGXUE_TIELAN.md` | `PUBLIC_CANDIDATE` | `cangxue-tielan` | Claim-reviewed public profile only; private whereabouts, relationships, secret ties, and unconfirmed abilities omitted. |
+| `regions/beiming-gu/npcs/FROSTPEAK_DOJO_MASTER.md` | `PUBLIC_CANDIDATE` | `shuang-yue` | Claim-reviewed public profile only; private whereabouts, relationships, secret ties, and unconfirmed abilities omitted. |
+| `regions/beiming-gu/npcs/HANYUE_MINGZHAO.md` | `PUBLIC_CANDIDATE` | `hanyue-mingzhao` | Claim-reviewed public profile only; private whereabouts, relationships, secret ties, and unconfirmed abilities omitted. |
+| `regions/beiming-gu/npcs/IRONROOT_DOJO_MASTER.md` | `PUBLIC_CANDIDATE` | `tie-song` | Claim-reviewed public profile only; private whereabouts, relationships, secret ties, and unconfirmed abilities omitted. |
+| `regions/beiming-gu/npcs/LINGFENG_YUJIN.md` | `PUBLIC_CANDIDATE` | `lingfeng-yujin` | Claim-reviewed public profile only; private whereabouts, relationships, secret ties, and unconfirmed abilities omitted. |
+| `regions/beiming-gu/npcs/MINGHU_YANSHU.md` | `PUBLIC_CANDIDATE` | `minghu-yanshu` | Claim-reviewed public profile only; private whereabouts, relationships, secret ties, and unconfirmed abilities omitted. |
 | `regions/beiming-gu/npcs/REGISTRY.md` | `REPOSITORY_CONTROL` | — |  |
-| `regions/beiming-gu/npcs/SILENT_SNOW_DOJO_MASTER.md` | `REVIEW_REQUIRED` | — |  |
-| `regions/beiming-gu/npcs/SILVER_TIGER_DOJO_MASTER.md` | `REVIEW_REQUIRED` | — |  |
-| `regions/beiming-gu/npcs/TIESHI_BEIYUE.md` | `REVIEW_REQUIRED` | — |  |
-| `regions/beiming-gu/npcs/XUANBING_LINGSU.md` | `REVIEW_REQUIRED` | — |  |
-| `regions/beiming-gu/npcs/XUANBING_YUE.md` | `REVIEW_REQUIRED` | — |  |
-| `regions/beiming-gu/npcs/XUANSONG_QINGHE.md` | `REVIEW_REQUIRED` | — |  |
-| `regions/beiming-gu/npcs/XUANYE_ZHENBEI.md` | `REVIEW_REQUIRED` | — |  |
-| `regions/beiming-gu/npcs/YAOCHI_SUWEN.md` | `REVIEW_REQUIRED` | — |  |
-| `regions/beiming-gu/npcs/YINSHAN_QIAOFENG.md` | `REVIEW_REQUIRED` | — |  |
+| `regions/beiming-gu/npcs/SILENT_SNOW_DOJO_MASTER.md` | `PUBLIC_CANDIDATE` | `mo-xueyan` | Claim-reviewed public profile only; private whereabouts, relationships, secret ties, and unconfirmed abilities omitted. |
+| `regions/beiming-gu/npcs/SILVER_TIGER_DOJO_MASTER.md` | `PUBLIC_CANDIDATE` | `bai-yushen` | Claim-reviewed public profile only; private whereabouts, relationships, secret ties, and unconfirmed abilities omitted. |
+| `regions/beiming-gu/npcs/TIESHI_BEIYUE.md` | `PUBLIC_CANDIDATE` | `tieshi-beiyue` | Claim-reviewed public profile only; private whereabouts, relationships, secret ties, and unconfirmed abilities omitted. |
+| `regions/beiming-gu/npcs/XUANBING_LINGSU.md` | `PUBLIC_CANDIDATE` | `xuanbing-lingsu` | Claim-reviewed public profile only; private whereabouts, relationships, secret ties, and unconfirmed abilities omitted. |
+| `regions/beiming-gu/npcs/XUANBING_YUE.md` | `PUBLIC_CANDIDATE` | `xuanbing-yue` | Claim-reviewed public profile only; private whereabouts, relationships, secret ties, and unconfirmed abilities omitted. |
+| `regions/beiming-gu/npcs/XUANSONG_QINGHE.md` | `PUBLIC_CANDIDATE` | `xuansong-qinghe` | Claim-reviewed public profile only; private whereabouts, relationships, secret ties, and unconfirmed abilities omitted. |
+| `regions/beiming-gu/npcs/XUANYE_ZHENBEI.md` | `PUBLIC_CANDIDATE` | `xuanye-zhenbei` | Claim-reviewed public profile only; private whereabouts, relationships, secret ties, and unconfirmed abilities omitted. |
+| `regions/beiming-gu/npcs/YAOCHI_SUWEN.md` | `PUBLIC_CANDIDATE` | `yaochi-suwen` | Claim-reviewed public profile only; private whereabouts, relationships, secret ties, and unconfirmed abilities omitted. |
+| `regions/beiming-gu/npcs/YINSHAN_QIAOFENG.md` | `PUBLIC_CANDIDATE` | `yinshan-qiaofeng` | Claim-reviewed public profile only; private whereabouts, relationships, secret ties, and unconfirmed abilities omitted. |
 | `regions/golden-dragon-empire/INDEX.md` | `REPOSITORY_CONTROL` | — |  |
 | `regions/golden-dragon-empire/npcs/JUN_HAOTIAN.md` | `PUBLISHED` | `jun-haotian` |  |
 | `regions/golden-dragon-empire/npcs/JUN_RUIYUAN.md` | `PUBLISHED` | `jun-ruiyuan` |  |
 | `regions/golden-dragon-empire/npcs/JUN_YUEJIN.md` | `PUBLISHED` | `jun-yuejin` |  |
-| `regions/golden-dragon-empire/npcs/LUO_ZHENKAI.md` | `REVIEW_REQUIRED` | — |  |
+| `regions/golden-dragon-empire/npcs/LUO_ZHENKAI.md` | `PUBLIC_CANDIDATE` | `luo-zhenkai` | Claim-reviewed public profile only; private whereabouts, relationships, secret ties, and unconfirmed abilities omitted. |
 | `regions/golden-dragon-empire/npcs/REGISTRY.md` | `REPOSITORY_CONTROL` | — |  |
 | `regions/golden-dragon-empire/npcs/SHEN_YUEHUA.md` | `PUBLISHED` | `shen-yuehua` |  |
-| `regions/golden-dragon-empire/npcs/SHEN_YUNTING.md` | `REVIEW_REQUIRED` | — |  |
+| `regions/golden-dragon-empire/npcs/SHEN_YUNTING.md` | `PUBLIC_CANDIDATE` | `shen-yunting` | Claim-reviewed public profile only; private whereabouts, relationships, secret ties, and unconfirmed abilities omitted. |
 | `regions/tianhai-yunzhou/INDEX.md` | `REPOSITORY_CONTROL` | — |  |
 | `regions/tianhai-yunzhou/npcs/BAI_XUANYIN.md` | `PUBLISHED` | `bai-xuanyin` |  |
-| `regions/tianhai-yunzhou/npcs/DUAN_HAICHENG.md` | `REVIEW_REQUIRED` | — |  |
+| `regions/tianhai-yunzhou/npcs/DUAN_HAICHENG.md` | `PUBLIC_CANDIDATE` | `duan-haicheng` | Claim-reviewed public profile only; private whereabouts, relationships, secret ties, and unconfirmed abilities omitted. |
 | `regions/tianhai-yunzhou/npcs/JI_HAOYUAN.md` | `PUBLISHED` | `ji-haoyuan` |  |
 | `regions/tianhai-yunzhou/npcs/JI_NINGZHAO.md` | `PUBLISHED` | `ji-ningzhao` |  |
 | `regions/tianhai-yunzhou/npcs/JI_ZHAONING.md` | `PUBLISHED` | `ji-zhaoning` |  |
-| `regions/tianhai-yunzhou/npcs/LIN_QIAOYU.md` | `REVIEW_REQUIRED` | — |  |
+| `regions/tianhai-yunzhou/npcs/LIN_QIAOYU.md` | `PUBLIC_CANDIDATE` | `lin-qiaoyu` | Claim-reviewed public profile only; private whereabouts, relationships, secret ties, and unconfirmed abilities omitted. |
 | `regions/tianhai-yunzhou/npcs/POWER_STRUCTURE.md` | `REPOSITORY_CONTROL` | — |  |
 | `regions/tianhai-yunzhou/npcs/REGISTRY.md` | `REPOSITORY_CONTROL` | — |  |
 | `templates/ANTI_CHEAT_HARD_GATE.md` | `INTERNAL_TEMPLATE` | — |  |
