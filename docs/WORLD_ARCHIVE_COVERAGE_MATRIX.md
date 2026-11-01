@@ -31,7 +31,16 @@
 - Ambiguous, unreviewed, GM-only, private or unknown entities remain plain text and must not enter search, suggestions, autocomplete, backlinks or the public entity graph.
 - Relationships are claim-level facts. Shared surnames do not prove kinship; titles do not prove current office; links must not invent relationships.
 - Each entity record should retain ID, canonical name, aliases, entity type, visibility, source path(s) and related public dossier IDs.
-- Every source citation must open its bundled local Markdown document inside the APK. A source path displayed as text is not a source reader.
+- Every source citation must open a bundled local, player-safe reviewed extract inside the APK. The reader must show exact source path, source commit, review date, and source classification. Do not bundle raw canonical Markdown merely because a file-level disposition is `PUBLISHED`: individual NPC/source files can contain location, whereabouts, or other claims that need claim-level review. Mixed-scope sources expose only the curated dossier extract; restricted claims never enter the player reader.
+
+## Offline source reader — Phase 1 implementation
+
+- Each public dossier can open a local reviewed extract without network access.
+- The reader is generated only from the dossier's approved public summary and paragraphs; it is **not** a verbatim rendering of the original Universe Markdown.
+- Exact provenance is retained: source path, pinned Universe commit, review date, and source classification.
+- Seven dossier source paths are classified `PARTIAL_PUBLIC`: `world/WORLD.md`, `world/LAWLESS_TERRITORIES.md`, `world/MAP_AND_REGIONS.md`, `world/FACTIONS.md`, `world/RUINED_ARCHIVER.md`, `world/ARTIFACTS_AND_RELICS.md`, and `world/ARTIFICIAL_ARTIFACTS.md`. Their raw source files are not bundled.
+- Even file-level `PUBLISHED` does not authorize copying every claim from a raw NPC profile. The player reader includes only claims selected into the reviewed dossier. This avoids exposing unreviewed whereabouts, locations, or other restricted details.
+- Regression tests cover provenance, public-safe scope notices, and reader navigation. Tests are committed but not yet run; CI and physical-device verification remain open.
 
 ## Full source-to-app coverage matrix (140/140)
 
