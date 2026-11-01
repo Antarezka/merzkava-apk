@@ -116,6 +116,30 @@ describe("World Archive visibility and entity routing", () => {
     expect(openLorePlaceholder("not-a-placeholder")).toBe(false);
   });
 
+  it("publishes the reviewed public governance, services, education, society and route dossiers", () => {
+    const expected = [
+      ["imperial-governance", "PUBLIC_CANDIDATE"],
+      ["imperial-public-services", "PUBLIC_CANDIDATE"],
+      ["open-learning-paths", "PUBLIC_CANDIDATE"],
+      ["social-stratification", "PUBLIC_CANDIDATE"],
+      ["three-power-routes", "PUBLIC_CANDIDATE"],
+      ["geography-travel", "PARTIAL_PUBLIC"],
+      ["tianhai-academies", "PUBLIC_CANDIDATE"],
+      ["world-wealth", "PUBLIC_CANDIDATE"]
+    ] as const;
+    const publicIds = new Set(getPublicLoreEntries().map(entry => entry.id));
+    for (const [id, disposition] of expected) {
+      expect(publicIds.has(id)).toBe(true);
+      expect(getLoreSourceDisposition(id)).toBe(disposition);
+      expect(openLoreSource(id)).toBe(true);
+      expect(renderLoreLibrary()).toContain(disposition);
+      closeLoreSource();
+    }
+    expect(resolveLoreEntry("Tianlan Supreme Academy")?.id).toBe("tianhai-academies");
+    expect(resolveLoreEntry("Imperial Governance")?.id).toBe("imperial-governance");
+    expect(resolveLoreEntry("Open Learning Paths")?.id).toBe("open-learning-paths");
+  });
+
   it("keeps Black Tide Expanse distinct from Black Tide Sea", () => {
     expect(resolveLoreEntry("Black Tide Expanse")?.id).toBe("black-tide-expanse");
     expect(resolveLoreEntry("Black Tide Sea")?.id).toBe("seas");
