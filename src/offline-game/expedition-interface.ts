@@ -1,6 +1,6 @@
 import "./expedition-interface.css";
 import {
-  getCurrentDialogue, getEternalSave, getExpeditionAtmosphere, getExpeditionScene, getRegionalDialogueCount,
+  getCurrentDialogue, getEternalSave, getExpeditionAtmosphere, getExpeditionScene, getRegionalDialogueCount, listEternalSaves,
 } from "./expedition-game";
 
 function escapeHtml(value:string):string {
@@ -21,11 +21,26 @@ export function renderExpeditionInterface():string {
   const startPanel=save?`<section class="expedition-character-panel expedition-profile-compact" aria-label="Your adventurer profile">
     <div class="expedition-profile-identity"><div><span class="expedition-profile-kicker">YOUR ADVENTURER</span><h3 class="expedition-player-name">${escapeHtml(save.character.name)}</h3><p class="expedition-note">Age ${save.character.age} · ${escapeHtml(regionNames[scene.region])} · Day ${save.day}</p></div></div>
     <div class="expedition-profile-meta"><span>SPIRIT REALM <b>Not recorded</b></span><span>MARTIAL SOUL <b>Not recorded</b></span><span>SPIRIT RING <b>Not recorded</b></span><span>SYNC PROGRESS <b>Not recorded</b></span><span>ARCANIST GRADE <b>Not recorded</b></span><span>ARCANIST FOCUS <b>Not recorded</b></span><span>HP <b>Not recorded</b></span><span>SATIETY <b>Not recorded</b></span></div>
-    <button type="button" class="text-button danger" data-eternal-end>End local journey</button></section>`
-    :`<section class="expedition-character-panel"><div class="section-heading"><span>BEGIN A SEPARATE JOURNEY</span><small>OFFLINE · LOCAL SAVE</small></div><p class="expedition-note">This character is created for Eternal Path only. It does not import or alter Convo characters.</p>
-      <form id="eternal-start-form" class="expedition-start-form"><label for="eternal-name">Character name</label><input id="eternal-name" name="name" minlength="2" maxlength="32" required placeholder="Your adventurer's name" />
-      <div class="expedition-form-row"><div><label for="eternal-age">Age</label><input id="eternal-age" name="age" type="number" min="1" max="120" value="14" required /></div><div><label for="eternal-region">Starting power</label><select id="eternal-region" name="region"><option value="golden-dragon-empire">Golden Dragon Empire</option><option value="tianhai-yunzhou">Tianhai Yunzhou</option><option value="beiming-gu">Beiming Gu</option></select></div></div>
-      <button type="submit" class="action-button">Begin Eternal Path <span>↗</span></button></form></section>`;
+    <div class="expedition-profile-actions"><span class="expedition-save-label">SAVE · ${escapeHtml(save.saveName)}</span><button type="button" class="text-button" data-eternal-manager-toggle>Manage journeys</button><button type="button" class="text-button danger" data-eternal-end>Leave journey</button></div></section>`
+    :`<section class="expedition-character-panel expedition-empty-profile"><span class="expedition-profile-kicker">NO ACTIVE JOURNEY</span><p class="expedition-note">Create a new local journey or load one of your saved adventures below. World Archive remains read-only.</p></section>`;
+  const savedSlots=listEternalSaves();
+  const saveCards=savedSlots.map(slot=>`<article class="expedition-save-card" data-save-card="${escapeHtml(slot.id)}">
+    <div class="expedition-save-card-heading"><div><strong>${escapeHtml(slot.name)}</strong><small>${escapeHtml(slot.characterName)} · Day ${slot.day}</small></div><span>${slot.active?"ACTIVE":escapeHtml(regionNames[slot.region])}</span></div>
+    <div class="expedition-save-actions">${slot.active?"":`<button type="button" data-eternal-save-load="${escapeHtml(slot.id)}">Load</button>`}<button type="button" data-eternal-save-rename-toggle="${escapeHtml(slot.id)}">Rename</button><button type="button" data-eternal-save-export="${escapeHtml(slot.id)}">Export</button><button type="button" class="danger" data-eternal-save-delete="${escapeHtml(slot.id)}">Delete</button></div>
+    <form class="expedition-rename-form" data-eternal-rename-form="${escapeHtml(slot.id)}" hidden><label>Journey name<input name="name" minlength="2" maxlength="48" required value="${escapeHtml(slot.name)}"/></label><button type="submit">Save name</button></form>
+  </article>`).join("");
+  const createJourneyForm=`<form id="eternal-start-form" class="expedition-start-form" ${save?"hidden":""}><div class="section-heading"><span>NEW JOURNEY</span><small>NON-CANON · LOCAL SAVE</small></div><label for="eternal-name">Character name</label><input id="eternal-name" name="name" minlength="2" maxlength="32" required placeholder="Your adventurer's name" />
+      <div class="expedition-form-row"><div><label for="eternal-age">Age</label><input id="eternal-age" name="age" type="number" min="1" max="120" value="14" required /></div><div><label for="eternal-region">Starting region</label><select id="eternal-region" name="region"><option value="golden-dragon-empire">Golden Dragon Empire</option><option value="tianhai-yunzhou">Tianhai Yunzhou</option><option value="beiming-gu">Beiming Gu</option></select></div></div>
+      <button type="submit" class="action-button">Begin new journey <span>↗</span></button></form>`;
+  const managerPanel=`<section class="expedition-save-manager" aria-label="Eternal Path save manager">
+    ${save?`<button type="button" class="expedition-manager-toggle" data-eternal-manager-toggle><span>JOURNEY MANAGER</span><small>${savedSlots.length} SAVED</small></button>`:`<div class="section-heading"><span>JOURNEY MANAGER</span><small>${savedSlots.length} SAVED</small></div>`}
+    <div class="expedition-manager-content" data-eternal-manager-content ${save?"hidden":""}>
+      <div class="expedition-save-list">${saveCards||`<p class="expedition-note">No saved journeys yet. Your first journey will appear here.</p>`}</div>
+      ${save?`<button type="button" class="text-button" data-eternal-new-form>＋ Create another journey</button>`:""}
+      ${createJourneyForm}
+      <label class="expedition-import-label">IMPORT JOURNEY BACKUP<input type="file" accept="application/json,.json" data-eternal-import /></label>
+      <p class="expedition-save-footnote">Saves are isolated per journey. Deleting a journey never changes the official World Archive.</p>
+    </div></section>`;
   const story=save&&dialogue?`<section class="expedition-dialogue" aria-live="polite"><div class="section-heading"><span>THE MOMENT · ${String((save.eventIndex % getRegionalDialogueCount())+1).padStart(3,"0")} / ${getRegionalDialogueCount()}</span><small>${escapeHtml(dialogue.chapter)}</small></div>
     <article class="expedition-dialogue-card">
       <div class="expedition-narrative-layer"><span class="expedition-narrative-label">ENVIRONMENT</span><p class="expedition-sensory-copy">${escapeHtml(scene.detail)} The air carries the day's changing temperature; nearby footsteps and distant voices blend into the ordinary rhythm of the region.</p></div>
