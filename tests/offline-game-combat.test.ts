@@ -73,6 +73,23 @@ describe("offline-game canon combat formulas", () => {
     })).toEqual({ valid: false, error: "HIGH_OUTPUT_NOT_CONFIRMED" });
   });
 
+  it("accepts only the half-base percentages for a declared combo follow-up", () => {
+    expect(calculateCombatDamage({
+      targetMaximumHp: 1000, targetCurrentHp: 1000,
+      baseDamagePercent: 4, combatRatio: 1, defenseReductionPercent: 0,
+      isComboFollowup: true
+    })).toMatchObject({ valid: true, result: { rawDamage: 40, roundedDamage: 40 } });
+    expect(calculateCombatDamage({
+      targetMaximumHp: 1000, targetCurrentHp: 1000,
+      baseDamagePercent: 4, combatRatio: 1, defenseReductionPercent: 0
+    })).toEqual({ valid: false, error: "INVALID_BASE_DAMAGE" });
+    expect(calculateCombatDamage({
+      targetMaximumHp: 1000, targetCurrentHp: 1000,
+      baseDamagePercent: 9, combatRatio: 1, defenseReductionPercent: 0,
+      isComboFollowup: true
+    })).toEqual({ valid: false, error: "HIGH_OUTPUT_NOT_CONFIRMED" });
+  });
+
   it("uses half the original base damage for a default combo follow-up", () => {
     expect(getComboFollowupBaseDamagePercent(5)).toBe(2.5);
     expect(getComboFollowupBaseDamagePercent(18)).toBe(9);
