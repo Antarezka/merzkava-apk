@@ -33,7 +33,7 @@ These percentages measure **source-path coverage**, not claim-by-claim completen
 | Potential player-facing source scope | 35 mapped / 72 eligible-or-review-needed paths | **48.6%** | The 72 comprise 21 `PUBLISHED`, 9 `PARTIAL_PUBLIC`, 14 `PUBLIC_CANDIDATE`, and 28 `REVIEW_REQUIRED` source files. |
 | Already dispositioned public-scope paths | 35 mapped / 44 `PUBLISHED` + `PARTIAL_PUBLIC` + `PUBLIC_CANDIDATE` paths | **79.5%** | Coverage among sources already classified into a public-facing disposition; it does not mean every claim is approved. |
 | Canonical mechanics source preservation | 16 / 16 `MECHANICS_REFERENCE` modules copied verbatim | **100% preserved** | Exact development snapshot exists separately in `docs/OFFLINE_GAME_CANON_FORMULA_SNAPSHOT.md`. One supplemental formula-bearing governance source is also preserved. |
-| Offline deterministic formula implementation | Implemented engine modules / required modules | **0%** | No standalone offline gameplay engine exists yet; source preservation is not implementation. |
+| Initial deterministic mechanic implementation | 1 foundational HP state module | **1 module implemented; CI verified** | HP maximum/state consistency is implemented. Overall engine percentage is not baselined; remaining formula domains and dependencies still require an inventory. |
 
 **Current Archive inventory:** 39 curated dossiers / 35 unique source paths. The 16 mechanics-reference files are intentionally not published as ordinary Archive lore. Claim-level content completeness remains **not yet measured**; do not turn the path ratios above into a claim that the Archive is 25%, 48.6%, or 79.5% complete in every dimension.
 
@@ -258,3 +258,13 @@ The existing catalogue derives each dossier's outbound `crossReferenceIds` from 
 - Regression tests: `tests/lore-library.test.ts`, commit `4ce04c872d39611b6fa782b8e2199f4157aa3b0f`.
 - Tests are committed but have **not yet been executed** in CI or on-device; graph QA remains open.
 - Source citation is still provenance text, not an in-app local source reader. The source reader remains a required task.
+
+
+## Offline-game implementation checkpoint — HP foundation (2026-11-01)
+
+- Canon source: `core/HP_SYSTEM.md` at Universe pin `2f76a864150528afb0e3d26cb16f9396ce610ff6` (blob `efef616efa7ad9c44c81470da6dc52bddc813204`).
+- Runtime module: `src/offline-game/mechanics/hp.ts`. It implements the official maximum-HP lookup table, Mortal/0, new-session and continuing-session bootstrap behavior, explicit death versus unresolved missing HP, and non-healing maximum updates.
+- Regression tests: `tests/offline-game-hp.test.ts`.
+- Validation: Web App Validation #565 passed on source commit `cfb2666d119843a6f7b479f4c430f91173a4bf50`; test and TypeScript/Vite build steps passed.
+- No damage, recovery, injury, or combat formulas are implemented by this module. Those remain separate canon domains.
+- This is **one implemented foundation module**, not a complete engine. Do not convert it into a whole-engine percentage before defining the full module inventory and dependencies. No APK build is implied by this validation result.
