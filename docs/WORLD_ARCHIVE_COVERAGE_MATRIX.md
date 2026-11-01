@@ -29,15 +29,15 @@ These percentages measure **source-path coverage**, not claim-by-claim completen
 
 | Measure | Calculation | Progress | Meaning |
 |---|---:|---:|---|
-| Whole-repository source footprint | 71 mapped paths / 140 Markdown paths | **50.7%** | How much of the entire Universe Markdown inventory currently has at least one Archive dossier mapping. |
-| Potential player-facing source scope | 71 mapped / 71 eligible-or-review-needed paths | **100%** | The 72 comprise 21 `PUBLISHED`, 9 `PARTIAL_PUBLIC`, 14 `PUBLIC_CANDIDATE`, and 28 `REVIEW_REQUIRED` source files. |
+| Whole-repository source footprint | 72 mapped paths / 140 Markdown paths | **51.4%** | How much of the entire Universe Markdown inventory currently has at least one Archive dossier mapping. |
+| Potential player-facing source scope | 71 mapped / 71 eligible-or-review-needed paths | **100%** | The 71 comprise 21 `PUBLISHED`, 9 `PARTIAL_PUBLIC`, and 41 `PUBLIC_CANDIDATE` source files; no source remains in `REVIEW_REQUIRED`. |
 | Already dispositioned public-scope paths | 71 mapped / 71 `PUBLISHED` + `PARTIAL_PUBLIC` + `PUBLIC_CANDIDATE` paths | **100%** | Coverage among sources already classified into a public-facing disposition; it does not mean every claim is approved. |
 | Canonical mechanics source preservation | 16 / 16 `MECHANICS_REFERENCE` modules copied verbatim, plus the supplemental governance allocation formula | **100% preserved** | Exact development snapshot exists separately in `docs/OFFLINE_GAME_CANON_FORMULA_SNAPSHOT.md`. One supplemental formula-bearing governance source is also preserved. |
 | Initial deterministic mechanic implementation | 7 foundational modules: HP, Satiety, Injury, Time/Day-left, Combat, Spirit Ring compatibility, and Spirit Ring progression | **7 modules implemented; CI verified** | HP state consistency, Satiety interval/intake, Injury recovery, Time/Day-left, Combat, and Spirit Ring formulas are implemented. Overall engine percentage is not baselined; remaining formula domains and dependencies still require an inventory. |
 
-**Current Archive inventory:** 87 curated dossiers / 71 unique player-facing source paths, plus 3 explicit ON_PLAN placeholders. The 16 mechanics-reference files are intentionally not published as ordinary Archive lore. Claim-level content completeness remains **not yet measured**; do not turn the path ratios above into a claim that the Archive is 50.7% or 100% complete in every dimension.
+**Current Archive inventory:** 87 curated dossiers / 71 unique player-facing source paths, plus 3 explicit ON_PLAN placeholders and 1 mapped legacy redirect. The 16 mechanics-reference files are intentionally not published as ordinary Archive lore. Claim-level content completeness remains **not yet measured**; do not turn the path ratios above into a claim that the Archive is 51.4% or 100% complete in every dimension.
 
-**How to read the progress:** use **100%** as the source-path coverage of the approved player-facing scope, **50.7%** as the whole-repository path footprint, and report formula preservation and game-engine implementation separately. Never combine these into one misleading average.
+**How to read the progress:** use **100%** as the source-path coverage of the approved player-facing scope, **51.4%** as the whole-repository path footprint, and report formula preservation and game-engine implementation separately. Never combine these into one misleading average.
 
 ## Mandatory entity-link contract
 
