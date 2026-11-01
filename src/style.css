@@ -1200,34 +1200,3 @@ button {color:inherit;} button:focus-visible {outline-color:#a68d5e;}
   .nav-item,.header-settings {transition:none}
   .nav-item:active,.header-settings:active {transform:none}
 }
-
-
-/* TEMPORARY SCENERY TEST — FX-02 black-background fog using Screen blend. */
-.scene-fog-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background-image: url("/game/scenery/shared/fx-02-atmospheric-fog.png");
-  background-repeat: no-repeat;
-  background-position: center 44%;
-  background-size: 100% auto;
-  mix-blend-mode: screen;
-  opacity: .68;
-  animation: merzkava-fog-drift 76s ease-in-out infinite alternate;
-  will-change: transform;
-}
-.app-header,
-.main-content,
-.app-shell > .notice {
-  position: relative;
-  z-index: 1;
-}
-.storage-status { z-index: 4; }
-@keyframes merzkava-fog-drift {
-  from { transform: translate3d(-1.1%, 0, 0) scale(1.015); }
-  to { transform: translate3d(1.1%, -0.35%, 0) scale(1.035); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .scene-fog-overlay { animation: none; }
-}
