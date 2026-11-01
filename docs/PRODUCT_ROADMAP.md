@@ -46,6 +46,8 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 
 ## 3. Workstream 1 — World Archive, typography, and reference experience
 
+**Progress now:** `[~] FOUNDATION EXISTS / AUDIT NOT COMPLETE`. The Archive catalogue/manifest and local reference layer exist, but article-by-article canon review, visibility approval, typography audit, navigation QA, and isolation proof remain open. Do not describe the Archive as complete or all articles as approved.
+
 **Goal:** Make the offline Archive complete, trustworthy, easy to navigate, and visually polished. Typography improvements belong to this workstream.
 
 ### 1A. Content integrity and coverage
@@ -84,6 +86,8 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 
 ## 4. Workstream 2 — Audit and repair existing features
 
+**Progress now:** `[?] AUDIT NOT STARTED`. The register below is only a list of known product areas; no full screen/control inventory or end-to-end verification has been recorded yet.
+
 **Goal:** Identify what already exists, what is incomplete, what is broken, and what is only visual scaffolding. No feature should remain invisible simply because it was never listed.
 
 ### 2A. Full feature inventory
@@ -112,6 +116,8 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 ---
 
 ## 5. Workstream 3 — New UI features and interactive visual design
+
+**Progress now:** `[ ] TODO FOR FACTION CARDS`. Existing splash/launcher visual work is tracked by its own code commits, but the three faction entry cards, their destinations, and the shared glass interaction system have not been verified as implemented.
 
 **Goal:** Make the app feel like a cohesive, atmospheric fantasy application rather than a collection of static screens.
 
@@ -143,6 +149,8 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 ---
 
 ## 6. Workstream 4 — App services, daily login, and canon-approved rewards
+
+**Progress now:** `[ ] TODO`. No daily check-in or reward implementation is recorded as complete. First dependency is a canon review of whether the proposed reward types and schedule are allowed.
 
 **Goal:** Add useful app-level systems without inventing or contradicting official Merzkava rules.
 
@@ -237,6 +245,8 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 
 ## 8. Workstream 6 — Future expansion backlog
 
+**Progress now:** `[x] PLACEHOLDER ESTABLISHED`. No specific feature is approved yet; future ideas must be scoped before being promoted into implementation.
+
 This section is intentionally an open slot for ideas not yet specified. New proposals go here first, then receive scope, dependencies, priority, and acceptance criteria before implementation.
 
 - [ ] **XXXX / Future feature placeholder** — awaiting product direction.
@@ -294,7 +304,7 @@ The workstreams describe product scope; this sequence describes safe delivery or
 
 ---
 
-## 10. How to read this roadmap and follow implementation
+## 11. How to read this roadmap and follow implementation
 
 This section is the operating manual for a new AI conversation, developer, or reviewer joining the project mid-stream.
 
@@ -376,7 +386,7 @@ The repository is the durable handoff. When a future conversation adds a new dec
 
 ---
 
-## 11. Verified project baseline — 2026-11-01
+## 12. Verified project baseline — 2026-11-01
 
 This is a dated snapshot, not a permanent claim. Recheck GitHub before every later task.
 
@@ -384,7 +394,7 @@ This is a dated snapshot, not a permanent claim. Recheck GitHub before every lat
 |---|---|---|
 | Working repository | `Antarezka/merzkava-apk` | GitHub repository |
 | Working branch | `feature/archive-experience` | Branch head inspected |
-| Current branch head | `232bdec0722ccbe9293d136ac2afb798d7f6b856` | Latest commit at time of this update; documentation change |
+| Current branch head | `3361252440fd1f9d15045a2f465482c080a536d7` | Latest roadmap documentation commit at time of this update; documentation-only change |
 | Latest app-code baseline found | `02e114270ec4a0ebe35314434b0dd07951f56ef4` | Latest identified app-code commit before roadmap-only commits; splash wordmark positioning |
 | Latest APK build run found | Build #292, run `41286968526` | Run on app-code SHA `02e1142`; overall run conclusion was failure because emulator verification stage failed; APK build/sign/verification/upload steps had succeeded according to run diagnostics. Do not call the full run successful. |
 | Latest web validation | #495, run `41289709639` | Passed on branch head `232bdec`; documentation/web validation only, not an APK build |
