@@ -123,7 +123,7 @@ describe("World Archive visibility and entity routing", () => {
 
     expect(openLoreSource("beiming-xenhwa")).toBe(true);
     html = renderLoreLibrary();
-    expect(html).not.toMatch(/\\b17\\b|white nine-tailed fox|half-beast|current whereabouts/i);
+    expect(html).not.toMatch(/\b17\b|white nine-tailed fox|half-beast|current whereabouts/i);
     expect(html).toContain("Beiming Xenhwa");
     closeLoreSource();
     expect(renderLoreLibrary()).toContain("LOCAL DOSSIER");
