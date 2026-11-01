@@ -6,8 +6,8 @@
 - Every existing feature, defect, and proposed feature must be inventoried or tracked there; do not assume a visible control is functional without verification.
 - **Convo / AI GM** is the connected conversation experience in the APK. It obtains active gameplay canon directly from the official `Antarezka/merzkava-universe` repository through the pinned source and routing pipeline.
 - **World Archive** is the reviewed local content/reference layer in the same APK. Users can browse it offline, and its approved, versioned content package is the source consumed by **Offline Game**.
-- **Offline Game** (working name) is the second playable experience inside the same APK. It consumes approved World Archive content and runs locally without AI/network dependency; it is not a fallback version of Convo.
-- World Archive content must never be silently appended to connected Convo/AI GM context. Convo and Offline Game must keep separate session/save state and source-version records; no implicit state or context crossover.
+- **Merzkava: Eternal Path** (current working title) is the second playable experience inside the same APK. It consumes approved World Archive content and runs locally without AI/network dependency; it is not a fallback version of Convo.
+- Offline Game is a Life Simulation Text RPG. Its world foundation comes from Merzkava Universe through the reviewed World Archive package; game-only additions are allowed only with explicit `IN_GAME_ORIGINAL` provenance and must never be represented as Universe canon. Follow `docs/offline-game/CONTENT_PROVENANCE.md` for the required `CANON`, `CANON_ADAPTATION`, and `IN_GAME_ORIGINAL` labels and player-facing display rules. World Archive content must never be silently appended to connected Convo/AI GM context. Convo and Offline Game must keep separate session/save state and source-version records; no implicit state or context crossover.
 - Daily login or reward systems must follow official Universe rules where applicable and use deterministic engine validation and auditable transactions. Do not invent canon rewards.
 
 ## Role and objective
