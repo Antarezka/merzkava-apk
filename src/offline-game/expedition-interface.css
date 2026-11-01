@@ -41,7 +41,6 @@
 /* Live scene composition: illustrated region first, translucent atmosphere above it. */
 .expedition-scene-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
 .expedition-scene-caption{color:#cbb99d;font-size:9px;letter-spacing:.08em}
-.expedition-test-toggle{min-height:36px;padding:8px 11px;border:1px solid #8b6b43;background:#29231b;color:#e9c996;font-size:10px;letter-spacing:.04em}
 .expedition-environment{min-height:clamp(220px,58vw,330px);background:#1a201f;--scene-fog-opacity:.22}
 .expedition-scene-image{position:absolute;z-index:0;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 48%;filter:saturate(.86) contrast(1.04);pointer-events:none}
 .expedition-light-layer{position:absolute;z-index:1;inset:0;background:linear-gradient(180deg,#f3d9a00a,#17171355 90%);pointer-events:none;transition:background .7s ease,filter .7s ease}
@@ -62,13 +61,10 @@
 .expedition-environment[data-weather="Rain"] .expedition-weather-layer{opacity:.5;background:repeating-linear-gradient(105deg,transparent 0 17px,#d7e4ed35 18px,#d7e4ed35 19px,transparent 20px 33px)}
 .expedition-environment[data-weather="Snow"] .expedition-weather-layer{opacity:.58;background-image:radial-gradient(#fff9 1px,transparent 2px),radial-gradient(#fff8 1px,transparent 2px);background-size:37px 43px,59px 61px;background-position:0 0,18px 22px}
 .expedition-environment[data-weather="Clear"] .expedition-weather-layer{opacity:0}
-.expedition-test-panel,.expedition-dialogue-card,.expedition-dialogue-locked{padding:16px;border:1px solid #5d4a34;background:linear-gradient(145deg,#2b261f,#1d1b18)}
-.expedition-test-panel label,.expedition-start-form label{display:block;margin:12px 0 6px;color:#d8c6a8;font-size:10px;letter-spacing:.06em}
-.expedition-test-panel select,.expedition-start-form input,.expedition-start-form select{width:100%;min-height:42px;padding:9px 10px;border:1px solid #65523d;border-radius:3px;background:#171614;color:#f0e5d4;font:inherit;font-size:12px}
-.expedition-test-panel input[type="range"]{width:100%;accent-color:#c18b45}
-.expedition-test-panel output{float:right;color:#e7c58d}
+.expedition-dialogue-card,.expedition-dialogue-locked{padding:16px;border:1px solid #5d4a34;background:linear-gradient(145deg,#2b261f,#1d1b18)}
+.expedition-start-form label{display:block;margin:12px 0 6px;color:#d8c6a8;font-size:10px;letter-spacing:.06em}
+.expedition-start-form input,.expedition-start-form select{width:100%;min-height:42px;padding:9px 10px;border:1px solid #65523d;border-radius:3px;background:#171614;color:#f0e5d4;font:inherit;font-size:12px}
 .expedition-test-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.expedition-test-actions{display:flex;justify-content:flex-end;margin-top:10px}
 .expedition-start-form{margin-top:12px}
 .expedition-player-name{margin:10px 0 4px;color:#f0e5d4;font:400 25px Georgia,serif}
 .expedition-dialogue{display:grid;gap:10px}
@@ -82,5 +78,11 @@
 .expedition-choice strong{font-size:11px;font-weight:600}
 .expedition-choice small{color:#a99e8d;font-size:10px;line-height:1.45}
 .expedition-choice:active{background:#3b2c1e;border-color:#c18b45}
-@media(max-width:360px){.expedition-test-row{gap:6px}.expedition-test-panel,.expedition-dialogue-card{padding:12px}.expedition-choice{padding:9px}}
+@media(max-width:360px){.expedition-test-row{gap:6px}.expedition-dialogue-card{padding:12px}.expedition-choice{padding:9px}}
 @media(prefers-reduced-motion:reduce){.expedition-light-layer,.expedition-weather-layer{transition:none}.expedition-fog-motion{transform:none!important}}
+
+/* The window reads world region, clock cycle and weather from the local save. */
+.expedition-environment[data-region="tianhai-yunzhou"] .expedition-light-layer{background:linear-gradient(115deg,#b9d8e833,#d7e9f022 52%,#182b3a55)}
+.expedition-environment[data-region="beiming-gu"] .expedition-scene-image{filter:saturate(.72) contrast(1.08) hue-rotate(4deg)}
+.expedition-environment[data-region="beiming-gu"] .expedition-light-layer{background:linear-gradient(115deg,#9dbbd033,#b7c9df18 52%,#0b172a66)}
+.expedition-environment[data-region="golden-dragon-empire"] .expedition-light-layer{background:linear-gradient(115deg,#d8a45b20,#e7d1a00d 52%,#21180f44)}
