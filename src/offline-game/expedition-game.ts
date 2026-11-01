@@ -58,7 +58,7 @@ export const ETERNAL_DIALOGUES: EternalDialogue[] = chapters.flatMap((chapter, c
       const subject = chapter.subjects[(sceneIndex * 2 + variantIndex) % chapter.subjects.length];
       const id = `ep-${String(sceneIndex + 1).padStart(2,"0")}-${String(chapterIndex + 1).padStart(2,"0")}-${String(variantIndex + 1).padStart(2,"0")}`;
       return {
-        id, title: `${chapter.name} · ${variation.suffix}`, sceneId:scene.id, chapter:chapter.name,
+        id, contentId:id, contentType:"dialogue", reviewStatus:"APPROVED", packageVersion:"0.1.0", summary:`${chapter.name} scene dialogue for ${scene.detail}`, title: `${chapter.name} · ${variation.suffix}`, sceneId:scene.id, chapter:chapter.name,
         speaker:chapter.speaker,
         text:`${sceneOpeners[scene.id]} ${prompt} ${subject}`,
         provenance:"IN_GAME_ORIGINAL" as const,
