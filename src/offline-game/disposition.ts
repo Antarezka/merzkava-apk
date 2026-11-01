@@ -42,7 +42,9 @@ export function applyDispositionEvidence(state:DispositionState,evidence:Partial
   const previous=state.label;
   const changed=candidate!==previous;
   const orderMargin=Math.abs(next.scores.order-50), moralMargin=Math.abs(next.scores.morality-50);
-  if(!changed || (orderMargin>=18&&moralMargin>=18)) next.label=candidate;
+  const needsOrder= candidate.startsWith("Lawful")||candidate.startsWith("Chaotic")||previous.startsWith("Lawful")||previous.startsWith("Chaotic");
+  const needsMoral= candidate.endsWith("Good")||candidate.endsWith("Evil")||previous.endsWith("Good")||previous.endsWith("Evil");
+  if(!changed || ((!needsOrder||orderMargin>=18)&&(!needsMoral||moralMargin>=18))) next.label=candidate;
  }
  next.lawfulnessBand=deriveLawfulnessBand(next.scores.order);
  return next;
