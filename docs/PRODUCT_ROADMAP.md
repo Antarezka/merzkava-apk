@@ -36,7 +36,7 @@ Both modes live in the same APK and may share app shell, navigation, visual comp
 - [ ] Verify offline and reconnect behavior without mixing stale or unapproved canon snapshots.
 - [ ] Document this separation in the app's architecture and release checks.
 
-**Hard boundaries:** Convo reads its active gameplay canon directly from the official Universe repository; World Archive is not a hidden Convo context source. Offline Game consumes only the approved, versioned World Archive package; it does not fetch raw Universe files or invent missing canon at runtime. World Archive remains browseable in-app. The Archive package is a curated content distribution layer, not a replacement for the official Universe repository as the ultimate canon authority.
+**Hard boundaries:** Convo reads its active gameplay canon directly from the official Universe repository; World Archive is not a hidden Convo context source. Offline Game consumes a versioned release package that pins the approved World Archive package and the separate reviewed Offline Game content pack; it does not fetch raw Universe files or invent missing canon at runtime. World Archive remains browseable in-app. The Archive package is a curated content distribution layer, not a replacement for the official Universe repository as the ultimate canon authority.
 
 ---
 
