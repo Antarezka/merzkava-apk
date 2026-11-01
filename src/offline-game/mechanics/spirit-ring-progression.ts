@@ -134,13 +134,13 @@ export function evaluateAbsorptionEligibility(
   }
   if (!input.martialSoulAwakened) return { eligible: false, reason: "MARTIAL_SOUL_AWAKENING_REQUIRED." };
   if (!input.ringAvailableAndLegallyObtained) return { eligible: false, reason: "RING_NOT_AVAILABLE_OR_NOT_LAWFULLY_OBTAINED." };
-  if (!input.requiredItemAvailable) return { eligible: false, reason: "REQUIRED_ITEM_MISSING." };
   if (!input.bodyConditionSuitable) return { eligible: false, reason: "BODY_CONDITION_NOT_SUITABLE." };
   if (!input.otherRequirementsMet) return { eligible: false, reason: "OTHER_OFFICIAL_REQUIREMENTS_NOT_MET." };
 
   if (input.ringNumber === 1) {
-    return { eligible: true, reason: "FIRST_RING_REQUIRES_AWAKENING_AND_VALID_RING; NO_COOLDOWN_OR_BREAKTHROUGH_GATE." };
+    return { eligible: true, reason: "FIRST_RING_REQUIRES_AWAKENING_AND_VALID_RING; NO_COOLDOWN_OR_BREAKTHROUGH_ITEM_GATE." };
   }
+  if (!input.requiredItemAvailable) return { eligible: false, reason: "REQUIRED_ITEM_MISSING." };
   if (!Number.isFinite(input.gapPoints) || input.gapPoints < 0 || input.gapPoints >= 10) {
     return { eligible: false, reason: "SYNC_GAP_MUST_BE_LESS_THAN_TEN_POINTS." };
   }
