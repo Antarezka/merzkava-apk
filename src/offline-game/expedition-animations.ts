@@ -4,6 +4,33 @@ function reducedMotion(): boolean {
   return typeof window !== "undefined" && Boolean(window.matchMedia?.("(prefers-reduced-motion: reduce)").matches);
 }
 
+/** Procedural weather/season particles are rendered only inside the clipped Scene Window. */
+function mountSceneParticles(root: HTMLElement): void {
+  const host=root.querySelector<HTMLElement>(".expedition-weather-particles");
+  const scene=root.querySelector<HTMLElement>(".expedition-environment");
+  if(!host||!scene||reducedMotion()) return;
+  const weather=scene.dataset.weather;
+  const cycle=scene.dataset.cycle;
+  const kind=weather==="Rain"?"rain":weather==="Snow"?"snow":cycle==="Dawn"?"petal":cycle==="Dusk"?"leaf":"";
+  if(!kind) return;
+  const count=kind==="rain"?22:kind==="snow"?18:12;
+  const nodes:HTMLElement[]=[];
+  for(let i=0;i<count;i++){
+    const particle=document.createElement("span");
+    particle.className="expedition-particle expedition-particle-"+kind;
+    particle.style.left=((i*37+11)%97)+"%";
+    particle.style.top=kind==="rain"?(-20-(i%5)*24)+"px":(-12-(i%6)*22)+"px";
+    particle.style.setProperty("--particle-drift",((i%7)-3)*9+"px");
+    host.appendChild(particle);nodes.push(particle);
+  }
+  if(kind==="rain"){
+    animate(nodes,{translateY:["-24px","360px"],translateX:(_,i)=>(((i%5)-2)*13)+"px",opacity:[0,.72,0],duration:1050,ease:"linear",delay:stagger(34),loop:true});
+  }else if(kind==="snow"){
+    animate(nodes,{translateY:["-18px","360px"],translateX:(_,i)=>(((i%7)-3)*12)+"px",scale:[.7,1.15],opacity:[0,.82,.12],duration:7200,ease:"inOutSine",delay:stagger(180),loop:true});
+  }else{
+    animate(nodes,{translateY:["-12px","360px"],translateX:[0,(_,i)=>(((i%7)-3)*23)+"px"],rotate:[-35,110],scale:[.65,1],opacity:[0,.82,0],duration:kind==="petal"?9200:11800,ease:"inOutSine",delay:stagger(260),loop:true});
+  }
+}
 /** Anime.js owns Eternal Path presentation motion; game state never depends on animation callbacks. */
 export function mountExpeditionAnimations(root: HTMLElement): () => void {
   const listeners: Array<() => void> = [];
@@ -22,6 +49,17 @@ export function mountExpeditionAnimations(root: HTMLElement): () => void {
       scale: [1.025, 1.075], translateX: ["-.45%", ".45%"], duration: 32000,
       ease: "inOutSine", loop: true, alternate: true,
     });
+    mountSceneParticles(root);
+    const sun = root.querySelector<HTMLElement>(".expedition-sun-glow");
+    if (sun) animate(sun,{opacity:[.58,.9],scale:[.98,1.045],duration:9200,ease:"inOutSine",loop:true,alternate:true});
+    const moon = root.querySelector<HTMLElement>(".expedition-moon-glow");
+    if (moon) animate(moon,{opacity:[.42,.78],scale:[.99,1.035],duration:11800,ease:"inOutSine",loop:true,alternate:true});
+    const rays = root.querySelector<HTMLElement>(".expedition-light-rays");
+    if (rays) animate(rays,{rotate:["-4deg","5deg"],opacity:[.16,.34],duration:26000,ease:"inOutSine",loop:true,alternate:true});
+    const lightning = root.querySelector<HTMLElement>(".expedition-lightning-layer");
+    if (lightning && root.querySelector<HTMLElement>(".expedition-environment")?.dataset.weather==="Rain") {
+      animate(lightning,{keyframes:[{opacity:0,duration:14500},{opacity:.78,duration:75},{opacity:.16,duration:130},{opacity:.58,duration:55},{opacity:0,duration:1100}],loop:true,ease:"linear"});
+    }
     const light = root.querySelector<HTMLElement>(".expedition-light-layer");
     if (light) animate(light, { opacity: [.72, 1], duration: 8200, ease: "inOutSine", loop: true, alternate: true });
     const weather = root.querySelector<HTMLElement>(".expedition-weather-layer");
@@ -37,7 +75,7 @@ export function mountExpeditionAnimations(root: HTMLElement): () => void {
     });
     const cloud = root.querySelector<HTMLElement>(".expedition-cloud-motion");
     if (cloud) animate(cloud, {
-      translateX: ["-3%", "3%"], opacity: [.16, .4], duration: 42000,
+      translateX: ["-3%", "3%"], translateY:["-.5%","1%"], opacity: [.22, .52], duration: 42000,
       ease: "inOutSine", loop: true, alternate: true,
     });
 
