@@ -4,6 +4,8 @@
 >
 > **Upstream:** `Antarezka/merzkava-universe` / `main` / `2f76a864150528afb0e3d26cb16f9396ce610ff6`
 >
+> **Inventory:** 16/16 `MECHANICS_REFERENCE` source files from the coverage matrix, plus the supplemental `world/GOLDEN_DRAGON_EMPIRE_GOVERNANCE.md` formula source (17 documents total). Source blob SHAs are recorded in each section marker.
+>
 > **Preservation rule:** Each source section below is copied verbatim from the pinned Universe commit. Keep equations, tables, exceptions, thresholds, ordering, dependencies, and explicit unresolved/unspecified values intact. Do not simplify, rebalance, silently repair, or infer missing values. The Universe repository remains canon authority; update this snapshot only by comparing a newly pinned upstream source.
 >
 > **Runtime safety:** Do not bundle this whole development snapshot as player-visible Archive text. Offline gameplay must use separately reviewed, deterministic engine implementations and approved public content. GM-only, private, or restricted source material must not be exposed merely because it is preserved here.
