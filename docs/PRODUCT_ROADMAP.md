@@ -79,7 +79,7 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 - [ ] Improve search relevance, aliases, and ambiguous-name handling.
 - [x] Make approved public entity mentions open the correct local dossier; automatic public mention links and inbound backlinks are rendered from the public dossier graph. Seven Golden Dragon regional dossiers now resolve separately; misleading aliases that previously routed Longyuan/Huanglongcheng to the Empire dossier were removed.
 - [x] Add an offline source reader for reviewed public-safe extracts, with exact source path, source commit, review date, and source classification. Raw source Markdown is deliberately not bundled; mixed-scope files and claim-level details require further review.
-- [ ] Verify entity links, backlinks, and source-reader navigation in CI and on-device; regression tests are committed but have not yet been executed.
+- [~] CI regression coverage for entity links, public-only targets, backlinks, placeholder resolution, search, and navigation has run successfully in Web App Validation #653 (15 test files / 133 tests, with TypeScript, gateway type-check, and Vite build). Physical-device link/backlink/source-reader navigation QA remains open.
 - [ ] Add useful empty, loading, unavailable, and no-result states.
 - [ ] Verify the Archive remains fully readable with network disabled.
 - [ ] Ensure Archive browsing cannot modify player inventory, wallet, character state, quests, or gameplay history.
