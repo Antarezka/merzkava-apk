@@ -33,7 +33,7 @@ These percentages measure **source-path coverage**, not claim-by-claim completen
 | Potential player-facing source scope | 35 mapped / 72 eligible-or-review-needed paths | **48.6%** | The 72 comprise 21 `PUBLISHED`, 9 `PARTIAL_PUBLIC`, 14 `PUBLIC_CANDIDATE`, and 28 `REVIEW_REQUIRED` source files. |
 | Already dispositioned public-scope paths | 35 mapped / 44 `PUBLISHED` + `PARTIAL_PUBLIC` + `PUBLIC_CANDIDATE` paths | **79.5%** | Coverage among sources already classified into a public-facing disposition; it does not mean every claim is approved. |
 | Canonical mechanics source preservation | 16 / 16 `MECHANICS_REFERENCE` modules copied verbatim | **100% preserved** | Exact development snapshot exists separately in `docs/OFFLINE_GAME_CANON_FORMULA_SNAPSHOT.md`. One supplemental formula-bearing governance source is also preserved. |
-| Initial deterministic mechanic implementation | 2 foundational modules: HP and Satiety | **2 modules implemented; CI verified** | HP state consistency and Satiety interval/intake are implemented. Overall engine percentage is not baselined; remaining formula domains and dependencies still require an inventory. |
+| Initial deterministic mechanic implementation | 3 foundational modules: HP, Satiety, and Injury | **3 modules implemented; CI verified** | HP state consistency, Satiety interval/intake, and Injury recovery are implemented. Overall engine percentage is not baselined; remaining formula domains and dependencies still require an inventory. |
 
 **Current Archive inventory:** 39 curated dossiers / 35 unique source paths. The 16 mechanics-reference files are intentionally not published as ordinary Archive lore. Claim-level content completeness remains **not yet measured**; do not turn the path ratios above into a claim that the Archive is 25%, 48.6%, or 79.5% complete in every dimension.
 
@@ -278,4 +278,14 @@ The existing catalogue derives each dossier's outbound `crossReferenceIds` from 
 - Validation: Web App Validation #572 passed on commit `deb8d403dfa93a5996668480b4e68d9de2e6c4b7`: 7 test files / 52 tests, TypeScript, gateway type-check, and Vite build all passed.
 - **Canon discrepancy requiring upstream resolution:** the Spirit Primordial example for 24 hours of Light activity says ≈0.014 Satiety; the stated 365-day base and formula yield ≈0.342466. Code follows the explicit table/formula and surfaces a warning; no Universe source was changed.
 - Calendar-window transitions, meal-opportunity tracking, protected-sleep transitions, and cross-system consequences are not yet implemented by this module.
-- Current deterministic foundation: **2 modules implemented and CI-verified (HP + Satiety)**. This is not a whole-engine percentage or playable offline mode. No APK status is implied by Web App Validation.
+- Current deterministic foundation: **3 modules implemented and CI-verified (HP + Satiety + Injury)**. This is not a whole-engine percentage or playable offline mode. No APK status is implied by Web App Validation.
+
+
+## Offline-game implementation checkpoint — Injury recovery (2026-11-01)
+
+- Canon source: `core/INJURY_SYSTEM.md` at Universe pin `2f76a864150528afb0e3d26cb16f9396ce610ff6` (blob `a90d3d1c58afd3da171d66bc632b23e2a30cbbfd`).
+- Runtime module: `src/offline-game/mechanics/injury.ts`; regression tests: `tests/offline-game-injury.test.ts` (5 tests).
+- Implements Class I–IV baseline recovery rates proportionally per elapsed in-game hour; class III/IV prerequisites are enforced. No ungrounded diagnosis or numerical activity penalty is invented.
+- Validation: Web App Validation #577 passed on commit `07bc36b05572b2f27abb41792ce4d243017ee1a2`: 8 test files / 57 tests, TypeScript, gateway type-check, and Vite build passed.
+- Deterministic foundation is now **3 modules: HP, Satiety, Injury**. This is not a whole-engine percentage. Remaining domains and dependencies are not yet fully inventoried.
+- Android Build #320 targets earlier commit `6310974` (HP + Satiety only); it is not evidence of an APK built from the latest Injury-inclusive source.
