@@ -96,6 +96,10 @@ function resolveDailyWeather(region:EternalRegion,day:number):EternalWeather {
   const pattern=regionalWeather[region];
   return pattern[Math.max(0,day-1)%pattern.length];
 }
+function currentWorldRegion(current:EternalSave|null=getEternalSave()):EternalRegion {
+  const location=ETERNAL_SCENES.find(scene=>scene.id===current?.locationId);
+  return location?.region ?? current?.character.region ?? "golden-dragon-empire";
+}
 function readSave(): EternalSave | null {
   try {
     const raw=localStorage.getItem(SAVE_KEY); if(!raw) return null;
@@ -104,7 +108,8 @@ function readSave(): EternalSave | null {
     // Backward-compatible migration for saves created before world locations were persisted.
     parsed.locationId=typeof parsed.locationId==="string" && ETERNAL_SCENES.some(scene=>scene.id===parsed.locationId)
       ? parsed.locationId : defaultSceneForRegion(parsed.character.region).id;
-    parsed.weather=resolveDailyWeather(parsed.character.region,Math.max(1,parsed.day||1));
+    const savedRegion=ETERNAL_SCENES.find(scene=>scene.id===parsed.locationId)?.region ?? parsed.character.region;
+    parsed.weather=resolveDailyWeather(savedRegion,Math.max(1,parsed.day||1));
     return parsed;
   } catch { return null; }
 }
@@ -118,14 +123,16 @@ export function resetEternalGame(): void { save=null; try{localStorage.removeIte
 export function getRegionalDialogueCount(): number {
   const current=getEternalSave();
   if(!current) return ETERNAL_DIALOGUES.length;
+  const region=currentWorldRegion(current);
   return ETERNAL_DIALOGUES.filter(node =>
-    ETERNAL_SCENES.find(scene=>scene.id===node.sceneId)?.region===current.character.region
+    ETERNAL_SCENES.find(scene=>scene.id===node.sceneId)?.region===region
   ).length;
 }
 export function getCurrentDialogue(): EternalDialogue | null {
   const current=getEternalSave(); if(!current) return null;
+  const region=currentWorldRegion(current);
   const regionalEvents=ETERNAL_DIALOGUES.filter(node =>
-    ETERNAL_SCENES.find(scene=>scene.id===node.sceneId)?.region===current.character.region
+    ETERNAL_SCENES.find(scene=>scene.id===node.sceneId)?.region===region
   );
   return regionalEvents[current.eventIndex % regionalEvents.length] ?? null;
 }
@@ -148,7 +155,8 @@ export function chooseEternalOption(index:number): void {
  */
 export function advanceEternalWorldTime(minutes:number):void {
   const current=getEternalSave();
-  if(!current || !Number.isFinite(minutes) || minutes<=0) return;
+  // The caller must validate each underlying action with the official duration rules first.
+  if(!current || !Number.isSafeInteger(minutes) || minutes<=0) return;
   const timestamp:SessionTimestamp={year:0,month:1,day:current.day,hour:current.hour,minute:current.minute,weekdayIndex:0};
   const advanced=advanceFallbackCalendar(timestamp,Math.floor(minutes));
   if(!advanced.valid) return;
@@ -156,7 +164,7 @@ export function advanceEternalWorldTime(minutes:number):void {
   current.day=advanced.result.timestamp.day;
   current.hour=advanced.result.timestamp.hour;
   current.minute=advanced.result.timestamp.minute;
-  if(current.day!==previousDay) current.weather=resolveDailyWeather(current.character.region,current.day);
+  if(current.day!==previousDay) current.weather=resolveDailyWeather(currentWorldRegion(current),current.day);
   persist();
 }
 
@@ -166,7 +174,6 @@ export function setEternalLocation(sceneId:string):void {
   const destination=ETERNAL_SCENES.find(scene=>scene.id===sceneId);
   if(!current || !destination) return;
   current.locationId=destination.id;
-  current.character.region=destination.region;
   current.weather=resolveDailyWeather(destination.region,current.day);
   persist();
 }
