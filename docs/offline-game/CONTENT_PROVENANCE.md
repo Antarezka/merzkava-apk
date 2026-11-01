@@ -11,7 +11,7 @@ Merzkava: Eternal Path is a **Life Simulation Text RPG** set in the world docume
 
 This contract allows that content to be authored for gameplay while preserving a visible, auditable boundary between official world facts and game-only additions.
 
-**World canon and gameplay content are related, but they are not the same thing.** The Universe repository remains the authority for canon. The approved World Archive package is the only world/content package read by Offline Game at runtime. The game must not fetch raw Universe files or silently promote its original content into canon.
+**World canon and gameplay content are related, but they are not the same thing.** The Universe repository remains the authority for canon. The approved World Archive package is the authority for canon-backed world references. A separate, versioned Offline Game content pack holds game-facing adaptations and original additions. The shipped Offline Game release package combines approved Archive references with reviewed game content; it never fetches raw Universe files. The game must not fetch raw Universe files or silently promote its original content into canon.
 
 ## 2. Required provenance labels
 
@@ -63,7 +63,7 @@ An original Spirit Beast or Arcanistry entry can exist as a game-only design. It
 
 ## 4. Content record contract
 
-Each packaged content record must carry the following logical fields. The implementation may use TypeScript interfaces, JSON, SQLite columns, or a normalized combination, but the meaning must remain stable.
+Each packaged content record must carry the following logical fields. The implementation may use TypeScript interfaces, JSON, SQLite columns, or a normalized combination, but the meaning must remain stable. `packageVersion` refers to the Offline Game content-pack version; the release manifest separately pins the World Archive package version/SHA.
 
 | Field | Required | Description |
 |---|---|---|
@@ -168,14 +168,14 @@ Required tooltip explanations:
 
 1. The Universe repository is the ultimate authority for world canon.
 2. World Archive reviews and curates player-safe world material; it is not allowed to invent canon.
-3. The approved, versioned World Archive package is the only world/content source consumed by Offline Game at runtime.
-4. The game package may contain approved game-only records, but those records must retain `IN_GAME_ORIGINAL` provenance and must not be written back as Universe canon.
+3. The approved, versioned World Archive package is the source of canon-backed world references consumed by Offline Game.
+4. The versioned Offline Game content pack may contain approved adaptations and game-only records. Those records retain their provenance and must not be written back as Universe canon. The final offline release package bundles/references both the approved Archive package and this game content pack.
 5. Keep the Universe source commit, World Archive package version/SHA, and Offline Game save/schema version as separate identifiers.
 6. Never use the development-only `CANON_FORMULA_SNAPSHOT.md` as a player-facing content package or runtime database.
 7. Never generate missing canon, mechanics, creature facts, item history, or Arcanistry rules at runtime with AI or inference.
 8. If a required rule or world fact is missing, contradictory, restricted, or unreviewed, block the affected content/feature and route it through the appropriate Universe and Archive review process.
 9. Deterministic engine values must be traceable to their rule source or explicitly classified as game-only implementation parameters.
-10. A game-only content record can be revised within the Offline Game package without changing the Universe repository. Such a revision must update the package version and release notes.
+10. A game-only content record can be revised within the Offline Game content pack without changing the Universe repository or canon Archive. Such a revision must update the game content-pack version and release notes.
 
 ## 8. Release validation checklist
 
