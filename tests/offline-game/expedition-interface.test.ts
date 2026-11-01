@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { renderExpeditionInterface } from "../../src/offline-game/expedition-interface";
-import { ETERNAL_DIALOGUES, ETERNAL_SCENES, getEternalSave, resetEternalGame, resetExpeditionPreview, setExpeditionPreview, startEternalGame } from "../../src/offline-game/expedition-game";
+import { chooseEternalOption, ETERNAL_DIALOGUES, ETERNAL_SCENES, getEternalSave, resetEternalGame, resetExpeditionPreview, setExpeditionPreview, startEternalGame } from "../../src/offline-game/expedition-game";
 
 describe("Eternal Path scene and prologue", () => {
   beforeEach(() => { resetEternalGame(); resetExpeditionPreview(); });
@@ -27,8 +27,8 @@ describe("Eternal Path scene and prologue", () => {
     startEternalGame({name:"Nafila",age:14,region:"golden-dragon-empire"});
     const save=getEternalSave();
     expect(save?.character.name).toBe("Nafila");
-    expect(renderExpeditionInterface()).toContain("Begin");
-    expect(renderExpeditionInterface()).toContain("Observe and listen");
+    expect(renderExpeditionInterface()).toContain("Nafila");
+    expect(renderExpeditionInterface()).toContain("Observe and listen");\n    chooseEternalOption(0);\n    expect(getEternalSave()?.completed).toBe(1);\n    expect(getEternalSave()?.insight).toBe(2);
   });
   it("ships 240 deterministic branching dialogue nodes across eight scene compositions", () => {
     expect(ETERNAL_DIALOGUES).toHaveLength(240);
