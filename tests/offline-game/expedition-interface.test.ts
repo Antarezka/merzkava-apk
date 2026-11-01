@@ -73,9 +73,11 @@ describe("Eternal Path live world scene", () => {
     expect(html).toContain("SPIRIT RING");
     expect(html).toContain("SYNC PROGRESS");
     expect(html).toContain("ARCANIST FOCUS");
-    expect(html).toContain("TRUE NEUTRAL");
+    expect(html).toContain("True Neutral");
     expect(html).toContain('class="expedition-choice-modal" hidden');
     expect(html).toContain("data-eternal-choice");
+    expect(html).toContain("DISPOSITION");
+    expect(html).toContain("JOURNEY MANAGER");
     expect(html).not.toContain("expedition-feature-grid");
     expect(html).not.toContain(dialogue?.choices[0].response ?? "__missing_choice_response__");
   });
