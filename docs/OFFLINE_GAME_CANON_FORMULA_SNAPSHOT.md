@@ -1233,3 +1233,542 @@ Semua syarat Awakening, Spirit Realm, Stage, Sync, Spirit Ring, breakthrough, Qi
 7. Jika suatu aksi memerlukan aturan rinci yang belum ditetapkan, jelaskan keterbatasannya dan selesaikan hanya bagian yang didukung sumber.
 8. Profil karakter harus mencerminkan Spirit Realm, Stage, dan progres. Jangan menambahkan field terpisah untuk Spirit Ring; jumlah slot mengikuti Spirit Realm, sementara informasi ring yang telah diperoleh—sumber, usia, warna, kemampuan, dan hasil proses yang diketahui—dicatat dalam bagian Teknik / Kemampuan atau deskripsi Martial Soul yang sudah ada. Jangan mengisi slot atau menaikkan Spirit Realm tanpa proses yang sah.
 
+
+
+---
+
+<!-- SOURCE core/CULTIVATOR_ACADEMIES.md | upstream blob f05040055f116aa7e88d49fbaabb3545132e1871 -->
+
+# MERZKAVA UNIVERSE — CULTIVATOR ACADEMIES & FOUNDATIONAL EDUCATION
+
+**Status:** Core concept established. The Golden Dragon Empire has exactly two named central boarding Cultivator Academies, both in Huanglongcheng. Specific admission rules, curriculum hours, fees, age limits, examinations, and graduation requirements remain undefined unless separately established. Binding continuity decisions: `world/CANON_DECISIONS_AND_PRECEDENCE.md`.
+
+## 1. PURPOSE
+
+Cultivator Academies provide foundational education for people pursuing cultivation. They teach basic theory, physical preparation, and practical knowledge relevant to Martial Souls, Spirit Rings, combat, the world's history, and the development of Artificial Artifacts.
+
+An academy is a broad educational route; it is not automatically a sect, a dojo, an Arcanist institution, or a guarantee of advancement. Individual institutions may differ in resources, teaching quality, specialization, and access, but specific differences must be established by canon or events.
+
+## 2. FOUNDATIONAL SUBJECTS
+
+The following are recognized areas of foundational instruction. This list establishes subject areas, not a fixed timetable or a requirement that every academy teaches every topic in the same way.
+
+### 2.1 Cultivation Fundamentals
+- Basic understanding of cultivation, Spirit Realms, and the general process of developing one's strength.
+- Introductory knowledge of Martial Souls and their relevance to a cultivator.
+- Other foundational concepts required to understand a cultivator's development.
+
+Advanced methods, breakthrough guarantees, or techniques restricted to a particular Spirit Realm are not implied by basic instruction.
+
+### 2.2 Physical Training
+- General physical conditioning, stamina, coordination, and bodily readiness.
+- Foundational exercises appropriate to the student's demonstrated condition and level.
+- Basic awareness of physical limits and the risks of training beyond them.
+
+Academy attendance does not automatically grant extraordinary physical ability, injury immunity, or combat mastery.
+
+### 2.3 Introductory Spirit Ring Theory
+- The role of Spirit Rings in a cultivator's development.
+- Basic concepts of Spirit Beasts, ring acquisition, compatibility, and absorption risk.
+- The importance of preparation and understanding relevant conditions before attempting to absorb a Spirit Ring.
+- The distinction between learning the theory and successfully carrying out the process.
+
+This subject provides introductory education only. It does not guarantee a suitable Spirit Beast, a successful absorption, compatibility, or a breakthrough. Actual Spirit Ring requirements and outcomes remain governed by the official cultivation, Spirit Ring, and Spirit Beast rules.
+
+### 2.4 Foundational Combat Knowledge
+- Basic principles of offense, defense, positioning, and situational awareness.
+- Introductory understanding of using one's abilities responsibly and effectively.
+- Recognition that practical combat outcomes depend on actual abilities, conditions, and the official combat rules.
+
+Completing basic lessons does not automatically grant a character a specific technique, combat bonus, or victory.
+
+### 2.5 World History and Major Wars
+- Historical events and major wars that shaped the world.
+- The rise, decline, and interactions of powers and factions.
+- The historical development of societies and the consequences of major conflicts.
+
+The exact syllabus, disputed accounts, and the knowledge available to a particular academy or student must be grounded in official history and the institution's established circumstances. Do not invent historical facts to fill gaps.
+
+### 2.6 Artificial Artifact History and Influence
+- The emergence and spread of Artificial Artifact technology.
+- The ways this technology influenced society, knowledge exchange, and warfare.
+- The distinction between learning about Artificial Artifacts and having the specialist knowledge, materials, tools, or Arcanist Grade required to formulate and manufacture them.
+
+Foundational history lessons do not automatically qualify a student as an Arcanist or provide practical formulation skill. Detailed Arcanist and production mechanics are governed by `core/ARCANISTRY_AND_FORMULATION.md`.
+
+### 2.7 Other Relevant Knowledge
+Depending on the established curriculum, foundational education may also include geography, Spirit Beast awareness, major factions, travel, and other knowledge relevant to life as a cultivator. Whether a particular academy offers a subject must be established rather than assumed.
+
+### 2.8 Supervised Spirit Beast Field Practice
+
+An academy that offers practical Spirit Ring preparation may teach theory first and then take students on supervised group expeditions into a selected forest or other wilderness area. This is the academy's **Safe Route** approach: instructors teach theory and field discipline, choose a route according to the students' demonstrated readiness and available hazard information, and supervise the group's attempt to locate or hunt an appropriate Spirit Beast.
+
+Field preparation may include habitat and track recognition, threat assessment, party coordination, retreat signals, emergency planning, ring compatibility, and the difference between defeating a Beast and successfully absorbing its ring. Actual content depends on the academy and the lessons the student has received.
+
+A Safe Route is a managed-risk training route, not a guarantee of safety. An unexpected Beast, inaccurate report, environmental hazard, separation, injury, or failed hunt remains possible. The academy's presence does not guarantee a rescue squad or medical outcome unless the specific expedition establishes those resources. No student receives an automatic combat bonus, guaranteed ring, improved compatibility, or successful absorption for attending.
+
+Only two specific central boarding academies exist in established Golden Dragon Empire canon: **Imperial Foundation Academy** and **Imperial Cultivation Academy**, both in Huanglongcheng. This is a deliberate final decision, not an invitation to add regional academies. Tianfeng (Scholarly Heights) is associated with talented people and can be a source of gifted students for these two academies; it is not a third academy or a separate regional academy network. Gifted students from Tianfeng and elsewhere may travel to Huanglongcheng for study. The academies follow established foundational education on Martial Souls, Spirit Realms, Spirit Beasts, Spirit Rings, safe training, and foundational combat. Do not automatically classify this curriculum as Soul-Nyuma, and do not assign Soul-Zoun, experimental, or coercive methods to the academies without explicit canon. The distinction is governed by `core/SPIRIT_REALM_TRADITIONS.md`. Do not assume every institution in the wider world has this field program.
+
+## 2.9 Soul-Nyuma and Soul-Zoun — Traditions as Educational Foundations
+
+The two Spirit Realm traditions are foundational bodies of knowledge that may shape an institution's curriculum, teaching method, and institutional identity. An academy may teach one tradition, compare both, or provide shared foundational Spirit Realm instruction without declaring exclusive affiliation. Do not classify either of the two established central Golden Dragon Empire academies by assumption; their actual doctrine must be confirmed by canon.
+
+An institution that teaches a tradition may include its philosophy and history; the treatment of Spirit Beast souls; Spirit Ring formation and absorption theory; natural or aberrant Spirit Ability expression; Qi efficiency, control, stability, and resource management; documented successes and failures; and criticism of the opposing tradition.
+
+The same principle applies to dojos, clans, sects, independent teachers, and research groups. Their teaching emphasis may differ even when they share an affiliation. A Soul-Nyuma institution may regard Soul-Zoun with contempt or disgust; a Soul-Zoun institution may consider Soul-Nyuma outdated, narrow-minded, or lacking vision. Such attitudes must be established for the particular institution or NPC and must not be generalized to every member.
+
+Education does not automatically grant practical mastery, a Spirit Ring, a Spirit Ability, a Sync increase, an absorption bonus, or an Arcanist qualification. Theory, instruction, practical competence, and official mechanical outcomes remain distinct. The binding doctrine is `core/SPIRIT_REALM_TRADITIONS.md`; absorption and Qi mechanics remain in their dedicated modules.
+
+## 3. ACADEMIES AND SPECIALIST PATHWAYS
+
+- A Cultivator Academy offers broad foundational education.
+- A specialist institution, dojo, organization, or mentor may offer narrower or more advanced instruction.
+- Arcanist education and access to specialized equipment, including a Formation Engraver, are not automatically included in ordinary academy education.
+- An academy may provide a pathway toward further study, but attendance alone does not confer Arcanist Grade, Spirit Realm advancement, combat mastery, or access to restricted knowledge.
+
+Outside the Golden Dragon Empire, institution counts and rules are established by regional canon rather than inferred from the Golden Dragon Empire's two-academy limit. Tianhai Yunzhou has four established Cultivator Academies, documented in `world/TIANHAI_ACADEMIES_AND_ARCANIST_INSTITUTE.md`; their methods are more flexible than the Golden Dragon Empire's established central academy curriculum, but official cultivation, Spirit Ring, combat, and Arcanist mechanics still apply. Their exact admissions, costs, and detailed curricula remain unspecified.
+
+## 4. LIMITS OF EDUCATION
+
+The GM must distinguish between what a character has been taught and what the character can actually do.
+
+- Attending lessons does not mean a character has mastered every subject.
+- A character's knowledge depends on their actual education, experience, access to materials, and recorded history.
+- Do not assume every academy teaches the same curriculum or has equal resources.
+- Do not invent grades, certificates, examinations, tuition, academic years, or graduation rules.
+- Do not treat introductory Spirit Ring theory as permission to bypass official absorption requirements.
+- Do not treat knowledge of Artificial Artifacts as Arcanist expertise or manufacturing capability.
+- If the specific academy, curriculum, or level of a character's education is unknown, keep that detail as `???` or establish it through play before relying on it.
+
+## 5. GM ENFORCEMENT
+
+When education matters in gameplay:
+
+1. Establish which academy, mentor, or learning route the character actually attended, if any.
+2. Determine which subjects and level of instruction are supported by the character's history.
+3. Separate theoretical knowledge from practical skill and proven mastery.
+4. Apply cultivation, Spirit Ring, combat, and Arcanist mechanics from their respective official modules.
+5. Do not grant unrecorded abilities, bonuses, qualifications, or access solely because the character attended an academy.
+
+## 6. CANON CONTINUITY
+
+- The two-academy limit applies to the Golden Dragon Empire's central boarding academies, not to Tianhai Yunzhou or the entire world. Tianfeng remains a source of talent rather than a third Imperial academy. Consult `world/CANON_DECISIONS_AND_PRECEDENCE.md` before changing or extending the Imperial structure.
+
+## 7. RELATED SOURCES
+
+- `core/CULTIVATION_SYSTEM.md` — cultivation progression and Spirit Realms.
+- `core/MARTIAL_SOUL.md` — Martial Soul rules.
+- `core/SPIRIT_RING_RULES.md` — Spirit Ring mechanics and absorption.
+- `bestiary/SPIRIT_BEAST_RULES.md` — Spirit Beast requirements and related rules.
+- `gameplay/COMBAT_SYSTEM.md` — combat resolution.
+- `core/ARCANISTRY_AND_FORMULATION.md` — Arcanist progression and Artificial Artifact formulation.
+- `world/HISTORY.md` — established historical events.
+- `world/ARTIFICIAL_ARTIFACTS.md` — Artificial Artifact lore and catalog.
+
+
+
+---
+
+<!-- SOURCE core/HP_SYSTEM.md | upstream blob efef616efa7ad9c44c81470da6dc52bddc813204 -->
+
+# Merzkava Universe — HP System
+
+Status: Mekanik resmi HP.
+Cakupan: HP maksimum berdasarkan Spirit Realm dan Stage, format HP, serta pencatatan HP saat ini.
+
+## 1. Prinsip Dasar
+
+- Mortal memiliki HP maksimum **100**.
+- Spirit Primordial/Stage 4 (Peak) memiliki HP maksimum **8.950**.
+- HP ditulis sebagai **HP saat ini / HP maksimum**, misalnya `HP: 100/100`.
+- HP maksimum ditentukan oleh Spirit Realm dan Stage pada tabel resmi di bawah.
+- HP saat ini berubah hanya karena kejadian gameplay yang sah, misalnya menerima damage atau pemulihan yang memiliki dasar. Naik Spirit Realm atau Stage menaikkan batas maksimum sesuai tabel, tetapi **tidak otomatis memulihkan HP saat ini hingga penuh**.
+- **Jika HP saat ini mencapai 0, karakter mati.** Kematian bersifat permanen kecuali mekanik resmi yang sudah ditetapkan secara eksplisit menyatakan sebaliknya. HP 0 bukan sekadar pingsan atau kondisi sekarat; jangan mengubahnya menjadi status lain tanpa dasar mekanik resmi.
+- **Modul ini belum menetapkan laju numerik pemulihan HP umum.** Istirahat, tidur, makanan, obat, tabib, teknik, atau artefak tidak boleh diberi angka pemulihan HP tanpa aturan atau efek terdokumentasi. GM boleh mencatat pemulihan naratif yang jelas didukung sumber/kejadian, tetapi tidak boleh mengarang angka atau durasi sebagai aturan resmi.
+- Progres pemulihan injury di `core/INJURY_SYSTEM.md` hanya memulihkan cedera yang dicatat; progres tersebut tidak mengisi HP. Sebaliknya, HP yang pulih tidak otomatis mengurangi progres injury.
+- Tabib yang berhasil ditemukan atau melakukan tindakan tidak otomatis memulihkan HP. HP hanya berubah jika hasil perawatan, obat, teknik, atau kemampuan memiliki efek HP yang eksplisit dan terdokumentasi, syaratnya terpenuhi, serta efek itu benar-benar diterapkan. Stabilisasi dapat mencegah kondisi memburuk bila mekanik dan situasi mendukung, tetapi tidak otomatis memberi HP, menghapus injury, atau membatalkan kematian.
+- Jangan menciptakan damage, pemulihan, bonus HP, atau pengecualian yang tidak didukung mekanik resmi.
+- Formula ini menentukan HP maksimum, bukan damage, pertahanan, peluang menang, atau kekuatan tempur secara keseluruhan.
+
+## 2. Tabel HP Maksimum
+
+| Spirit Realm | Stage 1 (Early) | Stage 2 (Middle) | Stage 3 (Late) | Stage 4 (Peak) |
+|---|---:|---:|---:|---:|
+| Mortal | — | — | — | 100 |
+| Spirit Initiate | 150 | 200 | 250 | 300 |
+| Spirit Adept | 375 | 450 | 525 | 600 |
+| Spirit Elder | 700 | 800 | 900 | 1.000 |
+| Spirit Monarch | 1.150 | 1.300 | 1.450 | 1.600 |
+| Spirit King | 1.825 | 2.050 | 2.275 | 2.500 |
+| Spirit Ancestor | 2.800 | 3.100 | 3.400 | 3.700 |
+| Spirit Emperor | 4.075 | 4.450 | 4.825 | 5.200 |
+| Spirit Sovereign | 5.650 | 6.100 | 6.550 | 7.000 |
+| Spirit Primordial | 7.488 | 7.975 | 8.463 | **8.950** |
+
+Mortal bukan salah satu dari sembilan Spirit Realm. Gunakan `Mortal/0` pada profil untuk menandai status mortal tanpa Stage kultivasi.
+
+## 3. Formula Interpolasi Stage
+
+Untuk setiap Spirit Realm, gunakan HP Peak Spirit Realm itu sebagai batas maksimum (H_max) dan HP Peak Spirit Realm sebelumnya sebagai batas dasar (H_prev). Untuk Spirit Initiate, H_prev = 100 (Mortal). Untuk Spirit Realm berikutnya, H_prev adalah HP Peak Spirit Realm sebelumnya.
+
+Hitung selisih:
+
+`ΔH = H_max − H_prev`
+
+Kemudian:
+
+- Stage 1 / Early: `H_prev + round(ΔH × 0,25)`
+- Stage 2 / Middle: `H_prev + round(ΔH × 0,50)`
+- Stage 3 / Late: `H_prev + round(ΔH × 0,75)`
+- Stage 4 / Peak: `H_max`
+
+Gunakan pembulatan ke bilangan bulat terdekat. Jika hasil tepat berada di antara dua bilangan bulat, bulatkan ke atas. Tabel pada §2 adalah nilai rujukan final; gunakan angka tabel jika ada perbedaan akibat pembulatan.
+
+Batas HP Peak per Spirit Realm:
+- Mortal: 100
+- Spirit Initiate: 300
+- Spirit Adept: 600
+- Spirit Elder: 1.000
+- Spirit Monarch: 1.600
+- Spirit King: 2.500
+- Spirit Ancestor: 3.700
+- Spirit Emperor: 5.200
+- Spirit Sovereign: 7.000
+- Spirit Primordial: 8.950
+
+## 4. Format dan Validasi Profil
+
+- Format wajib: `HP: saat_ini/maksimum`.
+- Jika Spirit Realm/Stage diketahui, isi HP maksimum dari tabel.
+- **Inisialisasi sesi baru:** jika snapshot karakter tidak mencatat HP saat ini, tetapkan HP awal sama dengan maksimum yang berlaku pada Spirit Realm/Stage tersebut. Contoh: Mortal tanpa HP awal tercatat menjadi `HP: 100/100`, bukan `HP: ???/100`.
+- **Sesi berjalan:** pertahankan HP saat ini dari profil gameplay terakhir dan terapkan hanya perubahan yang sah. Jika profil sesi berjalan tidak memuat nilai HP saat ini dan tidak ada riwayat untuk memulihkannya, isi `0` sebagai nilai numerik yang belum tersedia; jangan gunakan `???`.
+- Jika Spirit Realm/Stage belum diketahui, gunakan `HP: 0/0` sampai Spirit Realm/Stage dapat ditetapkan. Jangan gunakan `???` untuk nilai HP.
+- Jangan memulihkan HP ke penuh pada sesi berjalan tanpa penyebab sah. Pengecualian hanya inisialisasi sesi baru ketika snapshot tidak mencatat HP saat ini: gunakan maksimum yang berlaku sebagai HP awal.
+- Nilai HP saat ini tidak boleh melebihi maksimum. Jika riwayat atau input bertentangan, tandai konflik dan jangan diam-diam mengubah HP.
+- Saat Spirit Realm/Stage berubah, perbarui angka maksimum sesuai tabel, tetapi pertahankan HP saat ini yang tercatat sampai ada perubahan yang sah.
+
+## 5. Konsistensi
+
+- Istilah tingkat kultivasi harus selalu ditulis **Spirit Realm**. `Mortal` adalah status sebelum sembilan Spirit Realm, bukan Spirit Realm 0; jangan menggunakan `Realm` sebagai singkatan tingkat kultivasi.
+
+- Gunakan `core/CULTIVATION_SYSTEM.md` untuk memastikan Spirit Realm dan Stage yang sah.
+- Gunakan modul pertarungan resmi jika tersedia untuk menentukan damage, pertahanan, dan hasil pertarungan. Tabel ini sendiri tidak menetapkan angka damage.
+- Gunakan `core/INJURY_SYSTEM.md` untuk progres cedera; jangan memakai laju progres injury sebagai laju pemulihan HP.
+- Jangan menafsirkan Mortal sebagai bukti bahwa Martial Soul belum awakening.
+- Jangan mengubah angka HP maksimum di tabel tanpa revisi canon oleh pemilik repository.
+
+
+
+---
+
+<!-- SOURCE core/HUNGER_AND_METABOLISM.md | upstream blob 66bdc7d4fe4d5270cf3c40193909aca582ac1dde -->
+
+# Merzkava Universe — Hunger and Metabolism
+
+**Status:** Modul mekanik resmi.  
+**Cakupan:** Satiety, jadwal makan, pengurangan karena waktu aktif, tidur malam, Spirit Realm, kondisi tubuh, dan pengubah biologis/supranatural.
+
+Modul ini adalah satu-satunya sumber angka untuk Hunger dan Metabolism. Jangan membuat rumus hunger tandingan di modul lain.
+
+## 1. Stat Satiety
+
+### Konsumsi item yang belum teridentifikasi
+
+Jika item yang dikonsumsi belum memiliki identitas/jenis pasti atau detail relevan yang ditetapkan oleh kanon/GM, sebut item itu dengan label persis ``Unknown`` **membutuhkan appraisal untuk lebih pastinya** dalam laporan konsumsi dan ledger. Jangan menebak efek nutrisi, tier, atau nilai Satiety dari label tersebut. Konsumsi hanya boleh diproses jika konteks mendukung bahwa benda itu memang layak dimakan; jika tidak, identitas dan efeknya tetap belum diketahui sampai diperiksa/appraised secara sah. Makanan sehari-hari yang sudah jelas tetap mengikuti aturan konsumsi rutin dan tidak perlu appraisal.
+
+
+Format stat wajib:
+
+`Satiety: nilai/100`
+
+- Satiety adalah ukuran rasa kenyang dan cadangan makan jangka pendek untuk gameplay, bukan HP atau Qi.
+- Nilainya berada pada rentang 0–100. Jangan melebihi 100 atau mengurangi di bawah 0.
+- Makanan/minuman yang layak dikonsumsi menambah Satiety sesuai efek resminya; semua waktu terjaga diklasifikasikan sebagai istirahat atau aktivitas dan mengurangi Satiety sesuai kategori §4. Istirahat tidak pernah memulihkan Satiety; hanya memperlambat pengurangannya.
+- Satiety 0 berarti karakter kehabisan rasa kenyang dan perlu makan. Itu **tidak otomatis** berarti pingsan, kehilangan HP, atau mati. Konsekuensi tambahan harus memiliki aturan atau sebab yang sah.
+- Makanan/minuman yang aman dan layak dikonsumsi menambah Satiety sesuai efek resmi item atau kategori porsi §2. Racun, makanan rusak/terkontaminasi, benda yang tidak layak dimakan, dan konsumsi dengan efek khusus mengikuti aturan item/kejadian; jangan otomatis memberinya efek positif.
+- Jangan mengubah Satiety tanpa waktu terjaga yang berlalu, konsumsi yang benar-benar terjadi, atau pengubah yang sah.
+- Nilai Satiety 100 hanya boleh dipertahankan bila state sebelumnya dan perhitungan interval membenarkannya, atau ada konsumsi/pengubah resmi yang benar-benar menaikkannya. Penampilan prima, stamina tinggi, tidak mengeluh lapar, atau deskripsi kualitatif seperti 'jarang merasa lapar' tidak membatalkan pengurangan numerik. Efek biologis khusus hanya mengubah angka jika sumber resmi menetapkan faktor numerik yang sah.
+
+## 2. Jadwal Makan Normal
+
+Tiga jendela makan harian:
+
+| Waktu lokal dunia | Jendela makan |
+|---|---|
+| 06.00–11.00 | Pagi |
+| 12.00–18.00 | Siang |
+| 19.00–01.00 | Malam |
+
+- Karakter normal umumnya makan tiga kali sehari.
+- Satu **porsi makan standar yang benar-benar dikonsumsi** memulihkan **34 Satiety**. Nilai ini bukan bonus otomatis karena karakter memesan makanan atau duduk untuk makan.
+- Porsi kecil/camilan yang benar-benar dikonsumsi memulihkan 10 poin; porsi besar memulihkan 50 poin. Pilih kategori berdasarkan jumlah yang benar-benar dimakan, bukan ukuran pesanan atau porsi yang disajikan. Jika karakter hanya mencicipi atau memakan sebagian kecil, hitung hanya bagian yang benar-benar dikonsumsi sesuai kategori yang didukung; jangan menganggap seluruh hidangan habis.
+- Satiety dari makanan ditambahkan ke nilai sekarang dan dibatasi maksimum 100. Makan tidak otomatis mengisi ke 100 jika porsinya tidak cukup.
+- Jika item memiliki nilai pemulihan Satiety resmi yang spesifik, gunakan nilai itu; jika tidak, pilih kategori porsi hanya berdasarkan jenis dan jumlah yang jelas mendukungnya. **Tier item tidak menentukan nilai Satiety.** Saat melaporkan konsumsi, sebutkan nama item, jumlah, efek Satiety aktual, serta nilai sebelum → sesudah; cantumkan tier/kualitas hanya jika sudah diketahui atau relevan. Makanan sehari-hari yang jelas memakai kategori ekonomi rutin dan harga pasar lokal dari `core/10_ECONOMY_SYSTEM.md`; jangan mewajibkan appraisal hanya karena makanan itu tidak memiliki tier khusus. Gunakan `core/TIER_ASSESSMENT_AND_APPRAISAL.md` hanya bila identitas atau klasifikasi khusus memang penting: dahulukan ruling MAA untuk objek yang diperiksa, atau prediksi GM berskor dengan bukti cukup dan label provisional. Jika bukti tidak cukup, nyatakan klasifikasi belum ditetapkan; jangan menghambat transaksi atau konsumsi rutin karena tidak ada appraisal.
+- Makan di luar jendela tetap memulihkan Satiety sesuai porsi. Setelah makanan yang layak benar-benar dikonsumsi, hitungan beruntun jam makan terlewat direset; riwayat jendela yang sebelumnya terlewat tidak dihapus dari catatan kejadian.
+- Jam makan yang terlewat dihitung saat jendela berakhir tanpa karakter makan, **hanya jika karakter terjaga dan punya kesempatan wajar untuk makan**. Jendela yang berlalu saat tidur tidak dihitung sebagai jam makan terlewat.
+- Jika karakter tidak punya akses makanan atau tidak bisa makan karena situasi, jangan menganggap ia sengaja melewatkan makan; catat keadaan itu dan terapkan pengali jam makan terlewat hanya sesuai ketentuan di §5.
+
+## 3. Laju Dasar Menurut Tingkat
+
+Laju dasar menunjukkan waktu terjaga yang diperlukan untuk mengurangi 100 Satiety dari penuh ke 0 sebelum pengali kategori aktivitas, kondisi tubuh, jendela makan terlewat, dan efek khusus yang sah diterapkan.
+
+| Tingkat tubuh/kultivasi | Waktu aktif per 100 Satiety |
+|---|---:|
+| Mortal (belum memasuki sembilan Spirit Realm) | 24 jam |
+| Spirit Initiate | 2 hari |
+| Spirit Adept | 4 hari |
+| Spirit Elder | 8 hari |
+| Spirit Monarch | 16 hari |
+| Spirit King | 32 hari |
+| Spirit Ancestor | 64 hari |
+| Spirit Emperor | 128 hari |
+| Spirit Sovereign | 256 hari |
+| Spirit Primordial | 365 hari |
+
+Gunakan Spirit Realm yang benar-benar tercatat dan jangan menyingkat tingkat kultivasi menjadi `Realm`. Mortal adalah status dasar sebelum sembilan Spirit Realm. Jangan menaikkan tingkat metabolisme hanya karena karakter memiliki Martial Soul langka, ring berusia tinggi, kekayaan, status sosial, atau kekuatan yang belum ditetapkan. Pengaruh khusus harus memenuhi §7.
+
+## 4. Rumus Pengurangan Satiety dan Intensitas Aktivitas
+
+Gunakan satu rumus dasar untuk setiap interval waktu terjaga:
+
+Pengurangan dasar = (Jam terjaga dalam interval / Waktu dasar per 100 Satiety dalam jam) × 100
+
+Pengurangan akhir = min(Satiety saat ini, Pengurangan dasar × A × F × B × S)
+
+- Jam terjaga dalam interval: durasi dunia yang benar-benar berlalu dalam satu segmen aktivitas, tidak termasuk tidur malam yang dilindungi §6.
+- Waktu dasar: nilai pada tabel §3 yang dikonversi ke jam.
+- A: pengali kategori aktivitas di bawah.
+- F: pengali jendela makan terlewat di §5.
+- B: pengali kondisi tubuh di §7.
+- S: pengali biologis/supranatural hanya jika ada angka resmi yang sah. Jika tidak ada, gunakan ×1,00.
+- Batas pengali gabungan: setelah mengalikan faktor yang sah, gunakan nilai akhir maksimum ×8,00 untuk satu interval. Batas ini mencegah kombinasi pengali membuat Satiety habis secara matematis dalam beberapa menit, tetapi aktivitas Survival tetap sangat menguras.
+- Pengali aktivitas adalah kategori eksklusif untuk segmen waktu yang sama. Jangan mengalikan Ringan × Sedang × Berat × Survival sekaligus. Jika aktivitas berubah, pisahkan durasinya menjadi segmen berbeda.
+- Pengali kondisi tubuh tetap faktor terpisah dari aktivitas hanya jika kelelahan benar-benar terjadi dan memiliki dasar. Jangan menghitung dampak yang sama dua kali sebagai kategori aktivitas dan pengubah khusus.
+- Hitung seluruh interval dengan presisi internal penuh. **Bulatkan hanya nilai yang ditampilkan di laporan dan profil ke 0,1 Satiety**; jangan membulatkan state internal setelah setiap aktivitas. Jika perubahan internal kurang dari 0,05 sehingga tampilan satu desimal tidak berubah, tetap laporkan perubahan presisi internal, nilai tampilan yang tetap, dan catat peristiwa tersebut di ledger. Jangan kehilangan sisa pecahan akibat pembulatan tampilan.
+- Pengurangan aktual tidak boleh melebihi Satiety yang tersedia. Nilai akhir tidak pernah kurang dari 0.
+- Jika tidak ada waktu terjaga yang berlalu, tidak ada pengurangan karena waktu kecuali mekanik khusus resmi menyatakan sebaliknya.
+
+### Kategori aktivitas — wajib untuk setiap interval terjaga
+
+| Kategori | Pengali A | Contoh dan batas |
+|---|---:|---|
+| Istirahat terjaga | ×0,50 | Duduk/berbaring untuk memulihkan tenaga, berhenti sejenak, atau istirahat aman tanpa aktivitas fisik berarti. Memperlambat pengurangan; **tidak menambah Satiety**. |
+| Ringan | ×1,25 | Berjalan santai, berbelanja, mengobrol sambil bergerak, tugas ringan, aktivitas sehari-hari tanpa tuntutan fisik berarti. |
+| Sedang | ×1,75 | Berjalan jauh, perjalanan aktif, latihan rutin, kultivasi/meditasi terfokus yang berkelanjutan, pekerjaan fisik berkelanjutan, atau eksplorasi yang terus menguras tenaga. |
+| Berat | ×2,50 | Berlari lama, membawa beban berat, latihan intensif, pertarungan singkat yang menguras tenaga, atau kerja fisik berat. |
+| Survival | ×4,00 | Keadaan darurat nyata: bertahan/berjuang di medan perang, bencana, kabur dari ancaman yang terus berlangsung, atau combat berkepanjangan yang memicu tekanan fisik dan adrenalin. |
+
+- Setiap interval waktu terjaga harus diklasifikasikan sebagai satu kategori aktivitas yang paling sesuai, termasuk Istirahat terjaga bila memang sedang beristirahat. Jangan membiarkan waktu aktif tanpa kategori.
+- Survival bukan sinonim untuk aktivitas yang sekadar sulit atau lokasi berbahaya. Harus ada ancaman darurat yang nyata dan perjuangan aktif/berkelanjutan. Berdiri di medan perang tanpa mengerahkan tenaga atau berada di dekat bencana tidak otomatis membuat seluruh waktu menjadi Survival.
+- Adrenalin adalah alasan naratif untuk mengklasifikasikan kejadian sebagai Survival bila syaratnya terpenuhi; jangan menambahkan pengali adrenalin kedua di atas ×4,00.
+- Jika kategori berubah dalam satu aksi, hitung setiap segmen dengan durasi dan pengalinya sendiri, lalu jumlahkan pengurangannya. Jangan menghitung durasi yang sama dua kali.
+- Jika aktivitas menimbulkan kelelahan yang didukung kejadian, pengali kondisi tubuh §7 boleh berlaku bersamaan. Kategori aktivitas dan kondisi tubuh mengukur hal berbeda, tetapi pengali gabungan tetap tunduk pada batas ×8,00.
+
+**Contoh Mortal:** 6 jam aktivitas Ringan, kondisi normal, tanpa jendela makan terlewat: (6/24 × 100) × 1,25 = 31,25, dibulatkan menjadi **31,3 Satiety**.
+
+**Contoh Mortal Survival:** 1 jam Survival, kelelahan ekstrem, dan 3+ jendela makan terlewat: pengali mentah 4,00 × 2,50 × 4,00 = 40,00, dibatasi menjadi ×8,00; pengurangan maksimum dari interval 1 jam ialah 33,3 Satiety sebelum dibatasi oleh Satiety yang tersedia.
+
+**Contoh Spirit Primordial:** 24 jam aktivitas Ringan dalam kondisi normal tanpa jendela makan terlewat: pengurangan internal ≈ 0,014 Satiety; tampilan satu desimal dapat tetap sama pada interval ini, tetapi sisa presisi tetap disimpan dan diakumulasikan pada interval berikutnya.
+
+## 5. Jam Makan Terlewat
+
+Hitung jendela makan yang terlewat secara beruntun saat karakter terjaga dan memiliki kesempatan yang wajar untuk makan. Terapkan **satu pengali aktif** berikut untuk interval terjaga berikutnya; jangan menumpuk pengali per jendela dan jangan mengubah perhitungan interval yang sudah selesai secara retroaktif.
+
+| Jendela makan terlewat berturut-turut | Pengali F |
+|---|---:|
+| 0 | ×1,00 |
+| 1 | ×1,75 |
+| 2 | ×2,75 |
+| 3 atau lebih | ×4,00 |
+
+- Sebuah jendela dihitung terlewat ketika jendela itu berakhir tanpa karakter makan, selama karakter terjaga dan punya kesempatan yang wajar untuk makan. Jendela yang berlalu saat tidur malam yang dilindungi tidak dihitung.
+- Pengali baru mulai berlaku pada interval terjaga setelah jendela dinyatakan terlewat. Jangan menerapkannya kembali ke interval yang sudah dihitung.
+- Setelah karakter benar-benar mengonsumsi makanan atau minuman bernutrisi yang secara wajar memenuhi kebutuhan makan, reset hitungan jendela makan terlewat menjadi 0 untuk interval berikutnya. Air biasa atau konsumsi nonnutritif tidak otomatis mereset hitungan kecuali aturan item resmi menyatakan sebaliknya. Konsumsi tetap memulihkan Satiety sesuai efek resmi item meskipun terjadi di luar jendela makan.
+- Jika karakter terkurung, tidak sadar, terikat, atau situasi nyata lain menghalangi akses/kemampuan makan, jangan menyebutnya sengaja melewatkan makan. Hitung hanya kesempatan makan yang benar-benar ada; jangan menambahkan pengali saat karakter tidak punya pilihan wajar.
+- Jangan menambahkan pengurangan tetap khusus hanya karena sebuah jendela terlewat. Dampaknya diterapkan melalui pengali F terhadap pengurangan selama waktu terjaga berikutnya.
+
+## 6. Tidur Malam dan Penguncian Satiety
+
+Tidur malam normal adalah kebutuhan biologis dan pengecualian resmi dari batas durasi aksi biasa.
+
+- Ketika karakter mulai tidur malam, catat nilai Satiety terakhir sebagai nilai terkunci.
+- Selama tidur malam normal, **Satiety tidak berkurang**. Jangan menerapkan pengurangan waktu aktif, pengali kondisi tubuh, atau jam makan terlewat selama periode tidur yang dilindungi.
+- Ketika karakter bangun, lanjutkan perhitungan dari nilai Satiety yang terkunci dan mulai menghitung waktu aktif kembali dari waktu bangun.
+- Tidur malam boleh melewati batas aksi biasa 3 jam dalam `gameplay/TIME_AND_ACTION_RULES.md`; jangan memaksa pemain membagi tidur normal menjadi aksi tiga jam.
+- Tidur tidak otomatis memulihkan Satiety, HP, Qi, atau injury. Tidur hanya mengunci pengurangan Satiety selama periode tidur normal; pemulihan sistem lain mengikuti aturan masing-masing.
+- Jika tidur terganggu dan karakter benar-benar terjaga untuk periode tertentu, hitung pengurangan hanya selama waktu terjaga tersebut. Jangan menghukum waktu tidur yang benar-benar terjadi.
+- Tidur siang atau pingsan tidak otomatis dianggap tidur malam yang dilindungi. Perlakukan sesuai fakta kejadian; jangan gunakan tidur sebagai alasan untuk mengabaikan kebutuhan darurat atau konsekuensi yang telah ditetapkan.
+
+## 7. Kondisi Tubuh dan Pengubah Khusus
+
+Kondisi tubuh mengubah laju pengurangan Satiety dengan faktor B. Pilih satu kategori kelelahan yang paling sesuai dengan kondisi aktual; kategori yang saling tumpang tindih tidak boleh ditumpuk.
+
+| Kondisi tubuh | Pengali B |
+|---|---:|
+| Normal / lelah ringan | ×1,00 |
+| Kelelahan nyata | ×1,25 |
+| Kelelahan berat | ×1,75 |
+| Kelelahan ekstrem | ×2,50 |
+
+- Kelelahan harus memiliki dasar kejadian, misalnya aktivitas berkepanjangan, perjalanan berat, latihan intensif, kurang istirahat, atau perjuangan survival.
+- Pengali kondisi tubuh adalah kategori alternatif. Jika karakter mengalami kelelahan ekstrem, gunakan ×2,50 saja, bukan ×1,25 ×1,75 ×2,50.
+- Cedera, penyakit, racun, demam, kehamilan, usia, cuaca, atau kondisi khusus lain tidak mendapat pengali default dari modul ini. Terapkan hanya jika ada aturan resmi lain atau efek spesifik yang telah ditetapkan.
+- Jangan memberikan pengali kelelahan otomatis hanya karena giliran berlalu. Klasifikasi harus didukung aktivitas, kondisi, atau kejadian yang benar-benar terjadi.
+- Aktivitas dan kondisi tubuh boleh menjadi faktor terpisah hanya jika keduanya menggambarkan efek independen. Batas gabungan pengali ×8,00 pada §4 tetap berlaku.
+
+### Keunggulan atau kelemahan biologis/supranatural
+
+Genetik, garis keturunan, kutukan, berkah langit, konstitusi khusus, Martial Soul, obat, teknik, relik, atau efek supernatural boleh mengubah metabolisme, tetapi tidak otomatis melakukannya.
+
+1. Pastikan sifat atau efek tersebut tercatat atau diperoleh melalui kejadian yang sah.
+2. Tentukan apakah efek secara eksplisit memengaruhi kebutuhan makan/metabolisme.
+3. Jika efek memiliki besaran numerik resmi, gunakan sebagai faktor S.
+4. Jika efek hanya kualitatif, jangan menciptakan angka. Catat dampak naratifnya tanpa mengubah laju Satiety numerik sampai nilai resmi ditetapkan.
+5. Jangan menyimpulkan bahwa keturunan kuat otomatis tidak lapar, kutukan otomatis meningkatkan hunger, atau berkah otomatis menurunkan hunger tanpa sumber yang sah.
+
+Semua pengubah independen boleh dikalikan sebelum batas gabungan ×8,00 diterapkan, tetapi jangan menghitung efek yang sama dua kali, menumpuk kategori kelelahan, atau mengarang angka.
+
+## 8. Urutan Resolusi Wajib GM
+
+Setiap kali waktu berlalu, aktivitas berubah, makanan/minuman dikonsumsi, atau kondisi tubuh berubah:
+
+1. Ambil timestamp terakhir yang sah dan tentukan durasi dunia yang benar-benar berlalu.
+2. Pisahkan durasi menjadi segmen jika jenis aktivitas, kondisi tubuh, status terjaga, pengali, konsumsi, atau batas akhir jendela makan berubah. Ketika jendela makan berakhir di tengah interval, hitung segmen sebelum dan sesudah batas secara terpisah agar pengali baru tidak diterapkan secara retroaktif.
+3. Kecualikan tidur malam yang dilindungi §6. Selama tidur itu, Satiety terkunci pada nilai saat tidur dimulai.
+4. Tentukan Spirit Realm/status tubuh dan waktu dasar dari §3.
+5. Klasifikasikan setiap interval terjaga dengan tepat satu kategori aktivitas dari §4.
+6. Perbarui hitungan jendela makan hanya ketika jendela berakhir dan syarat kesempatan makan terpenuhi. Pengali baru berlaku ke interval berikutnya.
+7. Tentukan satu pengali kondisi tubuh dan faktor khusus yang benar-benar didukung sumber resmi.
+8. Hitung pengurangan per segmen memakai §4, terapkan batas pengali gabungan ×8,00, jumlahkan segmen, dan batasi pengurangan pada Satiety yang tersedia.
+9. Terapkan efek konsumsi hanya jika item benar-benar dimakan/diminum. Gunakan efek Satiety resmi item jika tersedia; jika tidak, gunakan kategori porsi §2 berdasarkan jenis dan jumlah yang jelas mendukungnya. Jangan menyimpulkan efek dari tier saja.
+10. Batasi nilai akhir pada 0–100 dan simpan nilai terbaru pada profil serta riwayat sesi.
+11. Untuk setiap aktivitas terbaru, sebutkan Satiety dalam respons: tampilkan perubahan dan nilai sebelum → sesudah bila berubah; jika tidak berubah, nyatakan nilai tetap dan alasan (misalnya tidur malam yang dilindungi atau tidak ada waktu terjaga yang berlalu). Sebelum memakai 100/100, audit state sebelumnya dan hitung semua interval terjaga yang sudah berlalu; jangan menyimpulkan Satiety penuh dari kondisi prima atau sifat 'jarang lapar'.
+12. Untuk setiap aktivitas terbaru, gunakan laporan yang konsisten. Jika Satiety berubah karena aktivitas: “Satiety berkurang −X (sebelum/100 → sesudah/100) akibat [kategori aktivitas] selama [durasi].” Jika dikonsumsi: “Dengan mengonsumsi **[nama item]** *Tier [tier resmi atau ‘Tier belum ditetapkan’]* ×[jumlah], Satiety bertambah/berkurang [±X] (sebelum/100 → sesudah/100).” Pakai kata bertambah atau berkurang sesuai efek aktual, bukan asumsi. Setelah kalimat perubahan terverifikasi, tulis persis inline-code `Log tercatat!`, lalu satu `LEDGER LOG` untuk semua perubahan state dari tindakan itu. Jika nilai tampilan satu desimal tidak berubah karena perubahan internal sangat kecil, sebutkan delta presisi internal dan nilai tampilan yang tetap, lalu catat perubahan tersebut. Jangan tampilkan penanda atau ledger jika tidak ada perubahan state aktual.
+13. **Rekonsiliasi ledger konsumsi:** jika makanan dibeli lalu dikonsumsi dalam aksi yang sama, catat transaksi uang dan pergerakan item/konsumsi sebagai subentri terkait dalam satu `LEDGER LOG` tampilan. Catat jumlah yang dibeli, jumlah yang benar-benar dikonsumsi, dan sisa yang benar-benar dibawa atau ditinggalkan bila relevan. Makanan yang habis dikonsumsi tidak boleh tetap tercantum di Inventory; sisa makanan hanya masuk Inventory jika benar-benar disimpan. Pemulihan Satiety dihitung sekali dari jumlah yang benar-benar dimakan, bukan dari jumlah yang dipesan dan bukan lagi dari jumlah yang tercatat sebagai konsumsi. Jika transaksi atau konsumsi tidak terjadi, jangan catat perubahan terkait.
+14. Jangan mengubah HP, Qi, injury, atau kondisi lain hanya karena Satiety berubah, kecuali sumber resmi lain atau kejadian sah menetapkan hubungan itu. Format dan urutan laporan gabungan mengikuti `templates/AUTHORITY_ORDER.md`, `templates/GAMEPLAY_RESPONSE_TEMPLATE.md`, dan `core/10_ECONOMY_SYSTEM.md`.
+
+Jika timestamp, Spirit Realm, periode tidur, kategori aktivitas, atau kondisi penting tidak diketahui, jangan menebak angka secara diam-diam. Gunakan data terverifikasi yang tersedia dan ungkapkan celahnya; minta klarifikasi hanya jika tanpa itu hasil tidak bisa diselesaikan dengan aman dan konsisten.
+
+## 9. Format Profil
+
+Tambahkan field berikut ke profil gameplay:
+
+`Satiety: nilai/100`
+
+Nilai harus berasal dari profil terakhir dan perubahan yang benar-benar terjadi. Jika state awal Satiety belum pernah ditetapkan, GM dapat menetapkan nilai awal yang masuk akal untuk karakter baru dan menandainya sebagai estimasi awal; jangan menganggap semua karakter yang sudah berjalan otomatis berada di 100.
+
+
+
+---
+
+<!-- SOURCE core/INJURY_SYSTEM.md | upstream blob a90d3d1c58afd3da171d66bc632b23e2a30cbbfd -->
+
+# Merzkava Universe — Injury System
+
+**Status:** Mekanik resmi injury v1.  
+**Cakupan:** klasifikasi cedera, syarat pemulihan, progres pemulihan, dan hubungan injury dengan HP.
+
+## 1. Prinsip Dasar
+
+- **HP dan injury adalah dua hal berbeda.** HP mengukur kondisi keseluruhan; injury mencatat kerusakan tertentu pada tubuh.
+- HP yang pulih tidak otomatis menyembuhkan injury. Injury yang sembuh juga tidak otomatis mengisi HP sampai penuh.
+- Setiap injury yang berdampak pada gameplay harus dicatat dengan: nama/jenis, bagian tubuh jika diketahui, kelas injury, kondisi pemicu, metode pemulihan yang dibutuhkan, progres pemulihan, serta efek atau komplikasi yang benar-benar terjadi.
+- Gunakan hanya cedera yang didukung kejadian. Jangan memberi cedera baru hanya untuk menghukum karakter, dan jangan menghapus cedera tanpa alasan pemulihan yang sah.
+- Tingkat keparahan tidak ditentukan dari nama luka saja. Pertimbangkan mekanisme cedera, lokasi, damage yang diterima, kondisi karakter, dan hasil pemeriksaan atau penanganan yang tercatat. **Jumlah HP yang hilang saja tidak cukup untuk menentukan kelas injury**: HP adalah dampak umum, sedangkan injury adalah kerusakan tubuh tertentu.
+- Satu kejadian dapat menimbulkan beberapa injury berbeda. Jangan menggabungkan, menggandakan, atau menganggap satu cedera sebagai cedera lain tanpa dasar.
+- Persentase progres adalah **kemajuan pemulihan injury**, bukan HP. Progres 100% berarti injury itu pulih; efek sisa hanya boleh dipertahankan bila sudah tercatat dan memiliki dasar.
+
+## 2. Empat Kelas Injury
+
+| Kelas | Nama | Contoh umum | Pemulihan alami | Pengobatan |
+|---|---|---|---|---|
+| I | Ringan | Memar ringan, lecet, luka dangkal, ketegangan otot ringan | Bisa pulih dengan istirahat dan perawatan dasar | Membantu mempercepat pemulihan |
+| II | Membutuhkan Perawatan | Luka dalam yang belum kritis, keseleo sedang, luka bakar sedang, robekan jaringan ringan | Bisa pulih lambat jika kondisi memungkinkan; risiko komplikasi tetap ada | Perawatan yang tepat mempercepat pemulihan secara signifikan |
+| III | Struktural | Patah tulang, dislokasi, robekan tendon/ligamen berat, kerusakan struktur tubuh | Istirahat saja tidak cukup untuk pemulihan yang benar; fungsi dapat tetap terganggu atau cedera memburuk | Wajib ada penanganan yang sesuai, misalnya reposisi, bidai, imobilisasi, atau teknik penyembuhan yang terbukti |
+| IV | Kritis | Pendarahan internal berat, kerusakan organ, luka yang mengancam nyawa, keracunan berat | Tidak dianggap pulih secara alami; dapat memburuk atau menyebabkan kematian | Perlu penanganan mendesak yang sesuai. Pemulihan baru berjalan setelah kondisi cukup stabil |
+
+Contoh di atas adalah panduan klasifikasi, bukan diagnosis otomatis. Jika tingkat keparahan belum dapat diketahui, catat sebagai **injury belum terklasifikasi** sampai ada bukti yang cukup.
+
+## 3. Progres Pemulihan
+
+Setiap injury memiliki progres tersendiri dari **0% sampai 100%**. Gunakan tabel berikut sebagai laju dasar per 24 jam waktu dalam dunia game, bukan waktu nyata.
+
+| Kelas injury | Pemulihan alami saat istirahat penuh | Dengan perawatan tepat |
+|---|---:|---:|
+| I — Ringan | +10 poin progres | +20 poin progres |
+| II — Membutuhkan Perawatan | +2 poin progres | +10 poin progres |
+| III — Struktural | Tidak ada progres pemulihan fungsional | +5 poin progres setelah penanganan yang diperlukan selesai |
+| IV — Kritis | Tidak ada progres sebelum kondisi distabilkan | +2 poin progres setelah stabil dan selama penanganan berkelanjutan |
+
+- Maksimum progres adalah 100%; jangan melampauinya.
+- Terapkan laju berdasarkan waktu pemulihan yang benar-benar berlalu. Jika waktu berlalu kurang dari 24 jam, hitung secara proporsional.
+- Angka pada tabel adalah laju dasar saat istirahat penuh dan tanpa komplikasi. Jika karakter beraktivitas, kembali bertarung, atau menggunakan bagian tubuh yang cedera, GM dapat mengurangi progres atau memperburuk injury **hanya jika aktivitas tersebut secara masuk akal mengganggu penyembuhan**. Jangan memberi penalti otomatis tanpa kaitan dengan cedera.
+- Perawatan harus sesuai dengan jenis injury dan benar-benar tersedia serta digunakan. Salep tidak otomatis menyembuhkan patah tulang; tabib tidak otomatis berhasil; pil, teknik, artefak, dan kemampuan penyembuhan hanya berpengaruh sesuai fungsi yang telah ditetapkan.
+- Untuk injury kelas III, progres dihitung setelah penanganan struktural yang diperlukan—misalnya tulang diposisikan dan diimobilisasi—benar-benar dilakukan. Tanpa penanganan itu, istirahat saja tidak menambah progres pemulihan fungsional.
+- Untuk injury kelas IV, penanganan awal harus menstabilkan kondisi terlebih dahulu. Jika belum stabil, jangan menambahkan progres pemulihan dan selesaikan konsekuensi sesuai kondisi yang tercatat.
+- Jika metode pengobatan, kualitas obat, kemampuan tabib, atau efektivitas teknik belum memiliki aturan khusus, gunakan laju dasar di atas dan jelaskan keterbatasannya; jangan mengarang bonus angka.
+
+## 4. Syarat dan Efek Pengobatan
+
+Pengobatan hanya dihitung bila semua syarat yang relevan terpenuhi:
+
+1. **Kecocokan:** metode atau obat memang dapat menangani jenis injury tersebut.
+2. **Akses:** karakter benar-benar memiliki, memperoleh, atau sedang ditangani dengan metode itu.
+3. **Penerapan:** obat digunakan dengan benar, atau tabib/teknik melakukan penanganan yang diperlukan.
+4. **Kebutuhan khusus:** cedera struktural sudah ditangani secara struktural; cedera kritis sudah distabilkan sebelum pemulihan rutin dimulai.
+
+Jika seluruh syarat terpenuhi, gunakan laju kolom **Dengan perawatan tepat**. Jika hanya sebagian terpenuhi, jangan otomatis memberikan bonus penuh. Jika pengobatan salah atau berbahaya, efeknya ditentukan oleh fakta dan konsekuensi yang didukung situasi; jangan mengarang efek pasti.
+
+**Batas kemampuan tabib:** keberadaan atau afiliasi tabib dengan Medicine Hall Society tidak otomatis menentukan tingkat keahlian, menjamin keberhasilan, atau memberi bonus angka. Nilai tindakan dari diagnosis/bukti yang tersedia, kecocokan prosedur, kompetensi yang sudah ditetapkan atau secara wajar dibuktikan dalam adegan, alat dan obat yang benar-benar tersedia, serta waktu dan kondisi pasien. Bila kompetensi atau efektivitas khusus belum ditetapkan, gunakan laju dasar **Dengan perawatan tepat** hanya setelah semua syarat §4 terpenuhi; jangan menambah bonus karena gelar, reputasi, atau afiliasi saja. Penanganan darurat/stabilisasi adalah tindakan awal, bukan berarti injury sudah sembuh.
+
+## 5. Istirahat, Aktivitas, dan Komplikasi
+
+- Istirahat penuh berarti karakter tidak melakukan aktivitas yang mengganggu pemulihan dan mendapat kesempatan memulihkan diri.
+- Aktivitas ringan, perjalanan, latihan, pertarungan, atau penggunaan bagian tubuh yang cedera harus dinilai berdasarkan injury yang tercatat. Aktivitas tidak selalu memperburuk semua cedera.
+- Komplikasi seperti infeksi, pendarahan berulang, tulang bergeser, atau cedera memburuk hanya boleh terjadi jika didukung oleh jenis injury, penanganan, kondisi, atau kejadian yang tercatat.
+- Jika komplikasi terjadi, catat sebagai perubahan kondisi yang jelas. Jangan diam-diam mengatur ulang progres tanpa menjelaskan penyebabnya.
+- Untuk injury yang mengancam nyawa, jangan memperlakukan tidur atau time skip sebagai pengganti penanganan darurat.
+
+## 6. Hubungan dengan HP dan Sistem Lain
+
+### Panduan konsekuensi injury dari Combat
+
+Combat menentukan apakah kejadian benar-benar menimbulkan cedera; bagian ini membantu memilih konsekuensi tanpa membuat ambang damage kaku:
+
+- **Benturan atau serangan ringan yang tertahan/teralihkan:** tidak wajib menghasilkan injury. Jika ada cedera yang tampak, gunakan Kelas I bila bukti mendukung.
+- **Serangan bersih yang menembus pertahanan, luka sayat/tusuk yang jelas, atau benturan kuat:** pertimbangkan Kelas I atau II berdasarkan kedalaman, lokasi, dan mekanisme. Jangan otomatis memilih Kelas II hanya karena serangan mengenai target.
+- **Patah tulang, dislokasi, tendon/ligamen rusak, atau kerusakan struktur yang jelas:** Kelas III. Jangan menyimpulkan cedera struktural dari angka damage saja.
+- **Pendarahan internal berat, kerusakan organ, keracunan berat, atau kondisi yang mengancam nyawa:** Kelas IV hanya jika kejadian dan bukti mendukungnya; jangan membuat diagnosis internal hanya karena HP rendah.
+- **Serangan beruntun/combo:** evaluasi tiap hit dan dampak gabungannya. Hit berikutnya dapat memperparah injury yang sudah ada atau menimbulkan injury berbeda jika mekanismenya mendukung; jangan menggandakan injury identik tanpa alasan.
+- **Beda satu Spirit Realm:** terapkan aturan khusus di `gameplay/COMBAT_SYSTEM.md`. Itu menetapkan ekspektasi adanya injury setelah hit yang merusak, bukan izin untuk mengarang jenis cedera berat. Jika bukti hanya mendukung cedera ringan, catat Kelas I.
+- **Deviasi penyerapan Spirit Ring:** catat cedera yang ditetapkan dari peristiwa deviasi. Jangan mengubah kategori risiko HP langsung menjadi diagnosis injury tertentu.
+
+Jika bukti belum cukup untuk memilih kelas, catat `injury belum terklasifikasi` dan efek fungsional yang benar-benar terlihat. Klasifikasi dapat diperbarui ketika ada pemeriksaan atau bukti baru.
+
+- Gunakan `core/HP_SYSTEM.md` untuk HP maksimum dan validasi HP.
+- Gunakan `gameplay/COMBAT_SYSTEM.md` untuk damage dan penentuan konsekuensi serangan yang didukung situasi. Combat menentukan kejadian cedera; modul ini menentukan klasifikasi dan pemulihannya.
+- Gunakan `core/SPIRIT_RING_RULES.md` untuk damage HP dan konsekuensi deviasi saat penyerapan Spirit Ring. Jika proses itu menghasilkan cedera, catat jenis cedera hanya berdasarkan hasil yang benar-benar ditetapkan; jangan mengarang diagnosis dari angka HP saja.
+- Gunakan `gameplay/TIME_AND_ACTION_RULES.md` untuk waktu yang berlalu. Progres injury hanya bertambah selama waktu pemulihan yang benar-benar berlalu.
+- Pemulihan HP dari modul lain tidak mengubah progres injury kecuali aturan khusus menyatakan demikian.
+- Kemampuan penyembuhan, obat khusus, salep, tabib, atau artefak dapat mengganti atau meningkatkan laju dasar hanya jika efeknya terdokumentasi dan syaratnya terpenuhi.
+
+## 7. Pencatatan dan Alur GM
+
+Saat injury muncul atau berubah:
+
+1. Catat cedera yang didukung oleh kejadian dan bagian tubuh jika diketahui.
+2. Tentukan kelas injury berdasarkan bukti. Jika tidak cukup, tandai belum terklasifikasi.
+3. Catat progres awal, biasanya 0% ketika injury baru terjadi.
+4. Nyatakan apakah pemulihan alami memungkinkan atau pengobatan wajib.
+5. Saat waktu berlalu, pilih laju yang sesuai dengan kondisi istirahat dan perawatan aktual.
+6. Perbarui progres, kondisi, dan efek fungsional yang benar-benar berubah.
+7. Pada 100%, tandai injury pulih dan hapus pembatasan yang berasal dari injury tersebut, kecuali efek sisa yang telah ditetapkan masih berlaku.
+
+**Format pencatatan ringkas:**
+
+`Injury: [jenis/lokasi] | Kelas: [I–IV/belum terklasifikasi] | Progres: [0–100]% | Syarat: [istirahat/perawatan khusus/stabilisasi] | Penanganan: [yang benar-benar dilakukan] | Efek: [yang masih berlaku]`
+
+## 8. Batas Aturan
+
+Kelas dan laju dalam modul ini adalah baseline umum. Modul ini belum menetapkan diagnosis medis terperinci, daftar obat khusus, tingkat kemampuan setiap tabib, atau efek numerik setiap teknik penyembuhan. Jangan mengarang angka atau menjadikan contoh umum sebagai kepastian. Aturan khusus yang kelak dibuat harus merujuk ke modul ini, bukan menduplikasi sistem progres injury di tempat lain.
+
