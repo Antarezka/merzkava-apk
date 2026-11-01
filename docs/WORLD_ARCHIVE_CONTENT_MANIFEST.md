@@ -579,3 +579,17 @@ The existing local catalogue is not safe to expose as a complete player-facing i
 - Critical unresolved conflict: the Golden Dragon officials roster still references the superseded 33-prefecture/268-county model.
 - The remaining 140-file line-by-line review, exact arithmetic validation, complete officeholder deduplication, and final public-claim approval are not complete.
 - Player-facing Archive publication approval: **not granted**.
+
+
+## Numeric cross-check — wealth model
+
+**Source:** Universe `world/WEALTH_DISTRIBUTION.md` at `2f76a864150528afb0e3d26cb16f9396ce610ff6`.
+
+A separate arithmetic check was run on both ownership tables:
+
+- Territorial allocation: shares total **100%** and the four listed Xuan Gold allocations sum exactly to **400,463,763,789,849 xg**.
+- Holder-group allocation: shares total **100%** and the ten listed Xuan Gold allocations sum exactly to **400,463,763,789,849 xg**.
+- The two tables are alternative views of the same total and must not be added together.
+- This validates arithmetic consistency only. It does not verify the fictional economic assumptions, liquidity, real-world plausibility, or whether characters know these figures.
+
+**Disposition:** arithmetic check passed; public disclosure/infographic approval remains pending claim-level knowledge review.
