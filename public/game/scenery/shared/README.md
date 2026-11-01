@@ -4,8 +4,8 @@ Reusable visual layers shared by all regions. Use true RGBA PNGs when an effect 
 
 ## Current test asset
 
-- `fx-02-atmospheric-fog.png` — uploaded fog plate with a black background; the game temporarily displays it using Screen blending.
-- The temporary default is controlled by `SCENERY_FOG_TEST_ENABLED` in `src/main.ts`.
+- `fx-02-atmospheric-fog.png` — uploaded fog plate with a black background, intended for Screen blending inside the Offline Game environment viewport.
+- Pending integration: the dedicated Offline Game / Expedition Interface screen is not implemented yet. Do not show this effect on Home, World Archive, or Convo.
 
 ## Planned asset groups
 
