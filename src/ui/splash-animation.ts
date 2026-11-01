@@ -22,6 +22,7 @@ export function animateOpeningSplash(splash: HTMLElement): () => void {
     return () => undefined;
   }
 
+  const backdropEntrance=animate(splash,{opacity:[0,1],duration:680,ease:"outCubic"});
   const layers = [shadow, body, head, tail];
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
     content.style.opacity = "1";
@@ -106,6 +107,7 @@ export function animateOpeningSplash(splash: HTMLElement): () => void {
   }));
 
   return () => {
+    backdropEntrance.pause();
     entrance.pause();
     bodyBreath.pause();
     shadowBreath.pause();
@@ -117,4 +119,15 @@ export function animateOpeningSplash(splash: HTMLElement): () => void {
     sparkAnimations.forEach(animation => animation.pause());
     particles.forEach(particle => particle.remove());
   };
+}
+
+/** Anime.js curtain replaces the former CSS keyframe close sequence. */
+export function animateSplashCurtain(splash:HTMLElement,onComplete:()=>void):void {
+  if(window.matchMedia?.("(prefers-reduced-motion: reduce)").matches){
+    animate(splash,{opacity:[1,0],duration:140,ease:"outQuad",onComplete});
+    return;
+  }
+  const content=splash.querySelector<HTMLElement>(".splash-content");
+  if(content) animate(content,{opacity:[1,0],translateY:[0,-7],scale:[1,.985],filter:["blur(0px)","blur(3px)"],duration:460,ease:"inOutCubic"});
+  animate(splash,{opacity:[1,0],duration:520,ease:"inOutCubic",onComplete});
 }
