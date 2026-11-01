@@ -128,21 +128,24 @@ export function calculateSatietyInterval(input: SatietyIntervalInput): SatietyCa
   }
 
   return {
-    satietyBefore: input.satiety,
-    satietyAfter,
-    baseDrain,
-    activityMultiplier,
-    missedMealMultiplier,
-    bodyConditionMultiplier,
-    biologicalMultiplier,
-    rawCombinedMultiplier,
-    appliedCombinedMultiplier,
-    requestedDrain,
-    actualDrain,
-    displayedBefore: displaySatiety(input.satiety),
-    displayedAfter: displaySatiety(satietyAfter),
-    displayedDrain: displaySatiety(actualDrain),
-    warnings
+    valid: true,
+    result: {
+      satietyBefore: input.satiety,
+      satietyAfter,
+      baseDrain,
+      activityMultiplier,
+      missedMealMultiplier,
+      bodyConditionMultiplier,
+      biologicalMultiplier,
+      rawCombinedMultiplier,
+      appliedCombinedMultiplier,
+      requestedDrain,
+      actualDrain,
+      displayedBefore: displaySatiety(input.satiety),
+      displayedAfter: displaySatiety(satietyAfter),
+      displayedDrain: displaySatiety(actualDrain),
+      warnings
+    }
   };
 }
 
