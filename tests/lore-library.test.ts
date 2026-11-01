@@ -164,6 +164,41 @@ describe("World Archive visibility and entity routing", () => {
     expect(publicText).not.toContain("Ying Wuxin");
   });
 
+  it("links named imperial officeholders and public institutional extracts without leaking internal agendas", () => {
+    const ids = [
+      "official-xuanyuan-wenyuan", "official-shen-mingde", "official-yunlan-qingzhi",
+      "official-baihu-zhengyang", "official-gu-jingheng", "official-cangyue-yucheng",
+      "official-heiyu-zhaolin", "official-xuanyuan-haoran", "official-cangyue-yunhe",
+      "official-tieyan-mingxuan", "official-yunlan-qinglan", "official-yanling-zhenyu",
+      "official-baihu-xuefeng", "official-zhenhai-haixiu", "imperial-audit-committee",
+      "prison-bound-items"
+    ];
+    const publicEntries = getPublicLoreEntries();
+    const byId = new Map(publicEntries.map(entry => [entry.id, entry]));
+    for (const id of ids) {
+      expect(byId.has(id)).toBe(true);
+      expect(getLoreSourceDisposition(id)).toBe("PUBLIC_CANDIDATE");
+    }
+    const officialText = ids.map(id => byId.get(id)?.summary + " " + byId.get(id)?.paragraphs.join(" ")).join(" ");
+    expect(officialText).not.toContain("present aim");
+    expect(officialText).not.toContain("political disposition");
+    expect(officialText).not.toContain("Luca's family case");
+    expect(resolveLoreEntry("Xuanyuan Haoran")?.id).toBe("official-xuanyuan-haoran");
+    expect(resolveLoreEntry("Imperial Special Financial Audit Committee")?.id).toBe("imperial-audit-committee");
+  });
+
+  it("keeps discovery-sensitive mountain groups behind a non-revealing ON_PLAN link", () => {
+    const placeholder = resolveLorePlaceholder("High Cloud-Sea Mountains");
+    expect(placeholder?.id).toBe("placeholder-remote-mountain-traditions");
+    expect(placeholder?.status).toBe("ON_PLAN");
+    expect(placeholder?.sourcePath).toBe("world/ANCIENT_SHAMANISM_AND_BUDDHIST_CLANS.md");
+    expect(openLorePlaceholder("placeholder-remote-mountain-traditions")).toBe(true);
+    const html = renderLoreLibrary();
+    expect(html).toContain("no concealed group identity or roster is disclosed");
+    expect(html).not.toContain("Ancient Shamanism");
+    expect(html).not.toContain("Buddhist Mountain Clan");
+  });
+
   it("keeps Black Tide Expanse distinct from Black Tide Sea", () => {
     expect(resolveLoreEntry("Black Tide Expanse")?.id).toBe("black-tide-expanse");
     expect(resolveLoreEntry("Black Tide Sea")?.id).toBe("seas");
