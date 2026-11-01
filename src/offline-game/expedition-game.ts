@@ -77,14 +77,20 @@ export const ETERNAL_DIALOGUES: EternalDialogue[] = chapters.flatMap((chapter, c
 ).flat();
 
 export interface EternalSave {
-  schemaVersion:2; character:{name:string;age:number;region:EternalRegion};
-  disposition:DispositionState;
+  schemaVersion:3; saveId:string; saveName:string; createdAt:string; updatedAt:string;
+  character:{name:string;age:number;region:EternalRegion}; disposition:DispositionState;
   /** Stable world location; deliberately independent from the current dialogue node. */
   locationId:string;
   day:number; hour:number; minute:number; weather:EternalWeather;
   eventIndex:number; energy:number; insight:number; bonds:number; completed:number;
 }
+export interface EternalSaveSummary {
+  id:string; name:string; characterName:string; region:EternalRegion; day:number; updatedAt:string; active:boolean;
+}
+interface EternalSaveSlot { id:string; name:string; createdAt:string; updatedAt:string; save:EternalSave; }
 const SAVE_KEY = "merzkava-eternal-path-save-v1";
+const SAVE_SLOTS_KEY = "merzkava-eternal-path-saves-v1";
+const ACTIVE_SAVE_KEY = "merzkava-eternal-path-active-v1";
 let save: EternalSave | null = null;
 function defaultSceneForRegion(region:EternalRegion):EternalScene {
   return ETERNAL_SCENES.find(scene=>scene.region===region) ?? ETERNAL_SCENES[0];
@@ -98,33 +104,119 @@ function resolveDailyWeather(region:EternalRegion,day:number):EternalWeather {
   const pattern=regionalWeather[region];
   return pattern[Math.max(0,day-1)%pattern.length];
 }
+function makeSaveId():string {
+  const random=globalThis.crypto?.randomUUID?.().replace(/-/g,"").slice(0,12);
+  return "journey-"+(random||Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,8));
+}
+function readSlots():EternalSaveSlot[] {
+  try {
+    const value=JSON.parse(localStorage.getItem(SAVE_SLOTS_KEY)??"[]");
+    return Array.isArray(value)?value.filter((item):item is EternalSaveSlot=>Boolean(item&&typeof item.id==="string"&&item.save&&typeof item.save==="object")):[];
+  } catch { return []; }
+}
+function writeSlots(slots:EternalSaveSlot[]):void {
+  localStorage.setItem(SAVE_SLOTS_KEY,JSON.stringify(slots));
+}
+function normalizeSave(value:unknown):EternalSave|null {
+  if(!value||typeof value!=="object") return null;
+  const parsed=value as Partial<EternalSave>&{schemaVersion?:number;character?:EternalSave["character"]};
+  if(![1,2,3].includes(Number(parsed.schemaVersion))||!parsed.character?.name||!Number.isInteger(parsed.eventIndex)) return null;
+  const region=["golden-dragon-empire","tianhai-yunzhou","beiming-gu"].includes(parsed.character.region)?parsed.character.region:"golden-dragon-empire";
+  const locationId=typeof parsed.locationId==="string"&&ETERNAL_SCENES.some(scene=>scene.id===parsed.locationId)?parsed.locationId:defaultSceneForRegion(region).id;
+  const now=new Date().toISOString();
+  return {
+    ...parsed,schemaVersion:3,saveId:typeof parsed.saveId==="string"?parsed.saveId:makeSaveId(),
+    saveName:typeof parsed.saveName==="string"&&parsed.saveName.trim()?parsed.saveName.trim():parsed.character.name,
+    createdAt:typeof parsed.createdAt==="string"?parsed.createdAt:now,updatedAt:typeof parsed.updatedAt==="string"?parsed.updatedAt:now,
+    character:{name:parsed.character.name.trim(),age:Number.isInteger(parsed.character.age)?parsed.character.age:14,region},
+    disposition:createDispositionState(parsed.disposition),locationId,
+    day:Number.isInteger(parsed.day)&&Number(parsed.day)>0?Number(parsed.day):1,
+    hour:Number.isInteger(parsed.hour)&&Number(parsed.hour)>=0&&Number(parsed.hour)<24?Number(parsed.hour):8,
+    minute:Number.isInteger(parsed.minute)&&Number(parsed.minute)>=0&&Number(parsed.minute)<60?Number(parsed.minute):0,
+    weather:resolveDailyWeather(ETERNAL_SCENES.find(scene=>scene.id===locationId)?.region??region,Number(parsed.day)||1),
+    eventIndex:Number(parsed.eventIndex)||0,energy:Number(parsed.energy)||0,insight:Number(parsed.insight)||0,bonds:Number(parsed.bonds)||0,completed:Number(parsed.completed)||0,
+  } as EternalSave;
+}
+function ensureLegacyMigration():EternalSaveSlot[] {
+  const slots=readSlots();
+  if(slots.length) return slots;
+  try {
+    const raw=localStorage.getItem(SAVE_KEY);
+    if(!raw) return slots;
+    const migrated=normalizeSave(JSON.parse(raw));
+    if(!migrated) return slots;
+    const slot:EternalSaveSlot={id:migrated.saveId,name:migrated.saveName,createdAt:migrated.createdAt,updatedAt:migrated.updatedAt,save:migrated};
+    writeSlots([slot]);localStorage.setItem(ACTIVE_SAVE_KEY,slot.id);localStorage.setItem(SAVE_KEY,JSON.stringify(migrated));
+    return [slot];
+  } catch { return slots; }
+}
 function currentWorldRegion(current:EternalSave|null=getEternalSave()):EternalRegion {
   const location=ETERNAL_SCENES.find(scene=>scene.id===current?.locationId);
   return location?.region ?? current?.character.region ?? "golden-dragon-empire";
 }
-function readSave(): EternalSave | null {
-  try {
-    const raw=localStorage.getItem(SAVE_KEY); if(!raw) return null;
-    const parsed=JSON.parse(raw) as Omit<EternalSave,"schemaVersion"> & {schemaVersion:number};
-    if((parsed.schemaVersion!==1 && parsed.schemaVersion!==2) || !parsed.character?.name || !Number.isInteger(parsed.eventIndex)) return null;
-    // Migrate the original single-save schema without discarding the player's journey.
-    parsed.schemaVersion=2;
-    parsed.disposition=createDispositionState(parsed.disposition);
-    // Backward-compatible migration for saves created before world locations were persisted.
-    parsed.locationId=typeof parsed.locationId==="string" && ETERNAL_SCENES.some(scene=>scene.id===parsed.locationId)
-      ? parsed.locationId : defaultSceneForRegion(parsed.character.region).id;
-    const savedRegion=ETERNAL_SCENES.find(scene=>scene.id===parsed.locationId)?.region ?? parsed.character.region;
-    parsed.weather=resolveDailyWeather(savedRegion,Math.max(1,parsed.day||1));
-    return parsed as EternalSave;
-  } catch { return null; }
+function persist():void {
+  if(!save) return;
+  const now=new Date().toISOString();save.updatedAt=now;
+  const slots=ensureLegacyMigration();
+  const index=slots.findIndex(slot=>slot.id===save!.saveId);
+  const record:EternalSaveSlot={id:save.saveId,name:save.saveName,createdAt:save.createdAt,updatedAt:now,save};
+  if(index>=0) slots[index]=record; else slots.push(record);
+  writeSlots(slots);localStorage.setItem(ACTIVE_SAVE_KEY,save.saveId);localStorage.setItem(SAVE_KEY,JSON.stringify(save));
 }
-function persist(): void { try { if(save) localStorage.setItem(SAVE_KEY,JSON.stringify(save)); } catch { /* The current session remains playable in memory. */ } }
-export function getEternalSave(): EternalSave | null { if(save===null) save=readSave(); return save; }
-export function startEternalGame(input:{name:string;age:number;region:EternalRegion}): void {
-  save={schemaVersion:2,character:{name:input.name.trim(),age:input.age,region:input.region},disposition:createDispositionState(),locationId:defaultSceneForRegion(input.region).id,day:1,hour:8,minute:0,weather:resolveDailyWeather(input.region,1),eventIndex:0,energy:100,insight:0,bonds:0,completed:0};
+function readActiveSave():EternalSave|null {
+  const slots=ensureLegacyMigration();let activeId="";
+  try{activeId=localStorage.getItem(ACTIVE_SAVE_KEY)??"";}catch{return null;}
+  const slot=slots.find(item=>item.id===activeId);return slot?normalizeSave(slot.save):null;
+}
+export function getEternalSave():EternalSave|null {
+  if(save===null) save=readActiveSave();
+  return save;
+}
+export function listEternalSaves():EternalSaveSummary[] {
+  const slots=ensureLegacyMigration();const activeId=(()=>{try{return localStorage.getItem(ACTIVE_SAVE_KEY)??"";}catch{return "";}})();
+  return slots.map(slot=>{const state=normalizeSave(slot.save);return state?{id:slot.id,name:slot.name,characterName:state.character.name,region:state.character.region,day:state.day,updatedAt:slot.updatedAt,active:slot.id===activeId}:null;}).filter((item):item is EternalSaveSummary=>item!==null).sort((a,b)=>b.updatedAt.localeCompare(a.updatedAt));
+}
+export function startEternalGame(input:{name:string;age:number;region:EternalRegion}):void {
+  const now=new Date().toISOString();const id=makeSaveId();
+  save={schemaVersion:3,saveId:id,saveName:input.name.trim(),createdAt:now,updatedAt:now,character:{name:input.name.trim(),age:input.age,region:input.region},disposition:createDispositionState(),locationId:defaultSceneForRegion(input.region).id,day:1,hour:8,minute:0,weather:resolveDailyWeather(input.region,1),eventIndex:0,energy:100,insight:0,bonds:0,completed:0};
   persist();
 }
-export function resetEternalGame(): void { save=null; try{localStorage.removeItem(SAVE_KEY);}catch{/* no-op */} }
+export function loadEternalSave(id:string):boolean {
+  const slot=ensureLegacyMigration().find(item=>item.id===id);const next=slot?normalizeSave(slot.save):null;
+  if(!next) return false;
+  save=next;persist();return true;
+}
+export function unloadEternalGame():void {
+  save=null;try{localStorage.removeItem(ACTIVE_SAVE_KEY);localStorage.removeItem(SAVE_KEY);}catch{/* no-op */}
+}
+export function renameEternalSave(id:string,name:string):boolean {
+  const nextName=name.trim();if(nextName.length<2||nextName.length>48) return false;
+  const slots=ensureLegacyMigration();const slot=slots.find(item=>item.id===id);if(!slot) return false;
+  slot.name=nextName;slot.save.saveName=nextName;slot.updatedAt=new Date().toISOString();
+  if(save?.saveId===id){save.saveName=nextName;save.updatedAt=slot.updatedAt;localStorage.setItem(SAVE_KEY,JSON.stringify(save));}
+  writeSlots(slots);return true;
+}
+export function deleteEternalSave(id:string):boolean {
+  const slots=ensureLegacyMigration();const next=slots.filter(item=>item.id!==id);if(next.length===slots.length) return false;
+  writeSlots(next);
+  if(save?.saveId===id) save=null;
+  try{if(localStorage.getItem(ACTIVE_SAVE_KEY)===id){localStorage.removeItem(ACTIVE_SAVE_KEY);localStorage.removeItem(SAVE_KEY);}}catch{/* no-op */}
+  return true;
+}
+export function exportEternalSave(id:string):string|null {
+  const slot=ensureLegacyMigration().find(item=>item.id===id);if(!slot) return null;
+  return JSON.stringify({format:"MERZKAVA_ETERNAL_PATH_SAVE",formatVersion:1,exportedAt:new Date().toISOString(),save:slot.save},null,2);
+}
+export function importEternalSave(raw:string):string {
+  const parsed=JSON.parse(raw) as {format?:string;formatVersion?:number;save?:unknown};
+  if(parsed.format!=="MERZKAVA_ETERNAL_PATH_SAVE"||parsed.formatVersion!==1) throw new Error("Format backup Eternal Path tidak dikenali.");
+  const imported=normalizeSave(parsed.save);if(!imported) throw new Error("Data perjalanan tidak lengkap atau rusak.");
+  const now=new Date().toISOString();imported.saveId=makeSaveId();imported.saveName=imported.saveName+" (Imported)";imported.createdAt=now;imported.updatedAt=now;
+  save=imported;persist();return imported.saveId;
+}
+export function resetEternalGame():void {
+  save=null;try{localStorage.removeItem(SAVE_KEY);localStorage.removeItem(SAVE_SLOTS_KEY);localStorage.removeItem(ACTIVE_SAVE_KEY);}catch{/* no-op */}
+}
 export function getRegionalDialogueCount(): number {
   const current=getEternalSave();
   if(!current) return ETERNAL_DIALOGUES.length;
