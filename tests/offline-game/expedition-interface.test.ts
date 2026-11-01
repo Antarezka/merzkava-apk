@@ -13,6 +13,7 @@ describe("Eternal Path live world scene", () => {
     const html=renderExpeditionInterface();
     expect(html).toContain('class="expedition-environment"');
     expect(html).toContain('class="expedition-scene-image"');
+    expect(html).toContain('data-location="gde-city"');
     expect(html).toContain('class="expedition-fog-motion"');
     expect(html).toContain("Imperial city panorama");
     expect(html).toContain("SCENE WINDOW · LIVE WORLD");
