@@ -23,7 +23,7 @@ export const ETERNAL_SCENES: EternalScene[] = [
 
 export interface EternalChoice { label: string; response: string; effects: { energy: number; insight: number; bonds: number }; minutes: number; }
 export interface EternalDialogue {
-  id: string; title: string; sceneId: string; chapter: string; speaker: string;
+  id: string; contentId:string; contentType:"dialogue"; reviewStatus:"APPROVED"; packageVersion:"0.1.0"; summary:string;\n  title: string; sceneId: string; chapter: string; speaker: string;
   text: string; provenance: "IN_GAME_ORIGINAL"; originalityNote: string;
   sourceRefs: {archiveDossierId:string;universeRepository:string;universeCommit:string;sourcePath:string}[];
   choices: [EternalChoice, EternalChoice];
