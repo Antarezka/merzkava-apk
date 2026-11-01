@@ -49,6 +49,32 @@ describe("World Archive visibility and entity routing", () => {
     expect(resolveLoreEntry("Spirit Hunters Guild")?.id).toBe("spirit-hunters-guild");
   });
 
+  it("publishes all seven reviewed Golden Dragon regions as distinct clickable entities", () => {
+    const regionIds = [
+      "region-longyuan", "region-canglan", "region-jinyue", "region-tianfeng",
+      "region-yanling", "region-baiyue", "region-xingluo"
+    ];
+    const publicIds = new Set(getPublicLoreEntries().map(entry => entry.id));
+    for (const id of regionIds) {
+      expect(publicIds.has(id)).toBe(true);
+      expect(getLoreSourceDisposition(id)).toBe("PUBLIC_CANDIDATE");
+    }
+    expect(resolveLoreEntry("Longyuan")?.id).toBe("region-longyuan");
+    expect(resolveLoreEntry("Canglan")?.id).toBe("region-canglan");
+    expect(resolveLoreEntry("Jinyue")?.id).toBe("region-jinyue");
+    expect(resolveLoreEntry("Tianfeng")?.id).toBe("region-tianfeng");
+    expect(resolveLoreEntry("Yanling")?.id).toBe("region-yanling");
+    expect(resolveLoreEntry("Baiyue")?.id).toBe("region-baiyue");
+    expect(resolveLoreEntry("Xingluo")?.id).toBe("region-xingluo");
+
+    expect(resolveLoreEntry("Huanglongcheng")).toBeUndefined();
+    expect(resolveLoreEntry("Cangqiong Harbor")).toBeUndefined();
+
+    expect(openLoreEntry("golden-dragon")).toBe(true);
+    const html = renderLoreLibrary();
+    for (const id of regionIds) expect(html).toContain('data-lore-open="' + id + '"');
+  });
+
   it("keeps Black Tide Expanse distinct from Black Tide Sea", () => {
     expect(resolveLoreEntry("Black Tide Expanse")?.id).toBe("black-tide-expanse");
     expect(resolveLoreEntry("Black Tide Sea")?.id).toBe("seas");
