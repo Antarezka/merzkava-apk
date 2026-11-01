@@ -33,7 +33,7 @@ These percentages measure **source-path coverage**, not claim-by-claim completen
 | Potential player-facing source scope | 35 mapped / 72 eligible-or-review-needed paths | **48.6%** | The 72 comprise 21 `PUBLISHED`, 9 `PARTIAL_PUBLIC`, 14 `PUBLIC_CANDIDATE`, and 28 `REVIEW_REQUIRED` source files. |
 | Already dispositioned public-scope paths | 35 mapped / 44 `PUBLISHED` + `PARTIAL_PUBLIC` + `PUBLIC_CANDIDATE` paths | **79.5%** | Coverage among sources already classified into a public-facing disposition; it does not mean every claim is approved. |
 | Canonical mechanics source preservation | 16 / 16 `MECHANICS_REFERENCE` modules copied verbatim | **100% preserved** | Exact development snapshot exists separately in `docs/OFFLINE_GAME_CANON_FORMULA_SNAPSHOT.md`. One supplemental formula-bearing governance source is also preserved. |
-| Initial deterministic mechanic implementation | 5 foundational modules: HP, Satiety, Injury, Time/Day-left, and Combat | **5 modules implemented; CI verified** | HP state consistency, Satiety interval/intake, Injury recovery, Time/Day-left, and Combat formulas are implemented. Overall engine percentage is not baselined; remaining formula domains and dependencies still require an inventory. |
+| Initial deterministic mechanic implementation | 7 foundational modules: HP, Satiety, Injury, Time/Day-left, Combat, Spirit Ring compatibility, and Spirit Ring progression | **7 modules implemented; CI verified** | HP state consistency, Satiety interval/intake, Injury recovery, Time/Day-left, Combat, and Spirit Ring formulas are implemented. Overall engine percentage is not baselined; remaining formula domains and dependencies still require an inventory. |
 
 **Current Archive inventory:** 39 curated dossiers / 35 unique source paths. The 16 mechanics-reference files are intentionally not published as ordinary Archive lore. Claim-level content completeness remains **not yet measured**; do not turn the path ratios above into a claim that the Archive is 25%, 48.6%, or 79.5% complete in every dimension.
 
@@ -310,3 +310,13 @@ The existing catalogue derives each dossier's outbound `crossReferenceIds` from 
 - Positive-ratio hit chance never reaches the written 10% lower clamp; formula approaches 25% as ratio approaches zero. Exact official clamp remains unchanged.
 - Deterministic foundation is now **5 modules: HP, Satiety, Injury, Time/Day-left, Combat**. Not a whole-engine percentage; remaining domains and dependencies are not fully inventoried.
 - Android Build #324 is separate and still running; its APK/emulator result must be checked independently.
+
+
+## Offline-game implementation checkpoint — Spirit Ring formulas (2026-11-01)
+
+- Canon source: `core/SPIRIT_RING_RULES.md` at Universe pin `2f76a864150528afb0e3d26cb16f9396ce610ff6` (blob `72666ef29bd5df41364f4727596747606fe581cf`).
+- Runtime modules: `src/offline-game/mechanics/spirit-ring-compatibility.ts` and `spirit-ring-progression.ts`; 15 focused tests.
+- Implements age pressure/EAG, Sync cap, eligible-only success/defect formulas, AWR, geometric compatibility, AgeTotal/PowerScale, Qi, ring eligibility, deviation HP loss, multipliers, and risk classification.
+- Web App Validation #600 passed on commit `9799378bddcd7bafb775ec37ed49b550ec014bf5`: 12 test files / 91 tests, TypeScript, gateway type-check, Vite build.
+- Foundation now **7 deterministic modules CI-verified** (HP, Satiety, Injury, Time/Day-left, Combat, Spirit Ring compatibility, Spirit Ring progression). This is not a whole-game completion percentage.
+- Android Build #327 package/signature verification passed; Android 14 emulator installation/smoke test is still running.
