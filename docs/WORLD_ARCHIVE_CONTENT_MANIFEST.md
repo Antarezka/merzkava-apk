@@ -972,9 +972,9 @@ All 24 source files are now marked `PUBLIC_CANDIDATE` for the curated extract on
 
 ### Updated path metrics
 
-- Whole Universe Markdown footprint: 67/140 = **47.9%**.
-- Potential player-facing / review-needed scope: 67/72 = **93.1%**.
-- Already dispositioned public-scope sources: 67/68 = **98.5%**.
+- Whole Universe Markdown footprint: 72/140 = **51.4%**.
+- Potential player-facing / review-needed scope: 71/71 = **100%**.
+- Already dispositioned public-scope sources: 71/71 = **100%**.
 - Remaining source review: three review-required world modules and one intentionally withheld hidden-group module. The latter is excluded to preserve discovery and GM narrative control, not because it was forgotten.
 - These are path metrics. They do not prove every canon claim, relationship edge, alias, or UI route has been verified.
 
@@ -997,7 +997,7 @@ Two intentionally incomplete/redirecting sources are also handled explicitly:
 ### Final source-path metrics for this pinned Universe snapshot
 
 - Approved player-facing source scope: 71/71 mapped to curated dossiers or explicit placeholders = **100%**.
-- Whole Universe Markdown inventory: 71/140 paths represented in the player-facing Archive = **50.7%**.
+- Whole Universe Markdown inventory: 72/140 paths mapped to player-facing dossiers/placeholders or the legacy Beiming redirect = **51.4%**.
 - Remaining 69/140 paths are intentionally handled outside the player-facing Archive: repository control, mechanics reference, private player data, GM-only content, internal templates, and legacy compatibility.
 - Canonical mechanics preservation: 16/16 mechanics-reference modules copied verbatim, plus the full supplemental Golden Dragon governance source containing the strategic-awakening regional-allocation formula.
 - These metrics certify path disposition/mapping only. They do not certify every link, alias, relationship, claim, search result, UI state, build, or physical-device behavior.
