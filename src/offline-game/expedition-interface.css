@@ -149,3 +149,27 @@ body.eternal-choice-open{overflow:hidden}
 .expedition-disposition-line{position:relative;padding:7px 10px;border-left:1px solid #98764e;background:linear-gradient(90deg,#6b4a2926,transparent 80%)}
 .expedition-disposition-line:after{content:"";position:absolute;right:0;top:50%;width:32px;height:1px;background:linear-gradient(90deg,#a27b4b66,transparent)}
 @media(prefers-reduced-motion:reduce){.expedition-scene-image,.expedition-light-layer,.expedition-weather-layer,.expedition-fog-motion{will-change:auto}}
+
+.expedition-profile-actions{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:12px;padding-top:7px;border-top:1px solid #514638}
+.expedition-save-label{margin-right:auto;max-width:48%;overflow:hidden;color:#a99c89;font-size:8px;text-overflow:ellipsis;white-space:nowrap}
+.expedition-save-manager{padding:12px;border:1px solid #594a38;background:linear-gradient(145deg,#27231e,#1d1a17)}
+.expedition-manager-toggle{display:flex;align-items:center;justify-content:space-between;width:100%;padding:3px;border:0;background:transparent;color:#dfc49c;font-size:9px;letter-spacing:.16em}
+.expedition-manager-toggle small{color:#a99c89;font-size:7px}
+.expedition-manager-content{display:grid;gap:12px;padding-top:12px}
+.expedition-save-list{display:grid;gap:8px}
+.expedition-save-card{padding:10px;border:1px solid #554632;background:#211e1a}
+.expedition-save-card-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.expedition-save-card-heading strong,.expedition-save-card-heading small{display:block}
+.expedition-save-card-heading strong{color:#ead8bc;font:400 16px Georgia,serif}
+.expedition-save-card-heading small{margin-top:4px;color:#a99c89;font-size:9px}
+.expedition-save-card-heading>span{color:#d4aa73;font-size:7px;letter-spacing:.12em}
+.expedition-save-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}
+.expedition-save-actions button,.expedition-rename-form button{padding:6px 9px;border:1px solid #665039;background:#2a241e;color:#e4d4bd;font-size:9px}
+.expedition-save-actions .danger{color:#d78e78}
+.expedition-rename-form{display:grid;gap:8px;margin-top:10px;padding-top:9px;border-top:1px solid #514638}
+.expedition-rename-form label,.expedition-import-label{display:grid;gap:6px;color:#c9b99f;font-size:8px;letter-spacing:.12em}
+.expedition-rename-form input{width:100%;padding:9px;border:1px solid #665039;background:#171512;color:#f0e5d4;font:12px inherit}
+.expedition-import-label{padding:10px;border:1px dashed #6c563c}
+.expedition-import-label input{max-width:100%;font-size:9px}
+.expedition-save-footnote{margin:0;color:#8f8578;font-size:9px;line-height:1.5}
+@media(prefers-reduced-motion:reduce){.expedition-save-card,.expedition-manager-content{scroll-behavior:auto}}
