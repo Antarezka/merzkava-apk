@@ -2,6 +2,8 @@
 
 > Status: inventory baseline; not a publication approval. Generated from the current repository trees and the APK's local lore catalogue.
 
+> **LATEST HANDOFF (2026-11-01):** The current branch contains **39 curated public dossiers / 35 unique source paths**. Seven Golden Dragon regional dossiers were added from claim-reviewed foundation and administrative facts only. The offline reader displays reviewed public-safe extracts with source provenance; it does not bundle raw canonical Markdown. Automated tests are committed but remain unexecuted, and no new APK build has been produced for these changes. Use the roadmap and coverage matrix as the current work instructions; older audit snapshots below are historical.
+
 ## Source snapshots
 
 - Universe repository: `Antarezka/merzkava-universe`
@@ -10,7 +12,7 @@
 - APK repository: `Antarezka/merzkava-apk`
 - APK branch: `feature/archive-experience`
 - APK lore catalogue path: `src/lore/lore-library.ts`
-- APK lore catalogue blob SHA: `4560c528dc9f4bb59c964bbf9ff6f53d04aaa8a1`
+- APK lore catalogue blob SHA: `58e404e529d42826d0a28df25c90230aa989e90e`
 - Current local entries: **39**
 - Offline source reader: **reviewed public-safe extracts bundled in the app code; raw source Markdown is not bundled**
 - Added public dossiers: seven Golden Dragon regions (`Longyuan`, `Canglan`, `Jinyue`, `Tianfeng`, `Yanling`, `Baiyue`, `Xingluo`), using only reviewed foundation and administrative claims.
@@ -688,7 +690,7 @@ All **39** Markdown files under `regions/*/npcs/` were reviewed: **35 individual
 
 ### Public Archive corpus — publication gate implemented
 
-The local Archive now contains **32 curated dossiers**, each explicitly marked `PUBLISHED`. The entries use **28 distinct source paths**; all referenced paths were checked against the current Universe tree and exist in the source snapshot.
+The local Archive now contains **39 curated dossiers**, each explicitly marked `PUBLISHED`. The entries use **35 distinct source paths**; all referenced paths were checked against the current Universe tree and exist in the source snapshot.
 
 - Every dossier stores its source path, source label, full source commit, review date, and generated cross-reference IDs.
 - The local entity graph includes only `PUBLISHED` dossiers. Search, inline highlights, related records, and open-entry actions all use the same public-only corpus.
@@ -725,7 +727,7 @@ This is a safety correction, **not** a completed state-approval workflow. The AP
 - Long mixed-source documents contain GM-only sections; public dossiers are curated excerpts, not permission to expose the underlying full source files.
 - No local Archive article grants gameplay authority. Mechanics continue to resolve only through the official Universe repository's INDEX and authoritative core/gameplay modules.
 
-**Audit disposition:** the regional NPC inventory, source-path coverage, public entity index, and automated visibility/link gates are complete for the current 32-dossier corpus. Canon facts that remain unknown or contradictory are explicitly quarantined rather than guessed. This does not certify the separate gameplay state-approval workflow or npm dependency advisory set as complete.
+**Audit disposition:** the regional NPC inventory, source-path coverage, public entity index, and automated visibility/link gates are complete for the current 39-dossier corpus. Canon facts that remain unknown or contradictory are explicitly quarantined rather than guessed. This does not certify the separate gameplay state-approval workflow or npm dependency advisory set as complete.
 
 
 ### Dependency advisory triage — production scope checked
@@ -785,8 +787,8 @@ The subsequent claim-level review tightened Beiming Xenhwa's public entry furthe
 
 ## Phase 1 matrix and handoff supersession — 2026-11-01
 
-The current APK catalogue is **32 dossiers across 28 unique Universe source paths**, on `feature/archive-experience`. The complete 140-path source-to-Archive disposition, stable-ID linking contract, next public candidates, exclusions and new-AI start order are maintained in [`docs/WORLD_ARCHIVE_COVERAGE_MATRIX.md`](WORLD_ARCHIVE_COVERAGE_MATRIX.md).
+The current APK catalogue is **39 dossiers across 35 unique Universe source paths**, on `feature/archive-experience`. The complete 140-path source-to-Archive disposition, stable-ID linking contract, next public candidates, exclusions and new-AI start order are maintained in [`docs/WORLD_ARCHIVE_COVERAGE_MATRIX.md`](WORLD_ARCHIVE_COVERAGE_MATRIX.md).
 
-This supersedes earlier statements in this manifest that the current catalogue contains 26 entries / 23 source files. The present app has a public-only 32-dossier graph with generated cross-reference IDs and tested title/alias routing. It does **not** yet have a complete source-document reader, a complete backlink graph for every public entity, full Universe coverage, or final offline/isolation QA. Earlier audit notes remain historical evidence for the stages at which they were written; use the Phase 1 matrix and current roadmap checkpoint as the latest handoff.
+This supersedes earlier statements in this manifest that the current catalogue contains 26 entries / 23 source files. The present app has a public-only 39-dossier graph with generated cross-reference IDs and tested title/alias routing. It has a reviewed-extract source reader and inbound backlinks, but still needs a broader entity graph, full Universe coverage, and final offline/isolation QA. Earlier audit notes remain historical evidence for the stages at which they were written; use the Phase 1 matrix and current roadmap checkpoint as the latest handoff.
 
 The Phase 1 documentation update does not modify the Universe repository and is not itself an APK build. Android Build #300 remains a baseline artifact only; see the matrix for its smoke-test caveat and required build re-verification.
