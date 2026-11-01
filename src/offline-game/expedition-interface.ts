@@ -6,13 +6,15 @@ import {
 function escapeHtml(value:string):string {
   return value.replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]??char));
 }
-const regionNames:Record<string,string>={"golden-dragon-empire":"Golden Dragon Empire","tianhai-yunzhou":"Tianhai Yunzhou","beiming-gu":"Beiming Gu"};
+const regionNames:Record<string,string>={"golden-dragon-empire":"Golden Dragon Empire","tianhai-yunzhou":"Tianhai Yunzhou","beiming-gu":"Beiming Gu","lawless-territories":"Lawless Territories","special-locations":"Special Locations"};
 
 export function renderExpeditionInterface():string {
   const save=getEternalSave(), scene=getExpeditionScene(), atmosphere=getExpeditionAtmosphere(), dialogue=getCurrentDialogue();
   const sceneWindow=`<section class="expedition-environment" aria-label="Eternal Path scene window" data-location="${scene.id}" data-region="${scene.region}" data-cycle="${atmosphere.cycle}" data-weather="${atmosphere.weather}" style="--scene-fog-opacity:${atmosphere.fog}">
     <img class="expedition-scene-image" src="${scene.image}" alt="" />
-    <div class="expedition-light-layer" aria-hidden="true"></div><div class="expedition-weather-layer" aria-hidden="true"></div>
+    <div class="expedition-cloud-layer" aria-hidden="true"><img class="expedition-cloud-motion" src="/game/scenery/shared/fx-01-soft-cloud-layer.png" alt="" /></div>
+    <div class="expedition-light-layer" aria-hidden="true"></div><div class="expedition-sun-glow" aria-hidden="true"></div><div class="expedition-moon-glow" aria-hidden="true"></div><div class="expedition-light-rays" aria-hidden="true"></div>
+    <div class="expedition-weather-layer" aria-hidden="true"></div><div class="expedition-weather-particles" aria-hidden="true"></div><div class="expedition-lightning-layer" aria-hidden="true"></div>
     <div class="expedition-fog-layer" aria-hidden="true"><img class="expedition-fog-motion" src="/game/scenery/shared/fx-02-atmospheric-fog.png" alt="" /></div>
     <div class="expedition-window-frame" aria-hidden="true"></div><span class="expedition-window-label">SCENE WINDOW · LIVE WORLD</span>
     <div class="expedition-scene-copy"><span class="scene-kicker">${escapeHtml(regionNames[scene.region])} · ${escapeHtml(atmosphere.cycle)} · ${escapeHtml(atmosphere.weather)}</span><h3>${escapeHtml(scene.label)}</h3><p>${escapeHtml(scene.detail)}</p></div>
