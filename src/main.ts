@@ -106,7 +106,7 @@ async function playEntrySplash(): Promise<void> {
 }
 
 const navigation: { id: ScreenId; label: string; icon: string }[] = [
-  { id: "home", label: "Home", icon: "⌂" }, { id: "gameplay", label: "Convo", icon: "✧" },
+  { id: "home", label: "Home", icon: "⌂" }, { id: "gameplay", label: "Convo", icon: "✧" }, { id: "offline-game", label: "Eternal Path", icon: "✦" },
   { id: "character", label: "Character", icon: "◉" }, { id: "inventory", label: "Inventory", icon: "▤" },
   { id: "map", label: "Archive", icon: "⌘" }, { id: "journal", label: "Journal", icon: "☷" },
   { id: "settings", label: "Settings", icon: "⚙" }
