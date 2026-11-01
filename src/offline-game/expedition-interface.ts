@@ -1,3 +1,4 @@
+import "./expedition-interface.css";
 import type { Character } from "../convo/characters/character-repository";
 
 function escapeHtml(value: string): string {
