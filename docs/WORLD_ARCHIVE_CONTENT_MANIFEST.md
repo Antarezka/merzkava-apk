@@ -806,3 +806,13 @@ The Archive now distinguishes entity-development status from source-review dispo
 - Regression coverage has been added for placeholder lookup, inline linking, search, detail navigation, related canon links, and status separation. Tests are committed but have not yet been executed in this environment.
 
 This update changes only the APK repository. It does not modify the official Universe repository or convert GM improvisation into canon.
+
+
+### Implementation checkpoint — linked entity status registry
+
+- **Implementation commit:** `511ae764f49550a31e8cf42266e9d96eee9ce0f2` on `feature/archive-experience`.
+- `src/lore/lore-library.ts` now contains the explicit placeholder registry and the `ON_PLAN` / `NON_CANON` status model. `src/main.ts` handles placeholder navigation, and `src/style.css` gives the statuses distinct labels and readable light-theme styling.
+- The current curated examples are Huanglongcheng and Cangqiong Harbor, both `ON_PLAN`. `NON-CANON` is supported by the model and renderer, but no unverified example has been fabricated.
+- `tests/lore-library.test.ts` includes regression coverage for both linked examples, detail navigation, search, and separation from ordinary canon dossier resolution.
+- **Verification:** the latest commit has no associated workflow run. Tests have not been executed; TypeScript/build and device checks remain pending.
+- **APK:** no new build was started. Build #300 remains the previous baseline only; do not present it as containing this change.
