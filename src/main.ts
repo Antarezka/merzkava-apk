@@ -1063,7 +1063,8 @@ root.addEventListener("change", async event => {
     render();
   }
 });
-\nroot.addEventListener("submit", async (event: SubmitEvent) => {
+
+root.addEventListener("submit", async (event: SubmitEvent) => {
   const form = event.target;
   if (!(form instanceof HTMLFormElement)) return;
   if (form.matches("[data-eternal-rename-form]")) {
