@@ -77,10 +77,11 @@ jobs:
           import { readFileSync, readdirSync } from "node:fs";
           const files = readdirSync("dist/assets");
           const js = files.filter(name => name.endsWith(".js")).map(name => readFileSync("dist/assets/" + name, "utf8")).join("\n");
-          for (const token of ["/kitty/body/kitty-body.png", "/kitty/kepala/kitty-head.png", "/kitty/ekor/kitty-tail.png", "/kitty/shadow/kitty-shadow.png"]) {
+          for (const token of ["/kitty/body/kitty-body.png", "/kitty/kepala/kitty-head.png", "/kitty/ekor/kitty-tail.png"]) {
             if (!js.includes(token)) throw new Error("Built JS is missing Kitty asset reference: " + token);
           }
           if (!js.includes(".splash-wordmark")) throw new Error("Built JS does not include the Kitty splash wordmark selector.");
+if (js.includes("/kitty/shadow/kitty-shadow.png")) throw new Error("The splash must not render Kitty’s separate floor-shadow layer.");
           console.log("Kitty asset references and splash selector are present in the web bundle.");
           NODE
 
