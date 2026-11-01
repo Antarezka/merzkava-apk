@@ -853,3 +853,16 @@ The first deterministic mechanic module has been added to the APK repository wit
 - Validation: [Web App Validation #565](https://github.com/Antarezka/merzkava-apk/actions/runs/41305346595) passed, including the test and TypeScript/Vite build steps.
 - Explicitly not included: combat damage, healing rates, injury progression, save persistence, event logic, or UI integration. These require their own source/dependency audits and tests.
 - No Android APK build was produced by this validation run.
+
+
+### Offline-game code milestone — Satiety/metabolism (2026-11-01)
+
+- Source: `core/HUNGER_AND_METABOLISM.md` at Universe pin `2f76a864150528afb0e3d26cb16f9396ce610ff6`; upstream blob `66bdc7d4fe4d5270cf3c40193909aca582ac1dde`.
+- Code: `src/offline-game/mechanics/satiety.ts`.
+- Tests: `tests/offline-game-satiety.test.ts` (9 tests).
+- Validation: [Web App Validation #572](https://github.com/Antarezka/merzkava-apk/actions/runs/41305824767) passed with 7 test files / 52 tests, TypeScript, gateway type-check, and Vite build.
+- Implemented: official base-time rates; activity, missed-meal, body-condition and verified biological multipliers; combined ×8 cap; full internal precision with one-decimal display; verified intake and portion values.
+- Not implemented here: time-window transition logic, meal-opportunity adjudication, sleep-state transitions, persistent Satiety state, injury/HP consequences, or UI.
+- Source discrepancy: the Spirit Primordial 24-hour Light example (≈0.014) conflicts with the stated 365-day base/formula (≈0.342466). Code follows the explicit table/formula and surfaces a warning. Upstream canon remains unchanged.
+- Current foundation: **2 modules implemented and CI-verified (HP + Satiety)**. The full offline engine remains incomplete; no whole-engine percentage is assigned.
+- CI dependency audit: four moderate advisories in development tooling (`@capacitor/cli`, `glob`, `minimatch`, `rimraf`); production-only audit reports zero vulnerabilities. The current workflow does not fail on this advisory report. No unsafe major-version downgrade was applied.
