@@ -233,17 +233,17 @@ These percentages measure **source-path coverage**, not claim-by-claim completen
 7. Continue the next unchecked roadmap task. Do not redo completed light-theme typography work. Do not modify the Universe repo unless explicitly asked.
 8. Before claiming a build, verify exact versionName/versionCode, source SHA, workflow run, artifact, signature/alignment and emulator/device smoke result.
 
-**Last known build reference (not a build of this Phase 1 documentation):** Android Build #300 used source SHA `956a0b1fa3b4f04ccca01f7fa7b1942b83bde770`, `versionCode=300`, `versionName=v.1.01.300-956`, package `com.antarezka.merzkava`. Artifact [merzkava-debug-apk](https://github.com/Antarezka/merzkava-apk/actions/runs/41298609571/artifacts/13080676292). APK compilation, package/version verification, alignment, signature verification and artifact upload passed; emulator install/smoke was interrupted by a system dialog taking focus. The user separately confirmed light-theme text readability on a physical device. This is the last known build baseline, not a build of the Phase 1 documentation commits.
+**Latest documented Android build (not a build of these documentation commits):** Android Build #340 compiled and verified APK package/version/alignment/signature and uploaded an artifact. The Android 14 emulator step was cancelled, so installation/smoke-test success is not claimed. Web App Validation #653 separately passed 15 test files / 133 tests, TypeScript, gateway type-check, and Vite build; it is not APK evidence.
 
 ## Phase 1 exit checklist
 
 - [x] 140/140 source paths assigned a disposition.
-- [x] Existing 39 dossiers and 35 source paths reconciled.
+- [x] Current catalogue coverage recorded: 87 curated dossiers / 71 unique player-facing source paths, plus 3 explicit `ON_PLAN` placeholders.
 - [x] Stable-ID/public-only linking contract documented.
 - [x] AI start order and build caveat recorded.
 - [ ] Re-verify against current recursive Universe tree before expanding.
-- [ ] Complete public entity links/backlinks and tests.
-- [ ] Implement offline local source reader.
+- [~] Public entity graph, backlinks, placeholder routing, and search/navigation regression tests are implemented; Web App Validation #653 passed 15 test files / 133 tests. Physical-device graph QA remains open.
+- [x] Implement offline local source reader for reviewed public-safe extracts; raw canonical Markdown remains excluded.
 - [ ] Expand approved public coverage.
 - [ ] Build and perform device navigation QA.
 
@@ -256,7 +256,7 @@ The existing catalogue derives each dossier's outbound `crossReferenceIds` from 
 
 - Runtime implementation: `src/lore/lore-library.ts`, commit `3dd0b21f32bdd383737da48d52248b96c623535a`.
 - Regression tests: `tests/lore-library.test.ts`, commit `4ce04c872d39611b6fa782b8e2199f4157aa3b0f`.
-- Tests are committed but have **not yet been executed** in CI or on-device; graph QA remains open.
+- Web App Validation #653 passed 15 test files / 133 tests, TypeScript, gateway type-check, and Vite build. On-device graph/navigation/source-reader QA remains open.
 - Source citation is still provenance text, not an in-app local source reader. The source reader remains a required task.
 
 
