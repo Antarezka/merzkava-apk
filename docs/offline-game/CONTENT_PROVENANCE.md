@@ -69,7 +69,7 @@ Each packaged content record must carry the following logical fields. The implem
 |---|---|---|
 | `contentId` | Yes | Stable, unique game-facing ID. Never use display name as the primary key. |
 | `displayName` | Yes | Player-facing name. |
-| `contentType` | Yes | Item, equipment, material, spirit-beast, arcanistry, quest, event, location-reference, etc. |
+| `contentType` | Yes | Item, equipment, material, spirit-beast, arcanistry, quest, event, dialogue, location-reference, etc. |
 | `provenance` | Yes | Exactly one of `CANON`, `CANON_ADAPTATION`, `IN_GAME_ORIGINAL`. |
 | `summary` | Yes | Player-safe description. |
 | `sourceRefs` | Conditional | Required for `CANON` and `CANON_ADAPTATION`; empty for `IN_GAME_ORIGINAL` unless it cites inspiration/constraints without claiming source authority. |
@@ -86,6 +86,11 @@ Each `sourceRefs` entry for canon-backed records must preserve:
 - `sourcePath` (exact path within the Universe repository)
 
 Do not put GM-only, private-player, hidden-agenda, or unreviewed material into the player package even if a source reference exists.
+
+
+### Dialogue and event content
+
+Dialogue nodes, choice labels, response text, and their gameplay effects are content records too. They must carry the same provenance, review status, and package version as other player-facing content. A story scene written specifically for Eternal Path is `IN_GAME_ORIGINAL`; it must not be represented as a quotation, event, or historical fact from the Universe repository. If a dialogue depends on a named canon NPC, settlement, institution, historical event, or official rule, it must cite the approved Archive dossier and exact Universe source path/commit before it can enter a release pack.
 
 ## 5. Example records
 
