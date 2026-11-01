@@ -6,7 +6,7 @@ import { getGameplaySessionRecord, initializeDatabase, saveGameplaySessionRecord
 import { createCharacter, deleteCharacter, listCharacters, type Character } from "./convo/characters/character-repository";
 import { validateCharacterDraft } from "./convo/engine/character-validation";
 import { renderScreen, type ScreenId } from "./app/screens";
-import { mountExpeditionAnimations } from "./offline-game/expedition-animations";
+import { animateExpeditionChoiceModal, mountExpeditionAnimations } from "./offline-game/expedition-animations";
 import { chooseEternalOption, resetEternalGame, startEternalGame, type EternalRegion } from "./offline-game/expedition-game";
 import { getCanonIndex, getCanonStatus, loadCanonModule, loadPlayerRegistry, loadRegisteredPlayerProfile, refreshCanon, refreshLatestPlayerRegistry, type CanonDocument } from "./convo/canon/canon-loader";
 import { routeCanonActivity } from "./convo/canon/canon-router";
@@ -623,18 +623,16 @@ root.addEventListener("scroll", event => {
 window.addEventListener("popstate", () => {
   const modal=root.querySelector<HTMLElement>(".expedition-choice-modal:not([hidden])");
   if(!modal) return;
-  modal.hidden=true;
+  animateExpeditionChoiceModal(modal,false,()=>root.querySelector<HTMLButtonElement>("[data-eternal-open-choices]")?.focus());
   document.body.classList.remove("eternal-choice-open");
-  root.querySelector<HTMLButtonElement>("[data-eternal-open-choices]")?.focus();
 });
 root.addEventListener("keydown", event => {
   const modal=root.querySelector<HTMLElement>(".expedition-choice-modal:not([hidden])");
   if(!modal) return;
   if(event.key==="Escape") {
-    modal.hidden=true;
+    animateExpeditionChoiceModal(modal,false,()=>root.querySelector<HTMLButtonElement>("[data-eternal-open-choices]")?.focus());
     document.body.classList.remove("eternal-choice-open");
     if(history.state?.eternalChoiceModal) history.back();
-    root.querySelector<HTMLButtonElement>("[data-eternal-open-choices]")?.focus();
     return;
   }
   if(event.key==="Tab") {
@@ -660,9 +658,9 @@ root.addEventListener("click", async (event: MouseEvent) => {
   if (interactive) playButtonSound();
 
   const eternalChoice = target.closest<HTMLButtonElement>("[data-eternal-choice]");
-  if (target.closest("[data-eternal-choice-dismiss]")) { const modal=root.querySelector<HTMLElement>("[data-eternal-choice-modal]"); if(modal) modal.hidden=true; document.body.classList.remove("eternal-choice-open"); if(history.state?.eternalChoiceModal) history.back(); root.querySelector<HTMLButtonElement>("[data-eternal-open-choices]")?.focus(); return; }
-  if (eternalChoice) { document.body.classList.remove("eternal-choice-open"); if(history.state?.eternalChoiceModal) history.back(); chooseEternalOption(Number(eternalChoice.dataset.eternalChoice)); render(); return; }
-  if (target.closest("[data-eternal-open-choices]")) { const modal=root.querySelector<HTMLElement>("[data-eternal-choice-modal]"); if(modal){modal.hidden=false;document.body.classList.add("eternal-choice-open");history.pushState({eternalChoiceModal:true},"");modal.querySelector<HTMLButtonElement>(".expedition-choice-close")?.focus();} return; }
+  if (target.closest("[data-eternal-choice-dismiss]")) { const modal=root.querySelector<HTMLElement>("[data-eternal-choice-modal]"); if(modal){animateExpeditionChoiceModal(modal,false,()=>root.querySelector<HTMLButtonElement>("[data-eternal-open-choices]")?.focus());} document.body.classList.remove("eternal-choice-open"); if(history.state?.eternalChoiceModal) history.back(); return; }
+  if (eternalChoice) { const modal=root.querySelector<HTMLElement>("[data-eternal-choice-modal]"); document.body.classList.remove("eternal-choice-open"); if(history.state?.eternalChoiceModal) history.back(); if(modal) animateExpeditionChoiceModal(modal,false,()=>{chooseEternalOption(Number(eternalChoice.dataset.eternalChoice));render();}); else {chooseEternalOption(Number(eternalChoice.dataset.eternalChoice));render();} return; }
+  if (target.closest("[data-eternal-open-choices]")) { const modal=root.querySelector<HTMLElement>("[data-eternal-choice-modal]"); if(modal){animateExpeditionChoiceModal(modal,true);document.body.classList.add("eternal-choice-open");history.pushState({eternalChoiceModal:true},"");modal.querySelector<HTMLButtonElement>(".expedition-choice-close")?.focus();} return; }
 
   if (target.closest("[data-eternal-end]")) { resetEternalGame(); render(); return; }
   const saveCopyButton = target.closest<HTMLButtonElement>("[data-save-copy]");
