@@ -1333,3 +1333,51 @@ button {color:inherit;} button:focus-visible {outline-color:#a68d5e;}
   .faction-card,.home-quick-access .overview-card,.nav-item,.header-settings { transition: none; }
   .faction-card:active,.nav-item:active,.header-settings:active { transform: none; }
 }
+
+
+/* Academy navigation — four-slot horizontal rail, with no wrapping or clipped hit areas. */
+.bottom-nav {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
+  scrollbar-width: none;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  isolation: isolate;
+}
+.bottom-nav::-webkit-scrollbar { display: none; }
+.bottom-nav .nav-item {
+  flex: 0 0 25%;
+  width: 25%;
+  min-width: 25%;
+  max-width: 25%;
+  min-height: 48px;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  overflow: visible;
+  touch-action: pan-x;
+}
+.bottom-nav .nav-item small {
+  overflow: visible;
+  text-overflow: clip;
+  white-space: nowrap;
+  font-size: clamp(7px, 2vw, 9px);
+}
+.bottom-nav .nav-icon { font-size: 18px; }
+.app-shell:not(.control-shell) { padding-bottom: calc(104px + env(safe-area-inset-bottom)); }
+.app-shell:has(.conversation-window) { padding-bottom: calc(112px + env(safe-area-inset-bottom)); }
+.storage-status { bottom: calc(76px + env(safe-area-inset-bottom)); }
+@media (min-width:620px) {
+  .bottom-nav { bottom: 12px; }
+  .bottom-nav .nav-item { min-height: 50px; }
+  .app-shell:not(.control-shell) { padding-bottom: 110px; }
+  .app-shell:has(.conversation-window) { padding-bottom: 110px; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .bottom-nav { scroll-behavior: auto; scroll-snap-type: x proximity; }
+}
