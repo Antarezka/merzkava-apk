@@ -55,7 +55,8 @@ describe("offline-game canon time and cooldown rules", () => {
       safeStationaryLocation: true,
       sufficientLogistics: true,
       checkpointsRecorded: true,
-      interruptionsAccounted: true
+      interruptionsAccounted: true,
+      satietyAccountingVerified: true
     };
     expect(validateActionDuration({
       kind: "PURE_CULTIVATION", durationMinutes: 30 * 1440,
