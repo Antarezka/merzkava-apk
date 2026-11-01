@@ -63,6 +63,23 @@ describe("Eternal Path live world scene", () => {
     expect(getEternalSave()?.completed).toBe(0);
   });
 
+  it("uses the compact narrative-first layout and keeps choice outcomes hidden", () => {
+    startEternalGame({name:"Nafila",age:14,region:"golden-dragon-empire"});
+    const dialogue=getCurrentDialogue();
+    const html=renderExpeditionInterface();
+    expect(html).toContain("✦ MERZKAVA: ETERNAL PATH");
+    expect(html).toContain('class="expedition-profile-compact"');
+    expect(html).toContain("SPIRIT REALM");
+    expect(html).toContain("SPIRIT RING");
+    expect(html).toContain("SYNC PROGRESS");
+    expect(html).toContain("ARCANIST FOCUS");
+    expect(html).toContain("TRUE NEUTRAL");
+    expect(html).toContain('class="expedition-choice-modal" hidden');
+    expect(html).toContain("data-eternal-choice");
+    expect(html).not.toContain("expedition-feature-grid");
+    expect(html).not.toContain(dialogue?.choices[0].response ?? "__missing_choice_response__");
+  });
+
   it("keeps a separate local character/save and starts an interactive chronicle", () => {
     startEternalGame({name:"Nafila",age:14,region:"golden-dragon-empire"});
     const save=getEternalSave();
