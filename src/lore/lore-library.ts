@@ -53,7 +53,8 @@ const LORE_ENTRY_DRAFTS: Omit<LoreEntry, "sourceCommit" | "reviewedAt" | "crossR
       "Golden Dragon Empire menempati kawasan timur Merzkava. Kekuatannya bertumpu pada skala wilayah, administrasi sipil, mobilisasi, sumber daya, dan jaringan permukiman.",
       "Kekaisaran memiliki tujuh wilayah besar: Longyuan, Canglan, Jinyue, Tianfeng, Yanling, Baiyue, dan Xingluo. Struktur resminya mencakup dua belas prefektur, enam county circuit, serta tiga belas desa dalam register desa resmi.",
       "Huanglongcheng adalah pusat kekaisaran sekaligus ibu kota wilayah Longyuan. Kota ini menjadi simpul pemerintahan dan kehidupan elite. Sementara itu, Dongxing di Xingluo menjadi pelabuhan penting yang menghubungkan jalur pelayaran timur dengan wilayah lain.",
-      "Karakter tiap wilayah berbeda: Longyuan berpusat pada istana dan politik; Canglan pada pertanian dan irigasi; Jinyue pada pertambangan serta logam spiritual; Tianfeng pada tradisi keilmuan; Yanling pada tungku dan pengerjaan; Baiyue pada pertahanan perbatasan; Xingluo pada perdagangan laut dan diplomasi."
+      "Karakter tiap wilayah berbeda: Longyuan berpusat pada istana dan politik; Canglan pada pertanian dan irigasi; Jinyue pada pertambangan serta logam spiritual; Tianfeng pada tradisi keilmuan; Yanling pada tungku dan pengerjaan; Baiyue pada pertahanan perbatasan; Xingluo pada perdagangan laut dan diplomasi.",
+      "Roster pejabat publik juga mencatat Xuanyuan Wenyuan, Shen Mingde, Yunlan Qingzhi, Baihu Zhengyang, Gu Jingheng, Cangyue Yucheng, dan Heiyu Zhaolin pada jabatan pusat; serta Xuanyuan Haoran, Cangyue Yunhe, Tieyan Mingxuan, Yunlan Qinglan, Yanling Zhenyu, Baihu Xuefeng, dan Zhenhai Haixiu sebagai gubernur tujuh wilayah."
     ],
     sourcePath: "world/GOLDEN_DRAGON_EMPIRE_ADMINISTRATIVE_ATLAS.md", sourceLabel: "Golden Dragon Administrative Atlas"
   },
@@ -145,7 +146,8 @@ const LORE_ENTRY_DRAFTS: Omit<LoreEntry, "sourceCommit" | "reviewedAt" | "crossR
       "Tianhai Yunzhou berada di barat daya dunia, berpusat pada pulau raksasa yang terapung di atas Yunmeng Sea. Laut bukan sekadar batas geografis: ia adalah jalur kehidupan, perdagangan, perjalanan, dan hubungan antardaerah.",
       "Pulau utama dibagi ke dalam empat kawasan arah—Utara, Selatan, Barat, dan Timur—serta struktur administratif tujuh distrik. Tianji Core berada di bagian pusat sebagai kawasan yang berkaitan dengan sistem penopang pulau; Misty Shoals merupakan zona maritim terluar.",
       "Utara berorientasi pada keamanan dan pengawasan laut. Selatan menjadi pusat pemerintahan, pendidikan, kerajinan, dan pengembangan Arcanist. Barat berpusat pada aktivitas pelabuhan dan armada, sedangkan Timur dikenal melalui pasar, perdagangan, serta pertukaran informasi.",
-      "Tianhai memiliki empat Cultivator Academies dan sebuah institusi riset Arcanist tingkat tinggi. Tradisi Arcanistry berawal di wilayah ini dan menjadi salah satu sumber pengaruh budaya serta teknologinya."
+      "Tianhai memiliki empat Cultivator Academies dan sebuah institusi riset Arcanist tingkat tinggi. Tradisi Arcanistry berawal di wilayah ini dan menjadi salah satu sumber pengaruh budaya serta teknologinya.",
+      "Dossier publik juga tersedia untuk Duan Haicheng, yang tumbuh di lingkungan perdagangan Artificial Artifact, dan Lin Qiaoyu, pelajar Arcanist yang menghargai hasil yang dapat direproduksi. Profil ini tidak menetapkan lokasi pribadi atau institusi tempat mereka belajar."
     ],
     sourcePath: "world/REGION_TIANHAI_YUNZHOU.md", sourceLabel: "Tianhai Yunzhou Regional Dossier"
   },
@@ -157,7 +159,8 @@ const LORE_ENTRY_DRAFTS: Omit<LoreEntry, "sourceCommit" | "reviewedAt" | "crossR
       "Beiming Gu terletak di utara Merzkava. Pegunungan, suhu ekstrem, dan keterisolasian geografis membentuk karakter wilayah serta cara masyarakatnya bertahan.",
       "Perairan utaranya dikenal sebagai Frostmirror Sea. Jalur pesisir dan pegunungan menghubungkan beberapa kawasan, tetapi kondisi alam membuat perjalanan tidak selalu mudah atau aman.",
       "Beiming memiliki hubungan sejarah yang kuat dengan Beiming Han dan warisan spiritual utara. Kisah Azerion juga terhubung dengan sejarah wilayah ini, termasuk perubahan luar biasa pada salah satu Heavenly Beast.",
-      "Tidak semua detail batas wilayah, jarak, dan jalur perjalanan telah ditetapkan. Peta Merzkava adalah kerangka hubungan geografis, bukan peta berskala dengan koordinat pasti."
+      "Tidak semua detail batas wilayah, jarak, dan jalur perjalanan telah ditetapkan. Peta Merzkava adalah kerangka hubungan geografis, bukan peta berskala dengan koordinat pasti.",
+      "Profil publik Beiming Gu yang telah ditinjau mencakup Beiming Jingheng, Beiming Xuanyu, Binghe Chuanliu, Lan Feng, Cangxue Beiran, Cangxue Tielan, Shuang Yue, Hanyue Mingzhao, Tie Song, Lingfeng Yujin, Minghu Yanshu, Mo Xueyan, Bai Yushen, Tieshi Beiyue, Xuanbing Lingsu, Xuanbing Yue, Xuansong Qinghe, Xuanye Zhenbei, Yaochi Suwen, dan Yinshan Qiaofeng. Setiap profil hanya memuat klaim publik yang telah dipilih; detail privat dan hubungan tersembunyi tidak ditampilkan."
     ],
     sourcePath: "world/REGION_BEIMING_GU.md", sourceLabel: "Beiming Gu Regional Dossier"
   },
@@ -485,7 +488,8 @@ const LORE_ENTRY_DRAFTS: Omit<LoreEntry, "sourceCommit" | "reviewedAt" | "crossR
       "Kaisar adalah pemegang kedaulatan tertinggi. Urusan sehari-hari dijalankan melalui Imperial Council, Grand Secretariat, kementerian pusat, tujuh gubernur wilayah, dua belas prefektur, dan enam county circuit. Setiap county circuit mengoordinasikan dua prefektur; ia bukan lapisan county tambahan.",
       "Register administrasi saat ini menetapkan tujuh wilayah, dua belas prefektur, enam county circuit, dan tiga belas desa resmi. Kota, town, township, district office, serta household register memiliki fungsi layanan atau pencatatan dan tidak otomatis menjadi jenjang pemerintahan baru.",
       "Pemerintahan sipil dan komando militer adalah dua rantai kewenangan berbeda. Gubernur tidak otomatis memimpin setiap garnisun, sedangkan komandan militer tidak otomatis mengelola urusan warga. Gelar bangsawan, afiliasi klan, Spirit Realm, atau kekuatan pribadi juga tidak otomatis memberikan jabatan maupun yurisdiksi.",
-      "Nama unit administratif dan kursinya mengikuti Administrative Atlas. Batas survei, koordinat, kode hukum lengkap, susunan rinci dewan, dan pejabat yang belum tercatat tetap terbuka; jangan mengisi kekosongan itu dengan asumsi."
+      "Nama unit administratif dan kursinya mengikuti Administrative Atlas. Batas survei, koordinat, kode hukum lengkap, susunan rinci dewan, dan pejabat yang belum tercatat tetap terbuka; jangan mengisi kekosongan itu dengan asumsi.",
+      "Nama tujuh kepala portofolio pusat dan tujuh gubernur wilayah dapat dibuka melalui dossier pejabat masing-masing; roster tersebut hanya menetapkan jabatan publik dan tidak memublikasikan disposisi politik atau agenda pribadi."
     ],
     sourcePath: "world/GOLDEN_DRAGON_EMPIRE_GOVERNANCE.md", sourceLabel: "Golden Dragon Empire Governance"
   },
