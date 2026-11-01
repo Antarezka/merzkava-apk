@@ -5,7 +5,7 @@ export function mountExpeditionAnimations(root: HTMLElement): () => void {
   const scope = createScope({ root, mediaQueries: { reduceMotion: "(prefers-reduced-motion: reduce)" } }).add(self => {
     if (!self || self.matches.reduceMotion) return;
     const entranceTargets = root.querySelectorAll<HTMLElement>(
-      ".expedition-heading, .expedition-scene-toolbar, .expedition-window-label, .expedition-character-panel, .expedition-dialogue, .expedition-test-panel, .expedition-feature, .expedition-footer",
+      ".expedition-heading, .expedition-scene-toolbar, .expedition-window-label, .expedition-character-panel, .expedition-dialogue, .expedition-feature, .expedition-footer",
     );
     if (entranceTargets.length) animate(entranceTargets, {
       opacity:[0,1], translateY:[12,0], duration:520, delay:stagger(55), ease:"outCubic",
