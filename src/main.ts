@@ -27,8 +27,6 @@ const app = document.querySelector<HTMLDivElement>("#app");
 if (!app) throw new Error("App root element was not found.");
 const root = app;
 
-// Temporary visual QA toggle: keep FX-02 enabled by default until the fog overlay is inspected.
-const SCENERY_FOG_TEST_ENABLED = true;
 
 type ThemeMode = "light" | "dark";
 const THEME_STORAGE_KEY = "merzkava-theme-mode";
@@ -467,7 +465,6 @@ function render(): void {
     ? floatingControlMarkup(floatingReadiness)
     : renderScreen(activeScreen as ScreenId, availableCharacters(), playerRegistryMessage, activeCharacterId ? getLedgerLog(activeCharacterId) : [], inventorySnapshot);
   root.innerHTML = `<div class="app-shell ${isControl ? "control-shell" : ""} ${menuRevealPending ? "is-entering" : ""}">
-    ${!isControl && SCENERY_FOG_TEST_ENABLED ? '<div class="scene-fog-overlay" aria-hidden="true"></div>' : ""}
     ${isControl ? "" : `<header class="app-header"><button class="brand" data-screen="home" aria-label="Merzkava home"><span class="brand-mark">M</span><span class="brand-wordmark"><small>MERZKAVA UNIVERSE</small><strong>Merzkava</strong></span></button><div class="header-context"><small>TACTICAL ACADEMY</small><strong>${navigation.find(item => item.id === activeScreen)?.label ?? "Command Hall"}</strong></div><div class="header-tools"><button class="header-settings" data-floating-action="start-bubble" aria-label="Start Bubble Mode" title="Start Bubble Mode">◉</button><button class="header-settings" data-screen="settings" aria-label="Settings">⚙</button></div></header>`}
     ${notice ? `<p class="notice" role="status">${escapeHtml(notice)}</p>` : ""}
     ${isControl ? content : `<main class="main-content">${content}${activeScreen === "settings" ? authPanel() + canonPanel() : ""}</main>`}
