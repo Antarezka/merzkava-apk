@@ -4,9 +4,10 @@
 
 - `docs/PRODUCT_ROADMAP.md` is the primary planning reference for product scope, workstreams, feature inventory, status tracking, and release gates.
 - Every existing feature, defect, and proposed feature must be inventoried or tracked there; do not assume a visible control is functional without verification.
-- Connected AI GM conversations must obtain canon from the official `Antarezka/merzkava-universe` repository through the active pinned source and routing pipeline.
-- World Archive is an independent offline reference library. It must not be appended to connected AI GM context, used as gameplay authority, or mutate connected gameplay/save state.
-- Any standalone offline game mode is a separate product mode with its own approved local content package and state boundary; it does not replace offline-unavailable AI GM conversation.
+- **Convo / AI GM** is the connected conversation experience in the APK. It obtains active gameplay canon directly from the official `Antarezka/merzkava-universe` repository through the pinned source and routing pipeline.
+- **World Archive** is the reviewed local content/reference layer in the same APK. Users can browse it offline, and its approved, versioned content package is the source consumed by **Offline Game**.
+- **Offline Game** (working name) is the second playable experience inside the same APK. It consumes approved World Archive content and runs locally without AI/network dependency; it is not a fallback version of Convo.
+- World Archive content must never be silently appended to connected Convo/AI GM context. Convo and Offline Game must keep separate session/save state and source-version records; no implicit state or context crossover.
 - Daily login or reward systems must follow official Universe rules where applicable and use deterministic engine validation and auditable transactions. Do not invent canon rewards.
 
 ## Role and objective
