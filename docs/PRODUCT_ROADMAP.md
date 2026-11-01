@@ -117,22 +117,22 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 
 ## 5. Workstream 3 — New UI features and interactive visual design
 
-**Progress now:** `[ ] TODO FOR FACTION CARDS`. Existing splash/launcher visual work is tracked by its own code commits, but the three faction entry cards, their destinations, and the shared glass interaction system have not been verified as implemented.
+**Progress now:** `[~] FIRST PASS IMPLEMENTED / VISUAL QA OPEN`. The Home screen now has three full-area clickable faction dossier cards that open their matching published World Archive entries. Each power has its own CSS emblem and color atmosphere, with responsive layouts and keyboard/touch feedback. Bespoke faction artwork, final glass-surface refinement, and on-device visual QA remain open; do not mark this workstream complete yet.
 
 **Goal:** Make the app feel like a cohesive, atmospheric fantasy application rather than a collection of static screens.
 
 ### 3A. Three powers / faction entry points
 
-- [ ] Create clear, clickable entry points for the three major powers:
+- [x] Create clear, clickable entry points for the three major powers:
   - Golden Dragon Empire
   - Tianhai Yunzhou
   - Beiming Gu
-- [ ] Give each entry point its own appropriate artwork/background identity based on that power.
+- [~] Establish a distinct CSS emblem and background identity for each power; bespoke faction artwork remains open.
 - [ ] Use a refined glass-like surface treatment where suitable: translucent background, controlled blur, subtle border/highlight, and readable text.
 - [ ] Keep artwork, text, and overlays balanced so labels remain legible.
-- [ ] Make the entire intended hit area clickable, not only the text.
-- [ ] Open the correct Archive destination or approved app destination when tapped.
-- [ ] Provide pressed, focused, selected, and disabled states where relevant.
+- [x] Make the entire intended hit area clickable, not only the text.
+- [x] Open the matching published World Archive dossier when tapped.
+- [x] Provide pressed and keyboard-focus feedback; selected/disabled states remain dependent on later interaction states.
 - [ ] Provide graceful image fallback if artwork is missing or cannot load.
 - [ ] Optimize image dimensions and formats for Android memory and performance.
 
