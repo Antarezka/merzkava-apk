@@ -9,7 +9,6 @@ export function animateAppScreen(shell: HTMLElement | null): void {
   if (!shell || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
   const header = shell.querySelector<HTMLElement>(".app-header");
-  const nav = shell.querySelector<HTMLElement>(".bottom-nav");
   const panels = Array.from(shell.querySelectorAll<HTMLElement>(".main-content > *"));
 
   if (header) {
@@ -31,12 +30,4 @@ export function animateAppScreen(shell: HTMLElement | null): void {
     });
   });
 
-  if (nav) {
-    animate(nav, {
-      opacity: [0.72, 1],
-      translateY: [8, 0],
-      duration: 390,
-      ease: "outCubic"
-    });
-  }
 }
