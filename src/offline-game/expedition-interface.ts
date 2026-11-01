@@ -9,7 +9,7 @@ function escapeHtml(value:string):string {
 const regionNames:Record<string,string>={"golden-dragon-empire":"Golden Dragon Empire","tianhai-yunzhou":"Tianhai Yunzhou","beiming-gu":"Beiming Gu"};
 export function renderExpeditionInterface():string {
   const save=getEternalSave(), scene=getExpeditionScene(), atmosphere=getExpeditionAtmosphere(), dialogue=getCurrentDialogue();
-  const sceneWindow=`<section class="expedition-environment" aria-label="Eternal Path scene window" data-region="${scene.region}" data-cycle="${atmosphere.cycle}" data-weather="${atmosphere.weather}" style="--scene-fog-opacity:${atmosphere.fog}">
+  const sceneWindow=`<section class="expedition-environment" aria-label="Eternal Path scene window" data-location="${scene.id}" data-region="${scene.region}" data-cycle="${atmosphere.cycle}" data-weather="${atmosphere.weather}" style="--scene-fog-opacity:${atmosphere.fog}">
     <img class="expedition-scene-image" src="${scene.image}" alt="" />
     <div class="expedition-light-layer" aria-hidden="true"></div><div class="expedition-weather-layer" aria-hidden="true"></div>
     <div class="expedition-fog-layer" aria-hidden="true"><img class="expedition-fog-motion" src="/game/scenery/shared/fx-02-atmospheric-fog.png" alt="" /></div>
