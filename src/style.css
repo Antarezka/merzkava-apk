@@ -856,3 +856,16 @@ button {color:inherit;} button:focus-visible {outline-color:#a68d5e;}
   background: #e2d6c2;
   border-left-color: #98734e;
 }
+
+
+/* Offline, claim-reviewed source reader. */
+.lore-source-open{justify-self:start;margin-top:5px;padding:9px 11px;border:1px solid #755536;background:#30251b;color:#edbd83;font-size:9px;font-weight:700;letter-spacing:.09em;text-align:left}
+.lore-source-reader{padding-bottom:28px}
+.lore-source-reader-lede{margin:0 0 18px;color:#a99b8b;font-size:12px;line-height:1.7}
+.lore-source-metadata{display:grid;gap:7px;margin:18px 0;padding:15px;border:1px solid #57432f;background:#211c17}
+.lore-source-metadata strong{color:#e9ddcf;font:500 20px "Cormorant Garamond",Georgia,serif}
+.lore-source-metadata code{color:#d1ad83;font-size:10px;overflow-wrap:anywhere}
+.lore-source-metadata small{color:#a99b8b;font-size:10px;line-height:1.6;overflow-wrap:anywhere}
+.lore-source-scope-note{margin:14px 0 22px;padding:12px 14px;border-left:2px solid #b98953;background:#282119;color:#c5bbae;font-size:11px;line-height:1.75}
+.lore-source-section-title{margin:22px 0 12px;color:#d19a61;font:600 10px Cinzel,Georgia,serif;letter-spacing:.14em}
+.lore-source-return{margin-top:18px}
