@@ -888,7 +888,7 @@ The first deterministic mechanic module has been added to the APK repository wit
 - Validation: [Web App Validation #584](https://github.com/Antarezka/merzkava-apk/actions/runs/41306800435) passed: 9 test files / 66 tests, TypeScript, gateway type-check, and Vite build.
 - Implemented: fallback calendar and seasons, date/time rollover, action-duration limits, protected night sleep, pure-cultivation eligibility and 30-day cap, verified Satiety accounting, cooldown accumulation excluding cultivation, and Day-left ceiling.
 - Explicit boundary: session era, initial date/weather/weekday anchor, travel durations, and actual action success are inputs/decisions from the session/game world; this utility does not invent them.
-- Current foundation: **8 modules implemented and CI-verified (HP + Satiety + Injury + Time/Day-left + Combat + Spirit Ring compatibility + Spirit Ring progression + Martial Soul Awakening)**. The full game engine remains incomplete; no overall percentage is assigned.
+- Current foundation: **9 modules implemented and CI-verified (HP + Satiety + Injury + Time/Day-left + Combat + Spirit Ring compatibility + Spirit Ring progression + Martial Soul Awakening)**. The full game engine remains incomplete; no overall percentage is assigned.
 - Android Build #322 is still a separate build/emulator run. It targets the Time module commit before the test-fixture-only follow-up; no final APK status is implied here.
 
 
@@ -1003,3 +1003,12 @@ Two intentionally incomplete/redirecting sources are also handled explicitly:
 - These metrics certify path disposition/mapping only. They do not certify every link, alias, relationship, claim, search result, UI state, build, or physical-device behavior.
 
 **Important distinction:** 100% means complete coverage of the approved player-facing source scope, not publication of all 140 files and not 100% completion of the future offline game engine.
+
+
+### Offline-game code milestone — Economy (2026-11-01)
+
+- Source: `core/10_ECONOMY_SYSTEM.md` at Universe pin `2f76a864150528afb0e3d26cb16f9396ce610ff6`; blob `0cc74b40d07ad8b2fe9fd2e4c37cdad1c0269456`.
+- Runtime: `economy-wallet.ts` and `economy-pricing.ts`; tests: 9.
+- Implements exact official currency ratios and normalization, unified price formula, condition/tier/demand/effective-scarcity factors, distribution/local adjustments, and disaster-band validation.
+- Web App Validation #634 passed: 14 test files / 126 tests, TypeScript, gateway type-check, Vite production build.
+- Nine deterministic modules are CI-verified; whole offline game remains incomplete.
