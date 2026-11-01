@@ -84,10 +84,19 @@ if [[ "$ACTIVITY_READY" -ne 1 ]]; then
   exit 1
 fi
 echo "Capturing Kitty splash frames immediately after first app draw..."
-FOCUSED_WINDOW="$(timeout 8s adb shell dumpsys window windows 2>/dev/null | grep -E 'mCurrentFocus|mFocusedApp' | head -n 2 || true)"
-if ! grep -q 'com.antarezka.merzkava' <<< "$FOCUSED_WINDOW"; then
-  echo "Merzkava is not the foreground window; refusing to label a system dialog as a splash screenshot."
+FOCUSED_WINDOW=""
+for attempt in 1 2 3; do
+  FOCUSED_WINDOW="$(timeout 8s adb shell dumpsys window windows 2>/dev/null | grep -E 'mCurrentFocus|mFocusedApp' | head -n 2 || true)"
+  if grep -q 'com.antarezka.merzkava' <<< "$FOCUSED_WINDOW"; then
+    break
+  fi
+  echo "A system window is temporarily covering Merzkava; dismissing transient dialog (attempt $attempt/3)."
   echo "$FOCUSED_WINDOW"
+  adb shell input keyevent 4 >/dev/null 2>&1 || true
+  sleep 3
+done
+if ! grep -q 'com.antarezka.merzkava' <<< "$FOCUSED_WINDOW"; then
+  echo "Merzkava did not regain foreground focus after transient system-dialog dismissal."
   collect_diagnostics
   exit 1
 fi
@@ -95,10 +104,15 @@ adb exec-out screencap -p > "$DIAG_DIR/kitty-splash-early.png"
 sleep 0.45
 FOCUSED_WINDOW="$(timeout 8s adb shell dumpsys window windows 2>/dev/null | grep -E 'mCurrentFocus|mFocusedApp' | head -n 2 || true)"
 if ! grep -q 'com.antarezka.merzkava' <<< "$FOCUSED_WINDOW"; then
-  echo "Merzkava lost foreground focus during splash capture."
-  echo "$FOCUSED_WINDOW"
-  collect_diagnostics
-  exit 1
+  echo "Merzkava lost foreground focus during splash capture; retrying once after dismissing a transient system window."
+  adb shell input keyevent 4 >/dev/null 2>&1 || true
+  sleep 3
+  FOCUSED_WINDOW="$(timeout 8s adb shell dumpsys window windows 2>/dev/null | grep -E 'mCurrentFocus|mFocusedApp' | head -n 2 || true)"
+  if ! grep -q 'com.antarezka.merzkava' <<< "$FOCUSED_WINDOW"; then
+    echo "$FOCUSED_WINDOW"
+    collect_diagnostics
+    exit 1
+  fi
 fi
 adb exec-out screencap -p > "$DIAG_DIR/kitty-splash-mid.png"
 test -s "$DIAG_DIR/kitty-splash-early.png"
