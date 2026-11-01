@@ -917,3 +917,20 @@ button {color:inherit;} button:focus-visible {outline-color:#a68d5e;}
   font-size: 15px;
   line-height: 1.9;
 }
+
+
+/* World Archive entity development states: linked, visible, and distinct from canon approval. */
+.lore-status-tag{display:inline-flex;align-items:center;width:max-content;padding:3px 7px;border:1px solid #987344;border-radius:2px;color:#edc58f;background:#3a2b1d;font:700 8px/1.3 system-ui,sans-serif;letter-spacing:.1em}
+.lore-status-on_plan{border-color:#9a794e;color:#f0c78e;background:#382b1e}
+.lore-status-non_canon{border-color:#9a6571;color:#e7a9b4;background:#382329}
+.lore-placeholder-note{margin:17px 0;padding:13px 14px;border-left:3px solid #c18a56;background:#292219;color:#d5c5b2}
+.lore-placeholder-note strong{display:block;margin-bottom:5px;color:#e6b77c;font-size:9px;letter-spacing:.13em}
+.lore-placeholder-note p{margin:0;color:inherit;font-size:11px;line-height:1.7}
+.lore-inline-status{display:inline-block;margin-left:4px;padding:1px 4px;border:1px solid #9a794e;border-radius:2px;color:#edc58f;font:700 7px/1.3 system-ui,sans-serif;letter-spacing:.05em;vertical-align:1px}
+.lore-inline-link-placeholder{border-bottom-style:dashed}
+.lore-placeholder-card .lore-card-index{display:flex;align-items:center;gap:6px}
+:root[data-theme="light"] .lore-status-on_plan{border-color:#9a713d;color:#704817;background:#f8ecd8}
+:root[data-theme="light"] .lore-status-non_canon{border-color:#a65b69;color:#7a2d3d;background:#f8e8eb}
+:root[data-theme="light"] .lore-placeholder-note{border-left-color:#a56c32;background:#f5ecdf;color:#4c4033}
+:root[data-theme="light"] .lore-placeholder-note strong{color:#80501f}
+:root[data-theme="light"] .lore-inline-status{border-color:#a87942;color:#704817}
