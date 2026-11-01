@@ -35,9 +35,9 @@
 
 ## Offline source reader — Phase 1 implementation
 
-- Each public dossier can open a local reviewed extract without network access.
+- Each public dossier can open a local reviewed extract without network access. The seven Golden Dragon regional dossiers are now added as distinct public entities.
 - The reader is generated only from the dossier's approved public summary and paragraphs; it is **not** a verbatim rendering of the original Universe Markdown.
-- Exact provenance is retained: source path, pinned Universe commit, review date, and source classification.
+- Exact provenance is retained: source path, pinned Universe commit, review date, and source classification, including `PUBLIC_CANDIDATE` for the seven regional modules used only through claim-reviewed extracts.
 - Seven dossier source paths are classified `PARTIAL_PUBLIC`: `world/WORLD.md`, `world/LAWLESS_TERRITORIES.md`, `world/MAP_AND_REGIONS.md`, `world/FACTIONS.md`, `world/RUINED_ARCHIVER.md`, `world/ARTIFACTS_AND_RELICS.md`, and `world/ARTIFICIAL_ARTIFACTS.md`. Their raw source files are not bundled.
 - Even file-level `PUBLISHED` does not authorize copying every claim from a raw NPC profile. The player reader includes only claims selected into the reviewed dossier. This avoids exposing unreviewed whereabouts, locations, or other restricted details.
 - Regression tests cover provenance, public-safe scope notices, and reader navigation. Tests are committed but not yet run; CI and physical-device verification remain open.
@@ -160,23 +160,23 @@
 | `world/REGIONAL_REPOSITORY_ARCHITECTURE.md` | `REPOSITORY_CONTROL` | — |  |
 | `world/REGION_ASHEN_BORDERLANDS.md` | `PUBLISHED` | `ashen-borderlands` |  |
 | `world/REGION_AZUREFLAME_BASIN.md` | `LEGACY_OR_COMPATIBILITY` | — |  |
-| `world/REGION_BAIYUE.md` | `PUBLIC_CANDIDATE` | — |  |
+| `world/REGION_BAIYUE.md` | `PUBLIC_CANDIDATE` | `region-baiyue` | Curated regional facts only; raw file includes unreviewed local NPC/encounter material. |
 | `world/REGION_BEIMING_GU.md` | `PUBLISHED` | `beiming` |  |
 | `world/REGION_BEIMING_HEARTLAND.md` | `PUBLIC_CANDIDATE` | — |  |
 | `world/REGION_BLACK_TIDE_EXPANSE.md` | `PUBLISHED` | `black-tide-expanse` |  |
-| `world/REGION_CANGLAN.md` | `PUBLIC_CANDIDATE` | — |  |
+| `world/REGION_CANGLAN.md` | `PUBLIC_CANDIDATE` | `region-canglan` | Curated regional facts only; raw file includes unreviewed local NPC/encounter material. |
 | `world/REGION_FROSTVEIL_RANGE.md` | `LEGACY_OR_COMPATIBILITY` | — |  |
 | `world/REGION_HOLLOWMOON_VALLEY.md` | `LEGACY_OR_COMPATIBILITY` | — |  |
 | `world/REGION_IRONROOT_REACH.md` | `LEGACY_OR_COMPATIBILITY` | — |  |
-| `world/REGION_JINYUE.md` | `PUBLIC_CANDIDATE` | — |  |
-| `world/REGION_LONGYUAN.md` | `PUBLIC_CANDIDATE` | — |  |
+| `world/REGION_JINYUE.md` | `PUBLIC_CANDIDATE` | `region-jinyue` | Curated regional facts only; raw file includes unreviewed local NPC/encounter material. |
+| `world/REGION_LONGYUAN.md` | `PUBLIC_CANDIDATE` | `region-longyuan` | Curated regional facts only; raw file includes unreviewed local NPC/encounter material. |
 | `world/REGION_NINE_FROST_WASTES.md` | `PUBLISHED` | `nine-frost-wastes` |  |
 | `world/REGION_SILVERPINE_WILDS.md` | `LEGACY_OR_COMPATIBILITY` | — |  |
 | `world/REGION_STONEGATE_MARCH.md` | `LEGACY_OR_COMPATIBILITY` | — |  |
-| `world/REGION_TIANFENG.md` | `PUBLIC_CANDIDATE` | — |  |
+| `world/REGION_TIANFENG.md` | `PUBLIC_CANDIDATE` | `region-tianfeng` | Curated regional facts only; raw file includes unreviewed local NPC/encounter material. |
 | `world/REGION_TIANHAI_YUNZHOU.md` | `PUBLISHED` | `tianhai` |  |
-| `world/REGION_XINGLUO.md` | `PUBLIC_CANDIDATE` | — |  |
-| `world/REGION_YANLING.md` | `PUBLIC_CANDIDATE` | — |  |
+| `world/REGION_XINGLUO.md` | `PUBLIC_CANDIDATE` | `region-xingluo` | Curated regional facts only; raw file includes unreviewed local NPC/encounter material. |
+| `world/REGION_YANLING.md` | `PUBLIC_CANDIDATE` | `region-yanling` | Curated regional facts only; raw file includes unreviewed local NPC/encounter material. |
 | `world/RUINED_ARCHIVER.md` | `PARTIAL_PUBLIC` | `ruined-archiver` |  |
 | `world/SOCIAL_STRATIFICATION.md` | `PUBLIC_CANDIDATE` | — |  |
 | `world/SPIRIT_HUNTERS_GUILD.md` | `PUBLISHED` | `spirit-hunters-guild` |  |
