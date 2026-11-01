@@ -142,3 +142,10 @@ body.eternal-choice-open{overflow:hidden}
 .expedition-profile-meta span{font-size:6px}
 .expedition-profile-meta b{font-size:8px}
 @media(max-width:360px){.expedition-heading>div{gap:6px}.expedition-heading h2{font-size:7px;letter-spacing:.11em}.expedition-profile-meta{grid-template-columns:repeat(4,minmax(0,1fr))}}
+
+/* Subtle responsive motion layers; Anime.js drives the actual movement. */
+.expedition-scene-image,.expedition-light-layer,.expedition-weather-layer,.expedition-fog-motion{will-change:transform,opacity}
+.expedition-weather-layer{background:radial-gradient(ellipse at 18% 8%,#e8d4b233,transparent 48%),linear-gradient(120deg,#c5d7dc0b,transparent 60%)}
+.expedition-disposition-line{position:relative;padding:7px 10px;border-left:1px solid #98764e;background:linear-gradient(90deg,#6b4a2926,transparent 80%)}
+.expedition-disposition-line:after{content:"";position:absolute;right:0;top:50%;width:32px;height:1px;background:linear-gradient(90deg,#a27b4b66,transparent)}
+@media(prefers-reduced-motion:reduce){.expedition-scene-image,.expedition-light-layer,.expedition-weather-layer,.expedition-fog-motion{will-change:auto}}
