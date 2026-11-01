@@ -193,7 +193,7 @@ function normalizeSave(value:unknown):EternalSave|null {
     day:Number.isInteger(parsed.day)&&Number(parsed.day)>0?Number(parsed.day):1,
     hour:Number.isInteger(parsed.hour)&&Number(parsed.hour)>=0&&Number(parsed.hour)<24?Number(parsed.hour):8,
     minute:Number.isInteger(parsed.minute)&&Number(parsed.minute)>=0&&Number(parsed.minute)<60?Number(parsed.minute):0,
-    weather:resolveDailyWeather(ETERNAL_SCENES.find(scene=>scene.id===locationId)?.region??region,Number(parsed.day)||1),
+    weather:resolveDailyWeather(region,Number(parsed.day)||1),
     eventIndex:Number(parsed.eventIndex)||0,energy:Math.max(0,Math.min(100,Number(parsed.energy)||0)),insight:Math.max(0,Number(parsed.insight)||0),bonds:Math.max(0,Number(parsed.bonds)||0),completed:Math.max(0,Number(parsed.completed)||0),
   } as EternalSave;
 }
