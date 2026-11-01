@@ -115,7 +115,7 @@ function readSave(): EternalSave | null {
       ? parsed.locationId : defaultSceneForRegion(parsed.character.region).id;
     const savedRegion=ETERNAL_SCENES.find(scene=>scene.id===parsed.locationId)?.region ?? parsed.character.region;
     parsed.weather=resolveDailyWeather(savedRegion,Math.max(1,parsed.day||1));
-    return parsed;
+    return parsed as EternalSave;
   } catch { return null; }
 }
 function persist(): void { try { if(save) localStorage.setItem(SAVE_KEY,JSON.stringify(save)); } catch { /* The current session remains playable in memory. */ } }
