@@ -595,6 +595,10 @@ const PARTIAL_PUBLIC_SOURCE_PATHS = new Set([
   "world/ARTIFICIAL_ARTIFACTS.md"
 ]);
 
+function formatLoreEntityStatus(status: LoreEntityStatus): string {
+  return status === "NON_CANON" ? "NON-CANON" : "ON PLAN";
+}
+
 function escapeLore(value: string): string {
   return value.replace(/[&<>"']/g, char => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" })[char] ?? char);
 }
@@ -631,7 +635,7 @@ function loreLinks(text: string, currentId: string): string {
     if (!match) { result += escapeLore(text.slice(cursor)); break; }
     result += escapeLore(text.slice(cursor, match.index));
     const attribute = match.placeholder ? "data-lore-placeholder-open" : "data-lore-open";
-    result += '<button class="lore-inline-link' + (match.placeholder ? ' lore-inline-link-placeholder' : '') + '" type="button" ' + attribute + '="' + match.id + '">' + escapeLore(match.label) + (match.placeholder ? ' <span class="lore-inline-status lore-status-' + (match.status ?? "ON_PLAN").toLowerCase() + '">' + escapeLore((match.status ?? "ON_PLAN").replace("_", " ")) + '</span>' : '') + '</button>';
+    result += '<button class="lore-inline-link' + (match.placeholder ? ' lore-inline-link-placeholder' : '') + '" type="button" ' + attribute + '="' + match.id + '">' + escapeLore(match.label) + (match.placeholder ? ' <span class="lore-inline-status lore-status-' + (match.status ?? "ON_PLAN").toLowerCase() + '">' + escapeLore(formatLoreEntityStatus(match.status ?? "ON_PLAN")) + '</span>' : '') + '</button>';
     cursor = match.index + match.label.length;
   }
   return result;
@@ -688,7 +692,7 @@ export function renderLoreResults(): string {
     '</button>'
   ).join("") + placeholders.map(item =>
     '<button class="lore-entry-card lore-placeholder-card" type="button" data-lore-placeholder-open="' + item.id + '">' +
-      '<span class="lore-card-index">' + escapeLore(item.category) + ' / <b class="lore-status-tag lore-status-' + item.status.toLowerCase() + '">' + escapeLore(item.status.replace("_", " ")) + '</b></span>' +
+      '<span class="lore-card-index">' + escapeLore(item.category) + ' / <b class="lore-status-tag lore-status-' + item.status.toLowerCase() + '">' + escapeLore(formatLoreEntityStatus(item.status)) + '</b></span>' +
       '<span class="lore-card-title">' + escapeLore(item.title) + '</span>' +
       '<span class="lore-card-summary">' + escapeLore(item.summary) + '</span>' +
       '<span class="lore-card-foot">DEVELOPMENT NOTE<b>↗</b></span>' +
@@ -700,7 +704,7 @@ function renderLorePlaceholder(item: LorePlaceholder): string {
   const related = item.relatedIds
     .map(id => getPublicLoreEntries().find(entry => entry.id === id))
     .filter((entry): entry is LoreEntry => Boolean(entry));
-  const statusLabel = item.status.replace("_", " ");
+  const statusLabel = formatLoreEntityStatus(item.status);
   const statusNote = item.status === "ON_PLAN"
     ? "The entity is intentionally under-specified. Known references remain valid, while additional details are left open for narrative development by the GM. This is not missing data and does not authorize the app to invent canon."
     : "This material is explicitly non-canonical. It may be used as a narrative or illustrative reference, but it does not establish or modify official Merzkava Universe canon.";
