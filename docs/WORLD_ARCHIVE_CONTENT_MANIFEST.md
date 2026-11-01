@@ -517,3 +517,65 @@ The existing local catalogue is not safe to expose as a complete player-facing i
 - Potential public article candidates: high-level Lawless social overview (carefully filtered), Ruined Archiver institutional overview, Wanluo/Ordo public institutional overview, and Spirit Hunters Guild overview. None is yet approved for publication.
 - Gameplay mechanics, secret maps, confidential records, hidden identities, and operational underworld details remain excluded.
 - Full 140-file line-by-line approval and player-facing publication approval: **not complete / not granted**.
+
+
+## World foundations, institutions, and cross-reference audit — sixth pass
+
+**Source snapshot:** Universe `2f76a864150528afb0e3d26cb16f9396ce610ff6`. Reviewed the listed world foundation, society, economy, artifact, event, regional, institutional, and route sources at section/source level. Long documents were not all read line-by-line; this pass records publication risks and source conflicts rather than granting blanket approval.
+
+### Additional regional findings
+
+- `world/REGION_STONEGATE_MARCH.md` is a compatibility pointer to `world/REGION_BEIMING_GU.md`, not an independent region. Do not create a duplicate article.
+- `world/REGION_TIANHAI_YUNZHOU.md` is a substantial consolidated regional source. It includes public districts, services, routes, and infrastructure alongside restricted strategic details and a GM-only Nerva note. Public extraction must be claim-level and cross-checked with NPC registry/profile access rules.
+- `world/TIANHAI_ACADEMIES_AND_ARCANIST_INSTITUTE.md` supports public institutional articles for the four academies and Tianhai Arcanist Institute, but contains a direct GM-only Beiming Nerva cover note at Beichen Cultivator Academy. Exclude that note and all cover-identity links from player search, highlighting, and graph metadata.
+- `world/LAWLESS_SOUTHERN_PORT_AND_ISLES.md` establishes Southwake Port and Lanternhook Isles, including Red Lantern Cay, Bitterglass Isle, and Dicewake Isle. Public overview may describe their location and broad character, but the medical/poison trade, gambling, illicit commerce, and high-risk expeditions require neutral, non-operational framing. No fees, exact coordinates, schedules, guaranteed safe passage, or permanent NPCs are established.
+- `world/REGION_STONEGATE_MARCH.md`, like the previously identified Frostveil Range, Hollowmoon Valley, Ironroot Reach, and Silverpine Wilds, is a compatibility redirect. All five redirect to the consolidated Beiming Gu source.
+
+### Social stratification and wealth distribution
+
+- `world/SOCIAL_STRATIFICATION.md` is a public-worldbuilding candidate. It explicitly distinguishes social standing, personal wealth, living conditions, and power/access; slum residence and homelessness must not be treated as moral categories or fixed occupations.
+- Its currency examples and class expectations defer to `core/10_ECONOMY_SYSTEM.md`. Do not copy exchange rates or price formulas into Archive as a second mechanics authority.
+- `world/WEALTH_DISTRIBUTION.md` records two views of the same global wealth total: territorial allocation and holder-group allocation. Never add the tables together. Market channels are not additional ownership shares. The model's total is not liquid cash and is not automatically known to ordinary characters.
+- Wealth totals and allocations are worldbuilding estimates/accounting baselines, not personal balances or exact treasuries. Do not expose them as ordinary in-world public knowledge without a source establishing that a character or institution knows them.
+- The tables' values and exact arithmetic should receive a separate numeric validation before any Archive infographic is generated. This audit did not certify the calculations.
+
+### World foundations and map navigation
+
+- `world/WORLD.md` is the primary lore overview but contains legacy/older sections and cross-references to other modules. It must not be copied wholesale. Current detailed sources and canon precedence must be checked for each claim.
+- `world/WORLD_NAVIGATION_TREE.md`, `world/THREE_POWER_PERSPECTIVE_MAPS.md`, `world/GEOGRAPHY_AND_TRAVEL.md`, and `world/LOCATION_AND_ROUTE_NETWORK.md` are navigation/route references, not a player-facing guarantee that every route is surveyed, safe, or publicly known.
+- Perspective maps are relative schematics, not scale maps. Route graph edges, local route segments, transport, schedules, access, and travel time are distinct. Unknown segments must remain unknown.
+- The navigation tree includes a hidden Inner Azerion branch and the labyrinth/Dead Zone. Those nodes may be used for GM navigation only; do not expose them in player map tiles, public route search, or suggested destinations.
+- `world/REGIONAL_REPOSITORY_ARCHITECTURE.md` remains repository architecture, not in-world lore. `world/CANON_LOAD_ROUTER.md`, `world/CANON_DECISIONS_AND_PRECEDENCE.md`, and `world/NPC_MANAGEMENT.md` are GM/authority references, not public articles.
+
+### Golden Dragon Empire governance — major source conflict requiring resolution
+
+- `world/GOLDEN_DRAGON_EMPIRE_GOVERNANCE.md` and `world/GOLDEN_DRAGON_EMPIRE_ADMINISTRATIVE_ATLAS.md` establish the current simplified structure: **7 regions, 12 prefectures, 6 county circuits, and 13 officially registered villages**. The governance source explicitly says former counts of 33 prefectures, 268 counties, 361 cities, 1,838 towns, and 22 villages are superseded.
+- `world/GOLDEN_DRAGON_EMPIRE_OFFICIALS.md` is a 112,016-character roster. Its opening scope describes seven central heads, seven regional governors, twelve active prefectural offices, and twenty-one retained regional/circuit officers. However, its later relationship/administrative-names section still states that the atlas governs **33 prefectures and 268 county jurisdictions**. This directly conflicts with the newer simplified atlas/governance structure.
+- The roster also retains many former prefect and county magistrate names, and its legacy role mapping requires reconciliation. Do not use the roster to generate 336 individual Archive profiles or imply all legacy officeholders currently hold active jurisdiction.
+- **Disposition:** `REVIEW_REQUIRED`. No official's current title, parent jurisdiction, or officeholder page should be published until the roster is reconciled against the current atlas and governance file. A public central-government overview may use the governance module's current portfolio structure, but should not infer individual biographies or active deployments.
+- The separate Imperial Special Financial Audit Committee dossier may support a high-level public institution entry. Its head is established as honest; deputy/lower personnel are unknown. Luca's family case remains unresolved and must not be turned into a confirmed conspiracy or accusation against the committee.
+
+### Institutions and restricted groups
+
+- `world/GOLDEN_DRAGON_EMPIRE_POPULATION_SERVICES.md` is a branch/service register with named public-facing service locations. It explicitly states that presence does not guarantee staffing, hours, inventory, specialist capability, free treatment, or equal service. A listed branch/contact point is not proof of a permanent full-service branch in every settlement. Review each institution and location separately before publication.
+- `world/ANCIENT_SHAMANISM_AND_BUDDHIST_CLANS.md` confirms two separate secluded groups. Their mountain locations and access routes are unknown; Ancient Shamanism has fewer than nine members and a strict recruitment/identity boundary. The Buddhist clan's name, exact population, leader identity, and detailed hierarchy remain unknown. Do not merge either group with Ordo Suci Tianming or expose them as routine map destinations.
+- `world/INTELLIGENT_PEOPLES.md` is a public foundational candidate, but explicitly an open list. Appearance does not establish abilities, lifespan, weaknesses, culture, morality, or cultivation compatibility. Its regional tolerance ranking is a broad social tendency, not universal law.
+- `world/FACTIONS.md` is a cross-faction index containing both public and sensitive references. Do not import it wholesale into public search. Every organization and relationship requires its own public/restricted claim review; reputation labels do not establish secret membership or Spirit Realm doctrine.
+- `world/PRISON_AND_BOUND_ITEMS.md` includes coercive restraints, detention contexts, and item-specific risks. It is not approved for general public catalogue ingestion. Any public description must avoid actionable escape/suppression instructions and must not invent effects, tiers, or universal penalties.
+- `world/DYNAMIC_EVENTS.md` distinguishes recurring canonical observances from one-off incidents, proposals, and resolved history. The Festival Tiga Kekuasaan is recurring every six in-world months, but first occurrence, next host, rotation order, exact date, venue, and duration remain unestablished. The current one-off active and resolved event registries are empty. Event proposals are not canon until approved and committed. Character knowledge is governed by explicit knowledge distribution; event occurrence does not automatically update character state.
+
+### Artifact and Arcanistry boundaries
+
+- `world/ARTIFACTS_AND_RELICS.md` is a provenance/catalogue source. It distinguishes Relic, Ancient Artifact, and Artificial Artifact by origin. It confirms the floating-island Tier 9 Artificial Artifact's support function, but its maker, materials, energy source, mechanism, maintenance, and weaknesses remain unknown/restricted.
+- Zun Jade and Ancient Zun are currency, not default crafting materials, cultivation tools, or artifacts. The Archive must not classify them as collectible relics.
+- The artifact catalogue is intentionally sparse. It explicitly says no other individual Relic or Ancient Artifact is fully specified in the current established canon; do not invent a gallery of named relics.
+- `world/ARTIFICIAL_ARTIFACTS.md` may support descriptive item entries only after item-level review. Production, formulation, tier assessment, and appraisal authority remain in core mechanics modules.
+- `world/TIANHAI_ACADEMIES_AND_ARCANIST_INSTITUTE.md` is an institutional source; Arcanist progression, production, certification, and grade mechanics remain governed by core modules.
+
+### Updated progress and publication gate
+
+- Reviewed at source/section level in this pass: Stonegate March, Tianhai Yunzhou, Tianhai academies/institute, Southern Port and Isles, Social Stratification, Wealth Distribution, World overview, Navigation Tree, Dynamic Events, Ancient Shamanism/Buddhist Clans, Imperial Special Financial Audit Committee, Intelligent Peoples, Prison and Bound Items, Factions, Golden Dragon Governance, Population Services, Officials roster, Artifacts and Relics, Artificial Artifacts, Geography and Travel, and Location and Route Network.
+- Several large sources were sampled by ranges or opening/tail sections; do not represent this as a complete line-by-line review of each file.
+- Critical unresolved conflict: the Golden Dragon officials roster still references the superseded 33-prefecture/268-county model.
+- The remaining 140-file line-by-line review, exact arithmetic validation, complete officeholder deduplication, and final public-claim approval are not complete.
+- Player-facing Archive publication approval: **not granted**.
