@@ -15,7 +15,7 @@ export function mountExpeditionAnimations(root: HTMLElement): () => void {
     if (!self || self.matches.reduceMotion) return;
 
     const entranceTargets = root.querySelectorAll<HTMLElement>(
-      ".expedition-heading, .expedition-character-panel, .expedition-status-grid, .expedition-feature, .expedition-footer",
+      ".expedition-heading, .expedition-window-label, .expedition-character-panel, .expedition-status-grid, .expedition-feature, .expedition-footer",
     );
 
     if (entranceTargets.length) {
