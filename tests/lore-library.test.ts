@@ -4,6 +4,9 @@ import {
   closeLoreEntry,
   getPublicLoreEntries,
   getLoreBacklinks,
+  getLoreSourceDisposition,
+  openLoreSource,
+  closeLoreSource,
   openLoreEntry,
   renderLoreLibrary,
   renderLoreResults,
@@ -92,6 +95,31 @@ describe("World Archive visibility and entity routing", () => {
     expect(openLoreEntry("tianhai")).toBe(true);
     expect(renderLoreLibrary()).toContain('class="lore-related lore-backlinks"');
     expect(renderLoreLibrary()).toContain('data-lore-open="world-atlas"');
+  });
+
+  it("opens a local reviewed source extract with exact provenance and safe scope", () => {
+    expect(getLoreSourceDisposition("world-atlas")).toBe("PARTIAL_PUBLIC");
+    expect(getLoreSourceDisposition("tianhai")).toBe("PUBLISHED");
+    expect(getLoreSourceDisposition("not-a-public-dossier")).toBeUndefined();
+
+    expect(openLoreSource("tianhai")).toBe(true);
+    let html = renderLoreLibrary();
+    expect(html).toContain("OFFLINE SOURCE READER");
+    expect(html).toContain("REVIEWED EXTRACT");
+    expect(html).toContain("world/REGION_TIANHAI_YUNZHOU.md");
+    expect(html).toContain("2f76a864150528afb0e3d26cb16f9396ce610ff6");
+    expect(html).toContain("PUBLICLY REVIEWED CONTENT");
+    expect(html).toContain("raw Markdown file");
+    closeLoreSource();
+
+    expect(openLoreEntry("world-atlas")).toBe(true);
+    expect(openLoreSource("world-atlas")).toBe(true);
+    html = renderLoreLibrary();
+    expect(html).toContain("PARTIAL_PUBLIC");
+    expect(html).toContain("mixed publication scope");
+    expect(html).not.toContain("Beiming Nerva");
+    closeLoreSource();
+    expect(renderLoreLibrary()).toContain("LOCAL DOSSIER");
   });
 
   it("retains source provenance and valid cross-reference IDs on every dossier", () => {
