@@ -1,6 +1,6 @@
 import "./expedition-interface.css";
 import {
-  ETERNAL_SCENES, getCurrentDialogue, getEternalSave, getExpeditionAtmosphere, getExpeditionScene,
+  ETERNAL_SCENES, getCurrentDialogue, getEternalSave, getExpeditionAtmosphere, getExpeditionScene, getRegionalDialogueCount,
   ETERNAL_DIALOGUES, type EternalCycle, type EternalWeather,
 } from "./expedition-game";
 
@@ -45,7 +45,7 @@ export function renderExpeditionInterface():string {
       <form id="eternal-start-form" class="expedition-start-form"><label for="eternal-name">Character name</label><input id="eternal-name" name="name" minlength="2" maxlength="32" required placeholder="Your adventurer's name" />
       <div class="expedition-test-row"><div><label for="eternal-age">Age</label><input id="eternal-age" name="age" type="number" min="1" max="120" value="14" required /></div><div><label for="eternal-region">Starting power</label><select id="eternal-region" name="region"><option value="golden-dragon-empire">Golden Dragon Empire</option><option value="tianhai-yunzhou">Tianhai Yunzhou</option><option value="beiming-gu">Beiming Gu</option></select></div></div>
       <button type="submit" class="action-button">Begin Eternal Path <span>↗</span></button></form></section>`;
-  const story=save&&dialogue?`<section class="expedition-dialogue" aria-live="polite"><div class="section-heading"><span>CHRONICLE · ${String(save.completed+1).padStart(3,"0")} / ${ETERNAL_DIALOGUES.length}</span><small>${escapeHtml(dialogue.chapter)}</small></div>
+  const story=save&&dialogue?`<section class="expedition-dialogue" aria-live="polite"><div class="section-heading"><span>CHRONICLE · ${String((save.eventIndex % getRegionalDialogueCount())+1).padStart(3,"0")} / ${getRegionalDialogueCount()}</span><small>${escapeHtml(dialogue.chapter)}</small></div>
     <article class="expedition-dialogue-card"><span class="expedition-speaker">${escapeHtml(dialogue.speaker)}</span><h3>${escapeHtml(dialogue.title)}</h3><p>${escapeHtml(dialogue.text)}</p><div class="expedition-provenance">IN-GAME ORIGINAL · Eternal Path story content</div>
       <div class="expedition-choice-list">${dialogue.choices.map((choice,index)=>`<button type="button" class="expedition-choice" data-eternal-choice="${index}"><span>0${index+1}</span><strong>${escapeHtml(choice.label)}</strong><small>${escapeHtml(choice.response)}</small></button>`).join("")}</div></article></section>`:`<section class="expedition-dialogue expedition-dialogue-locked"><div class="section-heading"><span>THE CHRONICLE</span><small>240 INTERACTIVE NODES</small></div><p>Create a separate Eternal Path character to begin the opening sequence.</p></section>`;
   return `<section class="expedition-page" aria-label="Merzkava Eternal Path"><header class="expedition-heading"><div><p class="eyebrow">STANDALONE · LOCAL LIFE SIMULATION RPG</p><h2>Merzkava:<br><em>Eternal Path</em></h2><p class="muted">A life shaped by the choices you make.</p></div><span class="expedition-mode-mark" aria-label="Offline mode">EP</span></header>
