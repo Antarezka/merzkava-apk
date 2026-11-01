@@ -33,7 +33,7 @@ These percentages measure **source-path coverage**, not claim-by-claim completen
 | Potential player-facing source scope | 35 mapped / 72 eligible-or-review-needed paths | **48.6%** | The 72 comprise 21 `PUBLISHED`, 9 `PARTIAL_PUBLIC`, 14 `PUBLIC_CANDIDATE`, and 28 `REVIEW_REQUIRED` source files. |
 | Already dispositioned public-scope paths | 35 mapped / 44 `PUBLISHED` + `PARTIAL_PUBLIC` + `PUBLIC_CANDIDATE` paths | **79.5%** | Coverage among sources already classified into a public-facing disposition; it does not mean every claim is approved. |
 | Canonical mechanics source preservation | 16 / 16 `MECHANICS_REFERENCE` modules copied verbatim | **100% preserved** | Exact development snapshot exists separately in `docs/OFFLINE_GAME_CANON_FORMULA_SNAPSHOT.md`. One supplemental formula-bearing governance source is also preserved. |
-| Initial deterministic mechanic implementation | 3 foundational modules: HP, Satiety, and Injury | **3 modules implemented; CI verified** | HP state consistency, Satiety interval/intake, and Injury recovery are implemented. Overall engine percentage is not baselined; remaining formula domains and dependencies still require an inventory. |
+| Initial deterministic mechanic implementation | 4 foundational modules: HP, Satiety, Injury, and Time/Day-left | **4 modules implemented; CI verified** | HP state consistency, Satiety interval/intake, Injury recovery, and Time/Day-left rules are implemented. Overall engine percentage is not baselined; remaining formula domains and dependencies still require an inventory. |
 
 **Current Archive inventory:** 39 curated dossiers / 35 unique source paths. The 16 mechanics-reference files are intentionally not published as ordinary Archive lore. Claim-level content completeness remains **not yet measured**; do not turn the path ratios above into a claim that the Archive is 25%, 48.6%, or 79.5% complete in every dimension.
 
@@ -278,7 +278,7 @@ The existing catalogue derives each dossier's outbound `crossReferenceIds` from 
 - Validation: Web App Validation #572 passed on commit `deb8d403dfa93a5996668480b4e68d9de2e6c4b7`: 7 test files / 52 tests, TypeScript, gateway type-check, and Vite build all passed.
 - **Canon discrepancy requiring upstream resolution:** the Spirit Primordial example for 24 hours of Light activity says ≈0.014 Satiety; the stated 365-day base and formula yield ≈0.342466. Code follows the explicit table/formula and surfaces a warning; no Universe source was changed.
 - Calendar-window transitions, meal-opportunity tracking, protected-sleep transitions, and cross-system consequences are not yet implemented by this module.
-- Current deterministic foundation: **3 modules implemented and CI-verified (HP + Satiety + Injury)**. This is not a whole-engine percentage or playable offline mode. No APK status is implied by Web App Validation.
+- Current deterministic foundation: **4 modules implemented and CI-verified (HP + Satiety + Injury + Time/Day-left)**. This is not a whole-engine percentage or playable offline mode. No APK status is implied by Web App Validation.
 
 
 ## Offline-game implementation checkpoint — Injury recovery (2026-11-01)
@@ -289,3 +289,13 @@ The existing catalogue derives each dossier's outbound `crossReferenceIds` from 
 - Validation: Web App Validation #577 passed on commit `07bc36b05572b2f27abb41792ce4d243017ee1a2`: 8 test files / 57 tests, TypeScript, gateway type-check, and Vite build passed.
 - Deterministic foundation is now **3 modules: HP, Satiety, Injury**. This is not a whole-engine percentage. Remaining domains and dependencies are not yet fully inventoried.
 - Android Build #320 targets earlier commit `6310974` (HP + Satiety only); it is not evidence of an APK built from the latest Injury-inclusive source.
+
+
+## Offline-game implementation checkpoint — Time and cooldown (2026-11-01)
+
+- Canon source: `gameplay/TIME_AND_ACTION_RULES.md` at Universe pin `2f76a864150528afb0e3d26cb16f9396ce610ff6` (blob `f4ad8b2e1afc0bc9ef25f8f9d97eb541ab7ea29f`).
+- Runtime module: `src/offline-game/mechanics/time.ts`; regression tests: `tests/offline-game-time.test.ts` (9 tests).
+- Implements 12×30 fallback calendar rollover, season lookup, 3-hour ordinary action cap, protected night-sleep exception, verified 30-day pure-cultivation gate including Satiety accounting, and cooldown accumulation excluding cultivation.
+- Validation: Web App Validation #584 passed on commit `409d420feac225d7427e627769e77eb12a4ff1b6`: 9 test files / 66 tests, TypeScript, gateway type-check, and Vite build passed.
+- Deterministic foundation is now **4 modules: HP, Satiety, Injury, Time/Day-left**. Not a whole-engine percentage; remaining formula domains/dependencies are not fully inventoried.
+- Android Build #322 targets code commit `3e7d97a`; the test-fixture correction in `409d420` followed it. APK/emulator workflow status must be checked separately.
