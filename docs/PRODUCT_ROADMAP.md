@@ -681,3 +681,20 @@ Before implementing a new feature or changing an existing one:
 - Web App Validation #653 passed: 15 test files / 133 tests, TypeScript, gateway type-check, and Vite production build.
 - Foundation now has 10 deterministic modules CI-verified. Full offline game remains incomplete; RNG orchestration, event/state engine, persistence, high-grade artifact gates, content traceability, and remaining formula domains remain open.
 - Android Build #340 compiled and verified APK package/version/alignment/signature and uploaded an artifact; Android 14 emulator step was cancelled, so installation/smoke-test success is not claimed.
+
+
+---
+
+## 13. Approved Eternal Path expansion — implementation directive (2026-11-02)
+
+The complete user-approved design and phase backlog now live in [ETERNAL_PATH_BLUEPRINT.md](./offline-game/ETERNAL_PATH_BLUEPRINT.md). This is part of the single master roadmap, not a competing roadmap. The earlier 5B design-only restriction is superseded: implementation is authorized to begin immediately in dependency-safe vertical slices while the blueprint remains the acceptance reference.
+
+**Scope:** open-ended ordinary life; optional Spirit Realm, Spirit Ring and Arcanistry paths; hybrid progression; collections and appraisal; property and territory (ownership/lease/claim/administration/influence/occupation kept distinct); player-created clans, sects, circles, parties, guilds and trade organizations; family/children/legacy; save-local naming dialogs; isolated save slots and export/import; hidden multi-axis disposition; NPC relationships/Social Links; composable sensory narrative and hidden deterministic consequences; canon provenance and read-only World Archive.
+
+**UI commitment:** compact one-line title; scene moved upward without reducing its image area; compact profile; derived disposition above the dominant narrative panel; modal choices that lock other game controls; remove obsolete Home feature cards; centered ornamental toolbar with Android safe margins and stable positioning across routes. Scene fog remains inside the existing glass window.
+
+**Phase order:** EP-0 audit/UI foundation → EP-1 save/data foundation → EP-2 deterministic simulation kernel → EP-3 narrative/social simulation → EP-4 life/ambition/ownership → EP-5 world content/progression breadth → EP-6 performance/accessibility/release. Each phase requires tests and evidence; mockups and schema-only placeholders are not completion.
+
+**Non-negotiable boundaries:** player-created names/entities and all journey outcomes are NON-CANON and save-local; World Archive and official Universe data are read-only. Preserve canonical character-profile fields and do not add Disposition to the Universe template. Choices never reveal predicted consequences or internal alignment values. Ordinary life must be a complete viable path, not a waiting room for cultivation.
+
+**Optimization:** indexed event selection; bounded active-NPC simulation; one world clock; deterministic off-screen advancement; transactional deltas plus snapshots; lazy-loaded deep screens; UI/view-model separation; no per-frame world simulation. Do not claim optimized until target-device profiling exists.
