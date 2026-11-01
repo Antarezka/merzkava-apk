@@ -806,3 +806,53 @@ button {color:inherit;} button:focus-visible {outline-color:#a68d5e;}
 .lore-detail .lore-source-card small {
   color: #d3c5b4;
 }
+
+/* World Archive — light theme: warm dark-brown reading ink with a restrained matching stroke.
+   Dark theme keeps the existing ivory typography above, unchanged. */
+:root[data-theme="light"] .lore-card-title,
+:root[data-theme="light"] .lore-detail .lore-paragraph,
+:root[data-theme="light"] .lore-detail .lore-lede,
+:root[data-theme="light"] .lore-source-card strong,
+:root[data-theme="light"] .lore-entry-card h3,
+:root[data-theme="light"] .lore-empty h3 {
+  color: #493326;
+  -webkit-text-stroke: .16px #493326;
+  text-shadow: 0 .25px 0 #49332618;
+}
+:root[data-theme="light"] .lore-card-summary,
+:root[data-theme="light"] .lore-detail .lore-detail-top,
+:root[data-theme="light"] .lore-detail .lore-source-card code,
+:root[data-theme="light"] .lore-detail .lore-source-card small,
+:root[data-theme="light"] .lore-related > button,
+:root[data-theme="light"] .lore-empty p {
+  color: #624a38;
+  -webkit-text-stroke: .1px #624a38;
+}
+:root[data-theme="light"] .lore-footnote,
+:root[data-theme="light"] .lore-card-foot,
+:root[data-theme="light"] .lore-detail-top span + span {
+  color: #755d49;
+  -webkit-text-stroke: .08px #755d49;
+}
+:root[data-theme="light"] .lore-category {
+  color: #60452f;
+  -webkit-text-stroke: .12px #60452f;
+}
+:root[data-theme="light"] .lore-category.is-active {
+  color: #493326;
+  -webkit-text-stroke: .16px #493326;
+}
+:root[data-theme="light"] .lore-paragraph-mark,
+:root[data-theme="light"] .lore-card-index {
+  color: #8a603b;
+  -webkit-text-stroke: .12px #8a603b;
+}
+:root[data-theme="light"] .lore-inline-link {
+  color: #80502d;
+  -webkit-text-stroke: .12px #80502d;
+  border-bottom-color: #9b7049;
+}
+:root[data-theme="light"] .lore-lede {
+  background: #e2d6c2;
+  border-left-color: #98734e;
+}
