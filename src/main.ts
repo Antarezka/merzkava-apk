@@ -20,6 +20,7 @@ import { getLedgerLog, initializeLedgerNotifications, showLedgerProposalBubble }
 import { startFloatingMode, requestFloatingOverlayPermission, getFloatingReadiness, requestFloatingNotifications, requestFloatingBatteryExemption, showFloatingBubble, stopFloatingService, type FloatingReadiness } from "./native/floating-window";
 import { floatingControlMarkup } from "./app/floating-control";
 import { animateOpeningSplash } from "./ui/splash-animation";
+import { animateAppScreen } from "./ui/app-shell-motion";
 import { closeLoreEntry, closeLoreSource, closeLorePlaceholder, openLoreEntry, openLoreSource, openLorePlaceholder, setLoreCategory, setLoreSearch, renderLoreResults } from "./world-archive/lore-library";
 
 const app = document.querySelector<HTMLDivElement>("#app");
@@ -32,7 +33,7 @@ const SOUND_STORAGE_KEY = "merzkava-sound-enabled";
 function readPreference(key: string, fallback: string): string {
   try { return localStorage.getItem(key) ?? fallback; } catch { return fallback; }
 }
-let themeMode: ThemeMode = readPreference(THEME_STORAGE_KEY, "light") === "dark" ? "dark" : "light";
+let themeMode: ThemeMode = readPreference(THEME_STORAGE_KEY, "dark") === "dark" ? "dark" : "light";
 let soundEnabled = readPreference(SOUND_STORAGE_KEY, "true") !== "false";
 function applyAppPreferences(): void {
   document.documentElement.dataset.theme = themeMode;
@@ -46,6 +47,7 @@ function saveAppPreferences(): void {
 }
 applyAppPreferences();
 let menuRevealPending = false;
+let lastAnimatedScreen: AppScreen | null = null;
 initializeLedgerNotifications();
 
 function showOpeningSplash(): HTMLDivElement {
@@ -103,9 +105,9 @@ async function playEntrySplash(): Promise<void> {
 }
 
 const navigation: { id: ScreenId; label: string; icon: string }[] = [
-  { id: "home", label: "Home", icon: "⌂" }, { id: "gameplay", label: "Play", icon: "✧" },
+  { id: "home", label: "Home", icon: "⌂" }, { id: "gameplay", label: "Convo", icon: "✧" },
   { id: "character", label: "Character", icon: "◉" }, { id: "inventory", label: "Inventory", icon: "▤" },
-  { id: "map", label: "Lore", icon: "⌘" }, { id: "journal", label: "Journal", icon: "☷" },
+  { id: "map", label: "Archive", icon: "⌘" }, { id: "journal", label: "Journal", icon: "☷" },
   { id: "settings", label: "Settings", icon: "⚙" }
 ];
 
@@ -451,6 +453,7 @@ function render(): void {
     lastPlayWarningNotice = "";
   }
   const isControl = activeScreen === "control";
+  const shouldAnimateScreen = !isControl && (lastAnimatedScreen !== activeScreen || menuRevealPending);
   const selectedCharacter = availableCharacters().find(item => item.id === activeCharacterId);
   const sourceProfile = selectedCharacter?.profileMarkdown ? parseCharacterProfile(selectedCharacter.profileMarkdown) : null;
   const currentProfile = latestGameplayProfile() ?? (sourceProfile?.valid
@@ -461,16 +464,18 @@ function render(): void {
     ? floatingControlMarkup(floatingReadiness)
     : renderScreen(activeScreen as ScreenId, availableCharacters(), playerRegistryMessage, activeCharacterId ? getLedgerLog(activeCharacterId) : [], inventorySnapshot);
   root.innerHTML = `<div class="app-shell ${isControl ? "control-shell" : ""} ${menuRevealPending ? "is-entering" : ""}">
-    ${isControl ? "" : '<header class="app-header"><button class="brand" data-screen="home" aria-label="Merzkava home"><span class="brand-mark">M</span><span><small>MERZKAVA UNIVERSE</small><strong>Merzkava</strong></span></button><button class="header-settings" data-floating-action="start-bubble" aria-label="Start Bubble Mode" title="Start Bubble Mode">◉</button><button class="header-settings" data-screen="settings" aria-label="Settings">⚙</button></header>'}
+    ${isControl ? "" : `<header class="app-header"><button class="brand" data-screen="home" aria-label="Merzkava home"><span class="brand-mark">M</span><span class="brand-wordmark"><small>MERZKAVA UNIVERSE</small><strong>Merzkava</strong></span></button><div class="header-context"><small>TACTICAL ACADEMY</small><strong>${navigation.find(item => item.id === activeScreen)?.label ?? "Command Hall"}</strong></div><div class="header-tools"><button class="header-settings" data-floating-action="start-bubble" aria-label="Start Bubble Mode" title="Start Bubble Mode">◉</button><button class="header-settings" data-screen="settings" aria-label="Settings">⚙</button></div></header>`}
     ${notice ? `<p class="notice" role="status">${escapeHtml(notice)}</p>` : ""}
     ${isControl ? content : `<main class="main-content">${content}${activeScreen === "settings" ? authPanel() + canonPanel() : ""}</main>`}
-    ${isControl ? "" : `<nav class="bottom-nav" aria-label="Main navigation">${navigation.map(item => `<button class="nav-item ${activeScreen === item.id ? "active" : ""}" data-screen="${item.id}" ${activeScreen === item.id ? 'aria-current="page"' : ""}><span>${item.icon}</span><small>${item.label}</small></button>`).join("")}</nav>`}
+    ${isControl ? "" : `<nav class="bottom-nav" aria-label="Academy navigation">${navigation.map((item, index) => `<button class="nav-item ${activeScreen === item.id ? "active" : ""}" data-screen="${item.id}" ${activeScreen === item.id ? 'aria-current="page"' : ""}><span class="nav-index">${String(index + 1).padStart(2, "0")}</span><span class="nav-icon">${item.icon}</span><small>${item.label}</small></button>`).join("")}</nav>`}
     ${isControl ? "" : `<div class="storage-status"><span class="status-dot"></span>${databaseMessage}</div>`}
     ${activeScreen === "gameplay" ? snapshotBlindMarkup() : ""}
     ${activeScreen === "home" && noticeboardVisible ? noticeboardMarkup() : ""}
     ${bugPanelMarkup()}
   </div>`;
   menuRevealPending = false;
+  if (shouldAnimateScreen) animateAppScreen(root.querySelector<HTMLElement>(".app-shell"));
+  if (!isControl) lastAnimatedScreen = activeScreen;
   updateSessionCalendar();
   renderChat();
   root.querySelectorAll<HTMLButtonElement>("[data-theme-mode]").forEach(button => {
