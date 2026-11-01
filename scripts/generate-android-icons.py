@@ -60,19 +60,25 @@ for density, pixels in {
     icon.save(folder / "ic_launcher.png", optimize=True)
     icon.save(folder / "ic_launcher_round.png", optimize=True)
 
-# Capacitor's starter project includes an anydpi-v24 vector named
-# ic_launcher_foreground.xml. Android resource precedence selects that vector
-# over this PNG, silently showing the default Android robot instead of Kitty.
-legacy_android_vector = RES / "drawable-anydpi-v24" / "ic_launcher_foreground.xml"
-if legacy_android_vector.exists():
-    legacy_android_vector.unlink()
+# Capacitor's Android template can ship a vector foreground in a version-
+# qualified drawable folder. Android gives that vector precedence over the
+# generated PNG, which can leave the default black-and-white Android robot
+# visible even though our Kitty PNGs were generated correctly. Remove every
+# stale vector with this resource name, regardless of its qualifier directory.
+for legacy_vector in RES.rglob("ic_launcher_foreground.xml"):
+    legacy_vector.unlink()
 
 drawable = RES / "drawable-nodpi"
 drawable.mkdir(parents=True, exist_ok=True)
-fit_centered(art, 432, 0.64).save(drawable / "ic_launcher_foreground.png", optimize=True)
+foreground = drawable / "ic_launcher_foreground.png"
+fit_centered(art, 432, 0.64).save(foreground, optimize=True)
 
-if legacy_android_vector.exists():
-    raise SystemExit("Stale Android starter foreground vector still overrides Kitty's PNG.")
+stale_vectors = list(RES.rglob("ic_launcher_foreground.xml"))
+if stale_vectors:
+    raise SystemExit(
+        "Stale Android launcher foreground vector still overrides Kitty's PNG: "
+        + ", ".join(str(path) for path in stale_vectors)
+    )
 
 # A transparent background is deliberate: the launcher must show Kitty alone,
 # not a dark square/circle behind her. Kitty stays within the adaptive safe zone.
@@ -88,7 +94,7 @@ xml = '''<?xml version="1.0" encoding="utf-8"?>
 (adaptive / "ic_launcher_round.xml").write_text(xml, encoding="utf-8")
 
 # Verify every raster has visible Kitty artwork and transparent corner pixels.
-generated = list(RES.glob("mipmap-*/ic_launcher*.png")) + [drawable / "ic_launcher_foreground.png"]
+generated = list(RES.glob("mipmap-*/ic_launcher*.png")) + [foreground]
 for path in generated:
     with Image.open(path) as check:
         if check.mode != "RGBA" or check.getchannel("A").getextrema()[0] != 0:
@@ -100,7 +106,14 @@ for path in generated:
             raise SystemExit(f"Transparent padding verification failed: {path}")
 
 for path in (adaptive / "ic_launcher.xml", adaptive / "ic_launcher_round.xml"):
-    if '@android:color/transparent' not in path.read_text(encoding="utf-8"):
+    content = path.read_text(encoding="utf-8")
+    if '@android:color/transparent' not in content:
         raise SystemExit(f"Adaptive icon background is not transparent: {path}")
+    if '@drawable/ic_launcher_foreground' not in content:
+        raise SystemExit(f"Adaptive icon does not reference Kitty's PNG foreground: {path}")
 
-print(f"Generated {len(generated)} transparent Kitty launcher PNGs; adaptive backgrounds are transparent; no shadow layer included.")
+print(
+    f"Generated {len(generated)} transparent Kitty launcher PNGs; "
+    "all stale foreground vectors removed; adaptive backgrounds are transparent; "
+    "no shadow layer included."
+)
