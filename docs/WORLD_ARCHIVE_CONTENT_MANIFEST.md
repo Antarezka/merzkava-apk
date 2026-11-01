@@ -956,3 +956,24 @@ The new dossier tests are committed but have not yet been executed in this envir
 - Web App Validation #610 passed: 13 test files / 114 tests, TypeScript, gateway type-check, Vite production build.
 - The resolver consumes supplied rolls; an auditable offline RNG, state orchestration, and persistence remain separate tasks.
 - Eight deterministic modules are CI-verified; no full-game completion percentage is assigned.
+
+
+## Claim-reviewed NPC public extracts — 2026-11-01
+
+Twenty-four NPC profiles previously classified `REVIEW_REQUIRED` now have separate public-safe dossiers based only on their explicitly labelled public-profile material and verified role/affiliation facts. The curated extracts deliberately omit private whereabouts, exact residences, secret affiliations, undisclosed relationships, private incidents, and unconfirmed capabilities.
+
+| Region / group | New dossier IDs |
+|---|---|
+| Beiming Gu | `beiming-jingheng`, `beiming-xuanyu`, `binghe-chuanliu`, `lan-feng`, `cangxue-beiran`, `cangxue-tielan`, `shuang-yue`, `hanyue-mingzhao`, `tie-song`, `lingfeng-yujin`, `minghu-yanshu`, `mo-xueyan`, `bai-yushen`, `tieshi-beiyue`, `xuanbing-lingsu`, `xuanbing-yue`, `xuansong-qinghe`, `xuanye-zhenbei`, `yaochi-suwen`, `yinshan-qiaofeng` |
+| Golden Dragon Empire | `luo-zhenkai`, `shen-yunting` |
+| Tianhai Yunzhou | `duan-haicheng`, `lin-qiaoyu` |
+
+All 24 source files are now marked `PUBLIC_CANDIDATE` for the curated extract only. Their raw canonical Markdown is still not bundled. Beiming Nerva and Ying Wuxin remain excluded as GM-only identities; no private player profile has been published.
+
+### Updated path metrics
+
+- Whole Universe Markdown footprint: 67/140 = **47.9%**.
+- Potential player-facing / review-needed scope: 67/72 = **93.1%**.
+- Already dispositioned public-scope sources: 67/68 = **98.5%**.
+- Remaining source review: three review-required world modules and one intentionally withheld hidden-group module. The latter is excluded to preserve discovery and GM narrative control, not because it was forgotten.
+- These are path metrics. They do not prove every canon claim, relationship edge, alias, or UI route has been verified.
