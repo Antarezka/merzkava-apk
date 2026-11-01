@@ -20,7 +20,7 @@ export function renderExpeditionInterface():string {
   </section>`;
   const startPanel=save?`<section class="expedition-character-panel expedition-profile-compact" aria-label="Your adventurer profile">
     <div class="expedition-profile-identity"><div><span class="expedition-profile-kicker">YOUR ADVENTURER</span><h3 class="expedition-player-name">${escapeHtml(save.character.name)}</h3><p class="expedition-note">Age ${save.character.age} · ${escapeHtml(regionNames[scene.region])} · Day ${save.day}</p></div></div>
-    <div class="expedition-profile-meta"><span>SPIRIT REALM <b>Not recorded</b></span><span>MARTIAL SOUL <b>Not recorded</b></span><span>SPIRIT RING <b>Not recorded</b></span><span>SYNC PROGRESS <b>Not recorded</b></span><span>ARCANIST GRADE <b>Not recorded</b></span><span>ARCANIST FOCUS <b>Not recorded</b></span><span>HP <b>Not recorded</b></span><span>SATIETY <b>Not recorded</b></span></div>
+    <div class="expedition-profile-meta"><span>SPIRIT REALM <b>Not recorded</b></span><span>MARTIAL SOUL <b>Not recorded</b></span><span>SPIRIT RING ABSORPTION <b>Not recorded</b></span><span>SYNC PROGRESS <b>Not recorded</b></span><span>ARCANIST GRADE <b>Not recorded</b></span><span>ARCANIST FOCUS <b>Not recorded</b></span><span>HP <b>Not recorded</b></span><span>SATIETY <b>Not recorded</b></span></div>
     <div class="expedition-profile-actions"><span class="expedition-save-label">SAVE · ${escapeHtml(save.saveName)}</span><button type="button" class="text-button" data-eternal-manager-toggle>Manage journeys</button><button type="button" class="text-button danger" data-eternal-end>Leave journey</button></div></section>`
     :`<section class="expedition-character-panel expedition-empty-profile"><span class="expedition-profile-kicker">NO ACTIVE JOURNEY</span><p class="expedition-note">Create a new local journey or load one of your saved adventures below. World Archive remains read-only.</p></section>`;
   const savedSlots=listEternalSaves();
@@ -39,7 +39,7 @@ export function renderExpeditionInterface():string {
       ${save?`<button type="button" class="text-button" data-eternal-new-form>＋ Create another journey</button>`:""}
       ${createJourneyForm}
       <label class="expedition-import-label">IMPORT JOURNEY BACKUP<input type="file" accept="application/json,.json" data-eternal-import /></label>
-      <p class="expedition-save-footnote">Saves are isolated per journey. Deleting a journey never changes the official World Archive.</p>
+      <p class="expedition-save-footnote">Saves are isolated per journey. Deleting a journey never changes the official World Archive.</p>${savedSlots.length?`<button type="button" class="text-button danger" data-eternal-reset-all>Delete all journeys</button>`:""}
     </div></section>`;
   const story=save&&dialogue?`<section class="expedition-dialogue" aria-live="polite"><div class="section-heading"><span>THE MOMENT · ${String((save.eventIndex % getRegionalDialogueCount())+1).padStart(3,"0")} / ${getRegionalDialogueCount()}</span><small>${escapeHtml(dialogue.chapter)}</small></div>
     <article class="expedition-dialogue-card">
