@@ -35,6 +35,15 @@ jobs:
             console.log(`- ${name}: severity=${item.severity}; direct=${item.isDirect}; range=${item.range}; fix=${JSON.stringify(item.fixAvailable)}; via=${via}`);
           }
           NODE
+          npm audit --omit=dev --json > /tmp/npm-audit-production.json || true
+          node <<'NODE'
+          const fs = require("node:fs");
+          const report = JSON.parse(fs.readFileSync("/tmp/npm-audit-production.json", "utf8"));
+          console.log("Production-only npm audit counts:", JSON.stringify(report.metadata?.vulnerabilities ?? {}));
+          for (const [name, item] of Object.entries(report.vulnerabilities ?? {})) {
+            console.log(`- production dependency ${name}: severity=${item.severity}; range=${item.range}`);
+          }
+          NODE
       - name: Validate Android smoke-test shell syntax
         run: bash -n scripts/emulator-smoke-test.sh
       - name: Run gameplay engine tests
