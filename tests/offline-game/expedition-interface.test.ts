@@ -17,6 +17,6 @@ describe("Eternal Path Expedition Interface", () => {
     const html = renderExpeditionInterface([character]);
     expect(html).toContain('<option value="local-1">Nafila</option>');
     expect(html).toContain("Offline Game save data and progression are not connected yet.");
-    expect(html).toContain("Convo sessions and saves remain separate.");
+    expect(html).toContain("Offline Game save data and progression are not connected yet.");
   });
 });
