@@ -10,7 +10,7 @@
 >
 > **Runtime safety:** Do not bundle this whole development snapshot as player-visible Archive text. Offline gameplay must use separately reviewed, deterministic engine implementations and approved public content. GM-only, private, or restricted source material must not be exposed merely because it is preserved here.
 >
-> **Offline game boundary:** The future game is a separate standalone mode, 100% Merzkava-derived, without AI/network dependency. BitLife and Solo Leveling remain design/presentation references only. This snapshot is not itself a playable implementation.
+> **Offline game boundary:** The future game is a separate standalone mode without AI/network dependency. Its world and canon-backed rules are grounded in Merzkava Universe; additional gameplay records may be authored separately only with explicit `IN-GAME ORIGINAL` provenance under `CONTENT_PROVENANCE.md`. BitLife and Solo Leveling remain design/presentation references only. This snapshot is not itself a playable implementation.
 
 
 ---
