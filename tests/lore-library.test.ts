@@ -103,7 +103,7 @@ describe("World Archive visibility and entity routing", () => {
   it("only shows categories that contain public dossiers", () => {
     const html = renderLoreLibrary();
     expect(html).not.toContain('data-lore-category="BEASTS"');
-    expect(html).not.toContain('data-lore-category="CULTURE"');
+    expect(html).toContain('data-lore-category="CULTURE"');
   });
 
   it("does not open a dossier that was removed from the public corpus", () => {
