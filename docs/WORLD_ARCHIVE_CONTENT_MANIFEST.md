@@ -398,3 +398,41 @@ The existing local catalogue is not safe to expose as a complete player-facing i
 - Remaining regional modules and other regional NPC registries/profiles: not yet fully reviewed.
 - Full 140-file line-by-line approval: **not complete**.
 - Player-facing publication approval: **not granted by this audit pass**.
+
+
+## Regional module audit — third pass
+
+**Source snapshot:** Universe `2f76a864150528afb0e3d26cb16f9396ce610ff6`. This pass examined the regional modules for Longyuan, Jinyue, Frostveil Range, Hollowmoon Valley, Ironroot Reach, Tianfeng, Xingluo, Yanling, Baiyue, and Canglan. This is a section-level/source-level review of the fetched content, not a line-by-line approval of every regional file.
+
+### Compatibility pointers
+
+- `world/REGION_FROSTVEIL_RANGE.md`, `world/REGION_HOLLOWMOON_VALLEY.md`, and `world/REGION_IRONROOT_REACH.md` are explicit compatibility pointers to `world/REGION_BEIMING_GU.md`. They do not establish independent regional canon. Archive should redirect to the consolidated source and avoid duplicate article/entity records.
+
+### Golden Dragon Empire regional modules
+
+- `world/REGION_LONGYUAN.md`, `world/REGION_JINYUE.md`, `world/REGION_TIANFENG.md`, `world/REGION_XINGLUO.md`, `world/REGION_YANLING.md`, `world/REGION_BAIYUE.md`, and `world/REGION_CANGLAN.md` are regional references with established settlement/territory material. Their own canon policy repeatedly labels area/density as provisional population-based estimates, not surveyed boundaries or uniform density. Preserve that qualification wherever any estimate is shown.
+- The administrative atlas is authoritative for prefecture seats, official village counts, and named village registers. Former prefectural seats are settlements/service hubs, not additional prefectures. Do not convert hamlets into official villages or infer unlisted towns, permanent services, leaders, exact coordinates, surveyed borders, neighboring regions, route distances, or travel durations.
+- Named regional routes are graph edges, not permission to infer direct travel. Xingluo's Frontier–Maritime Relay is explicitly staged courier and authorized land/sea transfers, not a direct road. Jinyue and Longyuan also explicitly prohibit invented distances and durations.
+- Regional population-facing service references defer to `world/GOLDEN_DRAGON_EMPIRE_POPULATION_SERVICES.md`; do not infer a bank, academy, library, Medicine Hall, or Ordo facility in every settlement.
+- Regional factions and NPC entries defer to central official rosters. Political tendencies are not proof of secret faction membership. A registry row does not establish current physical presence.
+- Longyuan's regional NPC table repeats Ying Wuxin's public clothing-pavilion identity while explicitly stating the concealed identity is GM-only. Treat the public owner role as a separate claim; exclude the concealed identity, criminal role, aliases, and secret connections from all player-facing entity metadata.
+- Jinyue's regional NPC table names civil officeholders and includes their public dispositions, but points to the central officials roster for authority and full profiles. Its current-situation section includes an underground mining consortium, secret tunnels, bribery, witness intimidation, and evidence destruction. These are scenario/GM threat details; do not surface as general public regional facts or searchable faction profiles unless separately established as public knowledge.
+- Longyuan's current-situation section describes an active smuggling operation and bribed officials. Treat operational leads and active threat details as GM/event content, not as a public guidebook entry. The regional text also describes the Imperial Special Financial Audit Committee and explicitly leaves deputy/lower-personnel integrity unknown; do not imply corruption is confirmed.
+- Longyuan and Jinyue contain named NPC details with Spirit Realm/Stage and other progression information. Keep such values out of the Archive's local authority; if capability is needed, link to the official rules/source rather than reproducing derived mechanics.
+
+### Remaining regional files — preliminary disposition only
+
+- `world/REGION_TIANFENG.md`: public scholarly-region overview candidate; preserve the explicit statement that no Cultivator Academy is established in Tianfeng and avoid inventing institutions or local services.
+- `world/REGION_XINGLUO.md`: public maritime-region overview candidate; staged inter-power relay and port-specific shipping constraints must remain exact. Do not turn a connected route map into a claim of direct travel.
+- `world/REGION_YANLING.md`: public industrial/forging-region overview candidate; settlement/service gaps, volcanic/furnace hazards, and unknown local routes must remain qualified.
+- `world/REGION_BAIYUE.md`: public frontier overview candidate; fortification/military context and the northern corridor are established only at the described level. Exact local alignment, crossings, and duration remain unknown.
+- `world/REGION_CANGLAN.md`: public riverlands overview candidate; Twin River Route and seasonal transport limitations must not be generalized to every local road or river.
+
+### Updated review progress
+
+- Beiming Gu NPC registry and 23 listed profile paths: reviewed at registry/profile level; no wholesale approval.
+- Golden Dragon Empire NPC registry and six canonical profile files: reviewed; central civil officials roster remains unreviewed in full.
+- Tianhai Yunzhou registry, six canonical profile files, index, and power-structure roster: reviewed; no wholesale approval.
+- Regional modules: first ten named regional modules have now received source-level/section-level review. Several remain candidates only; no region is approved for wholesale publication.
+- Remaining regional modules, world systems, events, factions, official rosters, and the full 140-file line-by-line review remain incomplete.
+- Player-facing publication approval: **not granted**.
