@@ -277,3 +277,67 @@ The World Archive is not complete until every source in scope has a reviewed dis
 ## Audit limitation
 
 This manifest records a verified tree inventory and the current local catalogue/source-path coverage. It does not claim that all 140 source Markdown documents have been line-by-line content-reviewed or that every candidate fact is public. Those reviews must be recorded before publication.
+
+## Content-review findings — first strict pass
+
+**Review basis:** targeted full-file reads of the following world modules, plus the opening identity/access sections of the first ten Beiming Gu NPC profiles. This is a first pass, not a declaration that all source content is approved.
+
+### World modules reviewed in this pass
+
+| Source | Initial disposition | Reason / handling |
+|---|---|---|
+| `world/ANCIENT_SHAMANISM_AND_BUDDHIST_CLANS.md` | `REVIEW_REQUIRED` + restricted split | Explicit hidden-group identity/secrecy; public-facing material must not expose concealed group identity or restricted hierarchy. |
+| `world/ARTIFACTS_AND_RELICS.md` | `PUBLISHED` candidate + item-level review | Lore/provenance catalog; production and appraisal mechanics must remain out of local authority. Unknown inventory entries remain unknown. |
+| `world/ARTIFICIAL_ARTIFACTS.md` | `PUBLISHED` candidate + item-level review | Known artifact catalog can be rewritten as descriptive dossiers; production requirements and condition scoring are mechanics references only. |
+| `world/CANON_DECISIONS_AND_PRECEDENCE.md` | `MECHANICS_REFERENCE` / GM continuity only | Binding decisions and hidden continuity safeguards are not a player-facing lore article. Extract only facts independently established as public elsewhere. |
+| `world/CANON_LOAD_ROUTER.md` | `MECHANICS_REFERENCE` | GM loading/navigation instructions, not an in-world article. |
+| `world/DYNAMIC_EVENTS.md` | `GM_ONLY` / `REVIEW_REQUIRED` per event | Persistent event registry and operating workflow; event visibility depends on event status and player discovery. |
+| `world/FACTIONS.md` | `REVIEW_REQUIRED` with faction-by-faction split | Contains public institutions alongside restricted groups and doctrine classifications. Do not publish the file wholesale. |
+| `world/GEOGRAPHY_AND_TRAVEL.md` | `PUBLISHED` candidate + route caution | Geographic descriptions may be published; exact route access, hidden sites, travel rules and unconfirmed edges need separate review. |
+| `world/GOLDEN_DRAGON_EMPIRE_ADMINISTRATIVE_ATLAS.md` | `PUBLISHED` candidate | Canonical public administrative framework; estimates must retain their estimated/planning-model labels. |
+| `world/GOLDEN_DRAGON_EMPIRE_GOVERNANCE.md` | `PUBLISHED` candidate + officeholder split | General public governance may be summarized; restricted officials, duties and undisclosed appointments require filtering. |
+| `world/GOLDEN_DRAGON_EMPIRE_OFFICIALS.md` | `REVIEW_REQUIRED` / roster not bulk-publishable | Large named political roster; deduplicate and classify individual officeholders, dispositions and access before creating profiles. |
+| `world/GOLDEN_DRAGON_EMPIRE_POPULATION_SERVICES.md` | `PUBLISHED` candidate + access split | Public service networks and visitor access can be summarized; institutional restrictions and mechanics must be excluded. |
+| `world/HISTORY.md` | `PUBLISHED` candidate + claim-level certainty | Publish only confirmed history; preserve unknown dates, hypotheses and unresolved evidence as unknown. |
+| `world/IMPERIAL_SPECIAL_FINANCIAL_AUDIT_COMMITTEE.md` | `REVIEW_REQUIRED` | Institution is established, but its personnel and unresolved family case require controlled, claim-level visibility review. |
+| `world/INTELLIGENT_PEOPLES.md` | `PUBLISHED` candidate | Public cultural overview; do not infer abilities, lifespans, weaknesses, or individual identity from appearance. |
+| `world/LAWLESS_SOUTHERN_PORT_AND_ISLES.md` | `PUBLISHED` candidate + venue sensitivity | Geographic and public leisure functions may be described neutrally; avoid presenting illegal services as public amenities or inventing access/safety. |
+| `world/LAWLESS_TERRITORIES.md` | `REVIEW_REQUIRED` with restricted split | Includes underground organizations, concealed authority and restricted continuity. Public-facing overview only after section-level filtering. |
+| `world/LOCATION_AND_ROUTE_NETWORK.md` | `MECHANICS_REFERENCE` / GM navigation | Route graph and hidden Inner Azerion location are not a general player-facing map. Publish only discovered, approved route facts from descriptive regional sources. |
+| `world/MAP_AND_REGIONS.md` | `PUBLISHED` candidate + compatibility split | Useful public map overview, but must defer to consolidated regional sources and preserve unconfirmed geography. |
+| `world/NPC_BAI_XUANYIN.md`, `NPC_JI_HAOYUAN.md`, `NPC_JI_NINGZHAO.md`, `NPC_JI_ZHAONING.md`, `NPC_JUN_HAOTIAN.md`, `NPC_JUN_RUIYUAN.md`, `NPC_JUN_YUEJIN.md`, `NPC_SHEN_YUEHUA.md`, `NPC_TIANHAI_POWER_STRUCTURE.md` | `LEGACY_OR_COMPATIBILITY` | These are moved-path pointers. The canonical regional profiles are the only sources to review or publish. |
+| `world/NPC_MANAGEMENT.md` | `MECHANICS_REFERENCE` / GM-only guidance | NPC continuity, knowledge and disclosure operating rules; not a public dossier. |
+| `world/NPC_YING_WUXIN.md` | `GM_ONLY` | Profile explicitly contains a concealed identity and restricted criminal leadership. Do not include the file or its secret aliases in player search/highlighting. |
+| `world/OPEN_LEARNING_PATHS_AND_WANDERING_INSTRUCTORS.md` | `MECHANICS_REFERENCE` + public institutional excerpts | Contains progression/teaching access rules and GM encounter procedure; do not duplicate as player-facing mechanics. |
+| `world/PRISON_AND_BOUND_ITEMS.md` | `REVIEW_REQUIRED` | Includes coercive restraints, abuse, custody and restricted uses. Any item entry needs separate public knowledge and sensitivity review. |
+| `world/REGIONAL_REPOSITORY_ARCHITECTURE.md` | `MECHANICS_REFERENCE` | Repository organization guidance, not in-world lore. |
+| `world/REGION_ASHEN_BORDERLANDS.md` | `REVIEW_REQUIRED` | Explicitly partially developed; preserve confirmed facts and do not fill missing settlements, institutions or routes. |
+| `world/REGION_AZUREFLAME_BASIN.md`, `world/REGION_BEIMING_HEARTLAND.md` | `LEGACY_OR_COMPATIBILITY` | Compatibility pointers; canonical source is consolidated `world/REGION_BEIMING_GU.md`. |
+| `world/REGION_BAIYUE.md`, `world/REGION_CANGLAN.md` | `PUBLISHED` candidate + local completeness review | Regional modules contain established public locations/services alongside unconfirmed fields. Keep estimates and unknowns labelled. |
+| `world/REGION_BEIMING_GU.md` | `PUBLISHED` candidate + restricted split | Consolidated regional source for all seven districts; contains GM constraints and NPC references that must not be copied wholesale. |
+| `world/REGION_BLACK_TIDE_EXPANSE.md` | `REVIEW_REQUIRED` with `GM_ONLY` split | Partially developed region with explicit concealed authority and restricted identity section. |
+| `world/REGION_CANGLAN.md` | `PUBLISHED` candidate + local completeness review | Established regional descriptions; do not convert estimated area/density into surveyed fact. |
+
+### NPC profile access review — first Beiming Gu batch
+
+The first ten profiles under `regions/beiming-gu/npcs/` were opened. The initial identity blocks establish public-facing names/roles for some individuals, but full profiles may contain private motives, undisclosed abilities, relationships or GM-only knowledge. Therefore **none of these profiles is approved for wholesale publication**.
+
+- `BEIMING_HAN.md`: public title/name can be considered; exact age and residence intentionally unknown. Review remaining profile for disclosure limits.
+- `BEIMING_JINGHENG.md`: public identity/age/family may be selectively usable; concealed criminal connection is GM-sensitive.
+- `BEIMING_NERVA.md`: high-risk. Identity is GM-sensitive in the regional registry; recurring visits/disguise and true identity must not appear in public archive/search until discovered in-world.
+- `BEIMING_XENHWA.md`: identity and public description may be usable; review remaining profile for restricted details.
+- `BEIMING_XUANYU.md`, `BINGHE_CHUANLIU.md`, `BLUE_FLAME_DOJO_MASTER.md`, `CANGXUE_TIELAN.md`, `FROSTPEAK_DOJO_MASTER.md`: named clan/dojo officeholders may be listed as public institutional facts only after complete profile review; do not expose private profile fields by default.
+- `CANGXUE_BEIRAN.md`: youth-circle NPC; public identity may be usable, but personal profile fields require a selective public summary.
+
+### Concrete implementation consequence
+
+The existing local catalogue is not safe to expose as a complete player-facing index without a visibility-aware entity registry. In particular, aliases such as concealed faction names or GM-sensitive NPC identities must be omitted from player search, suggestions, automatic highlighting and backlinks—not merely hidden in the article body.
+
+### Review progress
+
+- Repository tree inventory: complete for the recorded source commit.
+- World module content review: partial; first 30 world Markdown files examined at source level, with detailed dispositions recorded above for the files reviewed.
+- Regional module review: not yet complete.
+- All regional NPC profiles: not yet complete; first ten Beiming Gu profiles have initial identity/access review only.
+- Full 140-file line-by-line approval: **not complete**.
+- Player-facing publication approval: **not granted by this audit pass**.
