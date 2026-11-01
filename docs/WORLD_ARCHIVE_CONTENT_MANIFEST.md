@@ -653,3 +653,15 @@ The complete 486-line, 112,016-character `world/GOLDEN_DRAGON_EMPIRE_OFFICIALS.m
 - **Deep verification still outstanding:** exhaustive line-by-line semantic review of every long source, final row-by-row officeholder appointment reconciliation, and owner decision on the Badan Pengawasan ↔ Komite Auditor relationship.
 - **Publication approval:** not granted. Existing 26-entry APK catalogue remains a preliminary UI/content scaffold, not an approved canon corpus. Do not add or expose source text solely because its path exists in the catalogue.
 - **Implementation gate:** no public entity index, automatic highlights, autocomplete, backlinks, or source reader should be treated as canon-safe until visibility filtering and local-document resolution are implemented and tested end-to-end.
+
+
+### Golden Dragon active-prefect cross-check — completed
+
+A direct name-and-seat comparison was run between the current atlas prefecture register and the officials roster:
+
+- Atlas: 12 prefecture name/seat pairs.
+- Officials roster: all **12 of 12** active prefecture name/seat pairs match the atlas exactly; no missing or extra active prefecture appointment was found in those rows.
+- The 33 prefecture/local-administrator-labelled rows in the roster consist of the 12 current prefectural officeholders plus 21 retained local administrators whose former prefectural jurisdictions/seats remain settlements or service hubs. The latter are not additional active prefects.
+- This validates the 12 active appointments against the current register. It does not establish current physical whereabouts, public familiarity, or authority beyond the stated office.
+
+**Roster correction boundary:** the current 12 active prefecture entries may be linked to their canonical public regional offices after individual NPC visibility review. The 21 retained local administrators may be shown only with their reconciled current role wording; never revive their former prefecture as an active administrative unit.
