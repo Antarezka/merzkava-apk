@@ -130,6 +130,15 @@
 .expedition-choice{padding:13px;border-color:#71583d;background:#25211b}
 .expedition-choice strong{font-size:12px}
 .expedition-choice small{font-size:10px;line-height:1.5}
-body.eternal-choice-open{overflow:hidden;touch-action:none}
+body.eternal-choice-open{overflow:hidden}
 @media(max-width:360px){.expedition-profile-meta{gap:4px}.expedition-profile-meta span{font-size:6px}.expedition-profile-meta b{font-size:8px}.expedition-dialogue-card{padding:12px}.expedition-narrative-layer p{font-size:13px}}
 @media(min-width:600px){.expedition-choice-modal{align-items:center}.expedition-choice-sheet{max-height:78vh}}
+
+/* Keep the compact title on one horizontal line beside the standalone marker. */
+.expedition-heading>div{display:flex;align-items:center;gap:9px;min-width:0}
+.expedition-heading .eyebrow{flex:0 0 auto;font-size:8px;white-space:nowrap}
+.expedition-heading h2{font-size:8px;letter-spacing:.15em;overflow:hidden;text-overflow:clip}
+.expedition-profile-meta{grid-template-columns:repeat(4,minmax(0,1fr))}
+.expedition-profile-meta span{font-size:6px}
+.expedition-profile-meta b{font-size:8px}
+@media(max-width:360px){.expedition-heading>div{gap:6px}.expedition-heading h2{font-size:7px;letter-spacing:.11em}.expedition-profile-meta{grid-template-columns:repeat(4,minmax(0,1fr))}}
