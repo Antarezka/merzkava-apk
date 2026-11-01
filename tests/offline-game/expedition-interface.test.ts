@@ -68,7 +68,7 @@ describe("Eternal Path live world scene", () => {
     const dialogue=getCurrentDialogue();
     const html=renderExpeditionInterface();
     expect(html).toContain("✦ MERZKAVA: ETERNAL PATH");
-    expect(html).toContain('class="expedition-profile-compact"');
+    expect(html).toContain('expedition-character-panel expedition-profile-compact');
     expect(html).toContain("SPIRIT REALM");
     expect(html).toContain("SPIRIT RING");
     expect(html).toContain("SYNC PROGRESS");
