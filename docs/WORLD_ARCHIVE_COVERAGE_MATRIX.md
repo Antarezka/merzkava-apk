@@ -222,3 +222,13 @@
 - [ ] Build and perform device navigation QA.
 
 **Status:** Phase 1 source inventory + handoff baseline established. World Archive itself remains incomplete.
+
+
+## Implementation checkpoint — clickable public entity graph (2026-11-01)
+
+The existing catalogue derives each dossier's outbound `crossReferenceIds` from exact public titles and aliases mentioned in its summary/body. `loreLinks` turns those mentions into local `data-lore-open` buttons; targets are selected from `PUBLISHED` entries only. This pass adds `getLoreBacklinks(id)` and renders inbound **MENTIONED IN** dossier links. Regression tests cover outgoing clickable mentions, public-only targets, inbound links and invalid IDs.
+
+- Runtime implementation: `src/lore/lore-library.ts`, commit `3dd0b21f32bdd383737da48d52248b96c623535a`.
+- Regression tests: `tests/lore-library.test.ts`, commit `4ce04c872d39611b6fa782b8e2199f4157aa3b0f`.
+- Tests are committed but have **not yet been executed** in CI or on-device; graph QA remains open.
+- Source citation is still provenance text, not an in-app local source reader. The source reader remains a required task.
