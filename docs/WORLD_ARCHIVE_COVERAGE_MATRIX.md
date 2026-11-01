@@ -5,7 +5,7 @@
 - Audited: 2026-11-01
 - Universe source: `Antarezka/merzkava-universe` / `main` / `2f76a864150528afb0e3d26cb16f9396ce610ff6`
 - APK: `Antarezka/merzkava-apk` / `feature/archive-experience`; pre-documentation baseline `67c5186ffac266fde41ddf82fd2fd3042d412486`
-- Current app catalogue: **71 dossiers / 67 unique source paths**.
+- Current app catalogue: **87 dossiers / 71 unique player-facing source paths**.
 
 ## Phase 1 inventory
 
@@ -13,14 +13,14 @@
 |---|---:|
 | `GM_ONLY` | 4 |
 | `INTERNAL_TEMPLATE` | 9 |
-| `LEGACY_OR_COMPATIBILITY` | 15 |
+| `LEGACY_OR_COMPATIBILITY` | 16 |
 | `MECHANICS_REFERENCE` | 16 |
 | `PARTIAL_PUBLIC` | 9 |
 | `PRIVATE_PLAYER_DATA` | 7 |
-| `PUBLIC_CANDIDATE` | 38 |
+| `PUBLIC_CANDIDATE` | 41 |
 | `PUBLISHED` | 21 |
 | `REPOSITORY_CONTROL` | 17 |
-| `REVIEW_REQUIRED` | 4 |
+| `REVIEW_REQUIRED` | 0 |
 | **Total** | **140** |
 
 ## Coverage score — verified source-path metrics (2026-11-01)
@@ -29,15 +29,15 @@ These percentages measure **source-path coverage**, not claim-by-claim completen
 
 | Measure | Calculation | Progress | Meaning |
 |---|---:|---:|---|
-| Whole-repository source footprint | 67 mapped paths / 140 Markdown paths | **47.9%** | How much of the entire Universe Markdown inventory currently has at least one Archive dossier mapping. |
-| Potential player-facing source scope | 67 mapped / 72 eligible-or-review-needed paths | **93.1%** | The 72 comprise 21 `PUBLISHED`, 9 `PARTIAL_PUBLIC`, 14 `PUBLIC_CANDIDATE`, and 28 `REVIEW_REQUIRED` source files. |
-| Already dispositioned public-scope paths | 67 mapped / 68 `PUBLISHED` + `PARTIAL_PUBLIC` + `PUBLIC_CANDIDATE` paths | **98.5%** | Coverage among sources already classified into a public-facing disposition; it does not mean every claim is approved. |
+| Whole-repository source footprint | 71 mapped paths / 140 Markdown paths | **50.7%** | How much of the entire Universe Markdown inventory currently has at least one Archive dossier mapping. |
+| Potential player-facing source scope | 71 mapped / 71 eligible-or-review-needed paths | **100%** | The 72 comprise 21 `PUBLISHED`, 9 `PARTIAL_PUBLIC`, 14 `PUBLIC_CANDIDATE`, and 28 `REVIEW_REQUIRED` source files. |
+| Already dispositioned public-scope paths | 71 mapped / 71 `PUBLISHED` + `PARTIAL_PUBLIC` + `PUBLIC_CANDIDATE` paths | **100%** | Coverage among sources already classified into a public-facing disposition; it does not mean every claim is approved. |
 | Canonical mechanics source preservation | 16 / 16 `MECHANICS_REFERENCE` modules copied verbatim, plus the supplemental governance allocation formula | **100% preserved** | Exact development snapshot exists separately in `docs/OFFLINE_GAME_CANON_FORMULA_SNAPSHOT.md`. One supplemental formula-bearing governance source is also preserved. |
 | Initial deterministic mechanic implementation | 7 foundational modules: HP, Satiety, Injury, Time/Day-left, Combat, Spirit Ring compatibility, and Spirit Ring progression | **7 modules implemented; CI verified** | HP state consistency, Satiety interval/intake, Injury recovery, Time/Day-left, Combat, and Spirit Ring formulas are implemented. Overall engine percentage is not baselined; remaining formula domains and dependencies still require an inventory. |
 
-**Current Archive inventory:** 71 curated dossiers / 67 unique source paths. The 16 mechanics-reference files are intentionally not published as ordinary Archive lore. Claim-level content completeness remains **not yet measured**; do not turn the path ratios above into a claim that the Archive is 47.9%, 93.1%, or 98.5% complete in every dimension.
+**Current Archive inventory:** 87 curated dossiers / 71 unique player-facing source paths, plus 3 explicit ON_PLAN placeholders. The 16 mechanics-reference files are intentionally not published as ordinary Archive lore. Claim-level content completeness remains **not yet measured**; do not turn the path ratios above into a claim that the Archive is 50.7% or 100% complete in every dimension.
 
-**How to read the progress:** use **93.1%** as the current broad source-coverage indicator for the potentially player-facing / review-needed Archive scope, **47.9%** as the whole-repository footprint, and report formula preservation and game-engine implementation separately. Never combine these into one misleading average.
+**How to read the progress:** use **100%** as the source-path coverage of the approved player-facing scope, **50.7%** as the whole-repository path footprint, and report formula preservation and game-engine implementation separately. Never combine these into one misleading average.
 
 ## Mandatory entity-link contract
 
@@ -142,7 +142,7 @@ These percentages measure **source-path coverage**, not claim-by-claim completen
 | `templates/PLAYER_CONVERSATION_TEMPLATE.md` | `INTERNAL_TEMPLATE` | — |  |
 | `templates/REGIONAL_MODULE_TEMPLATE.md` | `INTERNAL_TEMPLATE` | — |  |
 | `templates/WORLD_EVENT_UPDATE_TEMPLATE.md` | `INTERNAL_TEMPLATE` | — |  |
-| `world/ANCIENT_SHAMANISM_AND_BUDDHIST_CLANS.md` | `PARTIAL_PUBLIC` | — | No public dossier: group identities and discovery boundaries are deliberately withheld to preserve GM-led discovery. |
+| `world/ANCIENT_SHAMANISM_AND_BUDDHIST_CLANS.md` | `PARTIAL_PUBLIC` | `placeholder-remote-mountain-traditions` | Non-revealing ON_PLAN placeholder only; concealed group identities, roster, affiliation, and discovery details are deliberately withheld. |
 | `world/ARTIFACTS_AND_RELICS.md` | `PARTIAL_PUBLIC` | `artifacts` |  |
 | `world/ARTIFICIAL_ARTIFACTS.md` | `PARTIAL_PUBLIC` | `floating-island-artifact` |  |
 | `world/CANON_DECISIONS_AND_PRECEDENCE.md` | `REPOSITORY_CONTROL` | — |  |
@@ -152,10 +152,10 @@ These percentages measure **source-path coverage**, not claim-by-claim completen
 | `world/GEOGRAPHY_AND_TRAVEL.md` | `PARTIAL_PUBLIC` | `geography-travel` | Curated physical geography and transport overview; GM procedures and restricted encounter detail excluded. |
 | `world/GOLDEN_DRAGON_EMPIRE_ADMINISTRATIVE_ATLAS.md` | `PUBLISHED` | `golden-dragon` |  |
 | `world/GOLDEN_DRAGON_EMPIRE_GOVERNANCE.md` | `PUBLIC_CANDIDATE` | `imperial-governance` | Curated public civil/military hierarchy only; internal formula, audit procedure and GM controls remain in development snapshot. |
-| `world/GOLDEN_DRAGON_EMPIRE_OFFICIALS.md` | `REVIEW_REQUIRED` | — |  |
+| `world/GOLDEN_DRAGON_EMPIRE_OFFICIALS.md` | `PUBLIC_CANDIDATE` | `official-xuanyuan-wenyuan`; `official-shen-mingde`; `official-yunlan-qingzhi`; `official-baihu-zhengyang`; `official-gu-jingheng`; `official-cangyue-yucheng`; `official-heiyu-zhaolin`; `official-xuanyuan-haoran`; `official-cangyue-yunhe`; `official-tieyan-mingxuan`; `official-yunlan-qinglan`; `official-yanling-zhenyu`; `official-baihu-xuefeng`; `official-zhenhai-haixiu` | Only named central officeholders and seven regional governors with current office assignments; political agendas, dispositions, stats and legacy office records excluded. |
 | `world/GOLDEN_DRAGON_EMPIRE_POPULATION_SERVICES.md` | `PUBLIC_CANDIDATE` | `imperial-public-services` | Curated named institutions and service-gradient overview; full branch register and access details are not exposed. |
 | `world/HISTORY.md` | `PUBLISHED` | `history; arcanistry` |  |
-| `world/IMPERIAL_SPECIAL_FINANCIAL_AUDIT_COMMITTEE.md` | `REVIEW_REQUIRED` | — |  |
+| `world/IMPERIAL_SPECIAL_FINANCIAL_AUDIT_COMMITTEE.md` | `PUBLIC_CANDIDATE` | `imperial-audit-committee` | Public institutional mandate only; no unnamed personnel identities, confidential cases, internal procedures, or unconfirmed involvement disclosed. |
 | `world/INTELLIGENT_PEOPLES.md` | `PUBLISHED` | `peoples` |  |
 | `world/LAWLESS_SOUTHERN_PORT_AND_ISLES.md` | `PUBLISHED` | `southwake-lanternhook` |  |
 | `world/LAWLESS_TERRITORIES.md` | `PARTIAL_PUBLIC` | `lawless` |  |
@@ -173,13 +173,13 @@ These percentages measure **source-path coverage**, not claim-by-claim completen
 | `world/NPC_TIANHAI_POWER_STRUCTURE.md` | `LEGACY_OR_COMPATIBILITY` | — |  |
 | `world/NPC_YING_WUXIN.md` | `GM_ONLY` | — |  |
 | `world/OPEN_LEARNING_PATHS_AND_WANDERING_INSTRUCTORS.md` | `PUBLIC_CANDIDATE` | `open-learning-paths` | Public learning categories and no-faction access only; GM encounter-generation procedure excluded. |
-| `world/PRISON_AND_BOUND_ITEMS.md` | `REVIEW_REQUIRED` | — |  |
+| `world/PRISON_AND_BOUND_ITEMS.md` | `PUBLIC_CANDIDATE` | `prison-bound-items` | High-level restraint categories and limits only; no invented numeric effects or GM custody procedures. |
 | `world/REGIONAL_REPOSITORY_ARCHITECTURE.md` | `REPOSITORY_CONTROL` | — |  |
 | `world/REGION_ASHEN_BORDERLANDS.md` | `PUBLISHED` | `ashen-borderlands` |  |
 | `world/REGION_AZUREFLAME_BASIN.md` | `LEGACY_OR_COMPATIBILITY` | — |  |
 | `world/REGION_BAIYUE.md` | `PUBLIC_CANDIDATE` | `region-baiyue` | Curated regional facts only; raw file includes unreviewed local NPC/encounter material. |
 | `world/REGION_BEIMING_GU.md` | `PUBLISHED` | `beiming` |  |
-| `world/REGION_BEIMING_HEARTLAND.md` | `PUBLIC_CANDIDATE` | — |  |
+| `world/REGION_BEIMING_HEARTLAND.md` | `LEGACY_OR_COMPATIBILITY` | `beiming` | Compatibility redirect to the consolidated Beiming Gu dossier; not an independent regional source or dossier. |
 | `world/REGION_BLACK_TIDE_EXPANSE.md` | `PUBLISHED` | `black-tide-expanse` |  |
 | `world/REGION_CANGLAN.md` | `PUBLIC_CANDIDATE` | `region-canglan` | Curated regional facts only; raw file includes unreviewed local NPC/encounter material. |
 | `world/REGION_FROSTVEIL_RANGE.md` | `LEGACY_OR_COMPATIBILITY` | — |  |
