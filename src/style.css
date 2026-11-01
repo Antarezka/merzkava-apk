@@ -664,3 +664,27 @@ button {color:inherit;} button:focus-visible {outline-color:#a68d5e;}
 @media(prefers-reduced-motion:reduce) {
   .splash-light-ray { opacity: .2; }
 }
+
+/* Final splash composition: center the MERZKAVA wordmark in the visible screen area. */
+.opening-splash .splash-content { width:min(100%,520px); max-height:100%; }
+.opening-splash .splash-stage {
+  width:min(100vw,460px); height:min(60svh,460px); min-height:300px; overflow:visible;
+}
+.opening-splash .splash-wordmark {
+  position:absolute; z-index:5; top:43%; left:50%; width:100%; max-width:100%;
+  translate:-50% -50%; transform:none; text-align:center; white-space:nowrap;
+  font-size:clamp(32px,8.5vw,48px); letter-spacing:.1em;
+  text-shadow:0 2px 10px #080d0bcc,0 0 24px #d2ad7066;
+}
+.opening-splash .splash-mascot {
+  z-index:3; left:50%; bottom:-1%; width:min(78vw,350px);
+  height:min(43svh,340px); max-height:340px; transform:translateX(-50%);
+}
+@media(max-height:620px) {
+  .opening-splash .splash-stage { height:52svh; min-height:245px; }
+  .opening-splash .splash-wordmark { top:42%; font-size:clamp(29px,7.8vw,40px); }
+  .opening-splash .splash-mascot { width:min(72vw,300px); height:39svh; max-height:260px; }
+}
+@media(max-width:360px) {
+  .opening-splash .splash-wordmark { font-size:29px; letter-spacing:.07em; }
+}
