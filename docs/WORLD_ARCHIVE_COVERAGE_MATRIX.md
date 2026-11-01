@@ -122,7 +122,7 @@
 | `world/CANON_DECISIONS_AND_PRECEDENCE.md` | `REPOSITORY_CONTROL` | — |  |
 | `world/CANON_LOAD_ROUTER.md` | `REPOSITORY_CONTROL` | — |  |
 | `world/DYNAMIC_EVENTS.md` | `GM_ONLY` | — |  |
-| `world/FACTIONS.md` | `PARTIAL_PUBLIC` | `factions; medicine-hall; ordo-suci-tianming; spirit-hunters-guild` |  |
+| `world/FACTIONS.md` | `PARTIAL_PUBLIC` | `factions; medicine-hall; ordo-suci-tianming` |  |
 | `world/GEOGRAPHY_AND_TRAVEL.md` | `PARTIAL_PUBLIC` | — |  |
 | `world/GOLDEN_DRAGON_EMPIRE_ADMINISTRATIVE_ATLAS.md` | `PUBLISHED` | `golden-dragon` |  |
 | `world/GOLDEN_DRAGON_EMPIRE_GOVERNANCE.md` | `PUBLIC_CANDIDATE` | — |  |
