@@ -78,6 +78,7 @@ export const ETERNAL_DIALOGUES: EternalDialogue[] = chapters.flatMap((chapter, c
 
 export interface EternalSave {
   schemaVersion:3; saveId:string; saveName:string; createdAt:string; updatedAt:string;
+  manifest:{universeRepository:string;universeCommit:string;contentPackVersion:string;deterministicSeed:string};
   character:{name:string;age:number;region:EternalRegion}; disposition:DispositionState;
   /** Stable world location; deliberately independent from the current dialogue node. */
   locationId:string;
@@ -139,6 +140,7 @@ function normalizeSave(value:unknown):EternalSave|null {
   const now=new Date().toISOString();
   return {
     ...parsed,schemaVersion:3,saveId:typeof parsed.saveId==="string"?parsed.saveId:makeSaveId(),
+    manifest:parsed.manifest&&typeof parsed.manifest==="object"?parsed.manifest:{universeRepository:"Antarezka/merzkava-universe",universeCommit:ETERNAL_SCENES[0].universeCommit,contentPackVersion:"0.1.0",deterministicSeed:typeof parsed.saveId==="string"?parsed.saveId:"legacy-seed"},
     saveName:typeof parsed.saveName==="string"&&parsed.saveName.trim()?parsed.saveName.trim():parsed.character.name,
     createdAt:typeof parsed.createdAt==="string"?parsed.createdAt:now,updatedAt:typeof parsed.updatedAt==="string"?parsed.updatedAt:now,
     character:{name:parsed.character.name.trim(),age:Number.isInteger(parsed.character.age)?parsed.character.age:14,region},
@@ -191,7 +193,7 @@ export function listEternalSaves():EternalSaveSummary[] {
 }
 export function startEternalGame(input:{name:string;age:number;region:EternalRegion}):void {
   const now=new Date().toISOString();const id=makeSaveId();
-  save={schemaVersion:3,saveId:id,saveName:input.name.trim(),createdAt:now,updatedAt:now,character:{name:input.name.trim(),age:input.age,region:input.region},disposition:createDispositionState(),locationId:defaultSceneForRegion(input.region).id,day:1,hour:8,minute:0,weather:resolveDailyWeather(input.region,1),eventIndex:0,energy:100,insight:0,bonds:0,completed:0};
+  save={schemaVersion:3,saveId:id,saveName:input.name.trim(),createdAt:now,updatedAt:now,manifest:{universeRepository:"Antarezka/merzkava-universe",universeCommit:ETERNAL_SCENES[0].universeCommit,contentPackVersion:"0.1.0",deterministicSeed:id},character:{name:input.name.trim(),age:input.age,region:input.region},disposition:createDispositionState(),locationId:defaultSceneForRegion(input.region).id,day:1,hour:8,minute:0,weather:resolveDailyWeather(input.region,1),eventIndex:0,energy:100,insight:0,bonds:0,completed:0};
   persist();
 }
 export function loadEternalSave(id:string):boolean {
