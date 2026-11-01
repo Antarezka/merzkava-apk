@@ -35,4 +35,12 @@ describe("World Archive offline typography", () => {
     expect(css).toContain(".lore-footnote{color:#c2b6a6;font-size:10px");
     expect(css).toContain(".lore-category{color:#d8c9b4;font-size:11px");
   });
+  
+  it("adds warm dark-brown typography for light-theme Archive reading", () => {
+    expect(css).toContain(':root[data-theme="light"] .lore-detail .lore-paragraph');
+    expect(css).toContain("color: #493326;");
+    expect(css).toContain("-webkit-text-stroke: .16px #493326;");
+    expect(css).toContain(':root[data-theme="light"] .lore-card-summary');
+    expect(css).toContain(':root[data-theme="light"] .lore-category');
+  });
 });
