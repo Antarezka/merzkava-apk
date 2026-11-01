@@ -30,3 +30,8 @@
 @keyframes expedition-fog-drift{from{transform:translate3d(-1.5%,0,0) scale(1.02)}to{transform:translate3d(1.5%,-1%,0) scale(1.06)}}
 @media(max-width:360px){.expedition-status-grid{gap:5px}.expedition-stat{padding:10px 4px}.expedition-stat strong{font-size:20px}.expedition-feature-grid{gap:7px}.expedition-feature{padding:12px 10px}.expedition-footer{font-size:6px}}
 @media(prefers-reduced-motion:reduce){.expedition-environment:before{animation:none}}
+
+/* Keep the expanded eight-destination bottom navigation usable on narrow phones. */
+.bottom-nav:has(.nav-item:nth-child(8)) .nav-item{padding-inline:0}
+.bottom-nav:has(.nav-item:nth-child(8)) .nav-item small{font-size:6px;letter-spacing:0}
+.bottom-nav:has(.nav-item:nth-child(8)) .nav-item .nav-icon{font-size:15px}
