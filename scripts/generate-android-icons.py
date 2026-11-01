@@ -60,9 +60,19 @@ for density, pixels in {
     icon.save(folder / "ic_launcher.png", optimize=True)
     icon.save(folder / "ic_launcher_round.png", optimize=True)
 
+# Capacitor's starter project includes an anydpi-v24 vector named
+# ic_launcher_foreground.xml. Android resource precedence selects that vector
+# over this PNG, silently showing the default Android robot instead of Kitty.
+legacy_android_vector = RES / "drawable-anydpi-v24" / "ic_launcher_foreground.xml"
+if legacy_android_vector.exists():
+    legacy_android_vector.unlink()
+
 drawable = RES / "drawable-nodpi"
 drawable.mkdir(parents=True, exist_ok=True)
 fit_centered(art, 432, 0.64).save(drawable / "ic_launcher_foreground.png", optimize=True)
+
+if legacy_android_vector.exists():
+    raise SystemExit("Stale Android starter foreground vector still overrides Kitty's PNG.")
 
 # A transparent background is deliberate: the launcher must show Kitty alone,
 # not a dark square/circle behind her. Kitty stays within the adaptive safe zone.
