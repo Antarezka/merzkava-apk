@@ -841,7 +841,31 @@ const PUBLIC_CANDIDATE_SOURCE_PATHS = new Set([
   "world/SOCIAL_STRATIFICATION.md",
   "world/THREE_POWER_PERSPECTIVE_MAPS.md",
   "world/TIANHAI_ACADEMIES_AND_ARCANIST_INSTITUTE.md",
-  "world/WEALTH_DISTRIBUTION.md"
+  "world/WEALTH_DISTRIBUTION.md",
+  "regions/beiming-gu/npcs/BEIMING_JINGHENG.md",
+  "regions/beiming-gu/npcs/BEIMING_XUANYU.md",
+  "regions/beiming-gu/npcs/BINGHE_CHUANLIU.md",
+  "regions/beiming-gu/npcs/BLUE_FLAME_DOJO_MASTER.md",
+  "regions/beiming-gu/npcs/CANGXUE_BEIRAN.md",
+  "regions/beiming-gu/npcs/CANGXUE_TIELAN.md",
+  "regions/beiming-gu/npcs/FROSTPEAK_DOJO_MASTER.md",
+  "regions/beiming-gu/npcs/HANYUE_MINGZHAO.md",
+  "regions/beiming-gu/npcs/IRONROOT_DOJO_MASTER.md",
+  "regions/beiming-gu/npcs/LINGFENG_YUJIN.md",
+  "regions/beiming-gu/npcs/MINGHU_YANSHU.md",
+  "regions/beiming-gu/npcs/SILENT_SNOW_DOJO_MASTER.md",
+  "regions/beiming-gu/npcs/SILVER_TIGER_DOJO_MASTER.md",
+  "regions/beiming-gu/npcs/TIESHI_BEIYUE.md",
+  "regions/beiming-gu/npcs/XUANBING_LINGSU.md",
+  "regions/beiming-gu/npcs/XUANBING_YUE.md",
+  "regions/beiming-gu/npcs/XUANSONG_QINGHE.md",
+  "regions/beiming-gu/npcs/XUANYE_ZHENBEI.md",
+  "regions/beiming-gu/npcs/YAOCHI_SUWEN.md",
+  "regions/beiming-gu/npcs/YINSHAN_QIAOFENG.md",
+  "regions/golden-dragon-empire/npcs/LUO_ZHENKAI.md",
+  "regions/golden-dragon-empire/npcs/SHEN_YUNTING.md",
+  "regions/tianhai-yunzhou/npcs/DUAN_HAICHENG.md",
+  "regions/tianhai-yunzhou/npcs/LIN_QIAOYU.md"
 ]);
 
 export const LORE_PLACEHOLDERS: LorePlaceholder[] = [
