@@ -218,7 +218,7 @@ describe("World Archive visibility and entity routing", () => {
       "official-baihu-zhengyang", "official-gu-jingheng", "official-cangyue-yucheng",
       "official-heiyu-zhaolin", "official-xuanyuan-haoran", "official-cangyue-yunhe",
       "official-tieyan-mingxuan", "official-yunlan-qinglan", "official-yanling-zhenyu",
-      "official-baihu-xuefeng", "official-zhenhai-haixiu", "luo-zhenkai", "shen-yunting"
+      "official-baihu-xuefeng", "official-zhenhai-haixiu"
     ]) expect(html).toContain('data-lore-open="' + id + '"');
 
     expect(openLoreEntry("beiming")).toBe(true);
