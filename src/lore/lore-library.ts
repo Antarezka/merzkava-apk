@@ -573,6 +573,175 @@ const LORE_ENTRY_DRAFTS: Omit<LoreEntry, "sourceCommit" | "reviewedAt" | "crossR
     sourcePath: "world/WEALTH_DISTRIBUTION.md", sourceLabel: "Global Xuan Gold Distribution"
   },
 
+  {
+    id: "beiming-jingheng", title: "Beiming Jingheng", aliases: ["Beiming Jingheng"],
+    visibility: "PUBLISHED", category: "PEOPLES", eyebrow: "Beiming Gu NPC · Public Profile",
+    summary: "Anggota Beiming Gu yang ambisius dan tercatat memiliki perilaku koruptif. Informasi ini dibatasi pada profil publik; koneksi rahasia dan insiden pribadi tidak ditampilkan.",
+    paragraphs: ["Beiming Jingheng dikenal sebagai pribadi ambisius dengan kecenderungan melakukan tindakan koruptif. Profil publik ini tidak membuka hubungan tersembunyi, rincian insiden pribadi, tempat tinggal, maupun keberadaannya saat ini."],
+    sourcePath: "regions/beiming-gu/npcs/BEIMING_JINGHENG.md", sourceLabel: "BEIMING JINGHENG"
+  },
+  {
+    id: "beiming-xuanyu", title: "Beiming Xuanyu", aliases: ["Beiming Xuanyu"],
+    visibility: "PUBLISHED", category: "PEOPLES", eyebrow: "Beiming Gu Clan · Public Profile",
+    summary: "Kepala Beiming Clan yang tenang, teliti, dan menjaga kesinambungan keluarga serta keamanan wilayah.",
+    paragraphs: ["Beiming Xuanyu memimpin Beiming Clan. Ia dikenal tenang dan teliti, dengan perhatian pada kesinambungan keluarga dan keamanan wilayah. Fokus khasnya berkaitan dengan es purba, qilin utara, dan lapisan embun beku yang mengunci material. Rincian kemampuan, ring, dan lokasi pribadinya tidak ditambahkan di sini."],
+    sourcePath: "regions/beiming-gu/npcs/BEIMING_XUANYU.md", sourceLabel: "BEIMING XUANYU"
+  },
+  {
+    id: "binghe-chuanliu", title: "Binghe Chuanliu", aliases: ["Binghe Chuanliu"],
+    visibility: "PUBLISHED", category: "PEOPLES", eyebrow: "Beiming Gu Clan · Public Profile",
+    summary: "Kepala Binghe Clan yang ramah, luwes, dan cepat membaca perubahan keadaan.",
+    paragraphs: ["Binghe Chuanliu memimpin Binghe Clan. Ia dikenal ramah, luwes, dan cepat membaca perubahan keadaan. Fokus khasnya adalah berang-berang sungai es dan arus utara. Detail kemampuan dan keberadaan terkini tidak diasumsikan."],
+    sourcePath: "regions/beiming-gu/npcs/BINGHE_CHUANLIU.md", sourceLabel: "BINGHE CHUANLIU"
+  },
+  {
+    id: "lan-feng", title: "Lan Feng", aliases: ["Lan Feng", "Blue-Flame Dojo Master"],
+    visibility: "PUBLISHED", category: "PEOPLES", eyebrow: "Beiming Gu Dojo · Public Profile",
+    summary: "Master Blue-Flame Dojo yang bersemangat dan menuntut kendali teknik dalam latihan.",
+    paragraphs: ["Lan Feng memimpin Blue-Flame Dojo. Ia bersemangat, menuntut kontrol teknik, dan tidak mentoleransi latihan ceroboh. Fokus khasnya adalah harimau salju berapi biru; api tersebut tidak berarti kekebalan mutlak terhadap dingin."],
+    sourcePath: "regions/beiming-gu/npcs/BLUE_FLAME_DOJO_MASTER.md", sourceLabel: "BLUE FLAME DOJO MASTER"
+  },
+  {
+    id: "cangxue-beiran", title: "Cangxue Beiran", aliases: ["Cangxue Beiran"],
+    visibility: "PUBLISHED", category: "PEOPLES", eyebrow: "Beiming Gu NPC · Public Profile",
+    summary: "Pemuda dari keluarga yang terkait pekerjaan berburu dan pasokan lokal; berhati-hati dan berorientasi pada survival.",
+    paragraphs: ["Cangxue Beiran dikenal berhati-hati, blak-blakan, berorientasi pada survival, dan lambat mempercayai orang asing. Ia akrab dengan risiko praktis kehidupan dan pekerjaan di lingkungan utara yang keras. Profil ini tidak menetapkan kemampuan tempur, pangkat berburu, atau hubungan klan tertentu."],
+    sourcePath: "regions/beiming-gu/npcs/CANGXUE_BEIRAN.md", sourceLabel: "CANGXUE BEIRAN"
+  },
+  {
+    id: "cangxue-tielan", title: "Cangxue Tielan", aliases: ["Cangxue Tielan"],
+    visibility: "PUBLISHED", category: "PEOPLES", eyebrow: "Beiming Gu Clan · Public Profile",
+    summary: "Kepala Cangxue Clan yang terus terang, tangguh, dan tidak menyukai pemborosan.",
+    paragraphs: ["Cangxue Tielan memimpin Cangxue Clan. Ia terus terang, tahan banting, dan tidak menyukai pemborosan. Fokus khasnya adalah lembu bertanduk besi kutub dan daya tahan."],
+    sourcePath: "regions/beiming-gu/npcs/CANGXUE_TIELAN.md", sourceLabel: "CANGXUE TIELAN"
+  },
+  {
+    id: "shuang-yue", title: "Shuang Yue", aliases: ["Shuang Yue", "Frostpeak Dojo Master"],
+    visibility: "PUBLISHED", category: "PEOPLES", eyebrow: "Beiming Gu Dojo · Public Profile",
+    summary: "Master Frostpeak Dojo yang sabar dan konsisten, mengutamakan dasar sebelum teknik sulit.",
+    paragraphs: ["Shuang Yue memimpin Frostpeak Dojo. Ia sabar, konsisten, dan mengutamakan penguasaan dasar sebelum teknik sulit. Fokus khasnya adalah beruang berlapis es dan pertahanan tubuh."],
+    sourcePath: "regions/beiming-gu/npcs/FROSTPEAK_DOJO_MASTER.md", sourceLabel: "FROSTPEAK DOJO MASTER"
+  },
+  {
+    id: "hanyue-mingzhao", title: "Hanyue Mingzhao", aliases: ["Hanyue Mingzhao"],
+    visibility: "PUBLISHED", category: "PEOPLES", eyebrow: "Beiming Gu Clan · Public Profile",
+    summary: "Kepala Hanyue Clan yang sopan, observan, dan berhati-hati terhadap janji politik.",
+    paragraphs: ["Hanyue Mingzhao memimpin Hanyue Clan. Ia sopan, observan, dan berhati-hati terhadap janji politik. Fokus khasnya adalah rusa es bercahaya bulan dan kristal beku."],
+    sourcePath: "regions/beiming-gu/npcs/HANYUE_MINGZHAO.md", sourceLabel: "HANYUE MINGZHAO"
+  },
+  {
+    id: "tie-song", title: "Tie Song", aliases: ["Tie Song", "Ironroot Dojo Master"],
+    visibility: "PUBLISHED", category: "PEOPLES", eyebrow: "Beiming Gu Dojo · Public Profile",
+    summary: "Master Ironroot Dojo yang kokoh, sederhana, dan tidak mudah terkesan oleh gelar.",
+    paragraphs: ["Tie Song memimpin Ironroot Dojo. Ia kokoh, sederhana, dan tidak mudah terkesan oleh gelar. Fokus khasnya adalah lembu musk bertanduk kuat dan daya tahan."],
+    sourcePath: "regions/beiming-gu/npcs/IRONROOT_DOJO_MASTER.md", sourceLabel: "IRONROOT DOJO MASTER"
+  },
+  {
+    id: "lingfeng-yujin", title: "Lingfeng Yujin", aliases: ["Lingfeng Yujin"],
+    visibility: "PUBLISHED", category: "PEOPLES", eyebrow: "Beiming Gu Clan · Public Profile",
+    summary: "Kepala Lingfeng Clan yang cepat mengambil keputusan lapangan dan tidak menyukai rapat panjang.",
+    paragraphs: ["Lingfeng Yujin memimpin Lingfeng Clan. Ia cepat mengambil keputusan di lapangan dan mudah bosan pada rapat panjang. Fokus khasnya adalah falcon salju dan angin lintas puncak."],
+    sourcePath: "regions/beiming-gu/npcs/LINGFENG_YUJIN.md", sourceLabel: "LINGFENG YUJIN"
+  },
+  {
+    id: "minghu-yanshu", title: "Minghu Yanshu", aliases: ["Minghu Yanshu"],
+    visibility: "PUBLISHED", category: "PEOPLES", eyebrow: "Beiming Gu Clan · Public Profile",
+    summary: "Kepala Minghu Clan yang sangat awas, hemat bicara, dan tidak menyukai perhatian.",
+    paragraphs: ["Minghu Yanshu memimpin Minghu Clan. Ia sangat awas, hemat bicara, dan tidak menyukai perhatian. Fokus khasnya adalah lynx putih, kabut beku, dan pengintaian."],
+    sourcePath: "regions/beiming-gu/npcs/MINGHU_YANSHU.md", sourceLabel: "MINGHU YANSHU"
+  },
+  {
+    id: "mo-xueyan", title: "Mo Xueyan", aliases: ["Mo Xueyan", "Silent Snow Dojo Master"],
+    visibility: "PUBLISHED", category: "PEOPLES", eyebrow: "Beiming Gu Dojo · Public Profile",
+    summary: "Master Silent Snow Dojo yang tenang, jarang memberi pujian, dan mengamati sebelum bergerak.",
+    paragraphs: ["Mo Xueyan memimpin Silent Snow Dojo. Ia tenang, jarang memberi pujian, dan mengamati sebelum bergerak. Fokus khasnya adalah burung hantu salju dan gerak tanpa suara."],
+    sourcePath: "regions/beiming-gu/npcs/SILENT_SNOW_DOJO_MASTER.md", sourceLabel: "SILENT SNOW DOJO MASTER"
+  },
+  {
+    id: "bai-yushen", title: "Bai Yushen", aliases: ["Bai Yushen", "Silver Tiger Dojo Master"],
+    visibility: "PUBLISHED", category: "PEOPLES", eyebrow: "Beiming Gu Dojo · Public Profile",
+    summary: "Master Silver Tiger Dojo yang langsung, kompetitif, dan menghargai keberanian yang terkendali.",
+    paragraphs: ["Bai Yushen memimpin Silver Tiger Dojo. Ia langsung, kompetitif, dan menghargai keberanian yang disertai kendali. Fokus khasnya adalah harimau salju bertaring perak dan serangan jarak dekat."],
+    sourcePath: "regions/beiming-gu/npcs/SILVER_TIGER_DOJO_MASTER.md", sourceLabel: "SILVER TIGER DOJO MASTER"
+  },
+  {
+    id: "tieshi-beiyue", title: "Tieshi Beiyue", aliases: ["Tieshi Beiyue"],
+    visibility: "PUBLISHED", category: "PEOPLES", eyebrow: "Beiming Gu Clan · Public Profile",
+    summary: "Kepala Tieshi Clan yang keras pada standar mutu dan adil terhadap pekerja.",
+    paragraphs: ["Tieshi Beiyue memimpin Tieshi Clan. Ia keras kepala dalam menjaga standar mutu, tetapi adil terhadap pekerja. Fokus khasnya adalah badak punggung gletser dan mineral beku."],
+    sourcePath: "regions/beiming-gu/npcs/TIESHI_BEIYUE.md", sourceLabel: "TIESHI BEIYUE"
+  },
+  {
+    id: "xuanbing-lingsu", title: "Xuanbing Lingsu", aliases: ["Xuanbing Lingsu"],
+    visibility: "PUBLISHED", category: "PEOPLES", eyebrow: "Beiming Gu Clan · Public Profile",
+    summary: "Kepala Xuanbing Clan yang disiplin, sabar, dan cenderung berbicara setelah menguji bukti.",
+    paragraphs: ["Xuanbing Lingsu memimpin Xuanbing Clan. Ia disiplin, sabar, dan cenderung berbicara setelah menguji bukti. Fokus khasnya adalah ular es bertingkat dan pertahanan dingin."],
+    sourcePath: "regions/beiming-gu/npcs/XUANBING_LINGSU.md", sourceLabel: "XUANBING LINGSU"
+  },
+  {
+    id: "xuanbing-yue", title: "Xuanbing Yue", aliases: ["Xuanbing Yue"],
+    visibility: "PUBLISHED", category: "PEOPLES", eyebrow: "Beiming Gu NPC · Public Profile",
+    summary: "Anggota muda Xuanbing Clan yang mantap, observan, dan melindungi orang yang dianggap diperlakukan tidak adil.",
+    paragraphs: ["Xuanbing Yue dikenal mantap, observan, terus terang, dan protektif terhadap orang yang dianggap dinilai tidak adil. Ia dibesarkan dalam tradisi klan. Pangkat, gelar formal, dan pendaftaran dojo tertentu belum ditetapkan."],
+    sourcePath: "regions/beiming-gu/npcs/XUANBING_YUE.md", sourceLabel: "XUANBING YUE"
+  },
+  {
+    id: "xuansong-qinghe", title: "Xuansong Qinghe", aliases: ["Xuansong Qinghe"],
+    visibility: "PUBLISHED", category: "PEOPLES", eyebrow: "Beiming Gu Clan · Public Profile",
+    summary: "Kepala Xuansong Clan yang pendiam, tekun, dan menghargai keseimbangan alam.",
+    paragraphs: ["Xuansong Qinghe memimpin Xuansong Clan. Ia pendiam, tekun, dan menghargai keseimbangan alam. Fokus khasnya adalah cerpelai pinus beku dan hutan utara."],
+    sourcePath: "regions/beiming-gu/npcs/XUANSONG_QINGHE.md", sourceLabel: "XUANSONG QINGHE"
+  },
+  {
+    id: "xuanye-zhenbei", title: "Xuanye Zhenbei", aliases: ["Xuanye Zhenbei"],
+    visibility: "PUBLISHED", category: "PEOPLES", eyebrow: "Beiming Gu Clan · Public Profile",
+    summary: "Kepala Xuanye Clan yang tegas, strategis, dan menjaga jarak sampai kepercayaan terbentuk.",
+    paragraphs: ["Xuanye Zhenbei memimpin Xuanye Clan. Ia tegas, strategis, dan menjaga jarak sampai kepercayaan terbentuk. Fokus khasnya adalah serigala utara berlapis embun beku hitam."],
+    sourcePath: "regions/beiming-gu/npcs/XUANYE_ZHENBEI.md", sourceLabel: "XUANYE ZHENBEI"
+  },
+  {
+    id: "yaochi-suwen", title: "Yaochi Suwen", aliases: ["Yaochi Suwen"],
+    visibility: "PUBLISHED", category: "PEOPLES", eyebrow: "Beiming Gu Clan · Public Profile",
+    summary: "Kepala Yaochi Clan yang lembut dalam percakapan tetapi tegas mengenai keselamatan.",
+    paragraphs: ["Yaochi Suwen memimpin Yaochi Clan. Ia lembut dalam percakapan tetapi tegas soal keselamatan. Fokus khasnya adalah bangau teratai salju dan herbal dingin."],
+    sourcePath: "regions/beiming-gu/npcs/YAOCHI_SUWEN.md", sourceLabel: "YAOCHI SUWEN"
+  },
+  {
+    id: "yinshan-qiaofeng", title: "Yinshan Qiaofeng", aliases: ["Yinshan Qiaofeng"],
+    visibility: "PUBLISHED", category: "PEOPLES", eyebrow: "Beiming Gu Clan · Public Profile",
+    summary: "Kepala Yinshan Clan yang waspada, praktis, dan sulit percaya pada peta yang belum diuji.",
+    paragraphs: ["Yinshan Qiaofeng memimpin Yinshan Clan. Ia waspada, praktis, dan sulit percaya pada peta yang belum diuji. Fokus khasnya adalah elang punggung salju dan mobilitas pegunungan."],
+    sourcePath: "regions/beiming-gu/npcs/YINSHAN_QIAOFENG.md", sourceLabel: "YINSHAN QIAOFENG"
+  },
+  {
+    id: "luo-zhenkai", title: "Luo Zhenkai", aliases: ["Luo Zhenkai"],
+    visibility: "PUBLISHED", category: "POWERS", eyebrow: "Golden Dragon NPC · Public Profile",
+    summary: "Ahli waris keluarga pedagang yang sosial, penuh perhitungan, dan cepat membaca pertukaran kepentingan.",
+    paragraphs: ["Luo Zhenkai tumbuh di lingkungan perdagangan dan negosiasi. Ia sosial, penuh perhitungan, dan cepat membaca pertukaran bantuan. Ia dapat menjadi sumber kabar pasar di antara kenalan, tetapi keandalan informasi bergantung pada kepentingan dan topiknya. Profil ini tidak menetapkan kepemilikan guild atau tempat usaha tertentu."],
+    sourcePath: "regions/golden-dragon-empire/npcs/LUO_ZHENKAI.md", sourceLabel: "LUO ZHENKAI"
+  },
+  {
+    id: "shen-yunting", title: "Shen Yunting", aliases: ["Shen Yunting"],
+    visibility: "PUBLISHED", category: "POWERS", eyebrow: "Golden Dragon NPC · Public Profile",
+    summary: "Anggota muda keluarga Shen yang disiplin, kompetitif, dan berhati-hati menjaga reputasi publik.",
+    paragraphs: ["Shen Yunting berasal dari salah satu cabang keluarga Shen. Ia disiplin, kompetitif, dan menjaga reputasi publik. Ia tidak boleh diasumsikan sebagai anggota keluarga kekaisaran, memiliki pangkat cabang tertentu, atau telah diterima di akademi tertentu."],
+    sourcePath: "regions/golden-dragon-empire/npcs/SHEN_YUNTING.md", sourceLabel: "SHEN YUNTING"
+  },
+  {
+    id: "duan-haicheng", title: "Duan Haicheng", aliases: ["Duan Haicheng"],
+    visibility: "PUBLISHED", category: "ARCHIVES", eyebrow: "Tianhai NPC · Public Profile",
+    summary: "Putra keluarga perdagangan Artificial Artifact yang percaya diri, praktis, dan memperhatikan kebutuhan pembeli.",
+    paragraphs: ["Duan Haicheng tumbuh di sekitar peredaran dan penjualan Artificial Artifact. Ia percaya diri, praktis, kompetitif, dan memperhatikan apa yang benar-benar dibutuhkan pembeli. Latar dagang tidak membuktikan keahlian teknis, kepemilikan bengkel, atau afiliasi guild tertentu."],
+    sourcePath: "regions/tianhai-yunzhou/npcs/DUAN_HAICHENG.md", sourceLabel: "DUAN HAICHENG"
+  },
+  {
+    id: "lin-qiaoyu", title: "Lin Qiaoyu", aliases: ["Lin Qiaoyu"],
+    visibility: "PUBLISHED", category: "ARCHIVES", eyebrow: "Tianhai NPC · Public Profile",
+    summary: "Pelajar Arcanist yang ingin tahu, metodis, dan gemar menguji jawaban yang diterima.",
+    paragraphs: ["Lin Qiaoyu mengejar pengetahuan Arcanistry dan menghargai hasil yang dapat direproduksi. Ia ingin tahu, metodis, dan bersedia mempertanyakan jawaban yang diterima. Grade Arcanist maupun pendaftaran institusi formal belum ditetapkan."],
+    sourcePath: "regions/tianhai-yunzhou/npcs/LIN_QIAOYU.md", sourceLabel: "LIN QIAOYU"
+  },
+
 ];
 
 const ARCHIVE_SOURCE_COMMIT = "2f76a864150528afb0e3d26cb16f9396ce610ff6";
