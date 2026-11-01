@@ -92,6 +92,19 @@ const SAVE_KEY = "merzkava-eternal-path-save-v1";
 const SAVE_SLOTS_KEY = "merzkava-eternal-path-saves-v1";
 const ACTIVE_SAVE_KEY = "merzkava-eternal-path-active-v1";
 let save: EternalSave | null = null;
+const memorySaveStorage=new Map<string,string>();
+function storageGet(key:string):string|null {
+  try { if(typeof globalThis.localStorage!=="undefined") return globalThis.storageGet(key); } catch {/* use in-memory fallback */}
+  return memorySaveStorage.get(key)??null;
+}
+function storageSet(key:string,value:string):void {
+  try { if(typeof globalThis.localStorage!=="undefined"){globalThis.storageSet(key,value);return;} } catch {/* use in-memory fallback */}
+  memorySaveStorage.set(key,value);
+}
+function storageRemove(key:string):void {
+  try { if(typeof globalThis.localStorage!=="undefined"){globalThis.storageRemove(key);memorySaveStorage.delete(key);return;} } catch {/* use in-memory fallback */}
+  memorySaveStorage.delete(key);
+}
 function defaultSceneForRegion(region:EternalRegion):EternalScene {
   return ETERNAL_SCENES.find(scene=>scene.region===region) ?? ETERNAL_SCENES[0];
 }
@@ -110,12 +123,12 @@ function makeSaveId():string {
 }
 function readSlots():EternalSaveSlot[] {
   try {
-    const value=JSON.parse(localStorage.getItem(SAVE_SLOTS_KEY)??"[]");
+    const value=JSON.parse(storageGet(SAVE_SLOTS_KEY)??"[]");
     return Array.isArray(value)?value.filter((item):item is EternalSaveSlot=>Boolean(item&&typeof item.id==="string"&&item.save&&typeof item.save==="object")):[];
   } catch { return []; }
 }
 function writeSlots(slots:EternalSaveSlot[]):void {
-  localStorage.setItem(SAVE_SLOTS_KEY,JSON.stringify(slots));
+  storageSet(SAVE_SLOTS_KEY,JSON.stringify(slots));
 }
 function normalizeSave(value:unknown):EternalSave|null {
   if(!value||typeof value!=="object") return null;
@@ -141,12 +154,12 @@ function ensureLegacyMigration():EternalSaveSlot[] {
   const slots=readSlots();
   if(slots.length) return slots;
   try {
-    const raw=localStorage.getItem(SAVE_KEY);
+    const raw=storageGet(SAVE_KEY);
     if(!raw) return slots;
     const migrated=normalizeSave(JSON.parse(raw));
     if(!migrated) return slots;
     const slot:EternalSaveSlot={id:migrated.saveId,name:migrated.saveName,createdAt:migrated.createdAt,updatedAt:migrated.updatedAt,save:migrated};
-    writeSlots([slot]);localStorage.setItem(ACTIVE_SAVE_KEY,slot.id);localStorage.setItem(SAVE_KEY,JSON.stringify(migrated));
+    writeSlots([slot]);storageSet(ACTIVE_SAVE_KEY,slot.id);storageSet(SAVE_KEY,JSON.stringify(migrated));
     return [slot];
   } catch { return slots; }
 }
@@ -161,11 +174,11 @@ function persist():void {
   const index=slots.findIndex(slot=>slot.id===save!.saveId);
   const record:EternalSaveSlot={id:save.saveId,name:save.saveName,createdAt:save.createdAt,updatedAt:now,save};
   if(index>=0) slots[index]=record; else slots.push(record);
-  writeSlots(slots);localStorage.setItem(ACTIVE_SAVE_KEY,save.saveId);localStorage.setItem(SAVE_KEY,JSON.stringify(save));
+  writeSlots(slots);storageSet(ACTIVE_SAVE_KEY,save.saveId);storageSet(SAVE_KEY,JSON.stringify(save));
 }
 function readActiveSave():EternalSave|null {
   const slots=ensureLegacyMigration();let activeId="";
-  try{activeId=localStorage.getItem(ACTIVE_SAVE_KEY)??"";}catch{return null;}
+  try{activeId=storageGet(ACTIVE_SAVE_KEY)??"";}catch{return null;}
   const slot=slots.find(item=>item.id===activeId);return slot?normalizeSave(slot.save):null;
 }
 export function getEternalSave():EternalSave|null {
@@ -173,7 +186,7 @@ export function getEternalSave():EternalSave|null {
   return save;
 }
 export function listEternalSaves():EternalSaveSummary[] {
-  const slots=ensureLegacyMigration();const activeId=(()=>{try{return localStorage.getItem(ACTIVE_SAVE_KEY)??"";}catch{return "";}})();
+  const slots=ensureLegacyMigration();const activeId=(()=>{try{return storageGet(ACTIVE_SAVE_KEY)??"";}catch{return "";}})();
   return slots.map(slot=>{const state=normalizeSave(slot.save);return state?{id:slot.id,name:slot.name,characterName:state.character.name,region:state.character.region,day:state.day,updatedAt:slot.updatedAt,active:slot.id===activeId}:null;}).filter((item):item is EternalSaveSummary=>item!==null).sort((a,b)=>b.updatedAt.localeCompare(a.updatedAt));
 }
 export function startEternalGame(input:{name:string;age:number;region:EternalRegion}):void {
@@ -187,20 +200,20 @@ export function loadEternalSave(id:string):boolean {
   save=next;persist();return true;
 }
 export function unloadEternalGame():void {
-  save=null;try{localStorage.removeItem(ACTIVE_SAVE_KEY);localStorage.removeItem(SAVE_KEY);}catch{/* no-op */}
+  save=null;try{storageRemove(ACTIVE_SAVE_KEY);storageRemove(SAVE_KEY);}catch{/* no-op */}
 }
 export function renameEternalSave(id:string,name:string):boolean {
   const nextName=name.trim();if(nextName.length<2||nextName.length>48) return false;
   const slots=ensureLegacyMigration();const slot=slots.find(item=>item.id===id);if(!slot) return false;
   slot.name=nextName;slot.save.saveName=nextName;slot.updatedAt=new Date().toISOString();
-  if(save?.saveId===id){save.saveName=nextName;save.updatedAt=slot.updatedAt;localStorage.setItem(SAVE_KEY,JSON.stringify(save));}
+  if(save?.saveId===id){save.saveName=nextName;save.updatedAt=slot.updatedAt;storageSet(SAVE_KEY,JSON.stringify(save));}
   writeSlots(slots);return true;
 }
 export function deleteEternalSave(id:string):boolean {
   const slots=ensureLegacyMigration();const next=slots.filter(item=>item.id!==id);if(next.length===slots.length) return false;
   writeSlots(next);
   if(save?.saveId===id) save=null;
-  try{if(localStorage.getItem(ACTIVE_SAVE_KEY)===id){localStorage.removeItem(ACTIVE_SAVE_KEY);localStorage.removeItem(SAVE_KEY);}}catch{/* no-op */}
+  try{if(storageGet(ACTIVE_SAVE_KEY)===id){storageRemove(ACTIVE_SAVE_KEY);storageRemove(SAVE_KEY);}}catch{/* no-op */}
   return true;
 }
 export function exportEternalSave(id:string):string|null {
@@ -215,7 +228,7 @@ export function importEternalSave(raw:string):string {
   save=imported;persist();return imported.saveId;
 }
 export function resetEternalGame():void {
-  save=null;try{localStorage.removeItem(SAVE_KEY);localStorage.removeItem(SAVE_SLOTS_KEY);localStorage.removeItem(ACTIVE_SAVE_KEY);}catch{/* no-op */}
+  save=null;try{storageRemove(SAVE_KEY);storageRemove(SAVE_SLOTS_KEY);storageRemove(ACTIVE_SAVE_KEY);}catch{/* no-op */}
 }
 export function getRegionalDialogueCount(): number {
   const current=getEternalSave();
