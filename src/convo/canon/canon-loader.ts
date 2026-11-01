@@ -1,4 +1,4 @@
-import { cacheCanonDocument, getCachedCanonDocument, type CachedCanonDocument } from "../database/database";
+import { cacheCanonDocument, getCachedCanonDocument, type CachedCanonDocument } from "../../shared/database";
 
 const CANON_REPOSITORY = "Antarezka/merzkava-universe";
 // Update this full commit SHA only when the owner deliberately advances the Universe pinned source. Runtime never bootstraps from README.

@@ -1,5 +1,5 @@
 import { Capacitor } from "@capacitor/core";
-import { getDatabase } from "../database/database";
+import { getDatabase } from "../../shared/database";
 
 export interface Character {
   id: string;

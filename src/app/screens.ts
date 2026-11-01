@@ -1,8 +1,8 @@
 import type { LedgerEntry } from "../ui/ledger-log";
 import { canonLabelMarkup } from "../ui/canon-labels";
-import type { Character } from "../characters/character-repository";
-import { PROFILE_FIELDS, parseCharacterProfile, type ProfileField } from "../engine/profile-parser";
-import { renderLoreLibrary } from "../lore/lore-library";
+import type { Character } from "../convo/characters/character-repository";
+import { PROFILE_FIELDS, parseCharacterProfile, type ProfileField } from "../convo/engine/profile-parser";
+import { renderLoreLibrary } from "../world-archive/lore-library";
 
 const PROFILE_FIELD_GROUPS = [
   { title: "PROFIL KARAKTER", fields: PROFILE_FIELDS.slice(0, 13) },
