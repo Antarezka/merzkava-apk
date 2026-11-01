@@ -9,9 +9,11 @@ export function animateAppScreen(shell: HTMLElement | null): void {
   if (header) animate(header, { opacity: [0, 1], translateY: [-8, 0], duration: 390, ease: "outCubic" });
   if (content) {
     const panels = content.querySelectorAll<HTMLElement>(":scope > *");
-    if (panels.length) animate(panels, {
-      opacity: [0, 1], translateY: [13, 0], duration: 470, delay: stagger(58), ease: "outCubic",
-    });
+    panels.forEach((panel,index)=>animate(panel,{
+      opacity:[0,1],
+      ...(panel.classList.contains("expedition-page")?{}:{translateY:[13,0]}),
+      duration:470,delay:58*index,ease:"outCubic",
+    }));
   }
   if (nav) {
     animate(nav, { opacity: [0, 1], translateY: [18, 0], duration: 520, delay: 90, ease: "outCubic" });
