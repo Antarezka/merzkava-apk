@@ -109,7 +109,7 @@ describe("World Archive visibility and entity routing", () => {
     expect(html).toContain("world/REGION_TIANHAI_YUNZHOU.md");
     expect(html).toContain("2f76a864150528afb0e3d26cb16f9396ce610ff6");
     expect(html).toContain("PUBLICLY REVIEWED CONTENT");
-    expect(html).toContain("raw Markdown file");
+    expect(html).toContain("not a verbatim copy of the canonical Markdown file");
     closeLoreSource();
 
     expect(openLoreEntry("world-atlas")).toBe(true);
@@ -117,7 +117,14 @@ describe("World Archive visibility and entity routing", () => {
     html = renderLoreLibrary();
     expect(html).toContain("PARTIAL_PUBLIC");
     expect(html).toContain("mixed publication scope");
-    expect(html).not.toContain("Beiming Nerva");
+    expect(html).toContain("raw Markdown is intentionally not copied");
+    closeLoreSource();
+    expect(renderLoreLibrary()).toContain("LOCAL DOSSIER");
+
+    expect(openLoreSource("beiming-xenhwa")).toBe(true);
+    html = renderLoreLibrary();
+    expect(html).not.toMatch(/\\b17\\b|white nine-tailed fox|half-beast|current whereabouts/i);
+    expect(html).toContain("Beiming Xenhwa");
     closeLoreSource();
     expect(renderLoreLibrary()).toContain("LOCAL DOSSIER");
   });
