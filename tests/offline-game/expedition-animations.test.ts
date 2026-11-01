@@ -51,6 +51,10 @@ describe("Eternal Path Anime.js motion", () => {
       alternate: true,
       ease: "inOutSine",
     }));
+    expect(mocks.animate).toHaveBeenNthCalledWith(3, fog, expect.objectContaining({
+      loop: true,
+      alternate: true,
+    }));
 
     dispose();
     expect(mocks.scope.revert).toHaveBeenCalledOnce();
