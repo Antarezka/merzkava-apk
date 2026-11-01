@@ -44,7 +44,7 @@ button{font:inherit;color:inherit;cursor:pointer} button:focus-visible{outline:2
 
 
 /* Opening sequence — a quiet visual-novel-style entrance on every cold app launch. */
-.opening-splash{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;overflow:hidden;background:#090807;pointer-events:auto}.opening-splash.is-closing{animation:splash-curtain .48s cubic-bezier(.76,0,.24,1) forwards}
+.opening-splash{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;overflow:hidden;background:#090807;pointer-events:auto}
 .opening-splash::before,.opening-splash::after{position:absolute;content:"";width:min(78vw,420px);aspect-ratio:1;border:1px solid #8b603a22;border-radius:50%;pointer-events:none}
 .opening-splash::after{width:min(58vw,310px);border-color:#d39a5b18}
 .splash-stage{position:relative;isolation:isolate}
@@ -231,9 +231,9 @@ button {color:inherit;} button:focus-visible {outline-color:#a68d5e;}
 
 /* Slow, continuous cinematic hand-off: fade into Kitty, fade out, then reveal the menu. */
 .opening-splash { opacity:1; }
-.opening-splash.is-arriving { animation:splash-fade-in 2400ms ease both; }
-.opening-splash.is-closing { animation:splash-fade-out 2400ms ease-in-out forwards; }
-.opening-splash.is-closing .splash-content { animation:splash-depart 2400ms ease-in-out forwards; }
+
+
+
 @keyframes splash-fade-in { from { opacity:0; } to { opacity:1; } }
 @keyframes splash-fade-out { from { opacity:1; } to { opacity:0; visibility:hidden; } }
 @keyframes splash-depart { from { opacity:1; transform:translateY(0) scale(1); filter:blur(0); } to { opacity:0; transform:translateY(-7px) scale(.985); filter:blur(3px); } }
