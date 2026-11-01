@@ -989,7 +989,10 @@ const PUBLIC_CANDIDATE_SOURCE_PATHS = new Set([
   "regions/golden-dragon-empire/npcs/LUO_ZHENKAI.md",
   "regions/golden-dragon-empire/npcs/SHEN_YUNTING.md",
   "regions/tianhai-yunzhou/npcs/DUAN_HAICHENG.md",
-  "regions/tianhai-yunzhou/npcs/LIN_QIAOYU.md"
+  "regions/tianhai-yunzhou/npcs/LIN_QIAOYU.md",
+  "world/GOLDEN_DRAGON_EMPIRE_OFFICIALS.md",
+  "world/IMPERIAL_SPECIAL_FINANCIAL_AUDIT_COMMITTEE.md",
+  "world/PRISON_AND_BOUND_ITEMS.md"
 ]);
 
 export const LORE_PLACEHOLDERS: LorePlaceholder[] = [
