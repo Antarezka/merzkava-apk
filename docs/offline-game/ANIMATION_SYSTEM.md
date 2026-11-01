@@ -24,7 +24,7 @@ Anime.js is the motion engine for the standalone **Merzkava: Eternal Path** expe
 | Tabs, journal, inventory, quest panels | Screen/component transitions | Pending functional UI |
 | Weather, day/night and scene transitions | Environment state transitions | Pending world/time runtime |
 
-FX-02 is a dedicated layer inside `.expedition-environment`. Its asset remains static when JavaScript is unavailable or reduced motion is requested; no global fog overlay is used.
+FX-02 is a dedicated layer inside `.expedition-environment`, which is presented as a framed scene window with an inset double-line border and independent scene labels. The fog remains behind scene copy and inside the viewport frame. Its asset remains static when JavaScript is unavailable or reduced motion is requested; no global fog overlay is used.
 
 ## 3. Accessibility and performance
 
