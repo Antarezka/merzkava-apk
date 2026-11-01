@@ -153,6 +153,37 @@ export function playSnapshotSlideSound(direction: "down" | "up"): void {
   }
 }
 
+
+/** A restrained mechanical ratchet tick for each navigation snap. */
+export function playNavigationTick(): void {
+  if (!soundEnabled) return;
+  try {
+    const context = new window.AudioContext();
+    const now = context.currentTime;
+    const bursts = [0, 0.032, 0.064];
+    bursts.forEach((offset, index) => {
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+      const filter = context.createBiquadFilter();
+      oscillator.type = "square";
+      oscillator.frequency.setValueAtTime(1850 - index * 210, now + offset);
+      filter.type = "lowpass";
+      filter.frequency.setValueAtTime(2600 - index * 250, now + offset);
+      gain.gain.setValueAtTime(0.0001, now + offset);
+      gain.gain.exponentialRampToValueAtTime(index === 2 ? 0.025 : 0.04, now + offset + 0.003);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + offset + 0.018);
+      oscillator.connect(filter);
+      filter.connect(gain);
+      gain.connect(context.destination);
+      oscillator.start(now + offset);
+      oscillator.stop(now + offset + 0.02);
+    });
+    window.setTimeout(() => { void context.close(); }, 180);
+  } catch (error) {
+    console.warn("Merzkava navigation tick could not play:", error);
+  }
+}
+
 export function setSoundEnabled(enabled: boolean): void {
   soundEnabled = enabled;
   if (!enabled) {
