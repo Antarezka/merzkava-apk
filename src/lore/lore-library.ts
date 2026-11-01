@@ -704,8 +704,9 @@ function renderLorePlaceholder(item: LorePlaceholder): string {
   const statusNote = item.status === "ON_PLAN"
     ? "The entity is intentionally under-specified. Known references remain valid, while additional details are left open for narrative development by the GM. This is not missing data and does not authorize the app to invent canon."
     : "This material is explicitly non-canonical. It may be used as a narrative or illustrative reference, but it does not establish or modify official Merzkava Universe canon.";
+  const backLabel = activeLoreId ? "← BACK TO DOSSIER" : "← BACK TO ARCHIVE";
   return '<article class="lore-detail lore-placeholder-detail">' +
-    '<button class="lore-back" type="button" data-lore-placeholder-back>← BACK TO ARCHIVE</button>' +
+    '<button class="lore-back" type="button" data-lore-placeholder-back>' + backLabel + '</button>' +
     '<div class="lore-detail-top"><span>ENTITY DEVELOPMENT REGISTER</span><span class="lore-status-tag lore-status-' + item.status.toLowerCase() + '">' + escapeLore(statusLabel) + '</span></div>' +
     '<h2>' + escapeLore(item.title) + '</h2>' +
     '<p class="lore-lede">' + escapeLore(item.summary) + '</p>' +
