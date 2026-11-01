@@ -1,28 +1,60 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { renderExpeditionInterface } from "../../src/offline-game/expedition-interface";
-import { chooseEternalOption, ETERNAL_DIALOGUES, ETERNAL_SCENES, getCurrentDialogue, getEternalSave, getExpeditionScene, getRegionalDialogueCount, resetEternalGame, resetExpeditionPreview, setExpeditionPreview, startEternalGame } from "../../src/offline-game/expedition-game";
+import {
+  advanceEternalWorldTime, chooseEternalOption, ETERNAL_DIALOGUES, ETERNAL_SCENES,
+  getCurrentDialogue, getEternalSave, getExpeditionAtmosphere, getExpeditionScene,
+  getRegionalDialogueCount, resetEternalGame, setEternalLocation, startEternalGame,
+} from "../../src/offline-game/expedition-game";
 
-describe("Eternal Path scene and prologue", () => {
-  beforeEach(() => { resetEternalGame(); resetExpeditionPreview(); });
-  it("composes an illustrated location with a separate translucent fog texture", () => {
+describe("Eternal Path live world scene", () => {
+  beforeEach(() => resetEternalGame());
+
+  it("renders the established scene window without temporary test controls", () => {
     const html=renderExpeditionInterface();
     expect(html).toContain('class="expedition-environment"');
     expect(html).toContain('class="expedition-scene-image"');
     expect(html).toContain('class="expedition-fog-motion"');
     expect(html).toContain("Imperial city panorama");
-    expect(html).toContain("SCENE WINDOW");
-    expect(html).toContain("data-eternal-test-toggle");
+    expect(html).toContain("SCENE WINDOW · LIVE WORLD");
+    expect(html).not.toContain("SCENE TEST BENCH");
+    expect(html).not.toContain("data-eternal-test-toggle");
+    expect(html).not.toContain("eternal-preview-scene");
   });
-  it("provides temporary scene, cycle, weather and fog controls", () => {
-    setExpeditionPreview({sceneId:"bg-settlement",cycle:"Night",weather:"Snow",fog:0.18});
-    const html=renderExpeditionInterface();
-    expect(html).toContain("SCENE TEST BENCH");
-    expect(html).toContain("Snowbound settlement");
-    expect(html).toContain('data-cycle="Night"');
-    expect(html).toContain('data-weather="Snow"');
-    expect(html).toContain("--scene-fog-opacity:0.18");
-    expect(html).toContain("do not advance, save, or alter the game clock");
+
+  it("binds scene location to persisted world location, not dialogue scene metadata", () => {
+    startEternalGame({name:"Nafila",age:14,region:"golden-dragon-empire"});
+    const initialLocation=getEternalSave()?.locationId;
+    const firstDialogueScene=getCurrentDialogue()?.sceneId;
+    expect(initialLocation).toBe("gde-city");
+    expect(getExpeditionScene().id).toBe("gde-city");
+    expect(getExpeditionScene().id).not.toBe(firstDialogueScene);
+
+    setEternalLocation("gde-market");
+    expect(getExpeditionScene().id).toBe("gde-market");
+    expect(getEternalSave()?.locationId).toBe("gde-market");
+    expect(getEternalSave()?.character.region).toBe("golden-dragon-empire");
   });
+
+  it("derives day cycle from world clock independently of dialogue progression", () => {
+    startEternalGame({name:"Nafila",age:14,region:"golden-dragon-empire"});
+    expect(getExpeditionAtmosphere().cycle).toBe("Morning");
+    const completedBefore=getEternalSave()?.completed;
+    advanceEternalWorldTime(600);
+    expect(getExpeditionAtmosphere().cycle).toBe("Dusk");
+    expect(getEternalSave()?.completed).toBe(completedBefore);
+    expect(renderExpeditionInterface()).toContain('data-cycle="Dusk"');
+  });
+
+  it("updates weather from the world day and region, not from dialogue count", () => {
+    startEternalGame({name:"Nafila",age:14,region:"beiming-gu"});
+    const initialWeather=getExpeditionAtmosphere().weather;
+    expect(initialWeather).toBe("Snow");
+    advanceEternalWorldTime(16*60);
+    expect(getEternalSave()?.day).toBe(2);
+    expect(getExpeditionAtmosphere().weather).toBe("Cloudy");
+    expect(getEternalSave()?.completed).toBe(0);
+  });
+
   it("keeps a separate local character/save and starts an interactive chronicle", () => {
     startEternalGame({name:"Nafila",age:14,region:"golden-dragon-empire"});
     const save=getEternalSave();
@@ -33,13 +65,15 @@ describe("Eternal Path scene and prologue", () => {
     expect(getEternalSave()?.completed).toBe(1);
     expect(getEternalSave()?.insight).toBe(2);
   });
-  it("keeps the live scene and dialogue aligned with the selected starting power", () => {
+
+  it("keeps the selected world location and dialogue region separate but consistent", () => {
     startEternalGame({name:"Nafila",age:14,region:"tianhai-yunzhou"});
     expect(getExpeditionScene().region).toBe("tianhai-yunzhou");
     expect(getRegionalDialogueCount()).toBe(60);
     expect(ETERNAL_SCENES.find(scene=>scene.id===getCurrentDialogue()?.sceneId)?.region).toBe("tianhai-yunzhou");
   });
-  it("ships 240 deterministic branching dialogue nodes across eight scene compositions", () => {
+
+  it("ships 240 deterministic dialogue nodes across eight scene compositions", () => {
     expect(ETERNAL_DIALOGUES).toHaveLength(240);
     expect(ETERNAL_SCENES).toHaveLength(8);
     expect(ETERNAL_DIALOGUES.every(node=>node.provenance==="IN_GAME_ORIGINAL" && node.choices.length===2)).toBe(true);
