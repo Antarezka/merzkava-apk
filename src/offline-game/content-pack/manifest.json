@@ -7,7 +7,7 @@
   "choicesPerNode": 2,
   "provenance": "IN_GAME_ORIGINAL",
   "sourceRefs": [],
-  "originalityNote": "All dialogue text and branching gameplay choices in this pack are authored for Eternal Path. They are not official Merzkava Universe canon.",
+  "originalityNote": "The dialogue is original game writing. The three Archive dossier references supply only the broad regional setting and constraints; they do not make the story events canon.",
   "worldArchivePackage": {
     "status": "PENDING",
     "requiredFor": "Canon-specific quests, NPCs, named settlements, history, factions beyond broad starting-power identity, official items, creatures and rules",
@@ -38,5 +38,25 @@
   "limitations": [
     "This is an opening playable slice, not the completed life simulation.",
     "Full approved World Archive package pinning, travel, quest chains, combat/reward validation, progression and physical-device QA remain pending."
+  ],
+  "archiveInspirationRefs": [
+    {
+      "archiveDossierId": "golden-dragon",
+      "universeRepository": "Antarezka/merzkava-universe",
+      "universeCommit": "2f76a864150528afb0e3d26cb16f9396ce610ff6",
+      "sourcePath": "world/GOLDEN_DRAGON_EMPIRE_ADMINISTRATIVE_ATLAS.md"
+    },
+    {
+      "archiveDossierId": "tianhai",
+      "universeRepository": "Antarezka/merzkava-universe",
+      "universeCommit": "2f76a864150528afb0e3d26cb16f9396ce610ff6",
+      "sourcePath": "world/REGION_TIANHAI_YUNZHOU.md"
+    },
+    {
+      "archiveDossierId": "beiming",
+      "universeRepository": "Antarezka/merzkava-universe",
+      "universeCommit": "2f76a864150528afb0e3d26cb16f9396ce610ff6",
+      "sourcePath": "world/REGION_BEIMING_GU.md"
+    }
   ]
 }
