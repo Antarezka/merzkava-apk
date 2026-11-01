@@ -22,7 +22,6 @@ export function animateOpeningSplash(splash: HTMLElement): () => void {
     return () => undefined;
   }
 
-  const backdropEntrance=animate(splash,{opacity:[0,1],duration:680,ease:"outCubic"});
   const layers = [shadow, body, head, tail];
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
     content.style.opacity = "1";
@@ -35,6 +34,7 @@ export function animateOpeningSplash(splash: HTMLElement): () => void {
     return () => undefined;
   }
 
+  const backdropEntrance=animate(splash,{opacity:[0,1],duration:680,ease:"outCubic"});
   const particles: HTMLSpanElement[] = [];
   for (let index = 0; index < 8; index += 1) {
     const particle = document.createElement("span");
