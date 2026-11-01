@@ -913,3 +913,36 @@ The first deterministic mechanic module has been added to the APK repository wit
 - Web App Validation #600 passed: 12 test files / 91 tests, TypeScript, gateway type-check, and Vite production build.
 - Seven deterministic modules are CI-verified; full offline game remains incomplete and has no overall completion percentage.
 - Android Build #327: APK package/version/alignment/signature verification passed; Android 14 emulator smoke test remains pending.
+
+
+## Expanded Archive coverage and offline formula preservation — 2026-11-01
+
+**Current curated catalogue:** 47 dossiers / 43 unique Universe source paths.
+
+Eight new reviewed public-safe dossier extracts were added:
+
+| Dossier ID | Universe source | Source handling |
+|---|---|---|
+| `imperial-governance` | `world/GOLDEN_DRAGON_EMPIRE_GOVERNANCE.md` | Public civil/military hierarchy; no GM procedure or strategic allocation formula in the player extract |
+| `imperial-public-services` | `world/GOLDEN_DRAGON_EMPIRE_POPULATION_SERVICES.md` | Named institutions and service-gradient overview; no assumption of universal branch availability |
+| `open-learning-paths` | `world/OPEN_LEARNING_PATHS_AND_WANDERING_INSTRUCTORS.md` | Public learning categories; GM encounter-generation procedure excluded |
+| `social-stratification` | `world/SOCIAL_STRATIFICATION.md` | Broad social layers; no invented local percentages or incomes |
+| `three-power-routes` | `world/THREE_POWER_PERSPECTIVE_MAPS.md` | Relative route framework; no invented coordinates, distances, or travel times |
+| `geography-travel` | `world/GEOGRAPHY_AND_TRAVEL.md` | Curated geography/transport overview; source remains mixed-scope |
+| `tianhai-academies` | `world/TIANHAI_ACADEMIES_AND_ARCANIST_INSTITUTE.md` | Four academies and Institute role; all progression mechanics remain in core |
+| `world-wealth` | `world/WEALTH_DISTRIBUTION.md` | Aggregate accounting estimates with liquidity and character-knowledge caveats |
+
+The source-disposition model remains distinct from dossier publication: six of the new dossiers use `PUBLIC_CANDIDATE` sources, while geography/travel uses `PARTIAL_PUBLIC`. The wealth model's player extract is curated; the full source remains a review candidate. The hidden mountain groups in `world/ANCIENT_SHAMANISM_AND_BUDDHIST_CLANS.md` are deliberately not exposed as a dossier because their identities and discovery boundaries are GM-sensitive.
+
+### Updated path metrics
+
+- Whole Universe Markdown footprint: 43/140 = **30.7%**.
+- Potential player-facing / review-needed scope: 43/72 = **59.7%**.
+- Already dispositioned public-scope sources: 43/44 = **97.7%**.
+- These figures measure source-path mapping only, not claim-level completeness or overall game readiness.
+
+### Formula source preservation for the future offline game
+
+`docs/OFFLINE_GAME_CANON_FORMULA_SNAPSHOT.md` now preserves all 16/16 `MECHANICS_REFERENCE` modules verbatim from Universe commit `2f76a864150528afb0e3d26cb16f9396ce610ff6`, plus the complete `world/GOLDEN_DRAGON_EMPIRE_GOVERNANCE.md` source containing the supplemental Strategic Awakening regional-allocation formula. The snapshot retains upstream blob SHAs and source boundaries. It is a development-only reference: do not expose the full snapshot through the player Archive or treat it as a replacement for the canonical Universe repository.
+
+The new dossier tests are committed but have not yet been executed in this environment. No new APK build is claimed by this content update.
