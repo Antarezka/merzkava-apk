@@ -95,15 +95,15 @@ const ACTIVE_SAVE_KEY = "merzkava-eternal-path-active-v1";
 let save: EternalSave | null = null;
 const memorySaveStorage=new Map<string,string>();
 function storageGet(key:string):string|null {
-  try { if(typeof globalThis.localStorage!=="undefined") return globalThis.storageGet(key); } catch {/* use in-memory fallback */}
+  try { if(typeof globalThis.localStorage!=="undefined") return globalThis.localStorage.getItem(key); } catch {/* use in-memory fallback */}
   return memorySaveStorage.get(key)??null;
 }
 function storageSet(key:string,value:string):void {
-  try { if(typeof globalThis.localStorage!=="undefined"){globalThis.storageSet(key,value);return;} } catch {/* use in-memory fallback */}
+  try { if(typeof globalThis.localStorage!=="undefined"){globalThis.localStorage.setItem(key,value);return;} } catch {/* use in-memory fallback */}
   memorySaveStorage.set(key,value);
 }
 function storageRemove(key:string):void {
-  try { if(typeof globalThis.localStorage!=="undefined"){globalThis.storageRemove(key);memorySaveStorage.delete(key);return;} } catch {/* use in-memory fallback */}
+  try { if(typeof globalThis.localStorage!=="undefined"){globalThis.localStorage.removeItem(key);memorySaveStorage.delete(key);return;} } catch {/* use in-memory fallback */}
   memorySaveStorage.delete(key);
 }
 function defaultSceneForRegion(region:EternalRegion):EternalScene {
