@@ -99,7 +99,10 @@ export function startEternalGame(input:{name:string;age:number;region:EternalReg
 export function resetEternalGame(): void { save=null; try{localStorage.removeItem(SAVE_KEY);}catch{/* no-op */} }
 export function getCurrentDialogue(): EternalDialogue | null {
   const current=getEternalSave(); if(!current) return null;
-  return ETERNAL_DIALOGUES[current.eventIndex % ETERNAL_DIALOGUES.length] ?? null;
+  const regionalEvents=ETERNAL_DIALOGUES.filter(node =>
+    ETERNAL_SCENES.find(scene=>scene.id===node.sceneId)?.region===current.character.region
+  );
+  return regionalEvents[current.eventIndex % regionalEvents.length] ?? null;
 }
 export function chooseEternalOption(index:number): void {
   const current=getEternalSave(); const event=getCurrentDialogue();
@@ -120,7 +123,9 @@ export function chooseEternalOption(index:number): void {
 export function getExpeditionScene(): EternalScene {
   const current=getEternalSave();
   if(preview.enabled) return ETERNAL_SCENES.find(scene=>scene.id===preview.sceneId) ?? ETERNAL_SCENES[0];
-  return ETERNAL_SCENES.find(scene=>scene.region===(current?.character.region ?? "golden-dragon-empire")) ?? ETERNAL_SCENES[0];
+  const dialogueScene=getCurrentDialogue()?.sceneId;
+  return ETERNAL_SCENES.find(scene=>scene.id===dialogueScene) ??
+    ETERNAL_SCENES.find(scene=>scene.region===(current?.character.region ?? "golden-dragon-empire")) ?? ETERNAL_SCENES[0];
 }
 export function getExpeditionAtmosphere(): {cycle:EternalCycle;weather:EternalWeather;fog:number;preview:boolean} {
   if(preview.enabled) return {cycle:preview.cycle,weather:preview.weather,fog:preview.fog,preview:true};
