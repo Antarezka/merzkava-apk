@@ -458,3 +458,62 @@ The existing local catalogue is not safe to expose as a complete player-facing i
 - High-risk hidden-identity content found in Black Tide and repeated Nerva identity exposure in Beiming regional text. Both require strict claim-level filtering.
 - Other regional modules, Lawless Territories central addendum, world systems, events, factions, and full 140-file line-by-line approval remain incomplete.
 - Player-facing publication approval: **not granted**.
+
+
+## World organizations and concealed-location audit — fifth pass
+
+**Source snapshot:** Universe `2f76a864150528afb0e3d26cb16f9396ce610ff6`. Reviewed `LAWLESS_TERRITORIES.md`, `RUINED_ARCHIVER.md`, `SPIRIT_HUNTERS_GUILD.md`, `THREE_POWER_PERSPECTIVE_MAPS.md`, and `WANLUO_SACRED_EXPANSE.md`. Some very long modules were reviewed through section-level ranges; this is not a full line-by-line certification.
+
+### Lawless Territories — mixed public context and restricted content
+
+- The Lawless Territories are explicitly not one state, government, sect, or unified faction. Regional association does not prove control of a village, road, auction, or arena.
+- Broad social context (poor agricultural soil, varied livelihoods, uneven safety, independent trade) may be summarized cautiously. Do not imply that all residents are criminals or that every encounter is hostile.
+- Silent Maw Hall's intermediary role, Black Scripture Sect appraisal services, Hollow Fang Alliance's illegal arenas, elite auctions, people-smuggling, and the Wayfarer Hearth Network are described as underworld services. These are sensitive subjects; a public article must be neutral, non-operational, and avoid inventing routes, prices, named clients, targets, or schedules.
+- Auction material includes illicit trade in half-beast people/lineages and portable Spirit Ring stasis artifacts. Do not present people as collectible inventory or turn restricted/illegal catalogues into shopping-like Archive content. Preserve the coercion/trafficking context if such history is discussed.
+- **Crimson Sovereign Court and Ying Wuxin — strict `GM_ONLY`.** The module repeats hidden leadership, secret links to Crimson Keel Brotherhood, capability details, and coercive Soul Illusion. Outward affection caused by coercion is explicitly not consent. Do not expose the identity, ability, victims, aliases, family links, or secret organizational hierarchy to players before discovery.
+- **Inner Azerion — restricted location/knowledge.** The city is concealed by dense illusion fog; safe routes are known only to experienced forest veterans and local hunter tribes. Its exact location, government, population, leadership, districts, and routes remain unknown. Do not place it on public maps, reveal access directions, or imply ordinary travelers can find it.
+- The Dead Zone is the deepest inner/core zone of Azerion Forest, not a synonym for the whole forest. The lake, ruins, Mega Colossal Labyrinth, and northern sea exit are dangerous and incompletely mapped. No complete internal labyrinth map exists; all map content must be limited to surveyed and recorded segments.
+- The Heavenly Beast's history and its connection to Beiming Han's scar are restricted knowledge known only to a very small number of people, including Beiming Xenhwa. Do not include this in public exposition or entity metadata.
+- The hidden slave market in Inner Azerion is established, but its scale, rules, inventory, ownership, and relationship to city authorities remain undefined. Do not invent them or imply universal local support.
+
+### Ruined Archiver — public institutional candidate with confidential records
+
+- Ruined Archiver is an Ordo Suci Tianming branch, not an independent guild or universal police force. A public overview of its registration, mapping, verification, compensation, and anomaly-warning mission is a possible Archive article.
+- Expedition records, maps, informants, buyers, possible anomalies, confidential sites, and sensitive findings are explicitly access-controlled. Do not publish every known Ruined or confidential map/report; a public article must describe the organization without exposing its operational records.
+- Staff witnessing registration/departure does not mean they enter the ruin, guarantee safety, or verify every subsequent claim. Map claims require evidence; surveyed, inferred, and unknown areas must stay distinct.
+- More than one thousand Golden Age Ruined are established globally, but locations, conditions, contents, and exploration status vary. Do not fabricate a directory or full map.
+- Compensation has an advance and a verification/final-payment process, but there is no universal price table or fixed bounty. Do not add one.
+- Formal hierarchy, internal ranks, universal license thresholds, party-size requirements, fixed risk labels, standard pay rates, verification times, branch staffing, universal sealing authority, and complete Tower alliance roster remain unspecified.
+- The GM continuity section includes strict information-routing rules and anti-meta protections; it is not player-facing lore.
+
+### Wanluo Sacred Expanse and Ordo Suci Tianming
+
+- A public overview may distinguish the Wanluo region, World Knowledge Tower relic, and Sanctum of Ten Thousand Vows headquarters. They are three separate entities and must not be merged.
+- Public roads, pilgrim facilities, and ordinary districts are generally accessible under local rules; specialized institutions, inner Tower areas, deeper chambers, observation zones, and confidential archives have separate access controls. Regional entry does not grant Tower access.
+- The Tower is an ancient divine relic, not owned by the Shen family, Ordo, or alliance. The Shen family is one of several parties entrusted with administrative rights/responsibilities.
+- Ordo Suci Tianming is the world's largest religious organization by follower count in the current setting and has a world-survival/anomaly early-warning mandate. It is not omniscient, not politically absolute, and not a universal law-enforcement body.
+- The World Knowledge Tower administration council, Wanluo regional administration, Ordo, and the alliance of elite envoys have distinct jurisdictions. Do not collapse their authority into one ruling body.
+- The formal alliance name, complete envoy roster, internal ranks, founding chronology, legal charter, voting system, precise geopolitical placement of Wanluo, and detailed administrative boundaries remain unestablished.
+- Public-facing facilities may be described at the level in the source. Sensitive archive content, anomaly reports, restricted access procedures, and undisclosed operational networks remain non-public.
+
+### Three-Power Perspective Maps
+
+- The perspective maps are explicitly relative schematics, not scale maps. They do not define coordinates, distances, exact borders, or travel times.
+- Mapped corridors can be travel frameworks rather than fully surveyed roads; exact pathing, crossings, access, safety, schedules, and durations may remain conditional or unspecified.
+- The Azerion Forest river trap and prison island, the Lawless approach, and the Mega Colossal Labyrinth exit are distinct geographic relationships. Do not collapse them into one route or show the hidden city as an ordinary waypoint.
+- Public map rendering must exclude concealed Inner Azerion, GM-only authority, undiscovered routes, and any restricted location details. Show only geography and routes approved for player knowledge.
+
+### Spirit Hunters Guild
+
+- The Guild's public identity is a broad contract-and-jobs organization, not a hunting-only service. A high-level neutral institutional overview may be publishable after review.
+- Branch availability, reach, fees, staff, membership, authority, contracts, risk, and rewards vary by local canon and events. Do not invent a branch in every settlement, fixed jobs, universal fees, guaranteed payments, or safety.
+- Contract tiers, party registration, hunting/absorption, combat, injury, HP, and bounty mechanics belong to official gameplay modules. Do not duplicate them in the Archive.
+- The Guild is not a world government, universal police force, or guarantee of safety. Allegations require evidence; temporary party membership does not imply trust or permanent affiliation.
+
+### Updated review progress
+
+- Five additional organization/map modules received source-level review.
+- High-risk content identified: Crimson Sovereign Court, Ying Wuxin, Inner Azerion, the Dead Zone/labyrinth, Heavenly Beast–Beiming Han scar history, confidential Ruined records, and restricted Tower/Ordo archives.
+- Potential public article candidates: high-level Lawless social overview (carefully filtered), Ruined Archiver institutional overview, Wanluo/Ordo public institutional overview, and Spirit Hunters Guild overview. None is yet approved for publication.
+- Gameplay mechanics, secret maps, confidential records, hidden identities, and operational underworld details remain excluded.
+- Full 140-file line-by-line approval and player-facing publication approval: **not complete / not granted**.
