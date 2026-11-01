@@ -58,7 +58,7 @@ export function renderExpeditionInterface():string {
     </section>
   </div>`:"";
   return `<section class="expedition-page" aria-label="Merzkava Eternal Path"><header class="expedition-heading"><div><p class="eyebrow">STANDALONE</p><h2>✦ MERZKAVA: ETERNAL PATH</h2></div></header>
-    ${sceneWindow}${startPanel}
+    ${sceneWindow}${startPanel}${managerPanel}
     ${save?`<div class="expedition-disposition-line"><span>DISPOSITION</span><strong>${escapeHtml(save.disposition.label)}</strong></div>`:""}
     ${story}${choiceModal}
     <footer class="expedition-footer"><span>ETERNAL PATH · LOCAL CONTENT PACK</span><span>WORLD ARCHIVE · READ ONLY</span></footer></section>`;
