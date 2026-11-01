@@ -46,7 +46,7 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 
 ## 3. Workstream 1 — World Archive, typography, and reference experience
 
-**Progress now:** `[~] FOUNDATION EXISTS / AUDIT NOT COMPLETE`. The Archive catalogue/manifest and local reference layer exist, but article-by-article canon review, visibility approval, typography audit, navigation QA, and isolation proof remain open. Do not describe the Archive as complete or all articles as approved.
+**Progress now:** `[~] PHASE 1 INVENTORY + HANDOFF BASELINE ESTABLISHED`. The app has 32 curated dossiers / 28 unique source paths. A 140-path source coverage matrix and AI continuation instructions are recorded in `docs/WORLD_ARCHIVE_COVERAGE_MATRIX.md`. Entity-graph expansion, the local source reader, additional public content review, offline/isolation proof and final QA remain open. Do not describe the Archive as complete or all articles as approved.
 
 **Goal:** Make the offline Archive complete, trustworthy, easy to navigate, and visually polished. Typography improvements belong to this workstream.
 
@@ -438,3 +438,28 @@ Before implementing a new feature or changing an existing one:
 - Raised small-screen Archive copy, summaries, category controls, source metadata, paragraph markers, and footnotes. The dark charcoal archive surfaces, warm brass accents, and parchment-like text palette are retained.
 - Added automated checks for local font asset presence, remote font-import removal, and the minimum Archive text scale.
 - **Still open:** on-device visual verification at narrow widths, Android system font scaling, and offline/reconnect smoke testing. This pass does not close the full Workstream 1 exit gate or certify article-by-article canon review.
+
+
+---
+
+## Workstream 1 — Phase 1 handoff checkpoint (2026-11-01)
+
+**Phase 1 objective:** establish a complete source-coverage baseline and a safe continuation point for a new AI/developer. This is documentation/audit groundwork, not a claim that the Archive content is complete or that a new APK has been built.
+
+- [x] Create `docs/WORLD_ARCHIVE_COVERAGE_MATRIX.md`: classify all 140 Markdown paths in Universe snapshot `2f76a864150528afb0e3d26cb16f9396ce610ff6`, map current published dossier IDs/source paths, and record exclusions and next candidates.
+- [x] Reconcile the current catalogue count: **32 dossiers / 28 unique source paths**. Older 26/23 figures in the manifest are stale and superseded.
+- [x] Specify the entity-link contract: stable local IDs, canonical names and aliases, clickable mentions, related records/backlinks, ambiguity-safe resolution, public-only graph, and no links to GM-only/private entities.
+- [x] Record the AI handoff sequence, branch baseline, Universe source snapshot, current implementation gaps, and last known Android build reference in the matrix.
+- [ ] Implement and test the complete public entity graph across article mentions, aliases, search, related records and backlinks.
+- [ ] Implement the local offline source reader; the current dossier source card displays the source path as plain text.
+- [ ] Expand public coverage from `PUBLIC_CANDIDATE` / `PARTIAL_PUBLIC` rows only after claim-level review.
+- [ ] Verify the matrix against the current recursive Universe tree before content expansion.
+- [ ] Build and test the resulting APK; record exact versionName, versionCode, source SHA, workflow run, artifact, signature and device smoke-test outcome.
+
+**Current branch baseline:** `feature/archive-experience`; pre-Phase-1-docs HEAD `67c5186ffac266fde41ddf82fd2fd3042d412486`. The Phase 1 documentation commits advance this branch; always fetch the actual HEAD before continuing.
+
+**Last known APK reference:** Android Build workflow #300, artifact [merzkava-debug-apk](https://github.com/Antarezka/merzkava-apk/actions/runs/41298609571/artifacts/13080676292). Its emulator smoke test was blocked by a system dialog taking focus. The user separately confirmed that the light-theme Archive text is readable on the physical device. This artifact is a baseline only, **not** a build of the Phase 1 documentation commits. Re-check build metadata and workflow history before selecting the next build/version.
+
+**Mandatory start order for a new AI:** read this roadmap → read `docs/WORLD_ARCHIVE_COVERAGE_MATRIX.md` → read `docs/WORLD_ARCHIVE_CONTENT_MANIFEST.md` → inspect actual branch HEAD and working tree → verify the Universe source pin → inspect `src/lore/lore-library.ts` and tests → continue the next unchecked Phase 1 item. Do not redo completed light-theme typography work. Do not modify `merzkava-universe` unless explicitly requested.
+
+**Phase 1 status:** `[x] INVENTORY + HANDOFF BASELINE`; overall Workstream 1 remains `[~] IN PROGRESS` until graph QA, local source reader, content expansion, isolation proof and release gates are complete.
