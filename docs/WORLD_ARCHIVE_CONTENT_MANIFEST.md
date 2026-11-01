@@ -816,3 +816,27 @@ This update changes only the APK repository. It does not modify the official Uni
 - `tests/lore-library.test.ts` includes regression coverage for both linked examples, detail navigation, search, and separation from ordinary canon dossier resolution.
 - **Verification:** the latest commit has no associated workflow run. Tests have not been executed; TypeScript/build and device checks remain pending.
 - **APK:** no new build was started. Build #300 remains the previous baseline only; do not present it as containing this change.
+
+## World Archive coverage and offline formula preservation — 2026-11-01
+
+### Measured source-path progress
+
+- Universe source snapshot: `main` at `2f76a864150528afb0e3d26cb16f9396ce610ff6`, containing 140 Markdown paths.
+- Current Archive: **39 curated dossiers / 35 unique mapped source paths**.
+- Whole-repository source-path footprint: **35/140 = 25.0%**.
+- Potential player-facing / review-needed scope: **35/72 = 48.6%**. The denominator is 21 `PUBLISHED`, 9 `PARTIAL_PUBLIC`, 14 `PUBLIC_CANDIDATE`, and 28 `REVIEW_REQUIRED` files.
+- Already dispositioned public-scope paths: **35/44 = 79.5%**, where the 44 paths are `PUBLISHED` + `PARTIAL_PUBLIC` + `PUBLIC_CANDIDATE`.
+- These are source-path indicators only. A mapped dossier may contain a curated subset of a source, so claim-level completeness remains unmeasured. Do not describe these figures as a percentage of every fact, paragraph, settlement, NPC, or world mechanic.
+
+### Formula source preservation for the future offline game
+
+- **Preserved:** all 16 source files classified `MECHANICS_REFERENCE` in the 140-path matrix, copied verbatim from the same pinned Universe commit into `docs/OFFLINE_GAME_CANON_FORMULA_SNAPSHOT.md`.
+- **Supplemental source preserved:** `world/GOLDEN_DRAGON_EMPIRE_GOVERNANCE.md`, which contains the regional public-awakening budget allocation formula and is classified `PUBLIC_CANDIDATE`. Its content remains subject to claim-level player-visibility review.
+- **Formula-source preservation:** 17/17 audited formula/rule source documents = **100% preserved**. The snapshot records the upstream blob SHA beside each source section so later changes can be compared exactly.
+- **Offline engine implementation:** **0%**. No deterministic standalone game engine has been implemented. Copying the source texts is preservation, not a playable or executable rules implementation.
+- **Packaging boundary:** this is a developer/source-reference snapshot, not a player-facing Archive bundle. Never expose GM-only/private/internal content or use the entire snapshot as runtime lore. Translate each approved mechanic into deterministic engine code, preserve source provenance, and add tests before the offline game can use it.
+- **Canon boundary:** Universe remains the authority. Do not modify or rewrite the Universe source as part of this APK-side preservation work.
+
+### Formula domains preserved
+
+Spirit Beast age/interval rules; economy and item pricing/scarcity; Arcanist progression, production chance and artifact condition; cultivation and progression gates; academy education constraints; HP; Satiety/metabolism; injury recovery; Martial Soul awakening, rarity, assessment and mutation; Soul-Nyuma/Soul-Zoun doctrinal boundaries; Spirit Ring age pressure, compatibility, Sync, absorption, defects, AWR, Qi and PowerScale; universal tier appraisal; combat rating/hit/damage/defense; time advancement and `Day left`; travel encounter, ambush and rescue probabilities; and the supplemental imperial regional funding allocation formula.
