@@ -82,7 +82,5 @@
 @media(prefers-reduced-motion:reduce){.expedition-light-layer,.expedition-weather-layer{transition:none}.expedition-fog-motion{transform:none!important}}
 
 /* The window reads world region, clock cycle and weather from the local save. */
-.expedition-environment[data-region="tianhai-yunzhou"] .expedition-light-layer{background:linear-gradient(115deg,#b9d8e833,#d7e9f022 52%,#182b3a55)}
-.expedition-environment[data-region="beiming-gu"] .expedition-scene-image{filter:saturate(.72) contrast(1.08) hue-rotate(4deg)}
-.expedition-environment[data-region="beiming-gu"] .expedition-light-layer{background:linear-gradient(115deg,#9dbbd033,#b7c9df18 52%,#0b172a66)}
-.expedition-environment[data-region="golden-dragon-empire"] .expedition-light-layer{background:linear-gradient(115deg,#d8a45b20,#e7d1a00d 52%,#21180f44)}
+.expedition-environment[data-region="tianhai-yunzhou"] .expedition-scene-image{filter:saturate(.92) contrast(1.02) hue-rotate(4deg) brightness(1.03)}
+.expedition-environment[data-region="beiming-gu"] .expedition-scene-image{filter:saturate(.72) contrast(1.08) hue-rotate(4deg) brightness(.96)}
