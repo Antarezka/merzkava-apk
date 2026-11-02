@@ -835,6 +835,21 @@ initializeGravityPullCord(root, {
 root.addEventListener("click", async (event: MouseEvent) => {
   const target = event.target;
   if (!(target instanceof Element)) return;
+
+  // Noticeboard dismissal must be handled before the cord's synthetic-click
+  // suppression; otherwise the first close tap after a lever gesture is eaten.
+  const noticeDismissButton = target.closest<HTMLElement>("[data-notice-dismiss]");
+  const noticeBackdrop = target.closest<HTMLElement>(".noticeboard-backdrop");
+  if (noticeDismissButton || (noticeBackdrop && !target.closest(".noticeboard-panel"))) {
+    if (noticeDismissButton?.dataset.noticeDismiss === "today") {
+      try { localStorage.setItem(noticeboardStorageKey, "1"); } catch { /* Session-only dismissal still works. */ }
+    }
+    noticeboardVisible = false;
+    document.body.classList.remove("noticeboard-open");
+    render();
+    return;
+  }
+
   const activeEternalModal=root.querySelector<HTMLElement>(".expedition-choice-modal:not([hidden])");
   if(activeEternalModal && !target.closest(".expedition-choice-modal")) return;
   if (event.detail !== 0 && suppressNextPointerClick) {
@@ -1128,21 +1143,6 @@ root.addEventListener("click", async (event: MouseEvent) => {
     form?.requestSubmit();
     return;
   }
-  const noticeDismissButton = target.closest<HTMLElement>("[data-notice-dismiss]");
-  if (noticeDismissButton) {
-    if (noticeDismissButton.dataset.noticeDismiss === "today") {
-      try { localStorage.setItem(noticeboardStorageKey, "1"); } catch { /* Session-only dismissal still works. */ }
-    }
-    noticeboardVisible = false;
-    render();
-    return;
-  }
-  if (target.classList.contains("noticeboard-backdrop")) {
-    noticeboardVisible = false;
-    render();
-    return;
-  }
-
   const refreshPlayersButton = target.closest<HTMLButtonElement>("[data-refresh-players]");
   if (refreshPlayersButton && !playerRegistryBusy) { await refreshPlayerRegistry(); return; }
   const floatingStartButton = target.closest<HTMLButtonElement>("[data-floating-start]");
