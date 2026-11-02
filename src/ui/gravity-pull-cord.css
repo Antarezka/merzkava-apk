@@ -23,11 +23,11 @@
   stroke:#351012;stroke-width:8;stroke-opacity:1;opacity:1;visibility:visible;
 }
 .gravity-cord-line path[data-cord-line]{
-  stroke:url(#cord-braid);stroke-width:6.2;stroke-opacity:1;opacity:1;visibility:visible;
+  stroke:url(#cord-braid) #9d302c;stroke-width:6.2;stroke-opacity:1;opacity:1;visibility:visible;
   filter:drop-shadow(1px 0 1px #f3a18b88) drop-shadow(-1px 0 2px #280b0b);
 }
 .gravity-cord-line .cord-thread-braid{
-  stroke:url(#cord-twist);stroke-width:4.6;stroke-opacity:1;opacity:.9;visibility:visible;
+  stroke:url(#cord-twist) #e58c76;stroke-width:4.6;stroke-opacity:1;opacity:.9;visibility:visible;
   mix-blend-mode:normal;
 }
 .gravity-cord-terminal{
