@@ -1,0 +1,68 @@
+/* App-wide antique magical cord; SVG tether and jewel share one moving endpoint. */
+.gravity-pull-cord{
+  position:fixed;z-index:95;top:0;right:clamp(20px,8vw,54px);
+  width:54px;height:178px;transform:rotate(0deg);
+  transform-origin:27px 0;pointer-events:none;overflow:visible;
+  filter:drop-shadow(0 4px 5px #0008);
+}
+.gravity-cord-anchor{
+  position:absolute;top:-5px;left:16px;width:22px;height:13px;
+  border:1px solid #76502d;border-top:0;border-radius:0 0 8px 8px;
+  background:linear-gradient(90deg,#4a1819,#a83b35 48%,#4a1819);
+  box-shadow:inset 0 1px 3px #f6c18a55,0 2px 4px #0008;
+}
+.gravity-cord-line{
+  position:absolute;inset:0;width:54px;height:210px;overflow:visible;
+  pointer-events:none;filter:drop-shadow(1px 1px 1px #280b0b);
+}
+.gravity-cord-line path{
+  fill:none;stroke:#491416;stroke-width:7;stroke-linecap:round;stroke-linejoin:round;
+  vector-effect:non-scaling-stroke;
+}
+.gravity-cord-line path[data-cord-line]{
+  stroke:url(#cord-braid);stroke-width:4.5;
+  stroke-linecap:round;stroke-linejoin:round;
+  filter:drop-shadow(1px 0 1px #f3a18b88) drop-shadow(-1px 0 2px #280b0b);
+}
+.gravity-cord-line .cord-thread-highlight{
+  fill:none;stroke:#e58c7688;stroke-width:1;stroke-linecap:round;
+  stroke-dasharray:1 5;stroke-dashoffset:1;
+  vector-effect:non-scaling-stroke;pointer-events:none;
+}
+.gravity-cord-terminal{
+  position:absolute;top:111px;left:0;width:54px;height:62px;padding:0;border:0;
+  display:grid;place-items:center;background:transparent;pointer-events:auto;touch-action:none;
+  transform:none;
+  transition:none;
+}
+.gravity-cord-terminal:before{
+  content:"";position:absolute;top:0;left:25px;width:4px;height:14px;
+  border-radius:2px;background:linear-gradient(90deg,#67451f,#f0d18b 48%,#8b622e);
+}
+.gravity-cord-jewel{
+  position:relative;display:grid;place-items:center;width:42px;height:42px;
+  border:2px solid #c6a365;border-radius:42% 42% 48% 48%;
+  background:linear-gradient(145deg,#f0d99f 0%,#9a7138 18%,#392a24 46%,#17191a 100%);
+  box-shadow:0 0 0 2px #281b17,0 0 0 4px #c19a5b55,0 0 15px #e6bf7388,
+    inset 0 1px 3px #fff8,inset 0 -4px 7px #08090b;
+}
+.gravity-cord-jewel:before{
+  content:"";position:absolute;inset:4px;border:1px solid #d7b978;border-radius:40% 40% 48% 48%;
+  background:repeating-conic-gradient(from 0deg,#c7a260 0deg 5deg,#493528 5deg 10deg);
+  clip-path:polygon(50% 0%,62% 12%,80% 7%,87% 25%,100% 50%,87% 75%,80% 93%,62% 88%,50% 100%,38% 88%,20% 93%,13% 75%,0 50%,13% 25%,20% 7%,38% 12%);
+}
+.gravity-cord-jewel:after{
+  content:"✦";position:absolute;display:grid;place-items:center;width:23px;height:23px;
+  border:1px solid #e0c58d;border-radius:50%;
+  background:radial-gradient(circle at 34% 28%,#a94b43,#672323 58%,#241a1a);
+  color:#f2d99d;font:14px Georgia,serif;text-shadow:0 0 6px #ffe3a5;
+  box-shadow:0 0 8px #c18b4566,inset 0 1px 3px #fff5;
+}
+.gravity-cord-terminal.is-grabbed .gravity-cord-jewel,
+.gravity-cord-terminal.is-pulling .gravity-cord-jewel{
+  box-shadow:0 0 0 2px #281b17,0 0 0 5px #e4bd6b77,0 0 22px #f4cb73,
+    inset 0 1px 3px #fff,inset 0 -4px 7px #08090b;
+}
+.gravity-cord-terminal.is-grabbed{cursor:grabbing}
+.gravity-cord-terminal:focus-visible{outline:2px solid #f0ce82;outline-offset:5px;border-radius:50%}
+@media(prefers-reduced-motion:reduce){.gravity-pull-cord{transition:none}}
