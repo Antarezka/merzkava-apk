@@ -93,3 +93,19 @@ The former 240-entry generated story sequence has been retired and removed from 
 - [ ] Install and manually inspect on the target Android device.
 - [ ] Capture evidence for toolbar stability, manager hidden/open states, scene-to-narrative continuity, clock treatment and narrative hierarchy.
 - [ ] Update the master roadmap with final status and evidence links.
+
+## UI-APP-001 — Shared app shell and cross-screen visual consistency
+
+**Status:** `[~] CODE-LEVEL REFINEMENT APPLIED / TARGET-DEVICE QA OPEN`
+
+- [x] Make the mobile app header full-bleed and align the brand, Bubble Mode action, and Settings control to the same viewport edges, respecting Android safe areas.
+- [x] Give the Bubble Mode and Settings controls distinct but related visual treatments within one shared header.
+- [x] Consolidate shared paper, verdigris/sage, ink, and aged-brass tokens across common cards, forms, settings, status notices, ledger bubbles, and Floating Control.
+- [x] Reconcile Eternal Path profile, choice sheet, save manager, and form surfaces with the app palette while preserving the scene-window artwork and weather layers.
+- [ ] Verify header alignment against the physical screen edges on the target Android device in portrait and landscape.
+- [ ] Verify Bubble Mode and Settings hit targets, safe-area spacing, sticky-header behavior, and header overlap during scroll.
+- [ ] Inspect every screen at 320px, 360px, 390px, and tablet widths; capture clipping, overflow, contrast, and inconsistent surfaces.
+- [ ] Verify both light and dark themes, native floating mode, dialogs, notices, ledger bubbles, and offline/empty states on-device.
+- [ ] Confirm no fixed-position control overlaps the navigation dock, Android gesture areas, or interactive content.
+
+**Acceptance:** the shared app shell reads as one coherent Merzkava interface; header utilities align consistently with the viewport; every major screen and overlay remains legible and usable across supported widths and themes. Code-level styling alone does not close this item.
