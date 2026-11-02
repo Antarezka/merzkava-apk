@@ -871,6 +871,38 @@ The complete user-approved design and phase backlog now live in [ETERNAL_PATH_BL
 
 **Gate:** Do not mark this workstream fully complete or begin Patch-1 story-node authoring until code verification and target-device UI/gesture QA are complete.
 
+
+
+## 5F. Goal-directed narrative network and long-term item catalog
+
+**Status:** `[ ] TODO — TARGETS APPROVED; IMPLEMENTATION DEFERRED TO EXISTING DEPENDENCY ORDER.`
+
+This section extends §5E without replacing its engine, schema, sequencing, or release gates. It does not authorize premature bulk authoring or Shop implementation.
+
+### 5F-1. Goal-directed 1,000-node network
+
+- [ ] Use the player goals and gameplay loops already defined in the approved Eternal Path plan as the organizing spine for narrative content. Collection is one explicit example; expand toward the other existing goals rather than inventing a separate goal taxonomy.
+- [ ] Build Patch 1 as a connected network of at least **1,000 genuinely distinct nodes/situations**. Nodes must branch into meaningful routes, prerequisites, setbacks, opportunities, discoveries, and follow-up situations that help the player pursue or experience those existing goals.
+- [ ] Do not count isolated filler scenes, text permutations, swapped names/locations, cosmetic reward changes, or duplicate outcomes as distinct nodes.
+- [ ] Every node is non-canonical and anchored to at least one reviewed, player-safe World Archive dossier. The Archive supplies context and lore boundaries; it does not canonize the authored scenario.
+- [ ] Preserve existing node labels/categories and provenance rules. Every node-content update adds at least **two distinct nodes**. The nine-node bootstrap remains a schema/resolver validation sample and does not count toward Patch 1's 1,000-node target.
+- [ ] Keep Patch-1 authoring blocked until the §5E execution prerequisites are verified: UI/repair gate, EP-2 simulation-state contracts, and EP-3 narrative/social engine/schema/resolver.
+
+### 5F-2. Item catalog: 25,000 total / 10,000 functional minimum
+
+- [ ] Establish a long-term target of **25,000 distinct item records** in the final catalog.
+- [ ] Ensure at least **10,000 items have genuine, testable gameplay functionality**. Each must have a defined purpose/effect or valid use in an implemented gameplay loop. Flavor-only entries, duplicate variants, and inert placeholders do not count toward this minimum.
+- [ ] Ensure every item is compatible with the world constraints and plausibly eligible to exist in Merzkava Universe. Use reviewed, player-safe World Archive dossiers as contextual anchors; do not contradict canon or fabricate official facts.
+- [ ] Preserve item provenance: canon-backed items require exact reviewed source references; game-only items use `IN_GAME_ORIGINAL` and remain explicitly Eternal Path-only. Archive anchoring is not proof of canon status.
+- [ ] Track distinct IDs, functional status, gameplay behavior/tests, provenance, Archive anchors, and duplicate/near-duplicate review. Never claim progress from generated names or unreviewed placeholders.
+
+### 5F-3. Shop — explicitly deferred
+
+- [ ] Shop is a future feature and must not be implemented until the owner explicitly signals readiness. Do not add Shop UI, vendor stock, purchase transactions, or shop-specific economy balancing before that authorization.
+- [ ] Item catalog design and deterministic item functionality may be prepared independently when their dependencies are ready. Do not expose purchase/spending flows as a Shop prematurely.
+
+**Acceptance gate:** the node network demonstrably branches toward existing player goals; all nodes are non-canonical and Archive-anchored; every node batch adds at least two; the 1,000-node count passes distinctness and quality review; and the final item catalog reaches 25,000 distinct entries with at least 10,000 verified functional items. Shop remains unimplemented until separately authorized.
+
 ## Mandatory node expansion policy — World Archive anchored, non-canonical
 
 This policy is a hard acceptance gate for all Eternal Path narrative-node work:
