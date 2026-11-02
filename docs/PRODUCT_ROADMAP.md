@@ -66,7 +66,7 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 
 ## 2A. Master project progress index
 
-**Current documented index: 19.5%** (calculated from the active roadmap checklist at this revision).
+**Current documented index: 18.8%** (calculated from the active roadmap checklist at this revision).
 
 Calculation rule: each active checklist item is scored as DONE = 1, IN PROGRESS = 0.5, and TODO / BLOCKED / AUDIT = 0. The index is:
 
