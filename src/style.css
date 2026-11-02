@@ -2514,3 +2514,34 @@ body { color:var(--ui-ink); }
 /* Restrained ink flecks beneath the letter text; motion is handled by Anime.js. */
 .dusty-letter-ink{position:absolute;z-index:0;inset:0;pointer-events:none;opacity:.2;background-image:radial-gradient(ellipse 12px 5px at 17% 29%,#3d2c1e88 0 42%,transparent 76%),radial-gradient(ellipse 8px 3px at 20% 31%,#3d2c1e77 0 38%,transparent 78%),radial-gradient(circle 2px at 24% 27%,#38271999 0 70%,transparent 100%),radial-gradient(circle 3px at 15% 35%,#38271977 0 70%,transparent 100%),radial-gradient(ellipse 15px 4px at 83% 72%,#4a342188 0 38%,transparent 78%),radial-gradient(circle 2px at 80% 69%,#38271999 0 70%,transparent 100%),radial-gradient(circle 3px at 87% 75%,#38271977 0 70%,transparent 100%);background-repeat:no-repeat;mix-blend-mode:multiply}
 .dusty-letter>:not(.dusty-letter-dust):not(.dusty-letter-ink){position:relative;z-index:1}
+
+
+/* Header Kitty: use the complete layered mascot artwork instead of a tiny cropped head. */
+.header-tools .header-kitty-trigger{position:relative;isolation:isolate;overflow:hidden;flex:0 0 44px;width:44px;height:44px;min-width:44px;min-height:44px;padding:0;border:1px solid #b99b5e;border-radius:50%;background:radial-gradient(circle at 35% 25%,#f4e8ce,#c9b47f 70%,#8b744b);box-shadow:inset 0 1px #fff9,0 2px 9px #293d3826,0 0 0 2px #b99b5e22}
+.header-kitty-mascot{position:absolute;inset:-9px;display:block;pointer-events:none}
+.header-kitty-layer{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:contain;pointer-events:none;user-select:none}
+.header-kitty-shadow{z-index:0}.header-kitty-tail{z-index:1}.header-kitty-body{z-index:2}.header-kitty-head{z-index:3;filter:drop-shadow(0 1px 2px #17120b66)}
+:root[data-theme="dark"] .header-tools .header-kitty-trigger{background:radial-gradient(circle at 35% 25%,#65563a,#302c24 72%);border-color:#b99b5e}
+
+/* Keep the mechanical toolbar lever above the navigation rail and give it a clear touch target. */
+.nav-toggle-handle{z-index:40;min-width:112px;min-height:38px;bottom:calc(76px + env(safe-area-inset-bottom,0px));padding:7px 14px;border-width:1px;border-bottom:0;border-radius:9px 9px 0 0;box-shadow:0 -4px 18px #0006,0 0 0 1px #d6b66f22}
+.app-shell.is-nav-collapsed .nav-toggle-handle{bottom:env(safe-area-inset-bottom,0px);border-bottom:1px solid #a78b54;border-radius:9px 9px 0 0}
+@media(max-width:600px){.nav-toggle-handle{bottom:calc(76px + env(safe-area-inset-bottom,0px))}}
+
+/* Settings are grouped by responsibility: local app preferences vs. world/account services. */
+.settings-category{margin:0 0 16px;border:1px solid var(--ui-rule);background:var(--ui-paper-raised);box-shadow:0 8px 22px #17120b0d}
+.settings-category>summary{display:flex;flex-direction:column;gap:5px;min-height:62px;padding:14px 16px;cursor:pointer;list-style:none;color:var(--ui-ink);font:600 12px/1.35 Cinzel,Georgia,serif;letter-spacing:.1em}
+.settings-category>summary::-webkit-details-marker{display:none}
+.settings-category>summary:after{content:"＋";align-self:flex-end;margin-top:-20px;color:var(--ui-brass);font:16px Georgia,serif}
+.settings-category[open]>summary:after{content:"−"}
+.settings-category>summary small{color:var(--ui-ink-soft);font:10px/1.4 system-ui,sans-serif;letter-spacing:.03em}
+.settings-category-content{padding:0 14px 15px;border-top:1px solid var(--ui-rule)}
+.settings-category-content>.page-heading{margin-top:16px}
+.settings-category-content>.section-block:first-of-type{margin-top:16px}
+.settings-category-content>.section-block{margin-top:20px}
+.settings-category-content>.canon-panel,.settings-category-content>.record-card{margin-top:20px}
+:root[data-theme="dark"] .settings-category{border-color:#536052;background:#202923;box-shadow:0 8px 22px #0002}
+:root[data-theme="dark"] .settings-category>summary{color:#e8dfcf}
+:root[data-theme="dark"] .settings-category>summary small{color:#bdc1b0}
+:root[data-theme="dark"] .settings-category-content{border-color:#536052}
+@media(prefers-reduced-motion:reduce){.nav-toggle-handle{transition:none}}
