@@ -832,10 +832,15 @@ root.addEventListener("pointercancel", event => {
 root.addEventListener("click", async (event: MouseEvent) => {
   const target = event.target;
   if (!(target instanceof Element)) return;
-  if (target.closest("[data-nav-toggle]")) {
+  const navLever = target.closest<HTMLButtonElement>("[data-nav-toggle]");
+  if (navLever) {
     if (suppressNavLeverClick) { suppressNavLeverClick = false; return; }
     playTypewriterLeverSound();
-    commitNavLeverToggle();
+    navLever.classList.add("is-pulled");
+    animateNavLeverPull(navLever, () => {
+      navLever.classList.remove("is-pulled");
+      commitNavLeverToggle();
+    });
     return;
   }
   const activeEternalModal=root.querySelector<HTMLElement>(".expedition-choice-modal:not([hidden])");
