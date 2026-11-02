@@ -187,7 +187,7 @@ export function listEternalSaves():EternalSaveSummary[] {
 }
 export function startEternalGame(input:{name:string;age:number;region:EternalRegion}):void {
   const now=new Date().toISOString();const id=makeSaveId();
-  save={schemaVersion:4,saveId:id,saveName:input.name.trim(),createdAt:now,updatedAt:now,manifest:{universeRepository:"Antarezka/merzkava-universe",universeCommit:ETERNAL_SCENES[0].universeCommit,contentPackVersion:"pending-patch-1",deterministicSeed:id},character:{name:input.name.trim(),age:input.age,region:input.region},disposition:createDispositionState(),locationId:defaultSceneForRegion(input.region).id,day:1,hour:8,minute:0,weather:resolveDailyWeather(input.region,1),eventIndex:0,energy:100,insight:0,bonds:0,completed:0,narrativeHistory:[],activeNodeId:null,lastOutcome:""};
+  save={schemaVersion:4,saveId:id,saveName:input.name.trim(),createdAt:now,updatedAt:now,manifest:{universeRepository:"Antarezka/merzkava-universe",universeCommit:ETERNAL_SCENES[0].universeCommit,contentPackVersion:"eternal-path-bootstrap-0.1.0",deterministicSeed:id},character:{name:input.name.trim(),age:input.age,region:input.region},disposition:createDispositionState(),locationId:defaultSceneForRegion(input.region).id,day:1,hour:8,minute:0,weather:resolveDailyWeather(input.region,1),eventIndex:0,energy:100,insight:0,bonds:0,completed:0,narrativeHistory:[],activeNodeId:null,lastOutcome:""};
   persist();
 }
 export function loadEternalSave(id:string):boolean {
@@ -262,9 +262,15 @@ export function resolveEternalSituationChoice(choiceId:string):NarrativeResoluti
   if(resolution.dispositionEvidence)current.disposition=applyDispositionEvidence(current.disposition,resolution.dispositionEvidence,current.day);
   current.narrativeHistory.push({nodeId:resolution.nodeId,choiceId:resolution.choiceId,day:current.day,transactionId:resolution.transactionId,outcomeText:resolution.outcomeText});
   current.narrativeHistory=current.narrativeHistory.slice(-500);
+  const timestamp:SessionTimestamp={year:0,month:1,day:current.day,hour:current.hour,minute:current.minute,weekdayIndex:0};
+  const advanced=advanceFallbackCalendar(timestamp,resolution.minutes);
+  if(!advanced.valid)return null;
+  const previousDay=current.day;
+  current.day=advanced.result.timestamp.day;current.hour=advanced.result.timestamp.hour;current.minute=advanced.result.timestamp.minute;
+  if(current.day!==previousDay)current.weather=resolveDailyWeather(currentWorldRegion(current),current.day);
   current.lastOutcome=resolution.outcomeText;current.activeNodeId=null;current.eventIndex+=1;current.completed+=1;
+  // One save write commits the choice, consequences, event record and world-time advance together.
   persist();
-  advanceEternalWorldTime(resolution.minutes);
   return resolution;
 }
 /** Legacy numeric choices are intentionally rejected; retired nodes cannot mutate a journey. */
