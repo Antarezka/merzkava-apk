@@ -2,6 +2,7 @@ package com.antarezka.merzkava;
 
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.app.NotificationManager;
@@ -26,6 +27,7 @@ import android.view.WindowManager;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.getcapacitor.JSObject;
@@ -295,12 +297,23 @@ public class FloatingWindowPlugin extends Plugin {
         header.addView(title, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1));
         title.setOnTouchListener((view, event) -> handleDrag(view, event, false));
 
-        TextView minimize = control(activity, "🐈‍⬛");
-        TextView fullscreen = control(activity, "□");
-        header.addView(minimize, new LinearLayout.LayoutParams(dp(activity, 42), ViewGroup.LayoutParams.MATCH_PARENT));
-        header.addView(fullscreen, new LinearLayout.LayoutParams(dp(activity, 34), ViewGroup.LayoutParams.MATCH_PARENT));
+        TextView kitty = control(activity, "🐈‍⬛");
+        kitty.setContentDescription("Kitty control guide");
+        TextView minimize = control(activity, "—");
+        minimize.setContentDescription("Minimize to Kitty bubble");
+        TextView menu = control(activity, "⋮");
+        menu.setContentDescription("Mini Window menu");
+        TextView reload = control(activity, "↻");
+        reload.setContentDescription("Reload page");
+        reload.setTag("floating-reload");
+        header.addView(kitty, new LinearLayout.LayoutParams(dp(activity, 36), ViewGroup.LayoutParams.MATCH_PARENT));
+        header.addView(minimize, new LinearLayout.LayoutParams(dp(activity, 34), ViewGroup.LayoutParams.MATCH_PARENT));
+        header.addView(menu, new LinearLayout.LayoutParams(dp(activity, 34), ViewGroup.LayoutParams.MATCH_PARENT));
+        header.addView(reload, new LinearLayout.LayoutParams(dp(activity, 34), ViewGroup.LayoutParams.MATCH_PARENT));
+        kitty.setOnClickListener(view -> showHeaderHelp(activity));
         minimize.setOnClickListener(view -> showBubbleMode());
-        fullscreen.setOnClickListener(view -> restoreToActivity());
+        menu.setOnClickListener(view -> showHeaderMenu(activity, menu));
+        reload.setOnClickListener(view -> reloadWebView(reload));
 
         contentFrame = new FrameLayout(activity);
         contentFrame.setBackgroundColor(Color.rgb(238, 231, 214));
@@ -417,6 +430,70 @@ public class FloatingWindowPlugin extends Plugin {
             transitionInProgress = false;
             restoreToActivity();
         }
+    }
+
+    private static TextView menuAction(Activity activity, String label) {
+        TextView item = new TextView(activity);
+        item.setText(label);
+        item.setTextColor(Color.rgb(38, 60, 54));
+        item.setTextSize(12);
+        item.setPadding(dp(activity, 14), dp(activity, 12), dp(activity, 14), dp(activity, 12));
+        item.setBackgroundColor(Color.TRANSPARENT);
+        item.setClickable(true);
+        return item;
+    }
+
+    private static void showHeaderMenu(Activity activity, View anchor) {
+        LinearLayout menu = new LinearLayout(activity);
+        menu.setOrientation(LinearLayout.VERTICAL);
+        menu.setPadding(dp(activity, 4), dp(activity, 4), dp(activity, 4), dp(activity, 4));
+        menu.setBackground(background("#eee7d6", "#b49b68", dp(activity, 8)));
+        TextView reloadItem = menuAction(activity, "↻   Reload current page");
+        TextView helpItem = menuAction(activity, "ⓘ   Button guide");
+        menu.addView(reloadItem);
+        menu.addView(helpItem);
+        PopupWindow popup = new PopupWindow(menu, dp(activity, 208),
+            ViewGroup.LayoutParams.WRAP_CONTENT, true);
+        popup.setBackgroundDrawable(background("#eee7d6", "#b49b68", dp(activity, 8)));
+        popup.setOutsideTouchable(true);
+        reloadItem.setOnClickListener(view -> {
+            popup.dismiss();
+            View reload = floatingRoot == null ? null : floatingRoot.findViewWithTag("floating-reload");
+            if (reload instanceof TextView) reloadWebView((TextView) reload);
+            else if (webView != null) webView.reload();
+        });
+        helpItem.setOnClickListener(view -> {
+            popup.dismiss();
+            showHeaderHelp(activity);
+        });
+        popup.showAsDropDown(anchor, -dp(activity, 150), 0, Gravity.END);
+    }
+
+    private static void showHeaderHelp(Activity activity) {
+        new AlertDialog.Builder(activity)
+            .setTitle("Mini Window controls")
+            .setMessage("🐈‍⬛ Kitty — opens this control guide.\n\n— Minimize — hides the Mini Window and brings back the active Kitty bubble. Your WebView session stays alive.\n\n⋮ Menu — opens the quick menu.\n\n↻ Reload — reloads the current WebView page; audio or in-page activity may restart.\n\nDrag the title area to move the window. Drag the lower-right grip to resize it.")
+            .setPositiveButton("Got it", (dialog, which) -> dialog.dismiss())
+            .show();
+    }
+
+    private static void reloadWebView(TextView button) {
+        if (webView == null || button == null || button.isEnabled() == false) return;
+        button.setEnabled(false);
+        button.setAlpha(0.45f);
+        webView.reload();
+        final long deadline = android.os.SystemClock.uptimeMillis() + 60000L;
+        final Runnable[] check = new Runnable[1];
+        check[0] = () -> {
+            if (webView == null || !webView.isLoading()
+                || android.os.SystemClock.uptimeMillis() >= deadline) {
+                button.setEnabled(true);
+                button.setAlpha(1f);
+            } else {
+                MAIN.postDelayed(check[0], 250L);
+            }
+        };
+        MAIN.postDelayed(check[0], 250L);
     }
 
     private static void showStripMode() {
