@@ -28,11 +28,9 @@ export function animateAppScreen(shell: HTMLElement | null, options: { menuToggl
       const hideDistance = Math.max(0, nav.offsetHeight - peek);
       const from = collapsed ? 0 : hideDistance;
       const to = collapsed ? hideDistance : 0;
-      const lever = nav.querySelector<HTMLElement>(".nav-toggle-handle");
       nav.style.pointerEvents = "auto";
       nav.style.opacity = "1";
       nav.style.transform = `translateX(-50%) translateY(${from}px)`;
-      if (lever) lever.style.transform = `translateY(${-from}px)`;
       const direction = Math.sign(to - from);
       const distance = Math.abs(to - from);
       const stages = [
@@ -53,13 +51,8 @@ export function animateAppScreen(shell: HTMLElement | null, options: { menuToggl
           });
         }
       });
-      if (lever) animate(lever, {
-        translateY: stages.map(stage => ({ to: -stage.to, duration: stage.duration, ease: stage.ease })),
-        duration: 960,
-        ease: "inOutSine"
-      });
     }
-    // Only the circular lever remains in the compact header while the dock is folded.
+    // The lever is a sibling of the dock, so it stays visible and moves independently.
     const grip = toggle?.querySelector<HTMLElement>(".nav-lever-grip");
     const arrow = toggle?.querySelector<HTMLElement>(".nav-toggle-arrow");
     if (grip) animate(grip, {
