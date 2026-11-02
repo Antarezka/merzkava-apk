@@ -1,6 +1,6 @@
 import { animate, stagger } from "animejs";
 
-/** Shared shell transitions. The app shell itself is never transformed so fixed modals stay viewport-relative. */
+/** Shared shell transitions. The app shell and fixed navigation rail are never translated so their viewport anchoring cannot drift during route changes. */
 export function animateAppScreen(shell: HTMLElement | null): void {
   if (!shell || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
   const header = shell.querySelector<HTMLElement>(".app-header");
@@ -16,10 +16,10 @@ export function animateAppScreen(shell: HTMLElement | null): void {
     }));
   }
   if (nav) {
-    animate(nav, { opacity: [0, 1], translateY: [18, 0], duration: 520, delay: 90, ease: "outCubic" });
+    animate(nav, { opacity: [0, 1], duration: 520, delay: 90, ease: "outCubic" });
     const items = nav.querySelectorAll<HTMLElement>(".nav-item");
     if (items.length) {
-      animate(items, { opacity: [0, 1], translateY: [7, 0], duration: 340, delay: stagger(32, { start: 150 }), ease: "outQuad" });
+      animate(items, { opacity: [0, 1], duration: 340, delay: stagger(32, { start: 150 }), ease: "outQuad" });
       items.forEach(item => {
         const enter=()=>animate(item,{scale:[1,1.055],duration:160,ease:"outQuad"});
         const leave=()=>animate(item,{scale:[1.055,1],duration:190,ease:"outQuad"});
