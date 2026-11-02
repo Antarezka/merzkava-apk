@@ -53,11 +53,11 @@ export function mountExpeditionAnimations(root: HTMLElement): () => void {
 
     // Uploaded image plates: each layer has its own motion profile and remains inside Scene Window.
     const sunImage = root.querySelector<HTMLElement>(".expedition-sun-glow-image");
-    if (sunImage) animate(sunImage,{translateX:["-.35%"," .35%"],scale:[1,1.035],opacity:[.72,1],duration:15000,ease:"inOutSine",loop:true,alternate:true});
+    if (sunImage && root.querySelector<HTMLElement>(".expedition-environment")?.dataset.cycle!=="Night") animate(sunImage,{translateX:["-.35%",".35%"],scale:[1,1.035],opacity:[.72,1],duration:15000,ease:"inOutSine",loop:true,alternate:true});
     const moonImage = root.querySelector<HTMLElement>(".expedition-moon-glow-image");
-    if (moonImage) animate(moonImage,{translateX:[".25%","-.25%"],scale:[1,1.025],opacity:[.58,.9],duration:19000,ease:"inOutSine",loop:true,alternate:true});
+    if (moonImage && root.querySelector<HTMLElement>(".expedition-environment")?.dataset.cycle==="Night") animate(moonImage,{translateX:[".25%","-.25%"],scale:[1,1.025],opacity:[.58,.9],duration:19000,ease:"inOutSine",loop:true,alternate:true});
     const rayImage = root.querySelector<HTMLElement>(".expedition-light-rays-image");
-    if (rayImage) animate(rayImage,{translateX:["1.2%","-1.2%"],translateY:["-.4%"," .5%"],opacity:[.55,.88],duration:28000,ease:"inOutSine",loop:true,alternate:true});
+    if (rayImage && ["Dawn","Morning","Day"].includes(root.querySelector<HTMLElement>(".expedition-environment")?.dataset.cycle??"")) animate(rayImage,{translateX:["1.2%","-1.2%"],translateY:["-.4%",".5%"],opacity:[.55,.88],duration:28000,ease:"inOutSine",loop:true,alternate:true});
     const rainTexture = root.querySelector<HTMLElement>(".expedition-rain-streak-image");
     if (rainTexture && root.querySelector<HTMLElement>(".expedition-environment")?.dataset.weather==="Rain") {
       animate(rainTexture,{translateY:["-3%","5%"],translateX:["1%","-1%"],opacity:[.5,.82],duration:2600,ease:"linear",loop:true,alternate:true});
@@ -79,11 +79,11 @@ export function mountExpeditionAnimations(root: HTMLElement): () => void {
       animate(frost,{opacity:[.52,.76],scale:[1.015,1.045],duration:12500,ease:"inOutSine",loop:true,alternate:true});
     }
     const sun = root.querySelector<HTMLElement>(".expedition-sun-glow");
-    if (sun) animate(sun,{opacity:[.58,.9],scale:[.98,1.045],duration:9200,ease:"inOutSine",loop:true,alternate:true});
+    if (sun && root.querySelector<HTMLElement>(".expedition-environment")?.dataset.cycle!=="Night") animate(sun,{opacity:[.58,.9],scale:[.98,1.045],duration:9200,ease:"inOutSine",loop:true,alternate:true});
     const moon = root.querySelector<HTMLElement>(".expedition-moon-glow");
-    if (moon) animate(moon,{opacity:[.42,.78],scale:[.99,1.035],duration:11800,ease:"inOutSine",loop:true,alternate:true});
+    if (moon && root.querySelector<HTMLElement>(".expedition-environment")?.dataset.cycle==="Night") animate(moon,{opacity:[.42,.78],scale:[.99,1.035],duration:11800,ease:"inOutSine",loop:true,alternate:true});
     const rays = root.querySelector<HTMLElement>(".expedition-light-rays");
-    if (rays) animate(rays,{rotate:["-4deg","5deg"],opacity:[.16,.34],duration:26000,ease:"inOutSine",loop:true,alternate:true});
+    if (rays && ["Dawn","Morning","Day"].includes(root.querySelector<HTMLElement>(".expedition-environment")?.dataset.cycle??"")) animate(rays,{rotate:["-4deg","5deg"],opacity:[.16,.34],duration:26000,ease:"inOutSine",loop:true,alternate:true});
     const lightning = root.querySelector<HTMLElement>(".expedition-lightning-layer");
     const lightningImage = root.querySelector<HTMLImageElement>(".expedition-lightning-flash-image");
     if (lightning && lightningImage && root.querySelector<HTMLElement>(".expedition-environment")?.dataset.weather==="Rain") {
