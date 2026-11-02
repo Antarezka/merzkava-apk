@@ -157,6 +157,53 @@ Object.assign(labels, {
   "STARTER SITUATIONS COMPLETE":{id:"SITUASI PEMULA SELESAI",pt:"SITUAÇÕES INICIAIS CONCLUÍDAS",fr:"SITUATIONS DE DÉPART TERMINÉES",ru:"СТАРТОВЫЕ СИТУАЦИИ ЗАВЕРШЕНЫ",ja:"初期シチュエーション完了","zh-CN":"初始情境已完成",ko:"시작 상황 완료"}
 });
 
+
+Object.assign(labels, {
+  "COMMAND HALL · THREE POWERS · ONE WORLD":{id:"AULA KOMANDO · TIGA KEKUATAN · SATU DUNIA",pt:"SALA DE COMANDO · TRÊS PODERES · UM MUNDO",fr:"SALLE DE COMMANDEMENT · TROIS PUISSANCES · UN MONDE",ru:"КОМАНДНЫЙ ЗАЛ · ТРИ ДЕРЖАВЫ · ОДИН МИР",ja:"指令ホール · 三大勢力 · 一つの世界","zh-CN":"指挥大厅 · 三大势力 · 一个世界",ko:"지휘 홀 · 세 세력 · 하나의 세계"},
+  "POLITICAL ATLAS · 01—03":{id:"ATLAS POLITIK · 01—03",pt:"ATLAS POLÍTICO · 01—03",fr:"ATLAS POLITIQUE · 01—03",ru:"ПОЛИТИЧЕСКИЙ АТЛАС · 01—03",ja:"政治地図 · 01—03","zh-CN":"政治图谱 · 01—03",ko:"정치 지도 · 01—03"},
+  RECORDS:{id:"CATATAN",pt:"REGISTROS",fr:"DOSSIERS",ru:"ЗАПИСИ",ja:"記録","zh-CN":"记录",ko:"기록"},
+  "EASTERN POWER · 01":{id:"KEKUATAN TIMUR · 01",pt:"PODER ORIENTAL · 01",fr:"PUISSANCE ORIENTALE · 01",ru:"ВОСТОЧНАЯ ДЕРЖАВА · 01",ja:"東方勢力 · 01","zh-CN":"东方势力 · 01",ko:"동부 세력 · 01"},
+  "Imperial administration · Eastern territories":{id:"Administrasi kekaisaran · Wilayah timur",pt:"Administração imperial · Territórios orientais",fr:"Administration impériale · Territoires de l’Est",ru:"Имперское управление · Восточные территории",ja:"帝国統治 · 東方領域","zh-CN":"帝国行政 · 东方领土",ko:"제국 행정 · 동부 영토"},
+  "OPEN DOSSIER":{id:"BUKA BERKAS",pt:"ABRIR DOSSIÊ",fr:"OUVRIR LE DOSSIER",ru:"ОТКРЫТЬ ДОСЬЕ",ja:"資料を開く","zh-CN":"打开档案",ko:"문서 열기"},
+  "SOUTHWESTERN POWER · 02":{id:"KEKUATAN BARAT DAYA · 02",pt:"PODER DO SUDOESTE · 02",fr:"PUISSANCE DU SUD-OUEST · 02",ru:"ЮГО-ЗАПАДНАЯ ДЕРЖАВА · 02",ja:"南西勢力 · 02","zh-CN":"西南势力 · 02",ko:"남서부 세력 · 02"},
+  "Floating island · Maritime civilisation":{id:"Pulau melayang · Peradaban maritim",pt:"Ilha flutuante · Civilização marítima",fr:"Île flottante · Civilisation maritime",ru:"Парящий остров · Морская цивилизация",ja:"浮遊島 · 海洋文明","zh-CN":"浮空岛 · 海洋文明",ko:"부유섬 · 해양 문명"},
+  "NORTHERN POWER · 03":{id:"KEKUATAN UTARA · 03",pt:"PODER DO NORTE · 03",fr:"PUISSANCE DU NORD · 03",ru:"СЕВЕРНАЯ ДЕРЖАВА · 03",ja:"北方勢力 · 03","zh-CN":"北方势力 · 03",ko:"북부 세력 · 03"},
+  "Northern highlands · Ancient spiritual heritage":{id:"Dataran tinggi utara · Warisan spiritual kuno",pt:"Terras altas do norte · Herança espiritual antiga",fr:"Hautes terres du nord · Héritage spirituel ancien",ru:"Северные нагорья · Древнее духовное наследие",ja:"北方高地 · 古代の霊的遺産","zh-CN":"北方高地 · 古老的灵性遗产",ko:"북부 고원 · 고대 영적 유산"},
+  "COMMAND DECK":{id:"DEK KOMANDO",pt:"PAINEL DE COMANDO",fr:"POSTE DE COMMANDEMENT",ru:"КОМАНДНАЯ ПАНЕЛЬ",ja:"コマンドデッキ","zh-CN":"指挥台",ko:"지휘 데크"},
+  "QUICK ACCESS":{id:"AKSES CEPAT",pt:"ACESSO RÁPIDO",fr:"ACCÈS RAPIDE",ru:"БЫСТРЫЙ ДОСТУП",ja:"クイックアクセス","zh-CN":"快速访问",ko:"빠른 접근"},
+  "Identity and cultivation":{id:"Identitas dan kultivasi",pt:"Identidade e cultivo",fr:"Identité et cultivation",ru:"Личность и культивация",ja:"身元と修練","zh-CN":"身份与修炼",ko:"신원 및 수련"},
+  "Items and finances":{id:"Barang dan keuangan",pt:"Itens e finanças",fr:"Objets et finances",ru:"Предметы и финансы",ja:"所持品と財務","zh-CN":"物品与财务",ko:"아이템 및 재정"},
+  "Places, history and records":{id:"Tempat, sejarah, dan catatan",pt:"Lugares, história e registros",fr:"Lieux, histoire et archives",ru:"Места, история и записи",ja:"場所・歴史・記録","zh-CN":"地点、历史与记录",ko:"장소, 역사 및 기록"},
+  "Your recorded story":{id:"Kisah yang tercatat",pt:"Sua história registrada",fr:"Votre histoire enregistrée",ru:"Ваша записанная история",ja:"記録された物語","zh-CN":"已记录的故事",ko:"기록된 이야기"},
+  "Pilih karakter, lalu mulai sesi baru. Riwayat percakapan tersimpan terpisah untuk setiap karakter.":{id:"Pilih karakter, lalu mulai sesi baru. Riwayat percakapan tersimpan terpisah untuk setiap karakter.",pt:"Escolha um personagem e inicie uma nova sessão. O histórico de conversa é salvo separadamente para cada personagem.",fr:"Choisissez un personnage et démarrez une nouvelle session. L’historique est enregistré séparément pour chaque personnage.",ru:"Выберите персонажа и начните новую сессию. История диалогов сохраняется отдельно для каждого персонажа.",ja:"キャラクターを選んで新しいセッションを開始してください。会話履歴はキャラクターごとに個別保存されます。","zh-CN":"选择角色并开始新会话。每个角色的对话记录都会单独保存。",ko:"캐릭터를 선택하고 새 세션을 시작하세요. 대화 기록은 캐릭터별로 별도 저장됩니다."},
+  "Catatan karakter & status":{id:"Catatan karakter & status",pt:"Registro e status do personagem",fr:"Dossier et statut du personnage",ru:"Запись персонажа и статус",ja:"キャラクター記録と状態","zh-CN":"角色记录与状态",ko:"캐릭터 기록 및 상태"},
+  "Pilih karakter untuk melihat catatan lokalnya.":{id:"Pilih karakter untuk melihat catatan lokalnya.",pt:"Escolha um personagem para ver seus registros locais.",fr:"Choisissez un personnage pour consulter ses notes locales.",ru:"Выберите персонажа, чтобы просмотреть его локальные записи.",ja:"キャラクターを選択するとローカル記録を確認できます。","zh-CN":"选择角色以查看其本地记录。",ko:"캐릭터를 선택하면 로컬 기록을 볼 수 있습니다."},
+  "Pilih karakter untuk memulai":{id:"Pilih karakter untuk memulai",pt:"Escolha um personagem para começar",fr:"Choisissez un personnage pour commencer",ru:"Выберите персонажа, чтобы начать",ja:"開始するキャラクターを選択","zh-CN":"选择角色以开始",ko:"시작할 캐릭터 선택"},
+  "No":{id:"Tidak",pt:"Não",fr:"Non",ru:"Нет",ja:"いいえ","zh-CN":"否",ko:"아니요"},
+  "Yes":{id:"Ya",pt:"Sim",fr:"Oui",ru:"Да",ja:"はい","zh-CN":"是",ko:"예"},
+  "Italic":{id:"Miring",pt:"Itálico",fr:"Italique",ru:"Курсив",ja:"斜体","zh-CN":"斜体",ko:"기울임"},
+  "Bold":{id:"Tebal",pt:"Negrito",fr:"Gras",ru:"Полужирный",ja:"太字","zh-CN":"粗体",ko:"굵게"},
+  "Code":{id:"Kode",pt:"Código",fr:"Code",ru:"Код",ja:"コード","zh-CN":"代码",ko:"코드"},
+  "Appearance, sound, local storage, and AI configuration.":{id:"Tampilan, suara, penyimpanan lokal, dan konfigurasi AI.",pt:"Aparência, som, armazenamento local e configuração de IA.",fr:"Apparence, son, stockage local et configuration de l’IA.",ru:"Внешний вид, звук, локальное хранилище и настройки ИИ.",ja:"外観、サウンド、ローカルストレージ、AI設定。","zh-CN":"外观、声音、本地存储和 AI 配置。",ko:"화면, 사운드, 로컬 저장소 및 AI 설정."},
+  "The Academy Obsidian theme is the default command-hall palette. Parchment mode switches to a warmer, light reading surface.":{id:"Tema Obsidian Akademi adalah palet bawaan aula komando. Mode Perkamen beralih ke permukaan baca terang yang lebih hangat.",pt:"O tema Obsidiana da Academia é a paleta padrão da sala de comando. O modo Pergaminho oferece uma superfície de leitura clara e mais acolhedora.",fr:"Le thème Obsidienne de l’Académie est la palette par défaut de la salle de commandement. Le mode Parchemin offre une surface de lecture plus chaude et claire.",ru:"Тема «Обсидиан Академии» — стандартная палитра командного зала. Режим пергамента переключает интерфейс на более тёплую светлую поверхность.",ja:"アカデミー・オブシディアンは指令ホールの標準配色です。羊皮紙モードでは、より暖かく明るい読書画面に切り替わります。","zh-CN":"学院黑曜石主题是指挥大厅的默认配色。羊皮纸模式会切换为更温暖、明亮的阅读界面。",ko:"아카데미 옵시디언 테마는 지휘 홀의 기본 팔레트입니다. 양피지 모드는 더 따뜻하고 밝은 읽기 화면으로 전환합니다."},
+  "Notifications":{id:"Notifikasi",pt:"Notificações",fr:"Notifications",ru:"Уведомления",ja:"通知","zh-CN":"通知",ko:"알림"},
+  "RUNNING":{id:"BERJALAN",pt:"EM EXECUÇÃO",fr:"EN COURS",ru:"РАБОТАЕТ",ja:"実行中","zh-CN":"运行中",ko:"실행 중"},
+  "NOT RUNNING":{id:"TIDAK BERJALAN",pt:"INATIVO",fr:"À L’ARRÊT",ru:"НЕ РАБОТАЕТ",ja:"停止中","zh-CN":"未运行",ko:"실행 중 아님"},
+  "Allow ↗":{id:"Izinkan ↗",pt:"Permitir ↗",fr:"Autoriser ↗",ru:"Разрешить ↗",ja:"許可 ↗","zh-CN":"允许 ↗",ko:"허용 ↗"},
+  "01 — 03":{id:"01 — 03",pt:"01 — 03",fr:"01 — 03",ru:"01 — 03",ja:"01 — 03","zh-CN":"01 — 03",ko:"01 — 03"},
+  "Create another journey":{id:"Buat perjalanan lain",pt:"Criar outra jornada",fr:"Créer un autre voyage",ru:"Создать другое путешествие",ja:"別の旅を作成","zh-CN":"创建另一段旅程",ko:"다른 여정 만들기"},
+  "Delete all journeys":{id:"Hapus semua perjalanan",pt:"Excluir todas as jornadas",fr:"Supprimer tous les voyages",ru:"Удалить все путешествия",ja:"すべての旅を削除","zh-CN":"删除所有旅程",ko:"모든 여정 삭제"},
+  "Load":{id:"Muat",pt:"Carregar",fr:"Charger",ru:"Загрузить",ja:"読み込む","zh-CN":"加载",ko:"불러오기"},
+  "Rename":{id:"Ubah nama",pt:"Renomear",fr:"Renommer",ru:"Переименовать",ja:"名前を変更","zh-CN":"重命名",ko:"이름 변경"},
+  "Export":{id:"Ekspor",pt:"Exportar",fr:"Exporter",ru:"Экспорт",ja:"エクスポート","zh-CN":"导出",ko:"내보내기"},
+  "Delete":{id:"Hapus",pt:"Excluir",fr:"Supprimer",ru:"Удалить",ja:"削除","zh-CN":"删除",ko:"삭제"},
+  "Age":{id:"Usia",pt:"Idade",fr:"Âge",ru:"Возраст",ja:"年齢","zh-CN":"年龄",ko:"나이"},
+  "WORLD ARCHIVE · READ ONLY":{id:"ARSIP DUNIA · HANYA BACA",pt:"ARQUIVO MUNDIAL · SOMENTE LEITURA",fr:"ARCHIVES DU MONDE · LECTURE SEULE",ru:"АРХИВ МИРА · ТОЛЬКО ЧТЕНИЕ",ja:"ワールドアーカイブ · 読み取り専用","zh-CN":"世界档案 · 只读",ko:"월드 아카이브 · 읽기 전용"},
+  "DISPOSITION":{id:"DISPOSISI",pt:"DISPOSIÇÃO",fr:"DISPOSITION",ru:"СКЛОННОСТИ",ja:"気質","zh-CN":"倾向",ko:"성향"},
+  "STANDALONE":{id:"MANDIRI",pt:"INDEPENDENTE",fr:"AUTONOME",ru:"АВТОНОМНЫЙ",ja:"独立","zh-CN":"独立",ko:"독립형"},
+  "ETERNAL PATH · LOCAL JOURNEY":{id:"ETERNAL PATH · PERJALANAN LOKAL",pt:"ETERNAL PATH · JORNADA LOCAL",fr:"ETERNAL PATH · VOYAGE LOCAL",ru:"ETERNAL PATH · ЛОКАЛЬНОЕ ПУТЕШЕСТВИЕ",ja:"ETERNAL PATH · ローカルの旅","zh-CN":"ETERNAL PATH · 本地旅程",ko:"ETERNAL PATH · 로컬 여정"}
+});
+
 export function getLanguage():AppLanguage {
   try { const saved=localStorage.getItem(STORAGE_KEY); return APP_LANGUAGES.some(item=>item.code===saved)?saved as AppLanguage:DEFAULT_LANGUAGE; }
   catch { return DEFAULT_LANGUAGE; }
