@@ -1,6 +1,6 @@
 # Eternal Path UI Repair Checklist
 
-**Status:** Open — latest user testing still reproduces toolbar drift.
+**Status:** Code-level UI refinement in progress; target-device verification remains open. Do not claim the toolbar drift is resolved until Android testing confirms it.
 **Master tracking:** [Product Roadmap §15](../PRODUCT_ROADMAP.md#15-active-ui-repair--eternal-path-scene-and-navigation-2026-11-02)
 **GitHub issue:** [#2 — Eternal Path toolbar drift and scene/narrative layout refinement](https://github.com/Antarezka/merzkava-apk/issues/2)
 **Scope:** Shared app navigation plus Eternal Path Scene Window, Save Manager and narrative presentation.
@@ -19,11 +19,11 @@
 - [ ] Verify screen changes do not recreate the toolbar at a different scroll offset or invoke automatic scrollIntoView/focus scrolling.
 - [ ] Verify toolbar remains viewport-anchored when switching Home → Convo → Eternal Path → Archive → Settings and when returning.
 - [ ] Verify manual horizontal swipe still works and route selection does not change the rail's scroll position.
-- [~] Keep a minimum 32 CSS-pixel breathing margin on both left and right edges (plus any reported safe-area inset), roughly a pinky-width at phone scale; do not let the rail approach Android back-swipe zones. At 320px viewport width, the rail should be about 256px wide before safe-area deductions.
-- [~] Shape the dock as a Retractable Secret Compartment: raised central crown, curved/recessed shoulders, dark verdigris enamel, antique brass edging, and fine Victorian/arcane engraving. Keep the side ropes and pulley details inside the dock so gesture margins stay empty.
-- [~] Use flat editorial emblems with recognizable silhouettes: Home = travel suitcase; Eternal Path = open book; Archive = document/record; Profile = cameo portrait. Keep Convo, Inventory, Journal, and Settings accessible by manual roulette swipe.
-- [~] Give each item its own rotary ring. Dragging the ring turns only that ring; the central flat emblem tilts slightly. The item coordinate, width, order, and label remain fixed. Side cables/pulleys respond to dial movement and use the existing sound toggle for mechanical ratchet ticks.
-- [~] Preserve manual scroll offset and each dial angle across route rerenders; keep Anime.js entrance/stagger on inner wrappers only.
+- [x] Set a minimum 32 CSS-pixel breathing margin on both left and right edges (plus safe-area insets); at 320px viewport width the rail is constrained to about 256px before safe-area deductions. Physical gesture clearance still requires device QA.
+- [x] Shape the dock as a Retractable Secret Compartment: raised central crown, curved/recessed shoulders, dark verdigris enamel, antique brass edging, and fine Victorian/arcane engraving. Keep side ropes and pulley details inside the dock.
+- [x] Use flat editorial emblems with recognizable silhouettes: Home = travel suitcase; Eternal Path = open book; Archive = document/record; Profile = cameo portrait. Keep Convo, Inventory, Journal, and Settings accessible by manual roulette swipe.
+- [x] Give each item its own rotary ring. Dragging the ring turns only that ring; the central flat emblem tilts slightly. Item coordinates, width, order, and label remain fixed. Side cables/pulleys respond to dial movement and use the existing sound toggle for mechanical ratchet ticks.
+- [x] Preserve manual scroll offset and each dial angle across route rerenders; keep Anime.js entrance/stagger on inner wrappers only.
 - [ ] Add regression tests for fixed-rail vs inner-wrapper transform isolation, route switching, stable scroll position and viewport anchoring.
 - [ ] Install APK on target Android device and confirm the toolbar no longer moves during repeated route changes.
 - [ ] Attach test evidence (screen recording or screenshots + build SHA) before closing.
@@ -32,31 +32,31 @@
 
 ## UI-EP-003 — Save Manager hidden menu
 
-- [ ] Remove the full-width/always-visible Save Manager section from the active Eternal Path content flow.
-- [ ] Show only a small, restrained ornamental Save Manager icon/button while a journey is active.
-- [ ] Open the existing manager content only after the trigger is clicked; use a floating overlay/popover/sheet that does not push the scene or narrative.
-- [ ] Include an explicit close control and support Android Back/Escape.
-- [ ] Keep all current actions: load, rename, export, delete, create another journey, import backup and delete-all confirmation.
-- [ ] Keep the no-active-journey creation/restore path discoverable; do not hide the only way to start or restore a journey.
-- [ ] Add tests for hidden-by-default, open/close, save operations and focus/keyboard behavior.
+- [x] Remove the full-width/always-visible Save Manager section from the active Eternal Path content flow.
+- [x] Show only a small, restrained ornamental Save Manager icon/button while a journey is active.
+- [x] Open the existing manager content only after the trigger is clicked; use a floating overlay/sheet with a dismissible backdrop that does not push the scene or narrative.
+- [x] Include an explicit close control, backdrop dismissal, Android Back/Escape, and keyboard focus containment.
+- [x] Preserve all current actions: load, rename, export, delete, create another journey, import backup and delete-all confirmation.
+- [x] Keep the no-active-journey creation/restore path discoverable; do not hide the only way to start or restore a journey.
+- [~] Add render-contract tests for hidden-by-default and accessible dialog/backdrop markup. Browser interaction, focus, keyboard and save-operation tests remain to be completed.
 
 **Acceptance:** with an active journey, the Save Manager occupies no permanent content row; only the small trigger is visible until tapped. Opening it does not reflow the Scene Window or narrative.
 
 ## UI-EP-004 — Narrative meets the weather window
 
-- [ ] Rework active-journey ordering so the narrative block sits directly below the weather Scene Window, with the disposition strip immediately above the narrative if retained.
-- [ ] Remove the unnecessary vertical gap between the Scene Window/disposition and narrative surface.
-- [ ] Preserve Scene Window clipping: rain, snow, frost, fog and lightning layers must not bleed into narrative or app shell.
-- [ ] Keep profile details compact and secondary; do not let profile/manager panels split the scene from its narrative.
+- [x] Rework active-journey ordering so the narrative block sits directly below the weather Scene Window, with the disposition strip immediately above the narrative.
+- [x] Remove the unnecessary vertical gap between the Scene Window/disposition and narrative surface.
+- [x] Preserve Scene Window clipping: rain, snow, frost, fog and lightning layers remain clipped inside the Scene Window.
+- [x] Keep profile details compact and secondary; profile and Save Manager do not split the scene from its narrative.
 - [ ] Verify at 320–360 px widths and larger screens.
 
 **Acceptance:** the scene and its narrative read as one continuous framed experience; no atmospheric FX escape the glass window.
 
 ## UI-EP-005 — Compact ink-brush clock
 
-- [ ] Put the in-world day/time in a compact black brush-stroke backing.
-- [ ] Use translucent black opacity so the scene remains subtly visible through it.
-- [ ] Add an uneven/fading tail to the right edge, like a single ink stroke dragged across the glass.
+- [x] Put the in-world day/time in a compact black brush-stroke backing.
+- [x] Use translucent black opacity so the scene remains subtly visible through it.
+- [x] Add an uneven/fading tapered tail to the right edge, like a single ink stroke dragged across the glass.
 - [ ] Size the backing to the clock text plus minimal padding only; do not create a full-width banner.
 - [ ] Preserve legibility in all weather and day-cycle combinations.
 
@@ -78,7 +78,7 @@ The former 240-entry generated story sequence has been retired and removed from 
 - [ ] Use consistent spacing and typography to make the five steps feel like one continuous passage.
 - [ ] Distinguish dialogue with a subtle left rule/ink panel, not a large card nested inside another large card.
 - [ ] Keep the player-response trigger visually attached to the narrative passage.
-- [~] Give the narrative column an independent vertical scroll area with contained overscroll and a visible, restrained scrollbar.
+- [x] Give the narrative column an independent vertical scroll area with contained overscroll and a visible, restrained scrollbar.
 - [ ] Ensure long dialogue wraps naturally without horizontal overflow or clipping.
 - [ ] Add representative tests for missing speaker detail, long dialogue, narrow screens and no-active-journey state.
 
