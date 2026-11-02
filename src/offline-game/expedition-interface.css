@@ -203,3 +203,36 @@ body.eternal-choice-open{overflow:hidden}
 .expedition-window-frame{z-index:11}
 .expedition-window-label,.scene-coordinate{z-index:12}
 @media(prefers-reduced-motion:reduce){.expedition-cloud-motion,.expedition-sun-glow,.expedition-moon-glow,.expedition-light-rays,.expedition-particle,.expedition-fog-motion{will-change:auto}.expedition-weather-particles{display:none}}
+
+
+/* Uploaded FX image plates. All compositing stays clipped to the Scene Window. */
+.expedition-sun-glow,.expedition-moon-glow{inset:0;top:0;right:0;width:auto;aspect-ratio:auto;overflow:hidden;background:none}
+.expedition-sun-glow-image,.expedition-moon-glow-image,.expedition-light-rays-image,
+.expedition-rain-streak-image,.expedition-snow-texture img,.expedition-petal-texture img,
+.expedition-leaf-texture img,.expedition-lightning-flash-image,.expedition-window-frost-image{
+  position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover;pointer-events:none;
+  mix-blend-mode:screen;
+}
+.expedition-sun-glow-image{opacity:.78}
+.expedition-moon-glow-image{opacity:.64}
+.expedition-light-rays{overflow:hidden}
+.expedition-light-rays-image{inset:-12%;width:124%;height:124%;opacity:.72}
+.expedition-rain-streaks,.expedition-snow-texture,.expedition-petal-texture,.expedition-leaf-texture{
+  position:absolute;inset:0;overflow:hidden;pointer-events:none;mix-blend-mode:screen;opacity:0
+}
+.expedition-rain-streaks{z-index:4.5}
+.expedition-snow-texture,.expedition-petal-texture,.expedition-leaf-texture{z-index:4.6}
+.expedition-environment[data-weather="Rain"] .expedition-rain-streaks{opacity:.68}
+.expedition-environment[data-weather="Snow"] .expedition-snow-texture{opacity:.62}
+.expedition-environment[data-cycle="Dawn"]:not([data-weather="Snow"]):not([data-weather="Rain"]) .expedition-petal-texture{opacity:.48}
+.expedition-environment[data-cycle="Dusk"]:not([data-weather="Snow"]):not([data-weather="Rain"]) .expedition-leaf-texture{opacity:.48}
+.expedition-lightning-layer img{width:100%;height:100%;object-fit:cover;mix-blend-mode:screen}
+.expedition-window-frost{position:absolute;z-index:9;inset:0;overflow:hidden;pointer-events:none;opacity:0;mix-blend-mode:screen;
+  -webkit-mask-image:radial-gradient(ellipse at center,#0000 35%,#000 78%);mask-image:radial-gradient(ellipse at center,#0000 35%,#000 78%)}
+.expedition-environment[data-weather="Snow"] .expedition-window-frost{opacity:.68}
+.expedition-window-frost-image{opacity:.8}
+.expedition-scene-copy{z-index:10}
+@media(prefers-reduced-motion:reduce){
+  .expedition-rain-streaks,.expedition-snow-texture,.expedition-petal-texture,.expedition-leaf-texture{will-change:auto}
+  .expedition-window-frost{opacity:.58}
+}
