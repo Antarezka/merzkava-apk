@@ -36,7 +36,7 @@ export function setLanguage(value:string):AppLanguage {
 export function translateLabel(value:string,language:AppLanguage):string { return labels[value]?.[language]??value; }
 export function languagePanelMarkup(language:AppLanguage):string {
   const options=APP_LANGUAGES.map(item=>'<option value="'+item.code+'" '+(item.code===language?'selected':'')+'>'+item.native+'</option>').join("");
-  return '<section class="language-preference"><label for="merzkava-language-select">✧ '+translateLabel("Language",language)+'</label><select id="merzkava-language-select" data-language-select aria-label="'+translateLabel("Choose language",language)+'">'+options+'</select></section>';
+  return '<section class="language-preference"><label for="merzkava-language-select">✧ '+translateLabel("Language",language)+'</label><select id="merzkava-language-select" data-language-select aria-label="'+translateLabel("Choose language",language)+'">'+options+'</select></section><div class="developer-credit"><strong>神Neru | Eru</strong><em>The Unfortunate Sleeping God</em></div>';
 }
 export function translateRenderedContent(root:ParentNode,language:AppLanguage):void {
   document.documentElement.lang=language;

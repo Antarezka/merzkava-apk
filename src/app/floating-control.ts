@@ -43,6 +43,6 @@ export function floatingControlMarkup(state: FloatingReadiness, language: AppLan
       <button class="floating-stop" data-floating-action="stop" ${!state.serviceRunning && !state.displayOverApps ? "disabled" : ""}>Stop service and close window <span>×</span></button>
       <button class="floating-donate" data-floating-action="donate">Donate stuff <span>♡</span></button>
     </section>
-    <p class="floating-footnote">Foreground service starts automatically when you enter Floating Mode and keeps an ongoing notification visible while the floating session is active.</p>\n    <div class="developer-credit"><strong>神Neru | Eru</strong><em>The Unfortunate Sleeping God</em></div>
+    <p class="floating-footnote">Foreground service starts automatically when you enter Floating Mode and keeps an ongoing notification visible while the floating session is active.</p>
   </main>`;
 }
