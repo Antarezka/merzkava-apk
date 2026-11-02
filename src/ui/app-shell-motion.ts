@@ -171,7 +171,7 @@ export function animateNavLeverPull(button: HTMLElement, onComplete: () => void)
   };
 
   // 0.10–0.25s: match the opening cluster of short mechanical impacts.
-  haptic(12);
+  haptic(38);
   animate(arm, {
     rotate: [
       { to: -15, duration: 105, ease: "outQuad" },
@@ -195,7 +195,7 @@ export function animateNavLeverPull(button: HTMLElement, onComplete: () => void)
       delay: 640,
     });
   }
-  window.setTimeout(() => haptic(10), 650);
+  window.setTimeout(() => haptic(30), 650);
 
   // 1.40–1.55s: align the pivot's firm mechanical catch with the loud final impact.
   if (pivot) animate(pivot, {
@@ -204,7 +204,7 @@ export function animateNavLeverPull(button: HTMLElement, onComplete: () => void)
     delay: 1400,
     ease: "outBack",
   });
-  window.setTimeout(() => haptic(24), 1420);
+  window.setTimeout(() => haptic(85), 1420);
 
   // 1.56–2.00s: release the lever after the catch; finish with a short settling motion.
   animate(arm, {
@@ -219,7 +219,7 @@ export function animateNavLeverPull(button: HTMLElement, onComplete: () => void)
       { to: 0, duration: 85, ease: "outCubic" },
     ],
     onComplete: () => {
-      haptic(12);
+      haptic(38);
       onComplete();
     },
   });
