@@ -137,6 +137,16 @@ Each save ID owns player/world state, relationships, organizations, territories,
 
 Index event lookup by region/location/time/tags. Simulate only active/nearby NPCs and advance off-screen schedules in deterministic time intervals; never run full-world simulation per frame. Separate UI rendering from simulation; UI reads compact view models and never recalculates authoritative formulas. Use append-only event/transaction records with periodic snapshots and bounded caches. Load only the active scene and visible panels; lazy-load deep profile/codex/save screens. Reuse assets and CSS layers; keep Anime.js scoped to scene FX. Establish performance budgets only after measuring the target device.
 
+## 12. Reading accessibility, audio and deferred Braille
+
+The shared product requirements for audio and inclusive reading are defined in [the master roadmap](../PRODUCT_ROADMAP.md#3d-audio-reading-controls-and-inclusive-access) and are implemented across the app rather than as Eternal Path-only decoration.
+
+- Eternal Path narrative has its own text preferences, independent from connected Convo: optional dyslexia-friendly fonts, font size/weight, line height, letter spacing, paragraph spacing and text width.
+- Vision support includes high contrast, color-vision profiles, and redundant non-color cues. Choices, statuses, warnings and rarity must remain understandable without color perception.
+- TalkBack and Android accessibility semantics, focus order, touch targets, dynamic text scaling and reduced motion are acceptance requirements.
+- Tap Sound, BGM and Ambient / Sound FX are independent audio categories with separate persistent controls. BGM playback remains dormant until user-provided music assets are ready.
+- Braille is a deferred post-core milestone. Its exact scope (refreshable Braille display / Android BrailleBack integration, in-app Braille presentation, or both) must be confirmed before design or implementation. Do not claim Braille support until tested with compatible assistive technology.
+
 ## 11. Master acceptance gate
 
 Eternal Path is not complete until a player can start/manage isolated journeys, live an ordinary life or pursue optional/hybrid ambitions, experience meaningful NPC/social/event consequences, create/manage player-local names and entities, acquire/control supported assets and organizations, save/load/export/delete safely, and play offline without changing World Archive canon. A mockup, empty screen or isolated formula module does not satisfy this gate.

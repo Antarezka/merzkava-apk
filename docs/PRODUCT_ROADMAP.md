@@ -24,6 +24,16 @@ Merzkava APK is **one Android application containing two playable experiences an
 
 Both modes live in the same APK and may share app shell, navigation, visual components, and infrastructure. They must retain separate mode identity, save/session state, and source-version records; switching modes must not silently merge state or context.
 
+### Visual identity and reference language
+
+The shared app experience is an original synthesis of four user-selected references:
+- **Arknights:** information hierarchy, tactical-feeling panels and purposeful navigation structure.
+- **Reverse: 1999:** editorial typography, restrained ornament, atmospheric composition and distinctive transitions.
+- **Girls' Frontline:** modular system presentation, character-facing information density and functional interface grouping.
+- **Harry Potter:** archival/magical atmosphere through books, old letters, seals, catalogues and tactile paper details.
+
+These are design references, not assets or templates to reproduce. Merzkava retains its own dark, warm-brass, parchment and arcane identity. Each screen must remain readable, responsive, accessible and function-first; atmosphere must never obscure controls or content.
+
 ### Architecture guardrails
 
 - [x] Official Universe repository is the canonical source for world lore and rules.
@@ -53,6 +63,16 @@ Both modes live in the same APK and may share app shell, navigation, visual comp
 A feature is not DONE merely because a screen, button, placeholder, or design mock-up exists. Completion requires working behavior, appropriate error/empty/offline states, accessibility checks, and a test or reproducible verification note.
 
 ---
+
+## 2A. Master project progress index
+
+**Current documented index: 19.5%** (calculated from the active roadmap checklist at this revision).
+
+Calculation rule: each active checklist item is scored as DONE = 1, IN PROGRESS = 0.5, and TODO / BLOCKED / AUDIT = 0. The index is:
+
+`(DONE + 0.5 × IN PROGRESS) ÷ all active checklist items × 100`
+
+This is a transparent checklist-completion index, **not** a prediction of remaining time, a measure of code volume, or a release-readiness score. Large and small tasks currently count equally. Historical implementation notes and retired work are excluded; the index must be recalculated when active checklist items or their statuses change. A feature is not complete until its own acceptance gate and verification evidence pass.
 
 ## 3. Workstream 1 — World Archive, typography, and reference experience
 
@@ -125,6 +145,14 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 - [ ] Add regression checks for every repaired critical behavior.
 - [ ] Re-audit after each major feature batch so new regressions are not hidden.
 
+### 2C. Regression baseline and repair safety
+
+- [ ] When a repair risks damaging a working screen or interaction, compare against the latest verified Android build and its source commit before changing behavior.
+- [ ] Preserve working toolbar/menu behavior as the regression baseline: stable positioning, current navigation destinations, horizontal roulette/scroll, rotary controls, touch/drag distinction and existing animation behavior.
+- [ ] Do not rework or reposition the toolbar merely for visual preference when the current build already behaves correctly; only change the specific confirmed defect.
+- [ ] For every repair, record the baseline build/commit, changed behavior, regression test and Android verification result.
+- [ ] If a change breaks a previously working function, stop feature expansion and restore/fix that behavior before continuing.
+
 **Exit gate:** Every existing screen and interactive element has an inventory status; critical defects are fixed or explicitly blocked; no visible control falsely implies functionality.
 
 ---
@@ -177,6 +205,37 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 - [ ] Verify all eight destinations, four-visible-item layout, drag-vs-tap behavior, scroll behavior, theme/mode changes, Android edge gestures, reduced motion, and visual stability on the target device.
 
 **Exit gate:** Four primary menu functions are immediately recognizable, all existing destinations remain reachable, rotation is local and never changes menu geometry, and the dock remains gesture-safe and stable on-device.
+
+### 3D. Audio, reading controls and inclusive access
+
+**Audio architecture**
+- [ ] Keep independent user controls for **Tap Sound**, **BGM**, and **Ambient / Sound FX**; changing or muting one category must not silently change the others.
+- [ ] Persist each category's enabled state and volume independently across app restarts.
+- [ ] Route existing navigation ratchet/tap feedback through Tap Sound; avoid duplicate playback when a control is tapped or dragged.
+- [ ] Prepare the BGM setting and playback boundary now, but keep music playback inactive/empty until the user supplies the BGM assets.
+- [ ] Keep environmental sounds (rain, wind, thunder and scene ambience) under Ambient / Sound FX, not Tap Sound or BGM.
+- [ ] Respect Android audio focus, interruptions, silent/mute state and reduced-motion/reduced-sensory preferences where applicable.
+
+**Independent text presentation**
+- [ ] Add separate typography preferences for connected Convo messages and Eternal Path narrative; neither mode may unexpectedly overwrite the other's settings.
+- [ ] Offer optional dyslexia-friendly font choices plus independent font size, weight, line height, letter spacing, paragraph spacing and text-width controls.
+- [ ] Keep font choices optional and preserve bundled/local font fallback so reading does not depend on a network font request.
+- [ ] Ensure user text settings apply to long-form narrative, dialogue, choices and system messages without clipping controls or hiding critical status information.
+
+**Vision and color accessibility**
+- [ ] Provide color-vision support profiles (including common red/green and blue/yellow deficiencies) and a high-contrast option.
+- [ ] Never communicate state, rarity, success, danger or availability by color alone; pair color with text, icon, shape, pattern or position.
+- [ ] Check text/background contrast, focus visibility, dynamic text scaling, zoom/reflow, touch targets and screen-reader labels across Convo and Eternal Path.
+- [ ] Respect Android accessibility services and TalkBack semantics; avoid animation or decorative layers that intercept reading/focus order.
+- [ ] Test all reading and color modes on narrow Android screens and with reduced motion enabled.
+
+**Deferred Braille milestone**
+- [ ] Plan Braille support only after the core app, audio controls, independent reading controls, accessibility baseline and Eternal Path content/engine milestones are complete.
+- [ ] Before implementation, confirm the intended scope with the user: compatible refreshable Braille display / Android BrailleBack integration, in-app Braille presentation, or both.
+- [ ] Design Braille output around semantic text and navigation structure, not screenshots or visual-only UI; test supported hardware/services before declaring support.
+
+**Exit gate:** Audio categories are independent and persistent; Convo and Eternal Path have independent readable-text preferences; vision accessibility does not rely on color alone; Android assistive technologies can navigate core flows. Braille remains a later milestone and is not falsely represented as implemented.
+
 
 **Exit gate:** New visual controls navigate to the right destinations, have meaningful feedback and fallback behavior, and remain readable/performance-safe on target Android devices.
 
@@ -321,7 +380,7 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 
 **Execution order:** (1) finish and verify the shared toolbar/menu and active UI repair; (2) establish the required EP-2 simulation-state contracts; (3) implement and test the EP-3 narrative/social engine and its schema/resolver; (4) only then author and validate Patch 1 content. A separate nine-situation bootstrap slice now validates the schema/resolver and gives each starting region three playable situations. It is not Patch 1, does not count toward the 1,000-situation target, and must not be expanded into bulk content until the UI repair and EP-2 contracts are verified. **Tracking:** [Issue #3](https://github.com/Antarezka/merzkava-apk/issues/3).
 
-**Retirement rule:** The generated 240-entry 0.1.0 sequence is retired, removed from active runtime, and must not be recycled, lightly rewritten, or used as the structural template for Patch 1.
+**Retirement rule:** The generated 240-entry 0.1.0 sequence is deleted from the active content pack/runtime and is not part of the current source tree. Keep only the small compatibility/rejection boundary needed to prevent old numeric choices from mutating saves, plus a regression test proving the retired sequence cannot load. Do not restore, recycle, lightly rewrite, or use it as the structural template for Patch 1.
 
 **Patch-1 minimum content target:** At least **1,000 genuinely distinct narrative situations/states** in the first patch. The count must represent meaningful differences in context, actors, stakes, triggers, available knowledge, and possible consequences—not combinatorial permutations that merely swap names, scene labels, or generic sentences.
 
@@ -334,7 +393,7 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 - [x] Starter closing questions are situation-specific and invite reasoning from the character’s perspective.
 - [x] Player choices hide outcome text and mechanical deltas until after validated resolution.
 - [x] Narrative remains in the independent reading column below the Scene Window.
-- [ ] Validate at least 1,000 materially distinct Patch-1 situations with coverage, duplicate/near-duplicate and human quality review. The nine bootstrap situations do not count.
+- [ ] Validate at least 1,000 materially distinct Patch-1 situations with coverage, duplicate/near-duplicate and human quality review. The nine bootstrap situations do not count. The retired 240-entry sequence is not retained as active content and must not be restored.
 - [~] Deterministic selection, no-repeat history, transaction IDs, single-save resolution and starter tests are implemented; full save/reload, patch migration and SQLite transaction QA remain open.
 - [~] Bootstrap patch has its own manifest and provenance; release QA, rollback compatibility and final patch packaging remain open.
 
