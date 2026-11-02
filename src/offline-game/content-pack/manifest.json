@@ -70,6 +70,7 @@
     "manifestPath": "patches/eternal-path-bootstrap/manifest.json",
     "runtimeSource": "../narrative-engine.ts",
     "provenance": "IN_GAME_ORIGINAL",
-    "notPatch1": true
+    "notPatch1": true,
+    "replayPolicy": "A situation can recur after two other situation resolutions; immediate repeats are blocked."
   }
 }
