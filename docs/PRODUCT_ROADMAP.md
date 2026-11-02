@@ -870,3 +870,15 @@ The complete user-approved design and phase backlog now live in [ETERNAL_PATH_BL
 - [ ] **Release verification:** TypeScript, full test suite, production build, Web App Validation, and Android APK workflow must pass on the same final commit. Install and inspect on target Android hardware; attach evidence for fixed toolbar anchoring, four visible items, manual roulette, drag-vs-tap, Android edge gestures, Save Manager, scene/narrative layout, clock, and weather clipping before closing Issue #2.
 
 **Gate:** Do not mark this workstream fully complete or begin Patch-1 story-node authoring until code verification and target-device UI/gesture QA are complete.
+
+## Mandatory node expansion policy — World Archive anchored, non-canonical
+
+This policy is a hard acceptance gate for all Eternal Path narrative-node work:
+
+1. **World Archive is the required anchor for every node.** Each node must be built around at least one reviewed, player-safe Archive dossier and use it as the setting/context/lore boundary. A node without an Archive anchor is invalid.
+2. **All nodes are non-canonical gameplay scenarios.** Nodes may use canon-backed references, but their authored scene, dialogue, choices, and consequences do not create, amend, or imply new official Universe facts.
+3. **Keep the existing labels and categories** already defined by the content plan and provenance contract. Do not collapse or rename them to represent Archive anchoring; anchoring and provenance are separate dimensions.
+4. **Minimum batch size: two new distinct nodes per node-content update.** A change that adds only one node fails acceptance. The previous nine-node starter slice remains the baseline and is not a substitute for the two-node minimum on subsequent updates.
+5. Before accepting an update, verify the node count delta, distinctness, Archive dossier anchors, non-canonical framing, provenance labels, and that no game-only text has been promoted into World Archive or Universe canon.
+
+The nine-node starter slice spans Golden Dragon Empire, Tianhai Yunzhou, and Beiming Gu (three each). Future updates retain the planned labels/categories and should continue to use the Archive as the organizing spine rather than treating the three powers as disconnected lore sources.
