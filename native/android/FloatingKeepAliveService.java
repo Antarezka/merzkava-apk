@@ -15,10 +15,13 @@ import android.content.pm.ServiceInfo;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.SweepGradient;
+import android.graphics.Matrix;
 import android.graphics.Path;
 import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.provider.Settings;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -222,14 +225,32 @@ public class FloatingKeepAliveService extends Service {
             float pulse = .72f + .28f * (float)Math.sin(System.currentTimeMillis()/520.0);
             int ringColor = online ? Color.rgb(226, 184, 82) : Color.rgb(224, 65, 62);
             paint.setStyle(Paint.Style.STROKE); paint.setStrokeWidth(dp(2.2f));
-            paint.setColor(ringColor); paint.setAlpha((int)(145 + 105 * pulse));
-            paint.setShadowLayer(dp(5), 0, 0, ringColor);
+            paint.setColor(ringColor); paint.setAlpha((int)(92 + 76 * pulse));
+            paint.setShadowLayer(dp(4), 0, 0, ringColor);
             canvas.drawCircle(cx, cy, dp(29.5f), paint);
-            paint.clearShadowLayer(); paint.setStyle(Paint.Style.FILL); paint.setAlpha(255);
+            paint.clearShadowLayer();
+            // A bright sweep travels continuously around the full circumference.
+            // Connectivity only changes its palette; drag, touch, service and window behavior stay untouched.
+            int soft = Color.argb((int)(70 * pulse), Color.red(ringColor), Color.green(ringColor), Color.blue(ringColor));
+            int bright = Color.argb((int)(255 * pulse), 255, 238, 190);
+            SweepGradient sweep = new SweepGradient(cx, cy,
+                new int[] { Color.TRANSPARENT, soft, ringColor, bright, ringColor, soft, Color.TRANSPARENT },
+                new float[] { 0f, 0.68f, 0.80f, 0.86f, 0.91f, 0.98f, 1f });
+            Matrix sweepRotation = new Matrix();
+            float rotation = (SystemClock.uptimeMillis() % 2600L) * (360f / 2600f);
+            sweepRotation.setRotate(rotation, cx, cy);
+            sweep.setLocalMatrix(sweepRotation);
+            paint.setShader(sweep);
+            paint.setStrokeCap(Paint.Cap.ROUND);
+            paint.setStrokeWidth(dp(2.8f));
+            paint.setAlpha(255);
+            paint.setShadowLayer(dp(7), 0, 0, ringColor);
+            canvas.drawCircle(cx, cy, dp(29.5f), paint);
+            paint.clearShadowLayer(); paint.setShader(null); paint.setStyle(Paint.Style.FILL); paint.setAlpha(255);
             paint.setColor(Color.rgb(29, 35, 29)); canvas.drawCircle(cx, cy, dp(26), paint);
             drawLayer(canvas, shadow, dp(4)); drawLayer(canvas, tail, dp(4));
             drawLayer(canvas, body, dp(4)); drawLayer(canvas, head, dp(4));
-            postInvalidateDelayed(48);
+            postInvalidateDelayed(24);
         }
     }
 
