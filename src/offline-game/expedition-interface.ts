@@ -13,9 +13,19 @@ export function renderExpeditionInterface():string {
   const sceneWindow=`<section class="expedition-environment" aria-label="Eternal Path scene window" data-location="${scene.id}" data-region="${scene.region}" data-cycle="${atmosphere.cycle}" data-weather="${atmosphere.weather}" style="--scene-fog-opacity:${atmosphere.fog}">
     <img class="expedition-scene-image" src="${scene.image}" alt="" />
     <div class="expedition-cloud-layer" aria-hidden="true"><img class="expedition-cloud-motion" src="/game/scenery/shared/fx-01-soft-cloud-layer.png" alt="" /></div>
-    <div class="expedition-light-layer" aria-hidden="true"></div><div class="expedition-sun-glow" aria-hidden="true"></div><div class="expedition-moon-glow" aria-hidden="true"></div><div class="expedition-light-rays" aria-hidden="true"></div>
-    <div class="expedition-weather-layer" aria-hidden="true"></div><div class="expedition-weather-particles" aria-hidden="true"></div><div class="expedition-lightning-layer" aria-hidden="true"></div>
+    <div class="expedition-light-layer" aria-hidden="true"></div>
+    <div class="expedition-sun-glow" aria-hidden="true"><img class="expedition-sun-glow-image" src="/game/scenery/shared/fx-03-sun-glow.png" alt="" /></div>
+    <div class="expedition-moon-glow" aria-hidden="true"><img class="expedition-moon-glow-image" src="/game/scenery/shared/fx-04-moon-glow.png" alt="" /></div>
+    <div class="expedition-light-rays" aria-hidden="true"><img class="expedition-light-rays-image" src="/game/scenery/shared/fx-05-volumetric-light-rays.png" alt="" /></div>
+    <div class="expedition-weather-layer" aria-hidden="true"></div>
+    <div class="expedition-rain-streaks" aria-hidden="true"><img class="expedition-rain-streak-image" src="/game/scenery/shared/fx-06-rain-streaks.png" alt="" /></div>
+    <div class="expedition-snow-texture" aria-hidden="true"><img src="/game/scenery/shared/fx-07a-floating-snow.png" alt="" /></div>
+    <div class="expedition-petal-texture" aria-hidden="true"><img src="/game/scenery/shared/fx-07b-floating-petals.png" alt="" /></div>
+    <div class="expedition-leaf-texture" aria-hidden="true"><img src="/game/scenery/shared/fx-07c-floating-autumn-leaves.png" alt="" /></div>
+    <div class="expedition-weather-particles" aria-hidden="true"></div>
+    <div class="expedition-lightning-layer" aria-hidden="true"><img class="expedition-lightning-flash-image" src="/game/scenery/shared/fx-08-lightning-flash-a.png" alt="" /></div>
     <div class="expedition-fog-layer" aria-hidden="true"><img class="expedition-fog-motion" src="/game/scenery/shared/fx-02-atmospheric-fog.png" alt="" /></div>
+    <div class="expedition-window-frost" aria-hidden="true"><img class="expedition-window-frost-image" src="/game/scenery/shared/fx-07a-window-frost.png" alt="" /></div>
     <div class="expedition-window-frame" aria-hidden="true"></div><span class="expedition-window-label">SCENE WINDOW · LIVE WORLD</span>
     <div class="expedition-scene-copy"><span class="scene-kicker">${escapeHtml(regionNames[scene.region])} · ${escapeHtml(atmosphere.cycle)} · ${escapeHtml(atmosphere.weather)}</span><h3>${escapeHtml(scene.label)}</h3><p>${escapeHtml(scene.detail)}</p></div>
     <span class="scene-coordinate">${save? `DAY ${save.day} · ${String(save.hour).padStart(2,"0")}:${String(save.minute).padStart(2,"0")}`:"WORLD SCENE PREVIEW"}</span>
