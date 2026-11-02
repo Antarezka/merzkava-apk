@@ -156,7 +156,7 @@ export function isSituationEligible(node:NarrativeSituation, context:NarrativeCo
 export function selectNarrativeSituation(context:NarrativeContext,nodes:NarrativeSituation[]=BOOTSTRAP_SITUATIONS):NarrativeSituation|null {
   const eligible=nodes.filter(node=>isSituationEligible(node,context)).sort((a,b)=>a.id.localeCompare(b.id));
   if(!eligible.length)return null;
-  return eligible[hash32([context.seed,context.saveId,context.day,context.locationId,context.sequence].join("|"))%eligible.length];
+  return eligible[hash32([context.seed,context.saveId,context.region,context.locationId,context.day,context.hour,context.minute,context.weather,getNarrativeCycle(context.hour,context.minute),context.age,context.disposition.label,context.sequence].join("|"))%eligible.length];
 }
 export function resolveNarrativeChoice(node:NarrativeSituation,choiceId:string,context:NarrativeContext):NarrativeResolution|null {
   if(!isSituationEligible(node,context))return null;
