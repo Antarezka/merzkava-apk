@@ -277,7 +277,7 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 - [ ] Create a content matrix mapping every canon-backed record to an approved Archive dossier and pinned Universe source SHA; keep `CANON`, `CANON_ADAPTATION`, and `IN_GAME_ORIGINAL` distinct.
 - [ ] Define progression pacing, economy balance, activity costs, age/time scale, difficulty, accessibility, and anti-softlock rules. Use test simulations rather than arbitrary hand-tuning.
 - [ ] Break the GDD into implementable vertical slices with acceptance criteria, test coverage, UI states, offline behavior, and explicit dependencies.
-- [ ] Approve the GDD and architecture baseline before large-scale content authoring or implementation. Keep the current 240-node prologue as a prototype/content sample until its role in the final structure is decided.
+- [ ] Approve the GDD and architecture baseline before large-scale content authoring or implementation. The former generated 240-node prologue is retired and removed from active runtime; it is not a prototype, sample, seed, or structural template for future narrative content. All replacement narrative work belongs to the context-aware Narrative Patch Engine in §5E and must follow its acceptance rules.
 
 **Design-stage exit gate:** A reviewed GDD, gameplay loop, system/data dependency map, content provenance plan, save model, and vertical-slice backlog exist. No major system is considered designed merely because a screen or formula module exists.
 
@@ -287,7 +287,7 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 
 - [ ] Choice-driven life simulation: character life stages, background, daily decisions, relationships, education/training, occupations/roles, resources, reputation, and long-term consequences, adapted to Merzkava canon.
 - [ ] Year/season/day progression with events and meaningful decisions; define the time scale so it works with Merzkava's world rules.
-- [ ] Build an event and choice system with varied outcomes and replayability; outcomes must be deterministic/seeded and locally persisted where appropriate.
+- [ ] Provide the offline gameplay loop with event opportunities and player choices. The shared event/node schema, context-aware selection, narrative composition, hidden resolution, replay prevention, and patch packaging are specified and tracked only in §5E (Issue #3); do not create a parallel event engine or author replacement story nodes under this section.
 - [~] Integrate the framed Scene Window with authoritative Eternal Path world state: persisted `locationId` selects the scene independently from dialogue metadata; the local world clock drives Dawn/Morning/Day/Dusk/Night lighting; deterministic regional weather changes by world day. The registry includes all 26 existing scenery PNGs across the three powers, Lawless Territories, and Special Locations. No legacy dialogue nodes remain active; the new Patch-1 narrative system is planned separately below. FX-01 cloud and FX-02 fog use isolated Screen-blended image layers; procedural sun/moon glow, light rays, rain/snow/seasonal particles, and lightning are mounted inside the clipped Scene Window and animated by Anime.js. Black-background `#000000` + `mix-blend-mode: screen` is the documented fallback when RGBA transparency cannot be generated. `advanceEternalWorldTime(minutes)` and `setEternalLocation(sceneId)` remain the state boundaries. Automated regression coverage has been expanded for the 26-scene registry and FX layer mounting; fresh CI and physical Android visual/performance verification remain pending. Character/status cards and full travel/activity systems remain open. See [Animation System](./offline-game/ANIMATION_SYSTEM.md) and [Scene FX Manifest](../public/game/scenery/ASSET_MANIFEST.md).
 - [ ] Design a self-contained life/adventure loop: character status, daily life, exploration, encounters, progression, and consequences.
 - [ ] Add a System layer inspired by Solo Leveling's presentation: status window, quests/objectives, attributes, titles/achievements, notifications, and progression feedback, using original Merzkava naming, art, lore, and mechanics.
@@ -317,7 +317,9 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 
 **Status:** PLANNED — NOT IN IMPLEMENTATION.
 
-**Priority:** Begin only after the shared toolbar/menu and current UI repair work are completed and verified. Do not spend the current implementation cycle authoring story nodes. **Tracking:** [Issue #3](https://github.com/Antarezka/merzkava-apk/issues/3).
+**Single source of truth:** This section owns the replacement narrative engine and all versioned story patches. §5B supplies the overall game-design constraints; §5C consumes the resulting event opportunities in the offline gameplay loop; EP-2 supplies authoritative simulation state and validated state-change boundaries; EP-3 owns narrative/social engine implementation. Do not create a competing node system, duplicate event schema, or parallel story backlog elsewhere.
+
+**Execution order:** (1) finish and verify the shared toolbar/menu and active UI repair; (2) establish the required EP-2 simulation-state contracts; (3) implement and test the EP-3 narrative/social engine and its schema/resolver; (4) only then author and validate Patch 1 content. Engine architecture and interface work must not be confused with permission to start bulk story-node authoring. **Tracking:** [Issue #3](https://github.com/Antarezka/merzkava-apk/issues/3).
 
 **Retirement rule:** The generated 240-entry 0.1.0 sequence is retired, removed from active runtime, and must not be recycled, lightly rewritten, or used as the structural template for Patch 1.
 
