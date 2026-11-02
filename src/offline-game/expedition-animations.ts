@@ -50,6 +50,34 @@ export function mountExpeditionAnimations(root: HTMLElement): () => void {
       ease: "inOutSine", loop: true, alternate: true,
     });
     mountSceneParticles(root);
+
+    // Uploaded image plates: each layer has its own motion profile and remains inside Scene Window.
+    const sunImage = root.querySelector<HTMLElement>(".expedition-sun-glow-image");
+    if (sunImage) animate(sunImage,{translateX:["-.35%"," .35%"],scale:[1,1.035],opacity:[.72,1],duration:15000,ease:"inOutSine",loop:true,alternate:true});
+    const moonImage = root.querySelector<HTMLElement>(".expedition-moon-glow-image");
+    if (moonImage) animate(moonImage,{translateX:[".25%","-.25%"],scale:[1,1.025],opacity:[.58,.9],duration:19000,ease:"inOutSine",loop:true,alternate:true});
+    const rayImage = root.querySelector<HTMLElement>(".expedition-light-rays-image");
+    if (rayImage) animate(rayImage,{translateX:["1.2%","-1.2%"],translateY:["-.4%"," .5%"],opacity:[.55,.88],duration:28000,ease:"inOutSine",loop:true,alternate:true});
+    const rainTexture = root.querySelector<HTMLElement>(".expedition-rain-streak-image");
+    if (rainTexture && root.querySelector<HTMLElement>(".expedition-environment")?.dataset.weather==="Rain") {
+      animate(rainTexture,{translateY:["-3%","5%"],translateX:["1%","-1%"],opacity:[.5,.82],duration:2600,ease:"linear",loop:true,alternate:true});
+    }
+    const snowTexture = root.querySelector<HTMLElement>(".expedition-snow-texture");
+    if (snowTexture && root.querySelector<HTMLElement>(".expedition-environment")?.dataset.weather==="Snow") {
+      animate(snowTexture,{translateY:["-2%","4%"],translateX:["-.8%","1.1%"],opacity:[.46,.78],duration:11500,ease:"inOutSine",loop:true,alternate:true});
+    }
+    const petalTexture = root.querySelector<HTMLElement>(".expedition-petal-texture");
+    if (petalTexture && root.querySelector<HTMLElement>(".expedition-environment")?.dataset.cycle==="Dawn") {
+      animate(petalTexture,{translateY:["-2%","5%"],translateX:["-1.5%","2%"],rotate:["-1.5deg","2deg"],opacity:[.35,.68],duration:18000,ease:"inOutSine",loop:true,alternate:true});
+    }
+    const leafTexture = root.querySelector<HTMLElement>(".expedition-leaf-texture");
+    if (leafTexture && root.querySelector<HTMLElement>(".expedition-environment")?.dataset.cycle==="Dusk") {
+      animate(leafTexture,{translateY:["-2%","5%"],translateX:["2%","-2%"],rotate:["1.5deg","-2deg"],opacity:[.34,.7],duration:21000,ease:"inOutSine",loop:true,alternate:true});
+    }
+    const frost = root.querySelector<HTMLElement>(".expedition-window-frost-image");
+    if (frost && root.querySelector<HTMLElement>(".expedition-environment")?.dataset.weather==="Snow") {
+      animate(frost,{opacity:[.52,.76],scale:[1.015,1.045],duration:12500,ease:"inOutSine",loop:true,alternate:true});
+    }
     const sun = root.querySelector<HTMLElement>(".expedition-sun-glow");
     if (sun) animate(sun,{opacity:[.58,.9],scale:[.98,1.045],duration:9200,ease:"inOutSine",loop:true,alternate:true});
     const moon = root.querySelector<HTMLElement>(".expedition-moon-glow");
@@ -57,8 +85,15 @@ export function mountExpeditionAnimations(root: HTMLElement): () => void {
     const rays = root.querySelector<HTMLElement>(".expedition-light-rays");
     if (rays) animate(rays,{rotate:["-4deg","5deg"],opacity:[.16,.34],duration:26000,ease:"inOutSine",loop:true,alternate:true});
     const lightning = root.querySelector<HTMLElement>(".expedition-lightning-layer");
-    if (lightning && root.querySelector<HTMLElement>(".expedition-environment")?.dataset.weather==="Rain") {
-      animate(lightning,{keyframes:[{opacity:0,duration:14500},{opacity:.78,duration:75},{opacity:.16,duration:130},{opacity:.58,duration:55},{opacity:0,duration:1100}],loop:true,ease:"linear"});
+    const lightningImage = root.querySelector<HTMLImageElement>(".expedition-lightning-flash-image");
+    if (lightning && lightningImage && root.querySelector<HTMLElement>(".expedition-environment")?.dataset.weather==="Rain") {
+      const variants = [
+        "/game/scenery/shared/fx-08-lightning-flash-a.png",
+        "/game/scenery/shared/fx-08-lightning-flash-b.png",
+        "/game/scenery/shared/fx-08-lightning-flash-c.png",
+      ];
+      let variant = 0;
+      animate(lightning,{keyframes:[{opacity:0,duration:13800},{opacity:.72,duration:70},{opacity:.12,duration:145},{opacity:.52,duration:55},{opacity:0,duration:1250}],loop:true,ease:"linear",onLoop:()=>{variant=(variant+1)%variants.length;lightningImage.src=variants[variant];}});
     }
     const light = root.querySelector<HTMLElement>(".expedition-light-layer");
     if (light) animate(light, { opacity: [.72, 1], duration: 8200, ease: "inOutSine", loop: true, alternate: true });
