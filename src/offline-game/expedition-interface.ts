@@ -1,6 +1,6 @@
 import "./expedition-interface.css";
 import {
-  getCurrentDialogue, getEternalSave, getExpeditionAtmosphere, getExpeditionScene, getRegionalDialogueCount, listEternalSaves,
+  getCurrentSituation, getEternalSave, getExpeditionAtmosphere, getExpeditionScene, getRegionalDialogueCount, listEternalSaves,
 } from "./expedition-game";
 
 function escapeHtml(value:string):string {
@@ -9,7 +9,7 @@ function escapeHtml(value:string):string {
 const regionNames:Record<string,string>={"golden-dragon-empire":"Golden Dragon Empire","tianhai-yunzhou":"Tianhai Yunzhou","beiming-gu":"Beiming Gu","lawless-territories":"Lawless Territories","special-locations":"Special Locations"};
 
 export function renderExpeditionInterface():string {
-  const save=getEternalSave(), scene=getExpeditionScene(), atmosphere=getExpeditionAtmosphere(), dialogue=getCurrentDialogue();
+  const save=getEternalSave(), scene=getExpeditionScene(), atmosphere=getExpeditionAtmosphere(), situation=getCurrentSituation();
   const sceneWindow=`<section class="expedition-environment" aria-label="Eternal Path scene window" data-location="${scene.id}" data-region="${scene.region}" data-cycle="${atmosphere.cycle}" data-weather="${atmosphere.weather}" style="--scene-fog-opacity:${atmosphere.fog}">
     <img class="expedition-scene-image" src="${scene.image}" alt="" />
     <div class="expedition-cloud-layer" aria-hidden="true"><img class="expedition-cloud-motion" src="/game/scenery/shared/fx-01-soft-cloud-layer.png" alt="" /></div>
@@ -54,24 +54,19 @@ export function renderExpeditionInterface():string {
       <label class="expedition-import-label">IMPORT JOURNEY BACKUP<input type="file" accept="application/json,.json" data-eternal-import /></label>
       <p class="expedition-save-footnote">Saves are isolated per journey. Deleting a journey never changes the official World Archive.</p>${savedSlots.length?`<button type="button" class="text-button danger" data-eternal-reset-all>Delete all journeys</button>`:""}
     </div></section>`;
-  const story=save&&dialogue?`<section class="expedition-dialogue" aria-live="polite"><div class="section-heading"><span>THE MOMENT · ${String((save.eventIndex % getRegionalDialogueCount())+1).padStart(3,"0")} / ${getRegionalDialogueCount()}</span><small>${escapeHtml(dialogue.chapter)}</small></div>
-    <article class="expedition-dialogue-card">
-      <div class="expedition-narrative-layer"><span class="expedition-narrative-label">ENVIRONMENT</span><p class="expedition-sensory-copy">${escapeHtml(scene.detail)} The air carries the day's changing temperature; nearby footsteps and distant voices blend into the ordinary rhythm of the region.</p></div>
-      <div class="expedition-narrative-layer"><span class="expedition-narrative-label">SCENE</span><h3>${escapeHtml(dialogue.title)}</h3><p>${escapeHtml(dialogue.summary)}</p></div>
-      <div class="expedition-narrative-layer expedition-npc-line"><span class="expedition-narrative-label">${escapeHtml(dialogue.speaker)}</span><p>“${escapeHtml(dialogue.text)}”</p></div>
-      <div class="expedition-provenance">IN-GAME ORIGINAL · ETERNAL PATH STORY CONTENT</div>
-      <button type="button" class="expedition-open-choices" data-eternal-open-choices>Respond · Choose your approach <span>↗</span></button>
-    </article></section>` : save?`<section class="expedition-dialogue expedition-dialogue-locked" aria-live="polite"><div class="section-heading"><span>THE CHRONICLE</span><small>PATCH 1 · PLANNED</small></div><article class="expedition-dialogue-card expedition-story-placeholder"><span class="expedition-narrative-label">NARRATIVE SYSTEM REBUILD</span><h3>A new chronicle is being prepared.</h3><p>The previous repetitive opening sequence has been retired. This journey, its character, location, world time, and saved records remain intact while the new context-aware story system is designed.</p><p>New story content will arrive as a reviewed Eternal Path patch. No placeholder choice will advance this journey.</p></article></section>`:`<section class="expedition-dialogue expedition-dialogue-locked"><div class="section-heading"><span>THE NARRATIVE</span><small>AWAITING YOUR JOURNEY</small></div><p>Create a separate Eternal Path character to begin a journey.</p></section>`;
-  const choiceModal=save&&dialogue?`<div class="expedition-choice-modal" hidden data-eternal-choice-modal>
-    <button class="expedition-choice-backdrop" type="button" aria-label="Close choices" data-eternal-choice-dismiss></button>
-    <section class="expedition-choice-sheet" role="dialog" aria-modal="true" aria-labelledby="eternal-choice-title">
-      <div class="expedition-choice-topline"><span>YOUR RESPONSE</span><button type="button" class="expedition-choice-close" data-eternal-choice-dismiss aria-label="Close choices">×</button></div>
-      <h3 id="eternal-choice-title">How will you respond?</h3><p class="expedition-choice-hint">Your approach will shape what happens next.</p>
-      <div class="expedition-choice-list">${dialogue.choices.map((choice,index)=>`<button type="button" class="expedition-choice" data-eternal-choice="${index}"><span>0${index+1}</span><strong>${escapeHtml(choice.label)}</strong></button>`).join("")}</div>
-    </section>
-  </div>`:"";
+  const outcome=save?.lastOutcome?'<aside class="expedition-outcome" aria-live="polite"><span class="expedition-narrative-label">AFTERMATH</span><p>'+escapeHtml(save.lastOutcome)+'</p></aside>':"";
+  const story=save&&situation?'<section class="expedition-dialogue" aria-live="polite"><div class="section-heading"><span>THE MOMENT · '+String(save.eventIndex+1).padStart(3,"0")+'</span><small>'+escapeHtml(situation.category.replace(/-/g," ").toUpperCase())+' · '+escapeHtml(situation.patchVersion)+'</small></div>'+
+    '<article class="expedition-dialogue-card">'+
+      '<div class="expedition-narrative-layer"><span class="expedition-narrative-label">SETTING / ATMOSPHERE</span><p class="expedition-sensory-copy">'+escapeHtml(situation.setting)+'</p></div>'+
+      '<div class="expedition-narrative-layer expedition-scene-action"><span class="expedition-narrative-label">SCENE ACTION</span><h3>'+escapeHtml(situation.title)+'</h3>'+situation.sceneAction.map(line=>'<p>'+escapeHtml(line)+'</p>').join("")+'</div>'+
+      situation.actors.map(actor=>'<div class="expedition-narrative-layer expedition-npc-line"><span class="expedition-narrative-label">CHARACTER BEHAVIOR · '+escapeHtml(actor.label)+'</span><p>'+escapeHtml(actor.observableBehavior)+'</p><p class="expedition-knowledge-note">'+escapeHtml(actor.knowledge)+'</p></div>').join("")+
+      '<div class="expedition-narrative-layer expedition-npc-line"><span class="expedition-narrative-label">DIALOGUE · '+escapeHtml(situation.dialogue.speaker)+'</span><p>“'+escapeHtml(situation.dialogue.text)+'”</p></div>'+
+      '<div class="expedition-narrative-layer expedition-player-question"><span class="expedition-narrative-label">PERSPECTIVE</span><p>'+escapeHtml(situation.closingQuestion)+'</p></div>'+
+      '<div class="expedition-provenance">IN-GAME ORIGINAL · STARTER SITUATION · NOT UNIVERSE CANON</div>'+
+      '<button type="button" class="expedition-open-choices" data-eternal-open-choices>Consider your response <span>↗</span></button></article></section>':save?'<section class="expedition-dialogue expedition-dialogue-locked" aria-live="polite"><div class="section-heading"><span>THE CHRONICLE</span><small>STARTER SITUATIONS COMPLETE</small></div><article class="expedition-dialogue-card expedition-story-placeholder"><span class="expedition-narrative-label">A QUIET MOMENT</span><h3>'+(save.lastOutcome?"The moment has passed.":"No eligible situation right now.")+'</h3><p>'+(save.lastOutcome?"The outcome has been recorded in this journey. The starter situation set for this region has been explored; additional reviewed narrative patches will expand the world.":"There is no starter situation matching the current journey context. More reviewed narrative content will be added in a later patch.")+'</p></article></section>':'<section class="expedition-dialogue expedition-dialogue-locked"><div class="section-heading"><span>THE NARRATIVE</span><small>AWAITING YOUR JOURNEY</small></div><p>Create a separate Eternal Path character to begin a journey.</p></section>';
+  const choiceModal=save&&situation?'<div class="expedition-choice-modal" hidden data-eternal-choice-modal><button class="expedition-choice-backdrop" type="button" aria-label="Close choices" data-eternal-choice-dismiss></button><section class="expedition-choice-sheet" role="dialog" aria-modal="true" aria-labelledby="eternal-choice-title"><div class="expedition-choice-topline"><span>YOUR RESPONSE</span><button type="button" class="expedition-choice-close" data-eternal-choice-dismiss aria-label="Close choices">×</button></div><h3 id="eternal-choice-title">Consider the situation</h3><p class="expedition-choice-hint">Only your chosen words or actions are shown before resolution.</p><div class="expedition-choice-list">'+situation.choices.map((choice,index)=>'<button type="button" class="expedition-choice" data-eternal-choice="'+escapeHtml(choice.id)+'"><span>0'+(index+1)+'</span><strong>'+escapeHtml(choice.label)+'</strong></button>').join("")+'</div></section></div>':"";
   const disposition=save?`<div class="expedition-disposition-line"><span>DISPOSITION</span><strong>${escapeHtml(save.disposition.label)}</strong></div>`:"";
-  const activeJourneyLayout=save?`${sceneWindow}${disposition}${story}${startPanel}${managerPanel}`:`${sceneWindow}${startPanel}${managerPanel}${story}`;
+  const activeJourneyLayout=save?`${sceneWindow}${disposition}${outcome}${story}${startPanel}${managerPanel}`:`${sceneWindow}${startPanel}${managerPanel}${story}`;
   return `<section class="expedition-page" aria-label="Merzkava Eternal Path"><header class="expedition-heading"><div><p class="eyebrow">STANDALONE</p><h2>✦ MERZKAVA: ETERNAL PATH</h2></div></header>
     ${activeJourneyLayout}${choiceModal}
     <footer class="expedition-footer"><span>ETERNAL PATH · LOCAL JOURNEY</span><span>WORLD ARCHIVE · READ ONLY</span></footer></section>`;
