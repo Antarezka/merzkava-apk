@@ -267,3 +267,19 @@ body.eternal-choice-open{overflow:hidden}
 @media(prefers-reduced-motion:reduce){
   .expedition-manager-trigger:active{transform:none}
 }
+
+
+/* Narrative viewport: long chronicles scroll inside their own reading surface. */
+.expedition-dialogue{
+  max-height:min(48vh,520px);
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:thin;
+  scrollbar-color:#9b8056 transparent;
+}
+.expedition-dialogue::-webkit-scrollbar{width:4px}
+.expedition-dialogue::-webkit-scrollbar-thumb{background:#9b8056;border-radius:8px}
+.expedition-story-placeholder{padding:18px 16px}
+.expedition-story-placeholder h3{margin:7px 0 10px;font-family:"Cormorant Garamond",Georgia,serif;font-size:1.45rem;font-weight:600;color:#eadfc9}
+.expedition-story-placeholder p{line-height:1.65;color:#c7bdad}
