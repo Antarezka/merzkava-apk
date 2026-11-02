@@ -44,7 +44,7 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
   };
 
   const play = (file: string, volume = 0.78): HTMLAudioElement | null => {
-    const enabled = document.documentElement.dataset.soundEnabled !== "false";
+    let enabled = true;\n    try { enabled = localStorage.getItem("merzkava-sound-enabled") !== "false"; } catch { /* Use the session default. */ }
     if (!enabled) return null;
     const audio = new Audio(file);
     audio.preload = "auto";
@@ -60,8 +60,8 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
     if (!shell || !dock || !handle) { done(); return; }
 
     const distance = dock.offsetHeight + 12;
-    const from = collapsed ? 0 : distance;
-    const to = collapsed ? distance : 0;
+    const from = collapsed ? distance : 0;
+    const to = collapsed ? 0 : distance;
     const duration = 1640;
 
     // Small mechanical shudder follows the activation clicks, then the dock travels.
@@ -73,8 +73,8 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
       ],
       duration,
       onComplete: () => {
-        dock.style.transform = `translateX(-50%) translateY(${to}px)`;
-        dock.querySelectorAll<HTMLElement>(".nav-item").forEach(item => {
+        dock.style.removeProperty("transform");
+        dock.style.transform = `translateX(-50%) translateY(${from}px)`;\n    dock.querySelectorAll<HTMLElement>(".nav-item").forEach(item => {
           item.style.pointerEvents = collapsed ? "none" : "auto";
         });
         done();
