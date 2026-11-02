@@ -39,6 +39,11 @@ document.title = APP_NAME + " · " + APP_VERSION;
 type ThemeMode = "light" | "dark";
 const THEME_STORAGE_KEY = "merzkava-theme-mode";
 const SOUND_STORAGE_KEY = "merzkava-sound-enabled";
+const PERFORMANCE_STORAGE_KEY = "merzkava-performance-tier";
+type PerformanceTier = "very-low" | "low" | "normal" | "high";
+function validPerformanceTier(value: string | null): PerformanceTier {
+  return value === "very-low" || value === "low" || value === "high" ? value : "normal";
+}
 const NAV_COLLAPSED_STORAGE_KEY = "merzkava-nav-collapsed";
 let currentLanguage: AppLanguage = getLanguage();
 let navigationCollapsed = readPreference(NAV_COLLAPSED_STORAGE_KEY, "false") === "true";
@@ -47,14 +52,17 @@ function readPreference(key: string, fallback: string): string {
 }
 let themeMode: ThemeMode = readPreference(THEME_STORAGE_KEY, "dark") === "dark" ? "dark" : "light";
 let soundEnabled = readPreference(SOUND_STORAGE_KEY, "true") !== "false";
+let performanceTier: PerformanceTier = validPerformanceTier(readPreference(PERFORMANCE_STORAGE_KEY, "normal"));
 function applyAppPreferences(): void {
   document.documentElement.dataset.theme = themeMode;
+  document.documentElement.dataset.performanceTier = performanceTier;
   setSoundEnabled(soundEnabled);
 }
 function saveAppPreferences(): void {
   try {
     localStorage.setItem(THEME_STORAGE_KEY, themeMode);
     localStorage.setItem(SOUND_STORAGE_KEY, String(soundEnabled));
+    localStorage.setItem(PERFORMANCE_STORAGE_KEY, performanceTier);
   } catch { /* Preferences remain active for this app session. */ }
 }
 applyAppPreferences();
@@ -493,7 +501,7 @@ function render(): void {
   root.innerHTML = `<div class="app-shell ${isControl ? "control-shell" : ""} ${menuRevealPending ? "is-entering" : ""} ${navigationCollapsed ? "is-nav-collapsed" : ""}">
     ${isControl ? "" : `<header class="app-header"><button class="brand" data-screen="home" aria-label="Merzkava home"><span class="brand-mark">M</span><span class="brand-wordmark"><small>MERZKAVA UNIVERSE</small><strong>Merzkava</strong></span></button><div class="header-context"><small>TACTICAL ACADEMY</small><strong>${translateLabel(navigation.find(item => item.id === activeScreen)?.label ?? "Command Hall", currentLanguage)}</strong></div><div class="header-tools"><button class="header-settings header-kitty-trigger" data-floating-action="start-bubble" aria-label="Start Bubble Mode" title="Start Bubble Mode"><span class="header-kitty-mascot" aria-hidden="true"><img class="header-kitty-layer header-kitty-shadow" src="/kitty/shadow/kitty-shadow.png" alt="" /><img class="header-kitty-layer header-kitty-tail" src="/kitty/ekor/kitty-tail.png" alt="" /><img class="header-kitty-layer header-kitty-body" src="/kitty/body/kitty-body.png" alt="" /><img class="header-kitty-layer header-kitty-head" src="/kitty/kepala/kitty-head.png" alt="" /></span></button><button class="header-settings" data-screen="settings" aria-label="Settings">⚙</button></div></header>
     `}${notice ? `<p class="notice" role="status">${escapeHtml(notice)}</p>` : ""}
-    ${isControl ? content : `<main class="main-content">${activeScreen === "settings" ? `<details class="settings-category app-settings-category" open><summary><span>APP SETTINGS</span><small>Appearance · Language · Sound · Storage</small></summary><div class="settings-category-content">${languagePanelMarkup(currentLanguage)}${content}</div></details><details class="settings-category world-settings-category"><summary><span>WORLD & ACCOUNT</span><small>Supabase · AI Gateway · Canon Source</small></summary><div class="settings-category-content">${authPanel()}${canonPanel()}</div></details>` : `${content}${activeScreen === "home" ? dustyLetterMarkup(currentLanguage, APP_VERSION) : ""}`}</main>`}
+    ${isControl ? content : `<main class="main-content">${activeScreen === "settings" ? `<details class="settings-category app-settings-category" open><summary><span>APP SETTINGS</span><small>Appearance · Language · Sound · Performance · Storage</small></summary><div class="settings-category-content">${languagePanelMarkup(currentLanguage)}${content}</div></details><details class="settings-category world-settings-category"><summary><span>WORLD & ACCOUNT</span><small>Supabase · AI Gateway · Canon Source</small></summary><div class="settings-category-content">${authPanel()}${canonPanel()}</div></details>` : `${content}${activeScreen === "home" ? dustyLetterMarkup(currentLanguage, APP_VERSION) : ""}`}</main>`}
     ${isControl ? "" : `<nav class="bottom-nav" aria-label="Academy navigation"><span class="nav-cable nav-cable-left" aria-hidden="true"></span><span class="nav-cable nav-cable-right" aria-hidden="true"></span><div class="nav-roulette-track">${navigation.map((item, index) => `<button class="nav-item ${activeScreen === item.id ? "active" : ""}" data-screen="${item.id}" ${activeScreen === item.id ? 'aria-current="page"' : ""}><span class="nav-item-motion"><span class="nav-index">${String(index + 1).padStart(2, "0")}</span><span class="nav-rotor" aria-hidden="true"><span class="nav-rotor-mark"></span><span class="nav-rotor-grip" data-nav-rotor="${item.id}"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="21" fill="none" stroke="transparent" stroke-width="7" pointer-events="stroke"/></svg></span><span class="nav-icon-frame nav-icon-frame-${item.id}"><span class="nav-icon"><span class="nav-icon-art">${item.icon}</span></span></span></span><small>${translateLabel(item.label, currentLanguage)}</small></span></button>`).join("")}</div></nav>`}
     ${!isControl ? `<div class="gravity-pull-cord" data-gravity-cord aria-hidden="true"><span class="gravity-cord-anchor"></span><svg class="gravity-cord-line" viewBox="0 0 54 210" aria-hidden="true"><defs><linearGradient id="cord-braid" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#491416"/><stop offset=".28" stop-color="#9d302c"/><stop offset=".52" stop-color="#d26b52"/><stop offset=".72" stop-color="#9d302c"/><stop offset="1" stop-color="#491416"/></linearGradient></defs><path data-cord-line d="M 27 5 C 27 48, 27 76, 27 118"/><path class="cord-thread-highlight" d="M 27 5 C 27 48, 27 76, 27 118"/></svg><button class="gravity-cord-terminal" type="button" data-cord-handle aria-label="${translateLabel(navigationCollapsed ? "Pull upward to show toolbar" : "Pull downward to hide toolbar", currentLanguage)}" title="${translateLabel(navigationCollapsed ? "Show toolbar" : "Hide toolbar", currentLanguage)}"><span class="gravity-cord-jewel" aria-hidden="true"></span></button></div>` : ""}
 
@@ -540,6 +548,11 @@ function render(): void {
     soundToggle.setAttribute("aria-pressed", String(soundEnabled));
     soundToggle.textContent = soundEnabled ? "Sound On" : "Sound Off";
   }
+  root.querySelectorAll<HTMLButtonElement>("[data-performance-tier]").forEach(button => {
+    const selected = button.dataset.performanceTier === performanceTier;
+    button.classList.toggle("is-selected", selected);
+    button.setAttribute("aria-pressed", String(selected));
+  });
   const formatToggle = root.querySelector<HTMLButtonElement>("[data-format-toggle]");
   const formatPanel = root.querySelector<HTMLElement>("#composer-format-panel");
   if (formatToggle && formatPanel) {
@@ -1047,6 +1060,18 @@ root.addEventListener("click", async (event: MouseEvent) => {
     applyAppPreferences();
     saveAppPreferences();
     render();
+    return;
+  }
+
+  const performanceButton = target.closest<HTMLButtonElement>("[data-performance-tier]");
+  if (performanceButton) {
+    const requested = performanceButton.dataset.performanceTier;
+    if (requested === "very-low" || requested === "low" || requested === "normal" || requested === "high") {
+      performanceTier = requested;
+      applyAppPreferences();
+      saveAppPreferences();
+      render();
+    }
     return;
   }
 
