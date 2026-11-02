@@ -25,7 +25,7 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
 
   const onMotion = (event: DeviceMotionEvent): void => {
     const gravity = event.accelerationIncludingGravity;
-    if (!gravity || gravity.x === null || gravity.y === null) return;
+    if (!gravity || gravity.x === null || gravity.y === null) return;\n    hasMotionData = true;
     // Screen-plane gravity vector; atan2 keeps the cord responsive in either tilt direction.
     const angle = Math.atan2(-gravity.x, Math.max(1.2, Math.abs(gravity.y))) * 180 / Math.PI;
     setAngle(angle * 0.9);
