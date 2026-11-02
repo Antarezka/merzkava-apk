@@ -1,48 +1,58 @@
-/* Gravity Pull Cord — rendered only in the in-app Main Menu shell. */
+/* Main Menu only: antique magical cord, kept clear of all underlying controls. */
 .gravity-pull-cord{
-  position:fixed;z-index:95;top:0;right:clamp(22px,8vw,54px);
-  width:34px;height:166px;transform:rotate(var(--cord-angle,0deg));
-  transform-origin:17px 0;pointer-events:none;overflow:visible;
-  filter:drop-shadow(0 3px 4px #0007);
+  position:fixed;z-index:95;top:0;right:clamp(20px,8vw,54px);
+  width:54px;height:178px;transform:rotate(0deg);
+  transform-origin:27px 0;pointer-events:none;overflow:visible;
+  filter:drop-shadow(0 4px 5px #0008);
 }
 .gravity-cord-anchor{
-  position:absolute;top:-5px;left:8px;width:18px;height:12px;border:1px solid #7c2725;
-  border-radius:0 0 8px 8px;background:linear-gradient(90deg,#541b1b,#b8473e 48%,#641f1d);
-  box-shadow:inset 0 1px 2px #f5b5a044,0 2px 3px #0008;
+  position:absolute;top:-5px;left:16px;width:22px;height:13px;
+  border:1px solid #76502d;border-top:0;border-radius:0 0 8px 8px;
+  background:linear-gradient(90deg,#4a1819,#a83b35 48%,#4a1819);
+  box-shadow:inset 0 1px 3px #f6c18a55,0 2px 4px #0008;
 }
 .gravity-cord-line{
-  position:absolute;top:5px;left:15px;width:4px;height:118px;border-radius:4px;
-  background:repeating-linear-gradient(115deg,#5b1718 0 2px,#a93832 2px 4px,#d36a55 4px 5px,#6d1d1d 5px 7px);
-  box-shadow:1px 0 1px #f3a18b66,-1px 0 2px #280b0b;
+  position:absolute;top:5px;left:25px;width:4px;height:118px;border-radius:4px;
+  background:repeating-linear-gradient(115deg,#491416 0 2px,#9d302c 2px 4px,#d26b52 4px 5px,#64191b 5px 7px);
+  box-shadow:1px 0 1px #f3a18b88,-1px 0 2px #280b0b;
+  transform-origin:top center;
 }
 .gravity-cord-line:after{
-  content:"";position:absolute;inset:0 1px;background:repeating-linear-gradient(0deg,transparent 0 5px,#e58c7666 5px 6px);
+  content:"";position:absolute;inset:0 1px;
+  background:repeating-linear-gradient(0deg,transparent 0 5px,#e58c7666 5px 6px);
 }
 .gravity-cord-terminal{
-  position:absolute;top:111px;left:0;width:34px;height:43px;
-  display:grid;place-items:center;pointer-events:auto;touch-action:none;
+  position:absolute;top:111px;left:0;width:54px;height:62px;padding:0;border:0;
+  display:grid;place-items:center;background:transparent;pointer-events:auto;touch-action:none;
 }
 .gravity-cord-terminal:before{
-  content:"";position:absolute;top:0;left:15px;width:4px;height:12px;
-  background:linear-gradient(90deg,#67451f,#f0d18b 48%,#8b622e);
+  content:"";position:absolute;top:0;left:25px;width:4px;height:14px;
+  border-radius:2px;background:linear-gradient(90deg,#67451f,#f0d18b 48%,#8b622e);
 }
 .gravity-cord-jewel{
-  position:relative;display:block;width:27px;height:27px;border:2px solid #c69a4d;border-radius:50%;
-  background:radial-gradient(circle at 32% 25%,#fff0b8 0 7%,#d7ad61 23%,#805522 62%,#3a2818 100%);
-  box-shadow:0 0 0 2px #382515,0 0 10px #e5bb6a88,inset 0 1px 3px #fff8;
+  position:relative;display:grid;place-items:center;width:42px;height:42px;
+  border:2px solid #c6a365;border-radius:42% 42% 48% 48%;
+  background:linear-gradient(145deg,#f0d99f 0%,#9a7138 18%,#392a24 46%,#17191a 100%);
+  box-shadow:0 0 0 2px #281b17,0 0 0 4px #c19a5b55,0 0 15px #e6bf7388,
+    inset 0 1px 3px #fff8,inset 0 -4px 7px #08090b;
 }
 .gravity-cord-jewel:before{
-  content:"";position:absolute;inset:5px;border:1px solid #f5d88e;border-radius:50%;
-  background:radial-gradient(circle at 35% 28%,#fff3c7,#c99a4c 58%,#765024);
+  content:"";position:absolute;inset:4px;border:1px solid #d7b978;border-radius:40% 40% 48% 48%;
+  background:repeating-conic-gradient(from 0deg,#c7a260 0deg 5deg,#493528 5deg 10deg);
+  clip-path:polygon(50% 0%,62% 12%,80% 7%,87% 25%,100% 50%,87% 75%,80% 93%,62% 88%,50% 100%,38% 88%,20% 93%,13% 75%,0 50%,13% 25%,20% 7%,38% 12%);
 }
 .gravity-cord-jewel:after{
-  content:"";position:absolute;left:10px;top:9px;width:5px;height:5px;border-radius:50%;
-  background:#fff1bd;box-shadow:0 0 7px 2px #ffe5a7;
+  content:"✦";position:absolute;display:grid;place-items:center;width:23px;height:23px;
+  border:1px solid #e0c58d;border-radius:50%;
+  background:radial-gradient(circle at 34% 28%,#a94b43,#672323 58%,#241a1a);
+  color:#f2d99d;font:14px Georgia,serif;text-shadow:0 0 6px #ffe3a5;
+  box-shadow:0 0 8px #c18b4566,inset 0 1px 3px #fff5;
 }
 .gravity-cord-terminal.is-grabbed .gravity-cord-jewel,
 .gravity-cord-terminal.is-pulling .gravity-cord-jewel{
-  box-shadow:0 0 0 2px #382515,0 0 16px #f4cb73, inset 0 1px 3px #fff;
+  box-shadow:0 0 0 2px #281b17,0 0 0 5px #e4bd6b77,0 0 22px #f4cb73,
+    inset 0 1px 3px #fff,inset 0 -4px 7px #08090b;
 }
 .gravity-cord-terminal.is-grabbed{cursor:grabbing}
-.gravity-cord-terminal:focus-visible{outline:2px solid #f0ce82;outline-offset:4px;border-radius:50%}
+.gravity-cord-terminal:focus-visible{outline:2px solid #f0ce82;outline-offset:5px;border-radius:50%}
 @media(prefers-reduced-motion:reduce){.gravity-pull-cord{transition:none}}
