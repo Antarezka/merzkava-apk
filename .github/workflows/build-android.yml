@@ -9,6 +9,7 @@ on:
       - feature/archive-experience
       - feature/final-menu-localization-kitty-ring
       - fix/floating-lever-detached
+      - safe/cord-clasp-2026-11-02
     paths:
       - "src/**"
       - "public/**"
