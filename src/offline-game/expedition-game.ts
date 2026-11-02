@@ -230,7 +230,7 @@ function buildNarrativeContext(current:EternalSave):NarrativeContext {
   const region=currentWorldRegion(current);
   return {saveId:current.saveId,seed:current.manifest.deterministicSeed,characterName:current.character.name,age:current.character.age,region,
     locationId:current.locationId,day:current.day,hour:current.hour,minute:current.minute,weather:current.weather,
-    disposition:current.disposition,completedNodeIds:current.narrativeHistory.map(item=>item.nodeId),sequence:current.eventIndex};
+    disposition:current.disposition,completedNodeIds:current.narrativeHistory.slice(-2).map(item=>item.nodeId),sequence:current.eventIndex};
 }
 /** Returns the saved active situation, or deterministically selects and persists the next eligible one. */
 export function getCurrentSituation():NarrativeSituation|null {
