@@ -156,10 +156,26 @@ export function animateNavLeverPull(button: HTMLElement, onComplete: () => void)
   const arm = button.querySelector<HTMLElement>(".nav-lever-arm");
   const pivot = button.querySelector<HTMLElement>(".nav-lever-pivot");
   if (!arm) { onComplete(); return; }
+
+  // Android WebView supports the Vibration API; browsers without it simply skip haptics.
+  // Three short pulses follow the pull, the detent click, and the spring return.
+  const haptic = (duration: number): void => {
+    try {
+      if (typeof navigator !== "undefined" && "vibrate" in navigator) navigator.vibrate(duration);
+    } catch { /* Haptic feedback is optional and must never block the toolbar. */ }
+  };
+  haptic(13);
+  const detentPulse = window.setTimeout(() => haptic(19), 150);
+  const returnPulse = window.setTimeout(() => haptic(27), 315);
+
   animate(arm, {
     rotate: [{ to: -28, duration: 145, ease: "outQuad" }, { to: 0, duration: 310, ease: "outElastic(1, .62)" }],
     translateY: [{ to: 5, duration: 145, ease: "outQuad" }, { to: 0, duration: 310, ease: "outBack" }],
-    onComplete
+    onComplete: () => {
+      window.clearTimeout(detentPulse);
+      window.clearTimeout(returnPulse);
+      onComplete();
+    }
   });
   if (pivot) animate(pivot, { scale: [1, 1.16, 1], duration: 430, ease: "outBack" });
 }
