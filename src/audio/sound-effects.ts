@@ -184,6 +184,65 @@ export function playNavigationTick(): void {
   }
 }
 
+let lastClockworkRatchetAt = 0;
+
+/** A short, low-volume metal-and-pawl ratchet for the rotary navigation rings. */
+export function playClockworkRatchet(): void {
+  if (!soundEnabled) return;
+  const stamp = performance.now();
+  if (stamp - lastClockworkRatchetAt < 42) return;
+  lastClockworkRatchetAt = stamp;
+  try {
+    const context = new window.AudioContext();
+    const now = context.currentTime;
+    const sampleCount = Math.floor(context.sampleRate * 0.12);
+    const buffer = context.createBuffer(1, sampleCount, context.sampleRate);
+    const samples = buffer.getChannelData(0);
+    for (let index = 0; index < sampleCount; index += 1) {
+      const fade = 1 - index / sampleCount;
+      samples[index] = (Math.random() * 2 - 1) * fade * fade;
+    }
+
+    const scrape = context.createBufferSource();
+    const scrapeFilter = context.createBiquadFilter();
+    const scrapeGain = context.createGain();
+    scrape.buffer = buffer;
+    scrapeFilter.type = "bandpass";
+    scrapeFilter.frequency.setValueAtTime(820, now);
+    scrapeFilter.Q.setValueAtTime(0.72, now);
+    scrapeGain.gain.setValueAtTime(0.0001, now);
+    scrapeGain.gain.exponentialRampToValueAtTime(0.025, now + 0.006);
+    scrapeGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.105);
+    scrape.connect(scrapeFilter);
+    scrapeFilter.connect(scrapeGain);
+    scrapeGain.connect(context.destination);
+    scrape.start(now);
+    scrape.stop(now + 0.11);
+
+    [0, 0.034, 0.069].forEach((offset, index) => {
+      const pawl = context.createOscillator();
+      const pawlFilter = context.createBiquadFilter();
+      const pawlGain = context.createGain();
+      pawl.type = "triangle";
+      pawl.frequency.setValueAtTime(310 - index * 42, now + offset);
+      pawl.frequency.exponentialRampToValueAtTime(175 - index * 18, now + offset + 0.022);
+      pawlFilter.type = "lowpass";
+      pawlFilter.frequency.setValueAtTime(1050, now + offset);
+      pawlGain.gain.setValueAtTime(0.0001, now + offset);
+      pawlGain.gain.exponentialRampToValueAtTime(0.035, now + offset + 0.003);
+      pawlGain.gain.exponentialRampToValueAtTime(0.0001, now + offset + 0.028);
+      pawl.connect(pawlFilter);
+      pawlFilter.connect(pawlGain);
+      pawlGain.connect(context.destination);
+      pawl.start(now + offset);
+      pawl.stop(now + offset + 0.03);
+    });
+    window.setTimeout(() => { void context.close(); }, 220);
+  } catch (error) {
+    console.warn("Merzkava clockwork ratchet could not play:", error);
+  }
+}
+
 export function setSoundEnabled(enabled: boolean): void {
   soundEnabled = enabled;
   if (!enabled) {
