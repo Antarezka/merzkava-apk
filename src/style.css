@@ -2459,3 +2459,8 @@ body { color:var(--ui-ink); }
   .lore-detail h2 {font-size:clamp(31px,9vw,43px);}
   .lore-paragraph {grid-template-columns:19px minmax(0,1fr);gap:7px;font-size:12px;}
 }
+
+
+/* Restore the original pull-cord toolbar hide/show behavior. */
+.app-shell .bottom-nav{will-change:transform,opacity;transition:transform .45s ease,opacity .35s ease}
+.app-shell.is-nav-collapsed .bottom-nav{transform:translate(-50%,calc(100% + 12px));opacity:0;pointer-events:none}
