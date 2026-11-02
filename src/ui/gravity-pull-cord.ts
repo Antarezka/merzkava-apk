@@ -9,8 +9,8 @@ const clamp = (value: number, min: number, max: number): number => Math.max(min,
 const randomBetween = (min: number, max: number): number => min + Math.random() * (max - min);
 
 /**
- * Main-menu-only magical pull cord. No device sensors are used.
- * The cord body is decorative/non-interactive; only its terminal receives input.
+ * App-wide magical pull cord. The SVG tether and terminal share one endpoint,
+ * so the rope always meets the jewel while it follows the pointer.
  */
 export function initializeGravityPullCord(root: HTMLElement, options: CordOptions): void {
   let active: { pointerId: number; startX: number; startY: number; handle: HTMLButtonElement } | null = null;
@@ -19,9 +19,25 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
 
   const getParts = () => ({
     cord: root.querySelector<HTMLElement>("[data-gravity-cord]"),
-    line: root.querySelector<HTMLElement>("[data-cord-line]"),
+    line: root.querySelector<SVGPathElement>("[data-cord-line]"),
     handle: root.querySelector<HTMLButtonElement>("[data-cord-handle]")
   });
+
+  // All geometry is derived from the same endpoint: the jewel's center.
+  // Positive dx always means right on screen; negative dx always means left.
+  const drawCord = (dx: number, vertical: number): void => {
+    const { line, handle } = getParts();
+    if (!line || !handle) return;
+    const x = clamp(dx, -72, 72);
+    const y = clamp(vertical, -70, 112);
+    const endX = 27 + x;
+    const endY = 142 + y;
+    const c1x = 27 + x * 0.18;
+    const c2x = 27 + x * 0.82;
+    line.setAttribute("d", `M 27 5 C ${c1x} 48, ${c2x} ${endY - 42}, ${endX} ${endY}`);
+    handle.style.top = `${111 + y}px`;
+    handle.style.setProperty("--cord-shift", `${x}px`);
+  };
 
   const play = (file: string, volume = 0.78): void => {
     let enabled = true;
@@ -36,12 +52,18 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
 
   const returnCord = (delay = 0): void => {
     window.setTimeout(() => {
-      const { line, handle } = getParts();
-      if (!line || !handle) return;
-      const currentHeight = clamp(line.getBoundingClientRect().height, 48, 230);
+      const { handle } = getParts();
+      if (!handle) return;
       const currentTop = clamp(Number.parseFloat(handle.style.top) || 111, 40, 223);
-      animate(line, { height: [currentHeight, 118], duration: 690, ease: "outElastic(1, .52)" });
-      animate(handle, { top: [currentTop, 111], duration: 690, ease: "outElastic(1, .52)" });
+      const currentShift = Number.parseFloat(handle.style.getPropertyValue("--cord-shift")) || 0;
+      const motion = { x: currentShift, y: currentTop - 111 };
+      animate(motion, {
+        x: 0,
+        y: 0,
+        duration: 690,
+        ease: "outElastic(1, .52)",
+        onUpdate: () => drawCord(motion.x, motion.y)
+      });
     }, delay);
   };
 
@@ -79,8 +101,7 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
     const to = wasCollapsed ? 0 : distance;
     const duration = 1640;
 
-    // The dock is centered by left/right auto margins, never translateX(-50%).
-    // Only the inner track rattles, so Anime.js cannot throw the whole dock sideways.
+    // Keep the dock centered; only its inner track performs the small rattle.
     dock.style.transform = `translateY(${from}px)`;
     dock.style.opacity = "1";
     dock.style.pointerEvents = "auto";
@@ -123,8 +144,8 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
   const trigger = (): void => {
     if (active) return;
     const wasCollapsed = options.isCollapsed();
-    const { cord, line, handle } = getParts();
-    if (!cord || !line || !handle) return;
+    const { cord, handle } = getParts();
+    if (!cord || !handle) return;
 
     pauseIdleSway?.();
     pauseIdleSway = null;
@@ -132,10 +153,8 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
     handle.classList.add("is-pulling");
     play("/audio/Mechanical%20Activation.mp3", 0.76);
 
-    const currentHeight = Math.max(118, line.getBoundingClientRect().height);
     const currentTop = Math.max(111, Number.parseFloat(handle.style.top) || 111);
-    animate(line, { height: [currentHeight, currentHeight + 24], duration: 145, ease: "outCubic" });
-    animate(handle, { top: [currentTop, currentTop + 24], duration: 145, ease: "outCubic" });
+    drawCord(0, currentTop - 111 + 24);
     returnCord(170);
 
     window.setTimeout(() => {
@@ -167,26 +186,14 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
     play("/audio/golden%20handle.mp3", 0.62);
     active = { pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, handle };
     handle.classList.add("is-grabbed");
-    handle.style.transition = "none";
-    const { line } = getParts();
-    if (line) line.style.transition = "none";
     try { handle.setPointerCapture(event.pointerId); } catch { /* Pointer capture is optional. */ }
   });
 
   root.addEventListener("pointermove", event => {
     if (!active || active.pointerId !== event.pointerId) return;
-    const { line, handle } = getParts();
-    if (!line || !handle) return;
     const vertical = clamp(event.clientY - active.startY, -70, 112);
-    // The jewel follows the finger in every direction. Upward/sideways motion
-    // only flexes the tether; the pull action is reserved for the lower zone.
-    const ropeLength = Math.max(48, 118 + vertical);
-    const bend = clamp(Math.atan2(event.clientX - active.startX, ropeLength) * 180 / Math.PI, -28, 28);
-    const shift = Math.tan(bend * Math.PI / 180) * ropeLength;
-    line.style.height = `${ropeLength}px`;
-    line.style.setProperty("--cord-bend", `${bend}deg`);
-    handle.style.top = `${111 + vertical}px`;
-    handle.style.setProperty("--cord-shift", `${shift}px`);
+    const horizontal = clamp(event.clientX - active.startX, -72, 72);
+    drawCord(horizontal, vertical);
   }, { passive: true });
 
   root.addEventListener("pointerup", event => {
@@ -196,21 +203,15 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
     const dx = event.clientX - active.startX;
     active = null;
     handle.classList.remove("is-grabbed");
-    handle.style.transition = "";
-    const { cord, line } = getParts();
-    if (line) line.style.transition = "";
     if (dy < 16 || Math.abs(dy) < Math.abs(dx) * 0.72) {
-      if (line) line.style.setProperty("--cord-bend", "0deg");
-      handle.style.setProperty("--cord-shift", "0px");
       returnCord();
+      const { cord } = getParts();
       if (cord) animate(cord, {
         rotate: [0], duration: 520, ease: "outElastic(1, .55)",
         onComplete: () => window.setTimeout(scheduleIdleSway, 650)
       });
       return;
     }
-    if (line) line.style.setProperty("--cord-bend", "0deg");
-    handle.style.setProperty("--cord-shift", "0px");
     suppressClick = true;
     trigger();
   }, { passive: true });
@@ -218,14 +219,7 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
   root.addEventListener("pointercancel", event => {
     if (!active || active.pointerId !== event.pointerId) return;
     const handle = active.handle;
-    const { line } = getParts();
     handle.classList.remove("is-grabbed");
-    handle.style.transition = "";
-    handle.style.setProperty("--cord-shift", "0px");
-    if (line) {
-      line.style.transition = "";
-      line.style.setProperty("--cord-bend", "0deg");
-    }
     active = null;
     returnCord();
     const { cord } = getParts();
