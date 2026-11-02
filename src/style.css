@@ -1721,3 +1721,32 @@ button {color:inherit;} button:focus-visible {outline-color:#a68d5e;}
   .bottom-nav .nav-cable:before,
   .bottom-nav .nav-cable:after{transition:none}
 }
+
+
+/* Keep the decorative cable/pulleys fixed to the compartment while only the inner rail scrolls. */
+.bottom-nav{
+  display:block;
+  overflow:visible;
+  padding:0;
+  touch-action:auto;
+}
+.bottom-nav .nav-roulette-track{
+  position:absolute;
+  z-index:3;
+  inset:0;
+  display:flex;
+  align-items:center;
+  padding:13px 15px 10px;
+  overflow-x:auto;
+  overflow-y:hidden;
+  overscroll-behavior-x:contain;
+  -webkit-overflow-scrolling:touch;
+  touch-action:pan-x;
+  scroll-snap-type:x mandatory;
+  scrollbar-width:none;
+}
+.bottom-nav .nav-roulette-track::-webkit-scrollbar{display:none}
+.bottom-nav .nav-cable{z-index:4}
+@media(max-width:380px){
+  .bottom-nav .nav-roulette-track{padding:11px 14px 8px}
+}
