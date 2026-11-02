@@ -3,14 +3,13 @@
 Standalone local game mode inside the same Merzkava APK. Owns deterministic mechanics and, as implemented, future event orchestration, progression, world simulation, and local save state. Runtime content must come from an approved, versioned World Archive package; no AI or network dependency is allowed for core play. Keep Offline Game state isolated from Convo.
 
 
-## Eternal Path first playable slice (content pack 0.1.0)
+## Eternal Path current foundation
 
-- `src/offline-game/expedition-game.ts` owns a separate local save namespace and a deterministic opening loop. It never imports Convo character records.
-- The approved first-pass content pack is described by `content-pack/manifest.json` and contains 240 unique dialogue node IDs. Each node has two choices, deterministic stat effects, and a local action duration. All story dialogue is `IN_GAME_ORIGINAL`; it is not official Universe canon.
-- Eight scene compositions use existing repository artwork for the three powers. The art is treated as game-only visual composition and does not establish new settlement names or facts.
-- The framed Scene Window reads the persisted world location, local clock, regional weather, and region identity from the game state. Its location is independent of dialogue node metadata; the temporary Scene Test Bench has been removed. Activities can advance the clock through `advanceEternalWorldTime`, and the travel system will update the saved area through `setEternalLocation`.
-- This is a playable prologue slice, not the completed life simulation. Full quest chains, travel, validated combat/rewards, complete world package pinning, and target-device QA remain open.
-
+- `src/offline-game/expedition-game.ts` owns the isolated local save namespace, deterministic world clock, region, weather, location, and journey manager.
+- The former 240-entry generated dialogue sequence in content pack 0.1.0 has been **retired and removed from active runtime** because its repeated template combinations did not meet the required narrative quality. It must not be reused.
+- Existing character journeys, scene location, local time, weather, and save slots remain available. Story choices are temporarily unavailable until the new context-aware Patch-1 narrative system is designed and reviewed.
+- Eight scene compositions continue to use existing repository artwork for the three powers. The art remains game-only visual composition and does not establish new canon settlements or facts.
+- The framed Scene Window reads persisted world location, local clock, regional weather, and region identity from game state. Activities and future travel use `advanceEternalWorldTime` and `setEternalLocation`.
 
 ## Eternal Path expansion — current implementation checkpoint
 
