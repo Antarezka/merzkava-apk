@@ -1,6 +1,6 @@
 # Offline Game Scenery & Scene FX Manifest
 
-Status: runtime registry and first procedural FX pass
+Status: runtime registry with uploaded image FX mounted and Anime.js motion profiles
 Branch: `feature/archive-experience`
 
 ## Rendering and compositing contract
@@ -54,13 +54,16 @@ Lawless Territories and Special Locations remain separate scene groups, not addi
 |---|---|---|
 | FX-01 | Soft cloud layer | Existing PNG mounted as its own Screen-blended layer; Anime.js cloud drift |
 | FX-02 | Atmospheric fog | Existing black-background PNG; Screen blend inside Scene Window; Anime.js drift and opacity |
-| FX-03 | Sun glow | Procedural radial glow; cycle-aware and Anime.js breathing; no separate image asset required |
-| FX-04 | Moon glow | Procedural radial glow for Night; Anime.js breathing; no separate image asset required |
-| FX-05 | Light rays | Procedural conic-gradient/mask layer; cycle-aware and Anime.js drift |
-| FX-06 | Rain streaks | CSS streak texture plus Anime.js rain particles |
-| FX-07 | Snow / petal / leaf particles | Anime.js particles: snow in Snow weather, petals at Dawn and leaves at Dusk; seasonal timing remains a visual approximation until a season model exists |
-| FX-08 | Lightning flash | Procedural Anime.js flash while Rain weather is active |
+| FX-03 | Sun glow | fx-03-sun-glow.png Screen-blended image plate; slow Anime.js breathing/drift in Dawn–Dusk |
+| FX-04 | Moon glow | fx-04-moon-glow.png Screen-blended image plate; slower Anime.js breathing at Night |
+| FX-05 | Volumetric light rays | fx-05-volumetric-light-rays.png Screen-blended image plate; slow Anime.js lateral/vertical drift during daylight |
+| FX-06 | Rain streaks | fx-06-rain-streaks.png Screen-blended texture with Anime.js downward/wind movement; procedural rain particles remain layered in front |
+| FX-07A | Floating snow | fx-07a-floating-snow.png Screen-blended snowfall plate plus Anime.js particles during Snow weather |
+| FX-07A | Window frost | fx-07a-window-frost.png Foreground edge-masked frost glass; subtle Anime.js opacity/scale breathing during Snow weather |
+| FX-07B | Floating petals | fx-07b-floating-petals.png Screen-blended seasonal plate with slow Anime.js drift/rotation at Dawn |
+| FX-07C | Floating autumn leaves | fx-07c-floating-autumn-leaves.png Screen-blended seasonal plate with slow Anime.js drift/rotation at Dusk |
+| FX-08 | Lightning flash | Three uploaded plates A/B/C, cycled per flash with brief Anime.js opacity keyframes during Rain weather; procedural fallback retained in CSS |
 
 ## Validation boundary
 
-Registry coverage is 26/26 existing scenery PNGs. FX layers are wired into the Scene Window and Anime.js motion is authored, but browser rendering, image visual quality, frame-time performance, reduced-motion behavior, and Android-device appearance still require a fresh build and on-device QA. Do not mark visual/device validation complete based only on source inspection.
+Registry coverage is 26/26 scenery PNGs. All uploaded shared FX plates FX-03 through FX-08 (including the three lightning variants and window frost) are mounted inside the Scene Window with effect-specific Anime.js motion. Browser rendering, image visual quality, frame-time performance, reduced-motion behavior, and Android-device appearance still require a fresh build and on-device QA. Do not mark visual/device validation complete based only on source inspection.
