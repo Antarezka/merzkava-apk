@@ -22,6 +22,7 @@ export interface NarrativeSituation {
   category: "ordinary-life" | "social" | "travel" | "discovery";
   provenance: "IN_GAME_ORIGINAL";
   sourceNote: string;
+  replayCooldownEvents: number;
   eligibility: {
     regions: NarrativeRegion[];
     cycles?: NarrativeCycle[];
@@ -64,7 +65,7 @@ export interface NarrativeResolution {
 }
 const base = (id:string, region:NarrativeRegion, title:string, setting:string, action:string[], actorLabel:string, knowledge:string, behavior:string, speakerText:string, question:string, choices:NarrativeChoice[]):NarrativeSituation => ({
   id, patchId:"eternal-path-bootstrap", patchVersion:"0.1.0-bootstrap", category:"ordinary-life", provenance:"IN_GAME_ORIGINAL",
-  sourceNote:"Original starter situation for the Eternal Path playable vertical slice; not Universe canon and not Patch 1 content.",
+  sourceNote:"Original starter situation for the Eternal Path playable vertical slice; not Universe canon and not Patch 1 content.", replayCooldownEvents:2,
   eligibility:{regions:[region]}, title, setting, sceneAction:action,
   actors:[{label:actorLabel,knowledge,observableBehavior:behavior}],
   dialogue:{speaker:actorLabel,text:speakerText}, closingQuestion:question, choices
