@@ -1872,3 +1872,188 @@ button {color:inherit;} button:focus-visible {outline-color:#a68d5e;}
   touch-action:none;
   cursor:grab;
 }
+
+
+/* Arcane Tactical Instrument — unified academy navigation finish. */
+/* The controls and roulette mechanics stay intact; only the visual housing is unified. */
+:root {
+  --nav-ink: #293d35;
+  --nav-shell-top: #526b59;
+  --nav-shell-mid: #344d40;
+  --nav-shell-bottom: #23382f;
+  --nav-shell-edge: #b79b67;
+  --nav-shell-inlay: #e0c995;
+  --nav-tile-top: #f2ead9;
+  --nav-tile-bottom: #d9cdb3;
+  --nav-tile-edge: #b49a68;
+  --nav-label: #e8dcc0;
+  --nav-muted: #c7b68f;
+  --nav-active: #f4dfad;
+  --nav-shadow: #101b15a8;
+}
+:root[data-theme="dark"] {
+  --nav-ink: #e8dfcf;
+  --nav-shell-top: #34473e;
+  --nav-shell-mid: #25372f;
+  --nav-shell-bottom: #192820;
+  --nav-shell-edge: #92794f;
+  --nav-shell-inlay: #c4a976;
+  --nav-tile-top: #e6dcc7;
+  --nav-tile-bottom: #cbbd9f;
+  --nav-tile-edge: #a58a5c;
+  --nav-label: #d6c9ad;
+  --nav-muted: #aa9b79;
+  --nav-active: #f1dcae;
+  --nav-shadow: #050b08c9;
+}
+.bottom-nav {
+  width: min(690px,calc(100vw - 64px - env(safe-area-inset-left) - env(safe-area-inset-right)));
+  min-height: 94px;
+  border: 1px solid var(--nav-shell-edge);
+  border-radius: 28px 28px 13px 13px / 22px 22px 13px 13px;
+  background:
+    radial-gradient(ellipse 42% 34px at 50% 0%,#a9b18b22 0%,transparent 100%),
+    linear-gradient(180deg,var(--nav-shell-top) 0%,var(--nav-shell-mid) 46%,var(--nav-shell-bottom) 100%);
+  box-shadow:
+    0 8px 26px var(--nav-shadow),
+    inset 0 1px 0 #fff2d45c,
+    inset 0 0 0 2px #d8bd8628,
+    inset 0 -8px 14px #07130d66;
+  clip-path: polygon(
+    0 19%, 3% 15%, 9% 11%, 18% 8%, 28% 5%,
+    39% 2%, 50% 1%, 61% 2%, 72% 5%, 82% 8%,
+    91% 11%, 97% 15%, 100% 19%, 100% 100%, 0 100%
+  );
+}
+.bottom-nav:before {
+  inset: 6px 10px 5px;
+  border-color: #d9c18a55;
+  border-radius: 23px 23px 9px 9px / 18px 18px 9px 9px;
+  box-shadow: inset 0 1px 0 #fff4dc1c,inset 0 -1px 0 #07130d75;
+}
+.bottom-nav:after {
+  left: 29%;
+  right: 29%;
+  top: 7px;
+  background: linear-gradient(90deg,transparent,var(--nav-shell-inlay),transparent);
+  opacity: .72;
+}
+.bottom-nav .nav-cable {
+  top: 25px;
+  bottom: 20px;
+  width: 3px;
+  opacity: .7;
+  background: linear-gradient(180deg,transparent,#d7bd86 12%,#806b48 50%,#d7bd86 88%,transparent);
+  filter: drop-shadow(0 1px 2px #07130d88);
+}
+.bottom-nav .nav-cable:before,
+.bottom-nav .nav-cable:after {
+  left: -4px;
+  width: 9px;
+  height: 9px;
+  border-color: #ddc48e;
+  background: radial-gradient(circle at 35% 30%,#f5e8c7,#b08c54 58%,#405447 61%);
+  box-shadow: 0 1px 3px #07130d99;
+}
+.bottom-nav .nav-item {
+  color: var(--nav-label);
+}
+.bottom-nav .nav-item:before {
+  inset: 7px 4px 5px;
+  border: 1px solid transparent;
+  border-radius: 15px 15px 8px 8px;
+  background: linear-gradient(180deg,#f1e4c51c,#f1e4c500 82%);
+  box-shadow: inset 0 1px 0 #fff4dc00;
+}
+.bottom-nav .nav-item.active:before {
+  border-color: #ddc48b88;
+  background: linear-gradient(180deg,#f2e5c52b,#f2e5c508 84%);
+  box-shadow: inset 0 0 14px #e5cc9630,0 0 12px #e5cc9617;
+}
+.bottom-nav .nav-item:after {
+  bottom: 2px;
+  height: 1px;
+  background: linear-gradient(90deg,transparent,#e6cd96,transparent);
+}
+.bottom-nav .nav-index {
+  color: var(--nav-muted);
+  font: 600 7px/1 "Cinzel",serif;
+  letter-spacing: .16em;
+}
+.bottom-nav .nav-rotor {
+  width: 42px;
+  height: 42px;
+}
+.bottom-nav .nav-rotor:before {
+  border: 1px solid var(--nav-shell-inlay);
+  background:
+    conic-gradient(from var(--rotor-angle,0deg),
+      #e4cc98 0 3deg,#6b806b 3deg 22deg,
+      #b99b66 22deg 25deg,#405b4a 25deg 45deg,
+      #e4cc98 45deg 48deg,#6b806b 48deg 67deg,
+      #b99b66 67deg 70deg,#405b4a 70deg 90deg,
+      #e4cc98 90deg 93deg,#6b806b 93deg 112deg,
+      #b99b66 112deg 115deg,#405b4a 115deg 135deg,
+      #e4cc98 135deg 138deg,#6b806b 138deg 157deg,
+      #b99b66 157deg 160deg,#405b4a 160deg 180deg,
+      #e4cc98 180deg 183deg,#6b806b 183deg 202deg,
+      #b99b66 202deg 205deg,#405b4a 205deg 225deg,
+      #e4cc98 225deg 228deg,#6b806b 228deg 247deg,
+      #b99b66 247deg 250deg,#405b4a 250deg 270deg,
+      #e4cc98 270deg 273deg,#6b806b 273deg 292deg,
+      #b99b66 292deg 295deg,#405b4a 295deg 315deg,
+      #e4cc98 315deg 318deg,#6b806b 318deg 337deg,
+      #b99b66 337deg 340deg,#405b4a 340deg 360deg);
+  box-shadow: 0 2px 5px #07130d99,inset 0 0 0 3px #263d31,inset 0 0 0 4px #e0c99575;
+}
+.bottom-nav .nav-rotor:after {
+  inset: 5px;
+  border: 1px solid #e0c99588;
+  opacity: .7;
+}
+.bottom-nav .nav-rotor-mark {
+  background: #f3dfb0;
+  box-shadow: 0 0 5px #f0d59a99;
+}
+.bottom-nav .nav-icon-frame {
+  border-color: var(--nav-tile-edge);
+  background: linear-gradient(145deg,var(--nav-tile-top),var(--nav-tile-bottom));
+  box-shadow: inset 0 1px 0 #fff9e9a8,0 1px 4px #09140e88;
+}
+.bottom-nav .nav-icon {
+  color: var(--nav-ink);
+  filter: drop-shadow(0 1px 0 #fff7e5aa);
+}
+.bottom-nav .nav-item.active {
+  color: var(--nav-active);
+  text-shadow: 0 0 10px #e4c68b38;
+}
+.bottom-nav .nav-item.active .nav-icon-frame {
+  border-color: #ead39b;
+  box-shadow: inset 0 1px 0 #fffdf0,0 0 0 1px #e3c88b55,0 2px 7px #07130d77;
+}
+.bottom-nav .nav-item.active .nav-rotor:before {
+  box-shadow: 0 2px 7px #07130daa,inset 0 0 0 3px #2b4436,inset 0 0 0 4px #f0d79b,0 0 10px #e2c48b42;
+}
+.bottom-nav .nav-item small {
+  color: inherit;
+  font: 600 7.5px/1.15 "Cinzel",serif;
+  letter-spacing: .055em;
+}
+.bottom-nav .nav-item:focus-visible {
+  outline: 2px solid #f0d79b;
+  outline-offset: -5px;
+}
+@media(max-width:380px) {
+  .bottom-nav {
+    width: calc(100vw - 64px - env(safe-area-inset-left) - env(safe-area-inset-right));
+    min-height: 91px;
+  }
+  .bottom-nav .nav-rotor { width: 39px; height: 39px; }
+  .bottom-nav .nav-item small { font-size: 6.8px; letter-spacing: .025em; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .bottom-nav .nav-item:before,
+  .bottom-nav .nav-item:after,
+  .bottom-nav .nav-icon-frame { transition: none; }
+}
