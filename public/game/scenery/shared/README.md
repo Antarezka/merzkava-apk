@@ -16,16 +16,21 @@ Black becomes visually transparent under Screen blending while the bright fog/cl
 
 ## FX image-generation prompts
 
-See [FX_GENERATION_PROMPTS.md](./FX_GENERATION_PROMPTS.md) for the next asset prompts (sun glow, moon glow, light rays, rain streaks, snow, petals, autumn leaves, and lightning). Every prompt follows the proven pure-black `#000000` background + CSS `mix-blend-mode: screen` workflow. Generated files remain optional enhancements; keep the procedural CSS/Anime.js implementation until each image is reviewed and integrated.
+See [FX_GENERATION_PROMPTS.md](./FX_GENERATION_PROMPTS.md) for the source prompts. The generated FX-03 through FX-08 plates are now mounted in the Eternal Path Scene Window and animated individually with Anime.js. The original procedural CSS/particle treatments remain as fallbacks and complementary layers.
 
 ## Existing assets
 
 - `fx-01-soft-cloud-layer.png` — cloud overlay, mounted in its own Screen-blended layer and moved with Anime.js.
 - `fx-02-atmospheric-fog.png` — black-background fog plate, mounted in the Scene Window with Screen blending and Anime.js drift.
+- `fx-03-sun-glow.png`, `fx-04-moon-glow.png`, `fx-05-volumetric-light-rays.png` — uploaded light plates with slow, cycle-aware Anime.js motion.
+- `fx-06-rain-streaks.png` — uploaded rain texture with downward/wind motion; procedural particles add depth.
+- `fx-07a-floating-snow.png`, `fx-07a-window-frost.png` — snowfall plate and edge-masked foreground frost.
+- `fx-07b-floating-petals.png`, `fx-07c-floating-autumn-leaves.png` — seasonal plates with gentle drift/rotation.
+- `fx-08-lightning-flash-a.png`, `fx-08-lightning-flash-b.png`, `fx-08-lightning-flash-c.png` — alternate distant lightning plates cycled during Rain-weather flashes.
 
-## Procedural effects
+## Procedural companions and fallbacks
 
-Sun glow, moon glow, light rays, rain streak/particles, snow/petal/leaf particles, and lightning are currently rendered with CSS layers and Anime.js rather than additional painted PNG files. Do not list these procedural effects as uploaded image assets.
+CSS gradients and generated Anime.js particles remain as complementary rain/snow/petal/leaf detail and fallback rendering. Uploaded image plates do not replace the live world-state selectors.
 
 ## Scope and safety
 
