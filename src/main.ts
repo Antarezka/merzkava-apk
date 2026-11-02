@@ -107,11 +107,11 @@ async function playEntrySplash(): Promise<void> {
 
 const navigation: { id: ScreenId; label: string; icon: string }[] = [
   { id: "home", label: "Home", icon: `<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M8 13.5 20 10l12 3.5v17H8z" fill="#d9c49a" stroke="#8e7047" stroke-width="1.5"/><path d="M15 12V8.5h10V12M13 16v14M27 16v14" fill="none" stroke="#80623f" stroke-width="1.8" stroke-linecap="round"/><path d="M17 19h6v5h-6z" fill="#80623f"/><path d="M18.5 30v-4h3v4" fill="#f0e5cc" stroke="#80623f" stroke-width="1"/></svg>` },
-  { id: "gameplay", label: "Convo", icon: `<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M8 9.5h24v17H19l-7 5v-5H8z" fill="#e8dfca" stroke="#94784f" stroke-width="1.5" stroke-linejoin="round"/><path d="m17 21 9-10-2 8-7 2z" fill="#b18b57"/><path d="m17 21 4-1" stroke="#6d5437" stroke-width="1.5" stroke-linecap="round"/><circle cx="13" cy="17.5" r="1" fill="#8d714b"/><circle cx="17" cy="17.5" r="1" fill="#8d714b"/></svg>` },
   { id: "offline-game", label: "Eternal Path", icon: `<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M6.5 11.5q7-3 13.5 1v19q-6.5-4-13.5-1zM33.5 11.5q-7-3-13.5 1v19q6.5-4 13.5-1z" fill="#e7ddc7" stroke="#94764b" stroke-width="1.5" stroke-linejoin="round"/><path d="M20 13v18M10 16q4-1 7 1M30 16q-4-1-7 1" fill="none" stroke="#a28354" stroke-width="1.2"/><path d="m20 5 1.2 2.3 2.5.4-1.8 1.8.4 2.5-2.3-1.2-2.3 1.2.4-2.5-1.8-1.8 2.5-.4z" fill="#c5a36c"/></svg>` },
-  { id: "character", label: "Character", icon: `<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 6.5c8 0 13.5 6 13.5 13.5S28 33.5 20 33.5 6.5 28 6.5 20 12 6.5 20 6.5z" fill="#e8dfca" stroke="#94764b" stroke-width="1.5"/><path d="M20 11.5a5 5 0 1 1 0 10 5 5 0 0 1 0-10zM11.5 29c1.5-4 4.2-6 8.5-6s7 2 8.5 6" fill="#b99a6a" stroke="#80623f" stroke-width="1.4" stroke-linecap="round"/></svg>` },
-  { id: "inventory", label: "Inventory", icon: `<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M8 14h24l-2 18H10z" fill="#e6dcc5" stroke="#94764b" stroke-width="1.5" stroke-linejoin="round"/><path d="M14 14v-3.5a6 6 0 0 1 12 0V14" fill="none" stroke="#b18b57" stroke-width="2"/><path d="M16 21h8" stroke="#80623f" stroke-width="1.5" stroke-linecap="round"/><path d="M20 18v7" stroke="#80623f" stroke-width="1.5" stroke-linecap="round"/></svg>` },
   { id: "map", label: "Archive", icon: `<svg viewBox="0 0 40 40" aria-hidden="true"><path d="m7 11 9-3 9 3 8-3v22l-8 3-9-3-9 3z" fill="#e8dfca" stroke="#94764b" stroke-width="1.5" stroke-linejoin="round"/><path d="M16 8v22M25 11v22M11 17l3-2 3 2 3-1 3 2" fill="none" stroke="#a17e4e" stroke-width="1.3"/><circle cx="24" cy="19" r="2" fill="#b18b57"/></svg>` },
+  { id: "character", label: "Profile", icon: `<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 6.5c8 0 13.5 6 13.5 13.5S28 33.5 20 33.5 6.5 28 6.5 20 12 6.5 20 6.5z" fill="#e8dfca" stroke="#94764b" stroke-width="1.5"/><path d="M20 11.5a5 5 0 1 1 0 10 5 5 0 0 1 0-10zM11.5 29c1.5-4 4.2-6 8.5-6s7 2 8.5 6" fill="#b99a6a" stroke="#80623f" stroke-width="1.4" stroke-linecap="round"/></svg>` },
+  { id: "gameplay", label: "Convo", icon: `<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M8 9.5h24v17H19l-7 5v-5H8z" fill="#e8dfca" stroke="#94784f" stroke-width="1.5" stroke-linejoin="round"/><path d="m17 21 9-10-2 8-7 2z" fill="#b18b57"/><path d="m17 21 4-1" stroke="#6d5437" stroke-width="1.5" stroke-linecap="round"/><circle cx="13" cy="17.5" r="1" fill="#8d714b"/><circle cx="17" cy="17.5" r="1" fill="#8d714b"/></svg>` },
+  { id: "inventory", label: "Inventory", icon: `<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M8 14h24l-2 18H10z" fill="#e6dcc5" stroke="#94764b" stroke-width="1.5" stroke-linejoin="round"/><path d="M14 14v-3.5a6 6 0 0 1 12 0V14" fill="none" stroke="#b18b57" stroke-width="2"/><path d="M16 21h8" stroke="#80623f" stroke-width="1.5" stroke-linecap="round"/><path d="M20 18v7" stroke="#80623f" stroke-width="1.5" stroke-linecap="round"/></svg>` },
   { id: "journal", label: "Journal", icon: `<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M10 7.5h21v26H10q-3 0-3-3V10.5q0-3 3-3z" fill="#e7ddc7" stroke="#94764b" stroke-width="1.5"/><path d="M12 7.5v26M17 14h10M17 19h10M17 24h7" stroke="#9b7a4d" stroke-width="1.4" stroke-linecap="round"/><path d="M27 7.5v6l-2-1.5-2 1.5v-6" fill="#b18b57"/></svg>` },
   { id: "settings", label: "Settings", icon: `<svg viewBox="0 0 40 40" aria-hidden="true"><path d="m20 6 3 2 3.5-.5 1.5 3 3 1.5-.5 3.5 2 3-2 3 .5 3.5-3 1.5-1.5 3-3.5-.5-3 2-3-2-3.5.5-1.5-3-3-1.5.5-3.5-2-3 2-3-.5-3.5 3-1.5 1.5-3L17 8z" fill="#d9c49a" stroke="#94764b" stroke-width="1.4" stroke-linejoin="round"/><circle cx="20" cy="20" r="5" fill="#263a33" stroke="#80623f" stroke-width="1.5"/></svg>` }
 ];
@@ -496,6 +496,9 @@ function render(): void {
       const id = rotor.dataset.navRotor;
       if (id) applyNavigationRotor(rotor, id);
     });
+    renderedNavigation.style.setProperty("--cable-left-offset", `${navigationCableTension}px`);
+    renderedNavigation.style.setProperty("--cable-right-offset", `${-navigationCableTension}px`);
+    renderedNavigation.style.setProperty("--cable-gear-angle", `${navigationCableRotation}deg`);
   }
   menuRevealPending = false;
   if (shouldAnimateScreen) animateAppScreen(root.querySelector<HTMLElement>(".app-shell"));
@@ -573,6 +576,8 @@ let pointerStart: { x: number; y: number } | null = null;
 let suppressNextPointerClick = false;
 let savedNavigationScrollLeft = 0;
 const navigationRotorAngles = new Map<string, number>();
+let navigationCableTension = 0;
+let navigationCableRotation = 0;
 let activeNavigationRotor: { element: HTMLElement; pointerId: number; lastPointerAngle: number; startX: number; startY: number; lastTick: number } | null = null;
 
 function applyNavigationRotor(element: HTMLElement, id: string): void {
@@ -656,6 +661,12 @@ root.addEventListener("pointermove", event => {
     const angle = (navigationRotorAngles.get(id) ?? 0) + delta;
     navigationRotorAngles.set(id, angle);
     applyNavigationRotor(active.element, id);
+    navigationCableTension = Math.sin(angle * Math.PI / 180) * 2.2;
+    navigationCableRotation = angle * 0.42;
+    const rail = active.element.closest<HTMLElement>(".bottom-nav");
+    rail?.style.setProperty("--cable-left-offset", `${navigationCableTension}px`);
+    rail?.style.setProperty("--cable-right-offset", `${-navigationCableTension}px`);
+    rail?.style.setProperty("--cable-gear-angle", `${navigationCableRotation}deg`);
     const tick = Math.floor(angle / 22);
     if (tick !== active.lastTick) {
       active.lastTick = tick;
