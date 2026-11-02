@@ -153,7 +153,7 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 ### 3B. Shared interaction and visual system
 
 - [~] Keep the bottom navigation rail anchored to the viewport across every route. The rail itself must not inherit screen-transition transforms; route selection must not auto-shift its horizontal scroll position. Manual horizontal scrolling remains available. **Regression reopened:** the user reports the toolbar still shifts in the latest build. Track under [UI-EP-002](./offline-game/UI_REPAIR_CHECKLIST.md#ui-ep-002-toolbar-position-drift) and [Issue #2](https://github.com/Antarezka/merzkava-apk/issues/2); do not treat the earlier CSS correction as verified.
-- [ ] Add and pass a navigation regression check for route changes, fixed viewport anchoring, scroll position stability, four-visible-item rail on narrow Android screens, transformed ancestor isolation, and Android safe-area/gesture margins. Physical-device verification remains required.
+- [ ] Add and pass a navigation regression check for route changes, fixed viewport anchoring, scroll position stability, four-visible-item rail on narrow Android screens, inner-wrapper animation isolation, and Android safe-area/gesture margins. Physical-device verification remains required.
 
 - [ ] Define reusable styles for glass panels, image cards, icon buttons, chips, dividers, and navigation controls.
 - [ ] Define consistent interaction feedback: tap, press, selection, loading, success, and failure.
@@ -757,7 +757,7 @@ The complete user-approved design and phase backlog now live in [ETERNAL_PATH_BL
 **Tracking document:** [UI Repair Checklist](./offline-game/UI_REPAIR_CHECKLIST.md).  
 **Tracked issue:** [#2 — Eternal Path toolbar drift and scene/narrative layout refinement](https://github.com/Antarezka/merzkava-apk/issues/2).
 
-- [ ] **UI-EP-002:** Fix toolbar position drift at its actual ownership boundary. The navigation rail must be outside transformed route-transition ancestors, remain viewport-anchored, preserve its scroll offset after every route change, and remain reachable on narrow Android screens. The previous roadmap statement that the fix was committed is not proof: latest user testing still reproduces the defect.
+- [ ] **UI-EP-002:** Fix toolbar position drift at its actual ownership boundary. The navigation rail must be outside transformed route-transition ancestors, remain viewport-anchored, preserve its scroll offset after every route change, and remain reachable on narrow Android screens. The previous roadmap statement that the fix was committed is not proof: latest user testing still reproduces the defect. **Preserve Anime.js entrance/hover/active-item animation and roulette-style horizontal navigation.** Animate inner `.nav-item-motion` wrappers; never animate the fixed `.bottom-nav` positioning transform.
 - [ ] **UI-EP-003:** Remove the always-present Journey Manager panel from the active Eternal Path layout. Show only a small ornamental Save Manager trigger; reveal the manager as a hidden overlay/panel only after the trigger is tapped. Preserve every existing save operation and safe-close behavior.
 - [ ] **UI-EP-004:** Let the narrative block visually meet the bottom edge of the weather Scene Window, avoiding the current excess gap and preserving the weather glass/FX clipping boundary.
 - [ ] **UI-EP-005:** Restyle the Scene Window clock as a compact black ink-brush stroke: translucent fill, short text-width footprint, and a fading brush tail; it must not become a wide banner.
