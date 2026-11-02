@@ -2657,3 +2657,6 @@ body { color:var(--ui-ink); }
 .app-shell.is-nav-collapsed .bottom-nav .nav-item{pointer-events:none}
 @media(max-width:600px){.nav-toggle-handle{left:max(24px,calc(env(safe-area-inset-left,0px) + 8px))!important}}
 @media(prefers-reduced-motion:reduce){.nav-toggle-handle{transition:none!important}}
+
+/* With the lever detached, restore the navigation items to the dock's true left edge. */
+.bottom-nav>.nav-roulette-track{padding-left:14px!important}
