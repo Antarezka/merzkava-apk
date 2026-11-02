@@ -1,8 +1,8 @@
 {
   "packageId": "merzkava-eternal-path-prologue",
   "packageVersion": "0.1.0",
-  "status": "RETIRED",
-  "contentType": "legacy-dialogue-retired",
+  "status": "BOOTSTRAP_ACTIVE_PATCH_1_PLANNED",
+  "contentType": "versioned-offline-game-content-pack",
   "dialogueNodeCount": 0,
   "choicesPerNode": 0,
   "provenance": "IN_GAME_ORIGINAL",
@@ -25,9 +25,9 @@
     "effects": [
       "energy",
       "insight",
-      "bonds",
+      "disposition-evidence",
       "local-clock",
-      "session-weather"
+      "event-history"
     ],
     "initialSessionState": {
       "clock": "Day 1 · 08:00",
@@ -36,9 +36,10 @@
     }
   },
   "limitations": [
-    "This is an opening playable slice, not the completed life simulation.",
-    "Full approved World Archive package pinning, travel, quest chains, combat/reward validation, progression and physical-device QA remain pending.",
-    "The 0.1.0 dialogue sequence is retired; no story nodes or choices are active until the new Patch-1 system is reviewed and released."
+    "The nine context-aware bootstrap situations form a small playable engine-validation slice; they are not Patch 1 and do not count toward its content target.",
+    "Patch 1 remains TODO and must contain at least 1,000 materially distinct situations after engine/state contracts, context coverage, duplicate review and human narrative review.",
+    "Full approved World Archive package pinning, travel, ordinary-life activity loops, quests, combat/reward validation, progression and physical-device QA remain pending.",
+    "The old generated 240-entry 0.1.0 dialogue sequence remains retired and is not reused."
   ],
   "archiveInspirationRefs": [
     {
@@ -60,5 +61,15 @@
       "sourcePath": "world/REGION_BEIMING_GU.md"
     }
   ],
-  "retirementNote": "The generated 240-entry sequence was retired for repetitive, low-quality writing and removed from the active runtime. Do not reuse it. A new context-aware Patch-1 narrative system is planned."
+  "retirementNote": "The generated 240-entry 0.1.0 dialogue sequence remains retired. The separate nine-situation bootstrap slice uses a new schema and deterministic resolver; it is not Patch 1 content and does not lower the 1,000-situation Patch-1 requirement.",
+  "narrativeBootstrap": {
+    "patchId": "eternal-path-bootstrap",
+    "patchVersion": "0.1.0-bootstrap",
+    "status": "ACTIVE_STARTER_SLICE",
+    "situationCount": 9,
+    "manifestPath": "patches/eternal-path-bootstrap/manifest.json",
+    "runtimeSource": "../narrative-engine.ts",
+    "provenance": "IN_GAME_ORIGINAL",
+    "notPatch1": true
+  }
 }
