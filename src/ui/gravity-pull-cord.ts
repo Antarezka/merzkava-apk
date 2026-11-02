@@ -167,6 +167,9 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
     play("/audio/golden%20handle.mp3", 0.62);
     active = { pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, handle };
     handle.classList.add("is-grabbed");
+    handle.style.transition = "none";
+    const { line } = getParts();
+    if (line) line.style.transition = "none";
     try { handle.setPointerCapture(event.pointerId); } catch { /* Pointer capture is optional. */ }
   });
 
@@ -175,10 +178,15 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
     const { line, handle, cord } = getParts();
     if (!line || !handle) return;
     const extension = clamp(event.clientY - active.startY, 0, 112);
-    const lateral = clamp((event.clientX - active.startX) * 0.12, -9, 9);
+    // Treat the cord as a flexible tether: horizontal hand movement bends
+    // the rope and shifts the ornament sideways without changing pull length.
+    const ropeLength = Math.max(80, 118 + extension);
+    const bend = clamp(Math.atan2(event.clientX - active.startX, ropeLength) * 180 / Math.PI, -28, 28);
+    const shift = Math.tan(bend * Math.PI / 180) * ropeLength;
     line.style.height = `${118 + extension}px`;
+    line.style.setProperty("--cord-bend", `${bend}deg`);
     handle.style.top = `${111 + extension}px`;
-    if (cord) cord.style.transform = `rotate(${lateral}deg)`;
+    handle.style.setProperty("--cord-shift", `${shift}px`);
   }, { passive: true });
 
   root.addEventListener("pointerup", event => {
@@ -188,9 +196,11 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
     const dx = event.clientX - active.startX;
     active = null;
     handle.classList.remove("is-grabbed");
-    if (dy < 16 || Math.abs(dy) < Math.abs(dx) * 0.72) {
+    if (dy < 48) {
+      const { cord, line } = getParts();
+      if (line) line.style.setProperty("--cord-bend", "0deg");
+      handle.style.setProperty("--cord-shift", "0px");
       returnCord();
-      const { cord } = getParts();
       if (cord) animate(cord, {
         rotate: [0], duration: 520, ease: "outElastic(1, .55)",
         onComplete: () => window.setTimeout(scheduleIdleSway, 650)
@@ -204,6 +214,11 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
   root.addEventListener("pointercancel", event => {
     if (!active || active.pointerId !== event.pointerId) return;
     active.handle.classList.remove("is-grabbed");
+    active.handle.style.transition = "";
+    active.handle.style.setProperty("--cord-shift", "0px");
+    if (line) line.style.transition = "";
+    const { line } = getParts();
+    line?.style.setProperty("--cord-bend", "0deg");
     active = null;
     returnCord();
     const { cord } = getParts();
