@@ -2331,3 +2331,131 @@ body { color:var(--ui-ink); }
 @media(prefers-reduced-motion:reduce) {
   .header-tools .header-settings,.action-button,.preference-choice button,.preference-toggle {transition:none;}
 }
+
+
+/* World Archive — align the reading room with the same green enamel and parchment surfaces. */
+.lore-hero {
+  border-color:#65796b;
+  border-radius:4px;
+  background:
+    radial-gradient(ellipse at 90% 8%,#d7c18b26,transparent 42%),
+    linear-gradient(125deg,#354f44 0%,#263e35 64%,#1e322b 100%);
+  box-shadow:inset 0 0 0 5px #eee7d609,0 12px 28px #293d3818;
+}
+.lore-hero:before {border-color:#d7c18b42;}
+.lore-hero h2 {color:#f1eadb;}
+.lore-hero h2 em {color:#dfc58d;}
+.lore-hero-copy>p {color:#d0d4c4;}
+.lore-hero-stamp {color:#c2c6b3;}
+.lore-hero-stamp b {color:#e2cc98;}
+.lore-hero-seal {border-color:#d0b77e77;color:#e0c995;}
+.lore-library-head h3 {color:var(--ui-ink);}
+.lore-library-head p {color:var(--ui-ink-soft);}
+.lore-record-count {border-color:var(--ui-brass);color:#927a4d;background:var(--ui-paper-raised);}
+.lore-search {
+  border-color:var(--ui-rule);
+  border-radius:3px;
+  background:var(--ui-paper-raised);
+  color:#927a4d;
+}
+.lore-search input {color:var(--ui-ink);}
+.lore-search input::placeholder,.lore-search kbd {color:#858779;}
+.lore-categories {scrollbar-color:#a68d5e transparent;}
+.lore-category {
+  border-color:var(--ui-rule);
+  border-radius:3px;
+  background:var(--ui-paper);
+  color:var(--ui-ink-soft);
+}
+.lore-category.is-active {
+  border-color:var(--ui-brass);
+  background:#e2d6b8;
+  color:#34483f;
+}
+.lore-entry-card {
+  border-color:var(--ui-rule);
+  border-radius:4px;
+  background:linear-gradient(110deg,var(--ui-paper-raised),var(--ui-paper));
+  box-shadow:0 5px 16px var(--ui-shadow);
+}
+.lore-entry-card:focus-visible {outline-color:var(--ui-brass);}
+.lore-card-index {color:#927a4d;}
+.lore-card-title {color:var(--ui-ink);}
+.lore-card-summary {color:var(--ui-ink-soft);}
+.lore-card-foot {border-top-color:var(--ui-rule);color:var(--ui-ink-soft);}
+.lore-card-foot b {color:#927a4d;}
+.lore-empty {border-color:var(--ui-rule);color:var(--ui-ink);}
+.lore-empty h3 {color:var(--ui-ink);}
+.lore-empty p,.lore-footnote {color:var(--ui-ink-soft);}
+.lore-back {color:#8e7951;}
+.lore-detail-top {color:#927a4d;}
+.lore-detail-top span+span {color:var(--ui-ink-soft);}
+.lore-detail h2 {color:var(--ui-ink);}
+.lore-lede {
+  border-left-color:var(--ui-brass);
+  background:linear-gradient(100deg,#e2d8c3,#eee7d6);
+  color:#40564a;
+}
+.lore-paragraph {color:#485c50;line-height:1.8;}
+.lore-paragraph-mark {color:#927a4d;}
+.lore-inline-link {border-bottom-color:#a68d5e;color:#526b5d;}
+.lore-inline-link:after {color:#927a4d;}
+.lore-source-card {
+  border-color:var(--ui-rule);
+  border-radius:4px;
+  background:linear-gradient(145deg,var(--ui-paper-raised),var(--ui-paper));
+}
+.lore-source-kicker {color:#927a4d;}
+.lore-source-card strong {color:var(--ui-ink);}
+.lore-source-card code {color:#667568;}
+.lore-source-card small {color:var(--ui-ink-soft);}
+.lore-related>button {
+  border-color:var(--ui-rule);
+  border-radius:3px;
+  background:var(--ui-paper-raised);
+  color:var(--ui-ink);
+}
+.lore-related>button b {color:#927a4d;}
+:root[data-theme="dark"] .lore-library-head h3,
+:root[data-theme="dark"] .lore-detail h2,
+:root[data-theme="dark"] .lore-empty h3 {color:#e8dfcf;}
+:root[data-theme="dark"] .lore-library-head p,
+:root[data-theme="dark"] .lore-card-summary,
+:root[data-theme="dark"] .lore-empty p,
+:root[data-theme="dark"] .lore-footnote {color:#bdc1b0;}
+:root[data-theme="dark"] .lore-search {
+  border-color:#596653;background:#202b24;color:#d0b77e;
+}
+:root[data-theme="dark"] .lore-search input {color:#e8dfcf;}
+:root[data-theme="dark"] .lore-search input::placeholder,
+:root[data-theme="dark"] .lore-search kbd {color:#9ea894;}
+:root[data-theme="dark"] .lore-category {
+  border-color:#536052;background:#29352e;color:#c3c8b8;
+}
+:root[data-theme="dark"] .lore-category.is-active {
+  border-color:#c1a875;background:#465342;color:#f0e4c8;
+}
+:root[data-theme="dark"] .lore-entry-card {
+  border-color:#536052;background:linear-gradient(110deg,#344138,#29342d);
+}
+:root[data-theme="dark"] .lore-card-title,
+:root[data-theme="dark"] .lore-paragraph {color:#e0dfd1;}
+:root[data-theme="dark"] .lore-card-foot {border-top-color:#536052;color:#bdc1b0;}
+:root[data-theme="dark"] .lore-lede {border-left-color:#c1a875;background:#344138;color:#e8dfcf;}
+:root[data-theme="dark"] .lore-inline-link {border-bottom-color:#c1a875;color:#e0ca98;}
+:root[data-theme="dark"] .lore-source-card {
+  border-color:#536052;background:linear-gradient(145deg,#344138,#29342d);
+}
+:root[data-theme="dark"] .lore-source-card strong {color:#e8dfcf;}
+:root[data-theme="dark"] .lore-source-card code,
+:root[data-theme="dark"] .lore-source-card small {color:#bdc1b0;}
+:root[data-theme="dark"] .lore-related>button {
+  border-color:#536052;background:#29352e;color:#e8dfcf;
+}
+@media(max-width:380px) {
+  .lore-hero {min-height:205px;padding:20px 15px;}
+  .lore-hero-seal {flex-basis:58px;width:58px;height:78px;}
+  .lore-hero-copy {max-width:calc(100% - 66px);}
+  .lore-detail h2 {font-size:clamp(31px,9vw,43px);}
+  .lore-paragraph {grid-template-columns:19px minmax(0,1fr);gap:7px;font-size:12px;}
+}
