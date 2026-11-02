@@ -177,6 +177,7 @@ public class FloatingKeepAliveService extends Service {
         private final Bitmap body = loadKittyLayer("kitty_body");
         private final Bitmap head = loadKittyLayer("kitty_head");
         private boolean online = hasValidatedInternet();
+        private ConnectivityManager connectivityManager;
         private ConnectivityManager.NetworkCallback networkCallback;
         KittyBubbleView() { super(FloatingKeepAliveService.this); setLayerType(View.LAYER_TYPE_SOFTWARE, null); }
         private Bitmap loadKittyLayer(String name) {
