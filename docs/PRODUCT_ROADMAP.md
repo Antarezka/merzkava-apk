@@ -167,13 +167,13 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 
 **Design decision:** The bottom navigation is a shared mechanical compartment, not a flat bar and not a separate toolbar per mode.
 
-- [x] Give the compartment a raised central crown and curved/recessed shoulders, with a dark green lacquer/verdigris surface, antique brass edging, fine engraving, and a restrained Victorian/arcane silhouette.
-- [x] Keep at least 32 CSS px of clear space on both screen edges, plus Android safe-area insets. Cable and pulley details stay inside the compartment boundary and never occupy the edge-gesture zones.
-- [x] Use flat editorial illustrations rather than emoji or generic system glyphs. The first four primary destinations are Home / recognizable travel suitcase, Eternal Path / open book, Archive / document record, and Profile / cameo portrait. Secondary destinations remain reachable by manual roulette swipe.
-- [x] Give each menu item an independent rotary ring. Dragging its ring rotates only that mechanism in place; the central emblem tilts slightly. No item may translate, swap order, resize, or clip during rotation.
-- [x] Couple the side cable/pulley ornament to the active dial movement and use the existing sound preference for restrained mechanical ratchet ticks.
-- [x] Preserve Anime.js entrance/stagger and active-item feedback on inner wrappers only. Keep the fixed rail viewport anchor transform isolated from item animation.
-- [x] Preserve manual horizontal scroll position and each dial rotation angle across route rerenders.
+- [~] Give the compartment a raised central crown and curved/recessed shoulders, with a dark green lacquer/verdigris surface, antique brass edging, fine engraving, and a restrained Victorian/arcane silhouette.
+- [~] Keep at least 32 CSS px of clear space on both screen edges, plus Android safe-area insets. Cable and pulley details stay inside the compartment boundary and never occupy the edge-gesture zones.
+- [~] Use flat editorial illustrations rather than emoji or generic system glyphs. The first four primary destinations are Home / recognizable travel suitcase, Eternal Path / open book, Archive / document record, and Profile / cameo portrait. Secondary destinations remain reachable by manual roulette swipe.
+- [~] Give each menu item an independent rotary ring. Dragging its ring rotates only that mechanism in place; the central emblem tilts slightly. No item may translate, swap order, resize, or clip during rotation.
+- [~] Couple the side cable/pulley ornament to the active dial movement and use the existing sound preference for restrained mechanical ratchet ticks.
+- [~] Preserve Anime.js entrance/stagger and active-item feedback on inner wrappers only. Keep the fixed rail viewport anchor transform isolated from item animation.
+- [~] Preserve manual horizontal scroll position and each dial rotation angle across route rerenders.
 - [ ] Verify all eight destinations, four-visible-item layout, drag-vs-tap behavior, scroll behavior, theme/mode changes, Android edge gestures, reduced motion, and visual stability on the target device.
 
 **Exit gate:** Four primary menu functions are immediately recognizable, all existing destinations remain reachable, rotation is local and never changes menu geometry, and the dock remains gesture-safe and stable on-device.
