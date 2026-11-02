@@ -26,7 +26,8 @@ import { dustyLetterMarkup } from "./app/dusty-letter";
 import { APP_NAME, APP_VERSION } from "./app/app-meta";
 import { getLanguage, languagePanelMarkup, translateLabel, translateRenderedContent, setLanguage, type AppLanguage } from "./i18n";
 import { animateOpeningSplash, animateSplashCurtain } from "./ui/splash-animation";
-import { animateAppScreen } from "./ui/app-shell-motion";\nimport { initializeGravityPullCord } from "./ui/gravity-pull-cord";
+import { animateAppScreen } from "./ui/app-shell-motion";
+import { initializeGravityPullCord } from "./ui/gravity-pull-cord";
 import { closeLoreEntry, closeLoreSource, closeLorePlaceholder, openLoreEntry, openLoreSource, openLorePlaceholder, setLoreCategory, setLoreSearch, renderLoreResults } from "./world-archive/lore-library";
 
 const app = document.querySelector<HTMLDivElement>("#app");
