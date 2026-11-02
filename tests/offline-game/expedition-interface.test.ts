@@ -100,7 +100,7 @@ describe("Eternal Path live world scene", () => {
     expect(html).toContain('class="scene-coordinate scene-clock-ink"');
     expect(html.indexOf('class="expedition-environment"')).toBeLessThan(html.indexOf('class="expedition-disposition-line"'));
     expect(html.indexOf('class="expedition-disposition-line"')).toBeLessThan(html.indexOf('class="expedition-dialogue"'));
-    expect(html.indexOf('class="expedition-dialogue"')).toBeLessThan(html.indexOf('expedition-profile-compact'));
+    expect(html.indexOf('class="expedition-dialogue expedition-dialogue-locked"')).toBeLessThan(html.indexOf('expedition-profile-compact'));
     expect(html).not.toContain("Manage journeys");
     expect(html).not.toContain("expedition-feature-grid");
     expect(html).toContain("The previous repetitive opening sequence has been retired.");
