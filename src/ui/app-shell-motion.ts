@@ -156,31 +156,45 @@ export function animateAppScreen(shell: HTMLElement | null, options: { menuToggl
 }
 
 
-/** A deliberate typewriter-style pull: the lever loads, snaps through its detent, then returns. */
+/** A staged mechanical pull: gear train engages, the lever loads, then its spring returns. */
 export function animateNavLeverPull(button: HTMLElement, onComplete: () => void): void {
   const arm = button.querySelector<HTMLElement>(".nav-lever-arm");
   const pivot = button.querySelector<HTMLElement>(".nav-lever-pivot");
+  const rotorGrips = Array.from(button.closest(".app-shell")?.querySelectorAll<HTMLElement>(".nav-rotor-grip") ?? []);
+
   if (!arm) { onComplete(); return; }
 
-  // Android WebView supports the Vibration API; browsers without it simply skip haptics.
-  // Three short pulses follow the pull, the detent click, and the spring return.
   const haptic = (duration: number): void => {
     try {
       if (typeof navigator !== "undefined" && "vibrate" in navigator) navigator.vibrate(duration);
-    } catch { /* Haptic feedback is optional and must never block the toolbar. */ }
+    } catch { /* Haptics are optional and must never block the toolbar. */ }
   };
-  haptic(13);
-  const detentPulse = window.setTimeout(() => haptic(19), 150);
-  const returnPulse = window.setTimeout(() => haptic(27), 315);
 
+  // Phase 1 — the handle takes up mechanical slack.
+  haptic(12);
   animate(arm, {
-    rotate: [{ to: -28, duration: 145, ease: "outQuad" }, { to: 0, duration: 310, ease: "outElastic(1, .62)" }],
-    translateY: [{ to: 5, duration: 145, ease: "outQuad" }, { to: 0, duration: 310, ease: "outBack" }],
+    rotate: [{ to: -17, duration: 105, ease: "outQuad" }, { to: -31, duration: 85, ease: "inOutQuad" }],
+    translateY: [{ to: 3, duration: 105, ease: "outQuad" }, { to: 6, duration: 85, ease: "inOutQuad" }],
     onComplete: () => {
-      window.clearTimeout(detentPulse);
-      window.clearTimeout(returnPulse);
-      onComplete();
-    }
+      // Phase 2 — a brief gear-train run-up, then the pawl catches.
+      haptic(18);
+      if (rotorGrips.length) {
+        animate(rotorGrips, {
+          rotate: [{ to: 13, duration: 105, ease: "outQuad" }, { to: -4, duration: 95, ease: "inOutSine" }, { to: 0, duration: 90, ease: "outCubic" }],
+          delay: stagger(9),
+        });
+      }
+      if (pivot) animate(pivot, { scale: [1, 1.13, 0.98, 1], duration: 285, ease: "outBack" });
+
+      // Phase 3 — release the spring with a controlled, soft mechanical rebound.
+      window.setTimeout(() => {
+        haptic(25);
+        animate(arm, {
+          rotate: [{ to: -25, duration: 65, ease: "inQuad" }, { to: 0, duration: 345, ease: "outElastic(1, .68)" }],
+          translateY: [{ to: 5, duration: 65, ease: "inQuad" }, { to: 0, duration: 345, ease: "outBack" }],
+          onComplete,
+        });
+      }, 105);
+    },
   });
-  if (pivot) animate(pivot, { scale: [1, 1.16, 1], duration: 430, ease: "outBack" });
 }
