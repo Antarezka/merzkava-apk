@@ -286,3 +286,156 @@ body.eternal-choice-open{overflow:hidden}
 .expedition-story-placeholder{padding:18px 16px}
 .expedition-story-placeholder h3{margin:7px 0 10px;font-family:"Cormorant Garamond",Georgia,serif;font-size:1.45rem;font-weight:600;color:#eadfc9}
 .expedition-story-placeholder p{line-height:1.65;color:#c7bdad}
+
+
+/* Eternal Path — match the app's arcane academy palette without flattening the scene window. */
+.expedition-heading {color:#293d38;}
+.expedition-mode-mark {
+  border-color:#a68d5e;
+  background:linear-gradient(145deg,#eee7d6,#d9cdb3);
+  color:#8e7951;
+}
+.expedition-character-panel,.expedition-feature,.expedition-save-manager {
+  border-color:#b7a982;
+  border-radius:4px;
+  background:linear-gradient(145deg,#eee7d6,#e2dac7);
+  color:#293d38;
+  box-shadow:0 5px 18px #293d3812,inset 0 1px #fff8;
+}
+.expedition-character-panel h3,.expedition-feature h3,
+.expedition-player-name,.expedition-save-card strong {color:#293d38;}
+.expedition-character-panel p,.expedition-feature p,.expedition-note,
+.expedition-profile-meta span {color:#6d786d;}
+.expedition-profile-meta b {color:#40594a;}
+.expedition-stat {
+  border-color:#c7bea9;
+  background:linear-gradient(145deg,#f3eddf,#e5ddca);
+  color:#293d38;
+}
+.expedition-stat strong {color:#40594a;}
+.expedition-character-panel select,
+.expedition-start-form input,.expedition-start-form select,
+.expedition-rename-form input {
+  border-color:#b9ad8e;
+  border-radius:3px;
+  background:#f5efdf;
+  color:#293d38;
+}
+.expedition-dialogue-card,.expedition-dialogue-locked,
+.expedition-save-card {
+  border-color:#b7a982;
+  border-radius:4px;
+  background:linear-gradient(145deg,#f2ead9,#e7deca);
+  color:#293d38;
+}
+.expedition-dialogue-card h3 {color:#35483d;}
+.expedition-dialogue-card p,.expedition-dialogue-locked p {color:#4f6255;}
+.expedition-npc-line {border-left-color:#a68d5e;background:#dcd2bd;color:#34483d;}
+.expedition-choice {
+  border-color:#b8a77f;
+  border-radius:3px;
+  background:linear-gradient(120deg,#eee7d6,#e1d7c1);
+  color:#34483d;
+}
+.expedition-choice:active,.expedition-choice:focus-visible {
+  border-color:#8d7950;
+  background:#e0d3b4;
+}
+.expedition-open-choices {
+  border-color:#a68d5e;
+  border-radius:3px;
+  background:linear-gradient(120deg,#526b5d,#344a3e);
+  color:#f2ead9;
+}
+.expedition-choice-sheet {
+  border-color:#b49b68;
+  border-radius:5px;
+  background:linear-gradient(150deg,#f1eadb,#e2d8c3);
+  color:#293d38;
+  box-shadow:0 20px 70px #0008,inset 0 0 0 4px #a68d5e12;
+}
+.expedition-choice-sheet h2,.expedition-choice-sheet h3 {color:#293d38;}
+.expedition-choice-close {
+  border-color:#b49b68;
+  background:#e8dfcb;
+  color:#40564a;
+}
+.expedition-save-manager.is-compact .expedition-manager-trigger {
+  border-color:#b49b68;
+  border-radius:50%;
+  background:linear-gradient(145deg,#526b5d,#293f36);
+  color:#f1e6cf;
+  box-shadow:0 4px 16px #17231f55,inset 0 1px #ffffff45;
+}
+.expedition-save-manager.is-compact .expedition-manager-content {
+  border-color:#b49b68;
+  border-radius:5px;
+  background:linear-gradient(150deg,#f1eadb,#e1d7c2);
+  color:#293d38;
+  box-shadow:0 18px 60px #0008,inset 0 0 0 4px #a68d5e12;
+}
+.expedition-save-card {border-color:#c7bea9;background:#f4eddd;}
+.expedition-save-actions button,.expedition-rename-form button {
+  border-color:#b49b68;
+  border-radius:3px;
+  background:#e6dcc5;
+  color:#40564a;
+}
+.expedition-import-label {border-color:#b49b68;color:#657267;}
+:root[data-theme="dark"] .expedition-character-panel,
+:root[data-theme="dark"] .expedition-feature,
+:root[data-theme="dark"] .expedition-save-manager,
+:root[data-theme="dark"] .expedition-dialogue-card,
+:root[data-theme="dark"] .expedition-dialogue-locked,
+:root[data-theme="dark"] .expedition-save-card {
+  border-color:#596653;
+  background:linear-gradient(145deg,#344138,#29342d);
+  color:#e8dfcf;
+}
+:root[data-theme="dark"] .expedition-character-panel h3,
+:root[data-theme="dark"] .expedition-feature h3,
+:root[data-theme="dark"] .expedition-player-name,
+:root[data-theme="dark"] .expedition-save-card strong,
+:root[data-theme="dark"] .expedition-dialogue-card h3 {color:#eee5d4;}
+:root[data-theme="dark"] .expedition-character-panel p,
+:root[data-theme="dark"] .expedition-feature p,
+:root[data-theme="dark"] .expedition-note,
+:root[data-theme="dark"] .expedition-profile-meta span,
+:root[data-theme="dark"] .expedition-dialogue-card p,
+:root[data-theme="dark"] .expedition-dialogue-locked p {color:#bdc4b3;}
+:root[data-theme="dark"] .expedition-profile-meta b {color:#e0ca98;}
+:root[data-theme="dark"] .expedition-stat {
+  border-color:#536052;background:#29352e;color:#e8dfcf;
+}
+:root[data-theme="dark"] .expedition-stat strong {color:#e0ca98;}
+:root[data-theme="dark"] .expedition-character-panel select,
+:root[data-theme="dark"] .expedition-start-form input,
+:root[data-theme="dark"] .expedition-start-form select,
+:root[data-theme="dark"] .expedition-rename-form input {
+  border-color:#596653;background:#202b24;color:#e8dfcf;
+}
+:root[data-theme="dark"] .expedition-npc-line {border-left-color:#c1a875;background:#26332b;color:#d9d5c5;}
+:root[data-theme="dark"] .expedition-choice {
+  border-color:#596653;background:linear-gradient(120deg,#344138,#29342d);color:#e8dfcf;
+}
+:root[data-theme="dark"] .expedition-choice:active,
+:root[data-theme="dark"] .expedition-choice:focus-visible {border-color:#c1a875;background:#3b493d;}
+:root[data-theme="dark"] .expedition-choice-sheet {
+  border-color:#8c7950;background:linear-gradient(150deg,#344138,#202b24);color:#e8dfcf;
+}
+:root[data-theme="dark"] .expedition-choice-sheet h2,
+:root[data-theme="dark"] .expedition-choice-sheet h3 {color:#eee5d4;}
+:root[data-theme="dark"] .expedition-choice-close,
+:root[data-theme="dark"] .expedition-save-actions button,
+:root[data-theme="dark"] .expedition-rename-form button {
+  border-color:#756847;background:#303b33;color:#e8dfcf;
+}
+:root[data-theme="dark"] .expedition-save-manager.is-compact .expedition-manager-content {
+  border-color:#8c7950;background:linear-gradient(150deg,#344138,#202b24);color:#e8dfcf;
+}
+:root[data-theme="dark"] .expedition-save-card {border-color:#536052;background:#29352e;}
+:root[data-theme="dark"] .expedition-import-label {border-color:#8c7950;color:#bdc4b3;}
+@media(max-width:390px) {
+  .expedition-choice-sheet {padding:13px;}
+  .expedition-character-panel,.expedition-feature {padding:12px;}
+}
