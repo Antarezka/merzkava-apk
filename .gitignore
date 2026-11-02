@@ -17,3 +17,13 @@ android/captures/
 
 # Cloudflare local development secrets
 .dev.vars
+
+# Android signing material (never commit)
+android/merzkava-upload.jks
+android/**/*.jks
+android/**/*.keystore
+*.jks
+*.keystore
+*.p12
+*.pfx
+*.key
