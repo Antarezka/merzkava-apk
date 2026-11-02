@@ -252,10 +252,12 @@ body.eternal-choice-open{overflow:hidden}
 .expedition-save-manager.is-compact .expedition-manager-content{position:fixed;z-index:72;right:max(12px,env(safe-area-inset-right));bottom:calc(74px + env(safe-area-inset-bottom));display:grid;width:min(420px,calc(100vw - 24px));max-height:min(72dvh,620px);overflow:auto;padding:14px;border:1px solid #9a774e;border-radius:5px;background:linear-gradient(150deg,#302820f7,#171512fa);box-shadow:0 18px 60px #000b;overscroll-behavior:contain}
 .expedition-save-manager.is-compact .expedition-manager-content[hidden]{display:none!important}
 .expedition-manager-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;color:#d9b984;font-size:8px;font-weight:700;letter-spacing:.15em}
+.expedition-manager-backdrop[hidden]{display:none!important}
+.expedition-save-manager.is-compact .expedition-manager-backdrop{position:fixed;z-index:71;inset:0;width:100vw;height:100dvh;padding:0;border:0;background:#08070670;backdrop-filter:blur(2px);cursor:default}
+.expedition-save-manager.is-compact .expedition-manager-content{z-index:72}
 .expedition-manager-close{width:29px;height:29px;border:1px solid #66513a;background:#211d18;color:#ead8bc;font-size:19px}
-.expedition-save-manager.is-compact:has(.expedition-manager-content:not([hidden])):before{position:fixed;z-index:-1;inset:0;content:"";background:#08070670;backdrop-filter:blur(2px)}
-.scene-clock-ink{display:inline-block;width:max-content;max-width:calc(100% - 30px);padding:5px 10px 5px 8px;border:0;border-radius:1px;color:#f1e7d5;font:600 7px/1.2 system-ui,sans-serif;letter-spacing:.13em;background:linear-gradient(90deg,#050605e8 0%,#080907d9 72%,#080907a8 88%,#08090700 100%);clip-path:polygon(0 9%,93% 0,100% 18%,96% 34%,100% 47%,92% 63%,97% 82%,84% 100%,0 91%);box-shadow:none;opacity:.9;backdrop-filter:blur(2px)}
-.scene-clock-ink:after{content:"";position:absolute}
+.scene-clock-ink{position:relative;isolation:isolate;display:inline-block;width:max-content;max-width:calc(100% - 30px);padding:5px 10px 5px 8px;border:0;border-radius:1px;color:#f1e7d5;font:600 7px/1.2 system-ui,sans-serif;letter-spacing:.13em;background:linear-gradient(90deg,#050605e8 0%,#080907d9 72%,#080907a8 88%,#08090700 100%);clip-path:polygon(0 9%,93% 0,100% 18%,96% 34%,100% 47%,92% 63%,97% 82%,84% 100%,0 91%);box-shadow:none;opacity:.9;backdrop-filter:blur(2px)}
+.scene-clock-ink:after{position:absolute;z-index:-1;top:0;right:-15px;width:22px;height:100%;content:"";background:linear-gradient(90deg,#080907a8,#08090700);clip-path:polygon(0 8%,100% 0,63% 31%,100% 54%,22% 78%,0 100%);opacity:.72}
 .expedition-scene-copy{max-width:min(440px,100%)}
 .expedition-dialogue-card{padding:14px 15px}
 .expedition-narrative-layer{margin-bottom:12px}
