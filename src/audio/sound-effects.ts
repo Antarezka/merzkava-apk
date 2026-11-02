@@ -244,81 +244,24 @@ export function playClockworkRatchet(): void {
 }
 
 
-/** Original synthesized carriage-return lever: spring scrape, metal detent and a weighty return clack. */
+/** Plays the recorded two-second lever mechanism used as the motion timing reference. */
+let leverAudio: HTMLAudioElement | null = null;
+
 export function playTypewriterLeverSound(): void {
   if (!soundEnabled) return;
   try {
-    const context = new window.AudioContext();
-    const now = context.currentTime;
-    if (context.state === "suspended") void context.resume();
-
-    // Carriage rail: a short, dry metal-on-metal slide that eases to a stop.
-    const length = Math.floor(context.sampleRate * 0.22);
-    const buffer = context.createBuffer(1, length, context.sampleRate);
-    const samples = buffer.getChannelData(0);
-    for (let i = 0; i < length; i++) {
-      const progress = i / length;
-      const envelope = Math.min(1, i / (context.sampleRate * 0.006)) * Math.pow(1 - progress, 1.35);
-      const grit = (Math.random() * 2 - 1) * 0.72 + Math.sin(i * 0.19) * 0.28;
-      samples[i] = grit * envelope;
+    if (!leverAudio) {
+      leverAudio = new Audio("/audio/Create_a_realistic_1_%232-1793605578542.mp3");
+      leverAudio.preload = "auto";
+      leverAudio.volume = 0.72;
     }
-    const scrape = context.createBufferSource();
-    const rail = context.createBiquadFilter();
-    const scrapeGain = context.createGain();
-    scrape.buffer = buffer;
-    rail.type = "bandpass";
-    rail.frequency.setValueAtTime(1450, now);
-    rail.frequency.exponentialRampToValueAtTime(360, now + 0.19);
-    rail.Q.value = 1.15;
-    scrapeGain.gain.setValueAtTime(0.0001, now);
-    scrapeGain.gain.exponentialRampToValueAtTime(0.075, now + 0.018);
-    scrapeGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.21);
-    scrape.connect(rail);
-    rail.connect(scrapeGain);
-    scrapeGain.connect(context.destination);
-    scrape.start(now);
-    scrape.stop(now + 0.22);
-
-    // The carriage reaches its stop: a bright original bell "ding" with soft harmonics.
-    const dingAt = now + 0.155;
-    [1320, 1980, 2640].forEach((frequency, index) => {
-      const bell = context.createOscillator();
-      const bellTone = context.createBiquadFilter();
-      const bellGain = context.createGain();
-      bell.type = "sine";
-      bell.frequency.setValueAtTime(frequency, dingAt);
-      bellTone.type = "lowpass";
-      bellTone.frequency.setValueAtTime(4200, dingAt);
-      const peak = [0.105, 0.036, 0.014][index];
-      const decay = [0.62, 0.42, 0.28][index];
-      bellGain.gain.setValueAtTime(0.0001, dingAt);
-      bellGain.gain.exponentialRampToValueAtTime(peak, dingAt + 0.006);
-      bellGain.gain.exponentialRampToValueAtTime(0.0001, dingAt + decay);
-      bell.connect(bellTone);
-      bellTone.connect(bellGain);
-      bellGain.connect(context.destination);
-      bell.start(dingAt);
-      bell.stop(dingAt + decay + 0.02);
+    leverAudio.pause();
+    leverAudio.currentTime = 0;
+    void leverAudio.play().catch(error => {
+      console.warn("Merzkava recorded lever sound could not play:", error);
     });
-
-    // A quiet mechanical detent underneath the bell gives the stop a physical edge.
-    const detent = context.createOscillator();
-    const detentGain = context.createGain();
-    detent.type = "triangle";
-    detent.frequency.setValueAtTime(245, dingAt);
-    detent.frequency.exponentialRampToValueAtTime(112, dingAt + 0.075);
-    detentGain.gain.setValueAtTime(0.0001, dingAt);
-    detentGain.gain.exponentialRampToValueAtTime(0.045, dingAt + 0.004);
-    detentGain.gain.exponentialRampToValueAtTime(0.0001, dingAt + 0.085);
-    detent.connect(detentGain);
-    detentGain.connect(context.destination);
-    detent.start(dingAt);
-    detent.stop(dingAt + 0.095);
-
-    window.setTimeout(() => { void context.close(); }, 900);
   } catch (error) {
-    console.warn("Merzkava typewriter lever sound could not play:", error);
-    playClockworkRatchet();
+    console.warn("Merzkava recorded lever sound could not play:", error);
   }
 }
 
