@@ -4,13 +4,15 @@ import {
   resetEternalGame, startEternalGame,
 } from "../../src/offline-game/expedition-game";
 
-describe("retired Eternal Path 0.1.0 dialogue sequence", () => {
+describe("retired Eternal Path 0.1.0 dialogue sequence and compatibility boundary", () => {
   beforeEach(() => resetEternalGame());
 
-  it("exposes no legacy generated story nodes", () => {
+  it("does not expose the retired generated sequence; the new bootstrap engine supplies separate situations", () => {
     startEternalGame({ name: "Nafila", age: 14, region: "golden-dragon-empire" });
-    expect(getRegionalDialogueCount()).toBe(0);
-    expect(getCurrentDialogue()).toBeNull();
+    expect(getRegionalDialogueCount()).toBe(3);
+    expect(getCurrentDialogue()).not.toBeNull();
+    expect(getCurrentDialogue()?.patchId).toBe("eternal-path-bootstrap");
+    expect(getCurrentDialogue()?.id).not.toContain("legacy");
   });
 
   it("rejects legacy choice indices without changing the saved journey", () => {
