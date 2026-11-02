@@ -34,7 +34,9 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
     const endY = 142 + y;
     const c1x = 27 + x * 0.18;
     const c2x = 27 + x * 0.82;
-    line.setAttribute("d", `M 27 5 C ${c1x} 48, ${c2x} ${endY - 42}, ${endX} ${endY}`);
+    const curve = `M 27 5 C ${c1x} 48, ${c2x} ${endY - 42}, ${endX} ${endY}`;
+    line.setAttribute("d", curve);
+    root.querySelector<SVGPathElement>(".cord-thread-braid")?.setAttribute("d", curve);
     handle.style.top = `${111 + y}px`;
     handle.style.left = `${x}px`;
   };
