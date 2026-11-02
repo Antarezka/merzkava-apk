@@ -1,0 +1,42 @@
+{
+  "patchId": "eternal-path-bootstrap",
+  "patchVersion": "0.1.0-bootstrap",
+  "status": "ACTIVE_STARTER_SLICE",
+  "contentType": "context-aware-narrative-situations",
+  "situationCount": 9,
+  "coverage": {
+    "golden-dragon-empire": 3,
+    "tianhai-yunzhou": 3,
+    "beiming-gu": 3
+  },
+  "runtimeSource": "src/offline-game/narrative-engine.ts",
+  "schema": "NarrativeSituation v1",
+  "provenance": "IN_GAME_ORIGINAL",
+  "scope": "A small playable engine-validation slice. These nine situations are not Patch 1 and do not count toward the Patch-1 minimum.",
+  "patch1": {
+    "status": "TODO",
+    "minimumDistinctSituations": 1000,
+    "approvalRequirements": [
+      "Context and consequence distinction review",
+      "Coverage matrix and duplicate/near-duplicate audit",
+      "Human narrative-quality review",
+      "Save compatibility, deterministic replay and offline QA"
+    ]
+  },
+  "runtimeRules": {
+    "offline": true,
+    "aiRequired": false,
+    "convoStateAccess": false,
+    "worldArchiveMutation": false,
+    "deterministicSelection": true,
+    "choiceResolution": "Validated local transaction; outcomes hidden until selected",
+    "replayPolicy": "A situation cannot repeat within the same journey history",
+    "saveSchemaVersion": 4
+  },
+  "limitations": [
+    "This is a starter playable slice, not the completed life simulator.",
+    "Only region, character age, local time/day-cycle, weather and saved event history are currently represented in the first context contract.",
+    "Relationship, inventory, current-activity and broader EP-2 simulation contracts remain pending.",
+    "Travel, quests, work/study loops, combat, progression breadth, SQLite transaction migration, and physical-device QA remain pending."
+  ]
+}
