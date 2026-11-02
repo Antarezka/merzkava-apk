@@ -36,7 +36,7 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
     const c2x = 27 + x * 0.82;
     line.setAttribute("d", `M 27 5 C ${c1x} 48, ${c2x} ${endY - 42}, ${endX} ${endY}`);
     handle.style.top = `${111 + y}px`;
-    handle.style.setProperty("--cord-shift", `${x}px`);
+    handle.style.left = `${x}px`;
   };
 
   const play = (file: string, volume = 0.78): void => {
@@ -55,7 +55,7 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
       const { handle } = getParts();
       if (!handle) return;
       const currentTop = clamp(Number.parseFloat(handle.style.top) || 111, 40, 223);
-      const currentShift = Number.parseFloat(handle.style.getPropertyValue("--cord-shift")) || 0;
+      const currentShift = Number.parseFloat(handle.style.left) || 0;
       const motion = { x: currentShift, y: currentTop - 111 };
       animate(motion, {
         x: 0,
