@@ -10,6 +10,7 @@ on:
       - feature/final-menu-localization-kitty-ring
       - fix/floating-lever-detached
       - safe/cord-clasp-2026-11-02
+      - repair/restore-touch-clicks-2026-11-03
     paths:
       - "src/**"
       - "public/**"
