@@ -519,6 +519,7 @@ function render(): void {
   if (!isControl) lastAnimatedScreen = activeScreen;
   updateSessionCalendar();
   renderChat();
+  translateRenderedContent(root, currentLanguage);
   root.querySelectorAll<HTMLButtonElement>("[data-theme-mode]").forEach(button => {
     const selected = button.dataset.themeMode === themeMode;
     button.classList.toggle("is-selected", selected);

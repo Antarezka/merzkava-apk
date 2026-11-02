@@ -73,6 +73,46 @@ Object.assign(labels, {
   "Show GM options":{id:"Tampilkan opsi GM",pt:"Mostrar opções do GM",fr:"Afficher les options du MJ",ru:"Показать варианты мастера",ja:"GMオプションを表示","zh-CN":"显示 GM 选项",ko:"GM 선택지 표시"},
   "Your story begins here":{id:"Kisahmu dimulai di sini",pt:"Sua história começa aqui",fr:"Votre histoire commence ici",ru:"Здесь начинается ваша история",ja:"ここから物語が始まる","zh-CN":"你的故事从这里开始",ko:"여기서 이야기가 시작됩니다"}
 });
+
+Object.assign(labels, {
+  "TACTICAL ACADEMY · COMMAND HALL":{id:"AKADEMI TAKTIS · AULA KOMANDO",pt:"ACADEMIA TÁTICA · SALA DE COMANDO",fr:"ACADÉMIE TACTIQUE · SALLE DE COMMANDEMENT",ru:"ТАКТИЧЕСКАЯ АКАДЕМИЯ · КОМАНДНЫЙ ЗАЛ",ja:"戦術学院 · 指令ホール","zh-CN":"战术学院 · 指挥大厅",ko:"전술 아카데미 · 지휘 홀"},
+  Command:{id:"Kendalikan",pt:"Comande",fr:"Dirigez",ru:"Управляй",ja:"導け","zh-CN":"掌控",ko:"지휘하라"},
+  "the chronicle.":{id:"kroniknya.",pt:"a crônica.",fr:"la chronique.",ru:"летописью.",ja:"年代記を。","zh-CN":"编年史。",ko:"연대기를."},
+  "Three powers. Countless lives. One world shaped by the choices made within it.":{id:"Tiga kekuatan. Tak terhitung kehidupan. Satu dunia yang dibentuk oleh pilihan di dalamnya.",pt:"Três poderes. Vidas incontáveis. Um mundo moldado pelas escolhas feitas nele.",fr:"Trois puissances. Des vies innombrables. Un monde façonné par les choix de ceux qui l'habitent.",ru:"Три державы. Бесчисленные жизни. Один мир, формируемый сделанным в нём выбором.",ja:"三つの勢力。数え切れない命。その選択によって形作られる一つの世界。","zh-CN":"三大势力，无数生命。一个由其中每个选择塑造的世界。",ko:"세 세력, 수많은 삶. 그 안에서 내린 선택으로 빚어지는 하나의 세계."},
+  "Continue your chronicle":{id:"Lanjutkan kronikmu",pt:"Continue sua crônica",fr:"Poursuivre votre chronique",ru:"Продолжить летопись",ja:"年代記を続ける","zh-CN":"继续你的编年史",ko:"연대기 이어가기"},
+  "Three great powers":{id:"Tiga kekuatan besar",pt:"Três grandes poderes",fr:"Trois grandes puissances",ru:"Три великие державы",ja:"三大勢力","zh-CN":"三大势力",ko:"세 대세력"},
+  "Choose a dossier to explore its place in Merzkava.":{id:"Pilih berkas untuk menjelajahi kedudukannya di Merzkava.",pt:"Escolha um dossiê para explorar seu lugar em Merzkava.",fr:"Choisissez un dossier pour découvrir sa place dans Merzkava.",ru:"Выберите досье, чтобы изучить место державы в Мерзкаве.",ja:"資料を選び、メルズカヴァにおける位置づけを確認してください。","zh-CN":"选择一份档案，探索它在 Merzkava 中的地位。",ko:"문서를 선택해 Merzkava에서의 위치를 살펴보세요."},
+  "YOUR IDENTITY":{id:"IDENTITASMU",pt:"SUA IDENTIDADE",fr:"VOTRE IDENTITÉ",ru:"ВАША ЛИЧНОСТЬ",ja:"あなたの身元","zh-CN":"你的身份",ko:"나의 신원"},
+  "Create a local character, or refresh the official players.md registry below to select a registered character.":{id:"Buat karakter lokal atau perbarui registry resmi players.md di bawah untuk memilih karakter terdaftar.",pt:"Crie um personagem local ou atualize o registro oficial players.md abaixo para selecionar um personagem registrado.",fr:"Créez un personnage local ou actualisez le registre officiel players.md ci-dessous pour en sélectionner un.",ru:"Создайте локального персонажа или обновите официальный реестр players.md ниже, чтобы выбрать зарегистрированного персонажа.",ja:"ローカルキャラクターを作成するか、下の公式 players.md 登録簿を更新して登録済みキャラクターを選択してください。","zh-CN":"创建本地角色，或刷新下方官方 players.md 名册以选择已登记角色。",ko:"로컬 캐릭터를 만들거나 아래 공식 players.md 명부를 새로고침해 등록된 캐릭터를 선택하세요."},
+  "NEW CHARACTER":{id:"KARAKTER BARU",pt:"NOVO PERSONAGEM",fr:"NOUVEAU PERSONNAGE",ru:"НОВЫЙ ПЕРСОНАЖ",ja:"新規キャラクター","zh-CN":"新角色",ko:"새 캐릭터"},
+  "MORTAL / NOT AWAKENED":{id:"MORTAL / BELUM TERBANGKIT",pt:"MORTAL / NÃO DESPERTO",fr:"MORTEL / NON ÉVEILLÉ",ru:"СМЕРТНЫЙ / НЕ ПРОБУЖДЁН",ja:"凡人 / 未覚醒","zh-CN":"凡人 / 未觉醒",ko:"필멸자 / 미각성"},
+  Background:{id:"Latar belakang",pt:"Histórico",fr:"Antécédents",ru:"Предыстория",ja:"背景","zh-CN":"背景",ko:"배경"},
+  "(optional)":{id:"(opsional)",pt:"(opcional)",fr:"(facultatif)",ru:"(необязательно)",ja:"（任意）","zh-CN":"（可选）",ko:"(선택 사항)"},
+  "Create character":{id:"Buat karakter",pt:"Criar personagem",fr:"Créer un personnage",ru:"Создать персонажа",ja:"キャラクター作成","zh-CN":"创建角色",ko:"캐릭터 생성"},
+  "PLAYER REGISTRY · players.md":{id:"REGISTRY PEMAIN · players.md",pt:"REGISTRO DE JOGADORES · players.md",fr:"REGISTRE DES JOUEURS · players.md",ru:"РЕЕСТР ИГРОКОВ · players.md",ja:"プレイヤー登録簿 · players.md","zh-CN":"玩家名册 · players.md",ko:"플레이어 명부 · players.md"},
+  "Refresh players":{id:"Perbarui pemain",pt:"Atualizar jogadores",fr:"Actualiser les joueurs",ru:"Обновить игроков",ja:"プレイヤー情報を更新","zh-CN":"刷新玩家列表",ko:"플레이어 새로고침"},
+  "YOUR CHARACTERS":{id:"KARAKTERMU",pt:"SEUS PERSONAGENS",fr:"VOS PERSONNAGES",ru:"ВАШИ ПЕРСОНАЖИ",ja:"あなたのキャラクター","zh-CN":"你的角色",ko:"내 캐릭터"},
+  "No character yet":{id:"Belum ada karakter",pt:"Nenhum personagem ainda",fr:"Aucun personnage pour le moment",ru:"Персонажей пока нет",ja:"キャラクターはまだいません","zh-CN":"尚无角色",ko:"아직 캐릭터가 없습니다"},
+  "Create your first adventurer using the form above.":{id:"Buat petualang pertamamu melalui formulir di atas.",pt:"Crie seu primeiro aventureiro usando o formulário acima.",fr:"Créez votre premier aventurier à l’aide du formulaire ci-dessus.",ru:"Создайте своего первого искателя приключений с помощью формы выше.",ja:"上のフォームから最初の冒険者を作成してください。","zh-CN":"使用上方表单创建你的第一位冒险者。",ko:"위 양식을 사용해 첫 모험가를 만드세요."},
+  "Delete character":{id:"Hapus karakter",pt:"Excluir personagem",fr:"Supprimer le personnage",ru:"Удалить персонажа",ja:"キャラクターを削除","zh-CN":"删除角色",ko:"캐릭터 삭제"},
+  WALLET:{id:"DOMPET",pt:"CARTEIRA",fr:"PORTEFEUILLE",ru:"КОШЕЛЁК",ja:"所持金","zh-CN":"钱包",ko:"지갑"},
+  "Balances will be calculated and validated by the game engine.":{id:"Saldo akan dihitung dan divalidasi oleh mesin permainan.",pt:"Os saldos serão calculados e validados pelo mecanismo do jogo.",fr:"Les soldes seront calculés et validés par le moteur du jeu.",ru:"Баланс будет рассчитан и проверен игровым движком.",ja:"残高はゲームエンジンによって計算・検証されます。","zh-CN":"余额将由游戏引擎计算并验证。",ko:"잔액은 게임 엔진에서 계산하고 검증합니다."},
+  "Inventory is empty":{id:"Inventaris kosong",pt:"Inventário vazio",fr:"Inventaire vide",ru:"Инвентарь пуст",ja:"所持品は空です","zh-CN":"物品栏为空",ko:"소지품이 비어 있습니다"},
+  "Items acquired during gameplay will be recorded here.":{id:"Barang yang diperoleh selama permainan akan dicatat di sini.",pt:"Os itens obtidos durante o jogo serão registrados aqui.",fr:"Les objets obtenus pendant le jeu seront consignés ici.",ru:"Предметы, полученные во время игры, будут записаны здесь.",ja:"ゲーム中に入手したアイテムはここに記録されます。","zh-CN":"游戏中获得的物品将记录在此处。",ko:"게임 중 획득한 아이템이 여기에 기록됩니다."},
+  "YOUR RECORDED HISTORY":{id:"RIWAYAT TERCATAT",pt:"SEU HISTÓRICO REGISTRADO",fr:"VOTRE HISTORIQUE",ru:"ВАША ИСТОРИЯ",ja:"記録された履歴","zh-CN":"已记录的历史",ko:"기록된 이력"},
+  "Quests, discoveries, and gameplay events.":{id:"Misi, penemuan, dan peristiwa permainan.",pt:"Missões, descobertas e eventos do jogo.",fr:"Quêtes, découvertes et événements de jeu.",ru:"Задания, открытия и игровые события.",ja:"クエスト、発見、ゲーム内イベント。","zh-CN":"任务、发现和游戏事件。",ko:"퀘스트, 발견 및 게임 이벤트."},
+  "No entries yet":{id:"Belum ada catatan",pt:"Ainda não há registros",fr:"Aucune entrée pour le moment",ru:"Записей пока нет",ja:"記録はまだありません","zh-CN":"暂无记录",ko:"아직 기록이 없습니다"},
+  "Verified events and important story moments will be recorded here.":{id:"Peristiwa terverifikasi dan momen cerita penting akan dicatat di sini.",pt:"Eventos verificados e momentos importantes da história serão registrados aqui.",fr:"Les événements vérifiés et les moments importants de l’histoire seront consignés ici.",ru:"Здесь будут записаны подтверждённые события и важные моменты истории.",ja:"確認済みの出来事や物語の重要な場面がここに記録されます。","zh-CN":"经过验证的事件和重要剧情时刻将在此记录。",ko:"검증된 사건과 중요한 이야기 순간이 여기에 기록됩니다."},
+  "MERZKAVA · WORLD TIME":{id:"MERZKAVA · WAKTU DUNIA",pt:"MERZKAVA · TEMPO DO MUNDO",fr:"MERZKAVA · TEMPS DU MONDE",ru:"MERZKAVA · ВРЕМЯ МИРА",ja:"MERZKAVA · 世界時刻","zh-CN":"MERZKAVA · 世界时间",ko:"MERZKAVA · 세계 시간"},
+  "THE CHRONICLE":{id:"KRONIK",pt:"A CRÔNICA",fr:"LA CHRONIQUE",ru:"ЛЕТОПИСЬ",ja:"年代記","zh-CN":"编年史",ko:"연대기"},
+  "PLAYER SESSION":{id:"SESI PEMAIN",pt:"SESSÃO DO JOGADOR",fr:"SESSION DU JOUEUR",ru:"СЕССИЯ ИГРОКА",ja:"プレイヤーセッション","zh-CN":"玩家会话",ko:"플레이어 세션"},
+  "WORLD SCENE PREVIEW":{id:"PRATINJAU ADEGAN DUNIA",pt:"PRÉVIA DA CENA MUNDIAL",fr:"APERÇU DE LA SCÈNE DU MONDE",ru:"ПРЕДПРОСМОТР МИРОВОЙ СЦЕНЫ",ja:"ワールドシーンプレビュー","zh-CN":"世界场景预览",ko:"월드 장면 미리보기"},
+  "SCENE WINDOW · LIVE WORLD":{id:"JENDELA ADEGAN · DUNIA AKTIF",pt:"JANELA DE CENA · MUNDO VIVO",fr:"FENÊTRE DE SCÈNE · MONDE VIVANT",ru:"ОКНО СЦЕНЫ · ЖИВОЙ МИР",ja:"シーンウィンドウ · ライブワールド","zh-CN":"场景窗口 · 动态世界",ko:"장면 창 · 살아 있는 세계"},
+  "Not recorded":{id:"Belum tercatat",pt:"Não registrado",fr:"Non enregistré",ru:"Не записано",ja:"未記録","zh-CN":"未记录",ko:"기록되지 않음"},
+  "JOURNEY MANAGER":{id:"PENGELOLA PERJALANAN",pt:"GERENCIADOR DE JORNADAS",fr:"GESTIONNAIRE DE VOYAGES",ru:"УПРАВЛЕНИЕ ПУТЕШЕСТВИЯМИ",ja:"旅の管理","zh-CN":"旅程管理",ko:"여정 관리자"},
+  "No saved journeys yet. Your first journey will appear here.":{id:"Belum ada perjalanan tersimpan. Perjalanan pertamamu akan muncul di sini.",pt:"Ainda não há jornadas salvas. Sua primeira jornada aparecerá aqui.",fr:"Aucun voyage enregistré. Votre premier voyage apparaîtra ici.",ru:"Сохранённых путешествий пока нет. Первое появится здесь.",ja:"保存された旅はまだありません。最初の旅がここに表示されます。","zh-CN":"尚无已保存的旅程。你的第一段旅程会显示在这里。",ko:"저장된 여정이 없습니다. 첫 여정이 여기에 표시됩니다."}
+});
+
 export function getLanguage():AppLanguage {
   try { const saved=localStorage.getItem(STORAGE_KEY); return APP_LANGUAGES.some(item=>item.code===saved)?saved as AppLanguage:DEFAULT_LANGUAGE; }
   catch { return DEFAULT_LANGUAGE; }
