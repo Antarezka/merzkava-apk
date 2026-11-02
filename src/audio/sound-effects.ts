@@ -243,6 +243,60 @@ export function playClockworkRatchet(): void {
   }
 }
 
+
+/** Original synthesized carriage-return lever: spring scrape, metal detent and a weighty return clack. */
+export function playTypewriterLeverSound(): void {
+  if (!soundEnabled) return;
+  try {
+    const context = new window.AudioContext();
+    const now = context.currentTime;
+    if (context.state === "suspended") void context.resume();
+    const length = Math.floor(context.sampleRate * 0.3);
+    const buffer = context.createBuffer(1, length, context.sampleRate);
+    const samples = buffer.getChannelData(0);
+    for (let i = 0; i < length; i++) {
+      const fade = Math.min(1, i / (context.sampleRate * 0.008)) * Math.pow(1 - i / length, 1.8);
+      samples[i] = (Math.random() * 2 - 1) * fade;
+    }
+    const scrape = context.createBufferSource();
+    const filter = context.createBiquadFilter();
+    const gain = context.createGain();
+    scrape.buffer = buffer;
+    filter.type = "bandpass";
+    filter.frequency.setValueAtTime(1120, now);
+    filter.frequency.exponentialRampToValueAtTime(420, now + 0.2);
+    filter.Q.value = 0.85;
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.09, now + 0.035);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.23);
+    scrape.connect(filter); filter.connect(gain); gain.connect(context.destination);
+    scrape.start(now); scrape.stop(now + 0.24);
+    const hit = (offset: number, hz: number, peak: number, decay: number, type: OscillatorType) => {
+      const osc = context.createOscillator();
+      const tone = context.createBiquadFilter();
+      const envelope = context.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(hz, now + offset);
+      osc.frequency.exponentialRampToValueAtTime(Math.max(55, hz * 0.48), now + offset + decay);
+      tone.type = "lowpass"; tone.frequency.setValueAtTime(2100, now + offset);
+      tone.frequency.exponentialRampToValueAtTime(520, now + offset + decay);
+      envelope.gain.setValueAtTime(0.0001, now + offset);
+      envelope.gain.exponentialRampToValueAtTime(peak, now + offset + 0.004);
+      envelope.gain.exponentialRampToValueAtTime(0.0001, now + offset + decay);
+      osc.connect(tone); tone.connect(envelope); envelope.connect(context.destination);
+      osc.start(now + offset); osc.stop(now + offset + decay + 0.01);
+    };
+    hit(0.105, 420, 0.12, 0.105, "triangle");
+    hit(0.155, 185, 0.17, 0.16, "sawtooth");
+    hit(0.205, 92, 0.13, 0.22, "sine");
+    hit(0.245, 1450, 0.035, 0.045, "square");
+    window.setTimeout(() => { void context.close(); }, 720);
+  } catch (error) {
+    console.warn("Merzkava typewriter lever sound could not play:", error);
+    playClockworkRatchet();
+  }
+}
+
 export function setSoundEnabled(enabled: boolean): void {
   soundEnabled = enabled;
   if (!enabled) {
