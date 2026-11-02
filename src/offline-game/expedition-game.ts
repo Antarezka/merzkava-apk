@@ -44,8 +44,17 @@ export const ETERNAL_SCENES: EternalScene[] = [
 /**
  * The generated 240-entry 0.1.0 dialogue sequence has been retired.
  * Story content is intentionally unavailable until the reviewed Patch-1 event system ships.
- * Keep the legacy save counters below only for backward-compatible save migration.
+ * These types remain only as a compatibility boundary; no legacy nodes are shipped.
  */
+export interface EternalChoice { label: string; response: string; effects: { energy: number; insight: number; bonds: number }; minutes: number; }
+export interface EternalDialogue {
+  id: string; contentId:string; contentType:"dialogue"; reviewStatus:"APPROVED"; packageVersion:"0.1.0"; summary:string;
+  title: string; sceneId: string; chapter: string; speaker: string;
+  text: string; provenance: "IN_GAME_ORIGINAL"; originalityNote: string;
+  sourceRefs: {archiveDossierId:string;universeRepository:string;universeCommit:string;sourcePath:string}[];
+  choices: [EternalChoice, EternalChoice];
+}
+/** Legacy save counters remain for schema compatibility and are normalized to zero. */
 export interface EternalSave {
   schemaVersion:3; saveId:string; saveName:string; createdAt:string; updatedAt:string;
   manifest:{universeRepository:string;universeCommit:string;contentPackVersion:string;deterministicSeed:string};
@@ -127,7 +136,7 @@ function normalizeSave(value:unknown):EternalSave|null {
     hour:Number.isInteger(parsed.hour)&&Number(parsed.hour)>=0&&Number(parsed.hour)<24?Number(parsed.hour):8,
     minute:Number.isInteger(parsed.minute)&&Number(parsed.minute)>=0&&Number(parsed.minute)<60?Number(parsed.minute):0,
     weather:resolveDailyWeather(region,Number(parsed.day)||1),
-    eventIndex:0,energy:Math.max(0,Math.min(100,Number(parsed.energy)||0)),insight:Math.max(0,Number(parsed.insight)||0),bonds:Math.max(0,Number(parsed.bonds)||0),completed:Math.max(0,Number(parsed.completed)||0),
+    eventIndex:0,energy:Math.max(0,Math.min(100,Number(parsed.energy)||0)),insight:Math.max(0,Number(parsed.insight)||0),bonds:Math.max(0,Number(parsed.bonds)||0),completed:0,
   } as EternalSave;
 }
 function ensureLegacyMigration():EternalSaveSlot[] {
@@ -215,7 +224,7 @@ export function resetEternalGame():void {
 export function getRegionalDialogueCount(): number {
   return 0;
 }
-export function getCurrentDialogue(): null {
+export function getCurrentDialogue(): EternalDialogue | null {
   return null;
 }
 /** Old choice indices are rejected; no retired node may mutate a journey. */
