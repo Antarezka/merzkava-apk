@@ -833,11 +833,9 @@ root.addEventListener("click", async (event: MouseEvent) => {
   const target = event.target;
   if (!(target instanceof Element)) return;
   if (target.closest("[data-nav-toggle]")) {
-    navigationCollapsed = !navigationCollapsed;
-    try { localStorage.setItem(NAV_COLLAPSED_STORAGE_KEY, String(navigationCollapsed)); } catch { /* Keep the control available for this session. */ }
-    playClockworkRatchet();
-    menuToggleAnimationPending = true;
-    render();
+    if (suppressNavLeverClick) { suppressNavLeverClick = false; return; }
+    playTypewriterLeverSound();
+    commitNavLeverToggle();
     return;
   }
   const activeEternalModal=root.querySelector<HTMLElement>(".expedition-choice-modal:not([hidden])");
