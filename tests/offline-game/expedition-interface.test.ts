@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { renderExpeditionInterface } from "../../src/offline-game/expedition-interface";
 import {
-  advanceEternalWorldTime, chooseEternalOption, ETERNAL_SCENES,
+  advanceEternalWorldTime, chooseEternalOption, ETERNAL_SCENES, resolveEternalSituationChoice,
   getCurrentDialogue, getCurrentSituation, getEternalSave, getExpeditionAtmosphere, getExpeditionScene,
   getRegionalDialogueCount, resetEternalGame, setEternalLocation, startEternalGame,
 } from "../../src/offline-game/expedition-game";
@@ -133,9 +133,41 @@ describe("Eternal Path live world scene", () => {
     expect(getCurrentDialogue()).not.toBeNull();
   });
 
+  it("resolves a player choice once, records it, and advances the authoritative world clock", () => {
+    startEternalGame({name:"Nafila",age:14,region:"golden-dragon-empire"});
+    const node=getCurrentSituation();
+    const before=getEternalSave();
+    expect(node).not.toBeNull();
+    const result=resolveEternalSituationChoice("help");
+    const after=getEternalSave();
+    expect(result?.nodeId).toBe(node?.id);
+    expect(after?.narrativeHistory).toHaveLength(1);
+    expect(after?.narrativeHistory[0].transactionId).toBe(result?.transactionId);
+    expect(after?.completed).toBe(1);
+    expect(after?.energy).toBe((before?.energy??0)-2);
+    expect(after?.insight).toBe((before?.insight??0)+1);
+    expect(after?.minute).toBe(10);
+    expect(after?.lastOutcome).toBe(result?.outcomeText);
+    expect(resolveEternalSituationChoice("not-a-choice")).toBeNull();
+  });
+
+  it("can play the three regional starter situations without repeating a node", () => {
+    startEternalGame({name:"Nafila",age:14,region:"beiming-gu"});
+    const seen=new Set<string>();
+    for(let index=0;index<3;index+=1){
+      const node=getCurrentSituation();
+      expect(node).not.toBeNull();
+      expect(seen.has(node!.id)).toBe(false);
+      seen.add(node!.id);
+      expect(resolveEternalSituationChoice("pass")).not.toBeNull();
+    }
+    expect(getCurrentSituation()).toBeNull();
+    expect(getEternalSave()?.narrativeHistory).toHaveLength(3);
+  });
+
   it("keeps all 26 registered scenery assets and ships no retired dialogue nodes", () => {
-    expect(getRegionalDialogueCount()).toBe(3);
-    expect(getCurrentDialogue()).not.toBeNull();
+    expect(getRegionalDialogueCount()).toBe(0);
+    expect(getCurrentDialogue()).toBeNull();
     expect(ETERNAL_SCENES).toHaveLength(26);
     expect(new Set(ETERNAL_SCENES.map(scene=>scene.image)).size).toBe(26);
     expect(ETERNAL_SCENES.every(scene=>scene.image.startsWith("/game/scenery/") && scene.provenance==="IN_GAME_ORIGINAL")).toBe(true);
