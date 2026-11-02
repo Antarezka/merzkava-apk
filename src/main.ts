@@ -667,7 +667,15 @@ root.addEventListener("click", async (event: MouseEvent) => {
 
   if (target.closest("[data-eternal-manager-toggle]")) {
     const panel=root.querySelector<HTMLElement>("[data-eternal-manager-content]");
-    if(panel){panel.hidden=!panel.hidden;if(!panel.hidden) animateExpeditionPanel(panel);}
+    const trigger=root.querySelector<HTMLButtonElement>(".expedition-manager-trigger");
+    if(panel){
+      panel.hidden=!panel.hidden;
+      trigger?.setAttribute("aria-expanded",String(!panel.hidden));
+      if(!panel.hidden){
+        animateExpeditionPanel(panel);
+        panel.querySelector<HTMLButtonElement>(".expedition-manager-close")?.focus();
+      } else trigger?.focus();
+    }
     return;
   }
   if (target.closest("[data-eternal-new-form]")) {
