@@ -719,6 +719,8 @@ window.addEventListener("popstate", () => {
   const manager=root.querySelector<HTMLElement>("[data-eternal-manager-content]");
   if(manager&&!manager.hidden){
     manager.hidden=true;
+    const backdrop=root.querySelector<HTMLButtonElement>("[data-eternal-manager-backdrop]");
+    if(backdrop) backdrop.hidden=true;
     root.querySelector<HTMLButtonElement>(".expedition-manager-trigger")?.setAttribute("aria-expanded","false");
     root.querySelector<HTMLButtonElement>(".expedition-manager-trigger")?.focus();
     return;
@@ -732,9 +734,20 @@ root.addEventListener("keydown", event => {
   const manager=root.querySelector<HTMLElement>("[data-eternal-manager-content]");
   if(event.key==="Escape"&&manager&&!manager.hidden){
     manager.hidden=true;
+    const backdrop=root.querySelector<HTMLButtonElement>("[data-eternal-manager-backdrop]");
+    if(backdrop) backdrop.hidden=true;
     root.querySelector<HTMLButtonElement>(".expedition-manager-trigger")?.setAttribute("aria-expanded","false");
     root.querySelector<HTMLButtonElement>(".expedition-manager-trigger")?.focus();
     if(history.state?.eternalManager) history.back();
+    return;
+  }
+  if(event.key==="Tab"&&manager&&!manager.hidden){
+    const focusable=Array.from(manager.querySelectorAll<HTMLElement>('button:not(:disabled),a[href],input:not(:disabled),select:not(:disabled),textarea:not(:disabled),[tabindex]:not([tabindex="-1"])'));
+    if(focusable.length){
+      const first=focusable[0],last=focusable[focusable.length-1];
+      if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
+      else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
+    }
     return;
   }
   const modal=root.querySelector<HTMLElement>(".expedition-choice-modal:not([hidden])");
@@ -778,6 +791,8 @@ root.addEventListener("click", async (event: MouseEvent) => {
     if(panel){
       panel.hidden=!panel.hidden;
       trigger?.setAttribute("aria-expanded",String(!panel.hidden));
+      const backdrop=root.querySelector<HTMLButtonElement>("[data-eternal-manager-backdrop]");
+      if(backdrop) backdrop.hidden=panel.hidden;
       if(!panel.hidden){
         history.pushState({eternalManager:true},"");
         animateExpeditionPanel(panel);
@@ -786,6 +801,19 @@ root.addEventListener("click", async (event: MouseEvent) => {
         if(history.state?.eternalManager) history.back();
         trigger?.focus();
       }
+    }
+    return;
+  }
+  if (target.closest("[data-eternal-manager-backdrop]")) {
+    const panel=root.querySelector<HTMLElement>("[data-eternal-manager-content]");
+    const trigger=root.querySelector<HTMLButtonElement>(".expedition-manager-trigger");
+    if(panel&&!panel.hidden){
+      panel.hidden=true;
+      const backdrop=root.querySelector<HTMLButtonElement>("[data-eternal-manager-backdrop]");
+      if(backdrop) backdrop.hidden=true;
+      trigger?.setAttribute("aria-expanded","false");
+      trigger?.focus();
+      if(history.state?.eternalManager) history.back();
     }
     return;
   }
