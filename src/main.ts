@@ -1,6 +1,7 @@
 import "./style.css";
 import "./ui/floating-ledger.css";
 import "./ui/floating-control.css";
+import "./ui/gravity-pull-cord.css";
 import { cancelOpeningSequence, playButtonSound, playClockworkRatchet, playNavigationTick, playOpeningSequence, playSnapshotSlideSound, playWarningBeep, setSoundEnabled } from "./audio/sound-effects";
 import { getGameplaySessionRecord, initializeDatabase, saveGameplaySessionRecord } from "./shared/database";
 import { createCharacter, deleteCharacter, listCharacters, type Character } from "./convo/characters/character-repository";
@@ -23,6 +24,7 @@ import { startFloatingMode, requestFloatingOverlayPermission, getFloatingReadine
 import { floatingControlMarkup } from "./app/floating-control";
 import { animateOpeningSplash, animateSplashCurtain } from "./ui/splash-animation";
 import { animateAppScreen } from "./ui/app-shell-motion";
+import { initializeGravityPullCord } from "./ui/gravity-pull-cord";
 import { closeLoreEntry, closeLoreSource, closeLorePlaceholder, openLoreEntry, openLoreSource, openLorePlaceholder, setLoreCategory, setLoreSearch, renderLoreResults } from "./world-archive/lore-library";
 
 const app = document.querySelector<HTMLDivElement>("#app");
@@ -33,11 +35,13 @@ const root = app;
 type ThemeMode = "light" | "dark";
 const THEME_STORAGE_KEY = "merzkava-theme-mode";
 const SOUND_STORAGE_KEY = "merzkava-sound-enabled";
+const NAV_COLLAPSED_STORAGE_KEY = "merzkava-nav-collapsed";
 function readPreference(key: string, fallback: string): string {
   try { return localStorage.getItem(key) ?? fallback; } catch { return fallback; }
 }
 let themeMode: ThemeMode = readPreference(THEME_STORAGE_KEY, "dark") === "dark" ? "dark" : "light";
 let soundEnabled = readPreference(SOUND_STORAGE_KEY, "true") !== "false";
+let navigationCollapsed = readPreference(NAV_COLLAPSED_STORAGE_KEY, "false") === "true";
 function applyAppPreferences(): void {
   document.documentElement.dataset.theme = themeMode;
   setSoundEnabled(soundEnabled);
@@ -478,11 +482,12 @@ function render(): void {
     : renderScreen(activeScreen as ScreenId, availableCharacters(), playerRegistryMessage, activeCharacterId ? getLedgerLog(activeCharacterId) : [], inventorySnapshot);
   const previousNavigation = root.querySelector<HTMLElement>(".nav-roulette-track");
   if (previousNavigation) savedNavigationScrollLeft = previousNavigation.scrollLeft;
-  root.innerHTML = `<div class="app-shell ${isControl ? "control-shell" : ""} ${menuRevealPending ? "is-entering" : ""}">
+  root.innerHTML = `<div class="app-shell ${isControl ? "control-shell" : ""} ${menuRevealPending ? "is-entering" : ""} ${navigationCollapsed ? "is-nav-collapsed" : ""}">
     ${isControl ? "" : `<header class="app-header"><button class="brand" data-screen="home" aria-label="Merzkava home"><span class="brand-mark">M</span><span class="brand-wordmark"><small>MERZKAVA UNIVERSE</small><strong>Merzkava</strong></span></button><div class="header-context"><small>TACTICAL ACADEMY</small><strong>${navigation.find(item => item.id === activeScreen)?.label ?? "Command Hall"}</strong></div><div class="header-tools"><button class="header-settings" data-floating-action="start-bubble" aria-label="Start Bubble Mode" title="Start Bubble Mode">◉</button><button class="header-settings" data-screen="settings" aria-label="Settings">⚙</button></div></header>`}
     ${notice ? `<p class="notice" role="status">${escapeHtml(notice)}</p>` : ""}
     ${isControl ? content : `<main class="main-content">${content}${activeScreen === "settings" ? authPanel() + canonPanel() : ""}</main>`}
     ${isControl ? "" : `<nav class="bottom-nav" aria-label="Academy navigation"><span class="nav-cable nav-cable-left" aria-hidden="true"></span><span class="nav-cable nav-cable-right" aria-hidden="true"></span><div class="nav-roulette-track">${navigation.map((item, index) => `<button class="nav-item ${activeScreen === item.id ? "active" : ""}" data-screen="${item.id}" ${activeScreen === item.id ? 'aria-current="page"' : ""}><span class="nav-item-motion"><span class="nav-index">${String(index + 1).padStart(2, "0")}</span><span class="nav-rotor" aria-hidden="true"><span class="nav-rotor-mark"></span><span class="nav-rotor-grip" data-nav-rotor="${item.id}"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="21" fill="none" stroke="transparent" stroke-width="7" pointer-events="stroke"/></svg></span><span class="nav-icon-frame nav-icon-frame-${item.id}"><span class="nav-icon"><span class="nav-icon-art">${item.icon}</span></span></span></span><small>${item.label}</small></span></button>`).join("")}</div></nav>`}
+    ${!isControl ? `${!isControl ? `<div class="gravity-pull-cord" data-gravity-cord aria-hidden="true"><span class="gravity-cord-anchor"></span><svg class="gravity-cord-line" viewBox="0 0 54 210" aria-hidden="true"><path data-cord-line d="M 27 5 C 27 48, 27 100, 27 142"/></svg><button class="gravity-cord-terminal" type="button" data-cord-handle aria-label="${translateLabel(navigationCollapsed ? "Pull upward to show toolbar" : "Pull downward to hide toolbar", currentLanguage)}" title="${translateLabel(navigationCollapsed ? "Show toolbar" : "Hide toolbar", currentLanguage)}"><span class="gravity-cord-jewel" aria-hidden="true"></span></button></div>` : ""}` : ""}
     ${isControl ? "" : `<div class="storage-status"><span class="status-dot"></span>${databaseMessage}</div>`}
     ${activeScreen === "gameplay" ? snapshotBlindMarkup() : ""}
     ${activeScreen === "home" && noticeboardVisible ? noticeboardMarkup() : ""}
@@ -766,6 +771,17 @@ root.addEventListener("keydown", event => {
     else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
   }
 });
+function commitNavLeverToggle(): void {
+  navigationCollapsed = !navigationCollapsed;
+  try { localStorage.setItem(NAV_COLLAPSED_STORAGE_KEY, String(navigationCollapsed)); } catch { /* Keep the control available for this session. */ }
+  menuToggleAnimationPending = false;
+  render();
+}
+initializeGravityPullCord(root, {
+  isCollapsed: () => navigationCollapsed,
+  toggle: commitNavLeverToggle
+});
+
 root.addEventListener("click", async (event: MouseEvent) => {
   const target = event.target;
   if (!(target instanceof Element)) return;
@@ -776,7 +792,7 @@ root.addEventListener("click", async (event: MouseEvent) => {
   const interactive = target.closest(
     "button:not(:disabled), a[href], [role='button'], [role='tab'], [role='menuitem'], input:not([type='hidden']):not(:disabled), select:not(:disabled), textarea:not(:disabled), summary"
   );
-  if (interactive) playButtonSound();
+  if (interactive && !target.closest("[data-cord-handle]")) playButtonSound();
 
   const eternalChoice = target.closest<HTMLButtonElement>("[data-eternal-choice]");
   if (target.closest("[data-eternal-choice-dismiss]")) { const modal=root.querySelector<HTMLElement>("[data-eternal-choice-modal]"); if(modal){animateExpeditionChoiceModal(modal,false,()=>root.querySelector<HTMLButtonElement>("[data-eternal-open-choices]")?.focus());} document.body.classList.remove("eternal-choice-open"); if(history.state?.eternalChoiceModal) history.back(); return; }
