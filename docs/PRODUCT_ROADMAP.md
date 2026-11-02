@@ -313,30 +313,30 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 
 **Exit gate:** Offline Game can be played end-to-end without internet/login, consumes only its approved versioned World Archive package, saves safely, and remains isolated from connected Convo context and state. Both modes remain discoverable and usable within the same APK.
 
-### 5E. Context-aware Narrative Patch Engine — TODO
+### 5E. Context-aware Narrative Patch Engine — IN PROGRESS
 
-**Status:** PLANNED — NOT IN IMPLEMENTATION.
+**Status:** `[~] ENGINE BOOTSTRAP VERTICAL SLICE IMPLEMENTED; PATCH 1 AUTHORING TODO.`
 
 **Single source of truth:** This section owns the replacement narrative engine and all versioned story patches. §5B supplies the overall game-design constraints; §5C consumes the resulting event opportunities in the offline gameplay loop; EP-2 supplies authoritative simulation state and validated state-change boundaries; EP-3 owns narrative/social engine implementation. Do not create a competing node system, duplicate event schema, or parallel story backlog elsewhere.
 
-**Execution order:** (1) finish and verify the shared toolbar/menu and active UI repair; (2) establish the required EP-2 simulation-state contracts; (3) implement and test the EP-3 narrative/social engine and its schema/resolver; (4) only then author and validate Patch 1 content. Engine architecture and interface work must not be confused with permission to start bulk story-node authoring. **Tracking:** [Issue #3](https://github.com/Antarezka/merzkava-apk/issues/3).
+**Execution order:** (1) finish and verify the shared toolbar/menu and active UI repair; (2) establish the required EP-2 simulation-state contracts; (3) implement and test the EP-3 narrative/social engine and its schema/resolver; (4) only then author and validate Patch 1 content. A separate nine-situation bootstrap slice now validates the schema/resolver and gives each starting region three playable situations. It is not Patch 1, does not count toward the 1,000-situation target, and must not be expanded into bulk content until the UI repair and EP-2 contracts are verified. **Tracking:** [Issue #3](https://github.com/Antarezka/merzkava-apk/issues/3).
 
 **Retirement rule:** The generated 240-entry 0.1.0 sequence is retired, removed from active runtime, and must not be recycled, lightly rewritten, or used as the structural template for Patch 1.
 
 **Patch-1 minimum content target:** At least **1,000 genuinely distinct narrative situations/states** in the first patch. The count must represent meaningful differences in context, actors, stakes, triggers, available knowledge, and possible consequences—not combinatorial permutations that merely swap names, scene labels, or generic sentences.
 
-- [ ] Design a versioned patch schema with stable IDs, provenance, source references, eligibility conditions, trigger conditions, cooldown/replay rules, deterministic selection, and save compatibility.
-- [ ] Integrate the node resolver with Eternal Path authoritative local character, location, time/day-cycle, weather, relationships, disposition, inventory/resources, current activity, and prior event history. Do not read or mutate Convo state.
-- [ ] Define a situation taxonomy broad enough for ordinary life, social encounters, travel, work/study, investigation, conflict, emergencies, discovery, faction/community activity, and quiet personal moments.
-- [ ] Require each situation to define what happened, who is involved, what each actor can know, what is observable, what remains uncertain, the immediate stakes, constraints, and meaningful consequence branches.
-- [ ] Build contextual narrative composition: Setting/Atmosphere → Scene Action → observable Character Behavior → Dialogue → a final perspective question grounded in the actual event.
-- [ ] Make Scene Action substantial and alive (normally around 5–9 readable lines when the event warrants it); do not pad short events merely to hit a line count.
-- [ ] The closing question must demonstrate comprehension of the situation and invite the player to reason from their character’s perspective. Avoid generic commands such as “What do you do?”, “Your action?”, or forced first-person prompts such as “I will…”.
-- [ ] Choices must arise from the situation and character context; do not expose hidden outcomes, odds, disposition deltas, or consequences before resolution.
-- [ ] Keep the narrative in one independently scrollable reading column beneath the Scene Window; long scenes must not push or move the shared toolbar.
-- [ ] Validate the 1,000-situation minimum with a coverage matrix, duplicate/near-duplicate checks, context-combination audits, and human narrative-quality review before approving Patch 1.
-- [ ] Add deterministic replay, atomic state resolution, event history, no-repeat safeguards, and tests for save/reload, migration, offline operation, and patch-version changes.
-- [ ] Release each patch independently with manifest, version, provenance, QA report, and rollback compatibility.
+- [~] Versioned node schema and bootstrap patch manifest exist with stable IDs, provenance, eligibility fields, deterministic selection and schema-v4 save migration; full source-reference and patch rollback compatibility remain open.
+- [~] Resolver currently reads save-local character, starting region/current location, age, local clock/day-cycle, weather, disposition and event history. Relationship, inventory/resource and current-activity contracts remain blocked on broader EP-2 state work. Convo remains isolated.
+- [~] Bootstrap taxonomy currently covers ordinary-life, social and discovery situations across all three starting powers; travel, work/study, investigation, conflict, emergencies and faction/community categories remain to be authored.
+- [~] The nine starter situations define participants, actor knowledge, observable behavior, uncertainty, stakes, constraints and choice branches; full content coverage and review remain open.
+- [x] Runtime composition renders Setting/Atmosphere → Scene Action → observable Character Behavior → Dialogue → contextual perspective question.
+- [x] Starter Scene Action uses six readable lines per situation; future authored scenes must remain event-proportional rather than padded.
+- [x] Starter closing questions are situation-specific and invite reasoning from the character’s perspective.
+- [x] Player choices hide outcome text and mechanical deltas until after validated resolution.
+- [x] Narrative remains in the independent reading column below the Scene Window.
+- [ ] Validate at least 1,000 materially distinct Patch-1 situations with coverage, duplicate/near-duplicate and human quality review. The nine bootstrap situations do not count.
+- [~] Deterministic selection, no-repeat history, transaction IDs, single-save resolution and starter tests are implemented; full save/reload, patch migration and SQLite transaction QA remain open.
+- [~] Bootstrap patch has its own manifest and provenance; release QA, rollback compatibility and final patch packaging remain open.
 
 **Exit gate:** Patch 1 is not approved until it contains at least 1,000 materially distinct situations, passes context/duplication review, integrates with Eternal Path state without touching Convo, and produces situation-aware narrative and reflective closing questions.
 
