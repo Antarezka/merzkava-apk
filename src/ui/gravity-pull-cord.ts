@@ -82,6 +82,8 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
     // The dock is centered by left/right auto margins, never translateX(-50%).
     // Only the inner track rattles, so Anime.js cannot throw the whole dock sideways.
     dock.style.transform = `translateY(${from}px)`;
+    dock.style.opacity = "1";
+    dock.style.pointerEvents = "auto";
     animate(dock, {
       translateY: [
         { to: from + (to - from) * 0.025, duration: 110, ease: "outQuad" },
