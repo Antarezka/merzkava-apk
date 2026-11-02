@@ -131,7 +131,7 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
     const target = event.target;
     if (!(target instanceof Element)) return;
     const handle = target.closest<HTMLButtonElement>("[data-cord-handle]");
-    if (!handle || (event.pointerType === "mouse" && event.button !== 0)) return;
+    if (!handle || active || (event.pointerType === "mouse" && event.button !== 0)) return;
     enableSensor();
     play("/audio/golden%20handle.mp3", 0.62);
     active = { pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, handle };
