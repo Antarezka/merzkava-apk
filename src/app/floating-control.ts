@@ -1,4 +1,5 @@
 import type { FloatingReadiness } from "../native/floating-window";
+import { languagePanelMarkup, type AppLanguage } from "../i18n";
 
 function status(ready: boolean): string {
   return ready
@@ -6,10 +7,10 @@ function status(ready: boolean): string {
     : '<span class="floating-status not-ready"><i></i>NOT READY</span>';
 }
 
-export function floatingControlMarkup(state: FloatingReadiness): string {
+export function floatingControlMarkup(state: FloatingReadiness, language: AppLanguage = "en"): string {
   return `<main class="floating-control">
     <div class="floating-control-brand"><span class="floating-brand-mark">M</span><div><small>MERZKAVA UNIVERSE</small><h1>Floating Control</h1></div></div>
-    <p class="floating-control-intro">Prepare the permissions and background service before entering your world. Complete each step in order.</p>
+    ${languagePanelMarkup(language)}\n    <p class="floating-control-intro">Prepare the permissions and background service before entering your world. Complete each step in order.</p>
 
     <section class="floating-health-panel">
       <div class="floating-health-row"><span>Display over the app</span>${status(state.displayOverApps)}</div>
@@ -42,6 +43,6 @@ export function floatingControlMarkup(state: FloatingReadiness): string {
       <button class="floating-stop" data-floating-action="stop" ${!state.serviceRunning && !state.displayOverApps ? "disabled" : ""}>Stop service and close window <span>×</span></button>
       <button class="floating-donate" data-floating-action="donate">Donate stuff <span>♡</span></button>
     </section>
-    <p class="floating-footnote">Foreground service starts automatically when you enter Floating Mode and keeps an ongoing notification visible while the floating session is active.</p>
+    <p class="floating-footnote">Foreground service starts automatically when you enter Floating Mode and keeps an ongoing notification visible while the floating session is active.</p>\n    <div class="developer-credit"><strong>神Neru | Eru</strong><em>The Unfortunate Sleeping God</em></div>
   </main>`;
 }

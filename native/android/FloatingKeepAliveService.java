@@ -5,6 +5,12 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.net.NetworkInfo;
 import android.content.pm.ServiceInfo;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -137,6 +143,20 @@ public class FloatingKeepAliveService extends Service {
         }
     }
 
+    private boolean hasValidatedInternet() {
+        ConnectivityManager manager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        if (manager == null) return false;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Network network = manager.getActiveNetwork();
+            if (network == null) return false;
+            NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);
+            return capabilities != null && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED);
+        }
+        NetworkInfo info = manager.getActiveNetworkInfo();
+        return info != null && info.isConnected();
+    }
+
     private void removeBubble() {
         if (bubble != null && bubble.getParent() != null && windowManager != null) {
             try { windowManager.removeViewImmediate(bubble); } catch (Exception ignored) { }
@@ -152,23 +172,63 @@ public class FloatingKeepAliveService extends Service {
 
     private final class KittyBubbleView extends View {
         private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        private final Path head = new Path();
+        private final Bitmap shadow = loadKittyLayer("kitty_shadow");
+        private final Bitmap tail = loadKittyLayer("kitty_tail");
+        private final Bitmap body = loadKittyLayer("kitty_body");
+        private final Bitmap head = loadKittyLayer("kitty_head");
+        private boolean online = hasValidatedInternet();
+        private ConnectivityManager.NetworkCallback networkCallback;
         KittyBubbleView() { super(FloatingKeepAliveService.this); setLayerType(View.LAYER_TYPE_SOFTWARE, null); }
+        private Bitmap loadKittyLayer(String name) {
+            int id = getResources().getIdentifier(name, "drawable", getPackageName());
+            return id == 0 ? null : BitmapFactory.decodeResource(getResources(), id);
+        }
+        private void updateConnectionState() {
+            boolean next = hasValidatedInternet();
+            if (online != next) { online = next; invalidate(); }
+        }
+        @Override protected void onAttachedToWindow() {
+            super.onAttachedToWindow();
+            connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+            updateConnectionState();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && connectivityManager != null) {
+                networkCallback = new ConnectivityManager.NetworkCallback() {
+                    @Override public void onAvailable(Network network) { post(() -> updateConnectionState()); }
+                    @Override public void onLost(Network network) { post(() -> updateConnectionState()); }
+                    @Override public void onCapabilitiesChanged(Network network, NetworkCapabilities caps) { post(() -> updateConnectionState()); }
+                };
+                try { connectivityManager.registerDefaultNetworkCallback(networkCallback); }
+                catch (Exception error) { android.util.Log.w("MerzkavaFloating", "Could not observe network changes", error); }
+            }
+        }
+        @Override protected void onDetachedFromWindow() {
+            if (connectivityManager != null && networkCallback != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                try { connectivityManager.unregisterNetworkCallback(networkCallback); } catch (Exception ignored) { }
+            }
+            networkCallback = null;
+            super.onDetachedFromWindow();
+        }
+        private void drawLayer(Canvas canvas, Bitmap bitmap, float inset) {
+            if (bitmap == null) return;
+            float side = dp(64) - inset * 2f;
+            android.graphics.RectF target = new android.graphics.RectF(inset, inset, inset + side, inset + side);
+            paint.setStyle(Paint.Style.FILL); paint.setAlpha(255);
+            canvas.drawBitmap(bitmap, null, target, paint);
+        }
         @Override protected void onDraw(Canvas canvas) {
             super.onDraw(canvas);
-            float cx = getWidth()/2f, cy = getHeight()/2f, u = Math.min(getWidth(), getHeight())*.39f;
-            paint.setColor(Color.rgb(38,60,54)); canvas.drawCircle(cx,cy,Math.min(cx,cy),paint);
-            head.reset(); head.moveTo(cx-u*.72f,cy-u*.02f); head.lineTo(cx-u*.82f,cy-u*.92f);
-            head.lineTo(cx-u*.22f,cy-u*.52f); head.quadTo(cx,cy-u*.66f,cx+u*.22f,cy-u*.52f);
-            head.lineTo(cx+u*.82f,cy-u*.92f); head.lineTo(cx+u*.72f,cy-u*.02f);
-            head.quadTo(cx+u*.62f,cy+u*.78f,cx,cy+u*.78f); head.quadTo(cx-u*.62f,cy+u*.78f,cx-u*.72f,cy-u*.02f); head.close();
-            paint.setColor(Color.rgb(10,12,11)); canvas.drawPath(head,paint);
-            paint.setColor(Color.rgb(212,175,55));
-            canvas.drawOval(cx-u*.43f,cy+u*.02f,cx-u*.12f,cy+u*.28f,paint);
-            canvas.drawOval(cx+u*.12f,cy+u*.02f,cx+u*.43f,cy+u*.28f,paint);
-            paint.setColor(Color.rgb(24,27,23));
-            canvas.drawCircle(cx-u*.275f,cy+u*.15f,u*.065f,paint);
-            canvas.drawCircle(cx+u*.275f,cy+u*.15f,u*.065f,paint);
+            float cx = getWidth()/2f, cy = getHeight()/2f;
+            float pulse = .72f + .28f * (float)Math.sin(System.currentTimeMillis()/520.0);
+            int ringColor = online ? Color.rgb(226, 184, 82) : Color.rgb(224, 65, 62);
+            paint.setStyle(Paint.Style.STROKE); paint.setStrokeWidth(dp(2.2f));
+            paint.setColor(ringColor); paint.setAlpha((int)(145 + 105 * pulse));
+            paint.setShadowLayer(dp(5), 0, 0, ringColor);
+            canvas.drawCircle(cx, cy, dp(29.5f), paint);
+            paint.clearShadowLayer(); paint.setStyle(Paint.Style.FILL); paint.setAlpha(255);
+            paint.setColor(Color.rgb(29, 35, 29)); canvas.drawCircle(cx, cy, dp(26), paint);
+            drawLayer(canvas, shadow, dp(4)); drawLayer(canvas, tail, dp(4));
+            drawLayer(canvas, body, dp(4)); drawLayer(canvas, head, dp(4));
+            postInvalidateDelayed(48);
         }
     }
 

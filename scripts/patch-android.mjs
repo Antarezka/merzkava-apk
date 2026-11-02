@@ -1,4 +1,4 @@
-import { cp, readFile, readdir, writeFile } from "node:fs/promises";
+import { cp, mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 const root = process.cwd();
@@ -26,6 +26,17 @@ if (!packageName) throw new Error("Could not determine Android application packa
 
 for (const filename of ["FloatingWindowPlugin.java", "FloatingKeepAliveService.java"]) {
   await cp(path.join(root, "native", "android", filename), path.join(packageDirectory, filename));
+}
+
+const kittyDrawableRoot = path.join(androidRoot, "app", "src", "main", "res", "drawable-nodpi");
+await mkdir(kittyDrawableRoot, { recursive: true });
+for (const [source, target] of [
+  ["shadow/kitty-shadow.png", "kitty_shadow.png"],
+  ["ekor/kitty-tail.png", "kitty_tail.png"],
+  ["body/kitty-body.png", "kitty_body.png"],
+  ["kepala/kitty-head.png", "kitty_head.png"]
+]) {
+  await cp(path.join(root, "public", "kitty", source), path.join(kittyDrawableRoot, target));
 }
 
 let patchedActivity = await readFile(mainActivityPath, "utf8");
@@ -66,6 +77,7 @@ if (!manifest.includes("android:launchMode=")) {
 }
 const permissions = [
   "android.permission.SYSTEM_ALERT_WINDOW",
+  "android.permission.ACCESS_NETWORK_STATE",
   "android.permission.FOREGROUND_SERVICE",
   "android.permission.FOREGROUND_SERVICE_SPECIAL_USE",
   "android.permission.POST_NOTIFICATIONS",

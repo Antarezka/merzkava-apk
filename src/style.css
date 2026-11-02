@@ -2459,3 +2459,26 @@ body { color:var(--ui-ink); }
   .lore-detail h2 {font-size:clamp(31px,9vw,43px);}
   .lore-paragraph {grid-template-columns:19px minmax(0,1fr);gap:7px;font-size:12px;}
 }
+
+
+/* Retractable clockwork navigation rail: brass lever stays reachable when folded. */
+.bottom-nav{transition:transform .48s cubic-bezier(.2,.75,.2,1),opacity .3s ease;will-change:transform}
+.app-shell.is-nav-collapsed .bottom-nav{transform:translate(-50%,calc(100% + 12px));opacity:.18;pointer-events:none}
+.nav-toggle-handle{position:fixed;z-index:7;left:50%;bottom:calc(68px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:flex;align-items:center;gap:9px;min-width:94px;min-height:30px;padding:5px 13px;border:1px solid #a78b54;border-bottom:0;border-radius:8px 8px 0 0;background:linear-gradient(180deg,#34463a,#202c25);color:#e8d6a9;box-shadow:0 -4px 16px #0004;letter-spacing:.12em;font:600 9px/1 Georgia,serif;transition:bottom .48s cubic-bezier(.2,.75,.2,1),background .2s ease}
+.nav-toggle-handle:before,.nav-toggle-handle:after{content:"";position:absolute;top:5px;width:3px;height:3px;border-radius:50%;background:#d6b66f;box-shadow:0 0 5px #d6b66f}
+.nav-toggle-handle:before{left:6px}.nav-toggle-handle:after{right:6px}
+.nav-toggle-grip{width:19px;height:3px;border-radius:3px;background:#c7a76a;box-shadow:0 0 6px #c7a76a66}
+.nav-toggle-arrow{font-size:13px;line-height:10px}
+.app-shell.is-nav-collapsed .nav-toggle-handle{bottom:env(safe-area-inset-bottom,0px);border-bottom:1px solid #a78b54;border-radius:8px 8px 0 0}
+.language-preference{display:grid;gap:8px;margin:0 0 16px;padding:14px;border:1px solid var(--ui-rule);background:var(--ui-paper-raised)}
+.language-preference label{font-size:10px;letter-spacing:.12em;color:var(--ui-brass)}
+.language-preference select{width:100%;min-height:42px;padding:9px 12px;border:1px solid var(--ui-rule);border-radius:3px;background:var(--ui-paper);color:var(--ui-ink);font:inherit}
+.developer-credit{margin:20px 0 8px;padding:14px 10px;border-top:1px solid var(--ui-rule);text-align:center;color:var(--ui-ink-soft);font-size:11px;letter-spacing:.06em}
+.developer-credit strong{display:block;color:var(--ui-brass);font:600 17px Georgia,serif;letter-spacing:.03em}
+.developer-credit em{display:block;margin-top:4px;font:italic 12px Georgia,serif}
+:root[data-theme="dark"] .language-preference{border-color:#536052;background:#29352e}
+:root[data-theme="dark"] .language-preference label{color:#d0b77e}
+:root[data-theme="dark"] .language-preference select{border-color:#536052;background:#202923;color:#e8dfcf}
+:root[data-theme="dark"] .developer-credit{border-color:#536052;color:#bdc1b0}
+@media(max-width:600px){.app-shell.is-nav-collapsed .storage-status{bottom:calc(14px + env(safe-area-inset-bottom,0px))}.nav-toggle-handle{bottom:calc(70px + env(safe-area-inset-bottom,0px))}}
+@media(prefers-reduced-motion:reduce){.bottom-nav,.nav-toggle-handle{transition:none}}

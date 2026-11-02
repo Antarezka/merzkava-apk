@@ -21,6 +21,7 @@ import { GatewayGMProvider, isGMGatewayConfigured } from "./convo/engine/gateway
 import { getLedgerLog, initializeLedgerNotifications, showLedgerProposalBubble } from "./ui/ledger-log";
 import { startFloatingMode, requestFloatingOverlayPermission, getFloatingReadiness, requestFloatingNotifications, requestFloatingBatteryExemption, showFloatingBubble, stopFloatingService, type FloatingReadiness } from "./native/floating-window";
 import { floatingControlMarkup } from "./app/floating-control";
+import { getLanguage, languagePanelMarkup, translateLabel, translateRenderedContent, setLanguage, type AppLanguage } from "./i18n";
 import { animateOpeningSplash, animateSplashCurtain } from "./ui/splash-animation";
 import { animateAppScreen } from "./ui/app-shell-motion";
 import { closeLoreEntry, closeLoreSource, closeLorePlaceholder, openLoreEntry, openLoreSource, openLorePlaceholder, setLoreCategory, setLoreSearch, renderLoreResults } from "./world-archive/lore-library";
@@ -33,6 +34,9 @@ const root = app;
 type ThemeMode = "light" | "dark";
 const THEME_STORAGE_KEY = "merzkava-theme-mode";
 const SOUND_STORAGE_KEY = "merzkava-sound-enabled";
+const NAV_COLLAPSED_STORAGE_KEY = "merzkava-nav-collapsed";
+let currentLanguage: AppLanguage = getLanguage();
+let navigationCollapsed = readPreference(NAV_COLLAPSED_STORAGE_KEY, "false") === "true";
 function readPreference(key: string, fallback: string): string {
   try { return localStorage.getItem(key) ?? fallback; } catch { return fallback; }
 }
@@ -474,20 +478,21 @@ function render(): void {
     : null);
   const inventorySnapshot = currentProfile ? { inventory: currentProfile.profile.fields.Inventory, assets: currentProfile.profile.fields["Assets Bangunan"], wallet: currentProfile.profile.fields["Wallet (wealth)"] } : undefined;
   const content = isControl
-    ? floatingControlMarkup(floatingReadiness)
+    ? floatingControlMarkup(floatingReadiness, currentLanguage)
     : renderScreen(activeScreen as ScreenId, availableCharacters(), playerRegistryMessage, activeCharacterId ? getLedgerLog(activeCharacterId) : [], inventorySnapshot);
   const previousNavigation = root.querySelector<HTMLElement>(".nav-roulette-track");
   if (previousNavigation) savedNavigationScrollLeft = previousNavigation.scrollLeft;
-  root.innerHTML = `<div class="app-shell ${isControl ? "control-shell" : ""} ${menuRevealPending ? "is-entering" : ""}">
+  root.innerHTML = `<div class="app-shell ${isControl ? "control-shell" : ""} ${menuRevealPending ? "is-entering" : ""} ${navigationCollapsed ? "is-nav-collapsed" : ""}">
     ${isControl ? "" : `<header class="app-header"><button class="brand" data-screen="home" aria-label="Merzkava home"><span class="brand-mark">M</span><span class="brand-wordmark"><small>MERZKAVA UNIVERSE</small><strong>Merzkava</strong></span></button><div class="header-context"><small>TACTICAL ACADEMY</small><strong>${navigation.find(item => item.id === activeScreen)?.label ?? "Command Hall"}</strong></div><div class="header-tools"><button class="header-settings" data-floating-action="start-bubble" aria-label="Start Bubble Mode" title="Start Bubble Mode">◉</button><button class="header-settings" data-screen="settings" aria-label="Settings">⚙</button></div></header>`}
     ${notice ? `<p class="notice" role="status">${escapeHtml(notice)}</p>` : ""}
-    ${isControl ? content : `<main class="main-content">${content}${activeScreen === "settings" ? authPanel() + canonPanel() : ""}</main>`}
-    ${isControl ? "" : `<nav class="bottom-nav" aria-label="Academy navigation"><span class="nav-cable nav-cable-left" aria-hidden="true"></span><span class="nav-cable nav-cable-right" aria-hidden="true"></span><div class="nav-roulette-track">${navigation.map((item, index) => `<button class="nav-item ${activeScreen === item.id ? "active" : ""}" data-screen="${item.id}" ${activeScreen === item.id ? 'aria-current="page"' : ""}><span class="nav-item-motion"><span class="nav-index">${String(index + 1).padStart(2, "0")}</span><span class="nav-rotor" aria-hidden="true"><span class="nav-rotor-mark"></span><span class="nav-rotor-grip" data-nav-rotor="${item.id}"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="21" fill="none" stroke="transparent" stroke-width="7" pointer-events="stroke"/></svg></span><span class="nav-icon-frame nav-icon-frame-${item.id}"><span class="nav-icon"><span class="nav-icon-art">${item.icon}</span></span></span></span><small>${item.label}</small></span></button>`).join("")}</div></nav>`}
+    ${isControl ? content : `<main class="main-content">${activeScreen === "settings" ? languagePanelMarkup(currentLanguage) : ""}${content}${activeScreen === "settings" ? authPanel() + canonPanel() : ""}</main>`}
+    ${isControl ? "" : `<nav class="bottom-nav" aria-label="Academy navigation"><span class="nav-cable nav-cable-left" aria-hidden="true"></span><span class="nav-cable nav-cable-right" aria-hidden="true"></span><div class="nav-roulette-track">${navigation.map((item, index) => `<button class="nav-item ${activeScreen === item.id ? "active" : ""}" data-screen="${item.id}" ${activeScreen === item.id ? 'aria-current="page"' : ""}><span class="nav-item-motion"><span class="nav-index">${String(index + 1).padStart(2, "0")}</span><span class="nav-rotor" aria-hidden="true"><span class="nav-rotor-mark"></span><span class="nav-rotor-grip" data-nav-rotor="${item.id}"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="21" fill="none" stroke="transparent" stroke-width="7" pointer-events="stroke"/></svg></span><span class="nav-icon-frame nav-icon-frame-${item.id}"><span class="nav-icon"><span class="nav-icon-art">${item.icon}</span></span></span></span><small>${translateLabel(item.label, currentLanguage)}</small></span></button>`).join("")}</div></nav><button class="nav-toggle-handle" type="button" data-nav-toggle aria-expanded="${!navigationCollapsed}" aria-label="${translateLabel(navigationCollapsed ? "Show toolbar" : "Hide toolbar", currentLanguage)}" title="${translateLabel(navigationCollapsed ? "Show toolbar" : "Hide toolbar", currentLanguage)}"><span class="nav-toggle-grip" aria-hidden="true"></span><span class="nav-toggle-label">${translateLabel(navigationCollapsed ? "Show toolbar" : "Hide toolbar", currentLanguage)}</span><span class="nav-toggle-arrow" aria-hidden="true">${navigationCollapsed ? "⌃" : "⌄"}</span></button>`}
     ${isControl ? "" : `<div class="storage-status"><span class="status-dot"></span>${databaseMessage}</div>`}
     ${activeScreen === "gameplay" ? snapshotBlindMarkup() : ""}
     ${activeScreen === "home" && noticeboardVisible ? noticeboardMarkup() : ""}
     ${bugPanelMarkup()}
   </div>`;
+  translateRenderedContent(root, currentLanguage);
   // Preserve the rail's manual roulette offset and each independent mechanical dial angle across rerenders.
   const renderedNavigation = root.querySelector<HTMLElement>(".nav-roulette-track");
   if (renderedNavigation) {
@@ -769,6 +774,13 @@ root.addEventListener("keydown", event => {
 root.addEventListener("click", async (event: MouseEvent) => {
   const target = event.target;
   if (!(target instanceof Element)) return;
+  if (target.closest("[data-nav-toggle]")) {
+    navigationCollapsed = !navigationCollapsed;
+    try { localStorage.setItem(NAV_COLLAPSED_STORAGE_KEY, String(navigationCollapsed)); } catch { /* Keep the control available for this session. */ }
+    playClockworkRatchet();
+    render();
+    return;
+  }
   const activeEternalModal=root.querySelector<HTMLElement>(".expedition-choice-modal:not([hidden])");
   if(activeEternalModal && !target.closest(".expedition-choice-modal")) return;
   if (event.detail !== 0 && suppressNextPointerClick) {
@@ -1195,6 +1207,11 @@ root.addEventListener("input", event => {
 
 root.addEventListener("change", event => {
   const target = event.target;
+  if (target instanceof HTMLSelectElement && target.matches("[data-language-select]")) {
+    currentLanguage = setLanguage(target.value);
+    render();
+    return;
+  }
   if (target instanceof HTMLSelectElement && target.id === "gameplay-character") {
     loadCharacterWorldTime(target.value);
     loadCharacterChat(target.value);
