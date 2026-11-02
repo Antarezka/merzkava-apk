@@ -1084,14 +1084,6 @@ root.addEventListener("click", async (event: MouseEvent) => {
 
   const refreshPlayersButton = target.closest<HTMLButtonElement>("[data-refresh-players]");
   if (refreshPlayersButton && !playerRegistryBusy) { await refreshPlayerRegistry(); return; }
-  if (target.closest("[data-open-floating-control]")) {
-    await refreshFloatingReadiness();
-    activeScreen = "control";
-    notice = "";
-    render();
-    return;
-  }
-
   const floatingStartButton = target.closest<HTMLButtonElement>("[data-floating-start]");
   if (floatingStartButton) {
     floatingStartButton.disabled = true;
