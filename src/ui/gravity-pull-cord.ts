@@ -32,7 +32,8 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
     const x = clamp(dx, -72, 72);
     const y = clamp(vertical, -70, 112);
     const endX = 27 + x;
-    const endY = 142 + y;
+    // Attach to the center of the upper clasp, 7px below the handle top.
+    const endY = 118 + y;
     const c1x = 27 + x * 0.18;
     const c2x = 27 + x * 0.82;
     const curve = `M 27 5 C ${c1x} 48, ${c2x} ${endY - 42}, ${endX} ${endY}`;
