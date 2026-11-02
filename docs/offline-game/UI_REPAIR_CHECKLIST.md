@@ -6,19 +6,21 @@
 **Scope:** Shared app navigation plus Eternal Path Scene Window, Save Manager and narrative presentation.
 **Rule:** Keep this as a checklist and evidence log. Do not mark an item complete from CSS intent or a passing unit test alone; Android device verification is required.
 
-## UI-EP-002 — Toolbar position drift
+## UI-EP-002 — Toolbar position drift (preserve Anime.js + roulette)
 
-**Observed:** The toolbar/navigation rail still moves from its expected position in the latest user-tested build. A previous fix was recorded in the roadmap, but the regression persists.
+**Observed:** The toolbar/navigation rail still moves from its expected position in the latest user-tested build. A previous fix was recorded in the roadmap, but the regression persists. **Do not remove toolbar animation or roulette navigation.** Keep Anime.js entrance/stagger, active-item feedback and horizontal roulette-style navigation. The fixed rail must not move as a side effect of those animations.
 
 ### Investigation checklist
 - [ ] Reproduce on the latest branch-head APK and record screen, route, device width, orientation and exact interaction sequence.
 - [ ] Inspect the actual rendered DOM: identify the toolbar's containing block and every ancestor with transform, filter, perspective, contain, will-change, animation or overflow clipping.
-- [ ] Verify route-transition animation does not transform the app-shell ancestor that owns the fixed toolbar.
+- [ ] Keep `.bottom-nav` fixed and apply Anime.js entrance motion to each `.nav-item-motion` inner wrapper (opacity + translateY + stagger), never to the rail's own centering/positioning transform.
+- [ ] Preserve roulette-style horizontal navigation, user-driven scroll/snap and the Anime.js active-item/hover feedback.
+- [ ] Ensure active-item animation and user scrolling do not modify the toolbar's fixed `left`/`bottom` anchor or reset `scrollLeft`.
 - [ ] Verify screen changes do not recreate the toolbar at a different scroll offset or invoke automatic scrollIntoView/focus scrolling.
 - [ ] Verify toolbar remains viewport-anchored when switching Home → Convo → Eternal Path → Archive → Settings and when returning.
 - [ ] Verify manual horizontal swipe still works and route selection does not change the rail's scroll position.
 - [ ] Verify safe-area insets and Android gesture margins on narrow screens.
-- [ ] Add regression tests for transformed ancestors, route switching, stable scroll position and viewport anchoring.
+- [ ] Add regression tests for fixed-rail vs inner-wrapper transform isolation, route switching, stable scroll position and viewport anchoring.
 - [ ] Install APK on target Android device and confirm the toolbar no longer moves during repeated route changes.
 - [ ] Attach test evidence (screen recording or screenshots + build SHA) before closing.
 
