@@ -204,3 +204,15 @@ Required tooltip explanations:
 **Concept:** A choice-driven simulation of a character's life in Merzkava, combined with text-RPG exploration, progression, encounters, quests, and cultivation. BitLife is a high-level life-simulation reference; Solo Leveling is a high-level progression/presentation reference. Neither contributes proprietary content or world canon.
 
 The title remains a working title until the owner explicitly locks it and availability/brand checks are completed.
+
+## Mandatory narrative-node anchor and batch contract
+
+The following additional rules apply to every narrative situation/node, including dialogue branches and event variants:
+
+- **Required World Archive anchor:** every node must identify at least one approved, player-safe World Archive dossier that supplies its world context, setting constraints, relevant entities, or lore boundaries. A node with no Archive anchor must not be packaged.
+- **Non-canonical by design:** every authored node is a gameplay scenario, not an official Universe record. Its narrative framing, dialogue, choices, and consequences must not be presented as new canon, even when it references canon entities or facts.
+- **Keep provenance labels unchanged:** continue to use exactly CANON, CANON_ADAPTATION, or IN_GAME_ORIGINAL according to the existing definitions above. Archive anchoring is a separate relationship and must not be used as a substitute provenance value. For IN_GAME_ORIGINAL, an Archive anchor records contextual inspiration/constraints only; it does not claim that the original node itself is supported by canon.
+- **At least two nodes per update:** every update that adds or expands narrative nodes must introduce at least two distinct nodes. A one-node increment is below the required minimum. The previous nine-node starter slice is the initial baseline, not an exception to this rule.
+- **Existing labels/categories remain:** preserve the already planned node labels and categories. Do not rename or remove them when adding Archive anchors.
+
+Recommended node metadata should therefore keep the provenance field and Archive relationship separate, for example archiveAnchors: [{ archiveDossierId: "...", role: "setting-context" }]. The exact dossier ID must resolve to the approved local World Archive package. For IN_GAME_ORIGINAL, do not populate canon sourceRefs merely to satisfy this anchor requirement; use archiveAnchors for contextual linkage and retain the required originalityNote.
