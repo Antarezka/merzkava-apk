@@ -331,7 +331,8 @@ Save generated files using these names:
 | FX-07A | `fx-07a-floating-snow.png` | Optional snow particle texture |
 | FX-07B | `fx-07b-floating-petals.png` | Optional blossom-petal texture |
 | FX-07C | `fx-07c-floating-autumn-leaves.png` | Optional autumn-leaf texture |
-| FX-08 | `fx-08-lightning-flash.png` | Brief lightning texture flash |
+| FX-07A | `fx-07a-window-frost.png` | Edge-masked foreground frost glass during Snow weather |
+| FX-08 | `fx-08-lightning-flash-a.png`, `fx-08-lightning-flash-b.png`, `fx-08-lightning-flash-c.png` | Brief lightning texture flash; cycle variants per flash |
 
 FX-01 Soft Cloud and FX-02 Atmospheric Fog are existing assets; do not regenerate them unless their visual quality is specifically being revised.
 
