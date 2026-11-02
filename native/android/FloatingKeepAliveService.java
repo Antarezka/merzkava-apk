@@ -229,49 +229,57 @@ public class FloatingKeepAliveService extends Service {
             int ringColor = online ? Color.rgb(226, 184, 82) : Color.rgb(224, 65, 62);
             int red = Color.red(ringColor), green = Color.green(ringColor), blue = Color.blue(ringColor);
 
-            // Keep only a quiet circular guide; the bright, broken trail does the chasing.
+            // A thin, dim guide keeps the circle legible without turning it into a full ring.
             paint.setShader(null); paint.setStyle(Paint.Style.STROKE);
-            paint.setStrokeWidth(dp(1.8f)); paint.setColor(ringColor); paint.setAlpha(34);
+            paint.setStrokeWidth(dp(1.4f)); paint.setColor(ringColor); paint.setAlpha(22);
             canvas.drawCircle(cx, cy, dp(29.5f), paint);
 
-            // Ouroboros-like moving trail: most of the circumference stays dark,
-            // with one open gap and a tapered luminous tail chasing its own head.
+            // A short, segmented trail leaves most of the circumference empty.
+            // Its dim tail follows the bright leading tip, creating a chasing Ouroboros.
             float rotation = (now % 2600L) * (360f / 2600f);
-            int tail = Color.argb((int)(38 + 32 * pulse), red, green, blue);
-            int mid = Color.argb((int)(150 + 55 * pulse), red, green, blue);
-            int hot = Color.argb((int)(245 * pulse), 255, 239, 196);
-            SweepGradient sweep = new SweepGradient(cx, cy,
-                new int[] { Color.TRANSPARENT, Color.TRANSPARENT, tail, mid, hot, ringColor, Color.TRANSPARENT },
-                new float[] { 0f, 0.68f, 0.75f, 0.82f, 0.87f, 0.92f, 1f });
-            Matrix sweepRotation = new Matrix();
-            sweepRotation.setRotate(rotation, cx, cy);
-            sweep.setLocalMatrix(sweepRotation);
-            paint.setShader(sweep); paint.setStrokeCap(Paint.Cap.ROUND);
-            paint.setStrokeWidth(dp(3.1f)); paint.setAlpha(255);
-            paint.setShadowLayer(dp(8), 0, 0, ringColor);
-            canvas.drawCircle(cx, cy, dp(29.5f), paint);
-            paint.clearShadowLayer(); paint.setShader(null); paint.setStyle(Paint.Style.FILL);
-
-            // The leading tip flashes like a compact industrial floodlight once per lap.
-            float headAngle = (float)Math.toRadians(rotation + 0.87f * 360f);
-            float hx = cx + (float)Math.cos(headAngle) * dp(29.5f);
-            float hy = cy + (float)Math.sin(headAngle) * dp(29.5f);
-            float flashPhase = (now % 2600L) / 2600f;
-            float flash = flashPhase < .085f ? 1f : (flashPhase < .13f ? .22f : 0f);
-            if (flash > 0f) {
-                int glowCore = Color.argb((int)(210 * flash), 255, 247, 218);
-                int glowEdge = Color.argb((int)(95 * flash), red, green, blue);
-                paint.setShader(new RadialGradient(hx, hy, dp(13),
-                    new int[] { glowCore, glowEdge, Color.TRANSPARENT },
-                    new float[] { 0f, .32f, 1f }, Shader.TileMode.CLAMP));
-                canvas.drawCircle(hx, hy, dp(13), paint);
-                paint.setShader(null);
-                paint.setColor(Color.WHITE); paint.setAlpha((int)(255 * flash));
-                paint.setShadowLayer(dp(10), 0, 0, online ? Color.rgb(255, 222, 137) : Color.rgb(255, 90, 82));
-                canvas.drawCircle(hx, hy, dp(2.7f), paint);
+            float arcSweep = 112f;
+            int segments = 14;
+            paint.setShader(null); paint.setStyle(Paint.Style.STROKE);
+            paint.setStrokeCap(Paint.Cap.ROUND);
+            paint.setStrokeWidth(dp(3.2f));
+            for (int i = 0; i < segments; i++) {
+                float progress = i / (float)(segments - 1);
+                float segmentStart = rotation - arcSweep + progress * arcSweep;
+                float segmentSweep = arcSweep / segments - 1.1f;
+                int alpha = (int)(24 + 196 * progress * progress);
+                paint.setColor(Color.argb(alpha, red, green, blue));
+                paint.setShadowLayer(dp(5.5f * progress), 0, 0, ringColor);
+                canvas.drawArc(cx - dp(29.5f), cy - dp(29.5f),
+                    cx + dp(29.5f), cy + dp(29.5f),
+                    segmentStart, segmentSweep, false, paint);
                 paint.clearShadowLayer();
             }
+            paint.setStyle(Paint.Style.FILL);
 
+            // The leading point passes one fixed beacon position each lap.
+            // A sharp double flash makes it read like an industrial warning lamp.
+            float headAngle = (float)Math.toRadians(rotation);
+            float hx = cx + (float)Math.cos(headAngle) * dp(29.5f);
+            float hy = cy + (float)Math.sin(headAngle) * dp(29.5f);
+            float lapPhase = (now % 2600L) / 2600f;
+            float flash = lapPhase >= .735f && lapPhase < .755f ? 1f
+                : (lapPhase >= .755f && lapPhase < .768f ? .12f
+                : (lapPhase >= .768f && lapPhase < .790f ? .92f : 0f));
+            if (flash > 0f) {
+                int glowCore = Color.argb((int)(238 * flash), 255, 250, 231);
+                int glowEdge = Color.argb((int)(170 * flash), red, green, blue);
+                paint.setShader(new RadialGradient(hx, hy, dp(16),
+                    new int[] { glowCore, glowEdge, Color.TRANSPARENT },
+                    new float[] { 0f, .26f, 1f }, Shader.TileMode.CLAMP));
+                canvas.drawCircle(hx, hy, dp(16), paint);
+                paint.setShader(null);
+            }
+            paint.setColor(Color.WHITE);
+            paint.setAlpha(255);
+            paint.setShadowLayer(dp(11), 0, 0,
+                online ? Color.rgb(255, 224, 142) : Color.rgb(255, 91, 83));
+            canvas.drawCircle(hx, hy, dp(2.8f), paint);
+            paint.clearShadowLayer();
             paint.setColor(Color.rgb(29, 35, 29)); canvas.drawCircle(cx, cy, dp(26), paint);
             drawLayer(canvas, shadow, dp(4)); drawLayer(canvas, tail, dp(4));
             drawLayer(canvas, body, dp(4)); drawLayer(canvas, head, dp(4));
