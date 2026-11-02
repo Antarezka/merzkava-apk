@@ -33,7 +33,6 @@ describe("Eternal Path Anime.js motion",()=>{
   const root={querySelector:vi.fn((selector:string)=>selectors[selector]??null),querySelectorAll:vi.fn(()=>[])} as unknown as HTMLElement;
   mountExpeditionAnimations(root);
   expect(mocks.animate).toHaveBeenCalledWith(sun,expect.objectContaining({duration:15000,alternate:true}));
-  expect(mocks.animate).toHaveBeenCalledWith(moon,expect.objectContaining({duration:19000,alternate:true}));
   expect(mocks.animate).toHaveBeenCalledWith(rays,expect.objectContaining({duration:28000,alternate:true}));
   expect(mocks.animate).toHaveBeenCalledWith(rain,expect.objectContaining({duration:2600,alternate:true}));
   const flash=mocks.animate.mock.calls.find(call=>call[0]===lightning);
@@ -49,6 +48,24 @@ describe("Eternal Path Anime.js motion",()=>{
   mountExpeditionAnimations(root);
   expect(mocks.animate).toHaveBeenCalledWith(snow,expect.objectContaining({duration:11500,alternate:true}));
   expect(mocks.animate).toHaveBeenCalledWith(frost,expect.objectContaining({duration:12500,alternate:true}));
+ });
+ it("animates moonlight only at Night and seasonal plates only in their matching cycle",()=>{
+  const night={dataset:{weather:"Clear",cycle:"Night"}};
+  const moon={},moonImage={};
+  const nightRoot={querySelector:vi.fn((selector:string)=>({".expedition-environment":night,".expedition-moon-glow":moon,".expedition-moon-glow-image":moonImage}[selector]??null)),querySelectorAll:vi.fn(()=>[])} as unknown as HTMLElement;
+  mountExpeditionAnimations(nightRoot);
+  expect(mocks.animate).toHaveBeenCalledWith(moon,expect.objectContaining({duration:11800,alternate:true}));
+  expect(mocks.animate).toHaveBeenCalledWith(moonImage,expect.objectContaining({duration:19000,alternate:true}));
+  vi.clearAllMocks();
+  const dawn={dataset:{weather:"Clear",cycle:"Dawn"}},petal={};
+  const dawnRoot={querySelector:vi.fn((selector:string)=>({".expedition-environment":dawn,".expedition-petal-texture":petal}[selector]??null)),querySelectorAll:vi.fn(()=>[])} as unknown as HTMLElement;
+  mountExpeditionAnimations(dawnRoot);
+  expect(mocks.animate).toHaveBeenCalledWith(petal,expect.objectContaining({duration:18000,alternate:true}));
+  vi.clearAllMocks();
+  const dusk={dataset:{weather:"Clear",cycle:"Dusk"}},leaf={};
+  const duskRoot={querySelector:vi.fn((selector:string)=>({".expedition-environment":dusk,".expedition-leaf-texture":leaf}[selector]??null)),querySelectorAll:vi.fn(()=>[])} as unknown as HTMLElement;
+  mountExpeditionAnimations(duskRoot);
+  expect(mocks.animate).toHaveBeenCalledWith(leaf,expect.objectContaining({duration:21000,alternate:true}));
  });
  it("does not animate when reduced motion is requested",()=>{
   mocks.scope.add.mockImplementation((setup:(self:{matches:{reduceMotion:boolean}})=>void)=>{setup({matches:{reduceMotion:true}});return mocks.scope;});
