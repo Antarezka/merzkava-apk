@@ -54,7 +54,7 @@ export interface EternalDialogue {
   sourceRefs: {archiveDossierId:string;universeRepository:string;universeCommit:string;sourcePath:string}[];
   choices: [EternalChoice, EternalChoice];
 }
-/** Legacy save counters remain for schema compatibility and are normalized to zero. */
+/** Legacy event counters remain in old saves for migration compatibility but are ignored by the retired story runtime. */
 export interface EternalSave {
   schemaVersion:3; saveId:string; saveName:string; createdAt:string; updatedAt:string;
   manifest:{universeRepository:string;universeCommit:string;contentPackVersion:string;deterministicSeed:string};
@@ -136,7 +136,7 @@ function normalizeSave(value:unknown):EternalSave|null {
     hour:Number.isInteger(parsed.hour)&&Number(parsed.hour)>=0&&Number(parsed.hour)<24?Number(parsed.hour):8,
     minute:Number.isInteger(parsed.minute)&&Number(parsed.minute)>=0&&Number(parsed.minute)<60?Number(parsed.minute):0,
     weather:resolveDailyWeather(region,Number(parsed.day)||1),
-    eventIndex:0,energy:Math.max(0,Math.min(100,Number(parsed.energy)||0)),insight:Math.max(0,Number(parsed.insight)||0),bonds:Math.max(0,Number(parsed.bonds)||0),completed:0,
+    eventIndex:Number(parsed.eventIndex)||0,energy:Math.max(0,Math.min(100,Number(parsed.energy)||0)),insight:Math.max(0,Number(parsed.insight)||0),bonds:Math.max(0,Number(parsed.bonds)||0),completed:Math.max(0,Number(parsed.completed)||0),
   } as EternalSave;
 }
 function ensureLegacyMigration():EternalSaveSlot[] {
