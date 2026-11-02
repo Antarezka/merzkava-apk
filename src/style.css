@@ -2660,3 +2660,8 @@ body { color:var(--ui-ink); }
 
 /* With the lever detached, restore the navigation items to the dock's true left edge. */
 .bottom-nav>.nav-roulette-track{padding-left:14px!important}
+
+
+/* Keep the detached lever's anchor fixed; Anime.js moves it in sync with the dock and clamps it at the screen edge. */
+.nav-toggle-handle{bottom:calc(7px + env(safe-area-inset-bottom,0px) + 20px)!important;transition:none!important}
+.app-shell.is-nav-collapsed .nav-toggle-handle{bottom:calc(7px + env(safe-area-inset-bottom,0px) + 20px)!important}
