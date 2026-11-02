@@ -1,10 +1,10 @@
 {
   "packageId": "merzkava-eternal-path-prologue",
   "packageVersion": "0.1.0",
-  "status": "APPROVED",
-  "contentType": "dialogue",
-  "dialogueNodeCount": 240,
-  "choicesPerNode": 2,
+  "status": "RETIRED",
+  "contentType": "legacy-dialogue-retired",
+  "dialogueNodeCount": 0,
+  "choicesPerNode": 0,
   "provenance": "IN_GAME_ORIGINAL",
   "sourceRefs": [],
   "originalityNote": "The dialogue is original game writing. The three Archive dossier references supply only the broad regional setting and constraints; they do not make the story events canon.",
@@ -37,7 +37,8 @@
   },
   "limitations": [
     "This is an opening playable slice, not the completed life simulation.",
-    "Full approved World Archive package pinning, travel, quest chains, combat/reward validation, progression and physical-device QA remain pending."
+    "Full approved World Archive package pinning, travel, quest chains, combat/reward validation, progression and physical-device QA remain pending.",
+    "The 0.1.0 dialogue sequence is retired; no story nodes or choices are active until the new Patch-1 system is reviewed and released."
   ],
   "archiveInspirationRefs": [
     {
@@ -58,5 +59,6 @@
       "universeCommit": "2f76a864150528afb0e3d26cb16f9396ce610ff6",
       "sourcePath": "world/REGION_BEIMING_GU.md"
     }
-  ]
+  ],
+  "retirementNote": "The generated 240-entry sequence was retired for repetitive, low-quality writing and removed from the active runtime. Do not reuse it. A new context-aware Patch-1 narrative system is planned."
 }
