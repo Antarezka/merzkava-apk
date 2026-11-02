@@ -64,7 +64,7 @@ describe("Eternal Path isolated journey saves",()=>{
   const slots=listEternalSaves();
   expect(slots).toHaveLength(1);
   expect(slots[0].characterName).toBe("Old Journey");
-  expect(getEternalSave()?.schemaVersion).toBe(3);
+  expect(getEternalSave()?.schemaVersion).toBe(4);
   expect(getEternalSave()?.eventIndex).toBe(4);
   delete (globalThis as {localStorage?:Storage}).localStorage;
  });
