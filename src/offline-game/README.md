@@ -14,7 +14,7 @@ Standalone local game mode inside the same Merzkava APK. Owns deterministic mech
 ## Eternal Path expansion — current implementation checkpoint
 
 - The approved full-game specification and EP-0 to EP-6 delivery phases are documented in [ETERNAL_PATH_BLUEPRINT.md](../../docs/offline-game/ETERNAL_PATH_BLUEPRINT.md); the single master plan remains [PRODUCT_ROADMAP.md](../../docs/PRODUCT_ROADMAP.md).
-- The Eternal Path home is being converted to a compact profile and narrative-first layout. Choices now render in a separate modal with hidden outcomes, input locking, focus handling and Back/Escape dismissal. The app navigation rail has a centered, narrower ornamental treatment with Android side safe margins.
+- The Eternal Path home is being converted to a compact profile and narrative-first layout. The former 240-node choice sequence and its choice modal are retired pending Patch 1; the current journey screen explains that the new story system is planned. The shared app navigation is being rebuilt as a fixed retractable clockwork compartment with function-specific flat emblems, local rotary rings, and Android side gesture clearance.
 - A save-local hidden multi-axis disposition baseline is persisted in schema v2; legacy schema-v1 journeys are migrated without discarding their current game state. Public profile shows only the derived label.
 - This is an initial UI/data foundation, not a completed life simulator. Save slots/export-import, activity simulation, NPC relationships/Social Links, ordinary-life careers, ownership/territory, organizations, family/naming, and integrated progression remain pending. Automated CI and physical Android QA are not yet confirmed for this checkpoint.
 
