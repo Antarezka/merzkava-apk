@@ -1,6 +1,6 @@
 import { animate, stagger } from "animejs";
 
-/** Shared shell transitions. The app shell and fixed navigation rail are never translated so their viewport anchoring cannot drift during route changes. */
+/** Shared shell transitions. The fixed navigation rail stays anchored; Anime.js motion is applied to its inner item wrappers so entrance and roulette interactions never move the rail itself. */
 export function animateAppScreen(shell: HTMLElement | null): void {
   if (!shell || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
   const header = shell.querySelector<HTMLElement>(".app-header");
@@ -17,9 +17,9 @@ export function animateAppScreen(shell: HTMLElement | null): void {
   }
   if (nav) {
     animate(nav, { opacity: [0, 1], duration: 520, delay: 90, ease: "outCubic" });
-    const items = nav.querySelectorAll<HTMLElement>(".nav-item");
+    const items = nav.querySelectorAll<HTMLElement>(".nav-item-motion");
     if (items.length) {
-      animate(items, { opacity: [0, 1], duration: 340, delay: stagger(32, { start: 150 }), ease: "outQuad" });
+      animate(items, { opacity: [0, 1], translateY: [9, 0], duration: 380, delay: stagger(38, { start: 150 }), ease: "outBack" });
       items.forEach(item => {
         const enter=()=>animate(item,{scale:[1,1.055],duration:160,ease:"outQuad"});
         const leave=()=>animate(item,{scale:[1.055,1],duration:190,ease:"outQuad"});
