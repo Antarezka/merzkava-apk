@@ -54,13 +54,16 @@ function mountSceneParticles(root: HTMLElement): () => void {
   };
 
   const destroyRenderer = () => {
-    if (!pixiApp || !initialized) return;
-    try {
-      pixiApp.ticker.stop();
-      pixiApp.destroy({ removeView: true }, { children: true, texture: true, textureSource: true });
-    } catch { /* The WebView may already have reclaimed its graphics context. */ }
+    if (!pixiApp) return;
+    const app = pixiApp;
     pixiApp = null;
+    const wasInitialized = initialized;
     initialized = false;
+    try {
+      if (wasInitialized) app.ticker.stop();
+      // Also attempt cleanup when Application.init() rejects partway through.
+      app.destroy({ removeView: true }, { children: true, texture: true, textureSource: true });
+    } catch { /* The WebView may already have reclaimed its graphics context. */ }
   };
 
   const onVisibilityChange = () => {
