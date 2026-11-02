@@ -36,7 +36,7 @@ All scene effects are dedicated layers inside `.expedition-environment`, clipped
 
 **Transparency fallback — preserve this exact method:** when Gemini or another generator cannot produce dependable RGBA alpha, export the effect as a PNG on a pure black `#000000` field and apply CSS `mix-blend-mode: screen` to its isolated overlay layer. This is the same compositing method used by the atmospheric fog plate. Black visually disappears while the brighter fog/cloud/light detail remains. True RGBA is optional, not a blocker. Never move this layer outside the clipped Scene Window.
 
-The stack now includes FX-01 clouds, FX-02 fog, procedural sun and moon glow, light rays, weather texture/particles, and lightning. Anime.js drives cloud/fog drift, glow/ray breathing, rain/snow/seasonal particle movement, and lightning flashes. CSS owns blending, masks, gradients, and particle appearance. Animation remains presentation-only and is cleaned up with the scoped mount lifecycle. No global fog or scene FX overlay is used.
+The stack mounts FX-01 clouds and FX-02 fog plus the uploaded FX-03 sun glow, FX-04 moon glow, FX-05 volumetric rays, FX-06 rain streaks, FX-07A snow and window frost, FX-07B petals, FX-07C leaves, and FX-08 lightning variants A/B/C. Every plate is an isolated Screen-blended layer inside the clipped Scene Window. Anime.js uses separate motion profiles: slow cloud/fog drift; warm sun and cool moon breathing; very slow ray drift; faster downward rain streaks; slow falling snow; gentle petal/leaf drift and rotation; edge-frost breathing; and brief, infrequent lightning flashes that cycle through A/B/C. Existing procedural rain/snow particles and CSS fallback treatments remain layered in place. CSS owns compositing, masks, gradients, and static fallback appearance. Animation remains presentation-only and is cleaned up with the scoped mount lifecycle. No global fog or scene FX overlay is used.
 
 ## 3. Current implementation
 
@@ -45,11 +45,13 @@ The stack now includes FX-01 clouds, FX-02 fog, procedural sun and moon glow, li
 | Expedition heading and panels | Staggered opacity/vertical entrance | Implemented |
 | FX-01 soft clouds | Screen-blended image layer with slow Anime.js drift | Implemented |
 | FX-02 atmospheric fog | Black-background Screen blend; slow texture movement inside the live opacity layer | Implemented |
-| FX-03 sun / FX-04 moon glow | Cycle-aware radial glow with Anime.js breathing | Procedural implementation |
-| FX-05 light rays | Masked conic-gradient layer with slow Anime.js drift | Procedural implementation |
-| FX-06 rain | Rain streak surface plus Anime.js particles | Procedural implementation |
-| FX-07 snow / petals / leaves | Anime.js particles selected by weather/day-cycle presentation | Procedural implementation |
-| FX-08 lightning | Infrequent procedural flash during Rain weather | Procedural implementation |
+| FX-03 sun glow | Uploaded Screen-blended image; slow breathing/drift in Dawn–Dusk | Image mounted; Android QA pending |
+| FX-04 moon glow | Uploaded Screen-blended image; slower breathing at Night | Image mounted; Android QA pending |
+| FX-05 volumetric rays | Uploaded Screen-blended image; slow daylight drift | Image mounted; Android QA pending |
+| FX-06 rain streaks | Uploaded Screen-blended streak plate plus procedural particles | Image mounted; Android QA pending |
+| FX-07A snow / window frost | Snow plate and edge-masked foreground frost with separate motion | Images mounted; Android QA pending |
+| FX-07B petals / FX-07C leaves | Separate seasonal plates with gentle drift and rotation | Images mounted; Android QA pending |
+| FX-08 lightning | Three image variants cycled during brief Rain-weather flashes | Images mounted; Android QA pending |
 | Scene location | Persisted world location, independent from dialogue metadata | Implemented |
 | Day-cycle lighting | Derived from local world clock | Implemented |
 | Regional atmosphere | Region-specific light treatment | First slice implemented |
@@ -73,7 +75,7 @@ The stack now includes FX-01 clouds, FX-02 fog, procedural sun and moon glow, li
 Automated tests cover scoped targeting, animation cleanup, reduced-motion behavior, live location binding, world-clock lighting, and daily weather independence from dialogue count.
 
 Still required:
-- Confirm all 26 registered scenery PNG paths, crop, Screen-blended overlays, live fog visibility, text contrast, and particle density on a physical Android device.
+- Confirm all 26 registered scenery PNG paths, every FX-01–FX-08 image plate, black-background Screen compositing, frost edge mask, live fog visibility, text contrast, and particle density on a physical Android device.
 - Confirm a future travel action changes the persisted location and scene together.
 - Confirm time advancement from non-dialogue activities changes the day-cycle without changing dialogue progress.
 - Confirm weather changes on world-day transitions, not after a fixed number of dialogue choices.
