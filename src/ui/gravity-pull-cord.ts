@@ -20,13 +20,14 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
   const getParts = () => ({
     cord: root.querySelector<HTMLElement>("[data-gravity-cord]"),
     line: root.querySelector<SVGPathElement>("[data-cord-line]"),
+    highlight: root.querySelector<SVGPathElement>("[data-cord-highlight]"),
     handle: root.querySelector<HTMLButtonElement>("[data-cord-handle]")
   });
 
   // All geometry is derived from the same endpoint: the jewel's center.
   // Positive dx always means right on screen; negative dx always means left.
   const drawCord = (dx: number, vertical: number): void => {
-    const { line, handle } = getParts();
+    const { line, highlight, handle } = getParts();
     if (!line || !handle) return;
     const x = clamp(dx, -72, 72);
     const y = clamp(vertical, -70, 112);
@@ -34,7 +35,9 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
     const endY = 142 + y;
     const c1x = 27 + x * 0.18;
     const c2x = 27 + x * 0.82;
-    line.setAttribute("d", `M 27 5 C ${c1x} 48, ${c2x} ${endY - 42}, ${endX} ${endY}`);
+    const path = `M 27 5 C ${c1x} 48, ${c2x} ${endY - 42}, ${endX} ${endY}`;
+    line.setAttribute("d", path);
+    highlight?.setAttribute("d", path);
     handle.style.top = `${111 + y}px`;
     handle.style.left = `${x}px`;
   };
