@@ -939,8 +939,8 @@ button {color:inherit;} button:focus-visible {outline-color:#a68d5e;}
   position:relative;
   isolation:isolate;
   width:min(100% - 28px,860px);
-  padding-top:max(12px,env(safe-area-inset-top));
-  padding-bottom:calc(112px + env(safe-area-inset-bottom));
+  padding-top:0;
+  padding-bottom:0;
 }
 .app-shell:not(.control-shell)::before {
   position:fixed;
