@@ -58,7 +58,8 @@ export function animateAppScreen(shell: HTMLElement | null, options: { menuToggl
 
   if (header) animate(header, { opacity: [0, 1], translateY: [-8, 0], duration: 390, ease: "outCubic" });
   if (content) {
-    const panels = content.querySelectorAll<HTMLElement>(":scope > *");
+    const panels = Array.from(content.querySelectorAll<HTMLElement>(":scope > *"))
+      .filter(panel => !panel.matches(".dusty-letter, .language-preference, .developer-credit"));
     panels.forEach((panel, index) => animate(panel, {
       opacity: [0, 1],
       ...(panel.classList.contains("expedition-page") ? {} : { translateY: [13, 0] }),
