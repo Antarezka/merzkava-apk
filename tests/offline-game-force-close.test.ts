@@ -16,7 +16,7 @@ afterEach(()=>{
 });
 
 describe("Eternal Path forced-close recovery",()=>{
-  it("restores the active journey and its latest choice after a process-style module restart",async()=>{
+  it("restores the active journey without replaying retired story choices after a process-style module restart",async()=>{
     const storage=createPersistentStorage();
     vi.stubGlobal("localStorage",storage);
     const firstBoot=await import("../src/offline-game/expedition-game");
@@ -26,9 +26,11 @@ describe("Eternal Path forced-close recovery",()=>{
     const saveId=before!.saveId;
 
     firstBoot.chooseEternalOption(1);
+    firstBoot.advanceEternalWorldTime(30);
     const afterChoice=firstBoot.getEternalSave()!;
-    expect(afterChoice.eventIndex).toBe(1);
-    expect(afterChoice.completed).toBe(1);
+    expect(afterChoice.eventIndex).toBe(0);
+    expect(afterChoice.completed).toBe(0);
+    expect(afterChoice.minute).toBe(30);
 
     // Simulate Android force-stop: the JavaScript module is discarded, while
     // native-backed localStorage remains intact. No graceful unload is called.
@@ -38,8 +40,10 @@ describe("Eternal Path forced-close recovery",()=>{
     expect(restored).toMatchObject({
       saveId,
       character:{name:"Nafila",age:14,region:"golden-dragon-empire"},
-      eventIndex:1,
-      completed:1,
+      eventIndex:0,
+      completed:0,
+      hour:8,
+      minute:30,
       disposition:{label:"True Neutral"},
     });
   });
