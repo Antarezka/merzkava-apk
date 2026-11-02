@@ -6,43 +6,23 @@ type CordOptions = {
 };
 
 const clamp = (value: number, min: number, max: number): number => Math.max(min, Math.min(max, value));
+const randomBetween = (min: number, max: number): number => min + Math.random() * (max - min);
 
 /**
- * Main-menu-only gravity cord. The cord has a fixed length and no hitbox;
- * only its gold terminal accepts touch or drag input.
+ * Main-menu-only magical pull cord. No device sensors are used.
+ * The cord body is decorative/non-interactive; only its terminal receives input.
  */
 export function initializeGravityPullCord(root: HTMLElement, options: CordOptions): void {
   let active: { pointerId: number; startX: number; startY: number; handle: HTMLButtonElement } | null = null;
   let suppressClick = false;
-  let lastAngle = 0;
-  let running = false;
-  let hasMotionData = false;
+  let idleAngle = 0;
 
-  const setAngle = (angle: number): void => {
-    lastAngle = clamp(angle, -32, 32);
-    const cord = root.querySelector<HTMLElement>("[data-gravity-cord]");
-    if (cord) cord.style.setProperty("--cord-angle", `${lastAngle}deg`);
-  };
-
-  const onMotion = (event: DeviceMotionEvent): void => {
-    const gravity = event.accelerationIncludingGravity;
-    if (!gravity || gravity.x === null || gravity.y === null) return;
-    hasMotionData = true;
-    const angle = Math.atan2(-gravity.x, Math.max(1.2, Math.abs(gravity.y))) * 180 / Math.PI;
-    setAngle(angle * 0.9);
-  };
-
-  const onOrientation = (event: DeviceOrientationEvent): void => {
-    if (hasMotionData || event.gamma === null) return;
-    setAngle(event.gamma * 0.42);
-  };
-
-  const enableSensor = (): void => {
-    if (running) return;
-    running = true;
-    window.addEventListener("devicemotion", onMotion, { passive: true });
-    window.addEventListener("deviceorientation", onOrientation, { passive: true });
-  };
+  const getParts = () => ({
+    cord: root.querySelector<HTMLElement>("[data-gravity-cord]"),
+    line: root.querySelector<HTMLElement>("[data-cord-line]"),
+    handle: root.querySelector<HTMLButtonElement>("[data-cord-handle]"),
+    ornament: root.querySelector<HTMLElement>(".gravity-cord-jewel")
+  });
 
   const play = (file: string, volume = 0.78): void => {
     let enabled = true;
@@ -55,8 +35,20 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
     void audio.play().catch(error => console.warn("Gravity cord audio could not play:", error));
   };
 
+  const returnCord = (delay = 0): void => {
+    window.setTimeout(() => {
+      const { line, handle } = getParts();
+      if (!line || !handle) return;
+      const currentHeight = Math.max(118, line.getBoundingClientRect().height);
+      const currentTop = Math.max(111, Number.parseFloat(handle.style.top) || 111);
+      animate(line, { height: [currentHeight, 118], duration: 690, ease: "outElastic(1, .52)" });
+      animate(handle, { top: [currentTop, 111], duration: 690, ease: "outElastic(1, .52)" });
+    }, delay);
+  };
+
   const animateDock = (wasCollapsed: boolean, done: () => void): void => {
     const dock = root.querySelector<HTMLElement>(".app-shell .bottom-nav");
+    const track = dock?.querySelector<HTMLElement>(".nav-roulette-track");
     const handle = root.querySelector<HTMLElement>("[data-cord-handle]");
     if (!dock || !handle) { done(); return; }
 
@@ -65,12 +57,14 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
     const to = wasCollapsed ? 0 : distance;
     const duration = 1640;
 
-    dock.style.transform = `translateX(-50%) translateY(${from}px)`;
+    // Dock is centered by left/right auto margins, not translateX(-50%).
+    // Its tiny rattle lives on the inner track, so it cannot destroy centering.
+    dock.style.transform = `translateY(${from}px)`;
     animate(dock, {
       translateY: [
-        { to: from + (to - from) * 0.018, duration: 90, ease: "outQuad" },
-        { to: from - (to - from) * 0.012, duration: 110, ease: "inOutSine" },
-        { to, duration: duration - 200, ease: "inOutCubic" }
+        { to: from + (to - from) * 0.025, duration: 110, ease: "outQuad" },
+        { to: from - (to - from) * 0.012, duration: 150, ease: "inOutSine" },
+        { to, duration: duration - 260, ease: "inOutCubic" }
       ],
       duration,
       onComplete: () => {
@@ -82,23 +76,22 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
       }
     });
 
-    // A short, controlled dock rattle follows the activation clicks.
-    animate(dock, {
+    if (track) animate(track, {
       translateX: [
-        { to: -2, duration: 45, delay: 300, ease: "outQuad" },
-        { to: 2, duration: 55, ease: "inOutSine" },
-        { to: -1, duration: 50, ease: "inOutSine" },
-        { to: 0, duration: 70, ease: "outCubic" }
+        { to: -2.5, duration: 55, delay: 300, ease: "outQuad" },
+        { to: 2.5, duration: 65, ease: "inOutSine" },
+        { to: -1, duration: 55, ease: "inOutSine" },
+        { to: 0, duration: 75, ease: "outCubic" }
       ],
       delay: 300
     });
 
-    const jewel = handle.querySelector<HTMLElement>(".gravity-cord-jewel");
-    if (jewel) animate(jewel, {
-      rotate: wasCollapsed ? [0, -9, 5, 0] : [0, 9, -5, 0],
-      scale: [1, 0.94, 1.06, 1],
-      duration: 520,
-      delay: 180,
+    const ornament = handle.querySelector<HTMLElement>(".gravity-cord-jewel");
+    if (ornament) animate(ornament, {
+      rotate: wasCollapsed ? [0, -13, 7, 0] : [0, 13, -7, 0],
+      scale: [1, 0.9, 1.08, 1],
+      duration: 610,
+      delay: 140,
       ease: "outCubic"
     });
   };
@@ -106,15 +99,20 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
   const trigger = (): void => {
     if (active) return;
     const wasCollapsed = options.isCollapsed();
-    const cord = root.querySelector<HTMLElement>("[data-gravity-cord]");
-    const handle = root.querySelector<HTMLButtonElement>("[data-cord-handle]");
-    if (!cord || !handle) return;
+    const { cord, line, handle } = getParts();
+    if (!cord || !line || !handle) return;
 
     active = { pointerId: -1, startX: 0, startY: 0, handle };
     handle.classList.add("is-pulling");
     play("/audio/Mechanical%20Activation.mp3", 0.76);
 
-    // Activation's opening clicks lead into the toolbar's travel sound.
+    // A visible tug on the cord, followed by a spring-loaded snap back.
+    const currentHeight = Math.max(118, line.getBoundingClientRect().height);
+    const currentTop = Math.max(111, Number.parseFloat(handle.style.top) || 111);
+    animate(line, { height: [currentHeight, currentHeight + 24], duration: 145, ease: "outCubic" });
+    animate(handle, { top: [currentTop, currentTop + 24], duration: 145, ease: "outCubic" });
+    returnCord(170);
+
     window.setTimeout(() => {
       play(wasCollapsed ? "/audio/spring%20return.mp3" : "/audio/toolbar%20fx%20turun.mp3", 0.82);
       animateDock(wasCollapsed, () => {
@@ -124,12 +122,37 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
       });
     }, 330);
 
-    const jewel = handle.querySelector<HTMLElement>(".gravity-cord-jewel");
-    if (jewel) animate(jewel, {
-      rotate: [0, wasCollapsed ? -10 : 10, 0],
-      duration: 360,
+    const ornament = handle.querySelector<HTMLElement>(".gravity-cord-jewel");
+    if (ornament) animate(ornament, {
+      rotate: [0, wasCollapsed ? -17 : 17, 0],
+      scale: [1, 0.88, 1.08, 1],
+      duration: 520,
       ease: "outCubic"
     });
+  };
+
+  // Calm idle breeze: usually a tiny sway, with occasional stronger gusts.
+  const scheduleIdleSway = (): void => {
+    const { cord } = getParts();
+    if (!cord || active) {
+      window.setTimeout(scheduleIdleSway, 650);
+      return;
+    }
+    const gust = Math.random() < 0.16;
+    const amplitude = gust ? randomBetween(4.2, 7.2) : randomBetween(0.7, 2.4);
+    const target = (Math.random() < 0.5 ? -1 : 1) * amplitude;
+    const duration = gust ? randomBetween(700, 1050) : randomBetween(1250, 2100);
+    animate(cord, {
+      rotate: [
+        { to: target, duration, ease: "inOutSine" },
+        { to: 0, duration: duration * randomBetween(0.9, 1.35), ease: "outSine" }
+      ],
+      onComplete: () => {
+        idleAngle = 0;
+        window.setTimeout(scheduleIdleSway, randomBetween(500, gust ? 1500 : 2200));
+      }
+    });
+    idleAngle = target;
   };
 
   root.addEventListener("pointerdown", event => {
@@ -137,12 +160,22 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
     if (!(target instanceof Element)) return;
     const handle = target.closest<HTMLButtonElement>("[data-cord-handle]");
     if (!handle || active || (event.pointerType === "mouse" && event.button !== 0)) return;
-    enableSensor();
     play("/audio/golden%20handle.mp3", 0.62);
     active = { pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, handle };
     handle.classList.add("is-grabbed");
     try { handle.setPointerCapture(event.pointerId); } catch { /* Pointer capture is optional. */ }
   });
+
+  root.addEventListener("pointermove", event => {
+    if (!active || active.pointerId !== event.pointerId) return;
+    const { line, handle, cord } = getParts();
+    if (!line || !handle) return;
+    const extension = clamp(event.clientY - active.startY, 0, 112);
+    const lateral = clamp((event.clientX - active.startX) * 0.12, -9, 9);
+    line.style.height = `${118 + extension}px`;
+    handle.style.top = `${111 + extension}px`;
+    if (cord) cord.style.transform = `rotate(${lateral}deg)`;
+  }, { passive: true });
 
   root.addEventListener("pointerup", event => {
     if (!active || active.pointerId !== event.pointerId) return;
@@ -151,9 +184,13 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
     const dx = event.clientX - active.startX;
     active = null;
     handle.classList.remove("is-grabbed");
-    if (dy < 16 || Math.abs(dy) < Math.abs(dx) * 0.72) return;
+    if (dy < 16 || Math.abs(dy) < Math.abs(dx) * 0.72) {
+      returnCord();
+      const { cord } = getParts();
+      if (cord) animate(cord, { rotate: [idleAngle, 0], duration: 520, ease: "outElastic(1, .55)" });
+      return;
+    }
     suppressClick = true;
-    // Pull downward each time; the dock mechanism reverses based on its current state.
     trigger();
   }, { passive: true });
 
@@ -161,6 +198,9 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
     if (!active || active.pointerId !== event.pointerId) return;
     active.handle.classList.remove("is-grabbed");
     active = null;
+    returnCord();
+    const { cord } = getParts();
+    if (cord) animate(cord, { rotate: [idleAngle, 0], duration: 520, ease: "outElastic(1, .55)" });
   }, { passive: true });
 
   root.addEventListener("click", event => {
@@ -170,9 +210,8 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
     if (!handle) return;
     if (suppressClick) { suppressClick = false; return; }
     if (event.detail !== 0) return;
-    enableSensor();
     trigger();
   });
 
-  enableSensor();
+  window.setTimeout(scheduleIdleSway, 450);
 }
