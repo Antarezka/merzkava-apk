@@ -807,7 +807,7 @@ root.addEventListener("click", async (event: MouseEvent) => {
   const interactive = target.closest(
     "button:not(:disabled), a[href], [role='button'], [role='tab'], [role='menuitem'], input:not([type='hidden']):not(:disabled), select:not(:disabled), textarea:not(:disabled), summary"
   );
-  if (interactive) playButtonSound();
+  if (interactive && !target.closest("[data-cord-handle]")) playButtonSound();
 
   const eternalChoice = target.closest<HTMLButtonElement>("[data-eternal-choice]");
   if (target.closest("[data-eternal-choice-dismiss]")) { const modal=root.querySelector<HTMLElement>("[data-eternal-choice-modal]"); if(modal){animateExpeditionChoiceModal(modal,false,()=>root.querySelector<HTMLButtonElement>("[data-eternal-open-choices]")?.focus());} document.body.classList.remove("eternal-choice-open"); if(history.state?.eternalChoiceModal) history.back(); return; }
