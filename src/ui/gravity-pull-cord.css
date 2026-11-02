@@ -28,8 +28,8 @@
 .gravity-cord-terminal{
   position:absolute;top:111px;left:0;width:54px;height:62px;padding:0;border:0;
   display:grid;place-items:center;background:transparent;pointer-events:auto;touch-action:none;
-  transform:translateX(var(--cord-shift,0px));
-  transition:transform .56s cubic-bezier(.18,.72,.24,1);
+  transform:none;
+  transition:none;
 }
 .gravity-cord-terminal:before{
   content:"";position:absolute;top:0;left:25px;width:4px;height:14px;
