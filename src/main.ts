@@ -704,7 +704,7 @@ root.addEventListener("scroll", event => {
   if (!(nav instanceof HTMLElement) || !nav.matches(".nav-roulette-track")) return;
   savedNavigationScrollLeft = nav.scrollLeft;
   if (!navigationScrollIntent) return;
-  const itemWidth = nav.clientWidth / 4;
+  const itemWidth = nav.querySelector<HTMLElement>(".nav-item")?.offsetWidth ?? nav.clientWidth / 4;
   if (!itemWidth) return;
   const tick = Math.round(nav.scrollLeft / itemWidth);
   if (tick !== lastNavigationTick) {
