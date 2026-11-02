@@ -152,14 +152,31 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 
 ### 3B. Shared interaction and visual system
 
-- [~] Keep the bottom navigation rail anchored to the viewport across every route. The rail itself must not inherit screen-transition transforms; route selection must not auto-shift its horizontal scroll position. Manual horizontal scrolling remains available. **Regression reopened:** the user reports the toolbar still shifts in the latest build. Track under [UI-EP-002](./offline-game/UI_REPAIR_CHECKLIST.md#ui-ep-002-toolbar-position-drift) and [Issue #2](https://github.com/Antarezka/merzkava-apk/issues/2); do not treat the earlier CSS correction as verified.
-- [ ] Add and pass a navigation regression check for route changes, fixed viewport anchoring, scroll position stability, four-visible-item rail on narrow Android screens, inner-wrapper animation isolation, and Android safe-area/gesture margins. Physical-device verification remains required.
+- [~] Replace the plain bottom rail with the **Retractable Victorian Clockwork Compartment**: a sculpted central drawer crown, recessed shoulders, dark verdigris enamel, aged brass trim, and restrained mechanical cable/pulley details. Keep the rail fixed and untransformed; preserve its manual horizontal roulette and scroll offset across route rerenders.
+- [~] The four primary destinations lead the rail in this order: Home (recognizable flat suitcase illustration), Eternal Path (open book), Archive (document/record), and Profile (cameo portrait). Convo, Inventory, Journal, and Settings remain available through manual horizontal scrolling; four destinations remain visible at a time on narrow phones.
+- [~] Each destination has its own function-specific flat editorial emblem in a Reverse: 1999-inspired visual language. Dragging the emblem rotary ring turns only that local mechanism; the central pictogram tilts slightly, while the fixed button coordinate, width, order, and label do not change. Side cables/pulleys respond subtly and ratchet ticks use the existing sound setting.
+- [ ] Verify the 32 CSS-pixel left/right breathing margins plus safe-area insets, stable scroll offset and button coordinates across Home, Convo, Eternal Path, Archive, Profile, theme changes, and rerenders. Physical-device gesture and visual QA remains required. Track under [UI-EP-002](./offline-game/UI_REPAIR_CHECKLIST.md#ui-ep-002-toolbar-position-drift) and [Issue #2](https://github.com/Antarezka/merzkava-apk/issues/2).
 
 - [ ] Define reusable styles for glass panels, image cards, icon buttons, chips, dividers, and navigation controls.
 - [ ] Define consistent interaction feedback: tap, press, selection, loading, success, and failure.
 - [ ] Keep animations purposeful and lightweight; respect reduced-motion/accessibility settings where supported.
 - [ ] Ensure visual controls have semantic labels and adequate touch targets.
 - [ ] Add a visual QA pass across all major screens after shared components change.
+
+### 3C. Retractable Victorian Clockwork Navigation
+
+**Design decision:** The bottom navigation is a shared mechanical compartment, not a flat bar and not a separate toolbar per mode.
+
+- [x] Give the compartment a raised central crown and curved/recessed shoulders, with a dark green lacquer/verdigris surface, antique brass edging, fine engraving, and a restrained Victorian/arcane silhouette.
+- [x] Keep at least 32 CSS px of clear space on both screen edges, plus Android safe-area insets. Cable and pulley details stay inside the compartment boundary and never occupy the edge-gesture zones.
+- [x] Use flat editorial illustrations rather than emoji or generic system glyphs. The first four primary destinations are Home / recognizable travel suitcase, Eternal Path / open book, Archive / document record, and Profile / cameo portrait. Secondary destinations remain reachable by manual roulette swipe.
+- [x] Give each menu item an independent rotary ring. Dragging its ring rotates only that mechanism in place; the central emblem tilts slightly. No item may translate, swap order, resize, or clip during rotation.
+- [x] Couple the side cable/pulley ornament to the active dial movement and use the existing sound preference for restrained mechanical ratchet ticks.
+- [x] Preserve Anime.js entrance/stagger and active-item feedback on inner wrappers only. Keep the fixed rail viewport anchor transform isolated from item animation.
+- [x] Preserve manual horizontal scroll position and each dial rotation angle across route rerenders.
+- [ ] Verify all eight destinations, four-visible-item layout, drag-vs-tap behavior, scroll behavior, theme/mode changes, Android edge gestures, reduced motion, and visual stability on the target device.
+
+**Exit gate:** Four primary menu functions are immediately recognizable, all existing destinations remain reachable, rotation is local and never changes menu geometry, and the dock remains gesture-safe and stable on-device.
 
 **Exit gate:** New visual controls navigate to the right destinations, have meaningful feedback and fallback behavior, and remain readable/performance-safe on target Android devices.
 
@@ -271,7 +288,7 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 - [ ] Choice-driven life simulation: character life stages, background, daily decisions, relationships, education/training, occupations/roles, resources, reputation, and long-term consequences, adapted to Merzkava canon.
 - [ ] Year/season/day progression with events and meaningful decisions; define the time scale so it works with Merzkava's world rules.
 - [ ] Build an event and choice system with varied outcomes and replayability; outcomes must be deterministic/seeded and locally persisted where appropriate.
-- [~] Integrate the framed Scene Window with authoritative Eternal Path world state: persisted `locationId` selects the scene independently from dialogue metadata; the local world clock drives Dawn/Morning/Day/Dusk/Night lighting; deterministic regional weather changes by world day. The registry now includes all 26 existing scenery PNGs across the three powers, Lawless Territories, and Special Locations; only the original eight scene compositions currently have authored dialogue. FX-01 cloud and FX-02 fog use isolated Screen-blended image layers; procedural sun/moon glow, light rays, rain/snow/seasonal particles, and lightning are mounted inside the clipped Scene Window and animated by Anime.js. Black-background `#000000` + `mix-blend-mode: screen` is the documented fallback when RGBA transparency cannot be generated. `advanceEternalWorldTime(minutes)` and `setEternalLocation(sceneId)` remain the state boundaries. Automated regression coverage has been expanded for the 26-scene registry and FX layer mounting; fresh CI and physical Android visual/performance verification remain pending. Character/status cards and full travel/activity systems remain open. See [Animation System](./offline-game/ANIMATION_SYSTEM.md) and [Scene FX Manifest](../public/game/scenery/ASSET_MANIFEST.md).
+- [~] Integrate the framed Scene Window with authoritative Eternal Path world state: persisted `locationId` selects the scene independently from dialogue metadata; the local world clock drives Dawn/Morning/Day/Dusk/Night lighting; deterministic regional weather changes by world day. The registry includes all 26 existing scenery PNGs across the three powers, Lawless Territories, and Special Locations. No legacy dialogue nodes remain active; the new Patch-1 narrative system is planned separately below. FX-01 cloud and FX-02 fog use isolated Screen-blended image layers; procedural sun/moon glow, light rays, rain/snow/seasonal particles, and lightning are mounted inside the clipped Scene Window and animated by Anime.js. Black-background `#000000` + `mix-blend-mode: screen` is the documented fallback when RGBA transparency cannot be generated. `advanceEternalWorldTime(minutes)` and `setEternalLocation(sceneId)` remain the state boundaries. Automated regression coverage has been expanded for the 26-scene registry and FX layer mounting; fresh CI and physical Android visual/performance verification remain pending. Character/status cards and full travel/activity systems remain open. See [Animation System](./offline-game/ANIMATION_SYSTEM.md) and [Scene FX Manifest](../public/game/scenery/ASSET_MANIFEST.md).
 - [ ] Design a self-contained life/adventure loop: character status, daily life, exploration, encounters, progression, and consequences.
 - [ ] Add a System layer inspired by Solo Leveling's presentation: status window, quests/objectives, attributes, titles/achievements, notifications, and progression feedback, using original Merzkava naming, art, lore, and mechanics.
 - [ ] Connect life-simulation choices to the System layer without turning every action into combat or a generic level grind.
@@ -295,6 +312,31 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 - [ ] Measure storage, memory, battery, and performance on target Android hardware.
 
 **Exit gate:** Offline Game can be played end-to-end without internet/login, consumes only its approved versioned World Archive package, saves safely, and remains isolated from connected Convo context and state. Both modes remain discoverable and usable within the same APK.
+
+### 5E. Context-aware Narrative Patch Engine — TODO
+
+<badge color="warning">PLANNED · NOT IN IMPLEMENTATION</badge>
+
+**Priority:** Begin only after the shared toolbar/menu and current UI repair work are completed and verified. Do not spend the current implementation cycle authoring story nodes.
+
+**Retirement rule:** The generated 240-entry 0.1.0 sequence is retired, removed from active runtime, and must not be recycled, lightly rewritten, or used as the structural template for Patch 1.
+
+**Patch-1 minimum content target:** At least **1,000 genuinely distinct narrative situations/states** in the first patch. The count must represent meaningful differences in context, actors, stakes, triggers, available knowledge, and possible consequences—not combinatorial permutations that merely swap names, scene labels, or generic sentences.
+
+- [ ] Design a versioned patch schema with stable IDs, provenance, source references, eligibility conditions, trigger conditions, cooldown/replay rules, deterministic selection, and save compatibility.
+- [ ] Integrate the node resolver with Eternal Path authoritative local character, location, time/day-cycle, weather, relationships, disposition, inventory/resources, current activity, and prior event history. Do not read or mutate Convo state.
+- [ ] Define a situation taxonomy broad enough for ordinary life, social encounters, travel, work/study, investigation, conflict, emergencies, discovery, faction/community activity, and quiet personal moments.
+- [ ] Require each situation to define what happened, who is involved, what each actor can know, what is observable, what remains uncertain, the immediate stakes, constraints, and meaningful consequence branches.
+- [ ] Build contextual narrative composition: Setting/Atmosphere → Scene Action → observable Character Behavior → Dialogue → a final perspective question grounded in the actual event.
+- [ ] Make Scene Action substantial and alive (normally around 5–9 readable lines when the event warrants it); do not pad short events merely to hit a line count.
+- [ ] The closing question must demonstrate comprehension of the situation and invite the player to reason from their character perspective. Avoid generic commands such as “What do you do?”, “Your action?”, or forced first-person prompts such as “I will…”.
+- [ ] Choices must arise from the situation and character context; do not expose hidden outcomes, odds, disposition deltas, or consequences before resolution.
+- [ ] Keep the narrative in one independently scrollable reading column beneath the Scene Window; long scenes must not push or move the shared toolbar.
+- [ ] Validate the 1,000-situation minimum with a coverage matrix, duplicate/near-duplicate checks, context-combination audits, and human narrative-quality review before approving Patch 1.
+- [ ] Add deterministic replay, atomic state resolution, event history, no-repeat safeguards, and tests for save/reload, migration, offline operation, and patch-version changes.
+- [ ] Release each patch independently with manifest, version, provenance, QA report, and rollback compatibility.
+
+**Exit gate:** Patch 1 is not approved until it contains at least 1,000 materially distinct situations, passes context/duplication review, integrates with Eternal Path state without touching Convo, and produces situation-aware narrative and reflective closing questions.
 
 ---
 
