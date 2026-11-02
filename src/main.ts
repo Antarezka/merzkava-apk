@@ -1,6 +1,7 @@
 import "./style.css";
 import "./ui/floating-ledger.css";
-import "./ui/floating-control.css";\nimport "./ui/gravity-pull-cord.css";
+import "./ui/floating-control.css";
+import "./ui/gravity-pull-cord.css";
 import { cancelOpeningSequence, playButtonSound, playClockworkRatchet, playNavigationTick, playTypewriterLeverSound, playOpeningSequence, playSnapshotSlideSound, playWarningBeep, setSoundEnabled } from "./audio/sound-effects";
 import { getGameplaySessionRecord, initializeDatabase, saveGameplaySessionRecord } from "./shared/database";
 import { createCharacter, deleteCharacter, listCharacters, type Character } from "./convo/characters/character-repository";
