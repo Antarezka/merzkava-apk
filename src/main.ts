@@ -804,7 +804,28 @@ function commitNavLeverToggle(): void {
   navigationCollapsed = !navigationCollapsed;
   try { localStorage.setItem(NAV_COLLAPSED_STORAGE_KEY, String(navigationCollapsed)); } catch { /* Keep the control available for this session. */ }
   menuToggleAnimationPending = false;
-  render();
+
+  // The dock animation has already completed. Update only the navigation state;
+  // rebuilding root.innerHTML here would flash every screen and restart its UI.
+  root.querySelector<HTMLElement>(".app-shell")?.classList.toggle("is-nav-collapsed", navigationCollapsed);
+
+  const dock = root.querySelector<HTMLElement>(".bottom-nav");
+  if (dock) {
+    dock.setAttribute("aria-hidden", String(navigationCollapsed));
+    dock.querySelectorAll<HTMLButtonElement>(".nav-item").forEach(item => {
+      item.tabIndex = navigationCollapsed ? -1 : 0;
+    });
+  }
+
+  const handle = root.querySelector<HTMLButtonElement>("[data-cord-handle]");
+  if (handle) {
+    const label = translateLabel(
+      navigationCollapsed ? "Pull upward to show toolbar" : "Pull downward to hide toolbar",
+      currentLanguage
+    );
+    handle.setAttribute("aria-label", label);
+    handle.title = translateLabel(navigationCollapsed ? "Show toolbar" : "Hide toolbar", currentLanguage);
+  }
 }
 initializeGravityPullCord(root, {
   isCollapsed: () => navigationCollapsed,
