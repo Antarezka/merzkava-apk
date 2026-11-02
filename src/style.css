@@ -2607,3 +2607,29 @@ body { color:var(--ui-ink); }
 .app-shell.is-nav-collapsed .bottom-nav{
   opacity:1;pointer-events:none;
 }
+
+
+/* Correct placement: the clockwork lever is attached to the lower navigation dock's left corner. */
+.bottom-nav{position:fixed;isolation:isolate;overflow:visible;}
+.bottom-nav>.nav-toggle-handle{
+  position:absolute!important;left:8px!important;top:calc(50% - 27px)!important;right:auto!important;bottom:auto!important;
+  z-index:42;display:grid;place-items:center;gap:0;
+  width:54px;height:54px;min-width:54px;min-height:54px;padding:5px;
+  border:1px solid #9d7a43;border-radius:8px;
+  background:linear-gradient(145deg,#354338 0%,#1c2821 72%);
+  box-shadow:0 3px 10px #0008,inset 0 1px #f1d99a33;
+}
+.bottom-nav>.nav-toggle-handle .nav-lever-assembly{transform:scale(.92);}
+.bottom-nav>.nav-toggle-handle .nav-toggle-label{display:none;}
+.bottom-nav>.nav-toggle-handle .nav-toggle-arrow{right:-4px;bottom:-4px;}
+.bottom-nav>.nav-roulette-track{padding-left:62px;}
+.app-shell.is-nav-collapsed .bottom-nav{opacity:1;pointer-events:auto;}
+.app-shell.is-nav-collapsed .bottom-nav .nav-item{pointer-events:none;}
+.app-shell.is-nav-collapsed .app-header{
+  min-height:0;height:auto;padding:5px 0 18px;overflow:visible;
+}
+.app-shell.is-nav-collapsed .app-header>.brand,
+.app-shell.is-nav-collapsed .app-header>.header-context,
+.app-shell.is-nav-collapsed .app-header>.header-tools{
+  visibility:visible;opacity:1;pointer-events:auto;
+}
