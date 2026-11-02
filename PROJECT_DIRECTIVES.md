@@ -66,3 +66,10 @@ Use clear, beginner-friendly explanations. State limitations directly. Do not in
 - Preserve the existing provenance labels and rules (CANON, CANON_ADAPTATION, and IN_GAME_ORIGINAL). World Archive anchoring is a separate context requirement, not a replacement provenance label and not a claim that original gameplay material is canon.
 - Every content update that adds or expands nodes must add at least **two distinct nodes**. One-node updates are not acceptable. The existing nine-node starter slice is the established initial baseline; future increments must meet the two-node minimum while preserving existing coverage and quality gates.
 - Keep the existing planned node labels/categories and presentation taxonomy unless the product owner explicitly changes them. Validate node count, Archive anchors, non-canon status, and provenance labels before accepting each update.
+
+## Mandatory Eternal Path content scale and direction
+
+- Build narrative nodes outward from the player goals and gameplay loops already defined in the project. Existing goals such as collecting are examples, not permission to invent a new goal taxonomy. Patch 1 targets at least 1,000 genuinely distinct, meaningfully branching nodes that support progression toward those existing goals.
+- Every node is non-canonical, anchored to reviewed player-safe World Archive dossier(s), and keeps the planned labels/categories and provenance. Every node-content update adds at least two distinct nodes. The nine-node bootstrap does not count toward Patch 1's 1,000-node target.
+- Long-term item catalog target: 25,000 distinct items total, with at least 10,000 genuinely functional items. Every item must be compatible with the official Merzkava Universe world constraints and use reviewed World Archive context. Preserve CANON / CANON_ADAPTATION / IN_GAME_ORIGINAL provenance; game-only additions never become Universe canon.
+- Shop implementation is deferred until the owner explicitly signals readiness. Do not implement purchasing, vendor stock, or shop UI before that approval; catalog preparation and item-function work can proceed independently when their dependencies are ready.
