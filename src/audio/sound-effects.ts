@@ -251,7 +251,7 @@ export function playTypewriterLeverSound(): void {
   if (!soundEnabled) return;
   try {
     if (!leverAudio) {
-      leverAudio = new Audio("/audio/Create_a_realistic_1_%232-1793605578542.mp3");
+      leverAudio = new Audio("/audio/Create_a_realistic_1_%233-1793605595966.mp3");
       leverAudio.preload = "auto";
       leverAudio.volume = 0.72;
     }
