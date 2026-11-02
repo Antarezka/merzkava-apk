@@ -113,7 +113,7 @@ button {color:inherit;} button:focus-visible {outline-color:#a68d5e;}
 
 /* Main-menu noticeboard modal */
 body:has(.noticeboard-backdrop){overflow:hidden;overscroll-behavior:none;}
-.noticeboard-backdrop{position:fixed;inset:68px 0 0;z-index:30;display:grid;grid-template-rows:minmax(0,1fr);align-items:start;justify-items:center;box-sizing:border-box;padding:12px 13px 14px;background:#17221dd9;backdrop-filter:blur(7px);overscroll-behavior:none;touch-action:pan-y;animation:noticeboard-fade .28s ease-out}
+.noticeboard-backdrop{position:fixed;inset:68px 0 0;z-index:30;display:grid;grid-template-rows:minmax(0,1fr);align-items:start;justify-items:center;box-sizing:border-box;padding:12px 13px 14px;background:#17221dd9;backdrop-filter:blur(7px);overscroll-behavior:none;touch-action:none;animation:noticeboard-fade .28s ease-out}
 .noticeboard-panel{position:relative;display:flex;flex-direction:column;width:min(100%,460px);height:min(82dvh,680px);max-height:calc(100dvh - 94px);min-height:0;overflow:hidden;padding:18px 20px 14px;border:1px solid #9f895e;background:radial-gradient(ellipse at 50% 0%,#fff9e9,#eee4cf 56%,#e4d8bf);color:#2b342d;box-shadow:0 24px 75px #080e0bbd,inset 0 0 0 5px #a68d5e17;touch-action:pan-y}
 .noticeboard-panel:before{content:'';position:absolute;inset:8px;border:1px solid #a58d6266;pointer-events:none}
 .noticeboard-topline{display:flex;justify-content:space-between;gap:12px;padding:5px 25px 12px 0;border-bottom:1px solid #b7a781;color:#766344;font:600 8px Cinzel,serif;letter-spacing:.14em}
