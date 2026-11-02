@@ -1441,56 +1441,256 @@ button {color:inherit;} button:focus-visible {outline-color:#a68d5e;}
 }
 
 
-/* Gesture-safe enchanted book plaque — Reverse: 1999 patina + wizarding brasswork. */
+/* Retractable Victorian clockwork compartment — fixed geometry, independent rotary emblems. */
 .bottom-nav{
-  width:min(690px,calc(100vw - 64px - env(safe-area-inset-left) - env(safe-area-inset-right)));
+  position:fixed;
+  z-index:60;
   left:50%;
   right:auto;
   bottom:calc(7px + env(safe-area-inset-bottom));
-  padding:10px 9px calc(9px + env(safe-area-inset-bottom));
-  border:1px solid #a68d5e;
-  border-radius:5px 15px 5px 15px;
+  width:min(690px,calc(100vw - 64px - env(safe-area-inset-left) - env(safe-area-inset-right)));
+  min-height:96px;
+  padding:13px 15px 10px;
+  display:flex;
+  align-items:center;
+  gap:0;
+  overflow-x:auto;
+  overflow-y:hidden;
+  overscroll-behavior-x:contain;
+  -webkit-overflow-scrolling:touch;
+  touch-action:pan-x;
+  scroll-snap-type:x mandatory;
+  scrollbar-width:none;
+  transform:translateX(-50%);
+  border:1px solid #a88a58;
+  border-radius:31px 31px 13px 13px / 24px 24px 13px 13px;
   background:
-    linear-gradient(135deg,#344c43f7 0%,#263b35f8 48%,#1f302cf9 100%);
+    radial-gradient(ellipse 55% 34px at 50% 0%,#526c59 0%,#344b3e 62%,transparent 100%),
+    linear-gradient(180deg,#31483b 0%,#26392f 38%,#1d2c26 100%);
   box-shadow:
-    0 9px 28px #17231f55,
-    0 2px 0 #d6c18a30,
-    inset 0 1px 0 #f2e6c333,
-    inset 0 0 0 3px #a68d5e18,
-    inset 0 -8px 18px #101b1840;
+    0 -3px 12px #0c1712a0,
+    0 9px 28px #111b17a8,
+    inset 0 1px 0 #f0dfbd55,
+    inset 0 0 0 3px #b69a6820,
+    inset 0 -9px 16px #0c171280;
+  isolation:isolate;
+  will-change:auto;
 }
+.bottom-nav::-webkit-scrollbar{display:none}
 .bottom-nav:before{
-  top:4px;
-  left:13%;
-  width:74%;
-  height:1px;
-  background:linear-gradient(90deg,transparent,#d5bd83a8 18%,#d5bd83a8 82%,transparent);
+  content:"";
+  position:absolute;
+  z-index:-1;
+  pointer-events:none;
+  inset:5px 9px 5px;
+  border:1px solid #c2a46b55;
+  border-radius:25px 25px 9px 9px / 19px 19px 9px 9px;
+  box-shadow:inset 0 1px 0 #fff0d022,inset 0 -1px 0 #070f0b80;
 }
 .bottom-nav:after{
-  top:auto;
-  bottom:4px;
-  left:24%;
-  width:52%;
+  content:"";
+  position:absolute;
+  z-index:0;
+  pointer-events:none;
+  left:22%;
+  right:22%;
+  top:6px;
   height:1px;
-  background:linear-gradient(90deg,transparent,#a68d5e88,transparent);
+  background:linear-gradient(90deg,transparent,#e0c48b99,transparent);
 }
+.bottom-nav .nav-cable{
+  position:absolute;
+  z-index:2;
+  top:22px;
+  bottom:20px;
+  width:5px;
+  pointer-events:none;
+  opacity:.88;
+  background:repeating-linear-gradient(to bottom,#c6a56b 0 3px,#6f5738 3px 5px,#e0c48b 5px 7px,transparent 7px 10px);
+  filter:drop-shadow(0 0 2px #070f0b);
+}
+.bottom-nav .nav-cable:before,
+.bottom-nav .nav-cable:after{
+  content:"";
+  position:absolute;
+  left:-4px;
+  width:11px;
+  height:11px;
+  border:1px solid #d2b47a;
+  border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#f0dfb8,#9c7a49 55%,#34483b 58%);
+  box-shadow:0 1px 3px #090f0c;
+}
+.bottom-nav .nav-cable:before{top:-8px}
+.bottom-nav .nav-cable:after{bottom:-8px}
+.bottom-nav .nav-cable-left{left:7px}
+.bottom-nav .nav-cable-right{right:7px}
 .bottom-nav .nav-item{
-  min-height:50px;
+  position:relative;
+  z-index:3;
+  flex:0 0 25%;
+  width:25%;
+  min-width:25%;
+  max-width:25%;
+  min-height:70px;
+  display:grid;
+  place-items:center;
+  padding:3px 1px 2px;
+  border:0;
+  border-radius:12px;
+  color:#d4c6a8;
+  background:transparent;
+  scroll-snap-align:start;
+  scroll-snap-stop:always;
+  transform:none;
+  -webkit-tap-highlight-color:transparent;
 }
-.bottom-nav .nav-item.active{
-  color:#f0d9a0;
-  text-shadow:0 0 12px #e1c99540;
+.bottom-nav .nav-item:before{
+  content:"";
+  position:absolute;
+  inset:4px 3px 3px;
+  border:1px solid transparent;
+  border-radius:12px 12px 7px 7px;
+  background:linear-gradient(180deg,#d8bd8420,#d8bd8400);
+  opacity:0;
+  transition:opacity .18s ease,border-color .18s ease;
+  pointer-events:none;
+}
+.bottom-nav .nav-item.active:before{
+  opacity:1;
+  border-color:#c5a56c72;
+  box-shadow:inset 0 0 13px #c5a56c18,0 0 12px #c5a56c12;
 }
 .bottom-nav .nav-item:after{
-  bottom:-2px;
+  content:"";
+  position:absolute;
+  bottom:0;
+  left:28%;
+  right:28%;
   height:2px;
-  background:linear-gradient(90deg,transparent,#d7bd83,transparent);
+  background:linear-gradient(90deg,transparent,#dfc38a,transparent);
+  opacity:0;
+  transition:opacity .18s ease;
+}
+.bottom-nav .nav-item.active:after{opacity:1}
+.bottom-nav .nav-item-motion{
+  display:grid;
+  justify-items:center;
+  align-content:center;
+  gap:3px;
+  width:100%;
+  min-width:0;
+  transform-origin:center center;
+  will-change:transform,opacity;
+}
+.bottom-nav .nav-index{
+  color:#c1a16b;
+  font:600 8px/1 "Cinzel",serif;
+  letter-spacing:.12em;
+  opacity:.82;
+}
+.bottom-nav .nav-rotor{
+  position:relative;
+  width:43px;
+  height:43px;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  touch-action:none;
+  user-select:none;
+  -webkit-user-select:none;
+  cursor:grab;
+}
+.bottom-nav .nav-rotor:active{cursor:grabbing}
+.bottom-nav .nav-rotor:before{
+  content:"";
+  position:absolute;
+  inset:1px;
+  border:1px solid #b99b66;
+  border-radius:50%;
+  background:
+    conic-gradient(from var(--rotor-angle,0deg),#e0c58b 0 3deg,transparent 3deg 22deg,#a98b58 22deg 25deg,transparent 25deg 45deg,#e0c58b 45deg 48deg,transparent 48deg 67deg,#a98b58 67deg 70deg,transparent 70deg 90deg,#e0c58b 90deg 93deg,transparent 93deg 112deg,#a98b58 112deg 115deg,transparent 115deg 135deg,#e0c58b 135deg 138deg,transparent 138deg 157deg,#a98b58 157deg 160deg,transparent 160deg 180deg,#e0c58b 180deg 183deg,transparent 183deg 202deg,#a98b58 202deg 205deg,transparent 205deg 225deg,#e0c58b 225deg 228deg,transparent 228deg 247deg,#a98b58 247deg 250deg,transparent 250deg 270deg,#e0c58b 270deg 273deg,transparent 273deg 292deg,#a98b58 292deg 295deg,transparent 295deg 315deg,#e0c58b 315deg 318deg,transparent 318deg 337deg,#a98b58 337deg 340deg,transparent 340deg 360deg);
+  box-shadow:0 2px 5px #09120e99,inset 0 0 0 3px #14251d,inset 0 0 0 4px #d3b57a55;
+  transform:rotate(var(--rotor-angle,0deg));
+  transition:box-shadow .18s ease;
+}
+.bottom-nav .nav-rotor:after{
+  content:"";
+  position:absolute;
+  inset:5px;
+  border:1px dashed #c5a87588;
+  border-radius:50%;
+  transform:rotate(var(--rotor-angle,0deg));
+  pointer-events:none;
+}
+.bottom-nav .nav-rotor-mark{
+  position:absolute;
+  z-index:2;
+  top:3px;
+  left:50%;
+  width:4px;
+  height:6px;
+  margin-left:-2px;
+  border-radius:2px;
+  background:#f0d7a0;
+  box-shadow:0 0 5px #e5c58a99;
+  transform:rotate(var(--rotor-angle,0deg));
+  transform-origin:2px 18px;
+  pointer-events:none;
+}
+.bottom-nav .nav-icon{
+  position:relative;
+  z-index:1;
+  width:28px;
+  height:28px;
+  display:grid;
+  place-items:center;
+  color:#e9dfca;
+  filter:drop-shadow(0 1px 1px #0a120d);
+  pointer-events:none;
+}
+.bottom-nav .nav-icon-art{
+  display:grid;
+  place-items:center;
+  width:100%;
+  height:100%;
+  transform:rotate(var(--icon-tilt,0deg));
+  transform-origin:center;
+  transition:transform .08s ease-out;
+}
+.bottom-nav .nav-icon svg{
+  display:block;
+  width:100%;
+  height:100%;
+  overflow:visible;
+}
+.bottom-nav .nav-item small{
+  max-width:100%;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  color:inherit;
+  font:600 8px/1.1 "Cinzel",serif;
+  letter-spacing:.035em;
+  text-align:center;
+}
+.bottom-nav .nav-item.active{color:#f1dcae;text-shadow:0 0 10px #e4c68b40}
+.bottom-nav .nav-item.active .nav-rotor:before{
+  box-shadow:0 2px 7px #09120eaa,inset 0 0 0 3px #1a2c22,inset 0 0 0 4px #e2c48b88,0 0 9px #e2c48b30;
 }
 @media(max-width:380px){
   .bottom-nav{
     width:calc(100vw - 64px - env(safe-area-inset-left) - env(safe-area-inset-right));
-    padding-inline:5px;
-    border-radius:4px 12px 4px 12px;
+    min-height:91px;
+    padding:11px 14px 8px;
   }
-  .bottom-nav .nav-item{min-height:48px}
+  .bottom-nav .nav-item{min-height:66px}
+  .bottom-nav .nav-rotor{width:39px;height:39px}
+  .bottom-nav .nav-icon{width:25px;height:25px}
+  .bottom-nav .nav-item small{font-size:7px}
+}
+@media(prefers-reduced-motion:reduce){
+  .bottom-nav .nav-item:before,
+  .bottom-nav .nav-item:after,
+  .bottom-nav .nav-icon-art{transition:none}
 }
