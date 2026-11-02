@@ -71,9 +71,11 @@ export function animateAppScreen(shell: HTMLElement | null, options: { menuToggl
     const letter = content.querySelector<HTMLElement>(".dusty-letter");
     if (letter) {
       const paragraphs = letter.querySelectorAll<HTMLElement>("p, .dusty-letter-author, .dusty-letter-title, .dusty-letter-farewell, .dusty-letter-foot");
+      const dust = letter.querySelector<HTMLElement>(".dusty-letter-dust");
       const seal = letter.querySelector<HTMLElement>(".kitty-wax-seal");
       const sealLayers = seal?.querySelectorAll<HTMLElement>("img");
       animate(letter, { opacity: [0, 1], translateY: [18, 0], duration: 760, delay: 110, ease: "outCubic" });
+      if (dust) animate(dust, { opacity: [0.18, 0.48, 0.28], translateX: [-4, 5, 0], duration: 2400, delay: 520, ease: "inOutSine" });
       if (paragraphs.length) animate(paragraphs, {
         opacity: [0, 1],
         translateY: [8, 0],
