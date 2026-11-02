@@ -797,6 +797,23 @@ initializeGravityPullCord(root, {
   toggle: commitNavLeverToggle
 });
 
+// Handle the noticeboard before gesture-click suppression or other delegated actions.
+root.addEventListener("click", (event: MouseEvent) => {
+  const target = event.target;
+  if (!(target instanceof Element)) return;
+  const dismiss = target.closest<HTMLElement>("[data-notice-dismiss]");
+  const backdrop = target.classList.contains("noticeboard-backdrop");
+  if (!dismiss && !backdrop) return;
+  event.preventDefault();
+  event.stopImmediatePropagation();
+  if (dismiss?.dataset.noticeDismiss === "today") {
+    try { localStorage.setItem(noticeboardStorageKey, "1"); } catch { /* Session-only dismissal still works. */ }
+  }
+  noticeboardVisible = false;
+  document.body.classList.remove("noticeboard-open");
+  render();
+}, true);
+
 root.addEventListener("click", async (event: MouseEvent) => {
   const target = event.target;
   if (!(target instanceof Element)) return;
@@ -1081,21 +1098,6 @@ root.addEventListener("click", async (event: MouseEvent) => {
     form?.requestSubmit();
     return;
   }
-  const noticeDismissButton = target.closest<HTMLElement>("[data-notice-dismiss]");
-  if (noticeDismissButton) {
-    if (noticeDismissButton.dataset.noticeDismiss === "today") {
-      try { localStorage.setItem(noticeboardStorageKey, "1"); } catch { /* Session-only dismissal still works. */ }
-    }
-    noticeboardVisible = false;
-    render();
-    return;
-  }
-  if (target.classList.contains("noticeboard-backdrop")) {
-    noticeboardVisible = false;
-    render();
-    return;
-  }
-
   const refreshPlayersButton = target.closest<HTMLButtonElement>("[data-refresh-players]");
   if (refreshPlayersButton && !playerRegistryBusy) { await refreshPlayerRegistry(); return; }
   const floatingStartButton = target.closest<HTMLButtonElement>("[data-floating-start]");
