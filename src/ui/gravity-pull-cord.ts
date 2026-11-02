@@ -15,7 +15,7 @@ const randomBetween = (min: number, max: number): number => min + Math.random() 
 export function initializeGravityPullCord(root: HTMLElement, options: CordOptions): void {
   let active: { pointerId: number; startX: number; startY: number; handle: HTMLButtonElement } | null = null;
   let suppressClick = false;
-  let idleAngle = 0;
+  let pauseIdleSway: (() => void) | null = null;
 
   const getParts = () => ({
     cord: root.querySelector<HTMLElement>("[data-gravity-cord]"),
@@ -46,7 +46,7 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
     }, delay);
   };
 
-  const animateDock = (wasCollapsed: boolean, done: () => void): void => {
+  const scheduleIdleSway = (): void => {\n    const { cord } = getParts();\n    if (!cord || active) { window.setTimeout(scheduleIdleSway, 650); return; }\n    const gust = Math.random() < 0.16;\n    const amplitude = gust ? randomBetween(4.2, 7.2) : randomBetween(0.7, 2.4);\n    const target = (Math.random() < 0.5 ? -1 : 1) * amplitude;\n    const duration = gust ? randomBetween(700, 1050) : randomBetween(1250, 2100);\n    const animation = animate(cord, {\n      rotate: [{ to: target, duration, ease: "inOutSine" }, { to: 0, duration: duration * randomBetween(0.9, 1.35), ease: "outSine" }],\n      onComplete: () => { pauseIdleSway = null; window.setTimeout(scheduleIdleSway, randomBetween(500, gust ? 1500 : 2200)); }\n    });\n    pauseIdleSway = () => animation.pause();\n  };\n\n  const animateDock = (wasCollapsed: boolean, done: () => void): void => {
     const dock = root.querySelector<HTMLElement>(".app-shell .bottom-nav");
     const track = dock?.querySelector<HTMLElement>(".nav-roulette-track");
     const handle = root.querySelector<HTMLElement>("[data-cord-handle]");
@@ -102,7 +102,7 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
     const { cord, line, handle } = getParts();
     if (!cord || !line || !handle) return;
 
-    active = { pointerId: -1, startX: 0, startY: 0, handle };
+    pauseIdleSway?.();\n    pauseIdleSway = null;\n    active = { pointerId: -1, startX: 0, startY: 0, handle };
     handle.classList.add("is-pulling");
     play("/audio/Mechanical%20Activation.mp3", 0.76);
 
@@ -118,7 +118,7 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
       animateDock(wasCollapsed, () => {
         handle.classList.remove("is-pulling");
         active = null;
-        options.toggle();
+        options.toggle();\n        window.setTimeout(scheduleIdleSway, 650);
       });
     }, 330);
 
@@ -131,36 +131,12 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
     });
   };
 
-  // Calm idle breeze: usually a tiny sway, with occasional stronger gusts.
-  const scheduleIdleSway = (): void => {
-    const { cord } = getParts();
-    if (!cord || active) {
-      window.setTimeout(scheduleIdleSway, 650);
-      return;
-    }
-    const gust = Math.random() < 0.16;
-    const amplitude = gust ? randomBetween(4.2, 7.2) : randomBetween(0.7, 2.4);
-    const target = (Math.random() < 0.5 ? -1 : 1) * amplitude;
-    const duration = gust ? randomBetween(700, 1050) : randomBetween(1250, 2100);
-    animate(cord, {
-      rotate: [
-        { to: target, duration, ease: "inOutSine" },
-        { to: 0, duration: duration * randomBetween(0.9, 1.35), ease: "outSine" }
-      ],
-      onComplete: () => {
-        idleAngle = 0;
-        window.setTimeout(scheduleIdleSway, randomBetween(500, gust ? 1500 : 2200));
-      }
-    });
-    idleAngle = target;
-  };
-
   root.addEventListener("pointerdown", event => {
     const target = event.target;
     if (!(target instanceof Element)) return;
     const handle = target.closest<HTMLButtonElement>("[data-cord-handle]");
     if (!handle || active || (event.pointerType === "mouse" && event.button !== 0)) return;
-    play("/audio/golden%20handle.mp3", 0.62);
+    pauseIdleSway?.();\n    pauseIdleSway = null;\n    play("/audio/golden%20handle.mp3", 0.62);
     active = { pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, handle };
     handle.classList.add("is-grabbed");
     try { handle.setPointerCapture(event.pointerId); } catch { /* Pointer capture is optional. */ }
@@ -187,7 +163,7 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
     if (dy < 16 || Math.abs(dy) < Math.abs(dx) * 0.72) {
       returnCord();
       const { cord } = getParts();
-      if (cord) animate(cord, { rotate: [idleAngle, 0], duration: 520, ease: "outElastic(1, .55)" });
+      if (cord) animate(cord, { rotate: [0], duration: 520, ease: "outElastic(1, .55)", onComplete: () => window.setTimeout(scheduleIdleSway, 650) });
       return;
     }
     suppressClick = true;
@@ -200,7 +176,7 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
     active = null;
     returnCord();
     const { cord } = getParts();
-    if (cord) animate(cord, { rotate: [idleAngle, 0], duration: 520, ease: "outElastic(1, .55)" });
+    if (cord) animate(cord, { rotate: [0], duration: 520, ease: "outElastic(1, .55)", onComplete: () => window.setTimeout(scheduleIdleSway, 650) });
   }, { passive: true });
 
   root.addEventListener("click", event => {
