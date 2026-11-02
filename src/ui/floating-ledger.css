@@ -53,3 +53,48 @@ body.native-floating-mode #ledger-bubble-stack{bottom:calc(112px + env(safe-area
 @media(max-height:520px){body.native-floating-mode .app-shell{padding-bottom:58px;}body.native-floating-mode .bottom-nav{padding-top:5px;padding-bottom:5px;}}
 
 body.native-floating-mode{min-width:0;}
+
+
+/* Ledger bubbles — same parchment/verdigris identity as the command header. */
+#ledger-bubble-stack {
+  right:max(14px,env(safe-area-inset-right));
+  width:min(292px,calc(100vw - 28px - env(safe-area-inset-left) - env(safe-area-inset-right)));
+}
+.ledger-bubble {
+  border:1px solid #b8aa85;
+  border-radius:5px 18px 5px 18px;
+  background:
+    linear-gradient(135deg,#fff9e8e8 0%,#eee7d6ee 56%,#dfe5d8e8 100%);
+  color:#293d38;
+  box-shadow:inset 0 1px #fff, inset 0 0 0 3px #a68d5e12,0 8px 24px #17231f2b;
+  backdrop-filter:blur(12px) saturate(1.1);
+  -webkit-backdrop-filter:blur(12px) saturate(1.1);
+}
+.ledger-bubble::before {
+  inset:4px;
+  border:1px solid #a68d5e55;
+  border-radius:2px 14px 2px 14px;
+  background:linear-gradient(135deg,#ffffff30,transparent 55%);
+}
+.ledger-bubble::after {background:#fff9;}
+.ledger-bubble-kicker {color:#8b754c;font:700 8px/1.2 Cinzel,serif;letter-spacing:.15em;}
+.ledger-bubble-change {color:#293d38;font:600 15px/1.25 "Cormorant Garamond",Georgia,serif;}
+.ledger-bubble-total,.ledger-bubble-detail {color:#68766b;font:500 11px/1.4 "Cormorant Garamond",Georgia,serif;}
+.ledger-bubble.tone-positive {border-color:#78977b;}
+.ledger-bubble.tone-negative {border-color:#b77e75;}
+.ledger-bubble.tone-neutral {border-color:#b8aa85;}
+:root[data-theme="dark"] .ledger-bubble {
+  border-color:#9b895f;
+  background:linear-gradient(135deg,#354239f2 0%,#29362ef2 62%,#25342ef2 100%);
+  color:#e8dfcf;
+  box-shadow:inset 0 1px #ffffff20,inset 0 0 0 3px #c1a87512,0 8px 24px #0008;
+}
+:root[data-theme="dark"] .ledger-bubble::before {border-color:#c1a87555;}
+:root[data-theme="dark"] .ledger-bubble-kicker {color:#d4bd88;}
+:root[data-theme="dark"] .ledger-bubble-change {color:#f0e6d3;}
+:root[data-theme="dark"] .ledger-bubble-total,
+:root[data-theme="dark"] .ledger-bubble-detail {color:#c2c9b8;}
+@media(max-width:390px) {
+  #ledger-bubble-stack {right:max(10px,env(safe-area-inset-right));}
+  .ledger-bubble {padding:11px 13px;}
+}
