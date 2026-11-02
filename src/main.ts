@@ -476,29 +476,30 @@ function render(): void {
   const content = isControl
     ? floatingControlMarkup(floatingReadiness)
     : renderScreen(activeScreen as ScreenId, availableCharacters(), playerRegistryMessage, activeCharacterId ? getLedgerLog(activeCharacterId) : [], inventorySnapshot);
-  const previousNavigation = root.querySelector<HTMLElement>(".bottom-nav");
+  const previousNavigation = root.querySelector<HTMLElement>(".nav-roulette-track");
   if (previousNavigation) savedNavigationScrollLeft = previousNavigation.scrollLeft;
   root.innerHTML = `<div class="app-shell ${isControl ? "control-shell" : ""} ${menuRevealPending ? "is-entering" : ""}">
     ${isControl ? "" : `<header class="app-header"><button class="brand" data-screen="home" aria-label="Merzkava home"><span class="brand-mark">M</span><span class="brand-wordmark"><small>MERZKAVA UNIVERSE</small><strong>Merzkava</strong></span></button><div class="header-context"><small>TACTICAL ACADEMY</small><strong>${navigation.find(item => item.id === activeScreen)?.label ?? "Command Hall"}</strong></div><div class="header-tools"><button class="header-settings" data-floating-action="start-bubble" aria-label="Start Bubble Mode" title="Start Bubble Mode">◉</button><button class="header-settings" data-screen="settings" aria-label="Settings">⚙</button></div></header>`}
     ${notice ? `<p class="notice" role="status">${escapeHtml(notice)}</p>` : ""}
     ${isControl ? content : `<main class="main-content">${content}${activeScreen === "settings" ? authPanel() + canonPanel() : ""}</main>`}
-    ${isControl ? "" : `<nav class="bottom-nav" aria-label="Academy navigation"><span class="nav-cable nav-cable-left" aria-hidden="true"></span><span class="nav-cable nav-cable-right" aria-hidden="true"></span>${navigation.map((item, index) => `<button class="nav-item ${activeScreen === item.id ? "active" : ""}" data-screen="${item.id}" ${activeScreen === item.id ? 'aria-current="page"' : ""}><span class="nav-item-motion"><span class="nav-index">${String(index + 1).padStart(2, "0")}</span><span class="nav-rotor" data-nav-rotor="${item.id}" aria-hidden="true"><span class="nav-rotor-mark"></span><span class="nav-icon"><span class="nav-icon-art">${item.icon}</span></span></span><small>${item.label}</small></span></button>`).join("")}</nav>`}
+    ${isControl ? "" : `<nav class="bottom-nav" aria-label="Academy navigation"><span class="nav-cable nav-cable-left" aria-hidden="true"></span><span class="nav-cable nav-cable-right" aria-hidden="true"></span><div class="nav-roulette-track">${navigation.map((item, index) => `<button class="nav-item ${activeScreen === item.id ? "active" : ""}" data-screen="${item.id}" ${activeScreen === item.id ? 'aria-current="page"' : ""}><span class="nav-item-motion"><span class="nav-index">${String(index + 1).padStart(2, "0")}</span><span class="nav-rotor" data-nav-rotor="${item.id}" aria-hidden="true"><span class="nav-rotor-mark"></span><span class="nav-icon"><span class="nav-icon-art">${item.icon}</span></span></span><small>${item.label}</small></span></button>`).join("")}</div></nav>`}
     ${isControl ? "" : `<div class="storage-status"><span class="status-dot"></span>${databaseMessage}</div>`}
     ${activeScreen === "gameplay" ? snapshotBlindMarkup() : ""}
     ${activeScreen === "home" && noticeboardVisible ? noticeboardMarkup() : ""}
     ${bugPanelMarkup()}
   </div>`;
   // Preserve the rail's manual roulette offset and each independent mechanical dial angle across rerenders.
-  const renderedNavigation = root.querySelector<HTMLElement>(".bottom-nav");
+  const renderedNavigation = root.querySelector<HTMLElement>(".nav-roulette-track");
   if (renderedNavigation) {
     renderedNavigation.scrollLeft = savedNavigationScrollLeft;
     renderedNavigation.querySelectorAll<HTMLElement>("[data-nav-rotor]").forEach(rotor => {
       const id = rotor.dataset.navRotor;
       if (id) applyNavigationRotor(rotor, id);
     });
-    renderedNavigation.style.setProperty("--cable-left-offset", `${navigationCableTension}px`);
-    renderedNavigation.style.setProperty("--cable-right-offset", `${-navigationCableTension}px`);
-    renderedNavigation.style.setProperty("--cable-gear-angle", `${navigationCableRotation}deg`);
+    const navigationDock = renderedNavigation.closest<HTMLElement>(".bottom-nav");
+    navigationDock?.style.setProperty("--cable-left-offset", `${navigationCableTension}px`);
+    navigationDock?.style.setProperty("--cable-right-offset", `${-navigationCableTension}px`);
+    navigationDock?.style.setProperty("--cable-gear-angle", `${navigationCableRotation}deg`);
   }
   menuRevealPending = false;
   if (shouldAnimateScreen) animateAppScreen(root.querySelector<HTMLElement>(".app-shell"));
@@ -747,7 +748,7 @@ let navigationScrollIntent = false;
 let lastNavigationTick = -1;
 let navigationIntentTimer: number | undefined;
 root.addEventListener("pointerdown", event => {
-  if ((event.target as Element | null)?.closest(".bottom-nav")) navigationScrollIntent = true;
+  if ((event.target as Element | null)?.closest(".nav-roulette-track")) navigationScrollIntent = true;
 }, { passive: true });
 root.addEventListener("touchstart", event => {
   if ((event.target as Element | null)?.closest(".bottom-nav")) navigationScrollIntent = true;
@@ -757,7 +758,7 @@ root.addEventListener("wheel", event => {
 }, { passive: true });
 root.addEventListener("scroll", event => {
   const nav = event.target;
-  if (!(nav instanceof HTMLElement) || !nav.matches(".bottom-nav")) return;
+  if (!(nav instanceof HTMLElement) || !nav.matches(".nav-roulette-track")) return;
   savedNavigationScrollLeft = nav.scrollLeft;
   if (!navigationScrollIntent) return;
   const itemWidth = nav.clientWidth / 4;
