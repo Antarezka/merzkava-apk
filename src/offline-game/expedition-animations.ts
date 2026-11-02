@@ -4,15 +4,15 @@ function reducedMotion(): boolean {
   return typeof window !== "undefined" && Boolean(window.matchMedia?.("(prefers-reduced-motion: reduce)").matches);
 }
 
-type SceneParticleKind = "rain" | "snow" | "petal";
-type ScenePerformanceProfile = { resolution: number; maxFps: number; rain: number; snow: number; petal: number };
+type SceneParticleKind = "rain" | "snow" | "petal" | "leaf";
+type ScenePerformanceProfile = { resolution: number; maxFps: number; rain: number; snow: number; petal: number; leaf: number };
 
 function scenePerformanceProfile(): ScenePerformanceProfile {
   const tier = document.documentElement.dataset.performanceTier;
-  if (tier === "very-low") return { resolution: .45, maxFps: 24, rain: 7, snow: 6, petal: 5 };
-  if (tier === "low") return { resolution: .65, maxFps: 30, rain: 11, snow: 9, petal: 8 };
-  if (tier === "high") return { resolution: 1, maxFps: 60, rain: 24, snow: 19, petal: 15 };
-  return { resolution: .82, maxFps: 45, rain: 17, snow: 14, petal: 11 };
+  if (tier === "very-low") return { resolution: .45, maxFps: 24, rain: 7, snow: 6, petal: 5, leaf: 5 };
+  if (tier === "low") return { resolution: .65, maxFps: 30, rain: 11, snow: 9, petal: 8, leaf: 8 };
+  if (tier === "high") return { resolution: 1, maxFps: 60, rain: 24, snow: 19, petal: 15, leaf: 15 };
+  return { resolution: .82, maxFps: 45, rain: 17, snow: 14, petal: 11, leaf: 11 };
 }
 
 /** PixiJS renders only the moving atmosphere particles; all assets remain bundled locally. */
@@ -22,7 +22,7 @@ function mountSceneParticles(root: HTMLElement): () => void {
   if (!host || !scene || reducedMotion()) return () => {};
   const weather = scene.dataset.weather;
   const cycle = scene.dataset.cycle;
-  const kind: SceneParticleKind | "" = weather === "Rain" ? "rain" : weather === "Snow" ? "snow" : cycle === "Dawn" ? "petal" : cycle === "Dusk" ? "petal" : "";
+  const kind: SceneParticleKind | "" = weather === "Rain" ? "rain" : weather === "Snow" ? "snow" : cycle === "Dawn" ? "petal" : cycle === "Dusk" ? "leaf" : "";
   if (!kind) return () => {};
 
   const profile = scenePerformanceProfile();
@@ -92,7 +92,7 @@ function mountSceneParticles(root: HTMLElement): () => void {
       const particleTexture = kind === "rain" ? PIXI.Texture.WHITE : (() => {
         const shape = new PIXI.Graphics();
         if (kind === "snow") shape.circle(5, 5, 4).fill({ color: 0xffffff });
-        else shape.ellipse(7, 5, 7, 3.5).fill({ color: 0xffffff });
+        else shape.ellipse(7, 5, kind === "leaf" ? 7.5 : 7, kind === "leaf" ? 3 : 3.5).fill({ color: 0xffffff });
         const texture = app.renderer.generateTexture(shape);
         shape.destroy();
         return texture;
@@ -120,7 +120,7 @@ function mountSceneParticles(root: HTMLElement): () => void {
         } else {
           sprite.width = 7 + (i % 4) * 2;
           sprite.height = 4 + (i % 3) * 1.5;
-          sprite.tint = cycle === "Dawn" ? 0xe7a4b1 : 0xc18b50;
+          sprite.tint = kind === "petal" ? 0xe7a4b1 : 0xc18b50;
           sprite.alpha = .48 + (i % 4) * .12;
         }
         sprite.x = Math.random() * width;
@@ -132,7 +132,7 @@ function mountSceneParticles(root: HTMLElement): () => void {
           vy: kind === "rain" ? 250 + (i % 6) * 35 : kind === "snow" ? 17 + (i % 5) * 5 : 18 + (i % 6) * 5,
           sway: kind === "rain" ? 0 : kind === "snow" ? 7 : 13,
           phase: i * 1.73,
-          spin: kind === "petal" ? ((i % 5) - 2) * .22 : 0,
+          spin: kind === "petal" || kind === "leaf" ? ((i % 5) - 2) * .22 : 0,
         });
       }
 
