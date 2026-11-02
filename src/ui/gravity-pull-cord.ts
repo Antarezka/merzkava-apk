@@ -193,12 +193,13 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
     if (!active || active.pointerId !== event.pointerId) return;
     const handle = active.handle;
     const dy = event.clientY - active.startY;
+    const dx = event.clientX - active.startX;
     active = null;
     handle.classList.remove("is-grabbed");
     handle.style.transition = "";
     const { cord, line } = getParts();
     if (line) line.style.transition = "";
-    if (dy < 48) {
+    if (dy < 16 || Math.abs(dy) < Math.abs(dx) * 0.72) {
       if (line) line.style.setProperty("--cord-bend", "0deg");
       handle.style.setProperty("--cord-shift", "0px");
       returnCord();
