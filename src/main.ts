@@ -106,10 +106,14 @@ async function playEntrySplash(): Promise<void> {
 }
 
 const navigation: { id: ScreenId; label: string; icon: string }[] = [
-  { id: "home", label: "Home", icon: "⌂" }, { id: "gameplay", label: "Convo", icon: "✧" }, { id: "offline-game", label: "Eternal Path", icon: "✦" },
-  { id: "character", label: "Character", icon: "◉" }, { id: "inventory", label: "Inventory", icon: "▤" },
-  { id: "map", label: "Archive", icon: "⌘" }, { id: "journal", label: "Journal", icon: "☷" },
-  { id: "settings", label: "Settings", icon: "⚙" }
+  { id: "home", label: "Home", icon: `<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M8 13.5 20 10l12 3.5v17H8z" fill="#d9c49a" stroke="#8e7047" stroke-width="1.5"/><path d="M15 12V8.5h10V12M13 16v14M27 16v14" fill="none" stroke="#80623f" stroke-width="1.8" stroke-linecap="round"/><path d="M17 19h6v5h-6z" fill="#80623f"/><path d="M18.5 30v-4h3v4" fill="#f0e5cc" stroke="#80623f" stroke-width="1"/></svg>` },
+  { id: "gameplay", label: "Convo", icon: `<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M8 9.5h24v17H19l-7 5v-5H8z" fill="#e8dfca" stroke="#94784f" stroke-width="1.5" stroke-linejoin="round"/><path d="m17 21 9-10-2 8-7 2z" fill="#b18b57"/><path d="m17 21 4-1" stroke="#6d5437" stroke-width="1.5" stroke-linecap="round"/><circle cx="13" cy="17.5" r="1" fill="#8d714b"/><circle cx="17" cy="17.5" r="1" fill="#8d714b"/></svg>` },
+  { id: "offline-game", label: "Eternal Path", icon: `<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M6.5 11.5q7-3 13.5 1v19q-6.5-4-13.5-1zM33.5 11.5q-7-3-13.5 1v19q6.5-4 13.5-1z" fill="#e7ddc7" stroke="#94764b" stroke-width="1.5" stroke-linejoin="round"/><path d="M20 13v18M10 16q4-1 7 1M30 16q-4-1-7 1" fill="none" stroke="#a28354" stroke-width="1.2"/><path d="m20 5 1.2 2.3 2.5.4-1.8 1.8.4 2.5-2.3-1.2-2.3 1.2.4-2.5-1.8-1.8 2.5-.4z" fill="#c5a36c"/></svg>` },
+  { id: "character", label: "Character", icon: `<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 6.5c8 0 13.5 6 13.5 13.5S28 33.5 20 33.5 6.5 28 6.5 20 12 6.5 20 6.5z" fill="#e8dfca" stroke="#94764b" stroke-width="1.5"/><path d="M20 11.5a5 5 0 1 1 0 10 5 5 0 0 1 0-10zM11.5 29c1.5-4 4.2-6 8.5-6s7 2 8.5 6" fill="#b99a6a" stroke="#80623f" stroke-width="1.4" stroke-linecap="round"/></svg>` },
+  { id: "inventory", label: "Inventory", icon: `<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M8 14h24l-2 18H10z" fill="#e6dcc5" stroke="#94764b" stroke-width="1.5" stroke-linejoin="round"/><path d="M14 14v-3.5a6 6 0 0 1 12 0V14" fill="none" stroke="#b18b57" stroke-width="2"/><path d="M16 21h8" stroke="#80623f" stroke-width="1.5" stroke-linecap="round"/><path d="M20 18v7" stroke="#80623f" stroke-width="1.5" stroke-linecap="round"/></svg>` },
+  { id: "map", label: "Archive", icon: `<svg viewBox="0 0 40 40" aria-hidden="true"><path d="m7 11 9-3 9 3 8-3v22l-8 3-9-3-9 3z" fill="#e8dfca" stroke="#94764b" stroke-width="1.5" stroke-linejoin="round"/><path d="M16 8v22M25 11v22M11 17l3-2 3 2 3-1 3 2" fill="none" stroke="#a17e4e" stroke-width="1.3"/><circle cx="24" cy="19" r="2" fill="#b18b57"/></svg>` },
+  { id: "journal", label: "Journal", icon: `<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M10 7.5h21v26H10q-3 0-3-3V10.5q0-3 3-3z" fill="#e7ddc7" stroke="#94764b" stroke-width="1.5"/><path d="M12 7.5v26M17 14h10M17 19h10M17 24h7" stroke="#9b7a4d" stroke-width="1.4" stroke-linecap="round"/><path d="M27 7.5v6l-2-1.5-2 1.5v-6" fill="#b18b57"/></svg>` },
+  { id: "settings", label: "Settings", icon: `<svg viewBox="0 0 40 40" aria-hidden="true"><path d="m20 6 3 2 3.5-.5 1.5 3 3 1.5-.5 3.5 2 3-2 3 .5 3.5-3 1.5-1.5 3-3.5-.5-3 2-3-2-3.5.5-1.5-3-3-1.5.5-3.5-2-3 2-3-.5-3.5 3-1.5 1.5-3L17 8z" fill="#d9c49a" stroke="#94764b" stroke-width="1.4" stroke-linejoin="round"/><circle cx="20" cy="20" r="5" fill="#263a33" stroke="#80623f" stroke-width="1.5"/></svg>` }
 ];
 
 type AppScreen = ScreenId | "control";
@@ -472,18 +476,27 @@ function render(): void {
   const content = isControl
     ? floatingControlMarkup(floatingReadiness)
     : renderScreen(activeScreen as ScreenId, availableCharacters(), playerRegistryMessage, activeCharacterId ? getLedgerLog(activeCharacterId) : [], inventorySnapshot);
+  const previousNavigation = root.querySelector<HTMLElement>(".bottom-nav");
+  if (previousNavigation) savedNavigationScrollLeft = previousNavigation.scrollLeft;
   root.innerHTML = `<div class="app-shell ${isControl ? "control-shell" : ""} ${menuRevealPending ? "is-entering" : ""}">
     ${isControl ? "" : `<header class="app-header"><button class="brand" data-screen="home" aria-label="Merzkava home"><span class="brand-mark">M</span><span class="brand-wordmark"><small>MERZKAVA UNIVERSE</small><strong>Merzkava</strong></span></button><div class="header-context"><small>TACTICAL ACADEMY</small><strong>${navigation.find(item => item.id === activeScreen)?.label ?? "Command Hall"}</strong></div><div class="header-tools"><button class="header-settings" data-floating-action="start-bubble" aria-label="Start Bubble Mode" title="Start Bubble Mode">◉</button><button class="header-settings" data-screen="settings" aria-label="Settings">⚙</button></div></header>`}
     ${notice ? `<p class="notice" role="status">${escapeHtml(notice)}</p>` : ""}
     ${isControl ? content : `<main class="main-content">${content}${activeScreen === "settings" ? authPanel() + canonPanel() : ""}</main>`}
-    ${isControl ? "" : `<nav class="bottom-nav" aria-label="Academy navigation">${navigation.map((item, index) => `<button class="nav-item ${activeScreen === item.id ? "active" : ""}" data-screen="${item.id}" ${activeScreen === item.id ? 'aria-current="page"' : ""}><span class="nav-item-motion"><span class="nav-index">${String(index + 1).padStart(2, "0")}</span><span class="nav-icon">${item.icon}</span><small>${item.label}</small></span></button>`).join("")}</nav>`}
+    ${isControl ? "" : `<nav class="bottom-nav" aria-label="Academy navigation"><span class="nav-cable nav-cable-left" aria-hidden="true"></span><span class="nav-cable nav-cable-right" aria-hidden="true"></span>${navigation.map((item, index) => `<button class="nav-item ${activeScreen === item.id ? "active" : ""}" data-screen="${item.id}" ${activeScreen === item.id ? 'aria-current="page"' : ""}><span class="nav-item-motion"><span class="nav-index">${String(index + 1).padStart(2, "0")}</span><span class="nav-rotor" data-nav-rotor="${item.id}" aria-hidden="true"><span class="nav-rotor-mark"></span><span class="nav-icon"><span class="nav-icon-art">${item.icon}</span></span></span><small>${item.label}</small></span></button>`).join("")}</nav>`}
     ${isControl ? "" : `<div class="storage-status"><span class="status-dot"></span>${databaseMessage}</div>`}
     ${activeScreen === "gameplay" ? snapshotBlindMarkup() : ""}
     ${activeScreen === "home" && noticeboardVisible ? noticeboardMarkup() : ""}
     ${bugPanelMarkup()}
   </div>`;
-  // Keep the navigation rail anchored at its initial scroll position on route changes.
-  // Users may still swipe the rail manually; selecting a screen must not move the rail.
+  // Preserve the rail's manual roulette offset and each independent mechanical dial angle across rerenders.
+  const renderedNavigation = root.querySelector<HTMLElement>(".bottom-nav");
+  if (renderedNavigation) {
+    renderedNavigation.scrollLeft = savedNavigationScrollLeft;
+    renderedNavigation.querySelectorAll<HTMLElement>("[data-nav-rotor]").forEach(rotor => {
+      const id = rotor.dataset.navRotor;
+      if (id) applyNavigationRotor(rotor, id);
+    });
+  }
   menuRevealPending = false;
   if (shouldAnimateScreen) animateAppScreen(root.querySelector<HTMLElement>(".app-shell"));
   if (activeScreen === "offline-game") {
@@ -558,6 +571,16 @@ async function refreshPlayerRegistry(): Promise<void> {
 
 let pointerStart: { x: number; y: number } | null = null;
 let suppressNextPointerClick = false;
+let savedNavigationScrollLeft = 0;
+const navigationRotorAngles = new Map<string, number>();
+let activeNavigationRotor: { element: HTMLElement; pointerId: number; lastPointerAngle: number; startX: number; startY: number; lastTick: number } | null = null;
+
+function applyNavigationRotor(element: HTMLElement, id: string): void {
+  const angle = navigationRotorAngles.get(id) ?? 0;
+  const tilt = Math.max(-7, Math.min(7, Math.sin(angle * Math.PI / 180) * 7));
+  element.style.setProperty("--rotor-angle", `${angle}deg`);
+  element.style.setProperty("--icon-tilt", `${tilt}deg`);
+}
 
 let blindDragStartY: number | null = null;
 root.addEventListener("pointerdown", event => {
@@ -597,6 +620,63 @@ root.addEventListener("pointercancel", () => {
   suppressNextPointerClick = false;
 }, { passive: true });
 
+function pointerAngleOnRotor(element: HTMLElement, event: PointerEvent): number {
+  const rect = element.getBoundingClientRect();
+  return Math.atan2(event.clientY - (rect.top + rect.height / 2), event.clientX - (rect.left + rect.width / 2)) * 180 / Math.PI;
+}
+root.addEventListener("pointerdown", event => {
+  const target = event.target;
+  if (!(target instanceof Element)) return;
+  const rotor = target.closest<HTMLElement>("[data-nav-rotor]");
+  if (!rotor || (event.pointerType === "mouse" && event.button !== 0)) return;
+  const id = rotor.dataset.navRotor;
+  if (!id) return;
+  const angle = pointerAngleOnRotor(rotor, event);
+  activeNavigationRotor = {
+    element: rotor,
+    pointerId: event.pointerId,
+    lastPointerAngle: angle,
+    startX: event.clientX,
+    startY: event.clientY,
+    lastTick: Math.floor((navigationRotorAngles.get(id) ?? 0) / 22)
+  };
+  try { rotor.setPointerCapture(event.pointerId); } catch { /* pointer capture may be unavailable in embedded WebViews */ }
+  event.preventDefault();
+}, { passive: false });
+root.addEventListener("pointermove", event => {
+  const active = activeNavigationRotor;
+  if (!active || active.pointerId !== event.pointerId) return;
+  const id = active.element.dataset.navRotor;
+  if (!id) return;
+  const nextPointerAngle = pointerAngleOnRotor(active.element, event);
+  let delta = nextPointerAngle - active.lastPointerAngle;
+  if (delta > 180) delta -= 360;
+  if (delta < -180) delta += 360;
+  active.lastPointerAngle = nextPointerAngle;
+  if (Math.hypot(event.clientX - active.startX, event.clientY - active.startY) > 7) suppressNextPointerClick = true;
+  if (Math.abs(delta) > 0.05) {
+    const angle = (navigationRotorAngles.get(id) ?? 0) + delta;
+    navigationRotorAngles.set(id, angle);
+    applyNavigationRotor(active.element, id);
+    const tick = Math.floor(angle / 22);
+    if (tick !== active.lastTick) {
+      active.lastTick = tick;
+      playNavigationTick();
+    }
+  }
+  event.preventDefault();
+}, { passive: false });
+root.addEventListener("pointerup", event => {
+  if (!activeNavigationRotor || activeNavigationRotor.pointerId !== event.pointerId) return;
+  try {
+    if (activeNavigationRotor.element.hasPointerCapture(event.pointerId)) activeNavigationRotor.element.releasePointerCapture(event.pointerId);
+  } catch { /* pointer capture may already have been released */ }
+  activeNavigationRotor = null;
+}, { passive: true });
+root.addEventListener("pointercancel", event => {
+  if (activeNavigationRotor?.pointerId === event.pointerId) activeNavigationRotor = null;
+}, { passive: true });
+
 let navigationScrollIntent = false;
 let lastNavigationTick = -1;
 let navigationIntentTimer: number | undefined;
@@ -611,7 +691,9 @@ root.addEventListener("wheel", event => {
 }, { passive: true });
 root.addEventListener("scroll", event => {
   const nav = event.target;
-  if (!(nav instanceof HTMLElement) || !nav.matches(".bottom-nav") || !navigationScrollIntent) return;
+  if (!(nav instanceof HTMLElement) || !nav.matches(".bottom-nav")) return;
+  savedNavigationScrollLeft = nav.scrollLeft;
+  if (!navigationScrollIntent) return;
   const itemWidth = nav.clientWidth / 4;
   if (!itemWidth) return;
   const tick = Math.round(nav.scrollLeft / itemWidth);
