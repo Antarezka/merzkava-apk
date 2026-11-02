@@ -21,25 +21,40 @@ export function animateAppScreen(shell: HTMLElement | null, options: { menuToggl
   }
 
   if (options.menuToggle) {
-    const track = nav?.querySelector<HTMLElement>(".nav-roulette-track");
-    const cables = nav?.querySelectorAll<HTMLElement>(".nav-cable");
-    const grip = toggle?.querySelector<HTMLElement>(".nav-toggle-grip");
-    const arrow = toggle?.querySelector<HTMLElement>(".nav-toggle-arrow");
     const collapsed = shell.classList.contains("is-nav-collapsed");
-    if (track) animate(track, {
-      opacity: collapsed ? [1, 0] : [0, 1],
-      translateY: collapsed ? [0, 7] : [7, 0],
-      duration: 360,
-      ease: collapsed ? "inCubic" : "outCubic"
-    });
-    if (cables?.length) animate(cables, {
-      opacity: collapsed ? [0.88, 0] : [0, 0.88],
-      duration: 300,
-      ease: "inOutSine"
-    });
+    if (nav) {
+      // The lever stays fixed outside the dock; only the toolbar itself sinks.
+      nav.style.pointerEvents = collapsed ? "none" : "auto";
+      nav.style.opacity = collapsed ? "1" : "0";
+      nav.style.transform = collapsed
+        ? "translateX(-50%) translateY(0px)"
+        : "translateX(-50%) translateY(92px)";
+      animate(nav, {
+        translateY: collapsed ? [0, 92] : [92, 0],
+        opacity: collapsed ? [1, 0] : [0, 1],
+        duration: 520,
+        ease: collapsed ? "inCubic" : "outCubic",
+        onComplete: () => {
+          nav.style.pointerEvents = collapsed ? "none" : "auto";
+        }
+      });
+    }
+    if (header) {
+      header.style.opacity = collapsed ? "1" : "0";
+      header.style.transform = collapsed ? "translateY(0px)" : "translateY(-16px)";
+      animate(header, {
+        translateY: collapsed ? [0, -16] : [-16, 0],
+        opacity: collapsed ? [1, 0] : [0, 1],
+        duration: 430,
+        delay: collapsed ? 70 : 35,
+        ease: collapsed ? "inOutCubic" : "outCubic"
+      });
+    }
+    const grip = toggle?.querySelector<HTMLElement>(".nav-lever-grip");
+    const arrow = toggle?.querySelector<HTMLElement>(".nav-toggle-arrow");
     if (grip) animate(grip, {
       rotate: collapsed ? [0, -180] : [180, 0],
-      scaleX: [1, 1.35, 1],
+      scaleX: [1, 1.25, 1],
       duration: 460,
       ease: "outBack"
     });
@@ -49,8 +64,8 @@ export function animateAppScreen(shell: HTMLElement | null, options: { menuToggl
       ease: "outCubic"
     });
     if (toggle) animate(toggle, {
-      scale: [0.97, 1.035, 1],
-      duration: 420,
+      scale: [0.96, 1.04, 1],
+      duration: 430,
       ease: "outBack"
     });
     return;
