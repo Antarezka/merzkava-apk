@@ -24,7 +24,8 @@ const labels: Record<string, Partial<Record<AppLanguage, string>>> = {
   "Show toolbar":{id:"Tampilkan toolbar",pt:"Mostrar barra",fr:"Afficher la barre",ru:"Показать панель",ja:"ツールバーを表示","zh-CN":"显示工具栏",ko:"도구 모음 표시"},
   Appearance:{id:"Tampilan",pt:"Aparência",fr:"Apparence",ru:"Внешний вид",ja:"外観","zh-CN":"外观",ko:"화면"},
   Sound:{id:"Suara",pt:"Som",fr:"Son",ru:"Звук",ja:"サウンド","zh-CN":"声音",ko:"사운드"},
-  "Floating Control":{id:"Kontrol Mengambang",pt:"Controle Flutuante",fr:"Contrôle flottant",ru:"Плавающее управление",ja:"フローティング操作","zh-CN":"悬浮控制",ko:"플로팅 컨트롤"}
+  "Floating Control":{id:"Kontrol Mengambang",pt:"Controle Flutuante",fr:"Contrôle flottant",ru:"Плавающее управление",ja:"フローティング操作","zh-CN":"悬浮控制",ko:"플로팅 컨트롤"},
+  "Open Floating Control":{id:"Buka Floating Control",pt:"Abrir Controle Flutuante",fr:"Ouvrir le contrôle flottant",ru:"Открыть плавающее управление",ja:"フローティング操作を開く","zh-CN":"打开悬浮控制",ko:"플로팅 컨트롤 열기"}
 };
 
 Object.assign(labels, {
