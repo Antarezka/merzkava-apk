@@ -149,3 +149,17 @@ export function animateAppScreen(shell: HTMLElement | null, options: { menuToggl
     if (arrow) animate(arrow, { rotate: [0, 0], duration: 1 });
   }
 }
+
+
+/** A deliberate typewriter-style pull: the lever loads, snaps through its detent, then returns. */
+export function animateNavLeverPull(button: HTMLElement, onComplete: () => void): void {
+  const arm = button.querySelector<HTMLElement>(".nav-lever-arm");
+  const pivot = button.querySelector<HTMLElement>(".nav-lever-pivot");
+  if (!arm) { onComplete(); return; }
+  animate(arm, {
+    rotate: [{ to: -28, duration: 145, ease: "outQuad" }, { to: 0, duration: 310, ease: "outElastic(1, .62)" }],
+    translateY: [{ to: 5, duration: 145, ease: "outQuad" }, { to: 0, duration: 310, ease: "outBack" }],
+    onComplete
+  });
+  if (pivot) animate(pivot, { scale: [1, 1.16, 1], duration: 430, ease: "outBack" });
+}
