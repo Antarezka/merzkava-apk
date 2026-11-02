@@ -251,46 +251,71 @@ export function playTypewriterLeverSound(): void {
     const context = new window.AudioContext();
     const now = context.currentTime;
     if (context.state === "suspended") void context.resume();
-    const length = Math.floor(context.sampleRate * 0.3);
+
+    // Carriage rail: a short, dry metal-on-metal slide that eases to a stop.
+    const length = Math.floor(context.sampleRate * 0.22);
     const buffer = context.createBuffer(1, length, context.sampleRate);
     const samples = buffer.getChannelData(0);
     for (let i = 0; i < length; i++) {
-      const fade = Math.min(1, i / (context.sampleRate * 0.008)) * Math.pow(1 - i / length, 1.8);
-      samples[i] = (Math.random() * 2 - 1) * fade;
+      const progress = i / length;
+      const envelope = Math.min(1, i / (context.sampleRate * 0.006)) * Math.pow(1 - progress, 1.35);
+      const grit = (Math.random() * 2 - 1) * 0.72 + Math.sin(i * 0.19) * 0.28;
+      samples[i] = grit * envelope;
     }
     const scrape = context.createBufferSource();
-    const filter = context.createBiquadFilter();
-    const gain = context.createGain();
+    const rail = context.createBiquadFilter();
+    const scrapeGain = context.createGain();
     scrape.buffer = buffer;
-    filter.type = "bandpass";
-    filter.frequency.setValueAtTime(1120, now);
-    filter.frequency.exponentialRampToValueAtTime(420, now + 0.2);
-    filter.Q.value = 0.85;
-    gain.gain.setValueAtTime(0.0001, now);
-    gain.gain.exponentialRampToValueAtTime(0.09, now + 0.035);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.23);
-    scrape.connect(filter); filter.connect(gain); gain.connect(context.destination);
-    scrape.start(now); scrape.stop(now + 0.24);
-    const hit = (offset: number, hz: number, peak: number, decay: number, type: OscillatorType) => {
-      const osc = context.createOscillator();
-      const tone = context.createBiquadFilter();
-      const envelope = context.createGain();
-      osc.type = type;
-      osc.frequency.setValueAtTime(hz, now + offset);
-      osc.frequency.exponentialRampToValueAtTime(Math.max(55, hz * 0.48), now + offset + decay);
-      tone.type = "lowpass"; tone.frequency.setValueAtTime(2100, now + offset);
-      tone.frequency.exponentialRampToValueAtTime(520, now + offset + decay);
-      envelope.gain.setValueAtTime(0.0001, now + offset);
-      envelope.gain.exponentialRampToValueAtTime(peak, now + offset + 0.004);
-      envelope.gain.exponentialRampToValueAtTime(0.0001, now + offset + decay);
-      osc.connect(tone); tone.connect(envelope); envelope.connect(context.destination);
-      osc.start(now + offset); osc.stop(now + offset + decay + 0.01);
-    };
-    hit(0.105, 420, 0.12, 0.105, "triangle");
-    hit(0.155, 185, 0.17, 0.16, "sawtooth");
-    hit(0.205, 92, 0.13, 0.22, "sine");
-    hit(0.245, 1450, 0.035, 0.045, "square");
-    window.setTimeout(() => { void context.close(); }, 720);
+    rail.type = "bandpass";
+    rail.frequency.setValueAtTime(1450, now);
+    rail.frequency.exponentialRampToValueAtTime(360, now + 0.19);
+    rail.Q.value = 1.15;
+    scrapeGain.gain.setValueAtTime(0.0001, now);
+    scrapeGain.gain.exponentialRampToValueAtTime(0.075, now + 0.018);
+    scrapeGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.21);
+    scrape.connect(rail);
+    rail.connect(scrapeGain);
+    scrapeGain.connect(context.destination);
+    scrape.start(now);
+    scrape.stop(now + 0.22);
+
+    // The carriage reaches its stop: a bright original bell "ding" with soft harmonics.
+    const dingAt = now + 0.155;
+    [1320, 1980, 2640].forEach((frequency, index) => {
+      const bell = context.createOscillator();
+      const bellTone = context.createBiquadFilter();
+      const bellGain = context.createGain();
+      bell.type = "sine";
+      bell.frequency.setValueAtTime(frequency, dingAt);
+      bellTone.type = "lowpass";
+      bellTone.frequency.setValueAtTime(4200, dingAt);
+      const peak = [0.105, 0.036, 0.014][index];
+      const decay = [0.62, 0.42, 0.28][index];
+      bellGain.gain.setValueAtTime(0.0001, dingAt);
+      bellGain.gain.exponentialRampToValueAtTime(peak, dingAt + 0.006);
+      bellGain.gain.exponentialRampToValueAtTime(0.0001, dingAt + decay);
+      bell.connect(bellTone);
+      bellTone.connect(bellGain);
+      bellGain.connect(context.destination);
+      bell.start(dingAt);
+      bell.stop(dingAt + decay + 0.02);
+    });
+
+    // A quiet mechanical detent underneath the bell gives the stop a physical edge.
+    const detent = context.createOscillator();
+    const detentGain = context.createGain();
+    detent.type = "triangle";
+    detent.frequency.setValueAtTime(245, dingAt);
+    detent.frequency.exponentialRampToValueAtTime(112, dingAt + 0.075);
+    detentGain.gain.setValueAtTime(0.0001, dingAt);
+    detentGain.gain.exponentialRampToValueAtTime(0.045, dingAt + 0.004);
+    detentGain.gain.exponentialRampToValueAtTime(0.0001, dingAt + 0.085);
+    detent.connect(detentGain);
+    detentGain.connect(context.destination);
+    detent.start(dingAt);
+    detent.stop(dingAt + 0.095);
+
+    window.setTimeout(() => { void context.close(); }, 900);
   } catch (error) {
     console.warn("Merzkava typewriter lever sound could not play:", error);
     playClockworkRatchet();
