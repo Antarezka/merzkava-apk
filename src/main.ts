@@ -810,22 +810,64 @@ initializeGravityPullCord(root, {
   toggle: commitNavLeverToggle
 });
 
-// Handle the noticeboard before gesture-click suppression or other delegated actions.
-root.addEventListener("click", (event: MouseEvent) => {
-  const target = event.target;
-  if (!(target instanceof Element)) return;
-  const dismiss = target.closest<HTMLElement>("[data-notice-dismiss]");
-  const backdrop = target.classList.contains("noticeboard-backdrop");
-  if (!dismiss && !backdrop) return;
-  event.preventDefault();
-  event.stopImmediatePropagation();
-  if (dismiss?.dataset.noticeDismiss === "today") {
+// Noticeboard dismissal is handled separately from the app's delegated actions.
+// A backdrop tap closes it, while a swipe outside the panel is ignored.
+let noticeboardBackdropPointer: { id: number; x: number; y: number } | null = null;
+
+function dismissNoticeboard(mode: "once" | "today" = "once"): void {
+  if (!noticeboardVisible) return;
+  if (mode === "today") {
     try { localStorage.setItem(noticeboardStorageKey, "1"); } catch { /* Session-only dismissal still works. */ }
   }
   noticeboardVisible = false;
   document.body.classList.remove("noticeboard-open");
+  noticeboardBackdropPointer = null;
   render();
+}
+
+root.addEventListener("pointerdown", (event: PointerEvent) => {
+  if (!event.isPrimary || !noticeboardVisible) return;
+  const target = event.target;
+  if (!(target instanceof Element) || !target.matches(".noticeboard-backdrop")) {
+    noticeboardBackdropPointer = null;
+    return;
+  }
+  noticeboardBackdropPointer = { id: event.pointerId, x: event.clientX, y: event.clientY };
 }, true);
+
+root.addEventListener("pointerup", (event: PointerEvent) => {
+  const start = noticeboardBackdropPointer;
+  noticeboardBackdropPointer = null;
+  if (!start || start.id !== event.pointerId || !noticeboardVisible) return;
+  const target = event.target;
+  if (!(target instanceof Element) || !target.matches(".noticeboard-backdrop")) return;
+  const moved = Math.hypot(event.clientX - start.x, event.clientY - start.y);
+  if (moved > 12) return;
+  event.preventDefault();
+  event.stopImmediatePropagation();
+  dismissNoticeboard("once");
+}, true);
+
+root.addEventListener("pointercancel", () => {
+  noticeboardBackdropPointer = null;
+}, true);
+
+root.addEventListener("click", (event: MouseEvent) => {
+  if (!noticeboardVisible) return;
+  const target = event.target;
+  if (!(target instanceof Element)) return;
+  const dismiss = target.closest<HTMLElement>("[data-notice-dismiss]");
+  if (!dismiss) return;
+  event.preventDefault();
+  event.stopImmediatePropagation();
+  dismissNoticeboard(dismiss.dataset.noticeDismiss === "today" ? "today" : "once");
+}, true);
+
+window.addEventListener("keydown", (event: KeyboardEvent) => {
+  if (event.key !== "Escape" || !noticeboardVisible) return;
+  event.preventDefault();
+  dismissNoticeboard("once");
+});
 
 root.addEventListener("click", async (event: MouseEvent) => {
   const target = event.target;
