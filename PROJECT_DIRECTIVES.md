@@ -58,3 +58,11 @@ Use clear, beginner-friendly explanations. State limitations directly. Do not in
 - Put genuinely cross-mode infrastructure in `src/shared/`; keep app composition in `src/app/`.
 - Mirror those boundaries in `tests/` and `docs/`. Do not create parallel product roadmaps for individual modes.
 - Preserve the source boundary: Convo loads Universe canon directly; Offline Game consumes only approved World Archive packages; neither mode silently imports the other's runtime state or context.
+
+## Mandatory World Archive node policy
+
+- Every Offline Game narrative node/situation must be designed around one or more reviewed, player-safe World Archive dossiers. World Archive is the mandatory world-context anchor for every node; do not author detached, free-floating nodes.
+- Every node remains non-canonical gameplay content. A node may reference canon-backed people, places, institutions, rules, or events through Archive dossiers, but its scene, dialogue, choices, and outcomes must never establish new Merzkava Universe canon.
+- Preserve the existing provenance labels and rules (CANON, CANON_ADAPTATION, and IN_GAME_ORIGINAL). World Archive anchoring is a separate context requirement, not a replacement provenance label and not a claim that original gameplay material is canon.
+- Every content update that adds or expands nodes must add at least **two distinct nodes**. One-node updates are not acceptable. The existing nine-node starter slice is the established initial baseline; future increments must meet the two-node minimum while preserving existing coverage and quality gates.
+- Keep the existing planned node labels/categories and presentation taxonomy unless the product owner explicitly changes them. Validate node count, Archive anchors, non-canon status, and provenance labels before accepting each update.
