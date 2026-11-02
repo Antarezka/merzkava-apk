@@ -170,6 +170,6 @@ Eternal Path is not complete until a player can start/manage isolated journeys, 
 
 **Boundaries still open:** this bootstrap resolver currently uses the available save fields (character, region/location, age, time/day-cycle, weather, disposition and event history). Relationship, inventory/resource and current-activity contracts are not yet present; do not imply that full EP-2/EP-3 integration is complete. Save storage remains the existing local WebView/browser bridge, not final SQLite transaction storage.
 
-**Validation:** CI runs are active. The first test run exposed one stale empty-save expectation; it was corrected. Do not claim the latest branch validation or APK build passed until the newest workflow run completes. Physical Android interaction/visual QA remains open.
+**Validation:** Web App Validation and the Eternal Path quality gate passed for code commit `51f8b748` (TypeScript, production web build, 22 test files / 171 tests). The Android APK build for the same code commit is still queued/pending; no APK artifact or emulator result is claimed yet. Physical Android interaction/visual QA remains open.
 
 **Next:** verify the latest web validation and Eternal Path quality gate; then test the bootstrap interaction on Android. Keep Patch 1 authoring on hold until UI repair and EP-2 state contracts are verified. Patch 1 retains its 1,000-situation minimum.
