@@ -93,6 +93,13 @@ describe("Eternal Path live world scene", () => {
     expect(html).toContain("data-eternal-choice");
     expect(html).toContain("DISPOSITION");
     expect(html).toContain("JOURNEY MANAGER");
+    expect(html).toContain('class="expedition-manager-trigger"');
+    expect(html).toContain('class="expedition-manager-content" data-eternal-manager-content hidden');
+    expect(html).toContain('class="scene-coordinate scene-clock-ink"');
+    expect(html.indexOf('class="expedition-environment"')).toBeLessThan(html.indexOf('class="expedition-disposition-line"'));
+    expect(html.indexOf('class="expedition-disposition-line"')).toBeLessThan(html.indexOf('class="expedition-dialogue"'));
+    expect(html.indexOf('class="expedition-dialogue"')).toBeLessThan(html.indexOf('class="expedition-profile-compact"'));
+    expect(html).not.toContain("Manage journeys");
     expect(html).not.toContain("expedition-feature-grid");
     expect(html).not.toContain(dialogue?.choices[0].response ?? "__missing_choice_response__");
   });
