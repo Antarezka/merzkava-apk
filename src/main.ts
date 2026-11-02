@@ -57,6 +57,7 @@ function saveAppPreferences(): void {
 }
 applyAppPreferences();
 let menuRevealPending = false;
+let menuToggleAnimationPending = false;
 let cleanupExpeditionAnimations: (() => void) | undefined;
 let lastAnimatedScreen: AppScreen | null = null;
 const splashAnimationCleanup=new WeakMap<HTMLDivElement,()=>void>();
@@ -511,7 +512,10 @@ function render(): void {
     navigationDock?.style.setProperty("--cable-gear-angle", `${navigationCableRotation}deg`);
   }
   menuRevealPending = false;
-  if (shouldAnimateScreen) animateAppScreen(root.querySelector<HTMLElement>(".app-shell"));
+  if (shouldAnimateScreen || menuToggleAnimationPending) {
+    animateAppScreen(root.querySelector<HTMLElement>(".app-shell"), { menuToggle: menuToggleAnimationPending });
+    menuToggleAnimationPending = false;
+  }
   if (activeScreen === "offline-game") {
     const expeditionPage = root.querySelector<HTMLElement>(".expedition-page");
     if (expeditionPage) cleanupExpeditionAnimations = mountExpeditionAnimations(expeditionPage);
@@ -783,6 +787,7 @@ root.addEventListener("click", async (event: MouseEvent) => {
     navigationCollapsed = !navigationCollapsed;
     try { localStorage.setItem(NAV_COLLAPSED_STORAGE_KEY, String(navigationCollapsed)); } catch { /* Keep the control available for this session. */ }
     playClockworkRatchet();
+    menuToggleAnimationPending = true;
     render();
     return;
   }
