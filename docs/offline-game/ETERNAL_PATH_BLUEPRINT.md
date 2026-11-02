@@ -157,3 +157,19 @@ Eternal Path is not complete until a player can start/manage isolated journeys, 
 **Validation:** earlier CI exposed a failing UI assertion, then a storage-environment failure in the test runner. The latest code has corresponding fixes and new tests, but the newest full validation run is still pending/has not yet been observed. No TypeScript/build pass or physical Android QA is claimed.
 
 **Next vertical slice:** SQLite-backed save repository + versioned manifest, then a minimal ordinary-life activity loop using the existing authoritative world clock and HP/Satiety modules. Continue to keep Anime.js presentation-only: it must never own game time, deterministic RNG, state mutation or NPC simulation.
+
+
+### 13M. EP-3 context-aware narrative bootstrap (2026-11-02)
+
+**Implemented on `feature/archive-experience`:**
+- Added `src/offline-game/narrative-engine.ts` with a typed situation schema, eligibility evaluation, deterministic context-seeded selection, hidden choice outcomes, deterministic transaction IDs and replay guards.
+- Added a separately versioned `eternal-path-bootstrap` patch manifest and nine original starter situations: three each for Golden Dragon Empire, Tianhai Yunzhou and Beiming Gu. These are a small playable engine-validation slice, not Patch 1 and do not count toward the Patch-1 minimum of 1,000 materially distinct situations.
+- Replaced the locked narrative placeholder with Setting/Atmosphere, six-line Scene Action, observable Character Behavior, Dialogue, contextual perspective question and a response sheet. Outcome text appears only after the choice resolves.
+- Added save schema v4 with journey-local active node, event history and last outcome. Legacy v1–v3 journeys migrate forward without discarding their prior state. Choice effects, event record and world-clock advance are serialized in one save update.
+- Added deterministic selection, region eligibility, no-repeat, choice validation, save migration and UI contract tests. The retired 240-entry dialogue sequence remains unused.
+
+**Boundaries still open:** this bootstrap resolver currently uses the available save fields (character, region/location, age, time/day-cycle, weather, disposition and event history). Relationship, inventory/resource and current-activity contracts are not yet present; do not imply that full EP-2/EP-3 integration is complete. Save storage remains the existing local WebView/browser bridge, not final SQLite transaction storage.
+
+**Validation:** CI runs are active. The first test run exposed one stale empty-save expectation; it was corrected. Do not claim the latest branch validation or APK build passed until the newest workflow run completes. Physical Android interaction/visual QA remains open.
+
+**Next:** verify the latest web validation and Eternal Path quality gate; then test the bootstrap interaction on Android. Keep Patch 1 authoring on hold until UI repair and EP-2 state contracts are verified. Patch 1 retains its 1,000-situation minimum.
