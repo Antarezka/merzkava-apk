@@ -23,23 +23,26 @@ export function animateAppScreen(shell: HTMLElement | null, options: { menuToggl
   if (options.menuToggle) {
     const collapsed = shell.classList.contains("is-nav-collapsed");
     if (nav) {
-      // The lever stays anchored in the header; only the navigation dock sinks.
-      nav.style.pointerEvents = collapsed ? "none" : "auto";
-      nav.style.opacity = collapsed ? "1" : "0";
-      nav.style.transform = collapsed
-        ? "translateX(-50%) translateY(0px)"
-        : "translateX(-50%) translateY(92px)";
+      // Fold the dock almost completely, leaving a slim visible edge as a visual cue.
+      const peek = 16;
+      const hideDistance = Math.max(0, nav.offsetHeight - peek);
+      const from = collapsed ? 0 : hideDistance;
+      const to = collapsed ? hideDistance : 0;
+      nav.style.pointerEvents = "none";
+      nav.style.opacity = "1";
+      nav.style.transform = `translateX(-50%) translateY(${from}px)`;
       animate(nav, {
-        translateY: collapsed ? [0, 92] : [92, 0],
-        opacity: collapsed ? [1, 0] : [0, 1],
+        translateY: [from, to],
+        opacity: [1, 1],
         duration: 520,
         ease: collapsed ? "inCubic" : "outCubic",
         onComplete: () => {
           nav.style.pointerEvents = collapsed ? "none" : "auto";
+          nav.style.transform = `translateX(-50%) translateY(${to}px)`;
         }
       });
     }
-    // The header remains fully visible; only the navigation dock sinks.
+    // Only the circular lever remains in the compact header while the dock is folded.
     const grip = toggle?.querySelector<HTMLElement>(".nav-lever-grip");
     const arrow = toggle?.querySelector<HTMLElement>(".nav-toggle-arrow");
     if (grip) animate(grip, {
