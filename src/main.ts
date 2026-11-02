@@ -58,6 +58,7 @@ function saveAppPreferences(): void {
 applyAppPreferences();
 let menuRevealPending = false;
 let menuToggleAnimationPending = false;
+let languageAnimationPending = false;
 let cleanupExpeditionAnimations: (() => void) | undefined;
 let lastAnimatedScreen: AppScreen | null = null;
 const splashAnimationCleanup=new WeakMap<HTMLDivElement,()=>void>();
@@ -512,9 +513,10 @@ function render(): void {
     navigationDock?.style.setProperty("--cable-gear-angle", `${navigationCableRotation}deg`);
   }
   menuRevealPending = false;
-  if (shouldAnimateScreen || menuToggleAnimationPending) {
+  if (shouldAnimateScreen || menuToggleAnimationPending || languageAnimationPending) {
     animateAppScreen(root.querySelector<HTMLElement>(".app-shell"), { menuToggle: menuToggleAnimationPending });
     menuToggleAnimationPending = false;
+    languageAnimationPending = false;
   }
   if (activeScreen === "offline-game") {
     const expeditionPage = root.querySelector<HTMLElement>(".expedition-page");
@@ -1219,6 +1221,7 @@ root.addEventListener("change", event => {
   const target = event.target;
   if (target instanceof HTMLSelectElement && target.matches("[data-language-select]")) {
     currentLanguage = setLanguage(target.value);
+    languageAnimationPending = true;
     render();
     return;
   }
