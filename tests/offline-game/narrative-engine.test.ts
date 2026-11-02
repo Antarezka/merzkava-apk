@@ -32,7 +32,7 @@ describe("Eternal Path context-aware narrative engine",()=>{
     expect(first?.eligibility.regions).toContain("golden-dragon-empire");
     expect(selectNarrativeSituation(context({region:"beiming-gu"}))?.eligibility.regions).toContain("beiming-gu");
   });
-  it("does not repeat a completed node in the same journey history",()=>{
+  it("blocks a situation while it remains inside the replay cooldown window",()=>{
     const current=context();
     const selected=selectNarrativeSituation(current);
     expect(selected).not.toBeNull();
