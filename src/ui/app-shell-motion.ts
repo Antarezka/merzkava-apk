@@ -156,7 +156,7 @@ export function animateAppScreen(shell: HTMLElement | null, options: { menuToggl
 }
 
 
-/** Audio-timed mechanical lever: pull, ratchet run, pawl catch, then spring return. */
+/** Audio-timed mechanical lever: opening slack, secondary ratchet, hard catch, spring return. */
 export function animateNavLeverPull(button: HTMLElement, onComplete: () => void): void {
   const arm = button.querySelector<HTMLElement>(".nav-lever-arm");
   const pivot = button.querySelector<HTMLElement>(".nav-lever-pivot");
@@ -170,52 +170,53 @@ export function animateNavLeverPull(button: HTMLElement, onComplete: () => void)
     } catch { /* Haptics are optional and must never block the toolbar. */ }
   };
 
-  // 0.00–0.18s: the three opening impacts take up the lever's mechanical slack.
+  // 0.10–0.25s: match the opening cluster of short mechanical impacts.
   haptic(12);
   animate(arm, {
-    rotate: [{ to: -17, duration: 105, ease: "outQuad" }, { to: -31, duration: 75, ease: "inOutQuad" }],
-    translateY: [{ to: 3, duration: 105, ease: "outQuad" }, { to: 6, duration: 75, ease: "inOutQuad" }],
+    rotate: [
+      { to: -15, duration: 105, ease: "outQuad" },
+      { to: -30, duration: 85, ease: "inOutQuad" },
+    ],
+    translateY: [
+      { to: 3, duration: 105, ease: "outQuad" },
+      { to: 6, duration: 85, ease: "inOutQuad" },
+    ],
   });
 
-  // 0.38–1.03s: follow the repeated ratchet chatter with discrete gear-tooth movements.
+  // 0.64–0.82s: the quieter gear/pawl chatter becomes a small, deliberate movement.
   if (rotorGrips.length) {
     animate(rotorGrips, {
       rotate: [
-        { to: 11, duration: 72, ease: "outQuad" },
-        { to: -7, duration: 72, ease: "inOutSine" },
-        { to: 13, duration: 72, ease: "inOutSine" },
-        { to: -8, duration: 72, ease: "inOutSine" },
-        { to: 12, duration: 72, ease: "inOutSine" },
-        { to: -6, duration: 72, ease: "inOutSine" },
-        { to: 8, duration: 72, ease: "inOutSine" },
-        { to: -3, duration: 72, ease: "inOutSine" },
-        { to: 0, duration: 72, ease: "outCubic" },
+        { to: 7, duration: 48, ease: "outQuad" },
+        { to: -4, duration: 48, ease: "inOutSine" },
+        { to: 6, duration: 48, ease: "inOutSine" },
+        { to: -2, duration: 48, ease: "outCubic" },
       ],
-      delay: 380,
+      delay: 640,
     });
   }
-  window.setTimeout(() => haptic(18), 380);
+  window.setTimeout(() => haptic(10), 650);
 
-  // 1.10–1.24s: the loud pawl catch is a compact pivot impact, not a long wobble.
+  // 1.40–1.55s: align the pivot's firm mechanical catch with the loud final impact.
   if (pivot) animate(pivot, {
-    scale: [1, 1.16, 0.97, 1],
-    duration: 145,
-    delay: 1090,
+    scale: [1, 1.13, 0.96, 1],
+    duration: 150,
+    delay: 1400,
     ease: "outBack",
   });
-  window.setTimeout(() => haptic(25), 1100);
+  window.setTimeout(() => haptic(24), 1420);
 
-  // 1.26–1.92s: spring-loaded return follows the descending metallic clicks.
+  // 1.56–2.00s: release the lever after the catch; finish with a short settling motion.
   animate(arm, {
     rotate: [
-      { to: -25, duration: 75, delay: 1260, ease: "inQuad" },
-      { to: 2, duration: 440, ease: "outElastic(1, .68)" },
-      { to: 0, duration: 140, ease: "outCubic" },
+      { to: -24, duration: 55, delay: 1560, ease: "inQuad" },
+      { to: 2, duration: 300, ease: "outElastic(1, .68)" },
+      { to: 0, duration: 85, ease: "outCubic" },
     ],
     translateY: [
-      { to: 5, duration: 75, delay: 1260, ease: "inQuad" },
-      { to: -1, duration: 440, ease: "outBack" },
-      { to: 0, duration: 140, ease: "outCubic" },
+      { to: 5, duration: 55, delay: 1560, ease: "inQuad" },
+      { to: -1, duration: 300, ease: "outBack" },
+      { to: 0, duration: 85, ease: "outCubic" },
     ],
     onComplete: () => {
       haptic(12);
