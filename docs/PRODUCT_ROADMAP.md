@@ -315,9 +315,9 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 
 ### 5E. Context-aware Narrative Patch Engine — TODO
 
-<badge color="warning">PLANNED · NOT IN IMPLEMENTATION</badge>
+**Status:** PLANNED — NOT IN IMPLEMENTATION.
 
-**Priority:** Begin only after the shared toolbar/menu and current UI repair work are completed and verified. Do not spend the current implementation cycle authoring story nodes.
+**Priority:** Begin only after the shared toolbar/menu and current UI repair work are completed and verified. Do not spend the current implementation cycle authoring story nodes. **Tracking:** [Issue #3](https://github.com/Antarezka/merzkava-apk/issues/3).
 
 **Retirement rule:** The generated 240-entry 0.1.0 sequence is retired, removed from active runtime, and must not be recycled, lightly rewritten, or used as the structural template for Patch 1.
 
@@ -329,7 +329,7 @@ A feature is not DONE merely because a screen, button, placeholder, or design mo
 - [ ] Require each situation to define what happened, who is involved, what each actor can know, what is observable, what remains uncertain, the immediate stakes, constraints, and meaningful consequence branches.
 - [ ] Build contextual narrative composition: Setting/Atmosphere → Scene Action → observable Character Behavior → Dialogue → a final perspective question grounded in the actual event.
 - [ ] Make Scene Action substantial and alive (normally around 5–9 readable lines when the event warrants it); do not pad short events merely to hit a line count.
-- [ ] The closing question must demonstrate comprehension of the situation and invite the player to reason from their character perspective. Avoid generic commands such as “What do you do?”, “Your action?”, or forced first-person prompts such as “I will…”.
+- [ ] The closing question must demonstrate comprehension of the situation and invite the player to reason from their character’s perspective. Avoid generic commands such as “What do you do?”, “Your action?”, or forced first-person prompts such as “I will…”.
 - [ ] Choices must arise from the situation and character context; do not expose hidden outcomes, odds, disposition deltas, or consequences before resolution.
 - [ ] Keep the narrative in one independently scrollable reading column beneath the Scene Window; long scenes must not push or move the shared toolbar.
 - [ ] Validate the 1,000-situation minimum with a coverage matrix, duplicate/near-duplicate checks, context-combination audits, and human narrative-quality review before approving Patch 1.
