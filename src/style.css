@@ -2674,3 +2674,14 @@ body { color:var(--ui-ink); }
 /* Keep the detached lever's anchor fixed; Anime.js moves it in sync with the dock and clamps it at the screen edge. */
 .nav-toggle-handle{bottom:calc(7px + env(safe-area-inset-bottom,0px) + 20px)!important;transition:none!important}
 .app-shell.is-nav-collapsed .nav-toggle-handle{bottom:calc(7px + env(safe-area-inset-bottom,0px) + 20px)!important}
+
+
+/* Performance controls: four compact quality tiers in the Academy's brass-and-parchment language. */
+.performance-choice button{display:flex;align-items:center;justify-content:center;gap:7px;min-width:calc(50% - 4px);flex:1 1 calc(50% - 4px);}
+.performance-choice button span{color:var(--ui-brass);font:15px Georgia,serif;line-height:1;}
+.performance-setting-intro{border-bottom:0;padding-bottom:8px;}
+.performance-sigil{display:grid;place-items:center;flex:0 0 34px;height:34px;border:1px solid var(--ui-rule);border-radius:50%;color:var(--ui-brass);font:20px Georgia,serif;background:var(--ui-paper);}
+.performance-note{margin:5px 0 0;color:var(--ui-ink-soft);font-size:9px;line-height:1.55;}
+:root[data-theme="dark"] .performance-sigil{background:#202923;border-color:#64705b;color:#d0b77e;}
+.expedition-weather-particles .expedition-pixi-canvas{display:block;width:100%;height:100%;pointer-events:none;}
+.expedition-weather-particles[data-renderer="pixi"] .expedition-particle{display:none;}
