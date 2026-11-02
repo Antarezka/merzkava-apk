@@ -1,6 +1,6 @@
 import "./style.css";
 import "./ui/floating-ledger.css";
-import "./ui/floating-control.css";
+import "./ui/floating-control.css";\nimport "./ui/gravity-pull-cord.css";
 import { cancelOpeningSequence, playButtonSound, playClockworkRatchet, playNavigationTick, playTypewriterLeverSound, playOpeningSequence, playSnapshotSlideSound, playWarningBeep, setSoundEnabled } from "./audio/sound-effects";
 import { getGameplaySessionRecord, initializeDatabase, saveGameplaySessionRecord } from "./shared/database";
 import { createCharacter, deleteCharacter, listCharacters, type Character } from "./convo/characters/character-repository";
@@ -25,7 +25,7 @@ import { dustyLetterMarkup } from "./app/dusty-letter";
 import { APP_NAME, APP_VERSION } from "./app/app-meta";
 import { getLanguage, languagePanelMarkup, translateLabel, translateRenderedContent, setLanguage, type AppLanguage } from "./i18n";
 import { animateOpeningSplash, animateSplashCurtain } from "./ui/splash-animation";
-import { animateAppScreen, animateNavLeverPull } from "./ui/app-shell-motion";
+import { animateAppScreen } from "./ui/app-shell-motion";\nimport { initializeGravityPullCord } from "./ui/gravity-pull-cord";
 import { closeLoreEntry, closeLoreSource, closeLorePlaceholder, openLoreEntry, openLoreSource, openLorePlaceholder, setLoreCategory, setLoreSearch, renderLoreResults } from "./world-archive/lore-library";
 
 const app = document.querySelector<HTMLDivElement>("#app");
@@ -493,7 +493,7 @@ function render(): void {
     ${notice ? `<p class="notice" role="status">${escapeHtml(notice)}</p>` : ""}
     ${isControl ? content : `<main class="main-content">${activeScreen === "settings" ? `<details class="settings-category app-settings-category" open><summary><span>APP SETTINGS</span><small>Appearance · Language · Sound · Storage</small></summary><div class="settings-category-content">${languagePanelMarkup(currentLanguage)}${content}</div></details><details class="settings-category world-settings-category"><summary><span>WORLD & ACCOUNT</span><small>Supabase · AI Gateway · Canon Source</small></summary><div class="settings-category-content">${authPanel()}${canonPanel()}</div></details>` : `${content}${activeScreen === "home" ? dustyLetterMarkup(currentLanguage, APP_VERSION) : ""}`}</main>`}
     ${isControl ? "" : `<nav class="bottom-nav" aria-label="Academy navigation"><span class="nav-cable nav-cable-left" aria-hidden="true"></span><span class="nav-cable nav-cable-right" aria-hidden="true"></span><div class="nav-roulette-track">${navigation.map((item, index) => `<button class="nav-item ${activeScreen === item.id ? "active" : ""}" data-screen="${item.id}" ${activeScreen === item.id ? 'aria-current="page"' : ""}><span class="nav-item-motion"><span class="nav-index">${String(index + 1).padStart(2, "0")}</span><span class="nav-rotor" aria-hidden="true"><span class="nav-rotor-mark"></span><span class="nav-rotor-grip" data-nav-rotor="${item.id}"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="21" fill="none" stroke="transparent" stroke-width="7" pointer-events="stroke"/></svg></span><span class="nav-icon-frame nav-icon-frame-${item.id}"><span class="nav-icon"><span class="nav-icon-art">${item.icon}</span></span></span></span><small>${translateLabel(item.label, currentLanguage)}</small></span></button>`).join("")}</div></nav>`}
-    ${isControl ? "" : `<button class="nav-toggle-handle" type="button" data-nav-toggle aria-expanded="${!navigationCollapsed}" aria-label="${translateLabel(navigationCollapsed ? "Show toolbar" : "Hide toolbar", currentLanguage)}" title="${translateLabel(navigationCollapsed ? "Show toolbar" : "Hide toolbar", currentLanguage)}"><span class="nav-lever-assembly" aria-hidden="true"><span class="nav-lever-pivot"></span><span class="nav-lever-arm"><span class="nav-lever-shaft"></span><span class="nav-lever-grip"></span></span><span class="nav-lever-plate"></span></span><span class="nav-toggle-arrow" aria-hidden="true">${navigationCollapsed ? "⌃" : "⌄"}</span></button>`}
+    ${isControl ? "" : `<div class="gravity-pull-cord" data-gravity-cord aria-hidden="true"><span class="gravity-cord-anchor"></span><span class="gravity-cord-line"></span><button class="gravity-cord-terminal" type="button" data-cord-handle aria-label="${translateLabel(navigationCollapsed ? "Pull upward to show toolbar" : "Pull downward to hide toolbar", currentLanguage)}" title="${translateLabel(navigationCollapsed ? "Show toolbar" : "Hide toolbar", currentLanguage)}"><span class="gravity-cord-jewel" aria-hidden="true"></span></button></div>`}
 
     ${isControl ? "" : `<div class="storage-status"><span class="status-dot"></span>${databaseMessage}</div>`}
     ${activeScreen === "gameplay" ? snapshotBlindMarkup() : ""}
@@ -784,67 +784,20 @@ root.addEventListener("keydown", event => {
     else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
   }
 });
-let activeNavLeverPull: { element: HTMLButtonElement; pointerId: number; startY: number; startX: number; moved: boolean } | null = null;
-let suppressNavLeverClick = false;
 function commitNavLeverToggle(): void {
   navigationCollapsed = !navigationCollapsed;
   try { localStorage.setItem(NAV_COLLAPSED_STORAGE_KEY, String(navigationCollapsed)); } catch { /* Keep the control available for this session. */ }
-  menuToggleAnimationPending = true;
+  menuToggleAnimationPending = false;
   render();
 }
-root.addEventListener("pointerdown", event => {
-  const target = event.target;
-  if (!(target instanceof Element)) return;
-  const lever = target.closest<HTMLButtonElement>("[data-nav-toggle]");
-  if (!lever || event.button !== 0) return;
-  activeNavLeverPull = { element: lever, pointerId: event.pointerId, startY: event.clientY, startX: event.clientX, moved: false };
-  try { lever.setPointerCapture(event.pointerId); } catch { /* Pointer capture is optional on older WebViews. */ }
+initializeGravityPullCord(root, {
+  isCollapsed: () => navigationCollapsed,
+  toggle: commitNavLeverToggle
 });
-root.addEventListener("pointermove", event => {
-  const pull = activeNavLeverPull;
-  if (!pull || pull.pointerId !== event.pointerId) return;
-  const distance = Math.hypot(event.clientX - pull.startX, event.clientY - pull.startY);
-  if (distance > 5) pull.moved = true;
-  if (pull.moved) event.preventDefault();
-}, { passive: false });
-root.addEventListener("pointerup", event => {
-  const pull = activeNavLeverPull;
-  if (!pull || pull.pointerId !== event.pointerId) return;
-  activeNavLeverPull = null;
-  const distanceY = event.clientY - pull.startY;
-  const distanceX = event.clientX - pull.startX;
-  if (Math.hypot(distanceX, distanceY) < 18) return;
-  suppressNavLeverClick = true;
-  const shouldToggle = Math.abs(distanceY) >= Math.abs(distanceX) ? distanceY > 0 : Math.abs(distanceX) > 18;
-  if (!shouldToggle) return;
-  pull.element.classList.add("is-pulled");
-  playTypewriterLeverSound();
-  animateNavLeverPull(pull.element, () => {
-    pull.element.classList.remove("is-pulled");
-    commitNavLeverToggle();
-  });
-}, { passive: true });
-root.addEventListener("pointercancel", event => {
-  if (activeNavLeverPull?.pointerId === event.pointerId) {
-    activeNavLeverPull.element.classList.remove("is-pulled");
-    activeNavLeverPull = null;
-  }
-}, { passive: true });
 
 root.addEventListener("click", async (event: MouseEvent) => {
   const target = event.target;
   if (!(target instanceof Element)) return;
-  const navLever = target.closest<HTMLButtonElement>("[data-nav-toggle]");
-  if (navLever) {
-    if (suppressNavLeverClick) { suppressNavLeverClick = false; return; }
-    playTypewriterLeverSound();
-    navLever.classList.add("is-pulled");
-    animateNavLeverPull(navLever, () => {
-      navLever.classList.remove("is-pulled");
-      commitNavLeverToggle();
-    });
-    return;
-  }
   const activeEternalModal=root.querySelector<HTMLElement>(".expedition-choice-modal:not([hidden])");
   if(activeEternalModal && !target.closest(".expedition-choice-modal")) return;
   if (event.detail !== 0 && suppressNextPointerClick) {
