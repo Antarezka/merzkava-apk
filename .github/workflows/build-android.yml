@@ -49,6 +49,9 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Prepare full application version label
+        run: echo "VITE_APP_VERSION=v.1.01.${GITHUB_RUN_NUMBER}-${GITHUB_SHA:0:3}" >> "$GITHUB_ENV"
+
       - name: Build web application
         run: npm run build
         env:

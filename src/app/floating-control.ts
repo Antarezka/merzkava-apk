@@ -1,5 +1,6 @@
 import type { FloatingReadiness } from "../native/floating-window";
 import { languagePanelMarkup, type AppLanguage } from "../i18n";
+import { APP_NAME, APP_VERSION } from "./app-meta";
 
 function status(ready: boolean): string {
   return ready
@@ -9,7 +10,7 @@ function status(ready: boolean): string {
 
 export function floatingControlMarkup(state: FloatingReadiness, language: AppLanguage = "en"): string {
   return `<main class="floating-control">
-    <div class="floating-control-brand"><span class="floating-brand-mark">M</span><div><small>MERZKAVA UNIVERSE</small><h1>Floating Control</h1></div></div>
+    <div class="floating-control-brand"><span class="floating-brand-mark">M</span><div><small>${APP_NAME.toUpperCase()} · APK ${APP_VERSION}</small><h1>Floating Control</h1></div></div>
     ${languagePanelMarkup(language)}\n    <p class="floating-control-intro">Prepare the permissions and background service before entering your world. Complete each step in order.</p>
 
     <section class="floating-health-panel">
