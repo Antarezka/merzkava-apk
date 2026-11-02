@@ -631,6 +631,61 @@ root.addEventListener("pointerdown", event => {
   if (!rotor || (event.pointerType === "mouse" && event.button !== 0)) return;
   const id = rotor.dataset.navRotor;
   if (!id) return;
+  activeNavigationRotor = {
+    element: rotor,
+    pointerId: event.pointerId,
+    lastPointerAngle: pointerAngleOnRotor(rotor, event),
+    startX: event.clientX,
+    startY: event.clientY,
+    lastTick: Math.floor((navigationRotorAngles.get(id) ?? 0) / 22)
+  };
+  try { rotor.setPointerCapture(event.pointerId); } catch { /* pointer capture may be unavailable in embedded WebViews */ }
+}, { passive: true });
+root.addEventListener("pointermove", event => {
+  const active = activeNavigationRotor;
+  if (!active || active.pointerId !== event.pointerId) return;
+  const id = active.element.dataset.navRotor;
+  if (!id) return;
+  const nextPointerAngle = pointerAngleOnRotor(active.element, event);
+  let delta = nextPointerAngle - active.lastPointerAngle;
+  if (delta > 180) delta -= 360;
+  if (delta < -180) delta += 360;
+  active.lastPointerAngle = nextPointerAngle;
+  if (Math.hypot(event.clientX - active.startX, event.clientY - active.startY) > 7) suppressNextPointerClick = true;
+  if (Math.abs(delta) > 0.05) {
+    const angle = (navigationRotorAngles.get(id) ?? 0) + delta;
+    navigationRotorAngles.set(id, angle);
+    applyNavigationRotor(active.element, id);
+    const tick = Math.floor(angle / 22);
+    if (tick !== active.lastTick) {
+      active.lastTick = tick;
+      playNavigationTick();
+    }
+  }
+  if (suppressNextPointerClick) event.preventDefault();
+}, { passive: false });
+root.addEventListener("pointerup", event => {
+  if (!activeNavigationRotor || activeNavigationRotor.pointerId !== event.pointerId) return;
+  try {
+    if (activeNavigationRotor.element.hasPointerCapture(event.pointerId)) activeNavigationRotor.element.releasePointerCapture(event.pointerId);
+  } catch { /* pointer capture may already have been released */ }
+  activeNavigationRotor = null;
+}, { passive: true });
+root.addEventListener("pointercancel", event => {
+  if (activeNavigationRotor?.pointerId === event.pointerId) activeNavigationRotor = null;
+}, { passive: true });
+
+function pointerAngleOnRotor(element: HTMLElement, event: PointerEvent): number {
+  const rect = element.getBoundingClientRect();
+  return Math.atan2(event.clientY - (rect.top + rect.height / 2), event.clientX - (rect.left + rect.width / 2)) * 180 / Math.PI;
+}
+root.addEventListener("pointerdown", event => {
+  const target = event.target;
+  if (!(target instanceof Element)) return;
+  const rotor = target.closest<HTMLElement>("[data-nav-rotor]");
+  if (!rotor || (event.pointerType === "mouse" && event.button !== 0)) return;
+  const id = rotor.dataset.navRotor;
+  if (!id) return;
   const angle = pointerAngleOnRotor(rotor, event);
   activeNavigationRotor = {
     element: rotor,
