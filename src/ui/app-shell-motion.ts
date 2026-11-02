@@ -23,7 +23,7 @@ export function animateAppScreen(shell: HTMLElement | null, options: { menuToggl
   if (options.menuToggle) {
     const collapsed = shell.classList.contains("is-nav-collapsed");
     if (nav) {
-      // The lever stays fixed outside the dock; only the toolbar itself sinks.
+      // The lever stays anchored in the header; only the navigation dock sinks.
       nav.style.pointerEvents = collapsed ? "none" : "auto";
       nav.style.opacity = collapsed ? "1" : "0";
       nav.style.transform = collapsed
