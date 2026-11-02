@@ -28,12 +28,12 @@ export function renderExpeditionInterface():string {
     <div class="expedition-window-frost" aria-hidden="true"><img class="expedition-window-frost-image" src="/game/scenery/shared/fx-07a-window-frost.png" alt="" /></div>
     <div class="expedition-window-frame" aria-hidden="true"></div><span class="expedition-window-label">SCENE WINDOW · LIVE WORLD</span>
     <div class="expedition-scene-copy"><span class="scene-kicker">${escapeHtml(regionNames[scene.region])} · ${escapeHtml(atmosphere.cycle)} · ${escapeHtml(atmosphere.weather)}</span><h3>${escapeHtml(scene.label)}</h3><p>${escapeHtml(scene.detail)}</p></div>
-    <span class="scene-coordinate">${save? `DAY ${save.day} · ${String(save.hour).padStart(2,"0")}:${String(save.minute).padStart(2,"0")}`:"WORLD SCENE PREVIEW"}</span>
+    <span class="scene-coordinate scene-clock-ink">${save? `DAY ${save.day} · ${String(save.hour).padStart(2,"0")}:${String(save.minute).padStart(2,"0")}`:"WORLD SCENE PREVIEW"}</span>
   </section>`;
   const startPanel=save?`<section class="expedition-character-panel expedition-profile-compact" aria-label="Your adventurer profile">
     <div class="expedition-profile-identity"><div><span class="expedition-profile-kicker">YOUR ADVENTURER</span><h3 class="expedition-player-name">${escapeHtml(save.character.name)}</h3><p class="expedition-note">Age ${save.character.age} · ${escapeHtml(regionNames[scene.region])} · Day ${save.day}</p></div></div>
     <div class="expedition-profile-meta"><span>SPIRIT REALM <b>Not recorded</b></span><span>MARTIAL SOUL <b>Not recorded</b></span><span>SPIRIT RING ABSORPTION <b>Not recorded</b></span><span>SYNC PROGRESS <b>Not recorded</b></span><span>ARCANIST GRADE <b>Not recorded</b></span><span>ARCANIST FOCUS <b>Not recorded</b></span><span>HP <b>Not recorded</b></span><span>SATIETY <b>Not recorded</b></span></div>
-    <div class="expedition-profile-actions"><span class="expedition-save-label">SAVE · ${escapeHtml(save.saveName)}</span><button type="button" class="text-button" data-eternal-manager-toggle>Manage journeys</button><button type="button" class="text-button danger" data-eternal-end>Leave journey</button></div></section>`
+    <div class="expedition-profile-actions"><span class="expedition-save-label">SAVE · ${escapeHtml(save.saveName)}</span><button type="button" class="text-button danger" data-eternal-end>Leave journey</button></div></section>`
     :`<section class="expedition-character-panel expedition-empty-profile"><span class="expedition-profile-kicker">NO ACTIVE JOURNEY</span><p class="expedition-note">Create a new local journey or load one of your saved adventures below. World Archive remains read-only.</p></section>`;
   const savedSlots=listEternalSaves();
   const saveCards=savedSlots.map(slot=>`<article class="expedition-save-card" data-save-card="${escapeHtml(slot.id)}">
@@ -44,9 +44,10 @@ export function renderExpeditionInterface():string {
   const createJourneyForm=`<form id="eternal-start-form" class="expedition-start-form" ${save?"hidden":""}><div class="section-heading"><span>NEW JOURNEY</span><small>NON-CANON · LOCAL SAVE</small></div><label for="eternal-name">Character name</label><input id="eternal-name" name="name" minlength="2" maxlength="32" required placeholder="Your adventurer's name" />
       <div class="expedition-form-row"><div><label for="eternal-age">Age</label><input id="eternal-age" name="age" type="number" min="1" max="120" value="14" required /></div><div><label for="eternal-region">Starting region</label><select id="eternal-region" name="region"><option value="golden-dragon-empire">Golden Dragon Empire</option><option value="tianhai-yunzhou">Tianhai Yunzhou</option><option value="beiming-gu">Beiming Gu</option></select></div></div>
       <button type="submit" class="action-button">Begin new journey <span>↗</span></button></form>`;
-  const managerPanel=`<section class="expedition-save-manager" aria-label="Eternal Path save manager">
-    ${save?`<button type="button" class="expedition-manager-toggle" data-eternal-manager-toggle><span>JOURNEY MANAGER</span><small>${savedSlots.length} SAVED</small></button>`:`<div class="section-heading"><span>JOURNEY MANAGER</span><small>${savedSlots.length} SAVED</small></div>`}
+  const managerPanel=`<section class="expedition-save-manager ${save?"is-compact":""}" aria-label="Eternal Path save manager">
+    ${save?`<button type="button" class="expedition-manager-trigger" data-eternal-manager-toggle aria-label="Open Save Manager" aria-expanded="false" title="Save Manager"><span aria-hidden="true">▤</span></button>`:`<div class="section-heading"><span>JOURNEY MANAGER</span><small>${savedSlots.length} SAVED</small></div>`}
     <div class="expedition-manager-content" data-eternal-manager-content ${save?"hidden":""}>
+      ${save?`<div class="expedition-manager-heading"><span>JOURNEY MANAGER · ${savedSlots.length} SAVED</span><button type="button" class="expedition-manager-close" data-eternal-manager-toggle aria-label="Close Save Manager">×</button></div>`:""}
       <div class="expedition-save-list">${saveCards||`<p class="expedition-note">No saved journeys yet. Your first journey will appear here.</p>`}</div>
       ${save?`<button type="button" class="text-button" data-eternal-new-form>＋ Create another journey</button>`:""}
       ${createJourneyForm}
@@ -69,9 +70,9 @@ export function renderExpeditionInterface():string {
       <div class="expedition-choice-list">${dialogue.choices.map((choice,index)=>`<button type="button" class="expedition-choice" data-eternal-choice="${index}"><span>0${index+1}</span><strong>${escapeHtml(choice.label)}</strong></button>`).join("")}</div>
     </section>
   </div>`:"";
+  const disposition=save?`<div class="expedition-disposition-line"><span>DISPOSITION</span><strong>${escapeHtml(save.disposition.label)}</strong></div>`:"";
+  const activeJourneyLayout=save?`${sceneWindow}${disposition}${story}${startPanel}${managerPanel}`:`${sceneWindow}${startPanel}${managerPanel}${story}`;
   return `<section class="expedition-page" aria-label="Merzkava Eternal Path"><header class="expedition-heading"><div><p class="eyebrow">STANDALONE</p><h2>✦ MERZKAVA: ETERNAL PATH</h2></div></header>
-    ${sceneWindow}${startPanel}${managerPanel}
-    ${save?`<div class="expedition-disposition-line"><span>DISPOSITION</span><strong>${escapeHtml(save.disposition.label)}</strong></div>`:""}
-    ${story}${choiceModal}
+    ${activeJourneyLayout}${choiceModal}
     <footer class="expedition-footer"><span>ETERNAL PATH · LOCAL CONTENT PACK</span><span>WORLD ARCHIVE · READ ONLY</span></footer></section>`;
 }
