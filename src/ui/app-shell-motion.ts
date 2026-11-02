@@ -14,9 +14,14 @@ export function animateAppScreen(shell: HTMLElement | null, options: { menuToggl
   const toggle = shell.querySelector<HTMLElement>(".nav-toggle-handle");
 
   if (reducedMotion) {
-    [header, content, nav, toggle].forEach(element => {
+    [header, content, nav].forEach(element => {
       if (element) { element.style.opacity = "1"; element.style.transform = ""; }
     });
+    if (toggle) {
+      const collapsed = shell.classList.contains("is-nav-collapsed");
+      toggle.style.opacity = "1";
+      toggle.style.transform = collapsed ? "translateY(25px)" : "";
+    }
     return;
   }
 
@@ -50,6 +55,27 @@ export function animateAppScreen(shell: HTMLElement | null, options: { menuToggl
           });
         }
       });
+      // The lever follows the dock's corner, then clamps at the screen edge.
+      // Its travel is the difference between the expanded and collapsed CSS bottom offsets.
+      if (toggle) {
+        const leverFrom = collapsed ? 0 : 25;
+        const leverTo = collapsed ? 25 : 0;
+        const leverDirection = Math.sign(leverTo - leverFrom);
+        const leverDistance = Math.abs(leverTo - leverFrom);
+        const leverStages = [
+          { to: leverFrom + leverDirection * leverDistance * 0.12, duration: 180, ease: "outSine" },
+          { to: leverTo - leverDirection * Math.min(5, leverDistance * 0.035), duration: 560, ease: "inOutSine" },
+          { to: leverTo, duration: 220, ease: "outCubic" }
+        ];
+        animate(toggle, {
+          translateY: leverStages,
+          duration: 960,
+          ease: "inOutSine",
+          onComplete: () => {
+            toggle.style.transform = leverTo ? `translateY(${leverTo}px)` : "";
+          }
+        });
+      }
     }
     // The lever is a sibling of the dock, so it stays visible and moves independently.
     const grip = toggle?.querySelector<HTMLElement>(".nav-lever-grip");
