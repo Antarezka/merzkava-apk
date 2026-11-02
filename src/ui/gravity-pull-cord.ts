@@ -38,8 +38,8 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
     window.setTimeout(() => {
       const { line, handle } = getParts();
       if (!line || !handle) return;
-      const currentHeight = Math.max(118, line.getBoundingClientRect().height);
-      const currentTop = Math.max(111, Number.parseFloat(handle.style.top) || 111);
+      const currentHeight = clamp(line.getBoundingClientRect().height, 48, 230);
+      const currentTop = clamp(Number.parseFloat(handle.style.top) || 111, 40, 223);
       animate(line, { height: [currentHeight, 118], duration: 690, ease: "outElastic(1, .52)" });
       animate(handle, { top: [currentTop, 111], duration: 690, ease: "outElastic(1, .52)" });
     }, delay);
@@ -177,15 +177,15 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
     if (!active || active.pointerId !== event.pointerId) return;
     const { line, handle } = getParts();
     if (!line || !handle) return;
-    const extension = clamp(event.clientY - active.startY, 0, 112);
-    // Treat the cord as a flexible tether: horizontal hand movement bends
-    // the rope and shifts the ornament sideways without changing pull length.
-    const ropeLength = Math.max(80, 118 + extension);
+    const vertical = clamp(event.clientY - active.startY, -70, 112);
+    // The jewel follows the finger in every direction. Upward/sideways motion
+    // only flexes the tether; the pull action is reserved for the lower zone.
+    const ropeLength = Math.max(48, 118 + vertical);
     const bend = clamp(Math.atan2(event.clientX - active.startX, ropeLength) * 180 / Math.PI, -28, 28);
     const shift = Math.tan(bend * Math.PI / 180) * ropeLength;
-    line.style.height = `${118 + extension}px`;
+    line.style.height = `${ropeLength}px`;
     line.style.setProperty("--cord-bend", `${bend}deg`);
-    handle.style.top = `${111 + extension}px`;
+    handle.style.top = `${111 + vertical}px`;
     handle.style.setProperty("--cord-shift", `${shift}px`);
   }, { passive: true });
 
