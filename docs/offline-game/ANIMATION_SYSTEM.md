@@ -85,3 +85,19 @@ Still required:
 - Record the exact APK build and device QA evidence in the master roadmap.
 
 A passing unit test or web build does not prove the fog looks correct on device.
+
+
+## PixiJS atmosphere renderer and performance tiers
+
+Eternal Path uses PixiJS v8 for the moving weather/season particle layer inside `.expedition-environment` only. PixiJS is installed as an npm dependency and bundled by Vite into local application assets; the renderer and scene effects do not require a network connection at runtime. The surrounding scene artwork, window frame, text, lighting plates, and Anime.js presentation transitions remain in their existing DOM/CSS/Anime.js layers.
+
+The Settings > Performance control stores `merzkava-performance-tier` locally and offers four quality levels:
+
+| Level | Pixi resolution multiplier | Particle budget (rain / snow / petals) | Renderer cap |
+|---|---:|---:|---:|
+| Sangat Rendah | 0.45 | 7 / 6 / 5 | 24 FPS |
+| Rendah | 0.65 | 11 / 9 / 8 | 30 FPS |
+| Normal | 0.82 | 17 / 14 / 11 | 45 FPS |
+| Tinggi | 1.00 | 24 / 19 / 15 | 60 FPS |
+
+Resolution is multiplied by a device-pixel-ratio cap of 2. The setting affects the PixiJS particle canvas resolution, particle count, and ticker cap; it does not downscale the underlying scene background image or other app screens. The renderer pauses while the document is hidden, is destroyed when Eternal Path rerenders or closes, and falls back to the existing Anime.js DOM particles if PixiJS initialization fails or reduced motion is requested.
