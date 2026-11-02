@@ -31,11 +31,17 @@ export function animateAppScreen(shell: HTMLElement | null, options: { menuToggl
       nav.style.pointerEvents = "none";
       nav.style.opacity = "1";
       nav.style.transform = `translateX(-50%) translateY(${from}px)`;
+      const direction = Math.sign(to - from);
+      const distance = Math.abs(to - from);
       animate(nav, {
-        translateY: [from, to],
+        translateY: [
+          { to: from + direction * distance * 0.12, duration: 180, ease: "outSine" },
+          { to: to - direction * Math.min(5, distance * 0.035), duration: 560, ease: "inOutSine" },
+          { to, duration: 220, ease: "outCubic" }
+        ],
         opacity: [1, 1],
-        duration: 520,
-        ease: collapsed ? "inCubic" : "outCubic",
+        duration: 960,
+        ease: "inOutSine",
         onComplete: () => {
           nav.style.pointerEvents = collapsed ? "none" : "auto";
           nav.style.transform = `translateX(-50%) translateY(${to}px)`;
