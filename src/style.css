@@ -2461,8 +2461,6 @@ body { color:var(--ui-ink); }
 }
 
 
-.floating-mode-actions{display:grid;gap:8px;margin-top:12px}.floating-mode-actions .text-button{justify-self:start;min-height:36px;padding:8px 2px;color:var(--ui-brass);font-size:10px;letter-spacing:.08em}.floating-mode-actions .action-button{width:100%}
-
 /* Retractable clockwork navigation rail: brass lever stays reachable when folded. */
 .bottom-nav{transition:transform .48s cubic-bezier(.2,.75,.2,1),opacity .3s ease;will-change:transform}
 .app-shell.is-nav-collapsed .bottom-nav{transform:translate(-50%,calc(100% + 12px));opacity:.18;pointer-events:none}
