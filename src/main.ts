@@ -651,6 +651,10 @@ root.addEventListener("pointerup", event => {
     blindDragStartY = null;
   }
   pointerStart = null;
+  // A drag may not produce a click event (for example, when the finger scrolls
+  // the page). Clear the one-gesture click guard after the browser's click turn
+  // so it can never swallow the next, unrelated button tap.
+  if (suppressNextPointerClick) window.setTimeout(() => { suppressNextPointerClick = false; }, 0);
 }, { passive: true });
 
 root.addEventListener("pointercancel", () => {
