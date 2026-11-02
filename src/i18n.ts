@@ -113,6 +113,50 @@ Object.assign(labels, {
   "No saved journeys yet. Your first journey will appear here.":{id:"Belum ada perjalanan tersimpan. Perjalanan pertamamu akan muncul di sini.",pt:"Ainda não há jornadas salvas. Sua primeira jornada aparecerá aqui.",fr:"Aucun voyage enregistré. Votre premier voyage apparaîtra ici.",ru:"Сохранённых путешествий пока нет. Первое появится здесь.",ja:"保存された旅はまだありません。最初の旅がここに表示されます。","zh-CN":"尚无已保存的旅程。你的第一段旅程会显示在这里。",ko:"저장된 여정이 없습니다. 첫 여정이 여기에 표시됩니다."}
 });
 
+
+Object.assign(labels, {
+  "FULL CHARACTER PROFILE · players.md · 18 FIELDS":{id:"PROFIL KARAKTER LENGKAP · players.md · 18 BIDANG",pt:"PERFIL COMPLETO DO PERSONAGEM · players.md · 18 CAMPOS",fr:"PROFIL COMPLET DU PERSONNAGE · players.md · 18 CHAMPS",ru:"ПОЛНЫЙ ПРОФИЛЬ ПЕРСОНАЖА · players.md · 18 ПОЛЕЙ",ja:"キャラクター完全プロフィール · players.md · 18項目","zh-CN":"完整角色档案 · players.md · 18 个字段",ko:"전체 캐릭터 프로필 · players.md · 18개 항목"},
+  "REGISTERED · players.md":{id:"TERDAFTAR · players.md",pt:"REGISTRADO · players.md",fr:"ENREGISTRÉ · players.md",ru:"ЗАРЕГИСТРИРОВАНО · players.md",ja:"登録済み · players.md","zh-CN":"已登记 · players.md",ko:"등록됨 · players.md"},
+  "No ledger entries yet":{id:"Belum ada entri ledger",pt:"Ainda não há lançamentos no livro-razão",fr:"Aucune entrée dans le registre pour le moment",ru:"Записей в журнале пока нет",ja:"台帳の記録はまだありません","zh-CN":"暂无账本记录",ko:"아직 원장 항목이 없습니다"},
+  "Only verified changes to character state will appear here. GM narration alone never changes your records.":{id:"Hanya perubahan status karakter yang terverifikasi akan muncul di sini. Narasi GM saja tidak pernah mengubah catatanmu.",pt:"Somente alterações verificadas no estado do personagem aparecerão aqui. A narração do GM, por si só, nunca altera seus registros.",fr:"Seules les modifications vérifiées de l’état du personnage apparaîtront ici. La narration du MJ seule ne modifie jamais vos données.",ru:"Здесь отображаются только подтверждённые изменения состояния персонажа. Одно лишь повествование мастера не меняет записи.",ja:"ここには確認済みのキャラクター状態の変更のみが表示されます。GMの語りだけで記録が変わることはありません。","zh-CN":"这里只会显示经过验证的角色状态变更。GM 叙述本身不会更改你的记录。",ko:"검증된 캐릭터 상태 변경만 여기에 표시됩니다. GM의 서술만으로 기록이 바뀌지는 않습니다."},
+  "POSSESSIONS & FINANCES":{id:"KEPEMILIKAN & KEUANGAN",pt:"BENS E FINANÇAS",fr:"POSSESSIONS ET FINANCES",ru:"ИМУЩЕСТВО И ФИНАНСЫ",ja:"所持品と財務","zh-CN":"物品与财务",ko:"소지품 및 재정"},
+  "Items, equipment, structures, and wallet.":{id:"Barang, perlengkapan, bangunan, dan dompet.",pt:"Itens, equipamentos, estruturas e carteira.",fr:"Objets, équipement, structures et portefeuille.",ru:"Предметы, снаряжение, сооружения и кошелёк.",ja:"アイテム、装備、建造物、所持金。","zh-CN":"物品、装备、建筑资产和钱包。",ko:"아이템, 장비, 건축물 및 지갑."},
+  "WALLET · GM REPORTED":{id:"DOMPET · LAPORAN GM",pt:"CARTEIRA · RELATO DO GM",fr:"PORTEFEUILLE · RAPPORT DU MJ",ru:"КОШЕЛЁК · ДАННЫЕ МАСТЕРА",ja:"所持金 · GM報告","zh-CN":"钱包 · GM 报告",ko:"지갑 · GM 보고"},
+  "BUILDING ASSETS":{id:"ASET BANGUNAN",pt:"ATIVOS IMOBILIÁRIOS",fr:"ACTIFS IMMOBILIERS",ru:"АКТИВЫ НЕДВИЖИМОСТИ",ja:"建物資産","zh-CN":"建筑资产",ko:"건축 자산"},
+  "LEDGER LOG":{id:"LOG LEDGER",pt:"REGISTRO CONTÁBIL",fr:"JOURNAL DE REGISTRE",ru:"ЖУРНАЛ УЧЁТА",ja:"台帳ログ","zh-CN":"账本日志",ko:"원장 기록"},
+  "ERA":{id:"ERA",pt:"ERA",fr:"ÈRE",ru:"ЭРА",ja:"時代","zh-CN":"纪元",ko:"시대"},
+  "YEAR":{id:"TAHUN",pt:"ANO",fr:"ANNÉE",ru:"ГОД",ja:"年","zh-CN":"年份",ko:"연도"},
+  "WORLD CLOCK":{id:"JAM DUNIA",pt:"RELÓGIO MUNDIAL",fr:"HORLOGE DU MONDE",ru:"МИРОВЫЕ ЧАСЫ",ja:"世界時計","zh-CN":"世界时钟",ko:"세계 시계"},
+  "ACTIVE CHARACTER":{id:"KARAKTER AKTIF",pt:"PERSONAGEM ATIVO",fr:"PERSONNAGE ACTIF",ru:"АКТИВНЫЙ ПЕРСОНАЖ",ja:"選択中のキャラクター","zh-CN":"当前角色",ko:"활성 캐릭터"},
+  "No character selected":{id:"Belum ada karakter dipilih",pt:"Nenhum personagem selecionado",fr:"Aucun personnage sélectionné",ru:"Персонаж не выбран",ja:"キャラクターが選択されていません","zh-CN":"未选择角色",ko:"선택된 캐릭터 없음"},
+  "Save ✧":{id:"Simpan ✧",pt:"Salvar ✧",fr:"Enregistrer ✧",ru:"Сохранить ✧",ja:"保存 ✧","zh-CN":"保存 ✧",ko:"저장 ✧"},
+  "Mulai Convo":{id:"Mulai Percakapan",pt:"Iniciar conversa",fr:"Commencer la conversation",ru:"Начать диалог",ja:"会話を開始","zh-CN":"开始对话",ko:"대화 시작"},
+  "Aksiku":{id:"Aksiku",pt:"Minha ação",fr:"Mon action",ru:"Моё действие",ja:"自分の行動","zh-CN":"我的行动",ko:"내 행동"},
+  "FORMAT TEKS":{id:"FORMAT TEKS",pt:"FORMATO DO TEXTO",fr:"FORMAT DU TEXTE",ru:"ФОРМАТ ТЕКСТА",ja:"テキスト形式","zh-CN":"文本格式",ko:"텍스트 형식"},
+  "Spirit Realm":{id:"Ranah Roh",pt:"Reino Espiritual",fr:"Royaume des Esprits",ru:"Духовное царство",ja:"霊界","zh-CN":"灵境",ko:"영계"},
+  "MARTIAL SOUL":{id:"JIWA BELA DIRI",pt:"ALMA MARCIAL",fr:"ÂME MARTIALE",ru:"БОЕВОЙ ДУХ",ja:"武魂","zh-CN":"武魂",ko:"무혼"},
+  "SPIRIT RING ABSORPTION":{id:"PENYERAPAN CINCIN ROH",pt:"ABSORÇÃO DO ANEL ESPIRITUAL",fr:"ABSORPTION DE L’ANNEAU SPIRITUEL",ru:"ПОГЛОЩЕНИЕ ДУХОВНОГО КОЛЬЦА",ja:"精霊環吸収","zh-CN":"精灵环吸收",ko:"영환 흡수"},
+  "SYNC PROGRESS":{id:"PROGRES SINKRONISASI",pt:"PROGRESSO DE SINCRONIA",fr:"PROGRESSION DE SYNCHRONISATION",ru:"ПРОГРЕСС СИНХРОНИЗАЦИИ",ja:"同期進行度","zh-CN":"同步进度",ko:"동기화 진행도"},
+  "ENERGY":{id:"ENERGI",pt:"ENERGIA",fr:"ÉNERGIE",ru:"ЭНЕРГИЯ",ja:"エネルギー","zh-CN":"能量",ko:"에너지"},
+  "INSIGHT":{id:"WAWASAN",pt:"PERCEPÇÃO",fr:"PERSPICACITÉ",ru:"ПРОНИЦАТЕЛЬНОСТЬ",ja:"洞察","zh-CN":"洞察",ko:"통찰"},
+  "ARCANIST GRADE":{id:"TINGKAT ARKANIS",pt:"GRAU DE ARCANISTA",fr:"GRADE D’ARCANISTE",ru:"РАНГ АРКАНИСТА",ja:"アルカニスト階級","zh-CN":"奥术师等级",ko:"아르카니스트 등급"},
+  "ARCANIST FOCUS":{id:"FOKUS ARKANIS",pt:"FOCO DE ARCANISTA",fr:"FOCUS D’ARCANISTE",ru:"ФОКУС АРКАНИСТА",ja:"アルカニスト集中力","zh-CN":"奥术师专注",ko:"아르카니스트 집중"},
+  "SATIETY":{id:"KETERPUASAN",pt:"SACIEDADE",fr:"SATIÉTÉ",ru:"СЫТОСТЬ",ja:"満腹度","zh-CN":"饱腹度",ko:"포만도"},
+  "NON-CANON · LOCAL SAVE":{id:"NON-KANON · SIMPANAN LOKAL",pt:"NÃO CANÔNICO · SALVAMENTO LOCAL",fr:"NON CANONIQUE · SAUVEGARDE LOCALE",ru:"НЕ КАНОН · ЛОКАЛЬНОЕ СОХРАНЕНИЕ",ja:"非正史 · ローカルセーブ","zh-CN":"非正典 · 本地存档",ko:"비정사 · 로컬 저장"},
+  "A QUIET MOMENT":{id:"MOMEN TENANG",pt:"UM MOMENTO TRANQUILO",fr:"UN MOMENT DE CALME",ru:"ТИХОЕ МГНОВЕНИЕ",ja:"静かなひととき","zh-CN":"宁静时刻",ko:"고요한 순간"},
+  "THE NARRATIVE":{id:"NARASI",pt:"A NARRATIVA",fr:"LE RÉCIT",ru:"ПОВЕСТВОВАНИЕ",ja:"物語","zh-CN":"叙事",ko:"서사"},
+  "AWAITING YOUR JOURNEY":{id:"MENUNGGU PERJALANANMU",pt:"AGUARDANDO SUA JORNADA",fr:"EN ATTENTE DE VOTRE VOYAGE",ru:"В ОЖИДАНИИ ВАШЕГО ПУТЕШЕСТВИЯ",ja:"あなたの旅を待っています","zh-CN":"等待你的旅程",ko:"여정을 기다리는 중"},
+  "Create a separate Eternal Path character to begin a journey.":{id:"Buat karakter Eternal Path terpisah untuk memulai perjalanan.",pt:"Crie um personagem separado de Eternal Path para iniciar uma jornada.",fr:"Créez un personnage distinct pour Eternal Path afin de commencer un voyage.",ru:"Создайте отдельного персонажа Eternal Path, чтобы начать путешествие.",ja:"旅を始めるには、Eternal Path専用のキャラクターを作成してください。","zh-CN":"创建一个独立的 Eternal Path 角色以开始旅程。",ko:"여정을 시작하려면 별도의 Eternal Path 캐릭터를 만드세요."},
+  "YOUR RESPONSE":{id:"RESPONSMU",pt:"SUA RESPOSTA",fr:"VOTRE RÉPONSE",ru:"ВАШ ОТВЕТ",ja:"あなたの返答","zh-CN":"你的回应",ko:"나의 응답"},
+  "Consider the situation":{id:"Pertimbangkan situasinya",pt:"Considere a situação",fr:"Considérez la situation",ru:"Обдумайте ситуацию",ja:"状況を考えてください","zh-CN":"考虑当前情况",ko:"상황을 고려하세요"},
+  "IN-GAME ORIGINAL · STARTER SITUATION · NOT UNIVERSE CANON":{id:"ORISINAL DALAM GAME · SITUASI PEMULA · BUKAN KANON UNIVERSE",pt:"ORIGINAL DO JOGO · SITUAÇÃO INICIAL · NÃO É CÂNONE DO UNIVERSO",fr:"ORIGINAL DU JEU · SITUATION DE DÉPART · NON CANONIQUE",ru:"ОРИГИНАЛЬНЫЙ ИГРОВОЙ КОНТЕНТ · СТАРТОВАЯ СИТУАЦИЯ · НЕ КАНОН ВСЕЛЕННОЙ",ja:"ゲーム内オリジナル · 初期状況 · ユニバース正史ではない","zh-CN":"游戏原创 · 初始情境 · 非宇宙正典",ko:"게임 오리지널 · 시작 상황 · 유니버스 정사 아님"},
+  "CHARACTER BEHAVIOR":{id:"PERILAKU KARAKTER",pt:"COMPORTAMENTO DO PERSONAGEM",fr:"COMPORTEMENT DU PERSONNAGE",ru:"ПОВЕДЕНИЕ ПЕРСОНАЖА",ja:"キャラクターの行動","zh-CN":"角色行为",ko:"캐릭터 행동"},
+  "DIALOGUE":{id:"DIALOG",pt:"DIÁLOGO",fr:"DIALOGUE",ru:"ДИАЛОГ",ja:"会話","zh-CN":"对话",ko:"대화"},
+  "PERSPECTIVE":{id:"SUDUT PANDANG",pt:"PERSPECTIVA",fr:"PERSPECTIVE",ru:"ТОЧКА ЗРЕНИЯ",ja:"視点","zh-CN":"视角",ko:"관점"},
+  "Consider your response":{id:"Tentukan responsmu",pt:"Considere sua resposta",fr:"Réfléchissez à votre réponse",ru:"Выберите свой ответ",ja:"返答を考えてください","zh-CN":"考虑你的回应",ko:"응답을 생각하세요"},
+  "STARTER SITUATIONS COMPLETE":{id:"SITUASI PEMULA SELESAI",pt:"SITUAÇÕES INICIAIS CONCLUÍDAS",fr:"SITUATIONS DE DÉPART TERMINÉES",ru:"СТАРТОВЫЕ СИТУАЦИИ ЗАВЕРШЕНЫ",ja:"初期シチュエーション完了","zh-CN":"初始情境已完成",ko:"시작 상황 완료"}
+});
+
 export function getLanguage():AppLanguage {
   try { const saved=localStorage.getItem(STORAGE_KEY); return APP_LANGUAGES.some(item=>item.code===saved)?saved as AppLanguage:DEFAULT_LANGUAGE; }
   catch { return DEFAULT_LANGUAGE; }
