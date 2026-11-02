@@ -152,7 +152,7 @@ describe("Eternal Path live world scene", () => {
     expect(resolveEternalSituationChoice("not-a-choice")).toBeNull();
   });
 
-  it("can play the three regional starter situations without repeating a node", () => {
+  it("can replay regional situations after two other events without immediate repetition", () => {
     startEternalGame({name:"Nafila",age:14,region:"beiming-gu"});
     const seen=new Set<string>();
     for(let index=0;index<3;index+=1){
@@ -162,7 +162,9 @@ describe("Eternal Path live world scene", () => {
       seen.add(node!.id);
       expect(resolveEternalSituationChoice("pass")).not.toBeNull();
     }
-    expect(getCurrentSituation()).toBeNull();
+    const next=getCurrentSituation();
+    expect(next).not.toBeNull();
+    expect(seen.has(next!.id)).toBe(true);
     expect(getEternalSave()?.narrativeHistory).toHaveLength(3);
   });
 
