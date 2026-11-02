@@ -20,8 +20,7 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
   const getParts = () => ({
     cord: root.querySelector<HTMLElement>("[data-gravity-cord]"),
     line: root.querySelector<HTMLElement>("[data-cord-line]"),
-    handle: root.querySelector<HTMLButtonElement>("[data-cord-handle]"),
-    ornament: root.querySelector<HTMLElement>(".gravity-cord-jewel")
+    handle: root.querySelector<HTMLButtonElement>("[data-cord-handle]")
   });
 
   const play = (file: string, volume = 0.78): void => {
@@ -46,7 +45,30 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
     }, delay);
   };
 
-  const scheduleIdleSway = (): void => {\n    const { cord } = getParts();\n    if (!cord || active) { window.setTimeout(scheduleIdleSway, 650); return; }\n    const gust = Math.random() < 0.16;\n    const amplitude = gust ? randomBetween(4.2, 7.2) : randomBetween(0.7, 2.4);\n    const target = (Math.random() < 0.5 ? -1 : 1) * amplitude;\n    const duration = gust ? randomBetween(700, 1050) : randomBetween(1250, 2100);\n    const animation = animate(cord, {\n      rotate: [{ to: target, duration, ease: "inOutSine" }, { to: 0, duration: duration * randomBetween(0.9, 1.35), ease: "outSine" }],\n      onComplete: () => { pauseIdleSway = null; window.setTimeout(scheduleIdleSway, randomBetween(500, gust ? 1500 : 2200)); }\n    });\n    pauseIdleSway = () => animation.pause();\n  };\n\n  const animateDock = (wasCollapsed: boolean, done: () => void): void => {
+  const scheduleIdleSway = (): void => {
+    const { cord } = getParts();
+    if (!cord || active) {
+      window.setTimeout(scheduleIdleSway, 650);
+      return;
+    }
+    const gust = Math.random() < 0.16;
+    const amplitude = gust ? randomBetween(4.2, 7.2) : randomBetween(0.7, 2.4);
+    const target = (Math.random() < 0.5 ? -1 : 1) * amplitude;
+    const duration = gust ? randomBetween(700, 1050) : randomBetween(1250, 2100);
+    const animation = animate(cord, {
+      rotate: [
+        { to: target, duration, ease: "inOutSine" },
+        { to: 0, duration: duration * randomBetween(0.9, 1.35), ease: "outSine" }
+      ],
+      onComplete: () => {
+        pauseIdleSway = null;
+        window.setTimeout(scheduleIdleSway, randomBetween(500, gust ? 1500 : 2200));
+      }
+    });
+    pauseIdleSway = () => animation.pause();
+  };
+
+  const animateDock = (wasCollapsed: boolean, done: () => void): void => {
     const dock = root.querySelector<HTMLElement>(".app-shell .bottom-nav");
     const track = dock?.querySelector<HTMLElement>(".nav-roulette-track");
     const handle = root.querySelector<HTMLElement>("[data-cord-handle]");
@@ -57,8 +79,8 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
     const to = wasCollapsed ? 0 : distance;
     const duration = 1640;
 
-    // Dock is centered by left/right auto margins, not translateX(-50%).
-    // Its tiny rattle lives on the inner track, so it cannot destroy centering.
+    // The dock is centered by left/right auto margins, never translateX(-50%).
+    // Only the inner track rattles, so Anime.js cannot throw the whole dock sideways.
     dock.style.transform = `translateY(${from}px)`;
     animate(dock, {
       translateY: [
@@ -102,11 +124,12 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
     const { cord, line, handle } = getParts();
     if (!cord || !line || !handle) return;
 
-    pauseIdleSway?.();\n    pauseIdleSway = null;\n    active = { pointerId: -1, startX: 0, startY: 0, handle };
+    pauseIdleSway?.();
+    pauseIdleSway = null;
+    active = { pointerId: -1, startX: 0, startY: 0, handle };
     handle.classList.add("is-pulling");
     play("/audio/Mechanical%20Activation.mp3", 0.76);
 
-    // A visible tug on the cord, followed by a spring-loaded snap back.
     const currentHeight = Math.max(118, line.getBoundingClientRect().height);
     const currentTop = Math.max(111, Number.parseFloat(handle.style.top) || 111);
     animate(line, { height: [currentHeight, currentHeight + 24], duration: 145, ease: "outCubic" });
@@ -118,7 +141,8 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
       animateDock(wasCollapsed, () => {
         handle.classList.remove("is-pulling");
         active = null;
-        options.toggle();\n        window.setTimeout(scheduleIdleSway, 650);
+        options.toggle();
+        window.setTimeout(scheduleIdleSway, 650);
       });
     }, 330);
 
@@ -136,7 +160,9 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
     if (!(target instanceof Element)) return;
     const handle = target.closest<HTMLButtonElement>("[data-cord-handle]");
     if (!handle || active || (event.pointerType === "mouse" && event.button !== 0)) return;
-    pauseIdleSway?.();\n    pauseIdleSway = null;\n    play("/audio/golden%20handle.mp3", 0.62);
+    pauseIdleSway?.();
+    pauseIdleSway = null;
+    play("/audio/golden%20handle.mp3", 0.62);
     active = { pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, handle };
     handle.classList.add("is-grabbed");
     try { handle.setPointerCapture(event.pointerId); } catch { /* Pointer capture is optional. */ }
@@ -163,7 +189,10 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
     if (dy < 16 || Math.abs(dy) < Math.abs(dx) * 0.72) {
       returnCord();
       const { cord } = getParts();
-      if (cord) animate(cord, { rotate: [0], duration: 520, ease: "outElastic(1, .55)", onComplete: () => window.setTimeout(scheduleIdleSway, 650) });
+      if (cord) animate(cord, {
+        rotate: [0], duration: 520, ease: "outElastic(1, .55)",
+        onComplete: () => window.setTimeout(scheduleIdleSway, 650)
+      });
       return;
     }
     suppressClick = true;
@@ -176,7 +205,10 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
     active = null;
     returnCord();
     const { cord } = getParts();
-    if (cord) animate(cord, { rotate: [0], duration: 520, ease: "outElastic(1, .55)", onComplete: () => window.setTimeout(scheduleIdleSway, 650) });
+    if (cord) animate(cord, {
+      rotate: [0], duration: 520, ease: "outElastic(1, .55)",
+      onComplete: () => window.setTimeout(scheduleIdleSway, 650)
+    });
   }, { passive: true });
 
   root.addEventListener("click", event => {
