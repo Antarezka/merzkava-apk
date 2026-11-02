@@ -195,7 +195,7 @@ body.eternal-choice-open{overflow:hidden}
 .expedition-particle-snow{width:3px;height:3px;border-radius:50%;background:#fff9;box-shadow:0 0 4px #fff8}
 .expedition-particle-petal{width:7px;height:10px;border-radius:80% 10% 80% 10%;background:linear-gradient(135deg,#f4b6b0cc,#fff0e0aa);filter:blur(.15px)}
 .expedition-particle-leaf{width:8px;height:13px;border-radius:90% 5% 90% 5%;background:linear-gradient(135deg,#d6a45ecc,#87965eaa)}
-.expedition-lightning-layer{position:absolute;z-index:6;inset:0;pointer-events:none;opacity:0;background:linear-gradient(115deg,#dceaffaa,#ffffff22 45%,transparent 76%);mix-blend-mode:screen}
+.expedition-lightning-layer{position:absolute;z-index:6;inset:0;pointer-events:none;opacity:0;background:radial-gradient(ellipse at 65% 18%,#dceaff22,transparent 55%);mix-blend-mode:screen}
 .expedition-fog-layer{z-index:7;inset:-8%;background:none;mix-blend-mode:screen;pointer-events:none;overflow:hidden}
 .expedition-fog-motion{mix-blend-mode:screen;opacity:.85;filter:blur(1px);will-change:transform,opacity}
 .expedition-environment:after{z-index:8}
