@@ -1,7 +1,7 @@
 import "./style.css";
 import "./ui/floating-ledger.css";
 import "./ui/floating-control.css";
-import { cancelOpeningSequence, playButtonSound, playNavigationTick, playOpeningSequence, playSnapshotSlideSound, playWarningBeep, setSoundEnabled } from "./audio/sound-effects";
+import { cancelOpeningSequence, playButtonSound, playClockworkRatchet, playNavigationTick, playOpeningSequence, playSnapshotSlideSound, playWarningBeep, setSoundEnabled } from "./audio/sound-effects";
 import { getGameplaySessionRecord, initializeDatabase, saveGameplaySessionRecord } from "./shared/database";
 import { createCharacter, deleteCharacter, listCharacters, type Character } from "./convo/characters/character-repository";
 import { validateCharacterDraft } from "./convo/engine/character-validation";
@@ -671,7 +671,7 @@ root.addEventListener("pointermove", event => {
     const tick = Math.floor(angle / 22);
     if (tick !== active.lastTick) {
       active.lastTick = tick;
-      playNavigationTick();
+      playClockworkRatchet();
     }
   }
   if (suppressNextPointerClick) event.preventDefault();
