@@ -96,7 +96,10 @@ describe("Eternal Path live world scene", () => {
     expect(html).toContain("DISPOSITION");
     expect(html).toContain("JOURNEY MANAGER");
     expect(html).toContain('class="expedition-manager-trigger"');
-    expect(html).toContain('class="expedition-manager-content" data-eternal-manager-content hidden');
+    expect(html).toContain('data-eternal-manager-backdrop aria-label="Close Save Manager" hidden');
+    expect(html).toContain('aria-controls="eternal-save-manager-dialog"');
+    expect(html).toContain('data-eternal-manager-backdrop aria-label="Close Save Manager" hidden');
+    expect(html).toContain('id="eternal-save-manager-dialog" class="expedition-manager-content" data-eternal-manager-content role="dialog" aria-modal="true" aria-labelledby="eternal-manager-title" hidden');
     expect(html).toContain('class="scene-coordinate scene-clock-ink"');
     expect(html.indexOf('class="expedition-environment"')).toBeLessThan(html.indexOf('class="expedition-disposition-line"'));
     expect(html.indexOf('class="expedition-disposition-line"')).toBeLessThan(html.indexOf('class="expedition-dialogue expedition-dialogue-locked"'));
