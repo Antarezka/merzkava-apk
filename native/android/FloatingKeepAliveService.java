@@ -222,31 +222,54 @@ public class FloatingKeepAliveService extends Service {
         @Override protected void onDraw(Canvas canvas) {
             super.onDraw(canvas);
             float cx = getWidth()/2f, cy = getHeight()/2f;
-            float pulse = .72f + .28f * (float)Math.sin(System.currentTimeMillis()/520.0);
+            long now = SystemClock.uptimeMillis();
+            float pulse = .72f + .28f * (float)Math.sin(now/520.0);
             int ringColor = online ? Color.rgb(226, 184, 82) : Color.rgb(224, 65, 62);
-            paint.setStyle(Paint.Style.STROKE); paint.setStrokeWidth(dp(2.2f));
-            paint.setColor(ringColor); paint.setAlpha((int)(92 + 76 * pulse));
-            paint.setShadowLayer(dp(4), 0, 0, ringColor);
+            int red = Color.red(ringColor), green = Color.green(ringColor), blue = Color.blue(ringColor);
+
+            // Keep only a quiet circular guide; the bright, broken trail does the chasing.
+            paint.setShader(null); paint.setStyle(Paint.Style.STROKE);
+            paint.setStrokeWidth(dp(1.8f)); paint.setColor(ringColor); paint.setAlpha(34);
             canvas.drawCircle(cx, cy, dp(29.5f), paint);
-            paint.clearShadowLayer();
-            // A bright sweep travels continuously around the full circumference.
-            // Connectivity only changes its palette; drag, touch, service and window behavior stay untouched.
-            int soft = Color.argb((int)(70 * pulse), Color.red(ringColor), Color.green(ringColor), Color.blue(ringColor));
-            int bright = Color.argb((int)(255 * pulse), 255, 238, 190);
+
+            // Ouroboros-like moving trail: most of the circumference stays dark,
+            // with one open gap and a tapered luminous tail chasing its own head.
+            float rotation = (now % 2600L) * (360f / 2600f);
+            int tail = Color.argb((int)(38 + 32 * pulse), red, green, blue);
+            int mid = Color.argb((int)(150 + 55 * pulse), red, green, blue);
+            int hot = Color.argb((int)(245 * pulse), 255, 239, 196);
             SweepGradient sweep = new SweepGradient(cx, cy,
-                new int[] { Color.TRANSPARENT, soft, ringColor, bright, ringColor, soft, Color.TRANSPARENT },
-                new float[] { 0f, 0.68f, 0.80f, 0.86f, 0.91f, 0.98f, 1f });
+                new int[] { Color.TRANSPARENT, Color.TRANSPARENT, tail, mid, hot, ringColor, Color.TRANSPARENT },
+                new float[] { 0f, 0.68f, 0.75f, 0.82f, 0.87f, 0.92f, 1f });
             Matrix sweepRotation = new Matrix();
-            float rotation = (SystemClock.uptimeMillis() % 2600L) * (360f / 2600f);
             sweepRotation.setRotate(rotation, cx, cy);
             sweep.setLocalMatrix(sweepRotation);
-            paint.setShader(sweep);
-            paint.setStrokeCap(Paint.Cap.ROUND);
-            paint.setStrokeWidth(dp(2.8f));
-            paint.setAlpha(255);
-            paint.setShadowLayer(dp(7), 0, 0, ringColor);
+            paint.setShader(sweep); paint.setStrokeCap(Paint.Cap.ROUND);
+            paint.setStrokeWidth(dp(3.1f)); paint.setAlpha(255);
+            paint.setShadowLayer(dp(8), 0, 0, ringColor);
             canvas.drawCircle(cx, cy, dp(29.5f), paint);
-            paint.clearShadowLayer(); paint.setShader(null); paint.setStyle(Paint.Style.FILL); paint.setAlpha(255);
+            paint.clearShadowLayer(); paint.setShader(null); paint.setStyle(Paint.Style.FILL);
+
+            // The leading tip flashes like a compact industrial floodlight once per lap.
+            float headAngle = (float)Math.toRadians(rotation + 0.87f * 360f);
+            float hx = cx + (float)Math.cos(headAngle) * dp(29.5f);
+            float hy = cy + (float)Math.sin(headAngle) * dp(29.5f);
+            float flashPhase = (now % 2600L) / 2600f;
+            float flash = flashPhase < .085f ? 1f : (flashPhase < .13f ? .22f : 0f);
+            if (flash > 0f) {
+                int glowCore = Color.argb((int)(210 * flash), 255, 247, 218);
+                int glowEdge = Color.argb((int)(95 * flash), red, green, blue);
+                paint.setShader(new RadialGradient(hx, hy, dp(13),
+                    new int[] { glowCore, glowEdge, Color.TRANSPARENT },
+                    new float[] { 0f, .32f, 1f }, Shader.TileMode.CLAMP));
+                canvas.drawCircle(hx, hy, dp(13), paint);
+                paint.setShader(null);
+                paint.setColor(Color.WHITE); paint.setAlpha((int)(255 * flash));
+                paint.setShadowLayer(dp(10), 0, 0, online ? Color.rgb(255, 222, 137) : Color.rgb(255, 90, 82));
+                canvas.drawCircle(hx, hy, dp(2.7f), paint);
+                paint.clearShadowLayer();
+            }
+
             paint.setColor(Color.rgb(29, 35, 29)); canvas.drawCircle(cx, cy, dp(26), paint);
             drawLayer(canvas, shadow, dp(4)); drawLayer(canvas, tail, dp(4));
             drawLayer(canvas, body, dp(4)); drawLayer(canvas, head, dp(4));
