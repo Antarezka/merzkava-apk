@@ -769,8 +769,6 @@ root.addEventListener("keydown", event => {
 root.addEventListener("click", async (event: MouseEvent) => {
   const target = event.target;
   if (!(target instanceof Element)) return;
-  const activeEternalModal=root.querySelector<HTMLElement>(".expedition-choice-modal:not([hidden])");
-  if(activeEternalModal && !target.closest(".expedition-choice-modal")) return;
   if (event.detail !== 0 && suppressNextPointerClick) {
     suppressNextPointerClick = false;
     return;
