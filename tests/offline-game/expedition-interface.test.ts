@@ -92,6 +92,8 @@ describe("Eternal Path live world scene", () => {
     expect(html).toContain("SETTING / ATMOSPHERE");
     expect(html).toContain("SCENE ACTION");
     expect(html).toContain("CHARACTER BEHAVIOR");
+    expect(html).not.toContain("expedition-knowledge-note");
+    expect(html).not.toContain("You steady the cart and collect the loose bundles");
     expect(html).toContain("DIALOGUE");
     expect(html).toContain("PERSPECTIVE");
     expect(html).toContain("STARTER SITUATION");
