@@ -1,6 +1,6 @@
 import { advanceFallbackCalendar, type SessionTimestamp } from "./mechanics/time";
 import { applyDispositionEvidence, createDispositionState, type DispositionState } from "./disposition";
-import { BOOTSTRAP_SITUATIONS, resolveNarrativeChoice, selectNarrativeSituation, type NarrativeContext, type NarrativeResolution, type NarrativeSituation } from "./narrative-engine";
+import { BOOTSTRAP_SITUATIONS, isSituationEligible, resolveNarrativeChoice, selectNarrativeSituation, type NarrativeContext, type NarrativeResolution, type NarrativeSituation } from "./narrative-engine";
 
 export type EternalRegion = "golden-dragon-empire" | "tianhai-yunzhou" | "beiming-gu";
 export type EternalSceneRegion = EternalRegion | "lawless-territories" | "special-locations";
@@ -237,7 +237,7 @@ export function getCurrentSituation():NarrativeSituation|null {
   const current=getEternalSave();if(!current)return null;
   if(current.activeNodeId){
     const active=BOOTSTRAP_SITUATIONS.find(node=>node.id===current.activeNodeId);
-    if(active)return active;
+    if(active&&isSituationEligible(active,buildNarrativeContext(current)))return active;
     current.activeNodeId=null;
   }
   const selected=selectNarrativeSituation(buildNarrativeContext(current));
