@@ -59,7 +59,7 @@ export function renderExpeditionInterface():string {
     '<article class="expedition-dialogue-card">'+
       '<div class="expedition-narrative-layer"><span class="expedition-narrative-label">SETTING / ATMOSPHERE</span><p class="expedition-sensory-copy">'+escapeHtml(situation.setting)+'</p></div>'+
       '<div class="expedition-narrative-layer expedition-scene-action"><span class="expedition-narrative-label">SCENE ACTION</span><h3>'+escapeHtml(situation.title)+'</h3>'+situation.sceneAction.map(line=>'<p>'+escapeHtml(line)+'</p>').join("")+'</div>'+
-      situation.actors.map(actor=>'<div class="expedition-narrative-layer expedition-npc-line"><span class="expedition-narrative-label">CHARACTER BEHAVIOR · '+escapeHtml(actor.label)+'</span><p>'+escapeHtml(actor.observableBehavior)+'</p><p class="expedition-knowledge-note">'+escapeHtml(actor.knowledge)+'</p></div>').join("")+
+      situation.actors.map(actor=>'<div class="expedition-narrative-layer expedition-npc-line"><span class="expedition-narrative-label">CHARACTER BEHAVIOR · '+escapeHtml(actor.label)+'</span><p>'+escapeHtml(actor.observableBehavior)+'</p></div>').join("")+
       '<div class="expedition-narrative-layer expedition-npc-line"><span class="expedition-narrative-label">DIALOGUE · '+escapeHtml(situation.dialogue.speaker)+'</span><p>“'+escapeHtml(situation.dialogue.text)+'”</p></div>'+
       '<div class="expedition-narrative-layer expedition-player-question"><span class="expedition-narrative-label">PERSPECTIVE</span><p>'+escapeHtml(situation.closingQuestion)+'</p></div>'+
       '<div class="expedition-provenance">IN-GAME ORIGINAL · STARTER SITUATION · NOT UNIVERSE CANON</div>'+
