@@ -23,9 +23,8 @@ export function animateAppScreen(shell: HTMLElement | null, options: { menuToggl
   if (options.menuToggle) {
     const collapsed = shell.classList.contains("is-nav-collapsed");
     if (nav) {
-      // Fold the dock almost completely, leaving a slim visible edge as a visual cue.
-      const peek = 16;
-      const hideDistance = Math.max(0, nav.offsetHeight - peek);
+      // Move the entire dock below the viewport; the detached lever remains accessible.
+      const hideDistance = nav.offsetHeight + 12;
       const from = collapsed ? 0 : hideDistance;
       const to = collapsed ? hideDistance : 0;
       nav.style.pointerEvents = "auto";
