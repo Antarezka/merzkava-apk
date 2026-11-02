@@ -1,6 +1,6 @@
 import { advanceFallbackCalendar, type SessionTimestamp } from "./mechanics/time";
 import { applyDispositionEvidence, createDispositionState, type DispositionState } from "./disposition";
-import { BOOTSTRAP_SITUATIONS, getNarrativeCycle, resolveNarrativeChoice, selectNarrativeSituation, type NarrativeContext, type NarrativeResolution, type NarrativeSituation } from "./narrative-engine";
+import { BOOTSTRAP_SITUATIONS, resolveNarrativeChoice, selectNarrativeSituation, type NarrativeContext, type NarrativeResolution, type NarrativeSituation } from "./narrative-engine";
 
 export type EternalRegion = "golden-dragon-empire" | "tianhai-yunzhou" | "beiming-gu";
 export type EternalSceneRegion = EternalRegion | "lawless-territories" | "special-locations";
@@ -125,7 +125,7 @@ function normalizeSave(value:unknown):EternalSave|null {
   const manifest:EternalSave["manifest"]={
     universeRepository:candidate?.universeRepository==="Antarezka/merzkava-universe"?candidate.universeRepository:"Antarezka/merzkava-universe",
     universeCommit:typeof candidate?.universeCommit==="string"&&/^[a-f0-9]{40}$/i.test(candidate.universeCommit)?candidate.universeCommit:ETERNAL_SCENES[0].universeCommit,
-    contentPackVersion:typeof candidate?.contentPackVersion==="string"&&candidate.contentPackVersion.length<=32?candidate.contentPackVersion:"pending-patch-1",
+    contentPackVersion:typeof candidate?.contentPackVersion==="string"&&candidate.contentPackVersion.length<=32?candidate.contentPackVersion:"eternal-path-bootstrap-0.1.0",
     deterministicSeed:typeof candidate?.deterministicSeed==="string"&&candidate.deterministicSeed.length<=128?candidate.deterministicSeed:saveId,
   };
   const age=Number.isInteger(parsed.character.age)&&parsed.character.age>=1&&parsed.character.age<=120?parsed.character.age:14;
@@ -187,7 +187,7 @@ export function listEternalSaves():EternalSaveSummary[] {
 }
 export function startEternalGame(input:{name:string;age:number;region:EternalRegion}):void {
   const now=new Date().toISOString();const id=makeSaveId();
-  save={schemaVersion:3,saveId:id,saveName:input.name.trim(),createdAt:now,updatedAt:now,manifest:{universeRepository:"Antarezka/merzkava-universe",universeCommit:ETERNAL_SCENES[0].universeCommit,contentPackVersion:"pending-patch-1",deterministicSeed:id},character:{name:input.name.trim(),age:input.age,region:input.region},disposition:createDispositionState(),locationId:defaultSceneForRegion(input.region).id,day:1,hour:8,minute:0,weather:resolveDailyWeather(input.region,1),eventIndex:0,energy:100,insight:0,bonds:0,completed:0,narrativeHistory:[],activeNodeId:null,lastOutcome:""};
+  save={schemaVersion:4,saveId:id,saveName:input.name.trim(),createdAt:now,updatedAt:now,manifest:{universeRepository:"Antarezka/merzkava-universe",universeCommit:ETERNAL_SCENES[0].universeCommit,contentPackVersion:"pending-patch-1",deterministicSeed:id},character:{name:input.name.trim(),age:input.age,region:input.region},disposition:createDispositionState(),locationId:defaultSceneForRegion(input.region).id,day:1,hour:8,minute:0,weather:resolveDailyWeather(input.region,1),eventIndex:0,energy:100,insight:0,bonds:0,completed:0,narrativeHistory:[],activeNodeId:null,lastOutcome:""};
   persist();
 }
 export function loadEternalSave(id:string):boolean {
