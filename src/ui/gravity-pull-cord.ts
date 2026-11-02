@@ -175,7 +175,7 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
 
   root.addEventListener("pointermove", event => {
     if (!active || active.pointerId !== event.pointerId) return;
-    const { line, handle, cord } = getParts();
+    const { line, handle } = getParts();
     if (!line || !handle) return;
     const extension = clamp(event.clientY - active.startY, 0, 112);
     // Treat the cord as a flexible tether: horizontal hand movement bends
@@ -193,11 +193,12 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
     if (!active || active.pointerId !== event.pointerId) return;
     const handle = active.handle;
     const dy = event.clientY - active.startY;
-    const dx = event.clientX - active.startX;
     active = null;
     handle.classList.remove("is-grabbed");
+    handle.style.transition = "";
+    const { cord, line } = getParts();
+    if (line) line.style.transition = "";
     if (dy < 48) {
-      const { cord, line } = getParts();
       if (line) line.style.setProperty("--cord-bend", "0deg");
       handle.style.setProperty("--cord-shift", "0px");
       returnCord();
@@ -207,18 +208,23 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
       });
       return;
     }
+    if (line) line.style.setProperty("--cord-bend", "0deg");
+    handle.style.setProperty("--cord-shift", "0px");
     suppressClick = true;
     trigger();
   }, { passive: true });
 
   root.addEventListener("pointercancel", event => {
     if (!active || active.pointerId !== event.pointerId) return;
-    active.handle.classList.remove("is-grabbed");
-    active.handle.style.transition = "";
-    active.handle.style.setProperty("--cord-shift", "0px");
-    if (line) line.style.transition = "";
+    const handle = active.handle;
     const { line } = getParts();
-    line?.style.setProperty("--cord-bend", "0deg");
+    handle.classList.remove("is-grabbed");
+    handle.style.transition = "";
+    handle.style.setProperty("--cord-shift", "0px");
+    if (line) {
+      line.style.transition = "";
+      line.style.setProperty("--cord-bend", "0deg");
+    }
     active = null;
     returnCord();
     const { cord } = getParts();
