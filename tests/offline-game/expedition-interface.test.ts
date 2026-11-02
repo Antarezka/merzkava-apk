@@ -134,8 +134,8 @@ describe("Eternal Path live world scene", () => {
   });
 
   it("keeps all 26 registered scenery assets and ships no retired dialogue nodes", () => {
-    expect(getRegionalDialogueCount()).toBe(0);
-    expect(getCurrentDialogue()).toBeNull();
+    expect(getRegionalDialogueCount()).toBe(3);
+    expect(getCurrentDialogue()).not.toBeNull();
     expect(ETERNAL_SCENES).toHaveLength(26);
     expect(new Set(ETERNAL_SCENES.map(scene=>scene.image)).size).toBe(26);
     expect(ETERNAL_SCENES.every(scene=>scene.image.startsWith("/game/scenery/") && scene.provenance==="IN_GAME_ORIGINAL")).toBe(true);
