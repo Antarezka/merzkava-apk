@@ -2586,3 +2586,7 @@ body { color:var(--ui-ink); }
 .app-header .nav-toggle-handle .nav-toggle-label{display:none;}
 .app-shell.is-nav-collapsed .app-header .nav-toggle-handle{inset:auto;border:1px solid #9d7a43;border-radius:50%;}
 @media(max-width:600px){.app-header .nav-toggle-handle{flex-basis:43px;width:43px;min-width:43px;height:43px;min-height:43px;margin-right:3px;}}
+
+/* Header has four aligned zones on desktop and three on compact screens. */
+@media(min-width:601px){.app-header{grid-template-columns:auto minmax(0,1fr) auto auto;}}
+@media(max-width:600px){.app-header{grid-template-columns:auto minmax(0,1fr) auto;}.header-context{display:none;}}
