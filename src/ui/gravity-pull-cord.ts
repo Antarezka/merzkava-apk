@@ -244,3 +244,5 @@ export function initializeGravityPullCord(root: HTMLElement, options: CordOption
 
   window.setTimeout(scheduleIdleSway, 450);
 }
+
+// Keep the Android build workflow eligible for this restored cord revision.
