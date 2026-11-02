@@ -136,7 +136,8 @@ describe("Eternal Path live world scene", () => {
   it("resolves a player choice once, records it, and advances the authoritative world clock", () => {
     startEternalGame({name:"Nafila",age:14,region:"golden-dragon-empire"});
     const node=getCurrentSituation();
-    const before=getEternalSave();
+    const energyBefore=getEternalSave()?.energy??0;
+    const insightBefore=getEternalSave()?.insight??0;
     expect(node).not.toBeNull();
     const result=resolveEternalSituationChoice("help");
     const after=getEternalSave();
@@ -144,8 +145,8 @@ describe("Eternal Path live world scene", () => {
     expect(after?.narrativeHistory).toHaveLength(1);
     expect(after?.narrativeHistory[0].transactionId).toBe(result?.transactionId);
     expect(after?.completed).toBe(1);
-    expect(after?.energy).toBe((before?.energy??0)-2);
-    expect(after?.insight).toBe((before?.insight??0)+1);
+    expect(after?.energy).toBe(energyBefore-2);
+    expect(after?.insight).toBe(insightBefore+1);
     expect(after?.minute).toBe(10);
     expect(after?.lastOutcome).toBe(result?.outcomeText);
     expect(resolveEternalSituationChoice("not-a-choice")).toBeNull();
