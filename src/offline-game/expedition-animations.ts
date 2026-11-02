@@ -4,32 +4,178 @@ function reducedMotion(): boolean {
   return typeof window !== "undefined" && Boolean(window.matchMedia?.("(prefers-reduced-motion: reduce)").matches);
 }
 
-/** Procedural weather/season particles are rendered only inside the clipped Scene Window. */
-function mountSceneParticles(root: HTMLElement): void {
-  const host=root.querySelector<HTMLElement>(".expedition-weather-particles");
-  const scene=root.querySelector<HTMLElement>(".expedition-environment");
-  if(!host||!scene||reducedMotion()) return;
-  const weather=scene.dataset.weather;
-  const cycle=scene.dataset.cycle;
-  const kind=weather==="Rain"?"rain":weather==="Snow"?"snow":cycle==="Dawn"?"petal":cycle==="Dusk"?"leaf":"";
-  if(!kind) return;
-  const count=kind==="rain"?22:kind==="snow"?18:12;
-  const nodes:HTMLElement[]=[];
-  for(let i=0;i<count;i++){
-    const particle=document.createElement("span");
-    particle.className="expedition-particle expedition-particle-"+kind;
-    particle.style.left=((i*37+11)%97)+"%";
-    particle.style.top=kind==="rain"?(-20-(i%5)*24)+"px":(-12-(i%6)*22)+"px";
-    particle.style.setProperty("--particle-drift",((i%7)-3)*9+"px");
-    host.appendChild(particle);nodes.push(particle);
-  }
-  if(kind==="rain"){
-    animate(nodes,{translateY:["-24px","360px"],translateX:(_,i)=>((((i??0)%5)-2)*13)+"px",opacity:[0,.72,0],duration:1050,ease:"linear",delay:stagger(34),loop:true});
-  }else if(kind==="snow"){
-    animate(nodes,{translateY:["-18px","360px"],translateX:(_,i)=>((((i??0)%7)-3)*12)+"px",scale:[.7,1.15],opacity:[0,.82,.12],duration:7200,ease:"inOutSine",delay:stagger(180),loop:true});
-  }else{
-    animate(nodes,{translateY:["-12px","360px"],translateX:(_,i)=>((((i??0)%7)-3)*23)+"px",rotate:[-35,110],scale:[.65,1],opacity:[0,.82,0],duration:kind==="petal"?9200:11800,ease:"inOutSine",delay:stagger(260),loop:true});
-  }
+type SceneParticleKind = "rain" | "snow" | "petal";
+type ScenePerformanceProfile = { resolution: number; maxFps: number; rain: number; snow: number; petal: number };
+
+function scenePerformanceProfile(): ScenePerformanceProfile {
+  const tier = document.documentElement.dataset.performanceTier;
+  if (tier === "very-low") return { resolution: .45, maxFps: 24, rain: 7, snow: 6, petal: 5 };
+  if (tier === "low") return { resolution: .65, maxFps: 30, rain: 11, snow: 9, petal: 8 };
+  if (tier === "high") return { resolution: 1, maxFps: 60, rain: 24, snow: 19, petal: 15 };
+  return { resolution: .82, maxFps: 45, rain: 17, snow: 14, petal: 11 };
+}
+
+/** PixiJS renders only the moving atmosphere particles; all assets remain bundled locally. */
+function mountSceneParticles(root: HTMLElement): () => void {
+  const host = root.querySelector<HTMLElement>(".expedition-weather-particles");
+  const scene = root.querySelector<HTMLElement>(".expedition-environment");
+  if (!host || !scene || reducedMotion()) return () => {};
+  const weather = scene.dataset.weather;
+  const cycle = scene.dataset.cycle;
+  const kind: SceneParticleKind | "" = weather === "Rain" ? "rain" : weather === "Snow" ? "snow" : cycle === "Dawn" ? "petal" : cycle === "Dusk" ? "petal" : "";
+  if (!kind) return () => {};
+
+  const profile = scenePerformanceProfile();
+  const count = profile[kind];
+  let disposed = false;
+  let initialized = false;
+  let pixiApp: import("pixi.js").Application | null = null;
+  let fallbackAnimation: { pause: () => void } | null = null;
+
+  const mountFallback = () => {
+    if (disposed) return;
+    const nodes: HTMLElement[] = [];
+    for (let i = 0; i < count; i++) {
+      const particle = document.createElement("span");
+      particle.className = "expedition-particle expedition-particle-" + kind;
+      particle.style.left = ((i * 37 + 11) % 97) + "%";
+      particle.style.top = kind === "rain" ? (-20 - (i % 5) * 24) + "px" : (-12 - (i % 6) * 22) + "px";
+      particle.style.setProperty("--particle-drift", ((i % 7) - 3) * 9 + "px");
+      host.appendChild(particle);
+      nodes.push(particle);
+    }
+    if (kind === "rain") {
+      fallbackAnimation = animate(nodes, { translateY: ["-24px", "360px"], translateX: (_, i) => ((((i ?? 0) % 5) - 2) * 13) + "px", opacity: [0, .72, 0], duration: 1050, ease: "linear", delay: stagger(34), loop: true });
+    } else if (kind === "snow") {
+      fallbackAnimation = animate(nodes, { translateY: ["-18px", "360px"], translateX: (_, i) => ((((i ?? 0) % 7) - 3) * 12) + "px", scale: [.7, 1.15], opacity: [0, .82, .12], duration: 7200, ease: "inOutSine", delay: stagger(180), loop: true });
+    } else {
+      fallbackAnimation = animate(nodes, { translateY: ["-12px", "360px"], translateX: (_, i) => ((((i ?? 0) % 7) - 3) * 23) + "px", rotate: [-35, 110], scale: [.65, 1], opacity: [0, .82, 0], duration: cycle === "Dawn" ? 9200 : 11800, ease: "inOutSine", delay: stagger(260), loop: true });
+    }
+  };
+
+  const destroyRenderer = () => {
+    if (!pixiApp || !initialized) return;
+    try {
+      pixiApp.ticker.stop();
+      pixiApp.destroy({ removeView: true }, { children: true, texture: true, textureSource: true });
+    } catch { /* The WebView may already have reclaimed its graphics context. */ }
+    pixiApp = null;
+    initialized = false;
+  };
+
+  const onVisibilityChange = () => {
+    if (!pixiApp || !initialized) return;
+    if (document.hidden) pixiApp.ticker.stop();
+    else pixiApp.ticker.start();
+  };
+  document.addEventListener("visibilitychange", onVisibilityChange);
+
+  void (async () => {
+    try {
+      const PIXI = await import("pixi.js");
+      if (disposed) return;
+      const app = new PIXI.Application();
+      pixiApp = app;
+      const deviceScale = Math.min(window.devicePixelRatio || 1, 2);
+      await app.init({
+        resizeTo: host,
+        backgroundAlpha: 0,
+        antialias: false,
+        autoDensity: true,
+        resolution: deviceScale * profile.resolution,
+        powerPreference: "low-power",
+        clearBeforeRender: true,
+      });
+      initialized = true;
+      if (disposed) { destroyRenderer(); return; }
+
+      const particleTexture = kind === "rain" ? PIXI.Texture.WHITE : (() => {
+        const shape = new PIXI.Graphics();
+        if (kind === "snow") shape.circle(5, 5, 4).fill({ color: 0xffffff });
+        else shape.ellipse(7, 5, 7, 3.5).fill({ color: 0xffffff });
+        const texture = app.renderer.generateTexture(shape);
+        shape.destroy();
+        return texture;
+      })();
+
+      type ParticleState = { sprite: import("pixi.js").Sprite; vx: number; vy: number; sway: number; phase: number; spin: number };
+      const particles: ParticleState[] = [];
+      const width = Math.max(1, host.clientWidth);
+      const height = Math.max(1, host.clientHeight);
+      for (let i = 0; i < count; i++) {
+        const sprite = new PIXI.Sprite(particleTexture);
+        sprite.anchor.set(.5);
+        if (kind === "rain") {
+          sprite.width = 1.5;
+          sprite.height = 13 + (i % 4) * 4;
+          sprite.tint = 0xd7e4ed;
+          sprite.alpha = .35 + (i % 4) * .12;
+          sprite.rotation = -.24;
+        } else if (kind === "snow") {
+          const size = 2.2 + (i % 4) * .9;
+          sprite.width = size;
+          sprite.height = size;
+          sprite.tint = 0xfff8e9;
+          sprite.alpha = .45 + (i % 5) * .1;
+        } else {
+          sprite.width = 7 + (i % 4) * 2;
+          sprite.height = 4 + (i % 3) * 1.5;
+          sprite.tint = cycle === "Dawn" ? 0xe7a4b1 : 0xc18b50;
+          sprite.alpha = .48 + (i % 4) * .12;
+        }
+        sprite.x = Math.random() * width;
+        sprite.y = Math.random() * height;
+        app.stage.addChild(sprite);
+        particles.push({
+          sprite,
+          vx: kind === "rain" ? 14 + (i % 5) * 5 : kind === "snow" ? ((i % 7) - 3) * 3 : ((i % 7) - 3) * 5,
+          vy: kind === "rain" ? 250 + (i % 6) * 35 : kind === "snow" ? 17 + (i % 5) * 5 : 18 + (i % 6) * 5,
+          sway: kind === "rain" ? 0 : kind === "snow" ? 7 : 13,
+          phase: i * 1.73,
+          spin: kind === "petal" ? ((i % 5) - 2) * .22 : 0,
+        });
+      }
+
+      let elapsed = 0;
+      app.ticker.maxFPS = profile.maxFps;
+      app.ticker.add(ticker => {
+        const dt = Math.min(ticker.deltaMS / 1000, .06);
+        elapsed += dt;
+        const currentWidth = Math.max(1, host.clientWidth);
+        const currentHeight = Math.max(1, host.clientHeight);
+        for (const particle of particles) {
+          const sprite = particle.sprite;
+          sprite.x += (particle.vx + Math.sin(elapsed * (kind === "rain" ? 1 : .8) + particle.phase) * particle.sway) * dt;
+          sprite.y += particle.vy * dt;
+          if (particle.spin) sprite.rotation += particle.spin * dt;
+          if (sprite.y > currentHeight + 18) {
+            sprite.y = -12 - Math.random() * 28;
+            sprite.x = Math.random() * currentWidth;
+          }
+          if (sprite.x < -20) sprite.x = currentWidth + 12;
+          else if (sprite.x > currentWidth + 20) sprite.x = -12;
+        }
+      });
+      app.canvas.className = "expedition-pixi-canvas";
+      app.canvas.setAttribute("aria-hidden", "true");
+      host.dataset.renderer = "pixi";
+      host.replaceChildren(app.canvas);
+      onVisibilityChange();
+    } catch {
+      destroyRenderer();
+      host.dataset.renderer = "fallback";
+      mountFallback();
+    }
+  })();
+
+  return () => {
+    disposed = true;
+    document.removeEventListener("visibilitychange", onVisibilityChange);
+    fallbackAnimation?.pause();
+    destroyRenderer();
+    host.replaceChildren();
+    delete host.dataset.renderer;
+  };
 }
 /** Anime.js owns Eternal Path presentation motion; game state never depends on animation callbacks. */
 export function mountExpeditionAnimations(root: HTMLElement): () => void {
@@ -49,7 +195,7 @@ export function mountExpeditionAnimations(root: HTMLElement): () => void {
       scale: [1.025, 1.075], translateX: ["-.45%", ".45%"], duration: 32000,
       ease: "inOutSine", loop: true, alternate: true,
     });
-    mountSceneParticles(root);
+    listeners.push(mountSceneParticles(root));
 
     // Uploaded image plates: each layer has its own motion profile and remains inside Scene Window.
     const sunImage = root.querySelector<HTMLElement>(".expedition-sun-glow-image");
