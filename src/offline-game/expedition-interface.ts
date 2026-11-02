@@ -1,6 +1,6 @@
 import "./expedition-interface.css";
 import {
-  getCurrentSituation, getEternalSave, getExpeditionAtmosphere, getExpeditionScene, getRegionalDialogueCount, listEternalSaves,
+  getCurrentSituation, getEternalSave, getExpeditionAtmosphere, getExpeditionScene, listEternalSaves,
 } from "./expedition-game";
 
 function escapeHtml(value:string):string {
@@ -32,7 +32,7 @@ export function renderExpeditionInterface():string {
   </section>`;
   const startPanel=save?`<section class="expedition-character-panel expedition-profile-compact" aria-label="Your adventurer profile">
     <div class="expedition-profile-identity"><div><span class="expedition-profile-kicker">YOUR ADVENTURER</span><h3 class="expedition-player-name">${escapeHtml(save.character.name)}</h3><p class="expedition-note">Age ${save.character.age} · ${escapeHtml(regionNames[scene.region])} · Day ${save.day}</p></div></div>
-    <div class="expedition-profile-meta"><span>SPIRIT REALM <b>Not recorded</b></span><span>MARTIAL SOUL <b>Not recorded</b></span><span>SPIRIT RING ABSORPTION <b>Not recorded</b></span><span>SYNC PROGRESS <b>Not recorded</b></span><span>ARCANIST GRADE <b>Not recorded</b></span><span>ARCANIST FOCUS <b>Not recorded</b></span><span>HP <b>Not recorded</b></span><span>SATIETY <b>Not recorded</b></span></div>
+    <div class="expedition-profile-meta"><span>SPIRIT REALM <b>Not recorded</b></span><span>MARTIAL SOUL <b>Not recorded</b></span><span>SPIRIT RING ABSORPTION <b>Not recorded</b></span><span>SYNC PROGRESS <b>Not recorded</b></span><span>ENERGY <b>${save.energy}/100</b></span><span>INSIGHT <b>${save.insight}</b></span><span>ARCANIST GRADE <b>Not recorded</b></span><span>ARCANIST FOCUS <b>Not recorded</b></span><span>HP <b>Not recorded</b></span><span>SATIETY <b>Not recorded</b></span></div>
     <div class="expedition-profile-actions"><span class="expedition-save-label">SAVE · ${escapeHtml(save.saveName)}</span><button type="button" class="text-button danger" data-eternal-end>Leave journey</button></div></section>`
     :`<section class="expedition-character-panel expedition-empty-profile"><span class="expedition-profile-kicker">NO ACTIVE JOURNEY</span><p class="expedition-note">Create a new local journey or load one of your saved adventures below. World Archive remains read-only.</p></section>`;
   const savedSlots=listEternalSaves();
