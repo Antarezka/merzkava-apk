@@ -41,86 +41,16 @@ export const ETERNAL_SCENES: EternalScene[] = [
   { id:"ra-outpost", region:"special-locations", label:"Ruined Archiver outpost", detail:"Special location · field outpost environment", image:"/game/scenery/special-locations/ra-01-ruined-archiver-outpost.png", archiveDossierId:"on-plan", sourcePath:"UNVERIFIED: visual asset only; validate exact Archive dossier and source path", universeCommit:"2f76a864150528afb0e3d26cb16f9396ce610ff6", provenance:"IN_GAME_ORIGINAL", note:"Broad visual category only; not a verified named canon location. Keep IN_GAME_ORIGINAL until Archive provenance is reviewed." },
 ];
 
-export interface EternalChoice { label: string; response: string; effects: { energy: number; insight: number; bonds: number }; minutes: number; }
-export interface EternalDialogue {
-  id: string; contentId:string; contentType:"dialogue"; reviewStatus:"APPROVED"; packageVersion:"0.1.0"; summary:string;
-  title: string; sceneId: string; chapter: string; speaker: string;
-  text: string; provenance: "IN_GAME_ORIGINAL"; originalityNote: string;
-  sourceRefs: {archiveDossierId:string;universeRepository:string;universeCommit:string;sourcePath:string}[];
-  choices: [EternalChoice, EternalChoice];
-}
-const chapters = [
-  { name:"A quiet beginning", speaker:"A passerby", prompts:["A vendor pauses while arranging the morning display.","A familiar sound drifts between the nearby rooftops.","Someone nearby seems to be waiting for the right moment to speak.","A small commotion draws a few curious glances.","The ordinary rhythm of the day briefly changes."], subjects:["A dropped parcel rests beside the walkway.","A hand-written notice has come loose from its board.","A tired traveller studies the route ahead.","A young apprentice struggles with a simple task.","Two neighbours disagree over a minor inconvenience."] },
-  { name:"People of the district", speaker:"A local resident", prompts:["The conversation begins cautiously, then grows warmer.","A resident notices that you have stopped to listen.","The person beside you leaves room for an honest answer.","A passing remark opens a more thoughtful conversation.","A stranger offers a greeting without asking for anything."], subjects:["They ask what brought you to this part of the region.","They mention how different people spend an ordinary day.","They wonder whether you prefer to observe or take part.","They share a small concern about the day ahead.","They ask what kind of skill you hope to develop."] },
-  { name:"A useful errand", speaker:"A shopkeeper", prompts:["A practical request is made without ceremony.","The shopkeeper checks a short list and looks up.","A simple task could save someone a little time.","The district is busy, but one small matter remains unattended.","A request is offered with no promise of reward."], subjects:["A bundle needs to be carried a short distance.","A customer is unsure which public route to take.","A few goods need to be sorted before the next rush.","A message must reach a nearby public counter.","A visitor needs help understanding a posted notice."] },
-  { name:"Learning by watching", speaker:"An instructor", prompts:["An instructor demonstrates a basic principle to a small group.","A careful explanation is repeated for anyone who missed it.","The lesson is practical rather than impressive.","A learner makes a mistake and is invited to try again.","The instructor asks the group to notice one small detail."], subjects:["The exercise is about patience and controlled movement.","The example shows why preparation matters.","The lesson rewards careful observation over speed.","The instructor explains how practice becomes habit.","A question about safe training is raised."] },
-  { name:"A moment of uncertainty", speaker:"A concerned local", prompts:["The mood changes when an uncertain report is mentioned.","A few people exchange looks before anyone answers.","The situation is unclear, and nobody claims otherwise.","A cautious request for help reaches the edge of the crowd.","The first account sounds incomplete, so details matter."], subjects:["A traveller has not returned at the expected time.","A route marker appears to have been moved.","Someone heard a noise but cannot identify its source.","A supply list does not match the delivered bundles.","A neighbour is worried about a missing personal belonging."] },
-  { name:"Evening reflection", speaker:"A travelling companion", prompts:["The day slows, leaving room to consider what happened.","The last light settles over the surrounding rooftops.","A companion asks what you learned from the day.","The conversation becomes quieter as people head home.","There is time to choose what deserves attention tomorrow."], subjects:["A small kindness may matter more than it first seemed.","A difficult moment revealed where patience is needed.","An unfinished task can wait until there is enough light.","A new acquaintance may become a useful contact.","Rest is also part of a life lived with intention."] },
-];
-const sceneOpeners: Record<string,string> = {
-  "gde-city":"The imperial-city panorama stretches beyond the immediate street, its roofs and distant walls softened by the atmosphere.",
-  "gde-street":"The traditional street carries the sound of footsteps, vendors, and ordinary conversations.",
-  "gde-market":"The marketplace is filled with movement, measured bargaining, and the scent of freshly prepared food.",
-  "gde-village":"The rural landscape feels less hurried; small tasks shape the rhythm of the settlement.",
-  "ty-city":"The floating-island city opens into layered terraces above the surrounding sea and cloud.",
-  "ty-skyport":"The skyport approach is busy with arrivals, departures, and careful movement around the landing area.",
-  "bg-north":"The northern landscape feels broad and cold, with distant ridges shaping the horizon.",
-  "bg-settlement":"The snowbound settlement moves at a deliberate pace, with warmth and shelter on everyone's mind.",
-  "gde-gate":"The imperial gate rises above the approach, framing the movement of people entering and leaving the city.",
-  "gde-academy":"The academy courtyard offers an orderly space for instruction and practice.",
-  "gde-mountain":"Mountain ridges and open wilderness shape a broad, quiet horizon.",
-  "ty-street":"Elevated streets connect the layered city above the sea.",
-  "ty-market":"The market district sits among the floating city's terraces and public routes.",
-  "ty-academy":"The academy environment reflects Tianhai's culture of study and disciplined practice.",
-  "ty-island-edge":"The island edge opens toward the surrounding sea and drifting cloud layers.",
-  "ty-terrace":"Residential terraces overlook the layered architecture of the floating city.",
-  "bg-tiger-habitat":"The northern wilderness provides a remote habitat framed by cold terrain.",
-  "bg-mining":"The mining landscape shows the region's work around rare-metal resources.",
-  "bg-pass":"A mountain pass cuts through the northern ridges.",
-  "bg-hall":"The grand hall presents a formal architectural environment in Beiming Gu.",
-  "bg-lake":"Frozen water and the surrounding banks define this northern landscape.",
-  "lt-wilderness":"A broad wilderness scene for the lawless territories; exact place identity remains unassigned.",
-  "lt-port":"A southern coastal and port-isles environment; exact place identity remains unassigned.",
-  "az-boundary":"The approach to Azerion is obscured by its illusion-fog boundary.",
-  "az-lake":"A vast lake forms part of Azerion's distinctive hidden environment.",
-  "ra-outpost":"A field outpost represents the Ruined Archiver's independent expedition presence.",
-};
-const variations = [
-  { suffix:"Listen first", first:"You take a moment to understand the situation before responding.", second:"You step forward and offer a practical hand." },
-  { suffix:"Ask a question", first:"You ask for one more detail rather than assuming what happened.", second:"You share what you have noticed and invite the other person to compare details." },
-  { suffix:"Offer help", first:"You offer help within your ability and keep the task modest.", second:"You suggest a safer or more orderly way to handle the matter." },
-  { suffix:"Practice patience", first:"You remain patient and let the other person finish explaining.", second:"You volunteer to demonstrate the task slowly and clearly." },
-  { suffix:"Make a careful choice", first:"You choose the least risky next step and observe the result.", second:"You bring the nearby people into the decision instead of acting alone." },
-];
-// Narrative content is intentionally authored for the original eight scene compositions only.
-const ETERNAL_DIALOGUE_SCENE_IDS = new Set(["gde-city","gde-street","gde-market","gde-village","ty-city","ty-skyport","bg-north","bg-settlement"]);
-const ETERNAL_DIALOGUE_SCENES = ETERNAL_SCENES.filter(scene=>ETERNAL_DIALOGUE_SCENE_IDS.has(scene.id));
-export const ETERNAL_DIALOGUES: EternalDialogue[] = chapters.flatMap((chapter, chapterIndex) =>
-  ETERNAL_DIALOGUE_SCENES.flatMap((scene, sceneIndex) =>
-    variations.map((variation, variantIndex) => {
-      const prompt = chapter.prompts[(sceneIndex + variantIndex) % chapter.prompts.length];
-      const subject = chapter.subjects[(sceneIndex * 2 + variantIndex) % chapter.subjects.length];
-      const id = `ep-${String(sceneIndex + 1).padStart(2,"0")}-${String(chapterIndex + 1).padStart(2,"0")}-${String(variantIndex + 1).padStart(2,"0")}`;
-      return {
-        id, contentId:id, contentType:"dialogue" as const, reviewStatus:"APPROVED" as const, packageVersion:"0.1.0" as const, summary:`${chapter.name} scene dialogue for ${scene.detail}`, sourceRefs:[{archiveDossierId:scene.archiveDossierId,universeRepository:"Antarezka/merzkava-universe",universeCommit:scene.universeCommit,sourcePath:scene.sourcePath}], title: `${chapter.name} · ${variation.suffix}`, sceneId:scene.id, chapter:chapter.name,
-        speaker:chapter.speaker,
-        text:`${sceneOpeners[scene.id]} ${prompt} ${subject}`,
-        provenance:"IN_GAME_ORIGINAL" as const,
-        originalityNote:"Created for Eternal Path gameplay; this dialogue is not official Merzkava Universe canon.",
-        choices:[
-          { label:"Observe and listen", response:variation.first, effects:{energy:-1,insight:2,bonds:0}, minutes:15 },
-          { label:"Take part", response:variation.second, effects:{energy:-2,insight:0,bonds:2}, minutes:25 },
-        ] as [EternalChoice,EternalChoice],
-      };
-    })
-  )
-).flat();
-
+/**
+ * The generated 240-entry 0.1.0 dialogue sequence has been retired.
+ * Story content is intentionally unavailable until the reviewed Patch-1 event system ships.
+ * Keep the legacy save counters below only for backward-compatible save migration.
+ */
 export interface EternalSave {
   schemaVersion:3; saveId:string; saveName:string; createdAt:string; updatedAt:string;
   manifest:{universeRepository:string;universeCommit:string;contentPackVersion:string;deterministicSeed:string};
   character:{name:string;age:number;region:EternalRegion}; disposition:DispositionState;
-  /** Stable world location; deliberately independent from the current dialogue node. */
+  /** Stable world location. */
   locationId:string;
   day:number; hour:number; minute:number; weather:EternalWeather;
   eventIndex:number; energy:number; insight:number; bonds:number; completed:number;
@@ -183,7 +113,7 @@ function normalizeSave(value:unknown):EternalSave|null {
   const manifest:EternalSave["manifest"]={
     universeRepository:candidate?.universeRepository==="Antarezka/merzkava-universe"?candidate.universeRepository:"Antarezka/merzkava-universe",
     universeCommit:typeof candidate?.universeCommit==="string"&&/^[a-f0-9]{40}$/i.test(candidate.universeCommit)?candidate.universeCommit:ETERNAL_SCENES[0].universeCommit,
-    contentPackVersion:typeof candidate?.contentPackVersion==="string"&&candidate.contentPackVersion.length<=32?candidate.contentPackVersion:"0.1.0",
+    contentPackVersion:typeof candidate?.contentPackVersion==="string"&&candidate.contentPackVersion.length<=32?candidate.contentPackVersion:"pending-patch-1",
     deterministicSeed:typeof candidate?.deterministicSeed==="string"&&candidate.deterministicSeed.length<=128?candidate.deterministicSeed:saveId,
   };
   const age=Number.isInteger(parsed.character.age)&&parsed.character.age>=1&&parsed.character.age<=120?parsed.character.age:14;
@@ -197,7 +127,7 @@ function normalizeSave(value:unknown):EternalSave|null {
     hour:Number.isInteger(parsed.hour)&&Number(parsed.hour)>=0&&Number(parsed.hour)<24?Number(parsed.hour):8,
     minute:Number.isInteger(parsed.minute)&&Number(parsed.minute)>=0&&Number(parsed.minute)<60?Number(parsed.minute):0,
     weather:resolveDailyWeather(region,Number(parsed.day)||1),
-    eventIndex:Number(parsed.eventIndex)||0,energy:Math.max(0,Math.min(100,Number(parsed.energy)||0)),insight:Math.max(0,Number(parsed.insight)||0),bonds:Math.max(0,Number(parsed.bonds)||0),completed:Math.max(0,Number(parsed.completed)||0),
+    eventIndex:0,energy:Math.max(0,Math.min(100,Number(parsed.energy)||0)),insight:Math.max(0,Number(parsed.insight)||0),bonds:Math.max(0,Number(parsed.bonds)||0),completed:Math.max(0,Number(parsed.completed)||0),
   } as EternalSave;
 }
 function ensureLegacyMigration():EternalSaveSlot[] {
@@ -242,7 +172,7 @@ export function listEternalSaves():EternalSaveSummary[] {
 }
 export function startEternalGame(input:{name:string;age:number;region:EternalRegion}):void {
   const now=new Date().toISOString();const id=makeSaveId();
-  save={schemaVersion:3,saveId:id,saveName:input.name.trim(),createdAt:now,updatedAt:now,manifest:{universeRepository:"Antarezka/merzkava-universe",universeCommit:ETERNAL_SCENES[0].universeCommit,contentPackVersion:"0.1.0",deterministicSeed:id},character:{name:input.name.trim(),age:input.age,region:input.region},disposition:createDispositionState(),locationId:defaultSceneForRegion(input.region).id,day:1,hour:8,minute:0,weather:resolveDailyWeather(input.region,1),eventIndex:0,energy:100,insight:0,bonds:0,completed:0};
+  save={schemaVersion:3,saveId:id,saveName:input.name.trim(),createdAt:now,updatedAt:now,manifest:{universeRepository:"Antarezka/merzkava-universe",universeCommit:ETERNAL_SCENES[0].universeCommit,contentPackVersion:"pending-patch-1",deterministicSeed:id},character:{name:input.name.trim(),age:input.age,region:input.region},disposition:createDispositionState(),locationId:defaultSceneForRegion(input.region).id,day:1,hour:8,minute:0,weather:resolveDailyWeather(input.region,1),eventIndex:0,energy:100,insight:0,bonds:0,completed:0};
   persist();
 }
 export function loadEternalSave(id:string):boolean {
@@ -281,34 +211,16 @@ export function importEternalSave(raw:string):string {
 export function resetEternalGame():void {
   save=null;try{storageRemove(SAVE_KEY);storageRemove(SAVE_SLOTS_KEY);storageRemove(ACTIVE_SAVE_KEY);}catch{/* no-op */}
 }
+/** Legacy dialogue API retained as an explicit empty boundary until Patch 1. */
 export function getRegionalDialogueCount(): number {
-  const current=getEternalSave();
-  if(!current) return ETERNAL_DIALOGUES.length;
-  const region=currentWorldRegion(current);
-  return ETERNAL_DIALOGUES.filter(node =>
-    ETERNAL_SCENES.find(scene=>scene.id===node.sceneId)?.region===region
-  ).length;
+  return 0;
 }
-export function getCurrentDialogue(): EternalDialogue | null {
-  const current=getEternalSave(); if(!current) return null;
-  const region=currentWorldRegion(current);
-  const regionalEvents=ETERNAL_DIALOGUES.filter(node =>
-    ETERNAL_SCENES.find(scene=>scene.id===node.sceneId)?.region===region
-  );
-  return regionalEvents[current.eventIndex % regionalEvents.length] ?? null;
+export function getCurrentDialogue(): null {
+  return null;
 }
-export function chooseEternalOption(index:number): void {
-  const current=getEternalSave(); const event=getCurrentDialogue();
-  if(!current || !event || (index!==0 && index!==1)) return;
-  const choice=event.choices[index];
-  current.energy=Math.max(0,Math.min(100,current.energy+choice.effects.energy));
-  current.insight=Math.max(0,current.insight+choice.effects.insight);
-  current.bonds=Math.max(0,current.bonds+choice.effects.bonds);
-  current.completed+=1; current.eventIndex+=1;
-  advanceEternalWorldTime(choice.minutes);
-  const dayPart=(current.hour*60+current.minute);
-  if(dayPart>=20*60 || dayPart<5*60) current.energy=Math.max(0,current.energy-1);
-  persist();
+/** Old choice indices are rejected; no retired node may mutate a journey. */
+export function chooseEternalOption(_index:number): void {
+  // Intentionally inactive. Patch 1 will introduce validated, context-aware event resolution.
 }
 /**
  * Advances the authoritative local world clock. Activities, travel, rest and other
