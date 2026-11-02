@@ -19,11 +19,11 @@
 - [ ] Verify screen changes do not recreate the toolbar at a different scroll offset or invoke automatic scrollIntoView/focus scrolling.
 - [ ] Verify toolbar remains viewport-anchored when switching Home → Convo → Eternal Path → Archive → Settings and when returning.
 - [ ] Verify manual horizontal swipe still works and route selection does not change the rail's scroll position.
-- [x] Keep a minimum 32 CSS-pixel breathing margin on both left and right edges (plus any reported safe-area inset), roughly a pinky-width at phone scale; do not let the rail approach Android back-swipe zones. At 320px viewport width, the rail should be about 256px wide before safe-area deductions.
-- [x] Shape the dock as a Retractable Secret Compartment: raised central crown, curved/recessed shoulders, dark verdigris enamel, antique brass edging, and fine Victorian/arcane engraving. Keep the side ropes and pulley details inside the dock so gesture margins stay empty.
-- [x] Use flat editorial emblems with recognizable silhouettes: Home = travel suitcase; Eternal Path = open book; Archive = document/record; Profile = cameo portrait. Keep Convo, Inventory, Journal, and Settings accessible by manual roulette swipe.
-- [x] Give each item its own rotary ring. Dragging the ring turns only that ring; the central flat emblem tilts slightly. The item coordinate, width, order, and label remain fixed. Side cables/pulleys respond to dial movement and use the existing sound toggle for mechanical ratchet ticks.
-- [x] Preserve manual scroll offset and each dial angle across route rerenders; keep Anime.js entrance/stagger on inner wrappers only.
+- [~] Keep a minimum 32 CSS-pixel breathing margin on both left and right edges (plus any reported safe-area inset), roughly a pinky-width at phone scale; do not let the rail approach Android back-swipe zones. At 320px viewport width, the rail should be about 256px wide before safe-area deductions.
+- [~] Shape the dock as a Retractable Secret Compartment: raised central crown, curved/recessed shoulders, dark verdigris enamel, antique brass edging, and fine Victorian/arcane engraving. Keep the side ropes and pulley details inside the dock so gesture margins stay empty.
+- [~] Use flat editorial emblems with recognizable silhouettes: Home = travel suitcase; Eternal Path = open book; Archive = document/record; Profile = cameo portrait. Keep Convo, Inventory, Journal, and Settings accessible by manual roulette swipe.
+- [~] Give each item its own rotary ring. Dragging the ring turns only that ring; the central flat emblem tilts slightly. The item coordinate, width, order, and label remain fixed. Side cables/pulleys respond to dial movement and use the existing sound toggle for mechanical ratchet ticks.
+- [~] Preserve manual scroll offset and each dial angle across route rerenders; keep Anime.js entrance/stagger on inner wrappers only.
 - [ ] Add regression tests for fixed-rail vs inner-wrapper transform isolation, route switching, stable scroll position and viewport anchoring.
 - [ ] Install APK on target Android device and confirm the toolbar no longer moves during repeated route changes.
 - [ ] Attach test evidence (screen recording or screenshots + build SHA) before closing.
@@ -78,7 +78,7 @@ The former 240-entry generated story sequence has been retired and removed from 
 - [ ] Use consistent spacing and typography to make the five steps feel like one continuous passage.
 - [ ] Distinguish dialogue with a subtle left rule/ink panel, not a large card nested inside another large card.
 - [ ] Keep the player-response trigger visually attached to the narrative passage.
-- [x] Give the narrative column an independent vertical scroll area with contained overscroll and a visible, restrained scrollbar.
+- [~] Give the narrative column an independent vertical scroll area with contained overscroll and a visible, restrained scrollbar.
 - [ ] Ensure long dialogue wraps naturally without horizontal overflow or clipping.
 - [ ] Add representative tests for missing speaker detail, long dialogue, narrow screens and no-active-journey state.
 
