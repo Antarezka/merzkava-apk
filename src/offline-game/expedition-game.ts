@@ -1,5 +1,6 @@
 import { advanceFallbackCalendar, type SessionTimestamp } from "./mechanics/time";
-import { createDispositionState, type DispositionState } from "./disposition";
+import { applyDispositionEvidence, createDispositionState, type DispositionState } from "./disposition";
+import { BOOTSTRAP_SITUATIONS, getNarrativeCycle, resolveNarrativeChoice, selectNarrativeSituation, type NarrativeContext, type NarrativeResolution, type NarrativeSituation } from "./narrative-engine";
 
 export type EternalRegion = "golden-dragon-empire" | "tianhai-yunzhou" | "beiming-gu";
 export type EternalSceneRegion = EternalRegion | "lawless-territories" | "special-locations";
@@ -55,14 +56,16 @@ export interface EternalDialogue {
   choices: [EternalChoice, EternalChoice];
 }
 /** Legacy event counters remain in old saves for migration compatibility but are ignored by the retired story runtime. */
+export interface EternalNarrativeRecord { nodeId:string; choiceId:string; day:number; transactionId:string; outcomeText:string; }
 export interface EternalSave {
-  schemaVersion:3; saveId:string; saveName:string; createdAt:string; updatedAt:string;
+  schemaVersion:4; saveId:string; saveName:string; createdAt:string; updatedAt:string;
   manifest:{universeRepository:string;universeCommit:string;contentPackVersion:string;deterministicSeed:string};
   character:{name:string;age:number;region:EternalRegion}; disposition:DispositionState;
   /** Stable world location. */
   locationId:string;
   day:number; hour:number; minute:number; weather:EternalWeather;
   eventIndex:number; energy:number; insight:number; bonds:number; completed:number;
+  narrativeHistory:EternalNarrativeRecord[]; activeNodeId:string|null; lastOutcome:string;
 }
 export interface EternalSaveSummary {
   id:string; name:string; characterName:string; region:EternalRegion; day:number; updatedAt:string; active:boolean;
@@ -113,7 +116,7 @@ function writeSlots(slots:EternalSaveSlot[]):void {
 function normalizeSave(value:unknown):EternalSave|null {
   if(!value||typeof value!=="object") return null;
   const parsed=value as Partial<EternalSave>&{schemaVersion?:number;character?:EternalSave["character"]};
-  if(![1,2,3].includes(Number(parsed.schemaVersion))||!parsed.character?.name||!Number.isInteger(parsed.eventIndex)||Number(parsed.eventIndex)<0) return null;
+  if(![1,2,3,4].includes(Number(parsed.schemaVersion))||!parsed.character?.name||!Number.isInteger(parsed.eventIndex)||Number(parsed.eventIndex)<0) return null;
   const region=["golden-dragon-empire","tianhai-yunzhou","beiming-gu"].includes(parsed.character.region)?parsed.character.region:"golden-dragon-empire";
   const locationId=typeof parsed.locationId==="string"&&ETERNAL_SCENES.some(scene=>scene.id===parsed.locationId)?parsed.locationId:defaultSceneForRegion(region).id;
   const now=new Date().toISOString();
@@ -127,7 +130,7 @@ function normalizeSave(value:unknown):EternalSave|null {
   };
   const age=Number.isInteger(parsed.character.age)&&parsed.character.age>=1&&parsed.character.age<=120?parsed.character.age:14;
   return {
-    ...parsed,schemaVersion:3,saveId,manifest,
+    ...parsed,schemaVersion:4,saveId,manifest,
     saveName:typeof parsed.saveName==="string"&&parsed.saveName.trim()?parsed.saveName.trim().slice(0,48):parsed.character.name.trim().slice(0,48),
     createdAt:typeof parsed.createdAt==="string"?parsed.createdAt:now,updatedAt:typeof parsed.updatedAt==="string"?parsed.updatedAt:now,
     character:{name:parsed.character.name.trim().slice(0,32),age,region},
@@ -137,6 +140,9 @@ function normalizeSave(value:unknown):EternalSave|null {
     minute:Number.isInteger(parsed.minute)&&Number(parsed.minute)>=0&&Number(parsed.minute)<60?Number(parsed.minute):0,
     weather:resolveDailyWeather(region,Number(parsed.day)||1),
     eventIndex:Number(parsed.eventIndex)||0,energy:Math.max(0,Math.min(100,Number(parsed.energy)||0)),insight:Math.max(0,Number(parsed.insight)||0),bonds:Math.max(0,Number(parsed.bonds)||0),completed:Math.max(0,Number(parsed.completed)||0),
+    narrativeHistory:Array.isArray((parsed as any).narrativeHistory)?(parsed as any).narrativeHistory.filter((item:any)=>item&&typeof item.nodeId==="string"&&typeof item.choiceId==="string"&&typeof item.transactionId==="string").slice(-500):[],
+    activeNodeId:typeof (parsed as any).activeNodeId==="string"&&(BOOTSTRAP_SITUATIONS.some(node=>node.id===(parsed as any).activeNodeId))?(parsed as any).activeNodeId:null,
+    lastOutcome:typeof (parsed as any).lastOutcome==="string"?(parsed as any).lastOutcome.slice(0,1200):"",
   } as EternalSave;
 }
 function ensureLegacyMigration():EternalSaveSlot[] {
@@ -181,7 +187,7 @@ export function listEternalSaves():EternalSaveSummary[] {
 }
 export function startEternalGame(input:{name:string;age:number;region:EternalRegion}):void {
   const now=new Date().toISOString();const id=makeSaveId();
-  save={schemaVersion:3,saveId:id,saveName:input.name.trim(),createdAt:now,updatedAt:now,manifest:{universeRepository:"Antarezka/merzkava-universe",universeCommit:ETERNAL_SCENES[0].universeCommit,contentPackVersion:"pending-patch-1",deterministicSeed:id},character:{name:input.name.trim(),age:input.age,region:input.region},disposition:createDispositionState(),locationId:defaultSceneForRegion(input.region).id,day:1,hour:8,minute:0,weather:resolveDailyWeather(input.region,1),eventIndex:0,energy:100,insight:0,bonds:0,completed:0};
+  save={schemaVersion:3,saveId:id,saveName:input.name.trim(),createdAt:now,updatedAt:now,manifest:{universeRepository:"Antarezka/merzkava-universe",universeCommit:ETERNAL_SCENES[0].universeCommit,contentPackVersion:"pending-patch-1",deterministicSeed:id},character:{name:input.name.trim(),age:input.age,region:input.region},disposition:createDispositionState(),locationId:defaultSceneForRegion(input.region).id,day:1,hour:8,minute:0,weather:resolveDailyWeather(input.region,1),eventIndex:0,energy:100,insight:0,bonds:0,completed:0,narrativeHistory:[],activeNodeId:null,lastOutcome:""};
   persist();
 }
 export function loadEternalSave(id:string):boolean {
@@ -220,17 +226,49 @@ export function importEternalSave(raw:string):string {
 export function resetEternalGame():void {
   save=null;try{storageRemove(SAVE_KEY);storageRemove(SAVE_SLOTS_KEY);storageRemove(ACTIVE_SAVE_KEY);}catch{/* no-op */}
 }
-/** Legacy dialogue API retained as an explicit empty boundary until Patch 1. */
-export function getRegionalDialogueCount(): number {
-  return 0;
+function buildNarrativeContext(current:EternalSave):NarrativeContext {
+  const region=currentWorldRegion(current);
+  return {saveId:current.saveId,seed:current.manifest.deterministicSeed,characterName:current.character.name,age:current.character.age,region,
+    locationId:current.locationId,day:current.day,hour:current.hour,minute:current.minute,weather:current.weather,
+    disposition:current.disposition,completedNodeIds:current.narrativeHistory.map(item=>item.nodeId),sequence:current.eventIndex};
 }
-export function getCurrentDialogue(): EternalDialogue | null {
-  return null;
+/** Returns the saved active situation, or deterministically selects and persists the next eligible one. */
+export function getCurrentSituation():NarrativeSituation|null {
+  const current=getEternalSave();if(!current)return null;
+  if(current.activeNodeId){
+    const active=BOOTSTRAP_SITUATIONS.find(node=>node.id===current.activeNodeId);
+    if(active)return active;
+    current.activeNodeId=null;
+  }
+  const selected=selectNarrativeSituation(buildNarrativeContext(current));
+  if(!selected){persist();return null;}
+  current.activeNodeId=selected.id;persist();return selected;
 }
-/** Old choice indices are rejected; no retired node may mutate a journey. */
-export function chooseEternalOption(_index:number): void {
-  // Intentionally inactive. Patch 1 will introduce validated, context-aware event resolution.
+export function getRegionalDialogueCount():number {
+  const current=getEternalSave();if(!current)return 0;
+  return BOOTSTRAP_SITUATIONS.filter(node=>node.eligibility.regions.includes(currentWorldRegion(current))).length;
 }
+/** Compatibility alias for the former dialogue view; now returns the current typed situation node. */
+export function getCurrentDialogue():NarrativeSituation|null { return getCurrentSituation(); }
+/** Resolves one visible player choice exactly once and records its deterministic transaction in this journey. */
+export function resolveEternalSituationChoice(choiceId:string):NarrativeResolution|null {
+  const current=getEternalSave();if(!current)return null;
+  const node=getCurrentSituation();if(!node)return null;
+  const context=buildNarrativeContext(current);
+  const resolution=resolveNarrativeChoice(node,choiceId,context);if(!resolution)return null;
+  if(current.narrativeHistory.some(item=>item.transactionId===resolution.transactionId))return null;
+  current.energy=Math.max(0,Math.min(100,current.energy+resolution.energyDelta));
+  current.insight=Math.max(0,current.insight+resolution.insightDelta);
+  if(resolution.dispositionEvidence)current.disposition=applyDispositionEvidence(current.disposition,resolution.dispositionEvidence,current.day);
+  current.narrativeHistory.push({nodeId:resolution.nodeId,choiceId:resolution.choiceId,day:current.day,transactionId:resolution.transactionId,outcomeText:resolution.outcomeText});
+  current.narrativeHistory=current.narrativeHistory.slice(-500);
+  current.lastOutcome=resolution.outcomeText;current.activeNodeId=null;current.eventIndex+=1;current.completed+=1;
+  persist();
+  advanceEternalWorldTime(resolution.minutes);
+  return resolution;
+}
+/** Legacy numeric choices are intentionally rejected; retired nodes cannot mutate a journey. */
+export function chooseEternalOption(_index:number):void {}
 /**
  * Advances the authoritative local world clock. Activities, travel, rest and other
  * world systems call this API; scene presentation never reads dialogue metadata.
