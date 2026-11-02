@@ -16,18 +16,19 @@
   pointer-events:none;filter:drop-shadow(1px 1px 1px #280b0b);
 }
 .gravity-cord-line path{
-  fill:none;stroke:#491416;stroke-width:7;stroke-linecap:round;stroke-linejoin:round;
-  vector-effect:non-scaling-stroke;
+  fill:none;stroke-linecap:round;stroke-linejoin:round;
+  vector-effect:non-scaling-stroke;pointer-events:none;
+}
+.gravity-cord-line .cord-base{
+  stroke:#351012;stroke-width:8;opacity:1;visibility:visible;
 }
 .gravity-cord-line path[data-cord-line]{
-  stroke:url(#cord-braid);stroke-width:4.5;
-  stroke-linecap:round;stroke-linejoin:round;
+  stroke:url(#cord-braid);stroke-width:6.2;stroke-opacity:1;opacity:1;
   filter:drop-shadow(1px 0 1px #f3a18b88) drop-shadow(-1px 0 2px #280b0b);
 }
-.gravity-cord-line .cord-thread-highlight{
-  fill:none;stroke:#e58c7688;stroke-width:1;stroke-linecap:round;
-  stroke-dasharray:1 5;stroke-dashoffset:1;
-  vector-effect:non-scaling-stroke;pointer-events:none;
+.gravity-cord-line .cord-thread-braid{
+  stroke:url(#cord-twist);stroke-width:4.6;opacity:.9;
+  mix-blend-mode:normal;
 }
 .gravity-cord-terminal{
   position:absolute;top:111px;left:0;width:54px;height:62px;padding:0;border:0;
