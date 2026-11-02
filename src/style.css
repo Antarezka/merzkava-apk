@@ -2633,3 +2633,27 @@ body { color:var(--ui-ink); }
 .app-shell.is-nav-collapsed .app-header>.header-tools{
   visibility:visible;opacity:1;pointer-events:auto;
 }
+
+
+/* Independent clockwork lever: visually docked to the lower-left corner, never nested in the toolbar. */
+.nav-toggle-handle{
+  position:fixed!important;z-index:90!important;
+  left:max(28px,calc((100vw - 690px)/2 + 8px))!important;
+  top:auto!important;right:auto!important;
+  bottom:calc(7px + env(safe-area-inset-bottom,0px) + 20px)!important;
+  display:grid!important;place-items:center!important;
+  width:48px!important;height:52px!important;min-width:48px!important;min-height:52px!important;
+  margin:0!important;padding:0!important;overflow:visible!important;
+  border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;
+  color:#e8d6a9;touch-action:pan-y;
+  transition:bottom .72s cubic-bezier(.2,.75,.2,1),transform .25s ease!important;
+  -webkit-tap-highlight-color:transparent;
+}
+.nav-toggle-handle:before,.nav-toggle-handle:after{content:none!important;display:none!important}
+.nav-toggle-handle .nav-lever-assembly{transform:scale(.94);filter:drop-shadow(0 2px 3px #000b)}
+.nav-toggle-handle .nav-toggle-arrow,.nav-toggle-handle .nav-toggle-label{display:none!important}
+.app-shell.is-nav-collapsed .nav-toggle-handle{bottom:calc(2px + env(safe-area-inset-bottom,0px))!important}
+.app-shell.is-nav-collapsed .bottom-nav{transform:translate(-50%,calc(100% + 12px));opacity:0;pointer-events:none}
+.app-shell.is-nav-collapsed .bottom-nav .nav-item{pointer-events:none}
+@media(max-width:600px){.nav-toggle-handle{left:max(24px,calc(env(safe-area-inset-left,0px) + 8px))!important}}
+@media(prefers-reduced-motion:reduce){.nav-toggle-handle{transition:none!important}}
