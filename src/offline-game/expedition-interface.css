@@ -439,3 +439,18 @@ body.eternal-choice-open{overflow:hidden}
   .expedition-choice-sheet {padding:13px;}
   .expedition-character-panel,.expedition-feature {padding:12px;}
 }
+
+
+/* Context-aware narrative node presentation */
+.expedition-scene-action>p{margin:0 0 9px;padding-left:10px;border-left:1px solid #a88b5b;color:#d8cbb9;font:13px/1.72 Georgia,serif}
+.expedition-knowledge-note{margin-top:7px!important;color:#a99e8d!important;font-size:11px!important}
+.expedition-player-question{padding:12px 13px;border-left:2px solid #a88b5b;background:#29251e}
+.expedition-player-question p{color:#eadfc9!important;font-style:italic}
+.expedition-outcome{margin:0 0 9px;padding:12px 14px;border:1px solid #8d7852;background:#e8dec8;color:#40564a}
+.expedition-outcome p{margin:5px 0 0;color:#40564a;font:13px/1.65 Georgia,serif}
+:root[data-theme="dark"] .expedition-scene-action>p{color:#d8cbb9}
+:root[data-theme="dark"] .expedition-knowledge-note{color:#b7ad9c!important}
+:root[data-theme="dark"] .expedition-player-question{background:#292d26}
+:root[data-theme="dark"] .expedition-player-question p{color:#eee5d4!important}
+:root[data-theme="dark"] .expedition-outcome{border-color:#8e7950;background:#2e3b32;color:#e9dfcd}
+:root[data-theme="dark"] .expedition-outcome p{color:#e9dfcd}
