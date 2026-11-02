@@ -1,17 +1,30 @@
 {
   "name": "merzkava-apk",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.3.0",
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
-    "build": "tsc -b && vite build",
+    "build": "tsc --noEmit && tsc --noEmit -p gateway/tsconfig.json && vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "typecheck": "tsc -b --pretty"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "cap:sync": "cap sync android && node scripts/patch-android.mjs",
+    "typecheck:gateway": "tsc --noEmit -p gateway/tsconfig.json",
+    "gateway:dev": "npx wrangler@4 dev --config gateway/wrangler.toml",
+    "gateway:deploy": "npx wrangler@4 deploy --config gateway/wrangler.toml"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@capacitor-community/sqlite": "^7.0.0",
+    "@capacitor/android": "^7.4.3",
+    "@capacitor/core": "^7.4.3",
+    "@aparajita/capacitor-secure-storage": "^7.1.6",
+    "animejs": "^4.5.0"
+  },
   "devDependencies": {
+    "@capacitor/cli": "^7.4.3",
     "typescript": "^5.7.3",
-    "vite": "^6.0.7"
+    "vite": "^6.0.7",
+    "vitest": "^5.0.5"
   }
 }

@@ -1,5 +1,15 @@
 # Project Directives
 
+## Master product roadmap
+
+- `docs/PRODUCT_ROADMAP.md` is the primary planning reference for product scope, workstreams, feature inventory, status tracking, and release gates.
+- Every existing feature, defect, and proposed feature must be inventoried or tracked there; do not assume a visible control is functional without verification.
+- **Convo / AI GM** is the connected conversation experience in the APK. It obtains active gameplay canon directly from the official `Antarezka/merzkava-universe` repository through the pinned source and routing pipeline.
+- **World Archive** is the reviewed local content/reference layer in the same APK. Users can browse it offline, and its approved, versioned content package is the source consumed by **Offline Game**.
+- **Merzkava: Eternal Path** (current working title) is the second playable experience inside the same APK. It uses approved World Archive content for canon-backed world references plus a separately versioned game-content pack for labelled adaptations and game-only additions, and runs locally without AI/network dependency; it is not a fallback version of Convo.
+- Offline Game is a Life Simulation Text RPG. Its world foundation comes from Merzkava Universe through the reviewed World Archive package; game-only additions are allowed only with explicit `IN_GAME_ORIGINAL` provenance and must never be represented as Universe canon. Follow `docs/offline-game/CONTENT_PROVENANCE.md` for the required `CANON`, `CANON_ADAPTATION`, and `IN_GAME_ORIGINAL` labels and player-facing display rules. World Archive content must never be silently appended to connected Convo/AI GM context. Convo and Offline Game must keep separate session/save state and source-version records; no implicit state or context crossover.
+- Daily login or reward systems must follow official Universe rules where applicable and use deterministic engine validation and auditable transactions. Do not invent canon rewards.
+
 ## Role and objective
 Act as technical lead, software architect, and primary developer of Merzkava APK: an Android-first hybrid roleplaying game connected to the canonical Merzkava Universe repository. The owner is a beginner working primarily from an Android phone. Prefer GitHub and cloud build workflows, and explain manual actions in small, clear steps.
 
@@ -39,3 +49,12 @@ Multiplayer, PvP, guild systems, and cloud synchronization are later milestones.
 
 ## Communication
 Use clear, beginner-friendly explanations. State limitations directly. Do not invent repository state, canon, test results, or implementation progress.
+
+
+## Repository organization
+
+- Keep one master roadmap at `docs/PRODUCT_ROADMAP.md`; all system-specific plans and notes link to it.
+- Keep Convo, World Archive, and Offline Game code in `src/convo/`, `src/world-archive/`, and `src/offline-game/` respectively.
+- Put genuinely cross-mode infrastructure in `src/shared/`; keep app composition in `src/app/`.
+- Mirror those boundaries in `tests/` and `docs/`. Do not create parallel product roadmaps for individual modes.
+- Preserve the source boundary: Convo loads Universe canon directly; Offline Game consumes only approved World Archive packages; neither mode silently imports the other's runtime state or context.

@@ -1,0 +1,15 @@
+name = "merzkava-gateway"
+main = "worker.ts"
+compatibility_date = "2026-10-30"
+
+[vars]
+AI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/openai/"
+AI_MODEL = "gemini-2.5-flash"
+SUPABASE_URL = "SET_SUPABASE_PROJECT_URL"
+SUPABASE_ANON_KEY = "SET_SUPABASE_ANON_KEY"
+ALLOWED_ORIGINS = "capacitor://localhost,https://localhost,http://localhost,http://localhost:5173,http://localhost:4173"
+
+[[ratelimits]]
+name = "AI_RATE_LIMITER"
+namespace_id = "1001"
+simple = { limit = 10, period = 60 }

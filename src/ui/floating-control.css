@@ -1,0 +1,86 @@
+.floating-control{width:min(100% - 28px,560px);min-height:100dvh;margin:0 auto;padding:max(28px,env(safe-area-inset-top)) 0 34px;color:#293d38}
+.floating-control-brand{display:flex;align-items:center;gap:13px;padding:6px 0 19px;border-bottom:1px solid #bdb49e}
+.floating-brand-mark{display:grid;place-items:center;width:48px;height:48px;border:1px solid #a68d5e;background:#eee7d6;color:#8e7951;font:28px Georgia,serif}
+.floating-control-brand small{color:#8e7951;font-size:8px;font-weight:700;letter-spacing:.2em}
+.floating-control-brand h1{margin:4px 0 0;color:#293d38;font:27px Georgia,serif;font-weight:400}
+.floating-control-intro{margin:16px 0 18px;color:#737b70;font-size:12px;line-height:1.7}
+.floating-health-panel{padding:4px 14px;border:1px solid #c7bea9;background:#eee7d6;box-shadow:0 5px 18px #4d4b3b0a}
+.floating-health-row{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:43px;border-bottom:1px solid #d8cfbb;color:#42564b;font-size:11px}
+.floating-health-row:last-child{border-bottom:0}
+.floating-status{display:inline-flex;align-items:center;gap:6px;font-size:8px;font-weight:700;letter-spacing:.12em;white-space:nowrap}
+.floating-status i{width:7px;height:7px;border-radius:50%;background:#ad7966}
+.floating-status.ready{color:#55745e}.floating-status.ready i{background:#6f9878}
+.floating-setup,.floating-actions{margin-top:24px}
+.floating-section-label{display:flex;justify-content:space-between;margin-bottom:10px;color:#8e7951;font-size:9px;font-weight:700;letter-spacing:.16em}
+.floating-section-label span{color:#929083}
+.floating-step{display:flex;align-items:center;gap:10px;min-height:72px;padding:10px 11px;border:1px solid #c7bea9;border-bottom:0;background:#eee7d6}
+.floating-step:last-child{border-bottom:1px solid #c7bea9}
+.floating-step-number{display:grid;place-items:center;flex:0 0 27px;width:27px;height:27px;border:1px solid #b9aa87;border-radius:50%;color:#927b50;font:12px Georgia,serif}
+.floating-step-copy{display:grid;flex:1;gap:4px;min-width:0}
+.floating-step-copy strong{color:#354a40;font-size:10px;font-weight:650;line-height:1.4}
+.floating-step-copy small{color:#7a8175;font-size:9px;line-height:1.45}
+.floating-step button,.floating-actions>button{min-height:34px;padding:8px 10px;border:1px solid #b49b68;background:#e6dcc5;color:#40564a;font-size:9px;white-space:nowrap}
+.floating-step button:disabled,.floating-actions>button:disabled{opacity:.42}
+.floating-check{color:#66846c;font-size:17px}
+.manual-step{background:#e9e2d2}
+.floating-actions{display:grid;gap:8px}
+.floating-actions>button{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:45px;padding:0 14px;text-align:left;font-size:11px}
+.floating-actions>button.floating-primary{border-color:#66796d;background:#314a41;color:#f0e8d8}
+.floating-actions>button.floating-stop{border-color:#c6a99b;background:#eee2d9;color:#875e51}
+.floating-actions>button.floating-donate{background:transparent;border-color:#c7bea9;color:#927b50}
+.floating-footnote{margin:17px 2px 0;color:#858779;font-size:9px;line-height:1.6}
+
+/* Compact diagnostic panel for actionable error reports. */
+.bug-report-backdrop{position:fixed;z-index:10020;inset:0;display:grid;place-items:center;padding:18px;background:#17231fc2;backdrop-filter:blur(4px)}
+.bug-report-panel{width:min(100%,440px);max-height:min(82dvh,620px);overflow:auto;padding:19px;border:1px solid #a68d5e;background:#eee7d6;color:#293d38;box-shadow:0 20px 65px #101d1980}
+.bug-report-heading{display:flex;justify-content:space-between;gap:12px;padding-bottom:10px;border-bottom:1px solid #c7bea9;color:#8e7951;font-size:8px;font-weight:700;letter-spacing:.15em}
+.bug-report-heading span:last-child{color:#9b6257}
+.bug-report-panel h2{margin:16px 0 8px;color:#31483f;font:23px Georgia,serif;font-weight:400}
+.bug-report-message{padding:11px;border:1px solid #cba99a;background:#f4e8df;color:#78594e;font:11px/1.55 ui-monospace,monospace;overflow-wrap:anywhere;white-space:pre-wrap}
+.bug-report-hint{color:#747c70;font-size:10px;line-height:1.6}
+.bug-report-actions{display:grid;grid-template-columns:1.3fr 1fr .7fr;gap:7px;margin-top:16px}
+.bug-report-actions button{min-height:40px;padding:8px 6px;border:1px solid #b49b68;background:#e4dac3;color:#40564a;font-size:10px}
+.bug-report-actions button:first-child{border-color:#66796d;background:#314a41;color:#f0e8d8}
+.bug-report-minimized{position:fixed;z-index:10020;right:14px;bottom:18px;min-height:40px;padding:9px 13px;border:1px solid #b49b68;background:#314a41;color:#f0e8d8;box-shadow:0 5px 20px #17231f55;font-size:10px}
+@media(max-width:360px){.bug-report-actions{grid-template-columns:1fr 1fr}.bug-report-actions button:first-child{grid-column:1/-1}}
+
+/* Floating Control uses the same academy paper, sage enamel and brass details. */
+.floating-control{width:min(calc(100% - 28px - env(safe-area-inset-left) - env(safe-area-inset-right)),560px);padding-top:max(22px,env(safe-area-inset-top));padding-bottom:max(34px,env(safe-area-inset-bottom));color:#293d38}
+.floating-control-brand{align-items:center;padding-bottom:17px;border-bottom-color:#c7bea9}
+.floating-brand-mark{border-color:#a68d5e;border-radius:3px;background:linear-gradient(145deg,#f2ead9,#ddd2bb);color:#8e7951;box-shadow:inset 0 1px #fff9,0 3px 10px #293d3818}
+.floating-control-brand h1{color:#293d38;font:500 27px/1.05 Cinzel,Georgia,serif}
+.floating-control-intro{color:#68766b}
+.floating-health-panel{border-color:#c7bea9;border-radius:4px;background:linear-gradient(145deg,#f3eddf,#e8dfcc);box-shadow:0 5px 18px #293d3810}
+.floating-health-row{border-bottom-color:#d8cfbb;color:#40564a}
+.floating-section-label{color:#8e7951}
+.floating-step{border-color:#c7bea9;background:linear-gradient(145deg,#f3eddf,#e8dfcc)}
+.floating-step-number{border-color:#b9aa87;color:#927b50}
+.floating-step-copy strong{color:#354a40}
+.floating-step-copy small{color:#737b70}
+.floating-step button,.floating-actions>button{border-color:#b49b68;border-radius:3px;background:#e6dcc5;color:#40564a}
+.floating-actions>button.floating-primary{border-color:#66796d;background:linear-gradient(120deg,#526b5d,#293f36);color:#f0e8d8}
+.floating-actions>button.floating-stop{border-color:#c6a99b;background:#eee2d9;color:#875e51}
+.floating-actions>button.floating-donate{background:transparent;border-color:#c7bea9;color:#927b50}
+.floating-footnote{color:#7a8175}
+.bug-report-backdrop{background:#17221dd9}
+.bug-report-panel{border-color:#a68d5e;border-radius:5px;background:linear-gradient(145deg,#f3eddf,#e6ddca);color:#293d38;box-shadow:0 20px 65px #101d1980,inset 0 0 0 4px #a68d5e12}
+.bug-report-message{border-color:#c7bea9;background:#f4e8df;color:#78594e}
+.bug-report-actions button{border-color:#b49b68;background:#e4dac3;color:#40564a}
+.bug-report-minimized{right:max(14px,env(safe-area-inset-right));border-color:#b49b68;background:#314a41;color:#f0e8d8}
+:root[data-theme="dark"] .floating-control{color:#e8dfcf}
+:root[data-theme="dark"] .floating-control-brand{border-bottom-color:#536052}
+:root[data-theme="dark"] .floating-brand-mark{border-color:#c1a875;background:linear-gradient(145deg,#39473c,#202d25);color:#e0ca98}
+:root[data-theme="dark"] .floating-control-brand h1{color:#e8dfcf}
+:root[data-theme="dark"] .floating-control-intro,:root[data-theme="dark"] .floating-step-copy small,:root[data-theme="dark"] .floating-footnote{color:#bdc1b0}
+:root[data-theme="dark"] .floating-health-panel,:root[data-theme="dark"] .floating-step{border-color:#536052;background:linear-gradient(145deg,#344138,#29342d)}
+:root[data-theme="dark"] .floating-health-row,:root[data-theme="dark"] .floating-step-copy strong{color:#e8dfcf}
+:root[data-theme="dark"] .floating-section-label{color:#d0b77e}
+:root[data-theme="dark"] .floating-step-number{border-color:#8c7950;color:#d0b77e}
+:root[data-theme="dark"] .floating-step button,:root[data-theme="dark"] .floating-actions>button{border-color:#756847;background:#303b33;color:#e8dfcf}
+:root[data-theme="dark"] .floating-actions>button.floating-primary{border-color:#8c9a7a;background:linear-gradient(120deg,#526b5d,#293f36);color:#f0e8d8}
+:root[data-theme="dark"] .floating-actions>button.floating-stop{border-color:#9a756a;background:#40312d;color:#e4b9a9}
+:root[data-theme="dark"] .floating-actions>button.floating-donate{border-color:#596653;background:transparent;color:#d0b77e}
+:root[data-theme="dark"] .bug-report-panel{border-color:#8c7950;background:linear-gradient(145deg,#344138,#202b24);color:#e8dfcf}
+:root[data-theme="dark"] .bug-report-message{border-color:#756847;background:#352d28;color:#e5c6b6}
+:root[data-theme="dark"] .bug-report-actions button{border-color:#756847;background:#303b33;color:#e8dfcf}
+@media(max-width:380px){.floating-control{width:calc(100% - 22px - env(safe-area-inset-left) - env(safe-area-inset-right))}.floating-step{gap:8px;padding-inline:9px}.floating-step-copy strong{font-size:9px}}

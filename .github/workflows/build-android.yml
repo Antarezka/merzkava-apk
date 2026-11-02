@@ -1,0 +1,212 @@
+name: Build Merzkava Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/opening-splash-screen
+      - feature/floating-mode-ledger
+      - feature/archive-experience
+    paths:
+      - "src/**"
+      - "public/**"
+      - "native/**"
+      - "scripts/**"
+      - ".github/workflows/build-android.yml"
+      - "package.json"
+      - "package-lock.json"
+      - "capacitor.config.ts"
+      - "vite.config.ts"
+
+permissions:
+  contents: read
+
+concurrency:
+  # Keep builds isolated by branch so a test on another branch cannot cancel this APK build.
+  group: merzkava-android-build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-android:
+    name: Build Android debug APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build web application
+        run: npm run build
+        env:
+          VITE_SUPABASE_URL: https://zqkcmumxjmuoforgkeet.supabase.co
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          VITE_GM_GATEWAY_URL: https://merzkava-gateway.izerameztria.workers.dev
+
+      - name: Create Android project if missing
+        run: |
+          if [ ! -d android ]; then
+            npx cap add android
+          fi
+
+      - name: Sync Capacitor Android project
+        run: npx cap sync android
+
+      - name: Verify Kitty splash assets in web build
+        run: |
+          set -euo pipefail
+          for asset in body/kitty-body.png kepala/kitty-head.png ekor/kitty-tail.png shadow/kitty-shadow.png; do
+            test -s "public/kitty/$asset"
+            test -s "dist/kitty/$asset"
+            echo "Verified dist/kitty/$asset"
+          done
+          node --input-type=module - <<'NODE'
+          import { readFileSync, readdirSync } from "node:fs";
+          const files = readdirSync("dist/assets");
+          const js = files.filter(name => name.endsWith(".js")).map(name => readFileSync("dist/assets/" + name, "utf8")).join("\n");
+          for (const token of ["/kitty/body/kitty-body.png", "/kitty/kepala/kitty-head.png", "/kitty/ekor/kitty-tail.png"]) {
+            if (!js.includes(token)) throw new Error("Built JS is missing Kitty asset reference: " + token);
+          }
+          if (!js.includes(".splash-wordmark")) throw new Error("Built JS does not include the Kitty splash wordmark selector.");
+          if (!js.includes("/kitty/shadow/kitty-shadow.png")) throw new Error("Built JS is missing Kitty’s splash floor-shadow layer.");
+          const iconScript = readFileSync("scripts/generate-android-icons.py", "utf8");
+          if (iconScript.includes('ASSETS / "shadow"') || iconScript.includes("shadow/kitty-shadow.png")) throw new Error("Launcher icon generator must not include Kitty’s floor-shadow layer.");
+          console.log("Kitty asset references and splash selector are present in the web bundle.");
+          NODE
+
+      - name: Install Merzkava Floating Mode native integration
+        run: node scripts/patch-android.mjs
+
+      - name: Generate transparent Kitty launcher icons
+        run: |
+          python3 -m pip install --user Pillow
+          python3 scripts/generate-android-icons.py
+
+      - name: Configure permanent update signing and version
+        env:
+          MERZKAVA_KEYSTORE_BASE64: ${{ secrets.MERZKAVA_KEYSTORE_BASE64 }}
+          MERZKAVA_KEYSTORE_PASSWORD: ${{ secrets.MERZKAVA_KEYSTORE_PASSWORD }}
+          MERZKAVA_KEY_ALIAS: ${{ secrets.MERZKAVA_KEY_ALIAS }}
+          MERZKAVA_KEY_PASSWORD: ${{ secrets.MERZKAVA_KEY_PASSWORD }}
+          MERZKAVA_VERSION_CODE: ${{ github.run_number }}
+        run: |
+          set -euo pipefail
+          export MERZKAVA_VERSION_NAME="v.1.01.${GITHUB_RUN_NUMBER}-${GITHUB_SHA:0:3}"
+          echo "MERZKAVA_VERSION_NAME=$MERZKAVA_VERSION_NAME" >> "$GITHUB_ENV"
+          for name in MERZKAVA_KEYSTORE_BASE64 MERZKAVA_KEYSTORE_PASSWORD MERZKAVA_KEY_ALIAS MERZKAVA_KEY_PASSWORD; do
+            if [ -z "${!name:-}" ]; then
+              echo "::error::Missing GitHub Actions secret: $name. Add all four MERZKAVA signing secrets before building an update APK."
+              exit 1
+            fi
+          done
+          echo "$MERZKAVA_KEYSTORE_BASE64" | base64 --decode > android/merzkava-upload.jks
+          test -s android/merzkava-upload.jks
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          p = Path("android/app/build.gradle")
+          s = p.read_text()
+          s, n = re.subn(r'versionCode\s+\d+', 'versionCode Integer.parseInt(System.getenv("MERZKAVA_VERSION_CODE") ?: "1")', s, count=1)
+          if n != 1:
+              raise SystemExit("Could not locate app versionCode in android/app/build.gradle")
+          s, n = re.subn(r'versionName\s+"[^"]+"', 'versionName System.getenv("MERZKAVA_VERSION_NAME") ?: "v.1.01.0-000"', s, count=1)
+          if n != 1:
+              raise SystemExit("Could not locate app versionName in android/app/build.gradle")
+          signing = '''
+              signingConfigs {
+                  merzkavaUpload {
+                      storeFile file("${rootProject.projectDir}/merzkava-upload.jks")
+                      storePassword System.getenv("MERZKAVA_KEYSTORE_PASSWORD")
+                      keyAlias System.getenv("MERZKAVA_KEY_ALIAS")
+                      keyPassword System.getenv("MERZKAVA_KEY_PASSWORD")
+                  }
+              }
+          '''
+          s = s.replace("android {", "android {\n" + signing, 1)
+          if re.search(r'buildTypes\s*\{', s) is None:
+              raise SystemExit("Could not locate buildTypes in android/app/build.gradle")
+          s, n = re.subn(r'(buildTypes\s*\{)', r'\1\n        debug { signingConfig signingConfigs.merzkavaUpload }', s, count=1)
+          if n != 1:
+              raise SystemExit("Could not configure debug signing")
+          p.write_text(s)
+          print("Configured stable Merzkava signing and versionCode", __import__("os").environ["MERZKAVA_VERSION_CODE"])
+          PY
+
+      - name: Build debug APK
+        working-directory: android
+        env:
+          MERZKAVA_KEYSTORE_PASSWORD: ${{ secrets.MERZKAVA_KEYSTORE_PASSWORD }}
+          MERZKAVA_KEY_ALIAS: ${{ secrets.MERZKAVA_KEY_ALIAS }}
+          MERZKAVA_KEY_PASSWORD: ${{ secrets.MERZKAVA_KEY_PASSWORD }}
+          MERZKAVA_VERSION_CODE: ${{ github.run_number }}
+        run: ./gradlew assembleDebug
+
+      - name: Verify APK package, version, alignment, and signature
+        env:
+          MERZKAVA_VERSION_CODE: ${{ github.run_number }}
+        run: |
+          set -euo pipefail
+          EXPECTED_VERSION_NAME="v.1.01.${GITHUB_RUN_NUMBER}-${GITHUB_SHA:0:3}"
+          APK="android/app/build/outputs/apk/debug/app-debug.apk"
+          BUILD_TOOLS="$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -n 1)"
+          test -s "$APK"
+          echo "APK file:"
+          file "$APK"
+          echo "APK size and checksum:"
+          stat -c '%s bytes' "$APK"
+          sha256sum "$APK"
+          echo "APK manifest metadata:"
+          "$BUILD_TOOLS/aapt" dump badging "$APK" | head -n 20
+          "$BUILD_TOOLS/aapt" dump badging "$APK" | grep -q "versionCode='$MERZKAVA_VERSION_CODE'"
+          "$BUILD_TOOLS/aapt" dump badging "$APK" | grep -q "versionName='$EXPECTED_VERSION_NAME'"
+          echo "Verified versionCode: $MERZKAVA_VERSION_CODE"
+          echo "Verified versionName: $EXPECTED_VERSION_NAME"
+          echo "APK alignment:"
+          "$BUILD_TOOLS/zipalign" -c -v 4 "$APK"
+          echo "APK signature:"
+          "$BUILD_TOOLS/apksigner" verify --verbose --print-certs "$APK"
+
+      # Preserve a verified APK artifact even if the hosted emulator service is unstable.
+      - name: Upload verified APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: merzkava-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Install APK on Android 14 emulator
+        uses: ReactiveCircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: default
+          arch: x86_64
+          profile: pixel_2
+          cores: 4
+          ram-size: 4096M
+          emulator-boot-timeout: 900
+          pre-emulator-launch-script: adb start-server
+          disable-animations: true
+          script: bash scripts/emulator-smoke-test.sh
+
+      - name: Upload emulator diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: merzkava-emulator-diagnostics
+          path: emulator-diagnostics/
+          if-no-files-found: ignore
+          retention-days: 7

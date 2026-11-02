@@ -1,0 +1,52 @@
+name: Web App Validation
+
+on:
+  push:
+    branches:
+      - main
+      - setup/project-foundation
+      - feature/**
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: npm install
+      - name: Report npm security advisories
+        run: |
+          npm audit --json > /tmp/npm-audit.json || true
+          node <<'NODE'
+          const fs = require("node:fs");
+          const report = JSON.parse(fs.readFileSync("/tmp/npm-audit.json", "utf8"));
+          const counts = report.metadata?.vulnerabilities ?? {};
+          console.log("npm audit counts:", JSON.stringify(counts));
+          for (const [name, item] of Object.entries(report.vulnerabilities ?? {})) {
+            const via = (item.via ?? []).map(value =>
+              typeof value === "string" ? value : `${value.title} [${value.range}]`
+            ).join("; ");
+            console.log(`- ${name}: severity=${item.severity}; direct=${item.isDirect}; range=${item.range}; fix=${JSON.stringify(item.fixAvailable)}; via=${via}`);
+          }
+          NODE
+          npm audit --omit=dev --json > /tmp/npm-audit-production.json || true
+          node <<'NODE'
+          const fs = require("node:fs");
+          const report = JSON.parse(fs.readFileSync("/tmp/npm-audit-production.json", "utf8"));
+          console.log("Production-only npm audit counts:", JSON.stringify(report.metadata?.vulnerabilities ?? {}));
+          for (const [name, item] of Object.entries(report.vulnerabilities ?? {})) {
+            console.log(`- production dependency ${name}: severity=${item.severity}; range=${item.range}`);
+          }
+          NODE
+      - name: Validate Android smoke-test shell syntax
+        run: bash -n scripts/emulator-smoke-test.sh
+      - name: Run gameplay engine tests
+        run: npm run test
+      - name: Type-check and build
+        run: npm run build

@@ -14,3 +14,6 @@ android/**/build/
 android/captures/
 .idea/
 .vscode/
+
+# Cloudflare local development secrets
+.dev.vars

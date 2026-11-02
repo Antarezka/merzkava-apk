@@ -1,0 +1,1 @@
+Trigger Android build after passing versionCode to the Gradle build step.
