@@ -2590,3 +2590,20 @@ body { color:var(--ui-ink); }
 /* Header has four aligned zones on desktop and three on compact screens. */
 @media(min-width:601px){.app-header{grid-template-columns:auto minmax(0,1fr) auto auto;}}
 @media(max-width:600px){.app-header{grid-template-columns:auto minmax(0,1fr) auto;}.header-context{display:none;}}
+
+
+/* Folded toolbar: keep the lever exposed and leave only a slim dock edge visible. */
+.app-shell.is-nav-collapsed .app-header{
+  min-height:58px;height:58px;padding:5px 2px 5px;overflow:visible;
+}
+.app-shell.is-nav-collapsed .app-header>.brand,
+.app-shell.is-nav-collapsed .app-header>.header-context,
+.app-shell.is-nav-collapsed .app-header>.header-tools{
+  visibility:hidden;opacity:0;pointer-events:none;
+}
+.app-shell.is-nav-collapsed .app-header>.nav-toggle-handle{
+  visibility:visible;opacity:1;pointer-events:auto;
+}
+.app-shell.is-nav-collapsed .bottom-nav{
+  opacity:1;pointer-events:none;
+}
