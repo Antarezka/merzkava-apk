@@ -26,6 +26,30 @@ describe("Eternal Path Anime.js motion",()=>{
   expect(mocks.animate).toHaveBeenCalledWith(narrative,expect.objectContaining({translateY:[9,0]}));
   dispose();expect(mocks.scope.revert).toHaveBeenCalledOnce();
  });
+ it("animates uploaded weather plates with distinct motion and cycles lightning variants",()=>{
+  const environment={dataset:{weather:"Rain",cycle:"Morning"}};
+  const sun={},moon={},rays={},rain={},lightning={},lightningImage={src:"/game/scenery/shared/fx-08-lightning-flash-a.png"};
+  const selectors:Record<string,any>={".expedition-environment":environment,".expedition-sun-glow-image":sun,".expedition-moon-glow-image":moon,".expedition-light-rays-image":rays,".expedition-rain-streak-image":rain,".expedition-lightning-layer":lightning,".expedition-lightning-flash-image":lightningImage};
+  const root={querySelector:vi.fn((selector:string)=>selectors[selector]??null),querySelectorAll:vi.fn(()=>[])} as unknown as HTMLElement;
+  mountExpeditionAnimations(root);
+  expect(mocks.animate).toHaveBeenCalledWith(sun,expect.objectContaining({duration:15000,alternate:true}));
+  expect(mocks.animate).toHaveBeenCalledWith(moon,expect.objectContaining({duration:19000,alternate:true}));
+  expect(mocks.animate).toHaveBeenCalledWith(rays,expect.objectContaining({duration:28000,alternate:true}));
+  expect(mocks.animate).toHaveBeenCalledWith(rain,expect.objectContaining({duration:2600,alternate:true}));
+  const flash=mocks.animate.mock.calls.find(call=>call[0]===lightning);
+  expect(flash).toBeTruthy();
+  flash?.[1].onLoop();
+  expect(lightningImage.src).toBe("/game/scenery/shared/fx-08-lightning-flash-b.png");
+ });
+ it("animates snow and frost only for Snow weather",()=>{
+  const environment={dataset:{weather:"Snow",cycle:"Night"}};
+  const snow={},frost={};
+  const selectors:Record<string,unknown>={".expedition-environment":environment,".expedition-snow-texture":snow,".expedition-window-frost-image":frost};
+  const root={querySelector:vi.fn((selector:string)=>selectors[selector]??null),querySelectorAll:vi.fn(()=>[])} as unknown as HTMLElement;
+  mountExpeditionAnimations(root);
+  expect(mocks.animate).toHaveBeenCalledWith(snow,expect.objectContaining({duration:11500,alternate:true}));
+  expect(mocks.animate).toHaveBeenCalledWith(frost,expect.objectContaining({duration:12500,alternate:true}));
+ });
  it("does not animate when reduced motion is requested",()=>{
   mocks.scope.add.mockImplementation((setup:(self:{matches:{reduceMotion:boolean}})=>void)=>{setup({matches:{reduceMotion:true}});return mocks.scope;});
   mountExpeditionAnimations({querySelectorAll:vi.fn(()=>[{}]),querySelector:vi.fn(()=>({}))} as unknown as HTMLElement);
