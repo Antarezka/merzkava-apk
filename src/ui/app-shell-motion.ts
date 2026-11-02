@@ -39,17 +39,7 @@ export function animateAppScreen(shell: HTMLElement | null, options: { menuToggl
         }
       });
     }
-    if (header) {
-      header.style.opacity = collapsed ? "1" : "0";
-      header.style.transform = collapsed ? "translateY(0px)" : "translateY(-16px)";
-      animate(header, {
-        translateY: collapsed ? [0, -16] : [-16, 0],
-        opacity: collapsed ? [1, 0] : [0, 1],
-        duration: 430,
-        delay: collapsed ? 70 : 35,
-        ease: collapsed ? "inOutCubic" : "outCubic"
-      });
-    }
+    // The header remains fully visible; only the navigation dock sinks.
     const grip = toggle?.querySelector<HTMLElement>(".nav-lever-grip");
     const arrow = toggle?.querySelector<HTMLElement>(".nav-toggle-arrow");
     if (grip) animate(grip, {
