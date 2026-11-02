@@ -30,7 +30,7 @@
     "worldArchiveMutation": false,
     "deterministicSelection": true,
     "choiceResolution": "Validated local transaction; outcomes hidden until selected",
-    "replayPolicy": "A situation cannot repeat within the same journey history",
+    "replayPolicy": "A situation cannot recur until two other situation resolutions have occurred in the same journey.",
     "saveSchemaVersion": 4
   },
   "limitations": [
