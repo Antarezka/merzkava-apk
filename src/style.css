@@ -2575,3 +2575,14 @@ body { color:var(--ui-ink); }
 .app-shell.is-nav-collapsed .nav-toggle-handle{bottom:env(safe-area-inset-bottom,0px);border-radius:7px 7px 3px 3px}
 @media(max-width:600px){.nav-toggle-handle{bottom:calc(76px + env(safe-area-inset-bottom,0px));min-width:124px;min-height:54px}}
 @media(prefers-reduced-motion:reduce){.nav-toggle-handle{transition:none}}
+
+
+/* The mechanical lever belongs to the upper-left app toolbar, not a detached bottom panel. */
+.app-header{grid-template-columns:auto minmax(0,1fr) auto;}
+.app-header .nav-toggle-handle{position:relative;inset:auto;left:auto;bottom:auto;z-index:2;flex:0 0 48px;width:48px;min-width:48px;height:48px;min-height:48px;margin:0 5px 0 0;padding:0;border:1px solid #9d7a43;border-radius:50%;background:linear-gradient(145deg,#354338 0%,#1c2821 72%);box-shadow:0 3px 10px #0005,inset 0 1px #f1d99a33;display:grid;place-items:center;touch-action:pan-y;}
+.app-header .nav-toggle-handle:before,.app-header .nav-toggle-handle:after{content:none;}
+.app-header .nav-toggle-handle .nav-lever-assembly{transform:scale(.82);}
+.app-header .nav-toggle-handle .nav-toggle-arrow{right:-3px;bottom:-3px;}
+.app-header .nav-toggle-handle .nav-toggle-label{display:none;}
+.app-shell.is-nav-collapsed .app-header .nav-toggle-handle{inset:auto;border:1px solid #9d7a43;border-radius:50%;}
+@media(max-width:600px){.app-header .nav-toggle-handle{flex-basis:43px;width:43px;min-width:43px;height:43px;min-height:43px;margin-right:3px;}}
