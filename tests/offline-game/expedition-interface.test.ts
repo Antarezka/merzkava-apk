@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { renderExpeditionInterface } from "../../src/offline-game/expedition-interface";
 import {
   advanceEternalWorldTime, chooseEternalOption, ETERNAL_SCENES,
-  getCurrentDialogue, getEternalSave, getExpeditionAtmosphere, getExpeditionScene,
+  getCurrentDialogue, getCurrentSituation, getEternalSave, getExpeditionAtmosphere, getExpeditionScene,
   getRegionalDialogueCount, resetEternalGame, setEternalLocation, startEternalGame,
 } from "../../src/offline-game/expedition-game";
 
@@ -42,8 +42,8 @@ describe("Eternal Path live world scene", () => {
     const initialLocation=getEternalSave()?.locationId;
     expect(initialLocation).toBe("gde-city");
     expect(getExpeditionScene().id).toBe("gde-city");
-    expect(getCurrentDialogue()).toBeNull();
-    expect(getRegionalDialogueCount()).toBe(0);
+    expect(getCurrentDialogue()).not.toBeNull();
+    expect(getRegionalDialogueCount()).toBe(3);
 
     setEternalLocation("gde-market");
     expect(getExpeditionScene().id).toBe("gde-market");
@@ -53,7 +53,7 @@ describe("Eternal Path live world scene", () => {
     setEternalLocation("ty-city");
     expect(getExpeditionScene().region).toBe("tianhai-yunzhou");
     expect(getEternalSave()?.character.region).toBe("golden-dragon-empire");
-    expect(getRegionalDialogueCount()).toBe(0);
+    expect(getRegionalDialogueCount()).toBe(3);
   });
 
   it("derives day cycle from world clock independently of dialogue progression", () => {
@@ -78,7 +78,7 @@ describe("Eternal Path live world scene", () => {
     expect(getEternalSave()?.completed).toBe(0);
   });
 
-  it("uses the compact narrative-first layout while Patch 1 is pending", () => {
+  it("renders the context-aware starter node and response sheet", () => {
     startEternalGame({name:"Nafila",age:14,region:"golden-dragon-empire"});
     const html=renderExpeditionInterface();
     expect(html).toContain("✦ MERZKAVA: ETERNAL PATH");
@@ -86,27 +86,31 @@ describe("Eternal Path live world scene", () => {
     expect(html).toContain("SPIRIT REALM");
     expect(html).toContain("SPIRIT RING");
     expect(html).toContain("SYNC PROGRESS");
-    expect(html).toContain("ARCANIST FOCUS");
+    expect(html).toContain("ENERGY");
+    expect(html).toContain("INSIGHT");
     expect(html).toContain("True Neutral");
-    expect(html).toContain("PATCH 1 · PLANNED");
-    expect(html).toContain("NARRATIVE SYSTEM REBUILD");
-    expect(html).not.toContain('class="expedition-choice-modal"');
-    expect(html).not.toContain("data-eternal-choice");
-    expect(html).toContain('class="expedition-dialogue expedition-dialogue-locked"');
+    expect(html).toContain("SETTING / ATMOSPHERE");
+    expect(html).toContain("SCENE ACTION");
+    expect(html).toContain("CHARACTER BEHAVIOR");
+    expect(html).toContain("DIALOGUE");
+    expect(html).toContain("PERSPECTIVE");
+    expect(html).toContain("STARTER SITUATION");
+    expect(html).toContain('class="expedition-choice-modal"');
+    expect(html).toContain('data-eternal-choice="help"');
+    expect(html).toContain('class="expedition-dialogue"');
     expect(html).toContain("DISPOSITION");
     expect(html).toContain("JOURNEY MANAGER");
     expect(html).toContain('class="expedition-manager-trigger"');
     expect(html).toContain('data-eternal-manager-backdrop aria-label="Close Save Manager" hidden');
     expect(html).toContain('aria-controls="eternal-save-manager-dialog"');
-    expect(html).toContain('data-eternal-manager-backdrop aria-label="Close Save Manager" hidden');
     expect(html).toContain('id="eternal-save-manager-dialog" class="expedition-manager-content" data-eternal-manager-content role="dialog" aria-modal="true" aria-labelledby="eternal-manager-title" hidden');
     expect(html).toContain('class="scene-coordinate scene-clock-ink"');
     expect(html.indexOf('class="expedition-environment"')).toBeLessThan(html.indexOf('class="expedition-disposition-line"'));
-    expect(html.indexOf('class="expedition-disposition-line"')).toBeLessThan(html.indexOf('class="expedition-dialogue expedition-dialogue-locked"'));
-    expect(html.indexOf('class="expedition-dialogue expedition-dialogue-locked"')).toBeLessThan(html.indexOf('expedition-profile-compact'));
+    expect(html.indexOf('class="expedition-disposition-line"')).toBeLessThan(html.indexOf('class="expedition-dialogue"'));
+    expect(html.indexOf('class="expedition-dialogue"')).toBeLessThan(html.indexOf('expedition-profile-compact'));
     expect(html).not.toContain("Manage journeys");
     expect(html).not.toContain("expedition-feature-grid");
-    expect(html).toContain("The previous repetitive opening sequence has been retired.");
+    expect(getCurrentSituation()?.id).toBeTruthy();
   });
 
   it("keeps the local journey while the retired story sequence remains inactive", () => {
@@ -114,18 +118,19 @@ describe("Eternal Path live world scene", () => {
     const save=getEternalSave();
     expect(save?.character.name).toBe("Nafila");
     expect(renderExpeditionInterface()).toContain("Nafila");
-    expect(renderExpeditionInterface()).toContain("PATCH 1 · PLANNED");
+    expect(renderExpeditionInterface()).toContain("SCENE ACTION");
     chooseEternalOption(0);
     expect(getEternalSave()?.completed).toBe(0);
     expect(getEternalSave()?.insight).toBe(0);
     expect(getEternalSave()?.eventIndex).toBe(0);
+    expect(getEternalSave()?.narrativeHistory).toHaveLength(0);
   });
 
   it("keeps the selected world location and dialogue region separate but consistent", () => {
     startEternalGame({name:"Nafila",age:14,region:"tianhai-yunzhou"});
     expect(getExpeditionScene().region).toBe("tianhai-yunzhou");
-    expect(getRegionalDialogueCount()).toBe(0);
-    expect(getCurrentDialogue()).toBeNull();
+    expect(getRegionalDialogueCount()).toBe(3);
+    expect(getCurrentDialogue()).not.toBeNull();
   });
 
   it("keeps all 26 registered scenery assets and ships no retired dialogue nodes", () => {
