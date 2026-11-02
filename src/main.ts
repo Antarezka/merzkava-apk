@@ -624,12 +624,27 @@ root.addEventListener("scroll", event => {
 }, true);
 
 window.addEventListener("popstate", () => {
+  const manager=root.querySelector<HTMLElement>("[data-eternal-manager-content]");
+  if(manager&&!manager.hidden){
+    manager.hidden=true;
+    root.querySelector<HTMLButtonElement>(".expedition-manager-trigger")?.setAttribute("aria-expanded","false");
+    root.querySelector<HTMLButtonElement>(".expedition-manager-trigger")?.focus();
+    return;
+  }
   const modal=root.querySelector<HTMLElement>(".expedition-choice-modal:not([hidden])");
   if(!modal) return;
   animateExpeditionChoiceModal(modal,false,()=>root.querySelector<HTMLButtonElement>("[data-eternal-open-choices]")?.focus());
   document.body.classList.remove("eternal-choice-open");
 });
 root.addEventListener("keydown", event => {
+  const manager=root.querySelector<HTMLElement>("[data-eternal-manager-content]");
+  if(event.key==="Escape"&&manager&&!manager.hidden){
+    manager.hidden=true;
+    root.querySelector<HTMLButtonElement>(".expedition-manager-trigger")?.setAttribute("aria-expanded","false");
+    root.querySelector<HTMLButtonElement>(".expedition-manager-trigger")?.focus();
+    if(history.state?.eternalManager) history.back();
+    return;
+  }
   const modal=root.querySelector<HTMLElement>(".expedition-choice-modal:not([hidden])");
   if(!modal) return;
   if(event.key==="Escape") {
@@ -672,9 +687,13 @@ root.addEventListener("click", async (event: MouseEvent) => {
       panel.hidden=!panel.hidden;
       trigger?.setAttribute("aria-expanded",String(!panel.hidden));
       if(!panel.hidden){
+        history.pushState({eternalManager:true},"");
         animateExpeditionPanel(panel);
         panel.querySelector<HTMLButtonElement>(".expedition-manager-close")?.focus();
-      } else trigger?.focus();
+      } else {
+        if(history.state?.eternalManager) history.back();
+        trigger?.focus();
+      }
     }
     return;
   }
