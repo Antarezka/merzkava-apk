@@ -1694,3 +1694,30 @@ button {color:inherit;} button:focus-visible {outline-color:#a68d5e;}
   .bottom-nav .nav-item:after,
   .bottom-nav .nav-icon-art{transition:none}
 }
+
+
+/* The compartment has a raised central drawer crown and recessed shoulders. */
+.bottom-nav{
+  clip-path:polygon(
+    0 24%, 2% 19%, 5% 16%, 10% 13%, 16% 12%,
+    20% 9%, 24% 6%, 30% 3%, 40% 1%, 60% 1%,
+    70% 3%, 76% 6%, 80% 9%, 84% 12%, 90% 13%,
+    95% 16%, 98% 19%, 100% 24%, 100% 100%, 0 100%
+  );
+}
+.bottom-nav .nav-cable{
+  transition:transform .075s linear;
+}
+.bottom-nav .nav-cable-left{transform:translateY(var(--cable-left-offset,0px))}
+.bottom-nav .nav-cable-right{transform:translateY(var(--cable-right-offset,0px))}
+.bottom-nav .nav-cable:before,
+.bottom-nav .nav-cable:after{
+  background:conic-gradient(from var(--cable-gear-angle,0deg),#f0d9a0 0 16deg,#886b42 16deg 34deg,#d7b77b 34deg 58deg,#4a5c49 58deg 78deg,#f0d9a0 78deg 96deg,#886b42 96deg 120deg,#d7b77b 120deg 146deg,#4a5c49 146deg 168deg,#f0d9a0 168deg 186deg,#886b42 186deg 210deg,#d7b77b 210deg 236deg,#4a5c49 236deg 258deg,#f0d9a0 258deg 276deg,#886b42 276deg 300deg,#d7b77b 300deg 326deg,#4a5c49 326deg 348deg,#f0d9a0 348deg 360deg);
+  transition:transform .075s linear;
+  transform:rotate(var(--cable-gear-angle,0deg));
+}
+@media(prefers-reduced-motion:reduce){
+  .bottom-nav .nav-cable,
+  .bottom-nav .nav-cable:before,
+  .bottom-nav .nav-cable:after{transition:none}
+}
