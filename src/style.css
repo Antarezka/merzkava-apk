@@ -112,27 +112,35 @@ button {color:inherit;} button:focus-visible {outline-color:#a68d5e;}
 .canon-document pre {border-color:#c7bea9;background:#e7dfcd;color:#3c5048;}
 
 /* Main-menu noticeboard modal */
-.noticeboard-backdrop{position:fixed;inset:0;z-index:30;display:grid;place-items:center;padding:18px 13px;background:#17221dd9;backdrop-filter:blur(7px);animation:noticeboard-fade .28s ease-out}
-.noticeboard-panel{position:relative;width:min(100%,460px);max-height:min(90vh,780px);overflow:auto;padding:22px 20px 17px;border:1px solid #9f895e;background:radial-gradient(ellipse at 50% 0%,#fff9e9,#eee4cf 56%,#e4d8bf);color:#2b342d;box-shadow:0 24px 75px #080e0bbd,inset 0 0 0 5px #a68d5e17}
+body.noticeboard-open{overflow:hidden;overscroll-behavior:none}
+.noticeboard-backdrop{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;padding:calc(env(safe-area-inset-top) + 10px) 13px calc(env(safe-area-inset-bottom) + 10px);background:#17221dd9;backdrop-filter:blur(7px);overscroll-behavior:none;animation:noticeboard-fade .28s ease-out}
+.noticeboard-panel{position:relative;align-self:center;width:min(100%,440px);max-height:min(78vh,640px);max-height:min(78dvh,640px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;padding:17px 18px 13px;border:1px solid #9f895e;background:radial-gradient(ellipse at 50% 0%,#fff9e9,#eee4cf 56%,#e4d8bf);color:#2b342d;box-shadow:0 24px 75px #080e0bbd,inset 0 0 0 5px #a68d5e17}
 .noticeboard-panel:before{content:'';position:absolute;inset:8px;border:1px solid #a58d6266;pointer-events:none}
-.noticeboard-topline{display:flex;justify-content:space-between;gap:12px;padding:5px 25px 12px 0;border-bottom:1px solid #b7a781;color:#766344;font:600 8px Cinzel,serif;letter-spacing:.14em}
-.noticeboard-close{position:absolute;top:16px;right:16px;z-index:2;width:29px;height:29px;border:1px solid #aa956c;background:#f1e8d5;color:#485347;font:22px/1 'Cormorant Garamond',serif}
-.noticeboard-seal{display:grid;place-items:center;width:43px;height:43px;margin:17px auto 10px;border:1px solid #9d8350;border-radius:50%;color:#967b49;font:600 23px Cinzel,serif;text-shadow:1px 1px 0 #fff8e8,-1px -1px 0 #92794c}
+.noticeboard-topline{display:flex;justify-content:space-between;gap:12px;padding:4px 25px 9px 0;border-bottom:1px solid #b7a781;color:#766344;font:600 8px Cinzel,serif;letter-spacing:.14em}
+.noticeboard-close{position:absolute;top:12px;right:13px;z-index:2;width:29px;height:29px;border:1px solid #aa956c;background:#f1e8d5;color:#485347;font:22px/1 'Cormorant Garamond',serif}
+.noticeboard-seal{display:grid;place-items:center;width:35px;height:35px;margin:10px auto 7px;border:1px solid #9d8350;border-radius:50%;color:#967b49;font:600 19px Cinzel,serif;text-shadow:1px 1px 0 #fff8e8,-1px -1px 0 #92794c}
 .noticeboard-kicker{margin:0;color:#8b7047;text-align:center;font:600 8px Cinzel,serif;letter-spacing:.2em}
-.noticeboard-panel h2{margin:9px 0 8px;color:#35443b;text-align:center;font:500 clamp(34px,9vw,45px)/.92 'Cormorant Garamond',serif;-webkit-text-stroke:.35px #35443b;text-shadow:.6px .6px 0 #fff7e6}
+.noticeboard-panel h2{margin:7px 0 6px;color:#35443b;text-align:center;font:500 clamp(30px,8vw,39px)/.92 'Cormorant Garamond',serif;-webkit-text-stroke:.35px #35443b;text-shadow:.6px .6px 0 #fff7e6}
 .noticeboard-panel h2 em{color:#9a754b;font-weight:500;-webkit-text-stroke:.25px #9a754b}
-.noticeboard-rule{display:flex;align-items:center;justify-content:center;gap:9px;margin:15px auto 12px;color:#a1844d;font:12px Cinzel,serif}
+.noticeboard-rule{display:flex;align-items:center;justify-content:center;gap:9px;margin:10px auto 8px;color:#a1844d;font:12px Cinzel,serif}
 .noticeboard-rule:before,.noticeboard-rule:after{content:'';height:1px;flex:1;background:linear-gradient(90deg,transparent,#b49a69)}.noticeboard-rule:after{background:linear-gradient(90deg,#b49a69,transparent)}
-.noticeboard-copy{max-width:330px;margin:0 auto 16px;color:#6c7164;text-align:center;font:500 14px/1.4 'Cormorant Garamond',serif}
-.noticeboard-feed{display:grid;border-top:1px solid #b8a77f}.noticeboard-entry{position:relative;display:grid;grid-template-columns:30px minmax(0,1fr);gap:10px;padding:13px 2px 12px;border-bottom:1px solid #b8a77f}
+.noticeboard-copy{max-width:330px;margin:0 auto 10px;color:#6c7164;text-align:center;font:500 13px/1.32 'Cormorant Garamond',serif}
+.noticeboard-feed{display:grid;border-top:1px solid #b8a77f}
+.noticeboard-entry{position:relative;display:grid;grid-template-columns:27px minmax(0,1fr);gap:8px;padding:9px 2px 8px;border-bottom:1px solid #b8a77f}
 .noticeboard-entry:after{content:'✦  ─────────  ✦';position:absolute;bottom:-7px;left:50%;z-index:1;transform:translateX(-50%);padding:0 7px;background:#eee4cf;color:#a1844d;font:8px Cinzel,serif;letter-spacing:.13em}
-.noticeboard-entry-index{color:#a1844d;font:600 19px Cinzel,serif;-webkit-text-stroke:.3px #a1844d;text-shadow:.5px .5px 0 #fff9e8}
-.noticeboard-entry-content h3{margin:0;color:#39483e;font:600 15px/1.2 Cinzel,serif;-webkit-text-stroke:.2px #39483e}.noticeboard-entry-content p{margin:5px 0 7px;color:#626b60;font:500 15px/1.32 'Cormorant Garamond',serif}
+.noticeboard-entry-index{color:#a1844d;font:600 17px Cinzel,serif;-webkit-text-stroke:.3px #a1844d;text-shadow:.5px .5px 0 #fff9e8}
+.noticeboard-entry-content h3{margin:0;color:#39483e;font:600 14px/1.18 Cinzel,serif;-webkit-text-stroke:.2px #39483e}
+.noticeboard-entry-content p{margin:4px 0 6px;color:#626b60;font:500 14px/1.27 'Cormorant Garamond',serif}
 .noticeboard-highlight{padding:0 2px;background:linear-gradient(transparent 52%,#d7bd7b99 52%);color:#815d32;font-weight:700;-webkit-box-decoration-break:clone;box-decoration-break:clone}
-.noticeboard-entry-meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px;color:#89734c;font:600 7px Cinzel,serif;letter-spacing:.08em}.noticeboard-loading{padding:18px 0;text-align:center;color:#7e735d;font:600 10px Cinzel,serif;letter-spacing:.12em}
-.noticeboard-actions{display:flex;gap:9px;margin-top:17px}.noticeboard-actions button{flex:1;min-height:40px;padding:8px;border:1px solid #9d8350;font:600 9px Cinzel,serif}.noticeboard-today{background:#35483d;color:#f4ead7}.noticeboard-ignore{background:transparent;color:#526052}
-.noticeboard-footnote{margin:11px 0 0;color:#8b806a;text-align:center;font:600 7px Cinzel,serif;letter-spacing:.08em}@keyframes noticeboard-fade{from{opacity:0}to{opacity:1}}
-@media(max-width:360px){.noticeboard-panel{padding:20px 16px 15px}.noticeboard-entry{grid-template-columns:25px minmax(0,1fr);gap:7px}.noticeboard-entry-content h3{font-size:13px}}/* Persona-style calendar composition, recoloured to the Reverse: 1999 palette. */
+.noticeboard-entry-meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px;color:#89734c;font:600 7px Cinzel,serif;letter-spacing:.08em}
+.noticeboard-loading{padding:14px 0;text-align:center;color:#7e735d;font:600 10px Cinzel,serif;letter-spacing:.12em}
+.noticeboard-actions{display:flex;gap:8px;margin-top:11px}
+.noticeboard-actions button{flex:1;min-height:36px;padding:7px;border:1px solid #9d8350;font:600 9px Cinzel,serif}
+.noticeboard-today{background:#35483d;color:#f4ead7}.noticeboard-ignore{background:transparent;color:#526052}
+.noticeboard-footnote{margin:8px 0 0;color:#8b806a;text-align:center;font:600 7px Cinzel,serif;letter-spacing:.08em}
+@keyframes noticeboard-fade{from{opacity:0}to{opacity:1}}
+@media(max-width:360px){.noticeboard-panel{padding:15px 14px 11px}.noticeboard-entry{grid-template-columns:24px minmax(0,1fr);gap:7px}.noticeboard-entry-content h3{font-size:12px}}
+/* Persona-style calendar composition, recoloured to the Reverse: 1999 palette. */
 .session-calendar-panel {position:relative;overflow:hidden;margin:0 0 27px;padding:15px 17px 12px;border:1px solid #6d7b6d;background:linear-gradient(135deg,#304941,#263c36 75%,#405448);color:#eee7d6;box-shadow:0 8px 24px #263c361c;}
 .session-calendar-panel:after {content:"";position:absolute;right:-36px;top:-56px;width:160px;height:160px;border:1px solid #d2bd8833;border-radius:50%;box-shadow:0 0 0 13px #d2bd8809,0 0 0 27px #d2bd8807;pointer-events:none;}
 .calendar-heading,.calendar-footer {display:flex;justify-content:space-between;align-items:center;gap:10px;}
