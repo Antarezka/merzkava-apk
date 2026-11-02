@@ -19,12 +19,13 @@
 - [ ] Verify screen changes do not recreate the toolbar at a different scroll offset or invoke automatic scrollIntoView/focus scrolling.
 - [ ] Verify toolbar remains viewport-anchored when switching Home → Convo → Eternal Path → Archive → Settings and when returning.
 - [ ] Verify manual horizontal swipe still works and route selection does not change the rail's scroll position.
-- [ ] Verify safe-area insets and Android gesture margins on narrow screens.
+- [ ] Keep a minimum 32 CSS-pixel breathing margin on both left and right edges (plus any reported safe-area inset), roughly a pinky-width at phone scale; do not let the rail approach Android back-swipe zones. At 320px viewport width, the rail should be about 256px wide before safe-area deductions.
+- [ ] Style the rail as a restrained enchanted-book nameplate: Reverse: 1999 aged-paper/brass detailing and muted verdigris, combined with a subtle Harry Potter-style engraved/arcane plaque silhouette. Keep the frame elegant and low-noise; no bulky fantasy ornament that steals touch space.
 - [ ] Add regression tests for fixed-rail vs inner-wrapper transform isolation, route switching, stable scroll position and viewport anchoring.
 - [ ] Install APK on target Android device and confirm the toolbar no longer moves during repeated route changes.
 - [ ] Attach test evidence (screen recording or screenshots + build SHA) before closing.
 
-**Acceptance:** toolbar remains in one stable viewport position through route transitions and rerenders; users can manually scroll the rail; no route selection auto-shifts it; no clipping or gesture-area collision.
+**Acceptance:** toolbar remains in one stable viewport position through route transitions and rerenders; users can manually scroll the rail; no route selection auto-shifts it; at least 32px of clear horizontal breathing room remains on each side (in addition to safe-area insets); the antique brass/verdigris plaque styling remains legible without reducing the four visible touch targets or clipping the roulette rail.
 
 ## UI-EP-003 — Save Manager hidden menu
 
