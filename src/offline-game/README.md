@@ -17,7 +17,7 @@ Standalone local game mode inside the same Merzkava APK. Owns deterministic mech
 - The approved full-game specification and EP-0 to EP-6 delivery phases are documented in [ETERNAL_PATH_BLUEPRINT.md](../../docs/offline-game/ETERNAL_PATH_BLUEPRINT.md); the single master plan remains [PRODUCT_ROADMAP.md](../../docs/PRODUCT_ROADMAP.md).
 - The Eternal Path home is being converted to a compact profile and narrative-first layout. The former 240-node sequence remains retired. The new typed situation engine now supplies nine bootstrap situations and a working response sheet; Patch 1 content remains planned. The shared app navigation is being rebuilt as a fixed retractable clockwork compartment with function-specific flat emblems, local rotary rings, and Android side gesture clearance.
 - A save-local hidden multi-axis disposition baseline is persisted in schema v2; legacy schema-v1 journeys are migrated without discarding their current game state. Public profile shows only the derived label.
-- This is an initial UI/data foundation, not a completed life simulator. Save slots/export-import, activity simulation, NPC relationships/Social Links, ordinary-life careers, ownership/territory, organizations, family/naming, and integrated progression remain pending. Automated CI and physical Android QA are not yet confirmed for this checkpoint.
+- This is an initial UI/data foundation, not a completed life simulator. Save slots/export-import, activity simulation, NPC relationships/Social Links, ordinary-life careers, ownership/territory, organizations, family/naming, and integrated progression remain pending. Automated Web App Validation and the Eternal Path quality gate passed for code commit `51f8b748` (22 test files / 171 tests); the Android APK build is still pending and physical Android QA remains open.
 
 
 ## EP-1 checkpoint — Journey Manager and Anime.js
@@ -34,4 +34,4 @@ Standalone local game mode inside the same Merzkava APK. Owns deterministic mech
 - Nine starter situations cover the three starting powers. Each has explicit actor knowledge, observable behavior, six scene-action beats, dialogue, a contextual closing question and hidden consequence branches.
 - Choices resolve locally and deterministically; event history, energy/insight changes, disposition evidence and world-clock advancement are saved with the journey.
 - The bootstrap content is explicitly `IN_GAME_ORIGINAL`, separate from Universe canon and separate from Patch 1. Patch 1 remains on hold until UI repair and EP-2 contracts are verified, and retains the minimum of 1,000 genuinely distinct situations.
-- CI and physical Android QA are not yet confirmed for the newest commit.
+- Web App Validation and the Eternal Path quality gate passed for code commit `51f8b748` (22 test files / 171 tests); the Android APK build is pending and physical Android QA remains open.
