@@ -1,6 +1,6 @@
 import { animate } from "animejs";
 
-export const ARCANISTRY_LEVER_PULL_DISTANCE = 28;
+export const ARCANISTRY_LEVER_PULL_DISTANCE = 43;
 export const ARCANISTRY_TICKET_TEAR_DISTANCE = 62;
 export const ARCANISTRY_MIN_LOADING_MS = 3000;
 
