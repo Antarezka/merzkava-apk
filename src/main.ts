@@ -9,7 +9,7 @@ import { validateCharacterDraft } from "./convo/engine/character-validation";
 import { renderScreen, type ScreenId } from "./app/screens";
 import { initializeIdleTriggerDrag } from "./offline-game/idle-trigger-drag";
 import { animateExpeditionChoiceModal, animateExpeditionPanel, mountExpeditionAnimations } from "./offline-game/expedition-animations";
-import { deleteEternalSave, exportEternalSave, importEternalSave, loadEternalSave, renameEternalSave, resetEternalGame, resolveEternalSituationChoice, setEternalLocation, startEternalGame, unloadEternalGame, type EternalRegion } from "./offline-game/expedition-game";
+import { deleteEternalSave, exportEternalSave, importEternalSave, loadEternalSave, renameEternalSave, resetEternalGame, resolveEternalSituationChoice, advanceEternalWorldTime, setEternalLocation, startEternalGame, unloadEternalGame, type EternalRegion } from "./offline-game/expedition-game";
 import { getCanonIndex, getCanonStatus, loadCanonModule, loadPlayerRegistry, loadRegisteredPlayerProfile, refreshCanon, refreshLatestPlayerRegistry, type CanonDocument } from "./convo/canon/canon-loader";
 import { routeCanonActivity } from "./convo/canon/canon-router";
 import { assembleGameplayContext } from "./convo/canon/context-assembler";
@@ -30,6 +30,7 @@ import { animateOpeningSplash, animateSplashCurtain } from "./ui/splash-animatio
 import { animateAppScreen } from "./ui/app-shell-motion";
 import { initializeGravityPullCord } from "./ui/gravity-pull-cord";
 import { mountArcanistryTicketMachine } from "./offline-game/arcanistry-ticket-machine";
+import { handleWorldMapHierarchyClick } from "./offline-game/world-map-hierarchy";
 import { closeLoreEntry, closeLoreSource, closeLorePlaceholder, openLoreEntry, openLoreSource, openLorePlaceholder, setLoreCategory, setLoreSearch, renderLoreResults } from "./world-archive/lore-library";
 
 const app = document.querySelector<HTMLDivElement>("#app");
@@ -981,6 +982,7 @@ root.addEventListener("click", async (event: MouseEvent) => {
   if (eternalChoice) { if(eternalChoice.disabled) return; const modal=root.querySelector<HTMLElement>("[data-eternal-choice-modal]"); modal?.querySelectorAll<HTMLButtonElement>("[data-eternal-choice]").forEach(button=>{button.disabled=true;}); document.body.classList.remove("eternal-choice-open"); if(history.state?.eternalChoiceModal) history.back(); const choiceId=eternalChoice.dataset.eternalChoice??""; if(modal) animateExpeditionChoiceModal(modal,false,()=>{const result=resolveEternalSituationChoice(choiceId);notice=result? "The moment has been recorded in your journey.": "That response is no longer available.";render();}); else {const result=resolveEternalSituationChoice(choiceId);notice=result? "The moment has been recorded in your journey.": "That response is no longer available.";render();} return; }
   if (target.closest("[data-eternal-open-choices]")) { const modal=root.querySelector<HTMLElement>("[data-eternal-choice-modal]"); if(modal){animateExpeditionChoiceModal(modal,true);document.body.classList.add("eternal-choice-open");history.pushState({eternalChoiceModal:true},"");modal.querySelector<HTMLButtonElement>(".expedition-choice-close")?.focus();} return; }
 
+  if(handleWorldMapHierarchyClick(target, root, minutes => { advanceEternalWorldTime(minutes); render(); })) return;
   const idleRegionButton=target.closest<HTMLButtonElement>("[data-idle-region]");
   if(idleRegionButton){
     const regionId=idleRegionButton.dataset.idleRegion;
