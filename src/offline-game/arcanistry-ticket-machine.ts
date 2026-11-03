@@ -136,10 +136,13 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
       setInputDisplay(machine, "");
       const status = machine.querySelector<HTMLElement>("[data-arcanistry-status]");
       if (status) status.textContent = "CODE MISMATCH · TRY AGAIN";
-      later(() => machine.classList.remove("is-code-rejected"), 650);
       later(() => {
-        if (machine.dataset.machineState === "code-ready" && status) status.textContent = "ACCESS CODE RETAINED · RE-ENTER FOUR DIGITS";
-      }, 850);
+        if (machine.dataset.machineState === "code-ready") {
+          machine.classList.remove("is-code-rejected");
+          machine.querySelectorAll<HTMLButtonElement>("[data-dial-digit]").forEach(button => { button.disabled = false; });
+          if (status) status.textContent = "ACCESS CODE RETAINED · RE-ENTER FOUR DIGITS";
+        }
+      }, 700);
       return;
     }
 
@@ -194,6 +197,7 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     if (!ticket || !loading) return;
 
     machine.dataset.machineState = "printing";
+    machine.style.setProperty("--lamp-flicker-duration", (0.38 + Math.random() * 0.74).toFixed(2) + "s");
     machine.classList.add("is-running");
     machine.classList.remove("has-ticket", "is-traveling");
     lever.disabled = true;
@@ -285,7 +289,7 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     const cancel = target.closest<HTMLButtonElement>("[data-cancel-code]");
     if (cancel) {
       resetAuthentication(machine, true);
-      machine.querySelectorAll<HTMLElement>("[data-idle-place]").forEach(place => place.classList.remove("is-selected"));
+      root.querySelectorAll<HTMLElement>("[data-idle-place]").forEach(place => place.classList.remove("is-selected"));
       return;
     }
     const generate = target.closest<HTMLButtonElement>("[data-generate-code]");
