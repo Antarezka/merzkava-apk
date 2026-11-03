@@ -225,7 +225,7 @@
 .arcanist-destination-card{position:relative;display:grid;grid-template-columns:45px minmax(0,1fr);align-items:center;gap:6px;min-width:0;min-height:54px;padding:4px 7px 4px 4px;overflow:hidden;text-align:left;border:1px solid #766347;background:linear-gradient(110deg,#293129,#171d18);color:#e9dec9;touch-action:manipulation}
 .arcanist-destination-card:before{content:"";position:absolute;inset:1px;border:1px solid var(--route-light,#6ebbd9);opacity:.62;pointer-events:none;animation:arcanist-lamp-breathe 2.7s ease-in-out infinite}
 .arcanist-destination-card[data-available="false"]{--route-light:#d98a48}
-.arcanist-destination-card[data-available="true"]{--route-light:#73c4e4}
+.arcanist-destination-card[data-available="true"]{--route-light:#d98a48}
 .arcanist-destination-card.is-selected{border-color:#e0c58f;background:linear-gradient(110deg,#52452f,#262b22);box-shadow:inset 0 0 0 1px #e2c58c55,0 0 10px #d8b77b24}
 .arcanist-destination-art-frame{position:relative;display:block;width:45px;height:43px;overflow:hidden;border:1px solid #a58a5b;background:#303b32;box-shadow:inset 0 0 0 2px #111}
 .arcanist-destination-art-frame img,.arcanist-destination-art{display:block;width:100%;height:100%;object-fit:cover}
@@ -234,7 +234,7 @@
 .arcanist-destination-card.is-selected .arcanist-destination-art-frame:after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at center,#fff1c966,#eacb8a22 62%,transparent 100%);mix-blend-mode:screen;pointer-events:none}
 .arcanist-destination-card-copy{display:grid;gap:4px;min-width:0}
 .arcanist-destination-card-copy strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:11px/1.1 Georgia,serif;color:#f0e4cd}
-.arcanist-destination-card-copy small{font:600 5px system-ui,sans-serif;letter-spacing:.1em;color:#91c9df}
+.arcanist-destination-card-copy small{font:600 5px system-ui,sans-serif;letter-spacing:.1em;color:#d9ad70}
 .arcanist-destination-card[data-available="false"] .arcanist-destination-card-copy small{color:#d89a61}
 .arcanist-destination-card.is-selected .arcanist-destination-card-copy strong{color:#fff0cc}
 .arcanist-status-lamp{position:absolute;right:3px;top:4px;width:3px;height:3px;border-radius:50%;background:var(--route-light);box-shadow:0 0 5px var(--route-light)}
