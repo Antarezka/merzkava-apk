@@ -92,8 +92,6 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
       lever.style.removeProperty("--lever-pull");
       lever.setAttribute("aria-label", "Lever locked until code verification");
     }
-    machine.querySelector<HTMLElement>("[data-arcanistry-dial-face]")?.removeAttribute("hidden");
-    machine.querySelector<HTMLElement>("[data-arcanistry-lever-face]")?.setAttribute("hidden", "");
     if (clearDestination) {
       machine.dataset.selectedScene = "";
       machine.dataset.selectedAvailable = "false";
@@ -149,9 +147,6 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     machine.classList.add("is-code-verified");
     machine.classList.remove("is-code-rejected");
     machine.querySelectorAll<HTMLButtonElement>("[data-dial-digit]").forEach(button => { button.disabled = true; });
-    machine.querySelector<HTMLElement>("[data-arcanistry-dial-face]")?.setAttribute("hidden", "");
-    const leverFace = machine.querySelector<HTMLElement>("[data-arcanistry-lever-face]");
-    leverFace?.removeAttribute("hidden");
     const lever = machine.querySelector<HTMLButtonElement>("[data-arcanistry-lever]");
     if (lever) {
       lever.disabled = false;
@@ -317,8 +312,8 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
   };
 
   const onDestinationSelected = (event: Event): void => {
-    const machine = event.currentTarget as HTMLElement;
-    resetAuthentication(machine);
+    const machine = event.target;
+    if (machine instanceof HTMLElement && machine.matches("[data-arcanistry-machine]")) resetAuthentication(machine);
   };
 
   const onPointerDown = (event: PointerEvent): void => {
@@ -397,8 +392,7 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     }, 440);
   };
 
-  const machine = root.querySelector<HTMLElement>("[data-arcanistry-machine]");
-  machine?.addEventListener("arcanistry:destination-selected", onDestinationSelected);
+  root.addEventListener("arcanistry:destination-selected", onDestinationSelected);
   root.addEventListener("click", onClick);
   root.addEventListener("pointerdown", onPointerDown, { passive: false });
   root.addEventListener("pointermove", onPointerMove, { passive: false });
@@ -411,7 +405,7 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     disposed = true;
     timers.forEach(id => window.clearTimeout(id));
     timers.clear();
-    machine?.removeEventListener("arcanistry:destination-selected", onDestinationSelected);
+    root.removeEventListener("arcanistry:destination-selected", onDestinationSelected);
     root.removeEventListener("click", onClick);
     root.removeEventListener("pointerdown", onPointerDown);
     root.removeEventListener("pointermove", onPointerMove);
