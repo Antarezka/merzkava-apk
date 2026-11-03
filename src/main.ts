@@ -29,7 +29,7 @@ import { getLanguage, languagePanelMarkup, translateLabel, translateRenderedCont
 import { animateOpeningSplash, animateSplashCurtain } from "./ui/splash-animation";
 import { animateAppScreen } from "./ui/app-shell-motion";
 import { initializeGravityPullCord } from "./ui/gravity-pull-cord";
-import { isRotaryAligned, rotaryActivationProgress, rotaryPointerDelta, ARCANISTRY_ACTIVATION_ANGLE } from "./offline-game/arcanistry-rotary";
+import { canCommitRotaryActivation, isRotaryAligned, parseRotaryApertureAngle, rotaryActivationProgress, rotaryPointerDelta, ARCANISTRY_ACTIVATION_ANGLE } from "./offline-game/arcanistry-rotary";
 import { closeLoreEntry, closeLoreSource, closeLorePlaceholder, openLoreEntry, openLoreSource, openLorePlaceholder, setLoreCategory, setLoreSearch, renderLoreResults } from "./world-archive/lore-library";
 
 const app = document.querySelector<HTMLDivElement>("#app");
@@ -943,8 +943,12 @@ root.addEventListener("pointerdown",event=>{
  const rotor=aperture?.closest<HTMLElement>("[data-arcanist-rotor]");
  if(!aperture||!rotor)return;
  selectArcanistDestination(aperture);
- const angle=arcanistPointerAngle(rotor,event);
- activeArcanistDial={element:rotor,selected:aperture,pointerId:event.pointerId,lastAngle:angle,startAngle:angle,turned:0,sceneId:rotor.dataset.sceneId??""};
+ const pointerAngle=arcanistPointerAngle(rotor,event);
+ const apertureAngle=parseRotaryApertureAngle(aperture.style.getPropertyValue("--hole-angle"));
+ if(apertureAngle===null)return;
+ activeArcanistDial={element:rotor,selected:aperture,pointerId:event.pointerId,lastAngle:pointerAngle,startAngle:apertureAngle,turned:0,sceneId:rotor.dataset.sceneId??""};
+ rotor.dataset.activationThreshold="pending";
+ rotor.closest<HTMLElement>("[data-arcanist-device]")?.classList.remove("is-at-threshold");
  try{rotor.setPointerCapture(event.pointerId);}catch{/* WebView fallback */}
  event.preventDefault();
 },{passive:false});
@@ -956,7 +960,10 @@ root.addEventListener("pointermove",event=>{
   active.turned+=delta;
   const angle=active.startAngle+active.turned;
   const progress=rotaryActivationProgress(angle,ARCANISTRY_ACTIVATION_ANGLE,active.startAngle);
+  const thresholdReached=isRotaryAligned(angle,ARCANISTRY_ACTIVATION_ANGLE);
   const device=active.element.closest<HTMLElement>("[data-arcanist-device]");
+  active.element.dataset.activationThreshold=thresholdReached?"reached":"pending";
+  device?.classList.toggle("is-at-threshold",thresholdReached);
   active.element.style.setProperty("--dial-angle",active.turned+"deg");
   active.element.style.setProperty("--gear-turn",(active.turned*2.4)+"deg");
   active.element.style.setProperty("--gear-turn-reverse",(active.turned*-3.24)+"deg");
@@ -980,11 +987,18 @@ root.addEventListener("pointermove",event=>{
 function finishArcanistDial(event:PointerEvent,cancelled=false):void{
  const active=activeArcanistDial;if(!active||active.pointerId!==event.pointerId)return;
  activeArcanistDial=null;
+ if(!cancelled){
+  const releaseAngle=arcanistPointerAngle(active.element,event);
+  active.turned+=rotaryPointerDelta(active.lastAngle,releaseAngle);
+  active.lastAngle=releaseAngle;
+ }
  try{if(active.element.hasPointerCapture(event.pointerId))active.element.releasePointerCapture(event.pointerId);}catch{/* already released */}
  const finalAngle=active.startAngle+active.turned;
  const aligned=!cancelled&&isRotaryAligned(finalAngle,ARCANISTRY_ACTIVATION_ANGLE);
- const completed=aligned&&Boolean(active.sceneId);
+ const completed=canCommitRotaryActivation(finalAngle,{released:!cancelled,cancelled,hasDestination:Boolean(active.sceneId)});
  const device=active.element.closest<HTMLElement>("[data-arcanist-device]");
+ active.element.dataset.activationThreshold=aligned?"reached":"pending";
+ device?.classList.remove("is-at-threshold");
  const drawer=active.element.closest<HTMLElement>("[data-arcanist-device]");
  const reducedMotion=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
  device?.classList.remove("is-turning");
