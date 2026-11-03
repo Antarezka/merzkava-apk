@@ -422,3 +422,43 @@
 
 .arcanist-ticket-dispenser[data-tear-direction="left-to-right"] .arcanist-ticket-slot:after{clip-path:polygon(0 0,100% 0,100% 22%,90% 13%,80% 19%,70% 10%,60% 16%,50% 8%,40% 14%,30% 6%,20% 11%,10% 4%,0 9%)}
 .arcanist-ticket-dispenser[data-tear-direction="right-to-left"] .arcanist-ticket-slot:after{clip-path:polygon(0 0,100% 0,100% 9%,90% 4%,80% 11%,70% 6%,60% 14%,50% 8%,40% 16%,30% 10%,20% 19%,10% 13%,0 22%)}
+
+/* Follow-up: straight, weighted downward lever stroke with a spring return. */
+.arcanist-lever-shaft,
+.arcanist-lever-handle{
+  transform:translateY(var(--lever-pull,0px)) rotate(calc(var(--lever-angle,0deg)));
+  transform-origin:50% 18px;
+}
+.arcanist-lever-button.is-pulling .arcanist-lever-shaft,
+.arcanist-lever-button.is-pulling .arcanist-lever-handle{transition:none}
+.arcanist-lever-button.is-pulled .arcanist-lever-shaft,
+.arcanist-lever-button.is-pulled .arcanist-lever-handle{
+  transform:translateY(45px) rotate(7deg);
+}
+.arcanist-lever-button.is-returning .arcanist-lever-shaft,
+.arcanist-lever-button.is-returning .arcanist-lever-handle{
+  transition:transform .62s cubic-bezier(.2,1.35,.42,1);
+}
+.arcanist-lever-button:not(.is-pulling):not(.is-pulled):not(.is-returning) .arcanist-lever-shaft,
+.arcanist-lever-button:not(.is-pulling):not(.is-pulled):not(.is-returning) .arcanist-lever-handle{
+  transition:transform .38s cubic-bezier(.2,.7,.2,1);
+}
+
+/* Lock ticket travel to the vertical axis; the tear animation keeps its existing profile. */
+.arcanist-ticket{
+  transform:translateX(-50%);
+  translate:0 var(--ticket-pull,0px);
+}
+.arcanist-ticket.is-returning{animation:arcanist-ticket-return .42s cubic-bezier(.2,.8,.3,1) forwards}
+@keyframes arcanist-ticket-return{
+  to{transform:translateX(-50%);translate:0 0}
+}
+.arcanist-ticket.is-torn{animation:arcanist-ticket-tear-down .42s cubic-bezier(.18,.68,.24,1) forwards}
+@keyframes arcanist-ticket-tear-down{
+  0%{transform:translateX(-50%) rotate(0deg);translate:0 var(--ticket-pull,62px);opacity:1}
+  100%{transform:translateX(-50%) rotate(-1.5deg);translate:0 calc(var(--ticket-pull,62px) + 74px);opacity:0}
+}
+@media(prefers-reduced-motion:reduce){
+  .arcanist-lever-button.is-returning .arcanist-lever-shaft,
+  .arcanist-lever-button.is-returning .arcanist-lever-handle{transition:none!important}
+}
