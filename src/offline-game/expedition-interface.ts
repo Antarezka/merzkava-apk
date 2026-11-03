@@ -10,7 +10,7 @@ const regionNames:Record<string,string>={"golden-dragon-empire":"Golden Dragon E
 
 export function renderExpeditionInterface():string {
   const save=getEternalSave(), scene=getExpeditionScene(), atmosphere=getExpeditionAtmosphere(), situation=getCurrentSituation();
-  const sceneWindow=`<section class="expedition-environment" aria-label="Eternal Path scene window" data-location="${scene.id}" data-region="${scene.region}" data-cycle="${atmosphere.cycle}" data-weather="${atmosphere.weather}" data-animation-state="${save?`${save.day}:${save.hour}:${save.minute}:${atmosphere.weather}:${scene.id}`:`preview:${scene.id}:${atmosphere.cycle}:${atmosphere.weather}`}" style="--scene-fog-opacity:${atmosphere.fog}">
+  const sceneWindow=`<section class="expedition-environment" aria-label="Eternal Path scene window" data-location="${scene.id}" data-region="${scene.region}" data-cycle="${atmosphere.cycle}" data-weather="${atmosphere.weather}" data-animation-state="${save?`${save.saveId}:${save.day}:${save.hour}:${save.minute}:${atmosphere.weather}:${scene.id}`:`preview:${scene.id}:${atmosphere.cycle}:${atmosphere.weather}`}" style="--scene-fog-opacity:${atmosphere.fog}">
     <img class="expedition-scene-image" src="${scene.image}" alt="" />
     <div class="expedition-cloud-layer" aria-hidden="true"><img class="expedition-cloud-motion" src="/game/scenery/shared/fx-01-soft-cloud-layer.png" alt="" /></div>
     <div class="expedition-light-layer" aria-hidden="true"></div>
