@@ -29,6 +29,7 @@ import { getLanguage, languagePanelMarkup, translateLabel, translateRenderedCont
 import { animateOpeningSplash, animateSplashCurtain } from "./ui/splash-animation";
 import { animateAppScreen } from "./ui/app-shell-motion";
 import { initializeGravityPullCord } from "./ui/gravity-pull-cord";
+import { isRotaryAligned, rotaryActivationProgress, rotaryPointerDelta, ARCANISTRY_ACTIVATION_ANGLE } from "./offline-game/arcanistry-rotary";
 import { closeLoreEntry, closeLoreSource, closeLorePlaceholder, openLoreEntry, openLoreSource, openLorePlaceholder, setLoreCategory, setLoreSearch, renderLoreResults } from "./world-archive/lore-library";
 
 const app = document.querySelector<HTMLDivElement>("#app");
@@ -916,11 +917,109 @@ window.addEventListener("keydown", (event: KeyboardEvent) => {
 });
 
 
-let activeArcanistDial:{element:HTMLElement;pointerId:number;lastAngle:number;turned:number}|null=null;
 function arcanistPointerAngle(element:HTMLElement,event:PointerEvent):number{const rect=element.getBoundingClientRect();return Math.atan2(event.clientY-(rect.top+rect.height/2),event.clientX-(rect.left+rect.width/2))*180/Math.PI;}
-root.addEventListener("pointerdown",event=>{const target=event.target;if(!(target instanceof Element))return;if(target.closest("[data-idle-place]"))return;const rotor=target.closest<HTMLElement>("[data-arcanist-rotor]");if(!rotor||(event.pointerType==="mouse"&&event.button!==0))return;activeArcanistDial={element:rotor,pointerId:event.pointerId,lastAngle:arcanistPointerAngle(rotor,event),turned:0};try{rotor.setPointerCapture(event.pointerId);}catch{/* WebView fallback */}event.preventDefault();},{passive:false});
-root.addEventListener("pointermove",event=>{const active=activeArcanistDial;if(!active||active.pointerId!==event.pointerId)return;const next=arcanistPointerAngle(active.element,event);let delta=next-active.lastAngle;if(delta>180)delta-=360;if(delta< -180)delta+=360;active.lastAngle=next;if(delta>0.15){active.turned=Math.min(135,active.turned+delta);active.element.style.setProperty("--dial-angle",active.turned+"deg");active.element.setAttribute("aria-valuenow",String(Math.round(active.turned)));active.element.closest<HTMLElement>("[data-arcanist-device]")?.classList.add("is-turning");playClockworkRatchet();suppressNextPointerClick=true;}event.preventDefault();},{passive:false});
-function finishArcanistDial(event:PointerEvent,cancelled=false):void{const active=activeArcanistDial;if(!active||active.pointerId!==event.pointerId)return;activeArcanistDial=null;try{if(active.element.hasPointerCapture(event.pointerId))active.element.releasePointerCapture(event.pointerId);}catch{/* already released */}const completed=!cancelled&&active.turned>=108;const sceneId=active.element.dataset.sceneId??"";active.element.style.setProperty("--dial-angle","0deg");active.element.setAttribute("aria-valuenow","0");active.element.closest<HTMLElement>("[data-arcanist-device]")?.classList.remove("is-turning");if(completed&&sceneId){playNavigationTick();setEternalLocation(sceneId);const drawer=root.querySelector<HTMLElement>("[data-arcanist-device]");if(drawer)drawer.hidden=true;root.querySelector<HTMLButtonElement>("[data-arcanist-pull]")?.setAttribute("aria-expanded","false");notice=sceneId==="gde-academy"?"Arrived at the Academy.":"Returned to the Imperial Capital.";render();}else if(active.turned>3){playNavigationTick();}}
+function selectArcanistDestination(place:HTMLElement):void{
+ const placeId=place.dataset.idlePlace??"";
+ const group=place.dataset.idleGroup??"regional";
+ const regionId=place.dataset.regionId??place.closest<HTMLElement>("[data-idle-map-region]")?.dataset.idleMapRegion??"golden-dragon-empire";
+ const name=place.querySelector(".idle-destination-name,small")?.textContent?.trim()??"Destination";
+ const sceneId=regionId==="golden-dragon-empire"?(placeId==="capital"?"gde-city":placeId==="academy"?"gde-academy"):"";
+ const rotor=root.querySelector<HTMLElement>("[data-arcanist-rotor]");
+ const placeName=root.querySelector<HTMLElement>("[data-idle-place-name]");
+ const placeNote=root.querySelector<HTMLElement>("[data-idle-place-note]");
+ const routeStatus=root.querySelector<HTMLElement>("[data-arcanist-route-status]");
+ const preview=root.querySelector<HTMLImageElement>("[data-arcanist-preview-image]");
+ if(placeName)placeName.textContent=name;
+ if(placeNote)placeNote.textContent=place.dataset.idleNote??"This destination is reserved for a future update.";
+ if(routeStatus)routeStatus.textContent=sceneId?"READY · DRAG TO ACTIVATE":"PREVIEW ONLY";
+ if(preview&&sceneId)preview.src=sceneId==="gde-academy"?"/game/scenery/golden-dragon-empire/gde-05-cultivation-academy-courtyard.png":"/game/scenery/golden-dragon-empire/establishing-views/gde-01-imperial-city-panorama.png";
+ if(rotor)rotor.dataset.sceneId=sceneId;
+ root.querySelectorAll<HTMLButtonElement>("[data-idle-place]").forEach(button=>button.classList.toggle("is-selected",button.dataset.idlePlace===placeId&&button.dataset.idleGroup===group));
+}
+let activeArcanistDial:{element:HTMLElement;selected:HTMLElement;pointerId:number;lastAngle:number;startAngle:number;turned:number;sceneId:string}|null=null;
+root.addEventListener("pointerdown",event=>{
+ const target=event.target;if(!(target instanceof Element)||(event.pointerType==="mouse"&&event.button!==0))return;
+ const aperture=target.closest<HTMLElement>(".arcanist-dial-aperture[data-idle-place]");
+ const rotor=aperture?.closest<HTMLElement>("[data-arcanist-rotor]");
+ if(!aperture||!rotor)return;
+ selectArcanistDestination(aperture);
+ const angle=arcanistPointerAngle(rotor,event);
+ activeArcanistDial={element:rotor,selected:aperture,pointerId:event.pointerId,lastAngle:angle,startAngle:angle,turned:0,sceneId:rotor.dataset.sceneId??""};
+ try{rotor.setPointerCapture(event.pointerId);}catch{/* WebView fallback */}
+ event.preventDefault();
+},{passive:false});
+root.addEventListener("pointermove",event=>{
+ const active=activeArcanistDial;if(!active||active.pointerId!==event.pointerId)return;
+ const next=arcanistPointerAngle(active.element,event);
+ const delta=rotaryPointerDelta(active.lastAngle,next);active.lastAngle=next;
+ if(Math.abs(delta)>0.08){
+  active.turned+=delta;
+  const angle=active.startAngle+active.turned;
+  const progress=rotaryActivationProgress(angle,ARCANISTRY_ACTIVATION_ANGLE);
+  const device=active.element.closest<HTMLElement>("[data-arcanist-device]");
+  active.element.style.setProperty("--dial-angle",active.turned+"deg");
+  active.element.style.setProperty("--gear-turn",(active.turned*2.4)+"deg");
+  active.element.style.setProperty("--thread-dash-offset",(350*(1-progress))+"px");
+  active.element.querySelectorAll<HTMLElement>(".arcanist-red-thread").forEach(thread=>thread.style.strokeDashoffset=(350*(1-progress))+"px");
+  active.element.querySelectorAll<HTMLElement>(".arcanist-dial-aperture").forEach(aperture=>{
+   const selected=aperture===active.selected;
+   const inset=selected?96:96-58*progress;
+   aperture.style.setProperty("--hole-inset",inset+"px");
+   aperture.style.setProperty("--hole-scale",selected?"1":String(1-.72*progress));
+   aperture.style.setProperty("--hole-opacity",selected?"1":String(1-.78*progress));
+  });
+  device?.classList.add("is-turning");device?.classList.remove("is-returning","is-activating");
+  playClockworkRatchet();
+  if(Math.abs(active.turned)>3)suppressNextPointerClick=true;
+ }
+ event.preventDefault();
+},{passive:false});
+function finishArcanistDial(event:PointerEvent,cancelled=false):void{
+ const active=activeArcanistDial;if(!active||active.pointerId!==event.pointerId)return;
+ activeArcanistDial=null;
+ try{if(active.element.hasPointerCapture(event.pointerId))active.element.releasePointerCapture(event.pointerId);}catch{/* already released */}
+ const finalAngle=active.startAngle+active.turned;
+ const aligned=!cancelled&&isRotaryAligned(finalAngle,ARCANISTRY_ACTIVATION_ANGLE);
+ const completed=aligned&&Boolean(active.sceneId);
+ const device=active.element.closest<HTMLElement>("[data-arcanist-device]");
+ const drawer=active.element.closest<HTMLElement>("[data-arcanist-device]");
+ const reducedMotion=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+ device?.classList.remove("is-turning");
+ device?.classList.add(completed?"is-activating":"is-returning");
+ active.element.style.setProperty("--dial-angle","0deg");
+ active.element.style.setProperty("--gear-turn","0deg");
+ active.element.setAttribute("aria-label",completed?"Arcanistry route activated":"Arcanistry rotor returned to its resting position");
+ active.element.querySelectorAll<HTMLElement>(".arcanist-dial-aperture").forEach(aperture=>{
+  const close=completed&&aperture!==active.selected;
+  aperture.style.setProperty("--hole-inset",close?"28px":"96px");
+  aperture.style.setProperty("--hole-scale",close?"0.18":"1");
+  aperture.style.setProperty("--hole-opacity",close?"0.04":"1");
+ });
+ if(completed){
+  active.selected.classList.add("is-route-locked");
+  playNavigationTick();
+  const finishTravel=()=>{
+   if(!drawer)return;
+   setEternalLocation(active.sceneId);
+   drawer.hidden=true;
+   root.querySelector<HTMLButtonElement>("[data-arcanist-pull]")?.setAttribute("aria-expanded","false");
+   notice=active.sceneId==="gde-academy"?"Arrived at the Academy.":"Arrived at the Imperial Capital.";
+   render();
+  };
+  window.setTimeout(finishTravel,reducedMotion?0:880);
+ }else{
+  if(aligned&&!active.sceneId){const status=root.querySelector<HTMLElement>("[data-arcanist-route-status]");if(status)status.textContent="ROUTE NOT CONNECTED";}
+  if(Math.abs(active.turned)>3)playNavigationTick();
+  window.setTimeout(()=>{
+   active.element.querySelectorAll<HTMLElement>(".arcanist-dial-aperture").forEach(aperture=>{
+    aperture.style.setProperty("--hole-inset","96px");aperture.style.setProperty("--hole-scale","1");aperture.style.setProperty("--hole-opacity","1");
+   });
+   active.element.querySelectorAll<HTMLElement>(".arcanist-red-thread").forEach(thread=>thread.style.strokeDashoffset="350px");
+   device?.classList.remove("is-returning");
+   active.element.style.setProperty("--thread-dash-offset","350px");
+  },reducedMotion?0:690);
+ }
+}
 root.addEventListener("pointerup",event=>finishArcanistDial(event),{passive:true});
 root.addEventListener("pointercancel",event=>finishArcanistDial(event,true),{passive:true});
 
@@ -987,28 +1086,7 @@ root.addEventListener("click", async (event: MouseEvent) => {
     return;
   }
   const idlePlaceButton=target.closest<HTMLButtonElement>("[data-idle-place]");
-  if(idlePlaceButton){
-    const placeName=root.querySelector<HTMLElement>("[data-idle-place-name]");
-    const placeNote=root.querySelector<HTMLElement>("[data-idle-place-note]");
-    const selectedName=idlePlaceButton.querySelector(".idle-destination-name,small")?.textContent?.trim()??"Destination";
-    if(placeName) placeName.textContent=selectedName;
-    if(placeNote) placeNote.textContent=idlePlaceButton.dataset.idleNote??"This destination is reserved for a future update.";
-    const placeId=idlePlaceButton.dataset.idlePlace;
-    const placeGroup=idlePlaceButton.dataset.idleGroup??"regional";
-    const regionId=idlePlaceButton.dataset.regionId??idlePlaceButton.closest<HTMLElement>("[data-idle-map-region]")?.dataset.idleMapRegion??"golden-dragon-empire";
-    const sceneId=regionId==="golden-dragon-empire"?(placeId==="capital"?"gde-city":placeId==="academy"?"gde-academy":""):"";
-    const routeStatus=root.querySelector<HTMLElement>("[data-arcanist-route-status]");
-    const previewImage=root.querySelector<HTMLImageElement>("[data-arcanist-preview-image]");
-    if(routeStatus) routeStatus.textContent=sceneId?"READY TO DIAL":"PREVIEW ONLY";
-    if(previewImage&&sceneId) previewImage.src=sceneId==="gde-academy"?"/game/scenery/golden-dragon-empire/gde-05-cultivation-academy-courtyard.png":"/game/scenery/golden-dragon-empire/establishing-views/gde-01-imperial-city-panorama.png";
-    const rotor=root.querySelector<HTMLElement>("[data-arcanist-rotor]");
-    if(rotor) rotor.dataset.sceneId=sceneId;
-    root.querySelectorAll<HTMLButtonElement>("[data-idle-place]").forEach(button=>{
-      const selected=button.dataset.idlePlace===placeId&&button.dataset.idleGroup===placeGroup;
-      button.classList.toggle("is-selected",selected);
-    });
-    return;
-  }
+  if(idlePlaceButton){selectArcanistDestination(idlePlaceButton);return;}
   if(target.closest("[data-arcanist-pull]")){const drawer=root.querySelector<HTMLElement>("[data-arcanist-device]");const trigger=root.querySelector<HTMLButtonElement>("[data-arcanist-pull]");if(drawer&&trigger){drawer.hidden=!drawer.hidden;trigger.setAttribute("aria-expanded",String(!drawer.hidden));}return;}
   if(target.closest("[data-arcanist-close]")){const drawer=root.querySelector<HTMLElement>("[data-arcanist-device]");const trigger=root.querySelector<HTMLButtonElement>("[data-arcanist-pull]");if(drawer&&trigger){drawer.hidden=true;trigger.setAttribute("aria-expanded","false");}return;}
   if (target.closest("[data-idle-rpg-open]")) {
