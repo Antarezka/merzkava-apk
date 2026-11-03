@@ -58,7 +58,7 @@ function serializeWorldMapCoordinates(markers: WorldMarker[]): string {
       type: "normalized-percentage", origin: "top-left",
       xAxis: "left-to-right", yAxis: "top-to-bottom",
       range: "0–100", anchor: "marker-center",
-      note: "Coordinates are percentages of the displayed flat map canvas, not pixel positions."
+      note: "Coordinates are percentages of the actual displayed map image bounds, not the surrounding editor canvas or pixel positions."
     },
     markers: markers.map(({ id, name, x, y }) => ({ id, name, x, y }))
   }, null, 2);
@@ -79,6 +79,21 @@ function bindWorldMapEditor(dialog: HTMLElement): void {
   let markers = readWorldMarkers();
   let dragging: WorldMarkerId | null = null;
   const exportField = dialog.querySelector<HTMLTextAreaElement>("[data-wmh-export]");
+  const mapImage = canvas.querySelector<HTMLImageElement>("img");
+  const mapBounds = () => {
+    const outer = canvas.getBoundingClientRect();
+    const width = mapImage?.naturalWidth || outer.width;
+    const height = mapImage?.naturalHeight || outer.height;
+    const scale = Math.min(outer.width / width, outer.height / height);
+    const drawnWidth = width * scale;
+    const drawnHeight = height * scale;
+    return {
+      left: outer.left + (outer.width - drawnWidth) / 2,
+      top: outer.top + (outer.height - drawnHeight) / 2,
+      width: drawnWidth, height: drawnHeight,
+      outerWidth: outer.width, outerHeight: outer.height
+    };
+  };
   const refreshExport = () => { if (exportField) exportField.value = serializeWorldMapCoordinates(markers); };
   refreshExport();
   const setStatus = (message: string) => {
@@ -88,13 +103,20 @@ function bindWorldMapEditor(dialog: HTMLElement): void {
   const clamp = (value: number) => Math.max(0, Math.min(100, Math.round(value * 10) / 10));
   const paint = (marker: WorldMarker) => {
     const button = canvas.querySelector<HTMLElement>('[data-wmh-drag-marker="' + marker.id + '"]');
-    if (button) { button.style.left = marker.x + "%"; button.style.top = marker.y + "%"; }
+    if (button) {
+      const bounds = mapBounds();
+      const outer = canvas.getBoundingClientRect();
+      button.style.left = ((bounds.left - outer.left + bounds.width * marker.x / 100) / bounds.outerWidth * 100) + "%";
+      button.style.top = ((bounds.top - outer.top + bounds.height * marker.y / 100) / bounds.outerHeight * 100) + "%";
+    }
     const row = dialog.querySelector<HTMLElement>('[data-wmh-coordinate-row="' + marker.id + '"]');
     row?.querySelectorAll<HTMLInputElement>("input").forEach(input => {
       const axis = input.dataset.axis as "x" | "y";
       if (document.activeElement !== input) input.value = String(marker[axis]);
     });
   };
+  markers.forEach(paint);
+  if (mapImage && !mapImage.complete) mapImage.addEventListener("load", () => markers.forEach(paint), { once: true });
   const update = (id: WorldMarkerId, x: number, y: number) => {
     const marker = markers.find(item => item.id === id);
     if (!marker) return;
@@ -111,8 +133,8 @@ function bindWorldMapEditor(dialog: HTMLElement): void {
   });
   canvas.addEventListener("pointermove", event => {
     if (!dragging) return;
-    const rect = canvas.getBoundingClientRect();
-    update(dragging, ((event.clientX - rect.left) / rect.width) * 100, ((event.clientY - rect.top) / rect.height) * 100);
+    const bounds = mapBounds();
+    update(dragging, ((event.clientX - bounds.left) / bounds.width) * 100, ((event.clientY - bounds.top) / bounds.height) * 100);
   });
   const stop = () => { dragging = null; };
   canvas.addEventListener("pointerup", stop);
