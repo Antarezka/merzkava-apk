@@ -21,48 +21,80 @@ const regionData: Record<RegionId, { name: string; subtitle: string; image: stri
 };
 
 
-type WorldMarkerId = "golden-dragon-empire" | "tianhai-yunzhou" | "beiming-gu";
-type WorldMarker = { id: WorldMarkerId; name: string; x: number; y: number };
-// v2 establishes the user-supplied accuracy-test coordinates as the new baseline.
-// A fresh storage key prevents older locally saved marker positions from overriding this build.
-const WORLD_MAP_COORDINATES_KEY = "merzkava.world-map.coordinates.v2";
+type WorldMarkerCategory = "power" | "territory" | "forest" | "sea" | "landmark" | "mountains";
+type WorldMarkerId =
+  | "golden-dragon-empire" | "tianhai-yunzhou" | "beiming-gu"
+  | "lawless-territories" | "ashen-borderlands" | "black-tide-expanse" | "nine-frost-wastes"
+  | "wanluo-sacred-expanse" | "azerion-forest" | "dead-zone" | "inner-azerion"
+  | "mega-colossal-labyrinth" | "high-cloud-sea-mountains" | "frostmirror-sea"
+  | "eastern-azure-sea" | "yunmeng-sea" | "wufeng-sea" | "black-tide-sea"
+  | "guixu-canghai" | "lanternhook-isles";
+type WorldMarker = {
+  id: WorldMarkerId; name: string; x: number; y: number;
+  category: WorldMarkerCategory; subtitle: string; description: string;
+  placementStatus: "provisional" | "owner-set";
+};
+// v3 preserves the three owner-supplied power coordinates and adds the remaining
+// canonical geography. New locations have explicitly provisional map placements
+// until the owner adjusts them in the editor.
+const WORLD_MAP_COORDINATES_KEY = "merzkava.world-map.coordinates.v3";
 const defaultWorldMarkers: WorldMarker[] = [
-  { id: "golden-dragon-empire", name: "Golden Dragon Empire", x: 78.6, y: 34 },
-  { id: "tianhai-yunzhou", name: "Tianhai Yunzhou", x: 19.4, y: 38.4 },
-  { id: "beiming-gu", name: "Beiming Gu", x: 45.2, y: 7.8 }
+  { id: "golden-dragon-empire", name: "Golden Dragon Empire", x: 78.6, y: 34, category: "power", subtitle: "EASTERN POWER", description: "The eastern imperial power. Its seven internal regions remain part of the Empire, not separate world powers.", placementStatus: "owner-set" },
+  { id: "tianhai-yunzhou", name: "Tianhai Yunzhou", x: 19.4, y: 38.4, category: "power", subtitle: "SOUTHWESTERN FLOATING POWER", description: "The maritime power centered on a giant floating island above Yunmeng Sea.", placementStatus: "owner-set" },
+  { id: "beiming-gu", name: "Beiming Gu", x: 45.2, y: 7.8, category: "power", subtitle: "NORTHERN POWER", description: "The northern power protected by mountain ranges and severe cold.", placementStatus: "owner-set" },
+  { id: "lawless-territories", name: "Lawless Territories", x: 18, y: 72, category: "territory", subtitle: "EXTERNAL MACRO-REGION · PROVISIONAL PLACEMENT", description: "A broad collection of communities and territories outside the direct jurisdiction of the three powers. It is not one unified country and includes Ashen Borderlands, Black Tide Expanse, and Nine Frost Wastes.", placementStatus: "provisional" },
+  { id: "ashen-borderlands", name: "Ashen Borderlands", x: 12, y: 65, category: "territory", subtitle: "WESTERN / SOUTHWESTERN LAWLESS TERRITORY", description: "Outside the western and southwestern borders of Golden Dragon Empire. Known settlements include Greyrock Village, Blackreed Village, Broken Bell Village, and Dust Lantern Village.", placementStatus: "provisional" },
+  { id: "black-tide-expanse", name: "Black Tide Expanse", x: 43, y: 80, category: "territory", subtitle: "LAWLESS MARITIME ARCHIPELAGO", description: "Remote islands and sea routes outside Tianhai Yunzhou's direct control. Known settlements include Saltwind Village, Driftwood Haven, Mistbell Village, and Redwake Village. Distinct from Black Tide Sea and Guixu Canghai.", placementStatus: "provisional" },
+  { id: "nine-frost-wastes", name: "Nine Frost Wastes", x: 54, y: 17, category: "territory", subtitle: "NORTHERN WILDS OUTSIDE BEIMING DEFENSES", description: "Northern wild areas outside Beiming Gu's official defenses, with snowfields, frozen valleys, conifer forests, and difficult mountains.", placementStatus: "provisional" },
+  { id: "wanluo-sacred-expanse", name: "Wanluo Sacred Expanse", x: 72, y: 70, category: "territory", subtitle: "SACRED REGION · POSITION UNCONFIRMED", description: "A broad green plain surrounded by ancient forests and mountains, centered on the World Knowledge Tower. Its sovereignty and position relative to the three powers remain unestablished.", placementStatus: "provisional" },
+  { id: "azerion-forest", name: "Azerion Forest", x: 48, y: 47, category: "forest", subtitle: "VAST CROSS-REGION FOREST", description: "A major Spirit Beast habitat extending from Lawless Territories into Golden Dragon Empire territory. Its easiest known entrance is on the Lawless side.", placementStatus: "provisional" },
+  { id: "dead-zone", name: "Dead Zone", x: 48, y: 49, category: "landmark", subtitle: "RESTRICTED CORE OF AZERION FOREST", description: "The deepest inner/core zone of Azerion Forest. It is not a separate forest or a synonym for the whole forest.", placementStatus: "provisional" },
+  { id: "inner-azerion", name: "Inner Azerion", x: 51, y: 47, category: "landmark", subtitle: "HIDDEN HALF-BEAST CITY", description: "A concealed city in the northern part of Azerion Forest, hidden by extremely dense illusion fog. Safe routes are known only to veteran forest-goers and local hunter tribes.", placementStatus: "provisional" },
+  { id: "mega-colossal-labyrinth", name: "Mega Colossal Labyrinth", x: 48, y: 53, category: "landmark", subtitle: "ANCIENT UNDERGROUND RUINS", description: "Reached through ruins beneath Azerion Forest's central lake and connected to an exit on the northern deep-sea coast. Its interior has no complete surveyed map.", placementStatus: "provisional" },
+  { id: "high-cloud-sea-mountains", name: "High Cloud-Sea Mountains", x: 82, y: 13, category: "mountains", subtitle: "UNNAMED REMOTE MOUNTAIN REGION · PROVISIONAL", description: "Remote high peaks rising above the sea of clouds. Two distinct hidden traditions are associated with this remote mountain setting; exact names, coordinates, and routes are not established.", placementStatus: "provisional" },
+  { id: "frostmirror-sea", name: "Frostmirror Sea", x: 26, y: 10, category: "sea", subtitle: "NORTHERN COASTAL SEA", description: "The northern coastal waters of Beiming Gu, connected around the northeastern maritime margin to Eastern Azure Sea.", placementStatus: "provisional" },
+  { id: "eastern-azure-sea", name: "Eastern Azure Sea", x: 92, y: 42, category: "sea", subtitle: "EASTERN COASTAL SEA", description: "The eastern maritime belt of Golden Dragon Empire, with the established eastern shipping lane and coastal ports.", placementStatus: "provisional" },
+  { id: "yunmeng-sea", name: "Yunmeng Sea", x: 22, y: 61, category: "sea", subtitle: "SOUTHWESTERN HOME WATERS", description: "The ocean beneath and around Tianhai Yunzhou's floating island. Its eastern passage connects to Eastern Azure Sea; its western/southern approach faces Lawless Territories.", placementStatus: "provisional" },
+  { id: "wufeng-sea", name: "Wufeng Sea", x: 67, y: 57, category: "sea", subtitle: "THE WINDLESS SEA", description: "A still-water basin with no wind, waves, or currents anywhere within its boundaries. Lantern Passage connects it to Yunmeng Sea; Three-Lantern Passage links toward Eastern Azure Sea.", placementStatus: "provisional" },
+  { id: "black-tide-sea", name: "Black Tide Sea", x: 48, y: 88, category: "sea", subtitle: "ORDINARY SOUTHERN SEA", description: "Ordinary open water south of Lawless Territories and around Black Tide Expanse. It separates the Lawless maritime region from Guixu Canghai.", placementStatus: "provisional" },
+  { id: "guixu-canghai", name: "Guixu Canghai", x: 56, y: 96, category: "sea", subtitle: "FAR-SOUTHERN POLAR OCEAN", description: "The world's farthest-southern, frigid, most dangerous ocean system, beyond the southern outer boundary of ordinary Black Tide Sea.", placementStatus: "provisional" },
+  { id: "lanternhook-isles", name: "Lanternhook Isles", x: 32, y: 83, category: "landmark", subtitle: "ARCHIPELAGO IN ORDINARY BLACK TIDE SEA", description: "A small archipelago with Red Lantern Cay (entertainment), Bitterglass Isle (specialist physicians and medicinal trade), and Dicewake Isle (gambling and wagers).", placementStatus: "provisional" }
 ];
 function readWorldMarkers(): WorldMarker[] {
   try {
     const saved = JSON.parse(localStorage.getItem(WORLD_MAP_COORDINATES_KEY) || "null");
-    if (Array.isArray(saved) && defaultWorldMarkers.every(item => saved.some((entry: any) =>
-      entry?.id === item.id && Number.isFinite(entry.x) && Number.isFinite(entry.y)))) {
+    if (Array.isArray(saved)) {
       return defaultWorldMarkers.map(item => {
-        const entry = saved.find((value: any) => value.id === item.id);
-        return { ...item, x: Math.max(0, Math.min(100, Number(entry.x))), y: Math.max(0, Math.min(100, Number(entry.y))) };
+        const entry = saved.find((value: any) => value?.id === item.id);
+        return entry && Number.isFinite(Number(entry.x)) && Number.isFinite(Number(entry.y))
+          ? { ...item, x: Math.max(0, Math.min(100, Number(entry.x))), y: Math.max(0, Math.min(100, Number(entry.y))), placementStatus: entry.placementStatus === "owner-set" ? "owner-set" : item.placementStatus }
+          : { ...item };
       });
     }
-  } catch { /* use built-in coordinates when storage is unavailable or invalid */ }
+  } catch { /* use built-in positions when storage is unavailable or invalid */ }
   return defaultWorldMarkers.map(item => ({ ...item }));
 }
 function worldMapMarkerMarkup(marker: WorldMarker, editor = false): string {
-  return '<button class="wmh-power wmh-power-' + (marker.id === "golden-dragon-empire" ? "gde" : marker.id === "tianhai-yunzhou" ? "ty" : "bg") +
-    (editor ? ' wmh-editor-marker' : '') + '" style="left:' + marker.x + '%;top:' + marker.y + '%" ' +
+  const number = String(defaultWorldMarkers.findIndex(item => item.id === marker.id) + 1).padStart(2, "0");
+  const provisional = marker.placementStatus === "provisional" ? ' title="Provisional placement — adjust in Map Editor"' : "";
+  return '<button class="wmh-power wmh-marker-' + marker.category + (editor ? ' wmh-editor-marker' : '') +
+    '" style="left:' + marker.x + '%;top:' + marker.y + '%" ' +
     (editor ? 'type="button" data-wmh-drag-marker="' + marker.id + '" aria-label="Drag ' + marker.name + '"' : 'data-wmh-info="' + marker.id + '"') +
-    '><b>' + (marker.id === "golden-dragon-empire" ? "01" : marker.id === "tianhai-yunzhou" ? "02" : "03") + '</b><span>' + marker.name + '</span></button>';
+    provisional + '><b>' + number + '</b><span>' + marker.name + '</span></button>';
 }
 function serializeWorldMapCoordinates(markers: WorldMarker[]): string {
   return JSON.stringify({
     format: "merzkava-world-map-coordinates",
-    schemaVersion: 1,
+    schemaVersion: 2,
     map: "Merzkava Universe World Map",
     image: "/world/Untitled77_20261029054536.png",
     coordinateSystem: {
       type: "normalized-percentage", origin: "top-left",
       xAxis: "left-to-right", yAxis: "top-to-bottom",
       range: "0–100", anchor: "marker-center",
-      note: "Coordinates are percentages of the actual displayed map image bounds, not the surrounding editor canvas or pixel positions."
+      note: "Coordinates are percentages of the actual displayed map image bounds, not the surrounding editor canvas or pixel positions. New marker placements are provisional until repositioned by the owner."
     },
-    markers: markers.map(({ id, name, x, y }) => ({ id, name, x, y }))
+    markers: markers.map(({ id, name, x, y, category, placementStatus }) => ({ id, name, category, x, y, placementStatus }))
   }, null, 2);
 }
 function bindWorldMapZoom(dialog: HTMLElement): void {
@@ -138,25 +170,26 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
 
 function mapEditorMarkup(): string {
   const markers = readWorldMarkers();
-  return '<div class="wmh-map-editor"><div class="wmh-editor-intro"><b>WORLD MAP · COORDINATE EDITOR</b><span>DRAG A MARKER OR EDIT ITS X / Y VALUES · 0–100%</span></div>' +
+  return '<div class="wmh-map-editor"><div class="wmh-editor-intro"><b>WORLD MAP · COORDINATE EDITOR</b><span>DRAG MARKERS OR EDIT X / Y · NEW PLACEMENTS ARE PROVISIONAL · 0–100%</span></div>' +
     '<div class="wmh-map-zoom" data-wmh-zoom-controls><button type="button" data-wmh-zoom="out" aria-label="Zoom out">−</button><span data-wmh-zoom-level>100%</span><button type="button" data-wmh-zoom="in" aria-label="Zoom in">+</button><button type="button" data-wmh-zoom="reset">RESET</button></div>' +
     '<div class="wmh-editor-canvas" data-wmh-editor-canvas><div class="wmh-editor-map-surface" data-wmh-map-surface><img src="/world/Untitled77_20261029054536.png" alt="World map coordinate canvas" />' +
     markers.map(marker => worldMapMarkerMarkup(marker, true)).join("") + '<div class="wmh-editor-crosshair" aria-hidden="true"></div></div></div>' +
-    '<div class="wmh-coordinate-table-wrap"><table class="wmh-coordinate-table"><thead><tr><th>AREA</th><th>X (%)</th><th>Y (%)</th></tr></thead><tbody>' +
-    markers.map(marker => '<tr data-wmh-coordinate-row="' + marker.id + '"><td>' + marker.name + '</td><td><input type="number" min="0" max="100" step="0.1" value="' + marker.x + '" data-wmh-coordinate="' + marker.id + '" data-axis="x" aria-label="' + marker.name + ' X coordinate" /></td><td><input type="number" min="0" max="100" step="0.1" value="' + marker.y + '" data-wmh-coordinate="' + marker.id + '" data-axis="y" aria-label="' + marker.name + ' Y coordinate" /></td></tr>').join("") +
-    '</tbody></table></div><section class="wmh-coordinate-transfer"><div class="wmh-transfer-heading"><b>COORDINATE REFERENCE</b><span>PORTABLE COPY · JSON</span></div><p>Copy this reference and keep it as the source of truth when placing areas, buildings, objects, or other map points.</p><textarea readonly spellcheck="false" data-wmh-export aria-label="Exportable world map coordinate reference"></textarea><div class="wmh-editor-actions"><button type="button" data-wmh-action="editor-copy">COPY COORDINATES</button></div><label class="wmh-import-label" for="wmh-coordinate-import">PASTE A PREVIOUS COORDINATE REFERENCE</label><textarea id="wmh-coordinate-import" spellcheck="false" data-wmh-import placeholder="Paste the copied JSON reference here..."></textarea><button class="wmh-import-button" type="button" data-wmh-action="editor-import">IMPORT PASTED COORDINATES</button></section><div class="wmh-editor-actions"><button type="button" data-wmh-action="editor-reset">RESET DEFAULTS</button><button type="button" data-wmh-action="editor-close">← WORLD MAP</button></div><p class="wmh-editor-status" data-wmh-editor-status>Move markers, then confirm to lock their positions on this device.</p><div class="wmh-editor-confirm-bar"><span>POSITION PREVIEW</span><button type="button" data-wmh-action="editor-confirm">✓ &nbsp; CONFIRM &amp; LOCK POSITIONS</button></div></div>';
+    '<div class="wmh-coordinate-table-wrap"><table class="wmh-coordinate-table"><thead><tr><th>TYPE</th><th>AREA</th><th>X (%)</th><th>Y (%)</th></tr></thead><tbody>' +
+    markers.map(marker => '<tr data-wmh-coordinate-row="' + marker.id + '"><td>' + marker.category.toUpperCase() + (marker.placementStatus === "provisional" ? ' · TEMP' : '') + '</td><td>' + marker.name + '</td><td><input type="number" min="0" max="100" step="0.1" value="' + marker.x + '" data-wmh-coordinate="' + marker.id + '" data-axis="x" aria-label="' + marker.name + ' X coordinate" /></td><td><input type="number" min="0" max="100" step="0.1" value="' + marker.y + '" data-wmh-coordinate="' + marker.id + '" data-axis="y" aria-label="' + marker.name + ' Y coordinate" /></td></tr>').join("") +
+    '</tbody></table></div><section class="wmh-coordinate-transfer"><div class="wmh-transfer-heading"><b>COORDINATE REFERENCE</b><span>PORTABLE COPY · JSON</span></div><p>Copy this complete reference to preserve every power, territory, forest, sea, and landmark marker. Provisional positions are clearly tagged.</p><textarea readonly spellcheck="false" data-wmh-export aria-label="Exportable world map coordinate reference"></textarea><div class="wmh-editor-actions"><button type="button" data-wmh-action="editor-copy">COPY COORDINATES</button></div><label class="wmh-import-label" for="wmh-coordinate-import">PASTE A PREVIOUS COORDINATE REFERENCE</label><textarea id="wmh-coordinate-import" spellcheck="false" data-wmh-import placeholder="Paste the copied JSON reference here..."></textarea><button class="wmh-import-button" type="button" data-wmh-action="editor-import">IMPORT PASTED COORDINATES</button></section><div class="wmh-editor-actions"><button type="button" data-wmh-action="editor-reset">RESET DEFAULTS</button><button type="button" data-wmh-action="editor-close">← WORLD MAP</button></div><p class="wmh-editor-status" data-wmh-editor-status>New locations use provisional display positions. Move them to their correct map locations, then confirm to save.</p><div class="wmh-editor-confirm-bar"><span>POSITION PREVIEW</span><button type="button" data-wmh-action="editor-confirm">✓ &nbsp; CONFIRM &amp; LOCK POSITIONS</button></div></div>';
 }
 function bindWorldMapEditor(dialog: HTMLElement): void {
   const canvas = dialog.querySelector<HTMLElement>("[data-wmh-editor-canvas]");
   if (!canvas || canvas.dataset.bound === "true") return;
   canvas.dataset.bound = "true";
   let markers = readWorldMarkers();
-  let dragging: WorldMarkerId | null = null;
+  let dragging: { id: WorldMarkerId; pointerId: number; scrollLeft: number; scrollTop: number } | null = null;
   const exportField = dialog.querySelector<HTMLTextAreaElement>("[data-wmh-export]");
   const surface = canvas.querySelector<HTMLElement>("[data-wmh-map-surface]");
   const mapImage = surface?.querySelector<HTMLImageElement>("img");
   if (!surface || !mapImage) return;
   let zoom = 1;
+  const originalTouchAction = canvas.style.touchAction;
   const applyZoom = () => {
     surface.style.width = (zoom * 100) + "%";
     const level = dialog.querySelector<HTMLElement>("[data-wmh-zoom-level]");
@@ -176,12 +209,17 @@ function bindWorldMapEditor(dialog: HTMLElement): void {
     if (button) {
       button.style.left = marker.x + "%";
       button.style.top = marker.y + "%";
+      button.title = marker.placementStatus === "provisional" ? "Provisional placement — adjust this marker" : "Owner-positioned map marker";
     }
     const row = dialog.querySelector<HTMLElement>('[data-wmh-coordinate-row="' + marker.id + '"]');
     row?.querySelectorAll<HTMLInputElement>("input").forEach(input => {
       const axis = input.dataset.axis as "x" | "y";
       if (document.activeElement !== input) input.value = String(marker[axis]);
     });
+    if (row) {
+      const typeCell = row.querySelector("td");
+      if (typeCell) typeCell.textContent = marker.category.toUpperCase() + (marker.placementStatus === "provisional" ? " · TEMP" : "");
+    }
   };
   applyZoom();
   if (!mapImage.complete) mapImage.addEventListener("load", () => markers.forEach(paint), { once: true });
@@ -190,32 +228,51 @@ function bindWorldMapEditor(dialog: HTMLElement): void {
     zoom = action === "reset" ? 1 : action === "in" ? Math.min(2.5, zoom + .25) : Math.max(1, zoom - .25);
     applyZoom();
   }));
-  const update = (id: WorldMarkerId, x: number, y: number) => {
+  const updateFromPointer = (id: WorldMarkerId, clientX: number, clientY: number) => {
     const marker = markers.find(item => item.id === id);
     if (!marker) return;
-    marker.x = clamp(x); marker.y = clamp(y); paint(marker); refreshExport();
+    const bounds = mapBounds();
+    marker.x = clamp(((clientX - bounds.left) / bounds.width) * 100);
+    marker.y = clamp(((clientY - bounds.top) / bounds.height) * 100);
+    marker.placementStatus = "owner-set";
+    paint(marker); refreshExport();
     setStatus(marker.name + " · X " + marker.x + "% · Y " + marker.y + "% · pending confirmation");
   };
   canvas.addEventListener("pointerdown", event => {
     const target = event.target as Element;
     const markerButton = target.closest<HTMLElement>("[data-wmh-drag-marker]");
-    if (!markerButton) return;
+    if (!markerButton || dragging) return;
     event.preventDefault();
-    dragging = markerButton.dataset.wmhDragMarker as WorldMarkerId;
+    event.stopPropagation();
+    dragging = {
+      id: markerButton.dataset.wmhDragMarker as WorldMarkerId,
+      pointerId: event.pointerId,
+      scrollLeft: canvas.scrollLeft,
+      scrollTop: canvas.scrollTop
+    };
+    canvas.style.touchAction = "none";
     markerButton.classList.add("wmh-editor-marker-lifted");
-    try { canvas.setPointerCapture(event.pointerId); } catch { /* pointer capture may be unavailable */ }
+    try { markerButton.setPointerCapture(event.pointerId); } catch { /* pointer capture may be unavailable */ }
   });
   canvas.addEventListener("pointermove", event => {
-    if (!dragging) return;
-    const bounds = mapBounds();
-    update(dragging, ((event.clientX - bounds.left) / bounds.width) * 100, ((event.clientY - bounds.top) / bounds.height) * 100);
+    if (!dragging || event.pointerId !== dragging.pointerId) return;
+    event.preventDefault();
+    updateFromPointer(dragging.id, event.clientX, event.clientY);
   });
-  const stop = () => {
-    if (dragging) canvas.querySelector<HTMLElement>('[data-wmh-drag-marker="' + dragging + '"]')?.classList.remove("wmh-editor-marker-lifted");
+  const stop = (event: PointerEvent, commitFinalPoint: boolean) => {
+    if (!dragging || event.pointerId !== dragging.pointerId) return;
+    event.preventDefault();
+    if (commitFinalPoint) updateFromPointer(dragging.id, event.clientX, event.clientY);
+    const active = dragging;
+    canvas.querySelector<HTMLElement>('[data-wmh-drag-marker="' + active.id + '"]')?.classList.remove("wmh-editor-marker-lifted");
     dragging = null;
+    canvas.style.touchAction = originalTouchAction || "pan-x pan-y";
+    // A marker drag must never cause the scroll viewport to jump to the release point.
+    canvas.scrollLeft = active.scrollLeft;
+    canvas.scrollTop = active.scrollTop;
   };
-  canvas.addEventListener("pointerup", stop);
-  canvas.addEventListener("pointercancel", stop);
+  canvas.addEventListener("pointerup", event => stop(event, true));
+  canvas.addEventListener("pointercancel", event => stop(event, false));
   dialog.querySelectorAll<HTMLInputElement>("[data-wmh-coordinate]").forEach(input => {
     input.addEventListener("change", () => {
       const id = input.dataset.wmhCoordinate as WorldMarkerId;
@@ -224,13 +281,17 @@ function bindWorldMapEditor(dialog: HTMLElement): void {
       const value = Number(input.value);
       if (!Number.isFinite(value)) { input.value = String(marker[input.dataset.axis as "x" | "y"]); return; }
       const axis = input.dataset.axis as "x" | "y";
-      update(id, axis === "x" ? value : marker.x, axis === "y" ? value : marker.y);
+      marker.placementStatus = "owner-set";
+      marker[axis] = clamp(value);
+      paint(marker); refreshExport();
+      setStatus(marker.name + " · X " + marker.x + "% · Y " + marker.y + "% · pending confirmation");
     });
   });
   const saveCoordinates = () => {
     try {
       localStorage.setItem(WORLD_MAP_COORDINATES_KEY, JSON.stringify(markers));
-      setStatus("Positions confirmed and locked on this device. They will remain after leaving the map or closing the app.");
+      const provisionalCount = markers.filter(marker => marker.placementStatus === "provisional").length;
+      setStatus("Positions saved on this device. " + provisionalCount + " location(s) still have provisional placement and can be adjusted later.");
     } catch { setStatus("Could not save: device storage is unavailable. Copy the JSON reference as a backup."); }
   };
   dialog.querySelector<HTMLElement>('[data-wmh-action="editor-confirm"]')?.addEventListener("click", saveCoordinates);
@@ -240,7 +301,7 @@ function bindWorldMapEditor(dialog: HTMLElement): void {
     try {
       if (navigator.clipboard?.writeText) {
         await navigator.clipboard.writeText(value);
-        setStatus("Coordinate reference copied. You can paste it into chat, notes, or another editor.");
+        setStatus("Complete world-map coordinate reference copied.");
       } else throw new Error("Clipboard API unavailable");
     } catch {
       if (exportField) {
@@ -261,16 +322,19 @@ function bindWorldMapEditor(dialog: HTMLElement): void {
       }
       markers = defaultWorldMarkers.map(base => {
         const item = incoming.find((entry: any) => entry.id === base.id);
-        return { ...base, x: clamp(Number(item.x)), y: clamp(Number(item.y)) };
+        return {
+          ...base, x: clamp(Number(item.x)), y: clamp(Number(item.y)),
+          placementStatus: item.placementStatus === "owner-set" ? "owner-set" : base.placementStatus
+        };
       });
       markers.forEach(paint); refreshExport();
       setStatus("Imported coordinates are a preview. Confirm & lock positions to save them on this device.");
-    } catch { setStatus("Import failed. Paste a valid Merzkava World Map JSON reference with all three area IDs."); }
+    } catch { setStatus("Import failed. Paste a complete Merzkava world-map JSON reference containing all 20 marker IDs."); }
   });
   dialog.querySelector<HTMLElement>('[data-wmh-action="editor-reset"]')?.addEventListener("click", () => {
     markers = defaultWorldMarkers.map(item => ({ ...item }));
     markers.forEach(paint); refreshExport();
-    setStatus("Default positions restored in preview. Confirm & lock positions to save them.");
+    setStatus("Default coordinates restored in preview. New area placements remain provisional.");
   });
 }
 
@@ -278,7 +342,7 @@ function panelMarkup(level: Level, regionId: RegionId = "golden-dragon-empire", 
   const region = regionData[regionId];
   const header = (kind: string, title: string, subtitle: string) =>
     '<header class="wmh-level-header"><div><span class="wmh-level-tag">' + kind + '</span><h3>' + title + '</h3><p>' + subtitle + '</p></div><button type="button" class="wmh-close" data-wmh-action="close" aria-label="Close map">×</button></header>';
-  if (level === "world") return header("WORLD MAP", "Merzkava Universe", "THREE GREAT POWERS · SEAS · UNCHARTED LANDS") +
+  if (level === "world") return header("WORLD MAP", "Merzkava Universe", "THREE GREAT POWERS · EXTERNAL TERRITORIES · FORESTS · SIX SEAS") +
     '<div class="wmh-map-zoom" data-wmh-zoom-controls><button type="button" data-wmh-zoom="out" aria-label="Zoom out">−</button><span data-wmh-zoom-level>100%</span><button type="button" data-wmh-zoom="in" aria-label="Zoom in">+</button><button type="button" data-wmh-zoom="reset">RESET</button></div>' +
     '<div class="wmh-world-map" data-wmh-map-viewport><div class="wmh-world-map-image" data-wmh-map-surface><img src="/world/Untitled77_20261029054536.png" alt="Canonical Merzkava world and regions map" />' +
     readWorldMarkers().map(marker => worldMapMarkerMarkup(marker)).join("") + '</div></div>' +
@@ -329,11 +393,12 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
   }
   if (action.dataset.wmhAction === "home") { overlay.dataset.level = "home"; dialog.innerHTML = panelMarkup("home",regionId,building); return true; }
   if (action.dataset.wmhInfo) {
-    const id = action.dataset.wmhInfo as RegionId;
-    const info = regionData[id];
+    const id = action.dataset.wmhInfo as WorldMarkerId;
+    const info = defaultWorldMarkers.find(item => item.id === id);
     if (!info) return true;
     dialog.querySelector(".wmh-marker-info")?.remove();
-    dialog.insertAdjacentHTML("beforeend", '<section class="wmh-marker-info"><div><small>POWER TERRITORY · MAP MARKER</small><b>' + info.name + '</b><span>' + info.subtitle + '</span></div><button type="button" data-wmh-action="dismiss-marker-info" aria-label="Close marker information">×</button></section>');
+    const placement = info.placementStatus === "provisional" ? '<em>PROVISIONAL MAP PLACEMENT · ADJUST IN MAP EDITOR</em>' : '<em>OWNER-POSITIONED MARKER</em>';
+    dialog.insertAdjacentHTML("beforeend", '<section class="wmh-marker-info"><div><small>' + info.category.toUpperCase() + ' · MAP MARKER</small><b>' + info.name + '</b><span>' + info.subtitle + '</span><p>' + info.description + '</p>' + placement + '</div><button type="button" data-wmh-action="dismiss-marker-info" aria-label="Close marker information">×</button></section>');
     return true;
   }
   if (action.dataset.wmhAction === "dismiss-marker-info") { dialog.querySelector(".wmh-marker-info")?.remove(); return true; }
