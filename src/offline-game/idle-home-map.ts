@@ -4,38 +4,38 @@ type Place = { id:string; name:string; icon:string; note:string; sceneId?:string
 const regions:Record<string,{name:string;subtitle:string;terrain:string;places:Place[]}> = {
   "golden-dragon-empire":{name:"Golden Dragon Empire",subtitle:"EASTERN TERRITORIES",terrain:"imperial",places:[
     {id:"capital",name:"Imperial Capital",icon:"♜",note:"Administrative and imperial centre.",sceneId:"gde-city",image:"/game/scenery/golden-dragon-empire/establishing-views/gde-01-imperial-city-panorama.png"},
-    {id:"nearby-city",name:"Nearby City",icon:"⌂",note:"A nearby urban settlement."},
-    {id:"port",name:"Port",icon:"⚓",note:"Coastal transport and trade access."},
-    {id:"market",name:"Market",icon:"▤",note:"Local trade and supplies."},
-    {id:"pavilion",name:"Pavilion",icon:"⌑",note:"A public gathering and service location."},
-    {id:"sparring",name:"Sparring Arena",icon:"⚔",note:"Training and combat practice."},
+    {id:"nearby-city",name:"Nearby City",icon:"⌂",note:"A nearby urban settlement.",image:"/game/scenery/golden-dragon-empire/gde-02-traditional-city-street.png"},
+    {id:"port",name:"Port",icon:"⚓",note:"Coastal transport and trade access.",image:"/game/scenery/golden-dragon-empire/gde-03-imperial-city-gate.png"},
+    {id:"market",name:"Market",icon:"▤",note:"Local trade and supplies.",image:"/game/scenery/golden-dragon-empire/gde-04-marketplace-street.png"},
+    {id:"pavilion",name:"Pavilion",icon:"⌑",note:"A public gathering and service location.",image:"/game/scenery/golden-dragon-empire/gde-06-rural-village-landscape.png"},
+    {id:"sparring",name:"Sparring Arena",icon:"⚔",note:"Training and combat practice.",image:"/game/scenery/golden-dragon-empire/gde-07-mountain-wilderness-panorama.png"},
     {id:"academy",name:"Academy",icon:"⌘",note:"Education and specialist learning.",sceneId:"gde-academy",image:"/game/scenery/golden-dragon-empire/gde-05-cultivation-academy-courtyard.png"}
   ]},
   "beiming-gu":{name:"Beiming Gu",subtitle:"NORTHERN TERRITORIES",terrain:"northern",places:[
-    {id:"heartland",name:"Beiming Heartland",icon:"⌂",note:"Central settlement area."},
-    {id:"dojo",name:"Dojo Network",icon:"⚔",note:"Training facilities across the region."},
-    {id:"market",name:"Local Market",icon:"▤",note:"Regional trade placeholder."},
-    {id:"pavilion",name:"Pavilion",icon:"⌑",note:"Public gathering and service location."},
-    {id:"mountain",name:"Mountain Routes",icon:"♢",note:"Routes through the northern highlands."},
-    {id:"wilds",name:"Wilds",icon:"♧",note:"Exploration areas beyond settlements."},
-    {id:"basin",name:"Basin",icon:"◉",note:"Regional landmark and travel destination."}
+    {id:"heartland",name:"Beiming Heartland",icon:"⌂",note:"Central settlement area.",image:"/game/scenery/beiming-gu/bg-02-snowbound-settlement.png"},
+    {id:"dojo",name:"Dojo Network",icon:"⚔",note:"Training facilities across the region.",image:"/game/scenery/beiming-gu/bg-06-beiming-gu-grand-hall.png"},
+    {id:"market",name:"Local Market",icon:"▤",note:"Regional trade placeholder.",image:"/game/scenery/beiming-gu/bg-04-rare-metal-mining-landscape.png"},
+    {id:"pavilion",name:"Pavilion",icon:"⌑",note:"Public gathering and service location.",image:"/game/scenery/beiming-gu/bg-06-beiming-gu-grand-hall.png"},
+    {id:"mountain",name:"Mountain Routes",icon:"♢",note:"Routes through the northern highlands.",image:"/game/scenery/beiming-gu/bg-05-northern-mountain-pass.png"},
+    {id:"wilds",name:"Wilds",icon:"♧",note:"Exploration areas beyond settlements.",image:"/game/scenery/beiming-gu/bg-01-northern-territory-panorama.png"},
+    {id:"basin",name:"Basin",icon:"◉",note:"Regional landmark and travel destination.",image:"/game/scenery/beiming-gu/bg-07-frozen-lake-river.png"}
   ]},
   "tianhai-yunzhou":{name:"Tianhai Yunzhou",subtitle:"SOUTHWESTERN FLOATING TERRITORIES",terrain:"floating",places:[
-    {id:"yunxiao",name:"Yunxiao Terrace",icon:"⌂",note:"Central settlement area."},
-    {id:"cangqiong",name:"Cangqiong Harbor",icon:"⚓",note:"Harbor and transport connection."},
-    {id:"haiyue",name:"Haiyue Market",icon:"▤",note:"Market and trading district."},
-    {id:"westwake",name:"Westwake Anchorage",icon:"⚓",note:"Anchorage and maritime access."},
-    {id:"pearlstep",name:"Pearlstep Landing",icon:"⌁",note:"Landing and transit location."},
-    {id:"linggong",name:"Linggong District",icon:"⌘",note:"Arcanistry and industrial facilities."},
-    {id:"academy",name:"Academies & Institute",icon:"⌑",note:"Education and Arcanistry services."},
-    {id:"dojo",name:"Five Dojos",icon:"⚔",note:"Training facilities."}
+    {id:"yunxiao",name:"Yunxiao Terrace",icon:"⌂",note:"Central settlement area.",image:"/game/scenery/tianhai-yunzhou/ty-01-floating-island-city-panorama.png"},
+    {id:"cangqiong",name:"Cangqiong Harbor",icon:"⚓",note:"Harbor and transport connection.",image:"/game/scenery/tianhai-yunzhou/ty-02-skyport-airship-approach.png"},
+    {id:"haiyue",name:"Haiyue Market",icon:"▤",note:"Market and trading district.",image:"/game/scenery/tianhai-yunzhou/ty-04-market-district-environment.png"},
+    {id:"westwake",name:"Westwake Anchorage",icon:"⚓",note:"Anchorage and maritime access.",image:"/game/scenery/tianhai-yunzhou/ty-02-skyport-airship-approach.png"},
+    {id:"pearlstep",name:"Pearlstep Landing",icon:"⌁",note:"Landing and transit location.",image:"/game/scenery/tianhai-yunzhou/ty-06-island-edge-cloud-sea.png"},
+    {id:"linggong",name:"Linggong District",icon:"⌘",note:"Arcanistry and industrial facilities.",image:"/game/scenery/tianhai-yunzhou/ty-03-elevated-city-street.png"},
+    {id:"academy",name:"Academies & Institute",icon:"⌑",note:"Education and Arcanistry services.",image:"/game/scenery/tianhai-yunzhou/ty-05-academy-environment.png"},
+    {id:"dojo",name:"Five Dojos",icon:"⚔",note:"Training facilities.",image:"/game/scenery/tianhai-yunzhou/ty-03-elevated-city-street.png"}
   ]}
 };
 const globalPlaces:Place[]=[
-  {id:"guild",name:"Spirit Hunters Guild",icon:"✧",note:"Contract and guild services."},
-  {id:"auction",name:"Auction House",icon:"♜",note:"High-value auction destination in the Lawless Territories."},
-  {id:"underground-arena",name:"Underground Arena",icon:"⚔",note:"Underground combat destination in the Lawless Territories."},
-  {id:"lawless",name:"Lawless Territories",icon:"⌖",note:"A separate world destination, not part of the three regional home maps."}
+  {id:"guild",name:"Spirit Hunters Guild",icon:"✧",note:"Contract and guild services.",image:"/game/scenery/special-locations/ra-01-ruined-archiver-outpost.png"},
+  {id:"auction",name:"Auction House",icon:"♜",note:"High-value auction destination in the Lawless Territories.",image:"/game/scenery/lawless-territories/lt-01-lawless-territory-wilderness.png"},
+  {id:"underground-arena",name:"Underground Arena",icon:"⚔",note:"Underground combat destination in the Lawless Territories.",image:"/game/scenery/lawless-territories/lt-01-lawless-territory-wilderness.png"},
+  {id:"lawless",name:"Lawless Territories",icon:"⌖",note:"A separate world destination, not part of the three regional home maps.",image:"/game/scenery/lawless-territories/lt-02-southern-port-isles.png"}
 ];
 const positions=["left:15%;top:27%","left:43%;top:18%","left:76%;top:30%","left:22%;top:57%","left:54%;top:48%","left:78%;top:69%","left:39%;top:79%","left:65%;top:84%"];
 function marker(p:Place,index:number,group:string):string {
