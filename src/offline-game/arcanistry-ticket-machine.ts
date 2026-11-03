@@ -16,7 +16,7 @@ type TravelHandler = (sceneId: string) => void | Promise<void>;
 
 export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: TravelHandler): () => void {
   const timers = new Set<number>();
-  let activeTicket: { element: HTMLButtonElement; pointerId: number; startX: number; startY: number; distance: number } | null = null;
+  let activeTicket: { element: HTMLButtonElement; pointerId: number; startX: number; lastX: number; startY: number; distance: number } | null = null;
   let activeLever: { element: HTMLButtonElement; machine: HTMLElement; pointerId: number; startY: number; distance: number } | null = null;
   let disposed = false;
 
@@ -175,7 +175,7 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     const ticket = target.closest<HTMLButtonElement>("[data-arcanistry-ticket]");
     const machine = ticket?.closest<HTMLElement>("[data-arcanistry-machine]");
     if (!ticket || !machine || ticket.hidden || machine.dataset.machineState !== "ticket-ready") return;
-    activeTicket = { element: ticket, pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, distance: 0 };
+    activeTicket = { element: ticket, pointerId: event.pointerId, startX: event.clientX, lastX: event.clientX, startY: event.clientY, distance: 0 };
     try { ticket.setPointerCapture(event.pointerId); } catch { /* WebView fallback */ }
     event.preventDefault();
   };
@@ -193,6 +193,7 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     if (!activeTicket || activeTicket.pointerId !== event.pointerId) return;
     const distance = Math.max(0, Math.min(112, event.clientY - activeTicket.startY));
     activeTicket.distance = distance;
+    activeTicket.lastX = event.clientX;
     activeTicket.element.style.setProperty("--ticket-pull", distance + "px");
     activeTicket.element.classList.toggle("is-under-tension", distance >= ARCANISTRY_TICKET_TEAR_DISTANCE * .72);
     event.preventDefault();
@@ -221,7 +222,7 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     const machine = active.element.closest<HTMLElement>("[data-arcanistry-machine]");
     if (!cancelled && isArcanistryTicketTorn(active.distance)) {
       const rect = active.element.getBoundingClientRect();
-      const fingerOffset = active.startX - (rect.left + rect.width / 2);
+      const fingerOffset = active.lastX - (rect.left + rect.width / 2);
       const bias = Math.max(-1, Math.min(1, fingerOffset / (rect.width * .42)));
       const direction = bias < -.12 ? "left-to-right" : bias > .12 ? "right-to-left" : "center";
       void tearTicket(active.element, active.distance, direction);
