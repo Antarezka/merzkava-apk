@@ -202,8 +202,8 @@ function panelMarkup(level: Level, regionId: RegionId = "golden-dragon-empire", 
   const header = (kind: string, title: string, subtitle: string) =>
     '<header class="wmh-level-header"><div><span class="wmh-level-tag">' + kind + '</span><h3>' + title + '</h3><p>' + subtitle + '</p></div><button type="button" class="wmh-close" data-wmh-action="close" aria-label="Close map">×</button></header>';
   if (level === "world") return header("WORLD MAP", "Merzkava Universe", "THREE GREAT POWERS · SEAS · UNCHARTED LANDS") +
-    '<div class="wmh-world-map"><img src="/world/Untitled77_20261029054536.png" alt="Canonical Merzkava world and regions map" />' +
-    readWorldMarkers().map(marker => worldMapMarkerMarkup(marker)).join("") + '</div>' +
+    '<div class="wmh-world-map"><div class="wmh-world-map-image"><img src="/world/Untitled77_20261029054536.png" alt="Canonical Merzkava world and regions map" />' +
+    readWorldMarkers().map(marker => worldMapMarkerMarkup(marker)).join("") + '</div></div>' +
     '<div class="wmh-bottom-actions"><button data-wmh-action="home">⌂ &nbsp; OPEN HOME MAP</button><button data-wmh-action="editor-open">⊞ &nbsp; MAP EDITOR</button><span>SELECT A POWER TO EXPLORE ITS TERRITORY</span></div>';
   if (level === "map-editor") return header("WORLD MAP TOOLS", "Map Editor", "FLAT WORLD MAP · NORMALIZED COORDINATES") + mapEditorMarkup();
   if (level === "regional") return header("REGIONAL MAP", region.name, region.subtitle) +
