@@ -67,13 +67,6 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     lever.setAttribute("aria-label", "Printing travel ticket");
     if (status) status.textContent = "TRANSMISSION ENGAGED · PRINTING ROUTE TICKET";
 
-    if (!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
-      animate(lever.querySelector(".arcanist-lever-handle") ?? lever, {
-        rotate: [0, 34],
-        duration: 240,
-        ease: "outCubic"
-      });
-    }
     shake(machine, 3.2);
     later(() => shake(machine, 6.5), 280);
     later(() => shake(machine, 2.8), 760);
@@ -91,8 +84,12 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
       machine.classList.add("has-ticket");
       machine.classList.remove("is-running");
       lever.classList.remove("is-pulled");
+      lever.classList.add("is-returning");
+      lever.style.removeProperty("--lever-angle");
+      lever.style.removeProperty("--lever-pull");
       lever.disabled = true;
       lever.setAttribute("aria-label", "Ticket issued");
+      later(() => lever.classList.remove("is-returning"), 620);
     }, 1480);
   };
 
@@ -184,8 +181,9 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     if (activeLever && activeLever.pointerId === event.pointerId) {
       const distance = Math.max(0, Math.min(58, event.clientY - activeLever.startY));
       activeLever.distance = distance;
-      activeLever.element.style.setProperty("--lever-angle", (distance * .48) + "deg");
-      activeLever.element.style.setProperty("--lever-pull", (distance * .18) + "px");
+      // Keep the lever on a straight downward stroke; the shaft and grip travel together.
+      activeLever.element.style.setProperty("--lever-angle", (distance * .12) + "deg");
+      activeLever.element.style.setProperty("--lever-pull", (distance * .78) + "px");
       activeLever.element.classList.toggle("is-pulling", distance > 2);
       event.preventDefault();
       return;
