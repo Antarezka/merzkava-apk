@@ -78,7 +78,7 @@ describe("Eternal Path event-driven Anime.js motion",()=>{
   expect(mocks.animate.mock.calls.some(call=>call[0]===nodes)).toBe(false);
   const click=scene.addEventListener.mock.calls.find((call:any[])=>call[0]==="click")?.[1];
   click();
-  const particleCall=mocks.animate.mock.calls.find(call=>call[0]===nodes);
+  const particleCall=mocks.animate.mock.calls.find(call=>Array.isArray(call[0]) && call[0].length===nodes.length && call[0][0]===nodes[0]);
   expect(particleCall).toBeTruthy();
   expect(particleCall?.[1]).not.toHaveProperty("loop");
   dispose();
