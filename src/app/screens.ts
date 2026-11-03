@@ -123,24 +123,24 @@ journal:`<div class="page-heading"><p class="eyebrow">YOUR RECORDED HISTORY</p><
 settings:`<div class="page-heading"><p class="eyebrow">PERSONAL COMMAND DECK</p><h2>Settings</h2><p class="muted">Atur pengalaman aplikasi dan kelola koneksi ke dunia Merzkava secara terpisah.</p></div><section class="section-block preference-panel"><div class="section-heading"><span>APPEARANCE</span><small>DISPLAY MODE</small></div><p class="muted">The Academy Obsidian theme is the default command-hall palette. Parchment mode switches to a warmer, light reading surface.</p><div class="preference-choice" role="group" aria-label="Appearance"><button type="button" data-theme-mode="light" aria-pressed="true">☼ &nbsp; Parchment Light</button><button type="button" data-theme-mode="dark" aria-pressed="false">☾ &nbsp; Academy Obsidian</button></div>
 <section class="narrative-wallpaper-settings" aria-label="Narrative wallpapers">
   <div class="wallpaper-settings-heading"><span>BUILT-IN DOODLE COLLECTION</span><small>REPEATING PATTERNS · LOCAL ONLY</small></div>
-  <div class="wallpaper-setting-group">
-    <h3>Convo narrative</h3><p>Hand-drawn fieldnotes, Arcanist instruments, expedition maps and bestiary sketches.</p>
-    <div class="wallpaper-choice-grid">
+  <details class="wallpaper-setting-group wallpaper-dropdown" data-wallpaper-dropdown="convo">
+    <summary class="wallpaper-dropdown-heading"><span class="wallpaper-heading-mark" aria-hidden="true">⌑</span><span class="wallpaper-heading-copy"><strong>Convo Pattern</strong><small>CHAT NARRATIVE BACKGROUND</small></span><span class="wallpaper-current-label" data-wallpaper-current="convo"></span><span class="wallpaper-dropdown-arrow" aria-hidden="true">⌄</span></summary>
+    <div class="wallpaper-dropdown-panel"><div class="wallpaper-choice-grid">
       <button type="button" class="wallpaper-choice" data-wallpaper-select="convo" data-wallpaper-value="astral" aria-pressed="true"><span class="wallpaper-preview preview-astral"></span><span>Celestial Fieldnotes</span></button>
       <button type="button" class="wallpaper-choice" data-wallpaper-select="convo" data-wallpaper-value="scholar" aria-pressed="false"><span class="wallpaper-preview preview-scholar"></span><span>Arcanist Notebook</span></button>
       <button type="button" class="wallpaper-choice" data-wallpaper-select="convo" data-wallpaper-value="imperial" aria-pressed="false"><span class="wallpaper-preview preview-imperial"></span><span>Explorer's Records</span></button>
       <button type="button" class="wallpaper-choice" data-wallpaper-select="convo" data-wallpaper-value="arcanist" aria-pressed="false"><span class="wallpaper-preview preview-arcanist"></span><span>Bestiary Sketchbook</span></button>
-    </div>
-  </div>
-  <div class="wallpaper-setting-group">
-    <h3>Eternal Path</h3><p>Pilgrim routes, forgotten seas, mythical beasts and fragments of Golden Age Ruined.</p>
-    <div class="wallpaper-choice-grid">
+    </div></div>
+  </details>
+  <details class="wallpaper-setting-group wallpaper-dropdown" data-wallpaper-dropdown="eternal">
+    <summary class="wallpaper-dropdown-heading"><span class="wallpaper-heading-mark" aria-hidden="true">✧</span><span class="wallpaper-heading-copy"><strong>Eternal Path Pattern</strong><small>EXPEDITION NARRATIVE BACKGROUND</small></span><span class="wallpaper-current-label" data-wallpaper-current="eternal"></span><span class="wallpaper-dropdown-arrow" aria-hidden="true">⌄</span></summary>
+    <div class="wallpaper-dropdown-panel"><div class="wallpaper-choice-grid">
       <button type="button" class="wallpaper-choice" data-wallpaper-select="eternal" data-wallpaper-value="spirit" aria-pressed="true"><span class="wallpaper-preview preview-spirit"></span><span>Pilgrim's Route</span></button>
       <button type="button" class="wallpaper-choice" data-wallpaper-select="eternal" data-wallpaper-value="clouds" aria-pressed="false"><span class="wallpaper-preview preview-clouds"></span><span>Sea of Forgotten Ages</span></button>
       <button type="button" class="wallpaper-choice" data-wallpaper-select="eternal" data-wallpaper-value="echoes" aria-pressed="false"><span class="wallpaper-preview preview-echoes"></span><span>Mythic Beasts</span></button>
       <button type="button" class="wallpaper-choice" data-wallpaper-select="eternal" data-wallpaper-value="tower" aria-pressed="false"><span class="wallpaper-preview preview-tower"></span><span>Ruined Relics</span></button>
-    </div>
-  </div>
+    </div></div>
+  </details>
 </section></section><section class="section-block preference-panel"><div class="section-heading"><span>SOUND</span><small>APP AUDIO</small></div><div class="setting-row"><div><h3>Sound effects & voice</h3><p>Opening chime, spoken title, interface clicks, and subtle interface sounds.</p></div><button class="preference-toggle" type="button" data-sound-toggle aria-pressed="true">Sound On</button></div></section><section class="section-block floating-mode-settings"><div class="section-heading"><span>FLOATING MODE</span><small>ANDROID OVERLAY</small></div><p class="muted">Keep the same interactive Merzkava session in a movable mini window above other apps. Android will ask for permission the first time.</p><button class="action-button" type="button" data-floating-start>Start Floating Mode <span>↗</span></button></section><div class="setting-row"><div><h3>Save location</h3><p>Local device database</p></div><span class="setting-value">SQLITE</span></div><div class="setting-row"><div><h3>AI Game Master</h3><p>Sign in with Supabase to use the authenticated AI Gateway.</p></div><span class="setting-value">GATEWAY</span></div><div class="setting-row"><div><h3>Canon source</h3><p>Antarezka / merzkava-universe</p></div><span class="setting-value">ACTIVE</span></div>`
 };
 export function renderScreen(screen: ScreenId, characters: Character[] = [], registryStatus = "Registered characters are loaded from the pinned players.md snapshot.", ledgerEntries: LedgerEntry[] = [], inventorySnapshot?: InventorySnapshot): string {
