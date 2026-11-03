@@ -43,10 +43,11 @@ describe("Arcanistry rotary activation geometry",()=>{
   });
 
   it("does not commit merely by reaching threshold; a valid release is required",()=>{
-    expect(canCommitRotaryActivation(-90,{released:false,hasDestination:true})).toBe(false);
-    expect(canCommitRotaryActivation(-90,{released:true,cancelled:true,hasDestination:true})).toBe(false);
-    expect(canCommitRotaryActivation(-90,{released:true,hasDestination:false})).toBe(false);
-    expect(canCommitRotaryActivation(-90,{released:true,hasDestination:true})).toBe(true);
-    expect(canCommitRotaryActivation(-76,{released:true,hasDestination:true})).toBe(false);
+    expect(canCommitRotaryActivation(-90,{released:false,hasDestination:true,thresholdReachedDuringDrag:true})).toBe(false);
+    expect(canCommitRotaryActivation(-90,{released:true,cancelled:true,hasDestination:true,thresholdReachedDuringDrag:true})).toBe(false);
+    expect(canCommitRotaryActivation(-90,{released:true,hasDestination:false,thresholdReachedDuringDrag:true})).toBe(false);
+    expect(canCommitRotaryActivation(-90,{released:true,hasDestination:true,thresholdReachedDuringDrag:false})).toBe(false);
+    expect(canCommitRotaryActivation(-90,{released:true,hasDestination:true,thresholdReachedDuringDrag:true})).toBe(true);
+    expect(canCommitRotaryActivation(-76,{released:true,hasDestination:true,thresholdReachedDuringDrag:true})).toBe(false);
   });
 });
