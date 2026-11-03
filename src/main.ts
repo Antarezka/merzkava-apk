@@ -923,7 +923,7 @@ function selectArcanistDestination(place:HTMLElement):void{
  const group=place.dataset.idleGroup??"regional";
  const regionId=place.dataset.regionId??place.closest<HTMLElement>("[data-idle-map-region]")?.dataset.idleMapRegion??"golden-dragon-empire";
  const name=place.querySelector(".idle-destination-name,small")?.textContent?.trim()??"Destination";
- const sceneId=regionId==="golden-dragon-empire"?(placeId==="capital"?"gde-city":placeId==="academy"?"gde-academy"):"";
+ const sceneId=regionId==="golden-dragon-empire"?(placeId==="capital"?"gde-city":placeId==="academy"?"gde-academy":""):"";
  const rotor=root.querySelector<HTMLElement>("[data-arcanist-rotor]");
  const placeName=root.querySelector<HTMLElement>("[data-idle-place-name]");
  const placeNote=root.querySelector<HTMLElement>("[data-idle-place-note]");
