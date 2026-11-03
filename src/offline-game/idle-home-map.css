@@ -462,3 +462,52 @@
   .arcanist-lever-button.is-returning .arcanist-lever-shaft,
   .arcanist-lever-button.is-returning .arcanist-lever-handle{transition:none!important}
 }
+
+
+/* Arcanist access-code register and fold-away rotary control. */
+.arcanist-machine-heading{position:relative}
+.arcanist-master-lamp{position:relative;display:grid;place-items:center;flex:0 0 15px;width:15px;height:15px;margin-right:5px;border:1px solid #9a7947;border-radius:50%;background:radial-gradient(circle,#4a3b24 0 38%,#171c16 44%);box-shadow:inset 0 0 0 2px #0c110d,0 0 4px #b98c4d55}
+.arcanist-master-lamp i{display:block;width:7px;height:7px;border-radius:50%;background:#d8a64d;box-shadow:0 0 5px 2px #e5b65c99,0 0 10px #d89a3d66;animation:arcanist-master-breathe 3.1s ease-in-out infinite}
+@keyframes arcanist-master-breathe{0%,100%{opacity:.48;filter:brightness(.72);box-shadow:0 0 3px 1px #d9a64e66}50%{opacity:1;filter:brightness(1.22);box-shadow:0 0 8px 3px #ffcf78cc,0 0 16px #e5a84e88}}
+.arcanist-machine-shell.is-code-verified .arcanist-master-lamp i{animation:none;opacity:1;filter:brightness(1.35);box-shadow:0 0 9px 3px #ffcf78dd,0 0 18px #e5a84eaa}
+.arcanist-machine-shell.is-running .arcanist-master-lamp i{animation:arcanist-master-flicker var(--lamp-flicker-duration, .73s) steps(1,end) infinite}
+@keyframes arcanist-master-flicker{0%{opacity:1;filter:brightness(1.7);box-shadow:0 0 13px 5px #ffe2a0}7%{opacity:.12;filter:brightness(.35);box-shadow:0 0 1px #b8863d}13%{opacity:.92;filter:brightness(1.9);box-shadow:0 0 16px 6px #ffe3a6}24%{opacity:.28;filter:brightness(.5);box-shadow:0 0 2px #b8863d}39%{opacity:1;filter:brightness(2.1);box-shadow:0 0 18px 7px #fff0bf}43%{opacity:.08;filter:brightness(.25);box-shadow:none}58%{opacity:.72;filter:brightness(1.3);box-shadow:0 0 9px 3px #ffd17d}74%{opacity:.18;filter:brightness(.4);box-shadow:0 0 2px #b8863d}88%{opacity:1;filter:brightness(1.9);box-shadow:0 0 15px 6px #ffe6ad}100%{opacity:.62;filter:brightness(1.1);box-shadow:0 0 7px 2px #e6ad55}}
+.arcanist-code-module{position:relative;z-index:3;display:grid;justify-items:center;gap:5px;width:min(230px,88%);margin:0 auto 7px;padding:6px 8px 5px;border:1px solid #9c7d50;background:linear-gradient(180deg,#30352c,#111712 70%);box-shadow:inset 0 0 0 2px #090e0b,inset 0 0 0 3px #705a39,0 2px 6px #0008}
+.arcanist-code-heading{display:flex;justify-content:space-between;align-items:center;width:100%;gap:6px;color:#d4b77e;font:700 6px system-ui,sans-serif;letter-spacing:.12em}
+.arcanist-code-heading small{color:#8f9c83;font-size:5px;letter-spacing:.08em}
+.arcanist-code-windows{display:flex;justify-content:center;gap:6px}
+.arcanist-code-window{display:grid;place-items:center;width:28px;height:31px;border:1px solid #9c8054;background:linear-gradient(180deg,#080d0a,#252a20 48%,#090e0b);box-shadow:inset 0 0 0 2px #080b09,0 0 5px #0008;color:#f4d89e}
+.arcanist-code-window b{font:700 20px/1 Georgia,serif;text-shadow:0 0 6px #e8c27c77}
+.arcanist-code-window b.is-spinning{animation:arcanist-counter-roll .17s linear infinite;filter:blur(.6px)}
+@keyframes arcanist-counter-roll{0%{transform:translateY(-5px);opacity:.4}50%{transform:translateY(0);opacity:1}100%{transform:translateY(5px);opacity:.45}}
+.arcanist-code-actions{display:grid;grid-template-columns:42px minmax(0,1fr) 42px;align-items:center;width:100%;gap:5px}
+.arcanist-code-action{display:grid;justify-items:center;gap:1px;min-height:30px;padding:2px;border:1px solid #806a48;background:linear-gradient(180deg,#3a3b30,#171c16);color:#e5c68b;touch-action:manipulation}
+.arcanist-code-action span{font:17px/1 Georgia,serif}
+.arcanist-code-action small{font:700 5px system-ui,sans-serif;letter-spacing:.08em}
+.arcanist-code-action:disabled{opacity:.32;filter:grayscale(.7)}
+.arcanist-code-cancel{color:#d8b58a}
+.arcanist-code-generate{color:#f1d59a}
+.arcanist-code-progress{text-align:center;color:#a99b7d;font:600 5px system-ui,sans-serif;letter-spacing:.1em}
+.arcanist-ticket-dispenser{display:flex;flex-direction:column;align-items:center;min-height:0}
+.arcanist-ticket-slot{flex:0 0 auto}
+.arcanist-control-panel{perspective:600px}
+.arcanist-folding-assembly{position:relative;display:block;width:100%;min-height:206px;transform-style:preserve-3d}
+.arcanist-dial-face,.arcanist-lever-face{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;backface-visibility:hidden;transition:transform .58s cubic-bezier(.2,.72,.25,1),opacity .36s ease}
+.arcanist-lever-face[hidden],.arcanist-dial-face[hidden]{display:none!important}
+.arcanist-dial-face{opacity:1;transform:rotateY(0deg);transform-origin:left center}
+.arcanist-lever-face{opacity:0;pointer-events:none;transform:rotateY(88deg);transform-origin:right center}
+.arcanist-machine-shell.is-code-verified .arcanist-dial-face{opacity:0;pointer-events:none;transform:rotateY(-88deg) translateX(-9px)}
+.arcanist-machine-shell.is-code-verified .arcanist-lever-face{opacity:1;pointer-events:auto;transform:rotateY(0deg)}
+.arcanist-dial-caption{width:100%;margin:2px 0 8px;text-align:center;color:#d6b77e;font:700 6px system-ui,sans-serif;letter-spacing:.11em}
+.arcanist-combination-dial{position:relative;display:grid;place-items:center;width:104px;height:104px;border:2px solid #a98855;border-radius:50%;background:radial-gradient(circle,#151b15 0 48%,#6f5734 50% 54%,#111711 57% 70%,#c09a61 72% 75%,#1b211a 78%);box-shadow:inset 0 0 0 3px #0a100c,inset 0 0 0 5px #8d7047,0 3px 8px #000b}
+.arcanist-combination-dial:before{content:"";position:absolute;inset:8px;border:1px dashed #c6a36b77;border-radius:50%;pointer-events:none}
+.arcanist-dial-rotor{position:absolute;inset:0;border-radius:50%;transform:rotate(var(--dial-turn,0deg));transition:transform .48s cubic-bezier(.16,.82,.2,1.14)}
+.arcanist-dial-number{position:absolute;left:50%;top:50%;display:grid;place-items:center;width:21px;height:21px;padding:0;border:1px solid #9c8054;border-radius:50%;background:radial-gradient(circle at 35% 30%,#e2c58f,#6e5431 70%,#2a251b);color:#fff0ca;font:700 9px Georgia,serif;text-shadow:0 1px 2px #20180e;box-shadow:0 1px 3px #000b;touch-action:manipulation;cursor:pointer}
+.arcanist-dial-number:active:not(:disabled){filter:brightness(1.45);box-shadow:0 0 8px #e8c27c}
+.arcanist-dial-number:disabled{opacity:.36;cursor:not-allowed}
+.arcanist-dial-hub{position:absolute;left:50%;top:50%;display:grid;place-items:center;width:31px;height:31px;transform:translate(-50%,-50%);border:2px solid #c6a36d;border-radius:50%;background:radial-gradient(circle,#8a6b3e,#28271d 65%,#0c120d);box-shadow:inset 0 0 0 2px #171b14,0 1px 4px #000b;color:#f2d69d;font:13px Georgia,serif;pointer-events:none}
+.arcanist-machine-shell.is-code-rejected .arcanist-code-windows{animation:arcanist-code-reject .22s ease-in-out 2}
+@keyframes arcanist-code-reject{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+.arcanist-machine-shell.is-code-verified .arcanist-code-window{border-color:#d4b77e;box-shadow:inset 0 0 0 2px #080b09,0 0 8px #f2cb7a88}
+@media(max-width:390px){.arcanist-code-module{width:92%;padding:5px}.arcanist-folding-assembly{min-height:190px}.arcanist-combination-dial{width:94px;height:94px}.arcanist-dial-number{width:19px;height:19px}.arcanist-code-window{width:25px;height:28px}}
+@media(prefers-reduced-motion:reduce){.arcanist-master-lamp i,.arcanist-code-window b.is-spinning{animation:none!important}.arcanist-dial-face,.arcanist-lever-face,.arcanist-dial-rotor{transition:none!important}}
