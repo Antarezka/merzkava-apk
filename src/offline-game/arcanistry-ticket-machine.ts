@@ -224,8 +224,10 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
   root.addEventListener("click", onClick);
   root.addEventListener("pointerdown", onPointerDown, { passive: false });
   root.addEventListener("pointermove", onPointerMove, { passive: false });
-  root.addEventListener("pointerup", event => onPointerEnd(event), { passive: true });
-  root.addEventListener("pointercancel", event => onPointerEnd(event, true), { passive: true });
+  const onPointerUp = (event: PointerEvent) => onPointerEnd(event);
+  const onPointerCancel = (event: PointerEvent) => onPointerEnd(event, true);
+  root.addEventListener("pointerup", onPointerUp, { passive: true });
+  root.addEventListener("pointercancel", onPointerCancel, { passive: true });
 
   return () => {
     disposed = true;
@@ -234,5 +236,7 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     root.removeEventListener("click", onClick);
     root.removeEventListener("pointerdown", onPointerDown);
     root.removeEventListener("pointermove", onPointerMove);
+    root.removeEventListener("pointerup", onPointerUp);
+    root.removeEventListener("pointercancel", onPointerCancel);
   };
 }
