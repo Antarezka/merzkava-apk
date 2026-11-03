@@ -80,6 +80,8 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
       ticket.disabled = false;
       ticket.classList.remove("is-returning", "is-torn", "is-under-tension");
       ticket.style.removeProperty("--ticket-pull");
+      ticket.style.removeProperty("--ticket-stretch");
+      ticket.style.removeProperty("--ticket-lean");
       ticket.style.removeProperty("--tear-bias");
       ticket.style.removeProperty("clip-path");
     }
