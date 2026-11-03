@@ -19,6 +19,9 @@ describe("Eternal Path live world scene", () => {
     expect(html).toContain('id="eternal-start-form" class="expedition-start-form"');
     expect(html).toContain("NO ACTIVE JOURNEY");
     expect(html).toContain("AWAITING YOUR JOURNEY");
+    expect(html.indexOf("NO ACTIVE JOURNEY")).toBeLessThan(html.indexOf('class="expedition-environment"'));
+    expect(html.indexOf('class="expedition-environment"')).toBeLessThan(html.indexOf("AWAITING YOUR JOURNEY"));
+    expect(html.indexOf("AWAITING YOUR JOURNEY")).toBeLessThan(html.indexOf('class="expedition-save-manager'));
   });
 
   it("renders the established scene window without temporary test controls", () => {
@@ -119,10 +122,10 @@ describe("Eternal Path live world scene", () => {
     expect(html).toContain('aria-controls="eternal-save-manager-dialog"');
     expect(html).toContain('id="eternal-save-manager-dialog" class="expedition-manager-content" data-eternal-manager-content role="dialog" aria-modal="true" aria-labelledby="eternal-manager-title" hidden');
     expect(html).toContain('class="scene-coordinate scene-clock-ink"');
-    expect(html.indexOf('class="expedition-outcome"')).toBeLessThan(html.indexOf('class="expedition-environment"'));
-    expect(html.indexOf('class="expedition-environment"')).toBeLessThan(html.indexOf('expedition-profile-compact'));
-    expect(html.indexOf('expedition-profile-compact')).toBeLessThan(html.indexOf('class="expedition-dialogue"'));
-    expect(html.indexOf('class="expedition-dialogue"')).toBeLessThan(html.indexOf('class="expedition-disposition-line"'));
+    expect(html.indexOf('class="expedition-environment"')).toBeLessThan(html.indexOf('class="expedition-disposition-line"'));
+    expect(html.indexOf('class="expedition-disposition-line"')).toBeLessThan(html.indexOf('class="expedition-outcome"'));
+    expect(html.indexOf('class="expedition-outcome"')).toBeLessThan(html.indexOf('class="expedition-dialogue"'));
+    expect(html.indexOf('class="expedition-dialogue"')).toBeLessThan(html.indexOf("expedition-profile-compact"));
     expect(html).not.toContain("Manage journeys");
     expect(html).not.toContain("expedition-feature-grid");
     expect(getCurrentSituation()?.id).toBeTruthy();
