@@ -147,11 +147,11 @@
  padding:0;color:#f3e5c9;background:transparent;border:0;clip-path:none;box-shadow:none;backdrop-filter:none;overflow:visible
 }
 .idle-clockwork{position:absolute;inset:0;width:100%;height:100%;overflow:visible;fill:none;pointer-events:none}
-.idle-clock-cable{fill:none;stroke:#e1c28a;stroke-width:1.15;stroke-linecap:round;stroke-linejoin:miter;filter:drop-shadow(0 1px 1px #111)}
+.idle-clock-cable{fill:none;stroke:#e7c98f;stroke-width:1.2;stroke-linecap:square;stroke-linejoin:miter;filter:drop-shadow(0 1px 1px #111)}
 .idle-cable-b{stroke:#92764c;stroke-width:.7;opacity:.9}
 .idle-cable-drop,.idle-cable-link{stroke:#d5b77e;stroke-width:.9}
 .idle-clock-jewel{fill:#f1d9a6;stroke:#57442b;stroke-width:1}
-.idle-clock-gear{fill:#1a211cdd;stroke:#e4c58e;stroke-width:1.15;stroke-linejoin:round;filter:drop-shadow(0 2px 2px #0b100d)}
+.idle-clock-gear{fill:transparent;stroke:#f0d39a;stroke-width:1.2;stroke-linejoin:miter;filter:drop-shadow(0 1px 1px #111)}
 .idle-clock-gear path{stroke:#e4c58e;stroke-width:1.5;stroke-linecap:square}
 .idle-clock-gear .idle-gear-hole{fill:#d9b77c;stroke:#493a25;stroke-width:1}
 .idle-calendar-data{position:absolute;left:0;bottom:1px;display:grid;grid-template-columns:1fr 1fr;align-items:end;gap:10px;width:148px;padding:0 4px 2px 7px}
@@ -177,3 +177,8 @@
 .idle-clock-gear{transform-box:fill-box;transform-origin:center}
 .expedition-idle-trigger{z-index:80;pointer-events:auto;touch-action:none;will-change:left,top}
 .expedition-idle-trigger.is-dragging{cursor:grabbing;transition:none!important;transform:scale(1.04);filter:brightness(1.15);box-shadow:0 7px 22px #000b,0 0 0 2px #e6c58e66}
+
+/* Keep the clockwork completely unboxed: the atlas must remain visible through every opening. */
+.idle-calendar-hud,.idle-clockwork{background:transparent!important;box-shadow:none!important;backdrop-filter:none!important}
+.idle-clock-gear .idle-gear-hole{fill:transparent;stroke:#e7c98f;stroke-width:1}
+.idle-clock-cable{stroke-dasharray:none}
