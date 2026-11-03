@@ -9,7 +9,7 @@ import { validateCharacterDraft } from "./convo/engine/character-validation";
 import { renderScreen, type ScreenId } from "./app/screens";
 import { initializeIdleTriggerDrag } from "./offline-game/idle-trigger-drag";
 import { animateExpeditionChoiceModal, animateExpeditionPanel, mountExpeditionAnimations } from "./offline-game/expedition-animations";
-import { deleteEternalSave, exportEternalSave, importEternalSave, loadEternalSave, renameEternalSave, resetEternalGame, resolveEternalSituationChoice, startEternalGame, unloadEternalGame, type EternalRegion } from "./offline-game/expedition-game";
+import { deleteEternalSave, exportEternalSave, importEternalSave, loadEternalSave, renameEternalSave, resetEternalGame, resolveEternalSituationChoice, setEternalLocation, startEternalGame, unloadEternalGame, type EternalRegion } from "./offline-game/expedition-game";
 import { getCanonIndex, getCanonStatus, loadCanonModule, loadPlayerRegistry, loadRegisteredPlayerProfile, refreshCanon, refreshLatestPlayerRegistry, type CanonDocument } from "./convo/canon/canon-loader";
 import { routeCanonActivity } from "./convo/canon/canon-router";
 import { assembleGameplayContext } from "./convo/canon/context-assembler";
@@ -913,6 +913,15 @@ window.addEventListener("keydown", (event: KeyboardEvent) => {
   dismissNoticeboard("once");
 });
 
+
+let activeArcanistDial:{element:HTMLElement;pointerId:number;lastAngle:number;turned:number}|null=null;
+function arcanistPointerAngle(element:HTMLElement,event:PointerEvent):number{const rect=element.getBoundingClientRect();return Math.atan2(event.clientY-(rect.top+rect.height/2),event.clientX-(rect.left+rect.width/2))*180/Math.PI;}
+root.addEventListener("pointerdown",event=>{const target=event.target;if(!(target instanceof Element))return;const rotor=target.closest<HTMLElement>("[data-arcanist-rotor]");if(!rotor||(event.pointerType==="mouse"&&event.button!==0))return;activeArcanistDial={element:rotor,pointerId:event.pointerId,lastAngle:arcanistPointerAngle(rotor,event),turned:0};try{rotor.setPointerCapture(event.pointerId);}catch{/* WebView fallback */}event.preventDefault();},{passive:false});
+root.addEventListener("pointermove",event=>{const active=activeArcanistDial;if(!active||active.pointerId!==event.pointerId)return;const next=arcanistPointerAngle(active.element,event);let delta=next-active.lastAngle;if(delta>180)delta-=360;if(delta< -180)delta+=360;active.lastAngle=next;if(delta>0.15){active.turned=Math.min(135,active.turned+delta);active.element.style.setProperty("--dial-angle",active.turned+"deg");active.element.querySelector<HTMLElement>("[data-arcanist-grip]")?.style.setProperty("transform","rotate("+active.turned+"deg)");active.element.setAttribute("aria-valuenow",String(Math.round(active.turned)));active.element.closest<HTMLElement>("[data-arcanist-device]")?.classList.add("is-turning");playClockworkRatchet();suppressNextPointerClick=true;}event.preventDefault();},{passive:false});
+function finishArcanistDial(event:PointerEvent,cancelled=false):void{const active=activeArcanistDial;if(!active||active.pointerId!==event.pointerId)return;activeArcanistDial=null;try{if(active.element.hasPointerCapture(event.pointerId))active.element.releasePointerCapture(event.pointerId);}catch{/* already released */}const completed=!cancelled&&active.turned>=108;const sceneId=active.element.dataset.sceneId??"";active.element.style.setProperty("--dial-angle","0deg");active.element.querySelector<HTMLElement>("[data-arcanist-grip]")?.style.setProperty("transform","rotate(0deg)");active.element.setAttribute("aria-valuenow","0");active.element.closest<HTMLElement>("[data-arcanist-device]")?.classList.remove("is-turning");if(completed&&sceneId){playNavigationTick();setEternalLocation(sceneId);const drawer=root.querySelector<HTMLElement>("[data-arcanist-device]");if(drawer)drawer.hidden=true;root.querySelector<HTMLButtonElement>("[data-arcanist-pull]")?.setAttribute("aria-expanded","false");notice=sceneId==="gde-academy"?"Arrived at the Academy.":"Returned to the Imperial Capital.";render();}else if(active.turned>3){playNavigationTick();}}
+root.addEventListener("pointerup",event=>finishArcanistDial(event),{passive:true});
+root.addEventListener("pointercancel",event=>finishArcanistDial(event,true),{passive:true});
+
 root.addEventListener("click", async (event: MouseEvent) => {
   const target = event.target;
   if (!(target instanceof Element)) return;
@@ -982,12 +991,21 @@ root.addEventListener("click", async (event: MouseEvent) => {
     if(placeNote) placeNote.textContent=idlePlaceButton.dataset.idleNote??"This destination is reserved for a future update.";
     const placeId=idlePlaceButton.dataset.idlePlace;
     const placeGroup=idlePlaceButton.dataset.idleGroup??"regional";
+    const sceneId=placeId==="capital"?"gde-city":placeId==="academy"?"gde-academy":"";
+    const routeStatus=root.querySelector<HTMLElement>("[data-arcanist-route-status]");
+    const previewImage=root.querySelector<HTMLImageElement>("[data-arcanist-preview-image]");
+    if(routeStatus) routeStatus.textContent=sceneId?"READY TO DIAL":"PREVIEW ONLY";
+    if(previewImage&&sceneId) previewImage.src=sceneId==="gde-academy"?"/game/scenery/golden-dragon-empire/gde-05-cultivation-academy-courtyard.png":"/game/scenery/golden-dragon-empire/establishing-views/gde-01-imperial-city-panorama.png";
+    const rotor=root.querySelector<HTMLElement>("[data-arcanist-rotor]");
+    if(rotor) rotor.dataset.sceneId=sceneId;
     root.querySelectorAll<HTMLButtonElement>("[data-idle-place]").forEach(button=>{
       const selected=button.dataset.idlePlace===placeId&&button.dataset.idleGroup===placeGroup;
       button.classList.toggle("is-selected",selected);
     });
     return;
   }
+  if(target.closest("[data-arcanist-pull]")){const drawer=root.querySelector<HTMLElement>("[data-arcanist-device]");const trigger=root.querySelector<HTMLButtonElement>("[data-arcanist-pull]");if(drawer&&trigger){drawer.hidden=!drawer.hidden;trigger.setAttribute("aria-expanded",String(!drawer.hidden));}return;}
+  if(target.closest("[data-arcanist-close]")){const drawer=root.querySelector<HTMLElement>("[data-arcanist-device]");const trigger=root.querySelector<HTMLButtonElement>("[data-arcanist-pull]");if(drawer&&trigger){drawer.hidden=true;trigger.setAttribute("aria-expanded","false");}return;}
   if (target.closest("[data-idle-rpg-open]")) {
     const modal=root.querySelector<HTMLElement>("[data-idle-rpg-modal]");
     const trigger=root.querySelector<HTMLButtonElement>("[data-idle-rpg-open]");
