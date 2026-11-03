@@ -45,6 +45,8 @@ function makeSceneRoot(weather="Clear",cycle="Morning",state="test-"+Math.random
 describe("Eternal Path event-driven Anime.js motion",()=>{
  beforeEach(()=>{
   vi.clearAllMocks();
+  Object.defineProperty(globalThis, "document", { configurable: true, value: { createElement: vi.fn(() => ({ className: "", style: { left: "", top: "", setProperty: vi.fn() } })) } });
+  Object.defineProperty(globalThis, "window", { configurable: true, value: { matchMedia: vi.fn(() => ({ matches: false })) } });
   mocks.animate.mockReturnValue({pause:vi.fn()});
   mocks.scope.add.mockImplementation((setup:(self:{matches:{reduceMotion:boolean}})=>void)=>{setup({matches:{reduceMotion:false}});return mocks.scope;});
  });
@@ -90,6 +92,7 @@ describe("Eternal Path event-driven Anime.js motion",()=>{
   disposeNext();
  });
  it("does not animate scene motion when reduced motion is requested",()=>{
+  (window as any).matchMedia = vi.fn(() => ({ matches: true }));
   mocks.scope.add.mockImplementation((setup:(self:{matches:{reduceMotion:boolean}})=>void)=>{setup({matches:{reduceMotion:true}});return mocks.scope;});
   const {root,scene}=makeSceneRoot();
   mountExpeditionAnimations(root);
