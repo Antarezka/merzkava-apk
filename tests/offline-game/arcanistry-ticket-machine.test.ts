@@ -3,6 +3,7 @@ import {
   ARCANISTRY_LEVER_PULL_DISTANCE,
   ARCANISTRY_MIN_LOADING_MS,
   ARCANISTRY_TICKET_TEAR_DISTANCE,
+  getArcanistryLeverAngle,
   isArcanistryLeverEngaged,
   isArcanistryTicketTorn
 } from "../../src/offline-game/arcanistry-ticket-machine";
@@ -14,6 +15,15 @@ describe("Arcanistry ticket interaction", () => {
     expect(isArcanistryLeverEngaged(42.9)).toBe(false);
     expect(isArcanistryLeverEngaged(43)).toBe(true);
     expect(isArcanistryLeverEngaged(Number.POSITIVE_INFINITY)).toBe(false);
+  });
+
+  it("rotates the quadrant lever in the direction of the horizontal gesture", () => {
+    expect(getArcanistryLeverAngle(0)).toBe(0);
+    expect(getArcanistryLeverAngle(-56)).toBeCloseTo(-55);
+    expect(getArcanistryLeverAngle(56)).toBeCloseTo(55);
+    expect(getArcanistryLeverAngle(-28)).toBeLessThan(0);
+    expect(getArcanistryLeverAngle(28)).toBeGreaterThan(0);
+    expect(getArcanistryLeverAngle(Number.NaN)).toBe(0);
   });
 
   it("requires a deliberate downward pull before the ticket tears", () => {
