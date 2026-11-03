@@ -185,7 +185,7 @@ function bindWorldMapEditor(dialog: HTMLElement): void {
   if (!canvas || canvas.dataset.bound === "true") return;
   canvas.dataset.bound = "true";
   let markers = readWorldMarkers();
-  let dragging: { id: WorldMarkerId; pointerId: number; scrollLeft: number; scrollTop: number } | null = null;
+  let dragging: { id: WorldMarkerId; pointerId: number; offsetX: number; offsetY: number; scrollLeft: number; scrollTop: number } | null = null;
   const exportField = dialog.querySelector<HTMLTextAreaElement>("[data-wmh-export]");
   const surface = canvas.querySelector<HTMLElement>("[data-wmh-map-surface]");
   const mapImage = surface?.querySelector<HTMLImageElement>("img");
@@ -230,7 +230,7 @@ function bindWorldMapEditor(dialog: HTMLElement): void {
     zoom = action === "reset" ? 1 : action === "in" ? Math.min(2.5, zoom + .25) : Math.max(1, zoom - .25);
     applyZoom();
   }));
-  const updateFromPointer = (id: WorldMarkerId, clientX: number, clientY: number) => {
+  const updateMarkerCenter = (id: WorldMarkerId, centerX: number, centerY: number) => {
     const marker = markers.find(item => item.id === id);
     if (!marker) return;
     const bounds = mapBounds();
@@ -246,25 +246,31 @@ function bindWorldMapEditor(dialog: HTMLElement): void {
     if (!markerButton || dragging) return;
     event.preventDefault();
     event.stopPropagation();
+    const id = markerButton.dataset.wmhDragMarker as WorldMarkerId;
+    canvas.style.touchAction = "none";
+    // Lift first, then measure the marker's VISUAL center. The finger-to-marker
+    // offset is retained for the entire gesture, including pointerup.
+    markerButton.classList.add("wmh-editor-marker-lifted");
+    const liftedBounds = markerButton.getBoundingClientRect();
     dragging = {
-      id: markerButton.dataset.wmhDragMarker as WorldMarkerId,
+      id,
       pointerId: event.pointerId,
+      offsetX: (liftedBounds.left + liftedBounds.width / 2) - event.clientX,
+      offsetY: (liftedBounds.top + liftedBounds.height / 2) - event.clientY,
       scrollLeft: canvas.scrollLeft,
       scrollTop: canvas.scrollTop
     };
-    canvas.style.touchAction = "none";
-    markerButton.classList.add("wmh-editor-marker-lifted");
     try { markerButton.setPointerCapture(event.pointerId); } catch { /* pointer capture may be unavailable */ }
   });
   canvas.addEventListener("pointermove", event => {
     if (!dragging || event.pointerId !== dragging.pointerId) return;
     event.preventDefault();
-    updateFromPointer(dragging.id, event.clientX, event.clientY);
+    updateMarkerCenter(dragging.id, event.clientX + dragging.offsetX, event.clientY + dragging.offsetY);
   });
   const stop = (event: PointerEvent, commitFinalPoint: boolean) => {
     if (!dragging || event.pointerId !== dragging.pointerId) return;
     event.preventDefault();
-    if (commitFinalPoint) updateFromPointer(dragging.id, event.clientX, event.clientY);
+    if (commitFinalPoint) updateMarkerCenter(dragging.id, event.clientX + dragging.offsetX, event.clientY + dragging.offsetY);
     const active = dragging;
     canvas.querySelector<HTMLElement>('[data-wmh-drag-marker="' + active.id + '"]')?.classList.remove("wmh-editor-marker-lifted");
     dragging = null;
