@@ -213,6 +213,8 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     stub.disabled = true;
     stub.hidden = false;
     stub.style.removeProperty("--ticket-pull");
+    stub.style.removeProperty("--ticket-stretch");
+    stub.style.removeProperty("--ticket-lean");
     stub.style.removeProperty("clip-path");
     ticket.parentElement?.appendChild(stub);
     ticket.style.clipPath = "polygon(0 " + Math.max(36,45-curve) + "%,16% " + Math.max(33,42-curve*.7) + "%,34% " + Math.min(55,47+curve*.35) + "%,52% " + Math.max(35,43-curve*.25) + "%,72% " + Math.min(56,48+curve*.4) + "%,88% " + Math.max(36,44-curve*.45) + "%,100% " + Math.min(55,47+curve) + "%,100% 100%,0 100%)";
@@ -319,7 +321,10 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     const distance = Math.max(0, Math.min(112, event.clientY - activeTicket.startY));
     activeTicket.distance = distance;
     activeTicket.lastX = event.clientX;
-    activeTicket.element.style.setProperty("--ticket-pull", distance + "px");
+    const stretch = 1 + (distance / 112) * .34;
+    const horizontalDrift = Math.max(-1, Math.min(1, (event.clientX - activeTicket.startX) / 54));
+    activeTicket.element.style.setProperty("--ticket-stretch", stretch.toFixed(3));
+    activeTicket.element.style.setProperty("--ticket-lean", (horizontalDrift * 1.6).toFixed(2) + "deg");
     activeTicket.element.classList.toggle("is-under-tension", distance >= ARCANISTRY_TICKET_TEAR_DISTANCE * .72);
     event.preventDefault();
   };
@@ -361,6 +366,8 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     if (machine && active.distance > 8) shakeVertically(machine, 1.2);
     later(() => {
       active.element.style.removeProperty("--ticket-pull");
+      active.element.style.removeProperty("--ticket-stretch");
+      active.element.style.removeProperty("--ticket-lean");
       active.element.classList.remove("is-returning");
     }, 440);
   };
