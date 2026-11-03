@@ -32,7 +32,7 @@ function panelMarkup(level: Level, regionId: RegionId = "golden-dragon-empire", 
     '<div class="wmh-bottom-actions"><button data-wmh-action="home">⌂ &nbsp; OPEN HOME MAP</button><span>SELECT A POWER TO EXPLORE ITS TERRITORY</span></div>';
   if (level === "regional") return header("REGIONAL MAP", region.name, region.subtitle) +
     '<div class="wmh-region-scene"><img src="' + region.image + '" alt="" /><div class="wmh-scene-shade"></div><span class="wmh-map-stamp">REGIONAL TERRITORY</span></div>' +
-    '<div class="wmh-site-grid">' + region.sites.map((site) =>
+    '<div class="wmh-site-grid">' + region.sites.map((site, i) =>
       '<button class="wmh-site-card" data-wmh-site="' + site + '" data-wmh-region-id="' + regionId + '"><span>' + ["♜","⌘","▤","⚓","⌑","⚔"][i] + '</span><b>' + site + '</b><small>' + (regionId === "golden-dragon-empire" && site === "Tianhai Academy" ? "EXPLORE COMPLEX" : "COMING SOON") + '</small></button>'
     ).join("") + '</div><div class="wmh-bottom-actions"><button data-wmh-action="back">← WORLD MAP</button><span>SELECT A LOCATION</span></div>';
   if (level === "local") return header("LOCAL AREA", selectedBuilding, "ACADEMY COMPLEX · BUILDINGS & GROUNDS") +
@@ -42,7 +42,7 @@ function panelMarkup(level: Level, regionId: RegionId = "golden-dragon-empire", 
     '<div class="wmh-local-footer"><span>● PLAYER &nbsp; ○ NPC · TAP A BUILDING OR CHARACTER</span><button data-wmh-action="exit-local">← EXIT TO CITY · +3 HOURS</button></div>';
   if (level === "interior") return header("INTERIOR MAP", selectedBuilding, "ISOMETRIC FLOOR PLAN · CLASSROOM") +
     '<div class="wmh-interior"><div class="wmh-classroom-floor"><div class="wmh-blackboard">LESSON BOARD</div><div class="wmh-teacher-desk">TEACHER</div>' +
-    '<div class="wmh-desks">' + Array.from({length:6},(_,i)=>'<div class="wmh-desk">DESK</div>').join("") + '</div>' +
+    '<div class="wmh-desks">' + Array.from({length:6},()=>'<div class="wmh-desk">DESK</div>').join("") + '</div>' +
     '<button class="wmh-avatar wmh-interior-player" data-wmh-npc="You" aria-label="Player"><span>✦</span></button><button class="wmh-avatar wmh-interior-npc-a" data-wmh-npc="Student" aria-label="Student"><span>●</span></button><button class="wmh-avatar wmh-interior-npc-b" data-wmh-npc="Student" aria-label="Student"><span>●</span></button><button class="wmh-avatar wmh-interior-npc-c" data-wmh-npc="Teacher" aria-label="Teacher"><span>●</span></button><div class="wmh-door">DOOR</div></div></div>' +
     '<div class="wmh-local-footer"><span>CHARACTERS ARE SHOWN AS ROUND PORTRAIT TOKENS</span><button data-wmh-action="back">← BACK TO LOCAL AREA</button></div><div class="wmh-dialogue" data-wmh-dialogue hidden><div class="wmh-dialogue-portrait">◉</div><div><small data-wmh-speaker>STUDENT</small><p data-wmh-line>“The lesson has already started. I should return to my seat.”</p></div><button data-wmh-action="dismiss-dialogue">×</button></div>';
   return header("HOME MAP", "Personal Grounds", "ISOMETRIC HOME · PLOTS & FACILITIES") +
@@ -64,7 +64,7 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
   const current = (overlay.dataset.level as Level) || "world";
   const regionId = (overlay.dataset.region as RegionId) || "golden-dragon-empire";
   const building = overlay.dataset.building || "Tianhai Academy";
-  if (action.dataset.wmhAction === "open") { overlay.hidden = false; overlay.dataset.level = "world"; dialog.innerHTML = panelMarkup("world","Merzkava Universe",""); return true; }
+  if (action.dataset.wmhAction === "open") { overlay.hidden = false; overlay.dataset.level = "world"; dialog.innerHTML = panelMarkup("world"); return true; }
   if (action.dataset.wmhAction === "close") { overlay.hidden = true; return true; }
   if (action.dataset.wmhAction === "back") {
     const next: Level = current === "interior" ? "local" : current === "local" ? "regional" : "world";
