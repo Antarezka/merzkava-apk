@@ -63,3 +63,12 @@
 .wmh-editor-actions button[data-wmh-action="editor-save"]{background:#715633;color:#fff0cf}
 .wmh-editor-status{min-height:18px;margin:8px 2px 0}
 @media(max-width:380px){.wmh-editor-marker{gap:3px;padding:5px;font-size:7px}.wmh-coordinate-table input{width:56px}.wmh-coordinate-table td:first-child{font-size:10px}}
+
+.wmh-coordinate-transfer{margin-top:14px;padding:11px;border:1px solid #9b8058;background:#101a14}
+.wmh-transfer-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;color:#efd7a9;font:700 10px Georgia,serif;letter-spacing:.12em}
+.wmh-transfer-heading span{font:8px Arial,sans-serif;color:#c4b28f}
+.wmh-coordinate-transfer>p{margin:7px 0 9px;color:#c9bea7;font:10px/1.45 Arial,sans-serif}
+.wmh-coordinate-transfer textarea{display:block;width:100%;min-height:160px;resize:vertical;box-sizing:border-box;padding:9px;border:1px solid #806b49;border-radius:0;background:#080f0b;color:#e9d7b5;font:10px/1.45 ui-monospace,monospace;white-space:pre;tab-size:2}
+.wmh-coordinate-transfer textarea[data-wmh-import]{min-height:100px;margin-top:6px}
+.wmh-import-label{display:block;margin:13px 0 5px;color:#e5c991;font:700 8px Arial,sans-serif;letter-spacing:.1em}
+.wmh-import-button{width:100%;margin-top:7px;padding:10px;border:1px solid #b89964;background:#29372e;color:#f2dfbb;font:700 9px Arial,sans-serif;letter-spacing:.07em}
