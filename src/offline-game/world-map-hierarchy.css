@@ -8,7 +8,8 @@
 .wmh-level-header p{margin:0;color:#b9b29f;font:8px/1.4 Arial,sans-serif;letter-spacing:.12em}
 .wmh-close{width:36px;height:36px;border:1px solid #92784e;background:#1d2922;color:#f2dfb9;font-size:24px}
 .wmh-world-map{position:relative;flex:1;min-height:420px;margin:12px 0;background:radial-gradient(ellipse at 50% 45%,#536b58,#18251e 70%);border:1px solid #a78b5e;overflow:hidden;display:flex;align-items:center;justify-content:center}
-.wmh-world-map img{height:100%;max-height:620px;max-width:78%;object-fit:contain;filter:drop-shadow(0 8px 12px #0008)}
+.wmh-world-map-image{position:relative;width:78%;max-height:620px;flex:none}
+.wmh-world-map-image>img{display:block;width:100%;height:auto;max-height:620px;object-fit:contain;filter:drop-shadow(0 8px 12px #0008)}
 .wmh-power{position:absolute;display:flex;align-items:center;gap:6px;padding:7px 9px;border:1px solid #e0c38d;background:#18221de8;color:#f5e5c6;box-shadow:0 3px 10px #0008;font-size:9px;touch-action:manipulation}
 .wmh-power b{color:#e8c27f}.wmh-power{transform:translate(-50%,-50%)}.wmh-power-gde,.wmh-power-ty,.wmh-power-bg{right:auto;bottom:auto}
 .wmh-bottom-actions{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0;color:#c6b18b;font-size:8px;letter-spacing:.1em}
