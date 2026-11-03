@@ -1,4 +1,5 @@
 import "./expedition-interface.css";
+import { renderIdleHomeMap } from "./idle-home-map";
 import {
   getCurrentSituation, getEternalSave, getExpeditionAtmosphere, getExpeditionScene, listEternalSaves,
 } from "./expedition-game";
@@ -93,16 +94,7 @@ export function renderExpeditionInterface():string {
           <path d="M14 45v2m24-2v2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
         </svg>
       </button>
-      <div class="expedition-idle-modal" data-idle-rpg-modal hidden>
-        <button type="button" class="expedition-idle-backdrop" data-idle-rpg-close aria-label="Close Idle RPG notice"></button>
-        <section class="expedition-idle-dialog" role="dialog" aria-modal="true" aria-labelledby="idle-rpg-title">
-          <div class="expedition-idle-heading"><span>COASTAL SIGNAL RECEIVER</span><span>✦</span></div>
-          <h3 id="idle-rpg-title">Idle RPG</h3>
-          <p>The receiver is still being tuned. A new journey of quiet progress and a living micro-economy will arrive here.</p>
-          <div class="expedition-idle-status"><span></span> SIGNAL NOT YET AVAILABLE</div>
-          <button type="button" class="expedition-idle-dismiss" data-idle-rpg-close>Understood</button>
-        </section>
-      </div>
+      ${renderIdleHomeMap()}
     </div>
     ${choiceModal}
     <footer class="expedition-footer"><span>ETERNAL PATH · LOCAL JOURNEY</span><span>WORLD ARCHIVE · READ ONLY</span></footer></section>`;
