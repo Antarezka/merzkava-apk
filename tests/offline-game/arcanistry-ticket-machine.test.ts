@@ -26,6 +26,11 @@ describe("Arcanistry ticket interaction", () => {
     expect(getArcanistryLeverAngle(Number.NaN)).toBe(0);
   });
 
+  it("uses downward ticket travel and keeps the tear at the upper perforation", () => {
+    expect(ARCANISTRY_TICKET_TEAR_DISTANCE).toBe(62);
+    expect(isArcanistryTicketTorn(62)).toBe(true);
+  });
+
   it("requires a deliberate downward pull before the ticket tears", () => {
     expect(ARCANISTRY_TICKET_TEAR_DISTANCE).toBe(62);
     expect(isArcanistryTicketTorn(0)).toBe(false);
