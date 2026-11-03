@@ -15,6 +15,11 @@ export function getArcanistryLeverAngle(horizontalDelta: number): number {
   return direction * Math.pow(progress, .9) * 55;
 }
 
+export function getArcanistryTicketExtension(verticalDelta: number): number {
+  if (!Number.isFinite(verticalDelta)) return 0;
+  return Math.max(0, Math.min(112, verticalDelta));
+}
+
 export function isArcanistryTicketTorn(distance: number): boolean {
   return Number.isFinite(distance) && distance >= ARCANISTRY_TICKET_TEAR_DISTANCE;
 }
@@ -334,9 +339,9 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
       return;
     }
     if (!activeTicket || activeTicket.pointerId !== event.pointerId) return;
-    const distance = Math.max(0, Math.min(112, event.clientY - activeTicket.startY));
+    const distance = getArcanistryTicketExtension(event.clientY - activeTicket.startY);
     activeTicket.distance = distance;
-    activeTicket.element.style.setProperty("--ticket-pull", Math.round(distance) + "px");
+    activeTicket.element.style.setProperty("--ticket-extension", Math.round(distance) + "px");
     activeTicket.element.classList.toggle("is-under-tension", distance >= ARCANISTRY_TICKET_TEAR_DISTANCE * .72);
     event.preventDefault();
   };
@@ -375,6 +380,7 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     if (machine && active.distance > 8) shakeVertically(machine, 1.2);
     later(() => {
       active.element.style.removeProperty("--ticket-pull");
+      active.element.style.removeProperty("--ticket-extension");
       active.element.style.removeProperty("--ticket-extension");
       active.element.classList.remove("is-returning");
     }, 440);
