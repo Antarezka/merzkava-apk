@@ -387,6 +387,6 @@
  .arcanist-destination-card:before,.arcanist-master-lamp i,
  .arcanist-machine-shell.is-running .arcanist-machine-gear,.arcanist-machine-shell.is-running .arcanist-machine-spring,
  .arcanist-machine-shell.is-running .arcanist-wirework path,.arcanist-loading-seal,
- .arcanist-ticket.is-returning,.arcanist-ticket.is-torn,.arcanist-travel-card.is-swallowing,.arcanist-travel-card.is-ejecting{animation:none!important}
+ .arcanist-machine-shell.is-printing .arcanist-ticket,.arcanist-ticket.is-returning,.arcanist-ticket.is-torn,.arcanist-travel-card.is-swallowing,.arcanist-travel-card.is-ejecting{animation:none!important}
  .arcanist-quadrant-lever.is-returning .arcanist-lever-shaft,.arcanist-quadrant-lever.is-returning .arcanist-lever-handle{transition:none!important}
 }
