@@ -1,6 +1,6 @@
 import "./world-map-hierarchy.css";
 
-type Level = "world" | "regional" | "local" | "interior" | "home";
+type Level = "world" | "regional" | "local" | "interior" | "home" | "map-editor";
 type RegionId = "golden-dragon-empire" | "tianhai-yunzhou" | "beiming-gu";
 const regionData: Record<RegionId, { name: string; subtitle: string; image: string; sites: string[] }> = {
   "golden-dragon-empire": {
@@ -20,16 +20,120 @@ const regionData: Record<RegionId, { name: string; subtitle: string; image: stri
   }
 };
 
+
+type WorldMarkerId = "golden-dragon-empire" | "tianhai-yunzhou" | "beiming-gu";
+type WorldMarker = { id: WorldMarkerId; name: string; x: number; y: number };
+const WORLD_MAP_COORDINATES_KEY = "merzkava.world-map.coordinates.v1";
+const defaultWorldMarkers: WorldMarker[] = [
+  { id: "golden-dragon-empire", name: "Golden Dragon Empire", x: 3, y: 20 },
+  { id: "tianhai-yunzhou", name: "Tianhai Yunzhou", x: 98, y: 52 },
+  { id: "beiming-gu", name: "Beiming Gu", x: 3, y: 86 }
+];
+function readWorldMarkers(): WorldMarker[] {
+  try {
+    const saved = JSON.parse(localStorage.getItem(WORLD_MAP_COORDINATES_KEY) || "null");
+    if (Array.isArray(saved) && defaultWorldMarkers.every(item => saved.some((entry: any) =>
+      entry?.id === item.id && Number.isFinite(entry.x) && Number.isFinite(entry.y)))) {
+      return defaultWorldMarkers.map(item => {
+        const entry = saved.find((value: any) => value.id === item.id);
+        return { ...item, x: Math.max(0, Math.min(100, Number(entry.x))), y: Math.max(0, Math.min(100, Number(entry.y))) };
+      });
+    }
+  } catch { /* use built-in coordinates when storage is unavailable or invalid */ }
+  return defaultWorldMarkers.map(item => ({ ...item }));
+}
+function worldMapMarkerMarkup(marker: WorldMarker, editor = false): string {
+  return '<button class="wmh-power wmh-power-' + (marker.id === "golden-dragon-empire" ? "gde" : marker.id === "tianhai-yunzhou" ? "ty" : "bg") +
+    (editor ? ' wmh-editor-marker' : '') + '" style="left:' + marker.x + '%;top:' + marker.y + '%" ' +
+    (editor ? 'type="button" data-wmh-drag-marker="' + marker.id + '" aria-label="Drag ' + marker.name + '"' : 'data-wmh-region="' + marker.id + '"') +
+    '><b>' + (marker.id === "golden-dragon-empire" ? "01" : marker.id === "tianhai-yunzhou" ? "02" : "03") + '</b><span>' + marker.name + '</span></button>';
+}
+function mapEditorMarkup(): string {
+  const markers = readWorldMarkers();
+  return '<div class="wmh-map-editor"><div class="wmh-editor-intro"><b>WORLD MAP · COORDINATE EDITOR</b><span>DRAG A MARKER OR EDIT ITS X / Y VALUES · 0–100%</span></div>' +
+    '<div class="wmh-editor-canvas" data-wmh-editor-canvas><img src="/world/Untitled77_20261029054536.png" alt="World map coordinate canvas" />' +
+    markers.map(marker => worldMapMarkerMarkup(marker, true)).join("") + '<div class="wmh-editor-crosshair" aria-hidden="true"></div></div>' +
+    '<div class="wmh-coordinate-table-wrap"><table class="wmh-coordinate-table"><thead><tr><th>AREA</th><th>X (%)</th><th>Y (%)</th></tr></thead><tbody>' +
+    markers.map(marker => '<tr data-wmh-coordinate-row="' + marker.id + '"><td>' + marker.name + '</td><td><input type="number" min="0" max="100" step="0.1" value="' + marker.x + '" data-wmh-coordinate="' + marker.id + '" data-axis="x" aria-label="' + marker.name + ' X coordinate" /></td><td><input type="number" min="0" max="100" step="0.1" value="' + marker.y + '" data-wmh-coordinate="' + marker.id + '" data-axis="y" aria-label="' + marker.name + ' Y coordinate" /></td></tr>').join("") +
+    '</tbody></table></div><div class="wmh-editor-actions"><button type="button" data-wmh-action="editor-reset">RESET</button><button type="button" data-wmh-action="editor-save">SAVE COORDINATES</button><button type="button" data-wmh-action="editor-close">← WORLD MAP</button></div><p class="wmh-editor-status" data-wmh-editor-status>Changes are a preview until saved.</p></div>';
+}
+function bindWorldMapEditor(dialog: HTMLElement): void {
+  const canvas = dialog.querySelector<HTMLElement>("[data-wmh-editor-canvas]");
+  if (!canvas || canvas.dataset.bound === "true") return;
+  canvas.dataset.bound = "true";
+  let markers = readWorldMarkers();
+  let dragging: WorldMarkerId | null = null;
+  const clamp = (value: number) => Math.max(0, Math.min(100, Math.round(value * 10) / 10));
+  const paint = (marker: WorldMarker) => {
+    const button = canvas.querySelector<HTMLElement>('[data-wmh-drag-marker="' + marker.id + '"]');
+    if (button) { button.style.left = marker.x + "%"; button.style.top = marker.y + "%"; }
+    const row = dialog.querySelector<HTMLElement>('[data-wmh-coordinate-row="' + marker.id + '"]');
+    row?.querySelectorAll<HTMLInputElement>("input").forEach(input => {
+      const axis = input.dataset.axis as "x" | "y";
+      if (document.activeElement !== input) input.value = String(marker[axis]);
+    });
+  };
+  const update = (id: WorldMarkerId, x: number, y: number) => {
+    const marker = markers.find(item => item.id === id);
+    if (!marker) return;
+    marker.x = clamp(x); marker.y = clamp(y); paint(marker);
+    const status = dialog.querySelector<HTMLElement>("[data-wmh-editor-status]");
+    if (status) status.textContent = marker.name + " · X " + marker.x + "% · Y " + marker.y + "% · unsaved preview";
+  };
+  canvas.addEventListener("pointerdown", event => {
+    const target = event.target as Element;
+    const markerButton = target.closest<HTMLElement>("[data-wmh-drag-marker]");
+    if (!markerButton) return;
+    event.preventDefault();
+    dragging = markerButton.dataset.wmhDragMarker as WorldMarkerId;
+    try { canvas.setPointerCapture(event.pointerId); } catch { /* pointer capture may be unavailable */ }
+  });
+  canvas.addEventListener("pointermove", event => {
+    if (!dragging) return;
+    const rect = canvas.getBoundingClientRect();
+    update(dragging, ((event.clientX - rect.left) / rect.width) * 100, ((event.clientY - rect.top) / rect.height) * 100);
+  });
+  const stop = () => { dragging = null; };
+  canvas.addEventListener("pointerup", stop);
+  canvas.addEventListener("pointercancel", stop);
+  dialog.querySelectorAll<HTMLInputElement>("[data-wmh-coordinate]").forEach(input => {
+    input.addEventListener("change", () => {
+      const id = input.dataset.wmhCoordinate as WorldMarkerId;
+      const marker = markers.find(item => item.id === id);
+      if (!marker) return;
+      const value = Number(input.value);
+      if (!Number.isFinite(value)) { input.value = String(marker[input.dataset.axis as "x" | "y"]); return; }
+      const axis = input.dataset.axis as "x" | "y";
+      update(id, axis === "x" ? value : marker.x, axis === "y" ? value : marker.y);
+    });
+  });
+  dialog.querySelector<HTMLElement>('[data-wmh-action="editor-save"]')?.addEventListener("click", () => {
+    try {
+      localStorage.setItem(WORLD_MAP_COORDINATES_KEY, JSON.stringify(markers));
+      const status = dialog.querySelector<HTMLElement>("[data-wmh-editor-status]");
+      if (status) status.textContent = "Coordinates saved on this device.";
+    } catch {
+      const status = dialog.querySelector<HTMLElement>("[data-wmh-editor-status]");
+      if (status) status.textContent = "Could not save: device storage is unavailable.";
+    }
+  });
+  dialog.querySelector<HTMLElement>('[data-wmh-action="editor-reset"]')?.addEventListener("click", () => {
+    markers = defaultWorldMarkers.map(item => ({ ...item }));
+    markers.forEach(paint);
+    const status = dialog.querySelector<HTMLElement>("[data-wmh-editor-status]");
+    if (status) status.textContent = "Default coordinates restored in preview. Save to keep them.";
+  });
+}
+
 function panelMarkup(level: Level, regionId: RegionId = "golden-dragon-empire", selectedBuilding = "Tianhai Academy"): string {
   const region = regionData[regionId];
   const header = (kind: string, title: string, subtitle: string) =>
     '<header class="wmh-level-header"><div><span class="wmh-level-tag">' + kind + '</span><h3>' + title + '</h3><p>' + subtitle + '</p></div><button type="button" class="wmh-close" data-wmh-action="close" aria-label="Close map">×</button></header>';
   if (level === "world") return header("WORLD MAP", "Merzkava Universe", "THREE GREAT POWERS · SEAS · UNCHARTED LANDS") +
     '<div class="wmh-world-map"><img src="/world/Untitled77_20261029054536.png" alt="Canonical Merzkava world and regions map" />' +
-    '<button class="wmh-power wmh-power-gde" data-wmh-region="golden-dragon-empire"><b>01</b><span>Golden Dragon Empire</span></button>' +
-    '<button class="wmh-power wmh-power-ty" data-wmh-region="tianhai-yunzhou"><b>02</b><span>Tianhai Yunzhou</span></button>' +
-    '<button class="wmh-power wmh-power-bg" data-wmh-region="beiming-gu"><b>03</b><span>Beiming Gu</span></button></div>' +
-    '<div class="wmh-bottom-actions"><button data-wmh-action="home">⌂ &nbsp; OPEN HOME MAP</button><span>SELECT A POWER TO EXPLORE ITS TERRITORY</span></div>';
+    readWorldMarkers().map(marker => worldMapMarkerMarkup(marker)).join("") + '</div>' +
+    '<div class="wmh-bottom-actions"><button data-wmh-action="home">⌂ &nbsp; OPEN HOME MAP</button><button data-wmh-action="editor-open">⊞ &nbsp; MAP EDITOR</button><span>SELECT A POWER TO EXPLORE ITS TERRITORY</span></div>';
+  if (level === "map-editor") return header("WORLD MAP TOOLS", "Map Editor", "FLAT WORLD MAP · NORMALIZED COORDINATES") + mapEditorMarkup();
   if (level === "regional") return header("REGIONAL MAP", region.name, region.subtitle) +
     '<div class="wmh-region-scene"><img src="' + region.image + '" alt="" /><div class="wmh-scene-shade"></div><span class="wmh-map-stamp">REGIONAL TERRITORY</span></div>' +
     '<div class="wmh-site-grid">' + region.sites.map((site, i) =>
@@ -65,6 +169,9 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
   const regionId = (overlay.dataset.region as RegionId) || "golden-dragon-empire";
   const building = overlay.dataset.building || "Tianhai Academy";
   if (action.dataset.wmhAction === "open") { overlay.hidden = false; overlay.dataset.level = "world"; dialog.innerHTML = panelMarkup("world"); return true; }
+  if (action.dataset.wmhAction === "editor-open") { overlay.dataset.level = "map-editor"; dialog.innerHTML = panelMarkup("map-editor"); bindWorldMapEditor(dialog); return true; }
+  if (action.dataset.wmhAction === "editor-close") { overlay.dataset.level = "world"; dialog.innerHTML = panelMarkup("world"); return true; }
+  if (action.dataset.wmhAction === "editor-save" || action.dataset.wmhAction === "editor-reset") return true;
   if (action.dataset.wmhAction === "close") { overlay.hidden = true; return true; }
   if (action.dataset.wmhAction === "back") {
     const next: Level = current === "interior" ? "local" : current === "local" ? "regional" : "world";
