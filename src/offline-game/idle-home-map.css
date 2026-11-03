@@ -68,3 +68,5 @@
 .idle-calendar-icons span{display:grid;place-items:center;width:13px;height:13px;border:1px solid #b99a66;background:#25251f;color:#d9bd88;font:8px Georgia,serif}
 .idle-map-compass{left:10px;right:auto;top:10px}
 @media(max-width:360px){.idle-calendar-hud{width:min(174px,57%);right:6px;top:6px;padding:7px 7px 6px}.idle-calendar-time>strong{font-size:15px}.idle-calendar-day strong{font-size:16px}.idle-calendar-icons{right:5px}}
+
+/* Calendar HUD scaffold is intentionally placeholder-only for the first visual review. */
