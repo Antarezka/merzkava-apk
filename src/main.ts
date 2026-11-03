@@ -1013,7 +1013,12 @@ function finishArcanistDial(event:PointerEvent,cancelled=false):void{
    notice=active.sceneId==="gde-academy"?"Arrived at the Academy.":"Arrived at the Imperial Capital.";
    render();
   };
-  window.setTimeout(finishTravel,reducedMotion?0:880);
+  const beginSceneLoading=()=>{
+   const loading=root.querySelector<HTMLElement>("[data-arcanist-loading]");
+   if(loading)loading.hidden=false;
+   window.setTimeout(finishTravel,reducedMotion?0:560);
+  };
+  window.setTimeout(beginSceneLoading,reducedMotion?0:880);
  }else{
   if(aligned&&!active.sceneId){const status=root.querySelector<HTMLElement>("[data-arcanist-route-status]");if(status)status.textContent="ROUTE NOT CONNECTED";}
   if(Math.abs(active.turned)>3)playNavigationTick();
