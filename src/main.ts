@@ -651,6 +651,9 @@ root.addEventListener("pointerup", event => {
     blindDragStartY = null;
   }
   pointerStart = null;
+  // Some WebViews do not emit click after a drag/scroll gesture. Release the
+  // suppression guard after this pointer sequence so the next tap is independent.
+  if (suppressNextPointerClick) window.setTimeout(() => { suppressNextPointerClick = false; }, 0);
 }, { passive: true });
 
 root.addEventListener("pointercancel", () => {
