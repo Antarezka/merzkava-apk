@@ -1,6 +1,6 @@
 import { animate } from "animejs";
 
-export const ARCANISTRY_LEVER_PULL_DISTANCE = 43;
+export const ARCANISTRY_LEVER_PULL_DISTANCE = 28;
 export const ARCANISTRY_TICKET_TEAR_DISTANCE = 62;
 export const ARCANISTRY_MIN_LOADING_MS = 3000;
 
@@ -291,12 +291,11 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
 
   const onPointerMove = (event: PointerEvent): void => {
     if (activeLever && activeLever.pointerId === event.pointerId) {
-      const distance = Math.max(0, Math.min(58, event.clientY - activeLever.startY));
+      const distance = Math.max(0, Math.min(56, event.clientY - activeLever.startY));
       activeLever.distance = distance;
-      const progress = distance / 58;
-      const curvedAngle = Math.pow(progress, .82) * 66;
+      const progress = distance / 56;
+      const curvedAngle = Math.pow(progress, .9) * -55;
       activeLever.element.style.setProperty("--lever-angle", curvedAngle.toFixed(1) + "deg");
-      activeLever.element.style.setProperty("--lever-pull", (Math.sin(progress * Math.PI / 2) * 3.5).toFixed(1) + "px");
       activeLever.element.classList.toggle("is-pulling", distance > 2);
       event.preventDefault();
       return;
