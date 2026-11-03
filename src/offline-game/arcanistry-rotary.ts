@@ -30,6 +30,11 @@ export function rotaryActivationProgress(angle:number,target=ARCANISTRY_ACTIVATI
 export function isRotaryAligned(angle:number,target=ARCANISTRY_ACTIVATION_ANGLE,tolerance=ARCANISTRY_ACTIVATION_TOLERANCE):boolean {
   return rotaryAngularDistance(angle,target)<=tolerance;
 }
+
+/** A route can commit only on a real release, never on alignment alone or cancellation. */
+export function canCommitRotaryActivation(angle:number,options:{released:boolean;cancelled?:boolean;hasDestination:boolean}):boolean {
+  return options.released&&!options.cancelled&&options.hasDestination&&isRotaryAligned(angle);
+}
 /** Resulting aperture angle after the pointer moves around the rotor center. */
 export function rotaryDragAngle(startApertureAngle:number,pointerStartAngle:number,pointerCurrentAngle:number):number {
   return startApertureAngle+rotaryPointerDelta(pointerStartAngle,pointerCurrentAngle);
