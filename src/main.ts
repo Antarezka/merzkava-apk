@@ -959,11 +959,14 @@ root.addEventListener("pointermove",event=>{
   const device=active.element.closest<HTMLElement>("[data-arcanist-device]");
   active.element.style.setProperty("--dial-angle",active.turned+"deg");
   active.element.style.setProperty("--gear-turn",(active.turned*2.4)+"deg");
+  active.element.style.setProperty("--gear-turn-reverse",(active.turned*-3.24)+"deg");
+  active.element.style.setProperty("--gear-turn-fast",(active.turned*4.32)+"deg");
   active.element.style.setProperty("--thread-dash-offset",(350*(1-progress))+"px");
   active.element.querySelectorAll<HTMLElement>(".arcanist-red-thread").forEach(thread=>thread.style.strokeDashoffset=(350*(1-progress))+"px");
   active.element.querySelectorAll<HTMLElement>(".arcanist-dial-aperture").forEach(aperture=>{
    const selected=aperture===active.selected;
-   const inset=selected?96:96-58*progress;
+   const radius=parseFloat(getComputedStyle(aperture).getPropertyValue("--hole-radius"))||96;
+   const inset=selected?radius:radius-58*progress;
    aperture.style.setProperty("--hole-inset",inset+"px");
    aperture.style.setProperty("--hole-scale",selected?"1":String(1-.72*progress));
    aperture.style.setProperty("--hole-opacity",selected?"1":String(1-.78*progress));
@@ -988,11 +991,14 @@ function finishArcanistDial(event:PointerEvent,cancelled=false):void{
  device?.classList.add(completed?"is-activating":"is-returning");
  active.element.style.setProperty("--dial-angle","0deg");
  active.element.style.setProperty("--gear-turn","0deg");
+ active.element.style.setProperty("--gear-turn-reverse","0deg");
+ active.element.style.setProperty("--gear-turn-fast","0deg");
  active.element.querySelectorAll<HTMLElement>(".arcanist-red-thread").forEach(thread=>thread.style.strokeDashoffset=completed?"0px":"350px");
  active.element.setAttribute("aria-label",completed?"Arcanistry route activated":"Arcanistry rotor returned to its resting position");
  active.element.querySelectorAll<HTMLElement>(".arcanist-dial-aperture").forEach(aperture=>{
   const close=completed&&aperture!==active.selected;
-  aperture.style.setProperty("--hole-inset",close?"28px":"96px");
+  const radius=parseFloat(getComputedStyle(aperture).getPropertyValue("--hole-radius"))||96;
+  aperture.style.setProperty("--hole-inset",close?Math.max(22,radius*.29)+"px":radius+"px");
   aperture.style.setProperty("--hole-scale",close?"0.18":"1");
   aperture.style.setProperty("--hole-opacity",close?"0.04":"1");
  });
