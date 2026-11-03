@@ -5,18 +5,18 @@ function reducedMotion(): boolean {
 }
 
 type SceneParticleKind = "rain" | "snow" | "petal" | "leaf";
+let lastSceneState: string | null = null;
 
-function mountSceneParticles(root: HTMLElement): () => void {
+function mountSceneParticles(root: HTMLElement): { nodes: HTMLElement[]; cleanup: () => void } {
   const host = root.querySelector<HTMLElement>(".expedition-weather-particles");
   const scene = root.querySelector<HTMLElement>(".expedition-environment");
-  if (!host || !scene || reducedMotion()) return () => {};
+  if (!host || !scene) return { nodes: [], cleanup: () => {} };
 
   const weather = scene.dataset.weather;
   const cycle = scene.dataset.cycle;
   const kind: SceneParticleKind | "" = weather === "Rain" ? "rain" : weather === "Snow" ? "snow" : cycle === "Dawn" ? "petal" : cycle === "Dusk" ? "leaf" : "";
-  if (!kind) return () => {};
+  if (!kind) return { nodes: [], cleanup: () => host.replaceChildren() };
 
-  // Lightweight DOM particles animated directly by Anime.js; no canvas or GPU renderer.
   const count = kind === "rain" ? 17 : kind === "snow" ? 14 : 11;
   const nodes: HTMLElement[] = [];
   for (let i = 0; i < count; i++) {
@@ -28,121 +28,94 @@ function mountSceneParticles(root: HTMLElement): () => void {
     host.appendChild(particle);
     nodes.push(particle);
   }
-
-  const particleAnimation = kind === "rain"
-    ? animate(nodes, { translateY: ["-24px", "360px"], translateX: (_, i) => ((((i ?? 0) % 5) - 2) * 13) + "px", opacity: [0, .72, 0], duration: 1050, ease: "linear", delay: stagger(34), loop: true })
-    : kind === "snow"
-      ? animate(nodes, { translateY: ["-18px", "360px"], translateX: (_, i) => ((((i ?? 0) % 7) - 3) * 12) + "px", scale: [.7, 1.15], opacity: [0, .82, .12], duration: 7200, ease: "inOutSine", delay: stagger(180), loop: true })
-      : animate(nodes, { translateY: ["-12px", "360px"], translateX: (_, i) => ((((i ?? 0) % 7) - 3) * 23) + "px", rotate: [-35, 110], scale: [.65, 1], opacity: [0, .82, 0], duration: cycle === "Dawn" ? 9200 : 11800, ease: "inOutSine", delay: stagger(260), loop: true });
-
-  const onVisibilityChange = () => {
-    if (document.hidden) particleAnimation.pause();
-    else particleAnimation.play();
-  };
-  document.addEventListener("visibilitychange", onVisibilityChange);
-
-  return () => {
-    document.removeEventListener("visibilitychange", onVisibilityChange);
-    particleAnimation.pause();
-    host.replaceChildren();
-  };
+  return { nodes, cleanup: () => host.replaceChildren() };
 }
-/** Anime.js owns Eternal Path presentation motion; game state never depends on animation callbacks. */
+
+/** Plays one finite scene beat. No Eternal Path scene effect runs continuously. */
+function playSceneBeat(root: HTMLElement, particles: HTMLElement[], onAnimation: (control: { pause?: () => void }) => void): void {
+  if (reducedMotion()) return;
+  const scene = root.querySelector<HTMLElement>(".expedition-environment");
+  if (!scene) return;
+
+  const run = (target: Element | Element[] | NodeListOf<Element> | null, params: Record<string, unknown>) => {
+    if (target && (Array.isArray(target) ? target.length > 0 : true)) onAnimation(animate(target as never, params as never));
+  };
+  const cycle = scene.dataset.cycle ?? "Day";
+  const weather = scene.dataset.weather ?? "Clear";
+  run(root.querySelector(".expedition-scene-image"), { scale: [1.025, 1.055], translateX: ["-.35%", ".35%"], duration: 1150, ease: "inOutSine" });
+  run(root.querySelector(".expedition-cloud-motion"), { translateX: ["-2%", "2%"], translateY: ["-.3%", ".5%"], opacity: [.22, .48], duration: 1450, ease: "inOutSine" });
+  run(root.querySelector(".expedition-light-layer"), { opacity: [.72, 1], duration: 900, ease: "inOutSine" });
+  run(root.querySelector(".expedition-weather-layer"), { opacity: [.06, weather === "Rain" || weather === "Snow" ? .32 : weather === "Fog" || weather === "Cloudy" ? .18 : .1], duration: 1100, ease: "inOutSine" });
+  run(root.querySelector(".expedition-fog-motion"), { translateX: ["-2%", "2%"], translateY: ["-.5%", ".8%"], opacity: [.58, .88], duration: 1650, ease: "inOutSine" });
+
+  const sun = cycle !== "Night";
+  run(root.querySelector(sun ? ".expedition-sun-glow" : ".expedition-moon-glow"), { opacity: sun ? [.58, .9] : [.42, .78], scale: sun ? [.98, 1.035] : [.99, 1.025], duration: 1250, ease: "inOutSine" });
+  run(root.querySelector(sun ? ".expedition-sun-glow-image" : ".expedition-moon-glow-image"), { translateX: ["-.25%", ".25%"], scale: [1, 1.025], opacity: [.65, .95], duration: 1450, ease: "inOutSine" });
+  if (["Dawn", "Morning", "Day"].includes(cycle)) {
+    run(root.querySelector(".expedition-light-rays"), { rotate: ["-2deg", "3deg"], opacity: [.16, .34], duration: 1500, ease: "inOutSine" });
+    run(root.querySelector(".expedition-light-rays-image"), { translateX: ["1%", "-1%"], opacity: [.5, .82], duration: 1500, ease: "inOutSine" });
+  }
+
+  if (weather === "Rain") {
+    run(root.querySelector(".expedition-rain-streak-image"), { translateY: ["-2%", "4%"], translateX: ["1%", "-1%"], opacity: [.45, .8], duration: 1050, ease: "linear" });
+    if (particles.length) run(particles, { translateY: ["-24px", "360px"], translateX: (_: unknown, i: number) => ((((i ?? 0) % 5) - 2) * 13) + "px", opacity: [0, .72, 0], duration: 1050, delay: stagger(24), ease: "linear" });
+    const flash = root.querySelector<HTMLElement>(".expedition-lightning-layer");
+    const flashImage = root.querySelector<HTMLImageElement>(".expedition-lightning-flash-image");
+    if (flash && flashImage) {
+      const variants = ["/game/scenery/shared/fx-08-lightning-flash-a.png", "/game/scenery/shared/fx-08-lightning-flash-b.png", "/game/scenery/shared/fx-08-lightning-flash-c.png"];
+      const variant = Math.floor(Date.now() / 1000) % variants.length;
+      flashImage.src = variants[variant];
+      run(flash, { keyframes: [{ opacity: 0, duration: 160 }, { opacity: .72, duration: 70 }, { opacity: .12, duration: 145 }, { opacity: .5, duration: 55 }, { opacity: 0, duration: 520 }], ease: "linear" });
+    }
+  } else if (weather === "Snow") {
+    run(root.querySelector(".expedition-snow-texture"), { translateY: ["-1%", "3%"], translateX: ["-.5%", ".8%"], opacity: [.42, .76], duration: 1600, ease: "inOutSine" });
+    run(root.querySelector(".expedition-window-frost-image"), { opacity: [.5, .76], scale: [1.01, 1.035], duration: 1350, ease: "inOutSine" });
+    if (particles.length) run(particles, { translateY: ["-18px", "360px"], translateX: (_: unknown, i: number) => ((((i ?? 0) % 7) - 3) * 12) + "px", scale: [.7, 1.1], opacity: [0, .82, .12], duration: 1700, delay: stagger(70), ease: "inOutSine" });
+  } else if (cycle === "Dawn" || cycle === "Dusk") {
+    const leaf = cycle === "Dusk";
+    run(root.querySelector(leaf ? ".expedition-leaf-texture" : ".expedition-petal-texture"), { translateY: ["-1%", "4%"], translateX: [leaf ? "1%" : "-1%", leaf ? "-1%" : "1%"], rotate: [leaf ? "1deg" : "-1deg", leaf ? "-2deg" : "2deg"], opacity: [.3, .68], duration: 1650, ease: "inOutSine" });
+    if (particles.length) run(particles, { translateY: ["-12px", "360px"], translateX: (_: unknown, i: number) => ((((i ?? 0) % 7) - 3) * 23) + "px", rotate: [-35, 110], scale: [.65, 1], opacity: [0, .82, 0], duration: 1750, delay: stagger(85), ease: "inOutSine" });
+  }
+}
+
+ /** Anime.js owns Eternal Path presentation motion; game state never depends on animation callbacks. */
 export function mountExpeditionAnimations(root: HTMLElement): () => void {
   const listeners: Array<() => void> = [];
+  const activeSceneAnimations: Array<{ pause?: () => void }> = [];
+  const scene = root.querySelector<HTMLElement>(".expedition-environment");
+  const particleMount = mountSceneParticles(root);
+  let disposed = false;
+  const playScene = () => {
+    if (disposed || reducedMotion() || !scene) return;
+    activeSceneAnimations.splice(0).forEach(animation => animation.pause?.());
+    playSceneBeat(root, particleMount.nodes, animation => activeSceneAnimations.push(animation));
+  };
+  if (scene) {
+    scene.setAttribute("role", "button");
+    scene.setAttribute("tabindex", "0");
+    scene.setAttribute("aria-label", "Play one scene animation");
+    const onClick = () => playScene();
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Enter" || event.key === " ") { event.preventDefault(); playScene(); }
+    };
+    scene.addEventListener("click", onClick);
+    scene.addEventListener("keydown", onKeyDown);
+    listeners.push(() => { scene.removeEventListener("click", onClick); scene.removeEventListener("keydown", onKeyDown); });
+    const state = scene.dataset.animationState ?? [scene.dataset.location, scene.dataset.cycle, scene.dataset.weather].join(":");
+    if (lastSceneState !== null && lastSceneState !== state) playScene();
+    lastSceneState = state;
+  }
+
   const scope = createScope({ root, mediaQueries: { reduceMotion: "(prefers-reduced-motion: reduce)" } }).add(self => {
     if (!self || self.matches.reduceMotion) return;
-
-    const entranceTargets = root.querySelectorAll<HTMLElement>(
-      ".expedition-heading, .expedition-environment, .expedition-character-panel, .expedition-disposition-line, .expedition-dialogue, .expedition-footer",
-    );
-    if (entranceTargets.length) animate(entranceTargets, {
-      opacity: [0, 1], translateY: [13, 0], duration: 560, delay: stagger(72), ease: "outCubic",
-    });
-
-    const sceneImage = root.querySelector<HTMLElement>(".expedition-scene-image");
-    if (sceneImage) animate(sceneImage, {
-      scale: [1.025, 1.075], translateX: ["-.45%", ".45%"], duration: 32000,
-      ease: "inOutSine", loop: true, alternate: true,
-    });
-    listeners.push(mountSceneParticles(root));
-
-    // Uploaded image plates: each layer has its own motion profile and remains inside Scene Window.
-    const sunImage = root.querySelector<HTMLElement>(".expedition-sun-glow-image");
-    if (sunImage && root.querySelector<HTMLElement>(".expedition-environment")?.dataset.cycle!=="Night") animate(sunImage,{translateX:["-.35%",".35%"],scale:[1,1.035],opacity:[.72,1],duration:15000,ease:"inOutSine",loop:true,alternate:true});
-    const moonImage = root.querySelector<HTMLElement>(".expedition-moon-glow-image");
-    if (moonImage && root.querySelector<HTMLElement>(".expedition-environment")?.dataset.cycle==="Night") animate(moonImage,{translateX:[".25%","-.25%"],scale:[1,1.025],opacity:[.58,.9],duration:19000,ease:"inOutSine",loop:true,alternate:true});
-    const rayImage = root.querySelector<HTMLElement>(".expedition-light-rays-image");
-    if (rayImage && ["Dawn","Morning","Day"].includes(root.querySelector<HTMLElement>(".expedition-environment")?.dataset.cycle??"")) animate(rayImage,{translateX:["1.2%","-1.2%"],translateY:["-.4%",".5%"],opacity:[.55,.88],duration:28000,ease:"inOutSine",loop:true,alternate:true});
-    const rainTexture = root.querySelector<HTMLElement>(".expedition-rain-streak-image");
-    if (rainTexture && root.querySelector<HTMLElement>(".expedition-environment")?.dataset.weather==="Rain") {
-      animate(rainTexture,{translateY:["-3%","5%"],translateX:["1%","-1%"],opacity:[.5,.82],duration:2600,ease:"linear",loop:true,alternate:true});
-    }
-    const snowTexture = root.querySelector<HTMLElement>(".expedition-snow-texture");
-    if (snowTexture && root.querySelector<HTMLElement>(".expedition-environment")?.dataset.weather==="Snow") {
-      animate(snowTexture,{translateY:["-2%","4%"],translateX:["-.8%","1.1%"],opacity:[.46,.78],duration:11500,ease:"inOutSine",loop:true,alternate:true});
-    }
-    const petalTexture = root.querySelector<HTMLElement>(".expedition-petal-texture");
-    if (petalTexture && root.querySelector<HTMLElement>(".expedition-environment")?.dataset.cycle==="Dawn") {
-      animate(petalTexture,{translateY:["-2%","5%"],translateX:["-1.5%","2%"],rotate:["-1.5deg","2deg"],opacity:[.35,.68],duration:18000,ease:"inOutSine",loop:true,alternate:true});
-    }
-    const leafTexture = root.querySelector<HTMLElement>(".expedition-leaf-texture");
-    if (leafTexture && root.querySelector<HTMLElement>(".expedition-environment")?.dataset.cycle==="Dusk") {
-      animate(leafTexture,{translateY:["-2%","5%"],translateX:["2%","-2%"],rotate:["1.5deg","-2deg"],opacity:[.34,.7],duration:21000,ease:"inOutSine",loop:true,alternate:true});
-    }
-    const frost = root.querySelector<HTMLElement>(".expedition-window-frost-image");
-    if (frost && root.querySelector<HTMLElement>(".expedition-environment")?.dataset.weather==="Snow") {
-      animate(frost,{opacity:[.52,.76],scale:[1.015,1.045],duration:12500,ease:"inOutSine",loop:true,alternate:true});
-    }
-    const sun = root.querySelector<HTMLElement>(".expedition-sun-glow");
-    if (sun && root.querySelector<HTMLElement>(".expedition-environment")?.dataset.cycle!=="Night") animate(sun,{opacity:[.58,.9],scale:[.98,1.045],duration:9200,ease:"inOutSine",loop:true,alternate:true});
-    const moon = root.querySelector<HTMLElement>(".expedition-moon-glow");
-    if (moon && root.querySelector<HTMLElement>(".expedition-environment")?.dataset.cycle==="Night") animate(moon,{opacity:[.42,.78],scale:[.99,1.035],duration:11800,ease:"inOutSine",loop:true,alternate:true});
-    const rays = root.querySelector<HTMLElement>(".expedition-light-rays");
-    if (rays && ["Dawn","Morning","Day"].includes(root.querySelector<HTMLElement>(".expedition-environment")?.dataset.cycle??"")) animate(rays,{rotate:["-4deg","5deg"],opacity:[.16,.34],duration:26000,ease:"inOutSine",loop:true,alternate:true});
-    const lightning = root.querySelector<HTMLElement>(".expedition-lightning-layer");
-    const lightningImage = root.querySelector<HTMLImageElement>(".expedition-lightning-flash-image");
-    if (lightning && lightningImage && root.querySelector<HTMLElement>(".expedition-environment")?.dataset.weather==="Rain") {
-      const variants = [
-        "/game/scenery/shared/fx-08-lightning-flash-a.png",
-        "/game/scenery/shared/fx-08-lightning-flash-b.png",
-        "/game/scenery/shared/fx-08-lightning-flash-c.png",
-      ];
-      let variant = 0;
-      animate(lightning,{keyframes:[{opacity:0,duration:13800},{opacity:.72,duration:70},{opacity:.12,duration:145},{opacity:.52,duration:55},{opacity:0,duration:1250}],loop:true,ease:"linear",onLoop:()=>{variant=(variant+1)%variants.length;lightningImage.src=variants[variant];}});
-    }
-    const light = root.querySelector<HTMLElement>(".expedition-light-layer");
-    if (light) animate(light, { opacity: [.72, 1], duration: 8200, ease: "inOutSine", loop: true, alternate: true });
-    const weather = root.querySelector<HTMLElement>(".expedition-weather-layer");
-    if (weather) {
-      const kind = root.querySelector<HTMLElement>(".expedition-environment")?.dataset.weather;
-      const visible = kind === "Rain" || kind === "Snow" ? .32 : kind === "Fog" || kind === "Cloudy" ? .18 : .06;
-      animate(weather, { opacity: [visible * .65, visible], duration: 6400, ease: "inOutSine", loop: true, alternate: true });
-    }
-    const fog = root.querySelector<HTMLElement>(".expedition-fog-motion");
-    if (fog) animate(fog, {
-      translateX: ["-3.5%", "3.5%"], translateY: ["-1.2%", "1.5%"], scale: [1.02, 1.09],
-      opacity: [.58, .92], duration: 30000, ease: "inOutSine", loop: true, alternate: true,
-    });
-    const cloud = root.querySelector<HTMLElement>(".expedition-cloud-motion");
-    if (cloud) animate(cloud, {
-      translateX: ["-3%", "3%"], translateY:["-.5%","1%"], opacity: [.22, .52], duration: 42000,
-      ease: "inOutSine", loop: true, alternate: true,
-    });
-
+    const entranceTargets = root.querySelectorAll<HTMLElement>(".expedition-heading, .expedition-environment, .expedition-character-panel, .expedition-disposition-line, .expedition-dialogue, .expedition-footer");
+    if (entranceTargets.length) animate(entranceTargets, { opacity: [0, 1], translateY: [13, 0], duration: 560, delay: stagger(72), ease: "outCubic" });
     const profileFields = root.querySelectorAll<HTMLElement>(".expedition-profile-meta span");
-    if (profileFields.length) animate(profileFields, {
-      opacity: [0, 1], translateY: [5, 0], duration: 340, delay: stagger(38), ease: "outQuad",
-    });
+    if (profileFields.length) animate(profileFields, { opacity: [0, 1], translateY: [5, 0], duration: 340, delay: stagger(38), ease: "outQuad" });
     const disposition = root.querySelector<HTMLElement>(".expedition-disposition");
-    if (disposition) animate(disposition, {
-      opacity: [.65, 1], scale: [.97, 1], duration: 900, ease: "outCubic",
-    });
+    if (disposition) animate(disposition, { opacity: [.65, 1], scale: [.97, 1], duration: 900, ease: "outCubic" });
     const narrative = root.querySelectorAll<HTMLElement>(".expedition-narrative-layer");
-    if (narrative.length) animate(narrative, {
-      opacity: [0, 1], translateY: [9, 0], duration: 520, delay: stagger(115), ease: "outCubic",
-    });
-
+    if (narrative.length) animate(narrative, { opacity: [0, 1], translateY: [9, 0], duration: 520, delay: stagger(115), ease: "outCubic" });
     root.querySelectorAll<HTMLElement>("button").forEach(button => {
       const enter = () => animate(button, { scale: [1, 1.018], duration: 170, ease: "outQuad" });
       const leave = () => animate(button, { scale: [1.018, 1], duration: 210, ease: "outQuad" });
@@ -151,7 +124,13 @@ export function mountExpeditionAnimations(root: HTMLElement): () => void {
       listeners.push(() => { button.removeEventListener("pointerenter", enter); button.removeEventListener("pointerleave", leave); });
     });
   });
-  return () => { listeners.forEach(dispose => dispose()); scope.revert(); };
+  return () => {
+    disposed = true;
+    listeners.forEach(dispose => dispose());
+    activeSceneAnimations.splice(0).forEach(animation => animation.pause?.());
+    particleMount.cleanup();
+    scope.revert();
+  };
 }
 
 /** Animated modal transitions remain presentation-only and never delay state validation. */
@@ -173,14 +152,11 @@ export function animateExpeditionChoiceModal(modal: HTMLElement, open: boolean, 
   if (modal.dataset.closing === "true") return;
   modal.dataset.closing = "true";
   if (backdrop) animate(backdrop, { opacity: [1, 0], duration: 190, ease: "inQuad" });
-  if (sheet) animate(sheet, {
-    opacity: [1, 0], translateY: [0, 24], duration: 220, ease: "inCubic",
-    onComplete: () => { modal.hidden = true; delete modal.dataset.closing; onComplete?.(); },
-  });
+  if (sheet) animate(sheet, { opacity: [1, 0], translateY: [0, 24], duration: 220, ease: "inCubic", onComplete: () => { modal.hidden = true; delete modal.dataset.closing; onComplete?.(); } });
   else { modal.hidden = true; delete modal.dataset.closing; onComplete?.(); }
 }
 
-export function animateExpeditionPanel(panel:HTMLElement):void {
-  if(reducedMotion()) return;
-  animate(panel,{opacity:[0,1],translateY:[9,0],duration:300,ease:"outCubic"});
+export function animateExpeditionPanel(panel: HTMLElement): void {
+  if (reducedMotion()) return;
+  animate(panel, { opacity: [0, 1], translateY: [9, 0], duration: 300, ease: "outCubic" });
 }
