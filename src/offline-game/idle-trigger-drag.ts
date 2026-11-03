@@ -1,71 +1,78 @@
-let savedPosition: { x:number; y:number } | null = null;
-let drag: { pointerId:number; startX:number; startY:number; originX:number; originY:number; moved:boolean; button:HTMLButtonElement; page:HTMLElement } | null = null;
-let installed = false;
-let suppressNextClick = false;
+type IdleDragState = {
+  pointerId:number; startX:number; startY:number; originX:number; originY:number;
+  moved:boolean; button:HTMLButtonElement;
+};
+let savedPosition:{x:number;y:number}|null=null;
+let drag:IdleDragState|null=null;
+let installed=false;
+let suppressNextClick=false;
 
-function clampPosition(x:number,y:number,button:HTMLElement,page:HTMLElement):{x:number;y:number} {
-  const rect=page.getBoundingClientRect();
-  const width=button.offsetWidth||46, height=button.offsetHeight||46;
-  const left=Math.max(0,rect.left), top=Math.max(0,rect.top);
-  const right=Math.min(window.innerWidth,rect.right), bottom=Math.min(window.innerHeight,rect.bottom);
+function clampPosition(x:number,y:number,button:HTMLElement):{x:number;y:number}{
+  const margin=6,width=button.offsetWidth||46,height=button.offsetHeight||46;
   return {
-    x:Math.max(left,Math.min(x,Math.max(left,right-width))),
-    y:Math.max(top,Math.min(y,Math.max(top,bottom-height)))
+    x:Math.max(margin,Math.min(x,window.innerWidth-width-margin)),
+    y:Math.max(margin,Math.min(y,window.innerHeight-height-margin))
   };
 }
-
-function applyPosition(button:HTMLButtonElement,page:HTMLElement):void {
-  if(!savedPosition) return;
-  const p=clampPosition(savedPosition.x,savedPosition.y,button,page);
+function applyPosition(button:HTMLButtonElement):void{
+  if(!savedPosition)return;
+  const p=clampPosition(savedPosition.x,savedPosition.y,button);
   savedPosition=p;
+  button.style.position="fixed";
   button.style.left=p.x+"px";
   button.style.top=p.y+"px";
   button.style.right="auto";
   button.style.bottom="auto";
 }
-
-export function initializeIdleTriggerDrag():void {
-  if(!installed) {
+export function initializeIdleTriggerDrag():void{
+  if(!installed){
     installed=true;
     document.addEventListener("pointerdown",event=>{
       const target=event.target as Element|null;
       const button=target?.closest<HTMLButtonElement>(".expedition-idle-trigger");
-      const page=button?.closest<HTMLElement>(".expedition-page");
-      if(!button||!page||event.button!==0) return;
+      if(!button||!event.isPrimary||(event.pointerType==="mouse"&&event.button!==0))return;
       const rect=button.getBoundingClientRect();
-      drag={pointerId:event.pointerId,startX:event.clientX,startY:event.clientY,originX:rect.left,originY:rect.top,moved:false,button,page};
-    },{capture:true});
+      drag={pointerId:event.pointerId,startX:event.clientX,startY:event.clientY,originX:rect.left,originY:rect.top,moved:false,button};
+    },{capture:true,passive:true});
     document.addEventListener("pointermove",event=>{
-      if(!drag||event.pointerId!==drag.pointerId) return;
-      const dx=event.clientX-drag.startX,dy=event.clientY-drag.startY;
-      if(!drag.moved&&Math.hypot(dx,dy)<6) return;
-      drag.moved=true;
+      const active=drag;
+      if(!active||event.pointerId!==active.pointerId)return;
+      const dx=event.clientX-active.startX,dy=event.clientY-active.startY;
+      if(!active.moved&&Math.hypot(dx,dy)<5)return;
+      active.moved=true;
       event.preventDefault();
-      const p=clampPosition(drag.originX+dx,drag.originY+dy,drag.button,drag.page);
+      active.button.classList.add("is-dragging");
+      const p=clampPosition(active.originX+dx,active.originY+dy,active.button);
       savedPosition=p;
-      drag.button.style.left=p.x+"px";
-      drag.button.style.top=p.y+"px";
-      drag.button.style.right="auto";
-      drag.button.style.bottom="auto";
+      active.button.style.position="fixed";
+      active.button.style.left=p.x+"px";
+      active.button.style.top=p.y+"px";
+      active.button.style.right="auto";
+      active.button.style.bottom="auto";
     },{capture:true,passive:false});
     const finish=(event:PointerEvent)=>{
-      if(!drag||event.pointerId!==drag.pointerId) return;
-      if(drag.moved) suppressNextClick=true;
+      const active=drag;
+      if(!active||event.pointerId!==active.pointerId)return;
+      if(active.moved)suppressNextClick=true;
+      active.button.classList.remove("is-dragging");
       drag=null;
     };
     document.addEventListener("pointerup",finish,true);
     document.addEventListener("pointercancel",finish,true);
     document.addEventListener("click",event=>{
-      if(!suppressNextClick) return;
+      if(!suppressNextClick)return;
       const target=event.target as Element|null;
-      if(target?.closest(".expedition-idle-trigger")) {
+      if(target?.closest(".expedition-idle-trigger")){
         event.preventDefault();
         event.stopImmediatePropagation();
       }
       suppressNextClick=false;
     },true);
+    window.addEventListener("resize",()=>{
+      const button=document.querySelector<HTMLButtonElement>(".expedition-page .expedition-idle-trigger");
+      if(button)applyPosition(button);
+    },{passive:true});
   }
   const button=document.querySelector<HTMLButtonElement>(".expedition-page .expedition-idle-trigger");
-  const page=button?.closest<HTMLElement>(".expedition-page");
-  if(button&&page) applyPosition(button,page);
+  if(button)applyPosition(button);
 }
