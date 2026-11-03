@@ -39,7 +39,7 @@ const globalPlaces:Place[]=[
 ];
 function marker(p:Place,index:number,group:string):string {
  const positions=["left:12%;top:28%","left:43%;top:18%","left:72%;top:31%","left:20%;top:55%","left:55%;top:48%","left:78%;top:66%","left:37%;top:76%","left:63%;top:83%"];
- return '<button type="button" class="idle-map-marker" data-idle-place="'+p.id+'" data-idle-group="'+group+'" style="'+positions[index%positions.length]+'" aria-label="'+p.name+' · Coming Soon"><span>'+p.icon+'</span><small>'+p.name+'</small></button>';
+ return '<button type="button" class="idle-map-marker" data-idle-place="'+p.id+'" data-idle-group="'+group+'" data-idle-note="'+p.note+'" style="'+positions[index%positions.length]+'" aria-label="'+p.name+' · Coming Soon"><span>'+p.icon+'</span><small>'+p.name+'</small></button>';
 }
 export function renderIdleHomeMap():string {
  const regionViews=Object.entries(regions).map(([id,r],i)=>'<section class="idle-map-region '+(i===0?'is-active':'')+'" data-idle-map-region="'+id+'" data-terrain="'+r.terrain+'" '+(i===0?'':'hidden')+'><div class="idle-map-landmass"><div class="idle-map-ridge ridge-a"></div><div class="idle-map-ridge ridge-b"></div><div class="idle-map-river"></div><div class="idle-map-road road-a"></div><div class="idle-map-road road-b"></div><div class="idle-map-home"><span>⌂</span><small>HOME</small></div>'+r.places.map((p,n)=>marker(p,n,"regional")).join("")+'</div></section>').join("");
