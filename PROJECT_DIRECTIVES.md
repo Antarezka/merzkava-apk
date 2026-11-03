@@ -1,5 +1,7 @@
 # Project Directives
 
+> **Mandatory restriction register:** Read [Forbidden Technologies & Regression Safeguards](./docs/FORBIDDEN_TECHNOLOGIES.md) before adding dependencies, renderers, animation systems, or input/event layers. A listed technology must not be reintroduced without the owner's explicit approval after a verified solution is found.
+
 ## Master product roadmap
 
 - `docs/PRODUCT_ROADMAP.md` is the primary planning reference for product scope, workstreams, feature inventory, status tracking, and release gates.

@@ -1,5 +1,7 @@
 # Known Issues and Baseline Warnings
 
+- **Permanent technology restrictions:** Follow [Forbidden Technologies & Regression Safeguards](docs/FORBIDDEN_TECHNOLOGIES.md) before proposing or adding rendering, animation, or input dependencies.
+
 ## Android touch/click failure — resolved by removing PixiJS
 
 - **Incident record:** [docs/INCIDENT_PIXIJS_ANDROID_INPUT_FAILURE.md](docs/INCIDENT_PIXIJS_ANDROID_INPUT_FAILURE.md).
