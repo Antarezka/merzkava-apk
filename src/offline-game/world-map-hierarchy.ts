@@ -230,12 +230,16 @@ function bindWorldMapEditor(dialog: HTMLElement): void {
     zoom = action === "reset" ? 1 : action === "in" ? Math.min(2.5, zoom + .25) : Math.max(1, zoom - .25);
     applyZoom();
   }));
-  const updateMarkerCenter = (id: WorldMarkerId, centerX: number, centerY: number) => {
+  const updateMarkerCenter = (id: WorldMarkerId, centerX: number, centerY: number, lifted = false) => {
     const marker = markers.find(item => item.id === id);
     if (!marker) return;
     const bounds = mapBounds();
+    // While lifted, the CSS raises the marker by 46 screen pixels. Store the
+    // underlying anchor 46px lower so its VISIBLE center follows the retained
+    // finger offset instead of applying the lift a second time.
+    const layoutCenterY = centerY + (lifted ? 46 : 0);
     marker.x = clamp(((centerX - bounds.left) / bounds.width) * 100);
-    marker.y = clamp(((centerY - bounds.top) / bounds.height) * 100);
+    marker.y = clamp(((layoutCenterY - bounds.top) / bounds.height) * 100);
     marker.placementStatus = "owner-set";
     paint(marker); refreshExport();
     setStatus(marker.name + " · X " + marker.x + "% · Y " + marker.y + "% · pending confirmation");
@@ -265,14 +269,18 @@ function bindWorldMapEditor(dialog: HTMLElement): void {
   canvas.addEventListener("pointermove", event => {
     if (!dragging || event.pointerId !== dragging.pointerId) return;
     event.preventDefault();
-    updateMarkerCenter(dragging.id, event.clientX + dragging.offsetX, event.clientY + dragging.offsetY);
+    updateMarkerCenter(dragging.id, event.clientX + dragging.offsetX, event.clientY + dragging.offsetY, true);
   });
   const stop = (event: PointerEvent, commitFinalPoint: boolean) => {
     if (!dragging || event.pointerId !== dragging.pointerId) return;
     event.preventDefault();
-    if (commitFinalPoint) updateMarkerCenter(dragging.id, event.clientX + dragging.offsetX, event.clientY + dragging.offsetY);
     const active = dragging;
+    const finalCenterX = event.clientX + active.offsetX;
+    const finalCenterY = event.clientY + active.offsetY;
+    // Remove the visual lift BEFORE committing the final anchor. This makes
+    // the unlifted marker land exactly where its lifted visual center was.
     canvas.querySelector<HTMLElement>('[data-wmh-drag-marker="' + active.id + '"]')?.classList.remove("wmh-editor-marker-lifted");
+    if (commitFinalPoint) updateMarkerCenter(active.id, finalCenterX, finalCenterY, false);
     dragging = null;
     canvas.style.touchAction = originalTouchAction || "pan-x pan-y";
     // A marker drag must never cause the scroll viewport to jump to the release point.
