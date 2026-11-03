@@ -23,11 +23,13 @@ const regionData: Record<RegionId, { name: string; subtitle: string; image: stri
 
 type WorldMarkerId = "golden-dragon-empire" | "tianhai-yunzhou" | "beiming-gu";
 type WorldMarker = { id: WorldMarkerId; name: string; x: number; y: number };
-const WORLD_MAP_COORDINATES_KEY = "merzkava.world-map.coordinates.v1";
+// v2 establishes the user-supplied accuracy-test coordinates as the new baseline.
+// A fresh storage key prevents older locally saved marker positions from overriding this build.
+const WORLD_MAP_COORDINATES_KEY = "merzkava.world-map.coordinates.v2";
 const defaultWorldMarkers: WorldMarker[] = [
-  { id: "golden-dragon-empire", name: "Golden Dragon Empire", x: 3, y: 20 },
-  { id: "tianhai-yunzhou", name: "Tianhai Yunzhou", x: 98, y: 52 },
-  { id: "beiming-gu", name: "Beiming Gu", x: 3, y: 86 }
+  { id: "golden-dragon-empire", name: "Golden Dragon Empire", x: 78.6, y: 34 },
+  { id: "tianhai-yunzhou", name: "Tianhai Yunzhou", x: 19.4, y: 38.4 },
+  { id: "beiming-gu", name: "Beiming Gu", x: 45.2, y: 7.8 }
 ];
 function readWorldMarkers(): WorldMarker[] {
   try {
