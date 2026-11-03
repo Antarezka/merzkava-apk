@@ -2,7 +2,7 @@ import { Capacitor } from "@capacitor/core";
 import { CapacitorSQLite, SQLiteConnection, type SQLiteDBConnection } from "@capacitor-community/sqlite";
 
 const DATABASE_NAME = "merzkava";
-const SCHEMA_VERSION = 5;
+const SCHEMA_VERSION = 6;
 let database: SQLiteDBConnection | null = null;
 
 const schema = [
@@ -14,6 +14,10 @@ const schema = [
   `CREATE TABLE IF NOT EXISTS canon_documents (path TEXT PRIMARY KEY NOT NULL, commit_sha TEXT NOT NULL, content TEXT NOT NULL, fetched_at TEXT NOT NULL);`,
   `CREATE TABLE IF NOT EXISTS canon_documents_snapshot (path TEXT NOT NULL, commit_sha TEXT NOT NULL, content TEXT NOT NULL, fetched_at TEXT NOT NULL, PRIMARY KEY (path, commit_sha));`,
   `CREATE TABLE IF NOT EXISTS gameplay_sessions (character_id TEXT PRIMARY KEY NOT NULL, snapshot_sha TEXT NOT NULL, canon_version TEXT NOT NULL, profile_markdown TEXT NOT NULL DEFAULT '', state_json TEXT NOT NULL DEFAULT '{}', state_verified INTEGER NOT NULL DEFAULT 0 CHECK(state_verified IN (0,1)), updated_at TEXT NOT NULL);`
+  `CREATE INDEX IF NOT EXISTS idx_characters_created_at ON characters(created_at DESC);`,
+  `CREATE INDEX IF NOT EXISTS idx_inventory_items_character_id ON inventory_items(character_id);`,
+  `CREATE INDEX IF NOT EXISTS idx_wallet_ledger_character_id ON wallet_ledger(character_id);`,
+  `CREATE INDEX IF NOT EXISTS idx_gameplay_logs_character_id ON gameplay_logs(character_id);`
 ];
 
 export type DatabaseStatus = { mode: "sqlite" | "preview" | "error"; message: string };
