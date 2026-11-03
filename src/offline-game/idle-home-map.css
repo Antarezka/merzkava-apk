@@ -194,49 +194,65 @@
 .arcanist-route-loading strong{font:700 9px system-ui,sans-serif;letter-spacing:.2em;color:#e6c68d}
 .arcanist-route-loading span{font:11px Georgia,serif;color:#bdb29d}
 @keyframes arcanist-seal-turn{to{transform:rotate(360deg)}}
-/* Victorian Arcanistry ticket engine — replacement for the former rotary selector. */
+/* Victorian Arcanistry route engine — rebuilt as one responsive, working mechanism. */
 .arcanist-device-drawer{
- position:absolute;z-index:40;inset:0;width:100%;height:100%;max-height:100%;left:0;bottom:auto;
- overflow-x:hidden;overflow-y:auto;padding:9px;background:radial-gradient(ellipse at 48% 15%,#394239 0%,#171d19 58%,#090d0b 100%);
+ position:absolute;z-index:40;inset:0;display:flex;flex-direction:column;
+ width:100%;height:100%;min-width:0;max-width:100%;box-sizing:border-box;
+ overflow-x:hidden;overflow-y:auto;padding:8px;
+ background:radial-gradient(ellipse at 48% 12%,#394239 0%,#171d19 58%,#090d0b 100%);
  border:1px solid #c5a16a;box-shadow:inset 0 0 0 4px #0b100d,inset 0 0 0 5px #94764b,0 12px 32px #000c;
- scrollbar-color:#9b7b4d #111713;
+ scrollbar-color:#9b7b4d #111713;overscroll-behavior:contain;
 }
 .arcanist-device-drawer[hidden]{display:none!important}
-.arcanist-machine-shell{position:relative;display:flex;flex-direction:column;min-height:100%;padding:10px 10px 13px;overflow:visible;border:1px solid #a98a59;background:linear-gradient(145deg,#31382f 0%,#1a211b 35%,#111713 72%,#2b2b22 100%);box-shadow:inset 0 0 0 2px #0b100d,inset 0 0 0 3px #806642,inset 0 0 30px #000b;color:#efe3cc}
-.arcanist-machine-shell:before,.arcanist-machine-shell:after{content:"";position:absolute;z-index:0;pointer-events:none;inset:5px;border:1px solid #b99a6633}
-.arcanist-machine-shell:after{inset:10px;border:1px solid #d4b77b18}
-.arcanist-machine-heading{position:relative;z-index:2;display:grid;grid-template-columns:7px 30px minmax(0,1fr) 30px;align-items:center;gap:7px;min-width:0;padding:3px 2px 7px;border-bottom:1px solid #b99a6655}
+.arcanist-machine-shell{
+ position:relative;isolation:isolate;display:flex;flex:1 0 auto;flex-direction:column;gap:7px;
+ width:100%;min-width:0;min-height:100%;box-sizing:border-box;padding:10px 10px 9px;overflow:visible;
+ border:1px solid #a98a59;background:linear-gradient(145deg,#31382f 0%,#1a211b 35%,#111713 72%,#2b2b22 100%);
+ box-shadow:inset 0 0 0 2px #0b100d,inset 0 0 0 3px #806642,inset 0 0 30px #000b;color:#efe3cc;
+}
+.arcanist-machine-shell:before,.arcanist-machine-shell:after{content:"";position:absolute;z-index:-1;pointer-events:none;inset:5px;border:1px solid #b99a6633}
+.arcanist-machine-shell:after{inset:10px;border-color:#d4b77b18}
+.arcanist-machine-heading{
+ position:relative;z-index:2;display:grid;grid-template-columns:20px 30px minmax(0,1fr) 30px;
+ align-items:center;gap:7px;flex:0 0 auto;min-width:0;padding:3px 2px 8px;border-bottom:1px solid #b99a6655;
+}
+.arcanist-master-lamp{position:relative;display:grid;place-items:center;width:18px;height:18px;border:1px solid #9a7947;border-radius:50%;background:radial-gradient(circle,#4a3b24 0 38%,#171c16 44%);box-shadow:inset 0 0 0 2px #0c110d,0 0 4px #b98c4d55}
+.arcanist-master-lamp i{display:block;width:7px;height:9px;border:1px solid #e8c47c;border-radius:48%;background:radial-gradient(ellipse at 50% 70%,#ffe7a3 0 18%,#e8a948 35%,#9d5b22 70%,transparent 72%);box-shadow:0 0 5px 2px #e5b65c99,0 0 10px #d89a3d66;animation:arcanist-master-breathe 3.1s ease-in-out infinite}
 .arcanist-machine-crest{display:grid;place-items:center;width:29px;height:29px;border:1px solid #d1b477;border-radius:50%;background:radial-gradient(circle,#685536,#171c17 72%);box-shadow:inset 0 0 0 3px #111710,0 0 12px #d4b47733;color:#f3d99e;font:21px Georgia,serif}
-.arcanist-machine-title{display:grid;gap:3px;min-width:0;max-width:100%;overflow:hidden}
-.arcanist-machine-title strong{display:block;min-width:0;overflow-wrap:anywhere;font:clamp(10px,3.3vw,14px)/1.08 Georgia,serif;letter-spacing:.035em;color:#f4e8d1}
+.arcanist-machine-title{display:grid;gap:3px;min-width:0;overflow:hidden}
+.arcanist-machine-title strong{display:block;overflow-wrap:anywhere;font:clamp(10px,3.3vw,14px)/1.08 Georgia,serif;letter-spacing:.035em;color:#f4e8d1}
 .arcanist-machine-title small{font:600 7px/1.2 system-ui,sans-serif;letter-spacing:.18em;color:#c6a36d}
 .arcanist-machine-heading>button{width:30px;height:30px;border:1px solid #8f744b;background:#202820;color:#e8d2a7;font:21px Georgia,serif}
-.arcanist-machine-main{position:relative;z-index:2;display:grid;grid-template-columns:minmax(0,1fr) 108px;align-items:stretch;gap:7px;padding:8px 0 5px}
-.arcanist-destination-panel{min-width:0;min-height:0;border:1px solid #92784e;background:linear-gradient(120deg,#141a16ed,#222720ed);box-shadow:inset 0 0 0 2px #080d0a,inset 0 0 0 3px #6f5838}
-.arcanist-panel-title{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:7px 8px;border-bottom:1px solid #94784f66;background:linear-gradient(90deg,#4a3b27,#1d241e)}
+.arcanist-machine-main{position:relative;z-index:2;display:flex;flex:0 0 auto;flex-direction:column;gap:7px;min-width:0;padding:0}
+.arcanist-destination-panel{display:flex;flex:0 0 132px;flex-direction:column;min-width:0;min-height:0;overflow:hidden;border:1px solid #92784e;background:linear-gradient(120deg,#141a16ed,#222720ed);box-shadow:inset 0 0 0 2px #080d0a,inset 0 0 0 3px #6f5838}
+.arcanist-panel-title{display:flex;flex:0 0 auto;align-items:center;justify-content:space-between;gap:6px;padding:7px 8px;border-bottom:1px solid #94784f66;background:linear-gradient(90deg,#4a3b27,#1d241e)}
 .arcanist-panel-title span{font:700 7px system-ui,sans-serif;letter-spacing:.14em;color:#f0d7a4}
 .arcanist-panel-title small{font:600 5px system-ui,sans-serif;letter-spacing:.1em;color:#a99b80;text-align:right}
-.arcanist-destination-scroll{height:clamp(190px,30vh,270px);max-height:clamp(190px,30vh,270px);overflow:auto;padding:5px;scrollbar-width:thin;scrollbar-color:#9a7c50 #171d19;overscroll-behavior:contain}
-.arcanist-destination-group+.arcanist-destination-group{margin-top:8px;padding-top:6px;border-top:1px solid #92784e55}
-.arcanist-destination-group h4{display:flex;align-items:center;gap:5px;margin:0 0 5px;color:#d9c39d;font:600 8px Georgia,serif;letter-spacing:.06em}
-.arcanist-destination-group h4 span{color:#c9a46d;font:700 7px system-ui,sans-serif}
-.arcanist-destination-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
-.arcanist-destination-card{position:relative;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:36px auto;align-content:start;justify-items:center;gap:3px;min-width:0;min-height:59px;padding:3px 2px;overflow:hidden;text-align:left;border:1px solid #766347;background:linear-gradient(110deg,#293129,#171d18);color:#e9dec9;touch-action:manipulation}
-.arcanist-destination-card:before{content:"";position:absolute;inset:1px;border:1px solid var(--route-light,#6ebbd9);opacity:.62;pointer-events:none;animation:arcanist-lamp-breathe 2.7s ease-in-out infinite}
-.arcanist-destination-card[data-available="false"]{--route-light:#d98a48}
-.arcanist-destination-card[data-available="true"]{--route-light:#d98a48}
-.arcanist-destination-card.is-selected{border-color:#e0c58f;background:linear-gradient(110deg,#52452f,#262b22);box-shadow:inset 0 0 0 1px #e2c58c55,0 0 10px #d8b77b24}
-.arcanist-destination-art-frame{position:relative;display:block;width:100%;height:36px;overflow:hidden;border:1px solid #a58a5b;background:#303b32;box-shadow:inset 0 0 0 2px #111}
+.arcanist-destination-scroll{
+ display:flex;flex:1 1 auto;align-items:stretch;gap:6px;min-width:0;min-height:0;
+ overflow-x:auto;overflow-y:hidden;padding:8px;scrollbar-width:thin;scrollbar-color:#9a7c50 #171d19;
+ overscroll-behavior-x:contain;scroll-snap-type:x mandatory;touch-action:pan-x;
+}
+.arcanist-destination-card{
+ position:relative;display:grid;flex:0 0 calc((100% - 18px)/4);grid-template-rows:minmax(0,1fr) auto;
+ align-content:stretch;justify-items:stretch;gap:4px;min-width:0;max-width:110px;min-height:0;padding:4px;
+ overflow:hidden;scroll-snap-align:start;text-align:center;border:1px solid #766347;
+ background:linear-gradient(150deg,#293129,#171d18);color:#e9dec9;touch-action:pan-x;
+}
+.arcanist-destination-card:before{content:"";position:absolute;inset:1px;border:1px solid var(--route-light,#d98a48);opacity:.55;pointer-events:none;animation:arcanist-lamp-breathe 2.7s ease-in-out infinite}
+.arcanist-destination-card[data-available="false"],.arcanist-destination-card[data-available="true"]{--route-light:#d98a48}
+.arcanist-destination-card.is-selected{border-color:#f4dca8;background:linear-gradient(110deg,#52452f,#262b22);box-shadow:inset 0 0 0 1px #e2c58c55,0 0 10px #d8b77b44}
+.arcanist-destination-art-frame{position:relative;display:block;width:100%;height:100%;min-height:48px;overflow:hidden;border:1px solid #a58a5b;background:#303b32;box-shadow:inset 0 0 0 2px #111}
 .arcanist-destination-art-frame img,.arcanist-destination-art{display:block;width:100%;height:100%;object-fit:cover}
 .arcanist-destination-card.is-selected .arcanist-destination-art-frame{border-color:#ffe3a9;box-shadow:0 0 0 1px #e6c98a,0 0 12px #ffe1a0aa}
 .arcanist-destination-card.is-selected .arcanist-destination-art-frame img{filter:brightness(1.42) sepia(.22) saturate(1.12)}
 .arcanist-destination-card.is-selected .arcanist-destination-art-frame:after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at center,#fff1c966,#eacb8a22 62%,transparent 100%);mix-blend-mode:screen;pointer-events:none}
-.arcanist-destination-card-copy{display:grid;gap:2px;min-width:0;width:100%;text-align:center}
+.arcanist-destination-card-copy{display:grid;gap:3px;min-width:0;width:100%;text-align:center}
 .arcanist-destination-card-copy strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:9px/1.05 Georgia,serif;color:#f0e4cd}
-.arcanist-destination-card-copy small{font:600 4px/1.1 system-ui,sans-serif;letter-spacing:.04em;color:#d9ad70}
+.arcanist-destination-card-copy small{font:600 5px/1.1 system-ui,sans-serif;letter-spacing:.04em;color:#d9ad70}
 .arcanist-destination-card[data-available="false"] .arcanist-destination-card-copy small{color:#d89a61}
 .arcanist-destination-card.is-selected .arcanist-destination-card-copy strong{color:#fff0cc}
-.arcanist-status-lamp{position:absolute;right:3px;top:4px;width:3px;height:3px;border-radius:50%;background:var(--route-light);box-shadow:0 0 5px var(--route-light)}
+.arcanist-status-lamp{position:absolute;right:4px;top:4px;width:4px;height:4px;border-radius:50%;background:var(--route-light);box-shadow:0 0 5px var(--route-light)}
 @keyframes arcanist-lamp-breathe{0%,100%{opacity:.25;box-shadow:inset 0 0 3px var(--route-light),0 0 2px var(--route-light)}50%{opacity:.9;box-shadow:inset 0 0 6px var(--route-light),0 0 7px var(--route-light)}}
 .arcanist-destination-art{position:relative;display:grid;place-items:center;overflow:hidden;background:linear-gradient(145deg,#a78d63,#526e5e 55%,#1e342b)}
 .arcanist-destination-art:before,.arcanist-destination-art:after{content:"";position:absolute;left:-15%;width:130%;height:65%;border-radius:50% 50% 0 0;transform:rotate(-12deg)}
@@ -249,356 +265,131 @@
 .arcanist-destination-art.art-tianhai-yunzhou{background:linear-gradient(145deg,#b9d3d0,#829b9c 48%,#526d78)}
 .arcanist-destination-art.art-lawless{background:linear-gradient(145deg,#c5a06c,#685346 50%,#242421)}
 .arcanist-destination-art.art-1{filter:hue-rotate(12deg)}.arcanist-destination-art.art-2{filter:hue-rotate(-18deg)}.arcanist-destination-art.art-3{filter:saturate(.7)}
-.arcanist-lever-panel{position:relative;display:flex;flex-direction:column;align-items:center;align-self:stretch;min-width:0;min-height:0;padding:5px 3px;border:1px solid #94784f;background:linear-gradient(155deg,#34392f,#171d18 68%,#29271f);box-shadow:inset 0 0 0 2px #090e0b,inset 0 0 0 3px #796142}
-.arcanist-lever-label{align-self:stretch;padding-bottom:6px;border-bottom:1px solid #92784e55;text-align:center;font:700 6px system-ui,sans-serif;letter-spacing:.1em;color:#d6b77e}
-.arcanist-card-reader{position:relative;display:flex;flex-direction:column;align-items:center;width:100%;gap:3px;margin:5px 0 6px}
-.arcanist-card-reader-label{color:#bda477;font:700 5px system-ui,sans-serif;letter-spacing:.12em;text-align:center}
-.arcanist-card-slot{position:relative;display:flex;align-items:center;justify-content:center;width:84%;height:8px;border:1px solid #b8945c;border-radius:2px;background:linear-gradient(180deg,#050806,#1d211a 48%,#050806);box-shadow:inset 0 0 0 2px #090d0a,0 1px 4px #000b,0 0 4px #d2ad6b22}
-.arcanist-card-slot:before{content:"";position:absolute;left:12%;right:12%;top:2px;height:1px;background:#d4b57866;box-shadow:0 0 4px #d4b57855}
+.arcanist-lever-panel{
+ position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(104px,.82fr);grid-template-rows:18px minmax(0,1fr);
+ align-items:stretch;gap:4px 8px;flex:0 0 190px;min-width:0;min-height:0;padding:7px 9px;
+ border:1px solid #94784f;background:linear-gradient(155deg,#34392f,#171d18 68%,#29271f);
+ box-shadow:inset 0 0 0 2px #090e0b,inset 0 0 0 3px #796142;
+}
+.arcanist-lever-label{grid-column:1/-1;align-self:center;padding:0 0 4px;border-bottom:1px solid #92784e55;text-align:center;font:700 7px system-ui,sans-serif;letter-spacing:.13em;color:#d6b77e}
+.arcanist-quadrant-lamp{position:absolute;z-index:6;top:29px;left:calc(25% - 11px);display:grid;place-items:center;width:23px;height:25px;pointer-events:none}
+.arcanist-quadrant-bulb{position:relative;display:grid;place-items:center;width:21px;height:23px;border:1px solid #9b7948;border-radius:48% 48% 42% 42%;background:radial-gradient(ellipse at 50% 42%,#604a2b 0 31%,#211d15 54%,#0c110d 72%);box-shadow:inset 0 0 0 2px #0a0e0b,0 0 0 2px #4b3924,0 0 8px #c28a3d66}
+.arcanist-quadrant-bulb i{position:relative;width:7px;height:10px;border:1px solid #f0c879;border-radius:50% 50% 35% 35%;background:radial-gradient(ellipse at 50% 70%,#fff2b4 0 14%,#f4b957 35%,#a65d25 72%,transparent 76%);box-shadow:0 0 5px 2px #e7b65d99,0 0 12px #e6a44877;animation:arcanist-quadrant-breathe 3.1s ease-in-out infinite}
+.arcanist-quadrant-bulb:before{content:"";position:absolute;left:6px;right:6px;bottom:-5px;height:6px;border:1px solid #9b7948;border-top:0;background:repeating-linear-gradient(180deg,#80633d 0 1px,#1a1d17 1px 3px)}
+@keyframes arcanist-quadrant-breathe{0%,100%{opacity:.46;filter:brightness(.7);box-shadow:0 0 3px 1px #d9a64e55}50%{opacity:1;filter:brightness(1.25);box-shadow:0 0 8px 3px #ffcf78cc,0 0 15px #e5a84e88}}
+.arcanist-quadrant-control{position:relative;display:flex;grid-column:1;grid-row:2;flex-direction:column;align-items:center;justify-content:flex-start;gap:3px;min-width:0;min-height:0}
+.arcanist-quadrant-caption{color:#c9ab77;font:700 6px system-ui,sans-serif;letter-spacing:.1em}
+.arcanist-quadrant-plate{position:relative;display:block;width:min(100%,116px);height:128px;min-height:0;flex:1 1 auto;border:1px solid #aa8a58;border-radius:48% 48% 5px 5px;background:linear-gradient(145deg,#403522,#171c16 50%,#4a3b27);box-shadow:inset 0 0 0 2px #111710,inset 0 0 0 3px #9b7b4c,0 3px 7px #0009}
+.arcanist-quadrant-plate:before{content:"";position:absolute;left:14px;right:14px;top:9px;bottom:13px;border:1px solid #c5a16a88;border-bottom-color:transparent;border-radius:60% 60% 0 0}
+.arcanist-quadrant-mark{position:absolute;width:4px;height:4px;border-radius:50%;background:#e0c18a;box-shadow:0 0 3px #e0c18a}
+.arcanist-quadrant-mark.mark-a{left:15px;top:53px}.arcanist-quadrant-mark.mark-b{left:29px;top:22px}.arcanist-quadrant-mark.mark-c{right:29px;top:22px}.arcanist-quadrant-mark.mark-d{right:15px;top:53px}
+.arcanist-quadrant-pivot{position:absolute;left:50%;bottom:9px;width:20px;height:20px;transform:translateX(-50%);border:2px solid #d0ae73;border-radius:50%;background:radial-gradient(circle,#b48a4e 0 24%,#22271f 28% 62%,#c6a16a 65%);box-shadow:0 1px 4px #000b}
+.arcanist-quadrant-lever{position:absolute;z-index:8;left:50%;bottom:14px;display:block;width:58px;height:104px;padding:0;border:0;background:transparent;touch-action:none;touch-action:pan-x;user-select:none;-webkit-user-select:none;transform:translateX(-50%) rotate(var(--lever-angle,0deg));transform-origin:50% calc(100% - 10px);cursor:grab;pointer-events:auto}
+.arcanist-quadrant-lever:disabled{opacity:.45;filter:grayscale(.65);cursor:not-allowed}
+.arcanist-quadrant-lever .arcanist-lever-shaft{position:absolute;left:calc(50% - 3px);top:13px;width:7px;height:77px;border:1px solid #e2c58e;border-radius:5px;background:linear-gradient(90deg,#4c3924,#f0d7a0 32%,#87683d 62%,#2c281f);box-shadow:0 0 0 1px #0b100d,0 2px 5px #000b}
+.arcanist-quadrant-lever .arcanist-lever-handle{position:absolute;left:calc(50% - 13px);top:0;width:26px;height:23px;border:1px solid #f0d59b;border-radius:48%;background:radial-gradient(circle at 35% 28%,#f0dfb5,#79603a 52%,#211c14 78%);box-shadow:inset 0 0 0 2px #34291c,0 3px 5px #000b}
+.arcanist-quadrant-lever .arcanist-lever-handle i{position:absolute;left:5px;right:5px;top:4px;height:2px;border-radius:3px;background:#f6e3b8aa}
+.arcanist-quadrant-lever.is-pulling{filter:brightness(1.18);transition:none}
+.arcanist-quadrant-lever.is-returning{transition:transform .42s cubic-bezier(.18,.75,.28,1)}
+.arcanist-quadrant-lever.is-pulled{transform:translateX(-50%) rotate(-52deg)}
+.arcanist-lever-hint{margin:0;text-align:center;color:#9d927c;font:600 5px/1.5 system-ui,sans-serif;letter-spacing:.1em}
+.arcanist-card-reader{position:relative;display:flex;grid-column:2;grid-row:2;flex-direction:column;align-items:center;justify-content:center;gap:9px;min-width:0;margin:0;padding:6px 4px;border-left:1px solid #92784e55}
+.arcanist-card-reader-label{color:#bda477;font:700 6px system-ui,sans-serif;letter-spacing:.1em;text-align:center}
+.arcanist-card-slot{position:relative;display:flex;align-items:center;justify-content:center;width:90%;height:13px;border:1px solid #b8945c;border-radius:2px;background:linear-gradient(180deg,#050806,#1d211a 48%,#050806);box-shadow:inset 0 0 0 2px #090d0a,0 1px 4px #000b,0 0 4px #d2ad6b22}
+.arcanist-card-slot:before{content:"";position:absolute;left:12%;right:12%;top:5px;height:1px;background:#d4b57866;box-shadow:0 0 4px #d4b57855}
 .arcanist-card-slot>i{position:absolute;left:50%;top:50%;width:3px;height:3px;transform:translate(-50%,-50%);border-radius:50%;background:#d8a24c;opacity:.25}
-.arcanist-card-warning-lamp{position:absolute;right:-13px;top:50%;width:6px;height:6px;transform:translateY(-50%);border:1px solid #8a6236;border-radius:50%;background:#4a2c16;box-shadow:inset 0 0 2px #120c07}
+.arcanist-card-warning-lamp{position:absolute;right:-12px;top:50%;width:7px;height:7px;transform:translateY(-50%);border:1px solid #8a6236;border-radius:50%;background:#4a2c16}
 .arcanist-card-warning-lamp.is-lit{background:#ff9b32;box-shadow:0 0 5px 2px #ff8a27,0 0 12px #ff9d3caa;animation:arcanist-warning-flicker .43s steps(2,end) infinite}
 @keyframes arcanist-warning-flicker{0%,100%{opacity:1}31%{opacity:.35}54%{opacity:.9}72%{opacity:.18}}
-.arcanist-card-inserted-indicator{position:absolute;top:12px;left:50%;transform:translateX(-50%);white-space:nowrap;color:#e8ca8d;font:700 5px system-ui,sans-serif;letter-spacing:.08em;text-shadow:0 0 5px #edc77b}
+.arcanist-card-inserted-indicator{position:absolute;top:calc(50% + 14px);left:50%;transform:translateX(-50%);white-space:nowrap;color:#e8ca8d;font:700 6px system-ui,sans-serif;letter-spacing:.08em;text-shadow:0 0 5px #edc77b}
 .arcanist-card-inserted-indicator[hidden]{display:none!important}
-.arcanist-travel-card{position:relative;display:flex;align-items:center;justify-content:space-between;gap:4px;width:70px;height:34px;padding:4px 5px;border:1px solid #c0a16c;border-radius:3px;background:linear-gradient(145deg,#d9c49a,#8d744b 56%,#4b3d2a);box-shadow:inset 0 0 0 2px #5a472d,0 2px 5px #0009;color:#382d1d;text-align:left;font:700 5px/1.3 Georgia,serif;letter-spacing:.06em;touch-action:manipulation;cursor:pointer}
+.arcanist-travel-card{position:relative;display:flex;align-items:center;justify-content:space-between;gap:5px;width:92px;height:48px;padding:5px 7px;border:1px solid #c0a16c;border-radius:3px;background:linear-gradient(145deg,#d9c49a,#8d744b 56%,#4b3d2a);box-shadow:inset 0 0 0 2px #5a472d,0 2px 5px #0009;color:#382d1d;text-align:left;font:700 6px/1.3 Georgia,serif;letter-spacing:.06em;touch-action:manipulation;cursor:pointer}
 .arcanist-travel-card[hidden]{display:none!important}
-.arcanist-card-chip{width:13px;height:10px;border:1px solid #6d5a3a;border-radius:2px;background:linear-gradient(90deg,transparent 30%,#6d5a3a 31% 35%,transparent 36%),linear-gradient(0deg,transparent 30%,#6d5a3a 31% 35%,transparent 36%);box-shadow:inset 0 0 0 1px #e2d1aa}
-.arcanist-travel-card>i{font:12px Georgia,serif;color:#71572f}
+.arcanist-card-chip{width:15px;height:12px;border:1px solid #6d5a3a;border-radius:2px;background:linear-gradient(90deg,transparent 30%,#6d5a3a 31% 35%,transparent 36%),linear-gradient(0deg,transparent 30%,#6d5a3a 31% 35%,transparent 36%);box-shadow:inset 0 0 0 1px #e2d1aa}
+.arcanist-travel-card>i{font:14px Georgia,serif;color:#71572f}
 .arcanist-travel-card.is-swallowing{animation:arcanist-card-swallow .68s cubic-bezier(.5,.02,.8,.35) forwards}
 .arcanist-travel-card.is-ejecting{animation:arcanist-card-eject .52s cubic-bezier(.15,.8,.25,1) both}
 @keyframes arcanist-card-swallow{0%{transform:translateY(0) scale(1);opacity:1}45%{transform:translateY(-8px) scale(.92,.86)}100%{transform:translateY(-30px) scale(.28,.16);opacity:0}}
 @keyframes arcanist-card-eject{0%{transform:translateY(-24px) scale(.3,.18);opacity:.2}70%{transform:translateY(3px) scale(1.03)}100%{transform:translateY(0) scale(1);opacity:1}}
 .arcanist-card-reader>small{color:#8f927e;font:600 5px system-ui,sans-serif;letter-spacing:.1em}
-.arcanist-quadrant-control{position:relative;display:flex;flex:1;flex-direction:column;align-items:center;justify-content:center;width:100%;min-height:0;gap:3px}
-.arcanist-quadrant-caption{color:#c9ab77;font:700 5px system-ui,sans-serif;letter-spacing:.1em}
-.arcanist-quadrant-plate{position:relative;width:76px;height:72px;flex:0 0 auto;border:1px solid #aa8a58;border-radius:48% 48% 5px 5px;background:linear-gradient(145deg,#403522,#171c16 50%,#4a3b27);box-shadow:inset 0 0 0 2px #111710,inset 0 0 0 3px #9b7b4c,0 3px 7px #0009}
-.arcanist-quadrant-plate:before{content:"";position:absolute;left:14px;right:14px;top:10px;bottom:13px;border:1px solid #c5a16a88;border-bottom-color:transparent;border-radius:60% 60% 0 0;transform:rotate(-1deg)}
-.arcanist-quadrant-mark{position:absolute;width:3px;height:3px;border-radius:50%;background:#e0c18a;box-shadow:0 0 3px #e0c18a}
-.arcanist-quadrant-mark.mark-a{left:15px;top:30px}.arcanist-quadrant-mark.mark-b{left:25px;top:14px}.arcanist-quadrant-mark.mark-c{right:25px;top:14px}.arcanist-quadrant-mark.mark-d{right:15px;top:30px}
-.arcanist-quadrant-pivot{position:absolute;left:50%;bottom:11px;width:17px;height:17px;transform:translateX(-50%);border:2px solid #d0ae73;border-radius:50%;background:radial-gradient(circle,#b48a4e 0 24%,#22271f 28% 62%,#c6a16a 65%);box-shadow:0 1px 4px #000b}
-.arcanist-quadrant-lever{position:absolute;z-index:5;display:block;left:50%;bottom:10px;width:36px;height:65px;inset:auto auto 17px 50%;padding:0;border:0;background:transparent;touch-action:none;user-select:none;transform:translateX(-50%) rotate(calc(-35deg + var(--lever-angle,0deg)));transform-origin:50% 84%;transition:transform .1s ease-out;cursor:grab}
-.arcanist-quadrant-lever:disabled{opacity:.45;filter:grayscale(.65);cursor:not-allowed}
-.arcanist-quadrant-lever .arcanist-lever-shaft{position:absolute;left:calc(50% - 3px);top:8px;width:6px;height:47px;border:1px solid #e2c58e;border-radius:5px;background:linear-gradient(90deg,#4c3924,#f0d7a0 32%,#87683d 62%,#2c281f);box-shadow:0 0 0 1px #0b100d,0 2px 5px #000b;transform:none}
-.arcanist-quadrant-lever .arcanist-lever-handle{position:absolute;left:calc(50% - 11px);top:0;width:22px;height:20px;border:1px solid #f0d59b;border-radius:50%;background:radial-gradient(circle at 35% 28%,#f0dfb5,#79603a 52%,#211c14 78%);box-shadow:inset 0 0 0 2px #34291c,0 3px 5px #000b;transform:none}
-.arcanist-quadrant-lever .arcanist-lever-handle i{position:absolute;left:5px;right:5px;top:4px;height:2px;border-radius:3px;background:#f6e3b8aa}
-.arcanist-quadrant-lever.is-returning{transition:transform .42s cubic-bezier(.18,.75,.28,1)}
-.arcanist-quadrant-lever.is-pulling{transition:none;filter:brightness(1.15)}
-.arcanist-lever-hint{margin:0;text-align:center;color:#9d927c;font:600 5px/1.5 system-ui,sans-serif;letter-spacing:.1em}
-.arcanist-machine-shell[data-selected-available="true"] .arcanist-lever-button{cursor:grab}
-.arcanist-machine-shell[data-selected-available="false"] .arcanist-lever-button{cursor:not-allowed}
-.arcanist-transmission-bay{position:relative;z-index:1;flex:0 0 18px;height:18px;min-height:18px;margin:0 1px 4px;overflow:hidden;border-top:1px solid #9b7c4e;border-bottom:1px solid #9b7c4e;background:linear-gradient(180deg,#111713,#2d332a 48%,#121813);box-shadow:inset 0 0 0 2px #080d0a,inset 0 0 0 3px #665337}
-.arcanist-wirework{position:absolute;inset:0;width:100%;height:100%;opacity:.78;fill:none;stroke:#c29b60;stroke-width:1.5;filter:drop-shadow(0 0 2px #c99d5a77)}
+.arcanist-transmission-bay{position:relative;z-index:1;display:block;flex:0 0 24px;height:24px;min-height:24px;margin:0 1px;overflow:hidden;border-top:1px solid #9b7c4e;border-bottom:1px solid #9b7c4e;background:linear-gradient(180deg,#111713,#2d332a 48%,#121813);box-shadow:inset 0 0 0 2px #080d0a,inset 0 0 0 3px #665337}
+.arcanist-wirework{position:absolute;inset:0;width:100%;height:100%;opacity:.78;fill:none;stroke:#c29b60;stroke-width:1.5;filter:drop-shadow(0 0 2px #c99d5a77);pointer-events:none}
 .arcanist-wire-drop{stroke:#dfc18b;stroke-width:1}
-.arcanist-machine-gear{position:absolute;z-index:2;display:grid;place-items:center;width:13px;height:13px;border:2px solid #bd9b65;border-radius:50%;background:radial-gradient(circle,#655034 0 23%,#141a15 27% 59%,#c4a06a 62% 67%,#171d18 70%);box-shadow:inset 0 0 0 3px #111710,0 2px 7px #000b;color:#f0d49a;font:27px Georgia,serif}
-.arcanist-machine-gear.gear-a{left:12%;top:2px;font-size:10px}.arcanist-machine-gear.gear-b{left:46%;top:1px;width:14px;height:14px;font-size:10px}.arcanist-machine-gear.gear-c{right:11%;top:2px;width:12px;height:12px;font-size:9px}
-.arcanist-machine-spring{position:absolute;left:32%;top:2px;width:18px;height:12px;border-left:2px solid #d3b27b;border-right:2px solid #d3b27b;background:repeating-linear-gradient(135deg,transparent 0 4px,#d5b477 4px 6px,transparent 6px 9px);filter:drop-shadow(0 0 2px #d5b47766)}
-.arcanist-machine-pulley{position:absolute;top:3px;width:7px;height:7px;border:2px solid #e0c18a;border-radius:50%;background:#1a211b;box-shadow:0 0 0 2px #6d5638}
+.arcanist-machine-gear{position:absolute;z-index:2;display:grid;place-items:center;width:15px;height:15px;border:2px solid #bd9b65;border-radius:50%;background:radial-gradient(circle,#655034 0 23%,#141a15 27% 59%,#c4a06a 62% 67%,#171d18 70%);box-shadow:inset 0 0 0 3px #111710,0 2px 7px #000b;color:#f0d49a;font:12px Georgia,serif}
+.arcanist-machine-gear.gear-a{left:12%;top:3px}.arcanist-machine-gear.gear-b{left:46%;top:3px}.arcanist-machine-gear.gear-c{right:11%;top:3px}
+.arcanist-machine-spring{position:absolute;left:32%;top:3px;width:18px;height:14px;border-left:2px solid #d3b27b;border-right:2px solid #d3b27b;background:repeating-linear-gradient(135deg,transparent 0 4px,#d5b477 4px 6px,transparent 6px 9px)}
+.arcanist-machine-pulley{position:absolute;top:5px;width:7px;height:7px;border:2px solid #e0c18a;border-radius:50%;background:#1a211b;box-shadow:0 0 0 2px #6d5638}
 .arcanist-machine-pulley.pulley-a{left:25%}.arcanist-machine-pulley.pulley-b{right:27%}
 .arcanist-transmission-caption{position:absolute;left:0;right:0;bottom:2px;text-align:center;color:#b39a70;font:600 5px system-ui,sans-serif;letter-spacing:.18em}
-.arcanist-machine-shell.is-running .arcanist-machine-gear{animation:arcanist-gear-spin 1.15s linear infinite}
-.arcanist-machine-shell.is-running .gear-b{animation-direction:reverse;animation-duration:1.7s}
-.arcanist-machine-shell.is-running .gear-c{animation-duration:.82s}
+.arcanist-machine-shell.is-running .arcanist-machine-gear,.arcanist-machine-shell.is-traveling .arcanist-machine-gear{animation:arcanist-gear-spin .8s linear infinite}
+.arcanist-machine-shell.is-running .gear-b,.arcanist-machine-shell.is-traveling .gear-b{animation-direction:reverse;animation-duration:1.3s}
 .arcanist-machine-shell.is-running .arcanist-machine-spring{animation:arcanist-spring-pulse .28s ease-in-out infinite alternate}
 .arcanist-machine-shell.is-running .arcanist-wirework path{stroke-dasharray:8 4;animation:arcanist-cable-travel .65s linear infinite}
 @keyframes arcanist-gear-spin{to{transform:rotate(360deg)}}@keyframes arcanist-spring-pulse{to{transform:scaleY(.7)}}@keyframes arcanist-cable-travel{to{stroke-dashoffset:-24}}
-.arcanist-ticket-dispenser{position:relative;z-index:4;display:flex;flex:1 0 180px;justify-content:center;align-items:flex-start;min-height:180px;margin:0 0 5px;padding-top:2px;overflow:visible;touch-action:pan-y}
-.arcanist-ticket-slot{position:absolute;z-index:2;top:4px;left:12%;display:flex;align-items:center;justify-content:center;gap:7px;width:76%;height:19px;border:1px solid #b18d57;background:linear-gradient(180deg,#080d0a,#30352b 42%,#090d0a);box-shadow:inset 0 0 0 2px #080b09,0 2px 5px #0009}
-.arcanist-ticket-slot span{position:absolute;bottom:22px;color:#b99a66;font:600 5px system-ui,sans-serif;letter-spacing:.16em}
-.arcanist-ticket-slot i{width:4px;height:4px;border-radius:50%;background:#c3a06b;box-shadow:0 0 3px #c3a06b}
-.arcanist-ticket{position:absolute;z-index:5;top:18px;left:50%;display:grid;justify-items:center;gap:4px;width:min(210px,72%);min-height:112px;padding:9px 12px 8px;border:1px solid #b18d57;background:linear-gradient(90deg,#d9c8a0,#f1e5c9 16%,#e9d9b7 85%,#c9b48a);color:#3b3326;box-shadow:0 4px 9px #0009;transform:translate(-50%,var(--ticket-pull,0px));touch-action:none;pointer-events:auto;user-select:none;cursor:grab}
+.arcanist-ticket-dispenser{position:relative;z-index:4;display:flex;flex:1 1 150px;justify-content:center;align-items:flex-start;min-height:150px;min-width:0;margin:0;padding-top:2px;overflow:visible;touch-action:pan-y}
+.arcanist-ticket-slot{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;gap:7px;width:76%;height:20px;margin-top:3px;border:1px solid #b18d57;background:linear-gradient(180deg,#080d0a,#30352b 42%,#090d0a);box-shadow:inset 0 0 0 2px #080b09,0 2px 5px #0009}
+.arcanist-ticket-slot:before{content:"";position:absolute;z-index:4;left:50%;top:100%;width:min(190px,86%);height:15px;transform:translateX(-50%);background:linear-gradient(90deg,#d9c8a0,#f1e5c9 16%,#e9d9b7 85%,#c9b48a);clip-path:polygon(0 0,100% 0,100% 58%,94% 78%,87% 58%,80% 82%,72% 58%,64% 78%,56% 58%,48% 82%,40% 58%,32% 78%,24% 58%,16% 82%,8% 58%,0 78%);pointer-events:none}
+.arcanist-ticket-slot>span{position:absolute;bottom:23px;color:#b99a66;font:600 6px system-ui,sans-serif;letter-spacing:.16em;white-space:nowrap}
+.arcanist-ticket-slot>i{width:4px;height:4px;border-radius:50%;background:#c3a06b;box-shadow:0 0 3px #c3a06b}
+.arcanist-ticket{position:absolute;z-index:5;top:23px;left:50%;display:grid;justify-items:center;gap:5px;width:min(240px,78%);min-height:116px;padding:10px 12px 9px;border:1px solid #b18d57;background:linear-gradient(90deg,#d9c8a0,#f1e5c9 16%,#e9d9b7 85%,#c9b48a);color:#3b3326;box-shadow:0 4px 9px #0009;transform:translateX(-50%) translateY(var(--ticket-pull,0px));touch-action:none;pointer-events:auto;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;cursor:grab}
 .arcanist-ticket[hidden]{display:none!important}
 .arcanist-ticket-top{font:700 6px system-ui,sans-serif;letter-spacing:.18em;color:#77603b}
 .arcanist-ticket strong{font:17px Georgia,serif;color:#342d22}
 .arcanist-ticket-route{font:600 6px system-ui,sans-serif;letter-spacing:.15em;color:#765f3d}
-.arcanist-ticket-perforation{width:100%;height:1px;margin-top:2px;border-top:1px dashed #826a45}
+.arcanist-ticket-perforation{position:absolute;top:0;left:0;right:0;height:8px;border-top:1px dashed #826a45;opacity:.85}
 .arcanist-ticket small{font:700 6px system-ui,sans-serif;letter-spacing:.16em;color:#886b3d}
 .arcanist-ticket.is-under-tension{filter:brightness(1.08);box-shadow:0 7px 14px #000b,0 0 9px #f0d7a2}
 .arcanist-ticket.is-returning{animation:arcanist-ticket-return .42s cubic-bezier(.2,.8,.3,1) forwards}
-@keyframes arcanist-ticket-return{to{transform:translate(-50%,0)}}
-.arcanist-ticket.is-torn{animation:arcanist-ticket-tear .38s ease-in forwards}
-@keyframes arcanist-ticket-tear{to{transform:translate(-50%,75px) rotate(3deg);opacity:0}}
-.arcanist-machine-status{position:relative;z-index:2;flex:0 0 auto;padding:6px 5px 2px;border-top:1px solid #9b7b4e55;text-align:center;color:#c7ad7d;font:600 6px system-ui,sans-serif;letter-spacing:.14em}
+@keyframes arcanist-ticket-return{to{transform:translateX(-50%) translateY(0)}}
+.arcanist-ticket.is-torn{animation:arcanist-ticket-tear-down .42s cubic-bezier(.18,.68,.24,1) forwards}
+@keyframes arcanist-ticket-tear-down{to{transform:translateX(-50%) translateY(calc(var(--ticket-pull,62px) + 74px)) rotate(-1.5deg);opacity:0}}
+.arcanist-ticket-stub{position:absolute;z-index:3;top:22px;left:50%;width:min(240px,78%);height:45px;transform:translateX(-50%);border:1px solid #b18d57;border-bottom:0;background:linear-gradient(90deg,#d9c8a0,#f1e5c9 16%,#e9d9b7 85%,#c9b48a);pointer-events:none}
+.arcanist-machine-status{position:relative;z-index:2;flex:0 0 auto;min-height:28px;padding:7px 5px 3px;border-top:1px solid #9b7b4e55;text-align:center;color:#c7ad7d;font:600 7px system-ui,sans-serif;letter-spacing:.1em}
 .arcanist-route-loading{position:absolute;z-index:20;inset:0;display:grid;align-content:center;justify-items:center;gap:10px;padding:24px;background:radial-gradient(circle at 50% 42%,#344035f5,#090d0bf7 72%);color:#f0dfbd;text-align:center}
 .arcanist-route-loading[hidden]{display:none!important}
 .arcanist-loading-seal{display:grid;place-items:center;width:64px;height:64px;border:1px solid #c8a56d;border-radius:50%;box-shadow:inset 0 0 0 5px #161d17,inset 0 0 0 6px #c8a56d66,0 0 18px #d3ac6b55;color:#e8c98e;font:35px Georgia,serif;animation:arcanist-seal-turn 2.4s linear infinite}
 .arcanist-route-loading strong{font:700 9px system-ui,sans-serif;letter-spacing:.2em;color:#e6c68d}
 .arcanist-route-loading span{font:11px Georgia,serif;color:#bdb29d}
-.arcanist-machine-shell.is-traveling .arcanist-machine-gear{animation:arcanist-gear-spin .8s linear infinite}
-@media(max-width:390px){.arcanist-device-drawer{padding:6px}.arcanist-machine-shell{padding:8px 7px 10px}.arcanist-machine-main{grid-template-columns:minmax(0,1fr) 86px;gap:6px}.arcanist-destination-grid{gap:4px}.arcanist-destination-card{grid-template-columns:37px minmax(0,1fr);min-height:49px;gap:4px;padding:3px}.arcanist-destination-art-frame{width:37px;height:39px}.arcanist-destination-card-copy strong{font-size:9px}.arcanist-lever-cage{width:70px;height:172px}.arcanist-destination-scroll{max-height:clamp(200px,37vh,330px)}}
-@media(max-height:650px){.arcanist-destination-scroll{max-height:31vh}.arcanist-lever-cage{height:150px}.arcanist-transmission-bay{height:59px}.arcanist-ticket-dispenser{min-height:42px}}
-@media(prefers-reduced-motion:reduce){.arcanist-destination-card:before,.arcanist-machine-shell.is-running .arcanist-machine-gear,.arcanist-machine-shell.is-running .arcanist-machine-spring,.arcanist-machine-shell.is-running .arcanist-wirework path,.arcanist-loading-seal{animation:none!important}.arcanist-ticket.is-returning,.arcanist-ticket.is-torn{animation:none!important}}
-
-
-.arcanist-lever-shaft{transform:rotate(calc(-17deg + var(--lever-angle,0deg)));transition:transform .28s cubic-bezier(.2,.7,.2,1)}
-.arcanist-lever-handle{transform:rotate(calc(-17deg + var(--lever-angle,0deg)));transition:transform .28s cubic-bezier(.2,.7,.2,1)}
-.arcanist-lever-button{touch-action:none;user-select:none}
-.arcanist-lever-button.is-pulling .arcanist-lever-shaft,.arcanist-lever-button.is-pulling .arcanist-lever-handle{transition:none}
-.arcanist-lever-button.is-returning .arcanist-lever-shaft,.arcanist-lever-button.is-returning .arcanist-lever-handle{transition:transform .34s cubic-bezier(.18,.72,.25,1)}
-.arcanist-lever-button.is-pulled .arcanist-lever-shaft,.arcanist-lever-button.is-pulled .arcanist-lever-handle{transform:rotate(18deg)}
-
-
-.arcanist-lever-shaft{transform:rotate(calc(-17deg + var(--lever-angle,0deg)));transition:transform .28s cubic-bezier(.2,.7,.2,1)}
-.arcanist-lever-handle{transform:rotate(calc(-17deg + var(--lever-angle,0deg)));transition:transform .28s cubic-bezier(.2,.7,.2,1)}
-.arcanist-lever-button{touch-action:none;user-select:none}
-.arcanist-lever-button.is-pulling .arcanist-lever-shaft,.arcanist-lever-button.is-pulling .arcanist-lever-handle{transition:none}
-.arcanist-lever-button.is-returning .arcanist-lever-shaft,.arcanist-lever-button.is-returning .arcanist-lever-handle{transition:transform .34s cubic-bezier(.18,.72,.25,1)}
-.arcanist-lever-button.is-pulled .arcanist-lever-shaft,.arcanist-lever-button.is-pulled .arcanist-lever-handle{transform:rotate(18deg)}
-
-
-/* Physical pull correction: the lever follows a short, downward weighted arc. */
-.arcanist-lever-shaft{transform:rotate(calc(-17deg + var(--lever-angle,0deg)));transform-origin:50% 19px}
-.arcanist-lever-handle{transform:translateY(var(--lever-pull,0px)) rotate(calc(-17deg + var(--lever-angle,0deg)));transform-origin:50% 18px}
-.arcanist-lever-button.is-pulling .arcanist-lever-shaft,.arcanist-lever-button.is-pulling .arcanist-lever-handle{transition:none}
-.arcanist-lever-button.is-returning .arcanist-lever-shaft,.arcanist-lever-button.is-returning .arcanist-lever-handle{transition:transform .38s cubic-bezier(.18,.72,.25,1)}
-.arcanist-lever-button.is-pulled .arcanist-lever-shaft{transform:rotate(11deg)}
-.arcanist-lever-button.is-pulled .arcanist-lever-handle{transform:translateY(11px) rotate(11deg)}
-.arcanist-lever-button:not(.is-pulling):not(.is-pulled) .arcanist-lever-shaft,.arcanist-lever-button:not(.is-pulling):not(.is-pulled) .arcanist-lever-handle{transition:transform .38s cubic-bezier(.18,.72,.25,1)}
-
-/* The ticket stays threaded in the issue slot; only the lower sheet tears away. */
-.arcanist-ticket-slot{position:relative}
-.arcanist-ticket-slot:after{content:"";position:absolute;z-index:4;left:50%;top:100%;width:min(190px,68%);height:15px;transform:translateX(-50%);background:linear-gradient(90deg,#d9c8a0,#f1e5c9 16%,#e9d9b7 85%,#c9b48a);clip-path:polygon(0 0,100% 0,100% 58%,94% 78%,87% 58%,80% 82%,72% 58%,64% 78%,56% 58%,48% 82%,40% 58%,32% 78%,24% 58%,16% 82%,8% 58%,0 78%);opacity:0;pointer-events:none}
-.arcanist-ticket-dispenser.has-ticket-stub .arcanist-ticket-slot:after{opacity:1}
-.arcanist-ticket{transform:translate(-50%,var(--ticket-pull,0px));will-change:transform,clip-path}
-.arcanist-ticket-perforation{position:absolute;top:0;left:0;right:0;width:100%;height:8px;margin:0;border:0;border-top:1px dashed #826a45;opacity:.85}
-.arcanist-ticket.is-torn{animation:arcanist-ticket-tear-down .42s cubic-bezier(.18,.68,.24,1) forwards}
-.arcanist-ticket.is-torn[data-tear-direction="left-to-right"]{clip-path:polygon(0 9%,10% 4%,20% 11%,30% 6%,40% 14%,50% 8%,60% 16%,70% 10%,80% 19%,90% 13%,100% 22%,100% 100%,0 100%)}
-.arcanist-ticket.is-torn[data-tear-direction="right-to-left"]{clip-path:polygon(0 22%,10% 13%,20% 19%,30% 10%,40% 16%,50% 8%,60% 14%,70% 6%,80% 11%,90% 4%,100% 9%,100% 100%,0 100%)}
-@keyframes arcanist-ticket-tear-down{0%{transform:translate(-50%,var(--ticket-pull,62px)) rotate(0deg);opacity:1}100%{transform:translate(-50%,calc(var(--ticket-pull,62px) + 74px)) rotate(-1.5deg);opacity:0}}
-@media(prefers-reduced-motion:reduce){.arcanist-ticket.is-torn{animation:none!important;opacity:0}}
-
-.arcanist-ticket-dispenser[data-tear-direction="left-to-right"] .arcanist-ticket-slot:after{clip-path:polygon(0 0,100% 0,100% 22%,90% 13%,80% 19%,70% 10%,60% 16%,50% 8%,40% 14%,30% 6%,20% 11%,10% 4%,0 9%)}
-.arcanist-ticket-dispenser[data-tear-direction="right-to-left"] .arcanist-ticket-slot:after{clip-path:polygon(0 0,100% 0,100% 9%,90% 4%,80% 11%,70% 6%,60% 14%,50% 8%,40% 16%,30% 10%,20% 19%,10% 13%,0 22%)}
-
-/* Follow-up: straight, weighted downward lever stroke with a spring return. */
-.arcanist-lever-shaft,
-.arcanist-lever-handle{
-  transform:translateY(var(--lever-pull,0px)) rotate(calc(var(--lever-angle,0deg)));
-  transform-origin:50% 18px;
-}
-.arcanist-lever-button.is-pulling .arcanist-lever-shaft,
-.arcanist-lever-button.is-pulling .arcanist-lever-handle{transition:none}
-.arcanist-lever-button.is-pulled .arcanist-lever-shaft,
-.arcanist-lever-button.is-pulled .arcanist-lever-handle{
-  transform:translateY(45px) rotate(7deg);
-}
-.arcanist-lever-button.is-returning .arcanist-lever-shaft,
-.arcanist-lever-button.is-returning .arcanist-lever-handle{
-  transition:transform .62s cubic-bezier(.2,1.35,.42,1);
-}
-.arcanist-lever-button:not(.is-pulling):not(.is-pulled):not(.is-returning) .arcanist-lever-shaft,
-.arcanist-lever-button:not(.is-pulling):not(.is-pulled):not(.is-returning) .arcanist-lever-handle{
-  transition:transform .38s cubic-bezier(.2,.7,.2,1);
-}
-
-/* Lock ticket travel to the vertical axis; the tear animation keeps its existing profile. */
-.arcanist-ticket{
-  transform:translateX(-50%);
-  translate:0 var(--ticket-pull,0px);
-}
-.arcanist-ticket.is-returning{animation:arcanist-ticket-return .42s cubic-bezier(.2,.8,.3,1) forwards}
-@keyframes arcanist-ticket-return{
-  to{transform:translateX(-50%);translate:0 0}
-}
-.arcanist-ticket.is-torn{animation:arcanist-ticket-tear-down .42s cubic-bezier(.18,.68,.24,1) forwards}
-@keyframes arcanist-ticket-tear-down{
-  0%{transform:translateX(-50%) rotate(0deg);translate:0 var(--ticket-pull,62px);opacity:1}
-  100%{transform:translateX(-50%) rotate(-1.5deg);translate:0 calc(var(--ticket-pull,62px) + 74px);opacity:0}
-}
-@media(prefers-reduced-motion:reduce){
-  .arcanist-lever-button.is-returning .arcanist-lever-shaft,
-  .arcanist-lever-button.is-returning .arcanist-lever-handle{transition:none!important}
-}
-
-
-
-/* Antique incandescent lighting and travel-card mechanics. */
-.arcanist-machine-heading{position:relative}
-.arcanist-master-lamp{position:relative;display:grid;place-items:center;flex:0 0 18px;width:18px;height:18px;margin-right:5px;border:1px solid #9a7947;border-radius:50%;background:radial-gradient(circle,#4a3b24 0 38%,#171c16 44%);box-shadow:inset 0 0 0 2px #0c110d,0 0 4px #b98c4d55}
-.arcanist-master-lamp i{position:relative;display:block;width:7px;height:9px;border:1px solid #e8c47c;border-radius:48% 48% 42% 42%;background:radial-gradient(ellipse at 50% 70%,#ffe7a3 0 18%,#e8a948 35%,#9d5b22 70%,transparent 72%);box-shadow:0 0 5px 2px #e5b65c99,0 0 10px #d89a3d66;animation:arcanist-master-breathe 3.1s ease-in-out infinite}
-.arcanist-master-lamp i:after{content:"";position:absolute;left:2px;right:2px;top:2px;height:4px;border-top:1px solid #fff0b2;border-radius:50%;transform:rotate(12deg)}
+@keyframes arcanist-seal-turn{to{transform:rotate(360deg)}}
+.arcanist-machine-shell.is-traveling .arcanist-master-lamp i,.arcanist-machine-shell.is-running .arcanist-master-lamp i{animation:arcanist-master-flicker var(--lamp-flicker-duration,.73s) steps(1,end) infinite}
+.arcanist-machine-shell.is-card-required .arcanist-master-lamp i,.arcanist-machine-shell.is-card-required .arcanist-quadrant-bulb i{animation:arcanist-warning-master .47s steps(2,end) infinite}
 @keyframes arcanist-master-breathe{0%,100%{opacity:.48;filter:brightness(.72);box-shadow:0 0 3px 1px #d9a64e66}50%{opacity:1;filter:brightness(1.22);box-shadow:0 0 8px 3px #ffcf78cc,0 0 16px #e5a84e88}}
-.arcanist-machine-shell.is-running .arcanist-master-lamp i{animation:arcanist-master-flicker var(--lamp-flicker-duration,.73s) steps(1,end) infinite}
 @keyframes arcanist-master-flicker{0%{opacity:1;filter:brightness(1.7)}7%{opacity:.12;filter:brightness(.35)}13%{opacity:.92;filter:brightness(1.9)}24%{opacity:.28;filter:brightness(.5)}39%{opacity:1;filter:brightness(2.1)}43%{opacity:.08;filter:brightness(.25)}58%{opacity:.72;filter:brightness(1.3)}74%{opacity:.18;filter:brightness(.4)}88%{opacity:1;filter:brightness(1.9)}100%{opacity:.62;filter:brightness(1.1)}}
-.arcanist-machine-shell.is-card-required .arcanist-master-lamp i{animation:arcanist-warning-master .47s steps(2,end) infinite}
-@keyframes arcanist-warning-master{0%,100%{opacity:1;filter:brightness(1.65);box-shadow:0 0 11px 4px #ff9c3d}35%{opacity:.22;filter:brightness(.45);box-shadow:0 0 2px #b36c2b}58%{opacity:.88;filter:brightness(1.8)}}
-.arcanist-destination-card.is-selected .arcanist-destination-art-frame{border-color:#fff0c2;box-shadow:0 0 0 1px #e6c98a,0 0 14px #ffe1a0cc}
-.arcanist-destination-card.is-selected .arcanist-destination-art-frame img{filter:brightness(1.48) sepia(.25) saturate(1.16)}
-.arcanist-destination-card.is-selected .arcanist-destination-art-frame:after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at center,#fff6d688,#f0d39b22 64%,transparent 100%);mix-blend-mode:screen;pointer-events:none}
-.arcanist-destination-card.is-selected:before{border-color:#ffd98b;opacity:1;box-shadow:0 0 8px #f8d28a88}
-.arcanist-machine-shell.is-running .arcanist-machine-gear{filter:drop-shadow(0 0 3px #e4bc7a55)}
-.arcanist-machine-shell.is-running .arcanist-card-slot{box-shadow:inset 0 0 0 2px #080b09,0 0 8px #ffc56b55}
-.arcanist-ticket{will-change:transform;touch-action:none}
-.arcanist-ticket.is-under-tension{transform:translate(-50%,var(--ticket-pull,0px)) rotate(var(--ticket-tilt,0deg));}
-.arcanist-ticket-stub{position:absolute;z-index:2;top:12px;left:50%;width:min(210px,72%);height:44px;overflow:hidden;transform:translateX(-50%);border:1px solid #b18d57;border-bottom:0;background:linear-gradient(90deg,#d9c8a0,#f1e5c9 16%,#e9d9b7 85%,#c9b48a);color:#3b3326;box-shadow:0 2px 5px #0007;pointer-events:none}
-.arcanist-ticket-stub[hidden]{display:none!important}
-.arcanist-ticket-stub:after{content:"";position:absolute;left:0;right:0;bottom:0;height:5px;background:repeating-linear-gradient(135deg,transparent 0 3px,#8d754e 3px 4px,transparent 4px 7px)}
-.arcanist-ticket.is-torn{animation:arcanist-ticket-tear .38s ease-in forwards}
-@keyframes arcanist-ticket-tear{to{transform:translate(-50%,75px) rotate(2deg);opacity:0}}
-.arcanist-machine-shell.is-traveling .arcanist-machine-gear{animation:arcanist-gear-spin .8s linear infinite}
-.arcanist-machine-shell.is-traveling .arcanist-master-lamp i{animation:arcanist-master-flicker .6s steps(1,end) infinite}
 @media(max-width:390px){
  .arcanist-device-drawer{padding:6px}
- .arcanist-machine-shell{padding:8px 7px 10px}
- .arcanist-machine-heading{grid-template-columns:6px 26px minmax(0,1fr) 26px;gap:5px}
- .arcanist-machine-crest{width:25px;height:25px;font-size:16px}
- .arcanist-machine-title strong{font-size:clamp(9px,3vw,12px);letter-spacing:0}
- .arcanist-machine-main{grid-template-columns:minmax(0,1fr) 94px;gap:5px}
- .arcanist-destination-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:3px}
- .arcanist-destination-card{min-height:54px;padding:2px 1px;grid-template-rows:31px auto}
- .arcanist-destination-art-frame{width:100%;height:31px}
+ .arcanist-machine-shell{padding:8px 7px 7px;gap:6px}
+ .arcanist-machine-main{gap:6px}
+ .arcanist-destination-panel{flex-basis:122px}
+ .arcanist-destination-scroll{gap:5px;padding:6px}
+ .arcanist-destination-card{flex-basis:calc((100% - 15px)/4);padding:3px}
  .arcanist-destination-card-copy strong{font-size:8px}
- .arcanist-destination-scroll{height:clamp(170px,27vh,230px);max-height:clamp(170px,27vh,230px)}
- .arcanist-quadrant-plate{width:68px;height:65px}
- .arcanist-quadrant-lever{height:59px}
- .arcanist-travel-card{width:64px;height:32px}
- .arcanist-ticket-dispenser{flex-basis:170px;min-height:170px}
+ .arcanist-destination-card-copy small{font-size:4px}
+ .arcanist-lever-panel{grid-template-columns:minmax(0,1fr) minmax(96px,.82fr);flex-basis:178px;padding:6px}
+ .arcanist-quadrant-plate{width:min(100%,104px);height:112px}
+ .arcanist-quadrant-lever{height:91px;width:54px}
+ .arcanist-travel-card{width:84px;height:43px}
+ .arcanist-ticket-dispenser{flex-basis:135px;min-height:135px}
+ .arcanist-ticket{min-height:104px}
 }
-@media(max-height:650px){.arcanist-destination-scroll{max-height:31vh}.arcanist-transmission-bay{height:59px}.arcanist-ticket-dispenser{min-height:42px}}
+@media(max-height:650px){
+ .arcanist-device-drawer{padding:5px}
+ .arcanist-machine-shell{gap:5px;padding:7px}
+ .arcanist-machine-main{gap:5px}
+ .arcanist-destination-panel{flex-basis:104px}
+ .arcanist-destination-scroll{padding:5px}
+ .arcanist-destination-art-frame{min-height:37px}
+ .arcanist-lever-panel{flex-basis:148px;padding:5px}
+ .arcanist-quadrant-plate{height:94px}
+ .arcanist-quadrant-lever{height:78px}
+ .arcanist-transmission-bay{flex-basis:19px;height:19px;min-height:19px}
+ .arcanist-ticket-dispenser{flex-basis:100px;min-height:100px}
+ .arcanist-ticket{min-height:82px;padding:7px}
+ .arcanist-machine-status{min-height:24px;padding:5px}
+}
 @media(prefers-reduced-motion:reduce){
- .arcanist-master-lamp i,.arcanist-card-warning-lamp,.arcanist-machine-shell.is-running .arcanist-machine-gear,.arcanist-machine-shell.is-running .arcanist-machine-spring,.arcanist-machine-shell.is-running .arcanist-wirework path,.arcanist-loading-seal{animation:none!important}
+ .arcanist-destination-card:before,.arcanist-quadrant-bulb i,.arcanist-master-lamp i,
+ .arcanist-machine-shell.is-running .arcanist-machine-gear,.arcanist-machine-shell.is-running .arcanist-machine-spring,
+ .arcanist-machine-shell.is-running .arcanist-wirework path,.arcanist-loading-seal,
  .arcanist-ticket.is-returning,.arcanist-ticket.is-torn,.arcanist-travel-card.is-swallowing,.arcanist-travel-card.is-ejecting{animation:none!important}
- .arcanist-quadrant-lever{transition:none!important}
-}
-
-/* 2026-11-04 route-engine layout and ticket pull reachability */
-.arcanist-machine-shell{min-height:0;height:auto;}
-.arcanist-ticket-dispenser{overflow:visible;}
-.arcanist-ticket{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;}
-.arcanist-ticket[hidden]{display:none!important;}
-@media(max-height:650px){.arcanist-destination-scroll{height:24vh;max-height:24vh}.arcanist-ticket-dispenser{flex-basis:160px;min-height:160px}.arcanist-transmission-bay{height:16px;min-height:16px;flex-basis:16px}}
-
-
-/* Dedicated exposed filament bulb above the quadrant lever. */
-.arcanist-quadrant-lamp{display:grid;justify-items:center;gap:3px;flex:0 0 auto;min-height:35px;margin:1px 0 3px;padding:2px 0 0}
-.arcanist-quadrant-bulb{position:relative;display:grid;place-items:center;width:23px;height:25px;border:1px solid #9b7948;border-radius:48% 48% 42% 42%;background:radial-gradient(ellipse at 50% 42%,#604a2b 0 31%,#211d15 54%,#0c110d 72%);box-shadow:inset 0 0 0 2px #0a0e0b,0 0 0 2px #4b3924,0 0 7px #c28a3d55}
-.arcanist-quadrant-bulb:before{content:"";position:absolute;left:7px;right:7px;bottom:-5px;height:6px;border:1px solid #9b7948;border-top:0;background:repeating-linear-gradient(180deg,#80633d 0 1px,#1a1d17 1px 3px)}
-.arcanist-quadrant-bulb i{position:relative;width:7px;height:10px;border:1px solid #f0c879;border-radius:50% 50% 35% 35%;background:radial-gradient(ellipse at 50% 70%,#fff2b4 0 14%,#f4b957 35%,#a65d25 72%,transparent 76%);box-shadow:0 0 5px 2px #e7b65d99,0 0 12px #e6a44877;animation:arcanist-quadrant-breathe 3.1s ease-in-out infinite}
-.arcanist-quadrant-bulb i:after{content:"";position:absolute;left:1px;right:1px;top:3px;height:4px;border-top:1px solid #fff0b5;border-radius:50%;transform:rotate(-12deg)}
-.arcanist-quadrant-lamp small{color:#a99169;font:600 4.5px/1.2 system-ui,sans-serif;letter-spacing:.12em;text-align:center}
-@keyframes arcanist-quadrant-breathe{0%,100%{opacity:.46;filter:brightness(.7);box-shadow:0 0 3px 1px #d9a64e55}50%{opacity:1;filter:brightness(1.25);box-shadow:0 0 8px 3px #ffcf78cc,0 0 15px #e5a84e88}}
-.arcanist-machine-shell.is-running .arcanist-quadrant-bulb i,.arcanist-machine-shell.is-traveling .arcanist-quadrant-bulb i{animation:arcanist-master-flicker var(--lamp-flicker-duration,.73s) steps(1,end) infinite}
-.arcanist-machine-shell.is-card-required .arcanist-quadrant-bulb i{animation:arcanist-warning-master .47s steps(2,end) infinite}
-@media(max-width:390px){.arcanist-quadrant-lamp{min-height:32px;margin:0 0 2px}.arcanist-quadrant-bulb{width:21px;height:23px}}
-@media(prefers-reduced-motion:reduce){.arcanist-quadrant-bulb i{animation:none!important}}
-
-
-/* Layout correction: filament sits in the header band, not inside the control stack. */
-.arcanist-machine-heading{position:relative;overflow:visible}
-.arcanist-control-panel{position:relative;overflow:visible;justify-content:flex-start;gap:2px;padding:4px 3px 5px}
-.arcanist-quadrant-lamp{position:absolute;z-index:6;top:-37px;right:39px;display:grid;place-items:center;width:23px;height:25px;margin:0;padding:0;pointer-events:none}
-.arcanist-quadrant-bulb{position:relative;display:grid;place-items:center;width:21px;height:23px;border:1px solid #9b7948;border-radius:48% 48% 42% 42%;background:radial-gradient(ellipse at 50% 42%,#604a2b 0 31%,#211d15 54%,#0c110d 72%);box-shadow:inset 0 0 0 2px #0a0e0b,0 0 0 2px #4b3924,0 0 8px #c28a3d66}
-.arcanist-quadrant-bulb:before{content:"";position:absolute;left:6px;right:6px;bottom:-5px;height:6px;border:1px solid #9b7948;border-top:0;background:repeating-linear-gradient(180deg,#80633d 0 1px,#1a1d17 1px 3px)}
-.arcanist-quadrant-bulb i{position:relative;width:7px;height:10px;border:1px solid #f0c879;border-radius:50% 50% 35% 35%;background:radial-gradient(ellipse at 50% 70%,#fff2b4 0 14%,#f4b957 35%,#a65d25 72%,transparent 76%);box-shadow:0 0 5px 2px #e7b65d99,0 0 12px #e6a44877;animation:arcanist-quadrant-breathe 3.1s ease-in-out infinite}
-.arcanist-quadrant-lamp small{display:none}
-.arcanist-lever-label{order:0;padding:0 0 3px;margin-top:0;font-size:5px}
-.arcanist-quadrant-control{order:1;flex:0 0 auto;gap:1px;justify-content:flex-start;margin:0}
-.arcanist-quadrant-caption{font-size:4px;line-height:1.1}
-.arcanist-quadrant-plate{width:69px;height:61px}
-.arcanist-quadrant-lever{height:55px;bottom:13px}
-.arcanist-quadrant-lever .arcanist-lever-shaft{height:39px}
-.arcanist-card-reader{order:2;gap:2px;margin:4px 0 0;padding-top:4px;border-top:1px solid #92784e55}
-.arcanist-card-reader-label{font-size:4.5px}
-.arcanist-card-slot{height:7px}
-.arcanist-travel-card{width:61px;height:28px}
-.arcanist-card-reader>small{font-size:4px}
-.arcanist-control-panel .arcanist-lever-hint{font-size:4px}
-.arcanist-machine-main{align-items:start}
-.arcanist-ticket-dispenser{margin-top:-3px;padding-top:0}
-.arcanist-ticket-slot{top:1px}
-.arcanist-ticket{top:15px}
-@media(max-width:390px){
- .arcanist-quadrant-lamp{top:-34px;right:34px;width:21px;height:23px}
- .arcanist-quadrant-plate{width:63px;height:56px}
- .arcanist-quadrant-lever{height:51px;bottom:11px}
- .arcanist-quadrant-lever .arcanist-lever-shaft{height:36px}
- .arcanist-travel-card{width:57px;height:26px}
- .arcanist-card-reader{margin-top:3px;padding-top:3px}
-}
-@media(prefers-reduced-motion:reduce){.arcanist-quadrant-bulb i{animation:none!important}}
-.arcanist-machine-shell.is-running .arcanist-quadrant-bulb i,.arcanist-machine-shell.is-traveling .arcanist-quadrant-bulb i{animation:arcanist-master-flicker var(--lamp-flicker-duration,.73s) steps(1,end) infinite}
-.arcanist-machine-shell.is-card-required .arcanist-quadrant-bulb i{animation:arcanist-warning-master .47s steps(2,end) infinite}
-
-
-/* Vertical-only correction for the compact Quadrant Control stack.
-   Preserve all existing component widths and horizontal geometry. */
-.arcanist-control-panel{
-  box-sizing:border-box;
-  height:clamp(88px,12vh,104px);
-  min-height:0;
-  max-height:104px;
-  padding-top:3px;
-  padding-bottom:2px;
-  gap:1px;
-}
-.arcanist-lever-label{font-size:5px;line-height:1.05;margin:0;padding-top:0;padding-bottom:2px}
-.arcanist-quadrant-control{gap:0;min-height:0;margin-top:0;margin-bottom:0}
-.arcanist-quadrant-caption{font-size:4.5px;line-height:1.05;margin-top:0;margin-bottom:1px}
-.arcanist-quadrant-plate{height:43px;flex-basis:43px}
-.arcanist-quadrant-lever{height:41px;bottom:8px}
-.arcanist-quadrant-lever .arcanist-lever-shaft{height:29px}
-.arcanist-control-panel .arcanist-lever-hint{display:none}
-.arcanist-card-reader{gap:1px;margin-top:2px;margin-bottom:0;padding-top:2px}
-.arcanist-card-reader-label{font-size:5px;line-height:1.05}
-.arcanist-card-slot{height:6px;min-height:6px}
-.arcanist-travel-card{height:20px;min-height:20px;padding-top:2px;padding-bottom:2px;font-size:5px}
-.arcanist-card-reader>small{font-size:4.5px;line-height:1.05}
-@media(max-height:700px){
- .arcanist-control-panel{height:84px;max-height:84px}
- .arcanist-quadrant-plate{height:38px;flex-basis:38px}
- .arcanist-quadrant-lever{height:36px;bottom:6px}
- .arcanist-quadrant-lever .arcanist-lever-shaft{height:25px}
- .arcanist-travel-card{height:18px;min-height:18px}
-}
-@media(max-height:620px){
- .arcanist-control-panel{height:78px;max-height:78px}
- .arcanist-quadrant-plate{height:34px;flex-basis:34px}
- .arcanist-quadrant-lever{height:32px;bottom:5px}
- .arcanist-quadrant-lever .arcanist-lever-shaft{height:22px}
- .arcanist-card-reader-label,.arcanist-card-reader>small{display:none}
-}
-
-/* 2026-11-04 horizontal alignment repair: constrain every machine layer to the
-   drawer's actual inner width; avoid competing inset + width constraints. */
-.arcanist-device-drawer{
-  inset:0;
-  left:0;
-  right:0;
-  top:0;
-  bottom:0;
-  width:auto;
-  height:auto;
-  max-width:100%;
-  min-width:0;
-  margin:0;
-  box-sizing:border-box;
-}
-.arcanist-machine-shell{
-  width:100%;
-  max-width:100%;
-  min-width:0;
-  margin:0;
-  box-sizing:border-box;
-}
-.arcanist-machine-heading,
-.arcanist-machine-main,
-.arcanist-transmission-bay,
-.arcanist-ticket-dispenser,
-.arcanist-machine-status{
-  width:100%;
-  max-width:100%;
-  min-width:0;
-  box-sizing:border-box;
-}
-.arcanist-machine-heading{
-  grid-template-columns:18px 29px minmax(0,1fr) 30px;
-}
-.arcanist-machine-main{
-  grid-template-columns:minmax(0,1fr) 108px;
-}
-@media(max-width:390px){
-  .arcanist-machine-main{
-    grid-template-columns:minmax(0,1fr) 94px;
-    gap:5px;
-  }
+ .arcanist-quadrant-lever.is-returning .arcanist-lever-shaft,.arcanist-quadrant-lever.is-returning .arcanist-lever-handle{transition:none!important}
 }
