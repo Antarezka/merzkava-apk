@@ -91,7 +91,6 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
       ticket.hidden = true;
       ticket.disabled = false;
       ticket.classList.remove("is-returning", "is-torn", "is-under-tension");
-      ticket.style.removeProperty("--ticket-pull");
       ticket.style.removeProperty("--ticket-extension");
       ticket.style.removeProperty("--tear-bias");
       ticket.style.removeProperty("clip-path");
@@ -193,7 +192,6 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
       shakeVertically(machine, 4.4);
       ticket.hidden = false;
       ticket.classList.remove("is-returning", "is-torn");
-      ticket.style.removeProperty("--ticket-pull");
       ticket.style.removeProperty("--ticket-extension");
       ticket.style.removeProperty("clip-path");
       const destination = ticket.querySelector<HTMLElement>("[data-ticket-destination]");
@@ -230,7 +228,6 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     stub.setAttribute("aria-hidden", "true");
     stub.disabled = true;
     stub.hidden = false;
-    stub.style.removeProperty("--ticket-pull");
     stub.style.removeProperty("--ticket-extension");
     stub.style.removeProperty("clip-path");
     ticket.parentElement?.appendChild(stub);
@@ -379,8 +376,6 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     const machine = active.element.closest<HTMLElement>("[data-arcanistry-machine]");
     if (machine && active.distance > 8) shakeVertically(machine, 1.2);
     later(() => {
-      active.element.style.removeProperty("--ticket-pull");
-      active.element.style.removeProperty("--ticket-extension");
       active.element.style.removeProperty("--ticket-extension");
       active.element.classList.remove("is-returning");
     }, 440);
