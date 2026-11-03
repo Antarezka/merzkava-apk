@@ -7,7 +7,7 @@
 .wmh-level-header h3{margin:7px 0 3px;font:clamp(23px,6vw,31px)/1 Georgia,serif;color:#f4e6ca}
 .wmh-level-header p{margin:0;color:#b9b29f;font:8px/1.4 Arial,sans-serif;letter-spacing:.12em}
 .wmh-close{width:36px;height:36px;border:1px solid #92784e;background:#1d2922;color:#f2dfb9;font-size:24px}
-.wmh-world-map{position:relative;flex:1;min-height:420px;max-height:calc(100dvh - 190px);margin:8px 0 12px;background:radial-gradient(ellipse at 50% 45%,#536b58,#18251e 70%);border:1px solid #a78b5e;overflow:auto;display:block;overscroll-behavior:contain;scrollbar-color:#a78b5e #17231c;scrollbar-width:thin}
+.wmh-world-map{position:relative;flex:1;min-height:420px;max-height:calc(100dvh - 190px);margin:8px 0 12px;background:radial-gradient(ellipse at 50% 45%,#536b58,#18251e 70%);border:1px solid #a78b5e;overflow:auto;display:block;overscroll-behavior:contain;scrollbar-color:#a78b5e #17231c;scrollbar-width:thin;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
 .wmh-world-map-image{position:relative;width:100%;flex:none}
 .wmh-world-map-image>img{display:block;width:100%;height:auto;max-height:none;object-fit:contain;filter:drop-shadow(0 8px 12px #0008)}
 .wmh-power{position:absolute;display:flex;align-items:center;gap:6px;padding:7px 9px;border:1px solid #e0c38d;background:#18221de8;color:#f5e5c6;box-shadow:0 3px 10px #0008;font-size:9px;touch-action:manipulation}
@@ -82,3 +82,12 @@
 .wmh-map-zoom span{min-width:42px;text-align:center;font-variant-numeric:tabular-nums}
 .wmh-world-map-image .wmh-power{transform:translate(-50%,-50%)}
 .wmh-editor-map-surface .wmh-editor-marker{transform:translate(-50%,-50%)}
+
+.wmh-world-map:active{cursor:grabbing}
+.wmh-world-map .wmh-power{cursor:pointer;user-select:none;-webkit-user-select:none}
+.wmh-marker-info{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 10px;padding:12px;border:1px solid #c4a16a;background:linear-gradient(110deg,#17241c,#26362b);color:#f2e4c9;box-shadow:0 4px 14px #0007}
+.wmh-marker-info>div{display:flex;flex-direction:column;gap:5px;min-width:0}
+.wmh-marker-info small{color:#d6b77e;font:700 8px Arial,sans-serif;letter-spacing:.13em}
+.wmh-marker-info b{font:19px Georgia,serif;color:#f4e6ca}
+.wmh-marker-info span{font:8px Arial,sans-serif;letter-spacing:.1em;color:#c6b18b}
+.wmh-marker-info button{flex:none;width:30px;height:30px;border:1px solid #92784e;background:#1d2922;color:#f2dfb9;font-size:20px}
