@@ -2769,3 +2769,25 @@ body { color:var(--ui-ink); }
   .narrative-wallpaper-settings .wallpaper-choice{flex-basis:132px}
 }
 @media(prefers-reduced-motion:reduce){.narrative-wallpaper-settings .wallpaper-dropdown-arrow{transition:none}}
+
+
+/* Engraved wayfinder insignia: a Victorian archive finial with a reversible compass point. */
+.narrative-wallpaper-settings .wallpaper-dropdown-arrow{
+  display:grid;place-items:center;flex:0 0 27px;width:27px;height:36px;
+  color:#9b7842;transform:rotate(0deg);transition:transform .24s ease;
+  filter:drop-shadow(0 1px 1px #6f542b55);
+}
+.narrative-wallpaper-settings .wallpaper-dropdown-arrow svg{
+  display:block;width:23px;height:32px;overflow:visible;
+  fill:none;stroke:currentColor;stroke-width:1.25;stroke-linecap:round;stroke-linejoin:round;
+}
+.narrative-wallpaper-settings .wallpaper-dropdown[open] .wallpaper-dropdown-arrow{transform:rotate(180deg)}
+.narrative-wallpaper-settings .wallpaper-dropdown-heading:focus-visible{
+  outline:1px solid #b99b5e;outline-offset:-3px;border-radius:4px;
+}
+:root[data-theme="dark"] .narrative-wallpaper-settings .wallpaper-dropdown-arrow{
+  color:#d2b575;filter:drop-shadow(0 1px 2px #0009);
+}
+@media(prefers-reduced-motion:reduce){
+  .narrative-wallpaper-settings .wallpaper-dropdown-arrow{transition:none}
+}
