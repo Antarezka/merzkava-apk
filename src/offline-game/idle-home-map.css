@@ -557,3 +557,48 @@
  .arcanist-quadrant-lever .arcanist-lever-shaft{height:22px}
  .arcanist-card-reader-label,.arcanist-card-reader>small{display:none}
 }
+
+/* 2026-11-04 horizontal alignment repair: constrain every machine layer to the
+   drawer's actual inner width; avoid competing inset + width constraints. */
+.arcanist-device-drawer{
+  inset:0;
+  left:0;
+  right:0;
+  top:0;
+  bottom:0;
+  width:auto;
+  height:auto;
+  max-width:100%;
+  min-width:0;
+  margin:0;
+  box-sizing:border-box;
+}
+.arcanist-machine-shell{
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  margin:0;
+  box-sizing:border-box;
+}
+.arcanist-machine-heading,
+.arcanist-machine-main,
+.arcanist-transmission-bay,
+.arcanist-ticket-dispenser,
+.arcanist-machine-status{
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  box-sizing:border-box;
+}
+.arcanist-machine-heading{
+  grid-template-columns:18px 29px minmax(0,1fr) 30px;
+}
+.arcanist-machine-main{
+  grid-template-columns:minmax(0,1fr) 108px;
+}
+@media(max-width:390px){
+  .arcanist-machine-main{
+    grid-template-columns:minmax(0,1fr) 94px;
+    gap:5px;
+  }
+}
