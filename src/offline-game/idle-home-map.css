@@ -1,0 +1,49 @@
+/* Idle RPG home-map wireframe. Isolated from Eternal Path and Convo UI. */
+.expedition-idle-modal{position:fixed;z-index:90;inset:0;display:grid;place-items:center;padding:0;background:#090807e8}
+.expedition-idle-modal[hidden]{display:none!important}
+.expedition-idle-backdrop{position:absolute;inset:0;width:100%;height:100%;border:0;background:#090807c9;backdrop-filter:blur(4px)}
+.idle-home-dialog{position:relative;z-index:1;width:min(100%,520px);height:100dvh;max-height:100dvh;overflow:hidden;display:flex;flex-direction:column;padding:max(10px,env(safe-area-inset-top)) 12px max(8px,env(safe-area-inset-bottom));background:linear-gradient(160deg,#252d28,#151b18 68%,#24251e);color:#efe4d0}
+.idle-home-header{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:5px 3px 10px;border-bottom:1px solid #b99a6655}
+.idle-home-kicker,.idle-panel-kicker{font-size:8px;letter-spacing:.16em;color:#c8a875;font-weight:700}
+.idle-home-header h3{margin:3px 0 2px;font:26px/1.05 Georgia,serif;color:#f2e6d1}
+.idle-region-subtitle{font-size:8px;letter-spacing:.13em;color:#a9b4a5}
+.idle-home-close{width:36px;height:36px;border:1px solid #947a50;background:#2b352e;color:#f1dfbd;font-size:24px;touch-action:manipulation}
+.idle-region-switch{display:flex;gap:5px;overflow-x:auto;padding:9px 0;scrollbar-width:none}
+.idle-region-switch button{flex:1 0 auto;min-height:34px;padding:5px 8px;border:1px solid #766344;background:#202820;color:#d7c7a8;font-size:9px;touch-action:manipulation}
+.idle-region-switch button.is-active{background:#8a7048;color:#fff1d5;border-color:#d7b67b}
+.idle-map-stage{position:relative;flex:1;min-height:260px;overflow:hidden;border:1px solid #9c8055;background:linear-gradient(180deg,#82928a 0%,#536b60 46%,#283d35 100%);isolation:isolate}
+.idle-map-region{position:absolute;inset:0;overflow:hidden}
+.idle-map-region[hidden]{display:none}
+.idle-map-landmass{position:absolute;inset:5% 3% 7%;overflow:hidden;clip-path:polygon(50% 0,88% 15%,100% 55%,77% 94%,28% 100%,0 65%,13% 22%);background:linear-gradient(145deg,#9a9a76,#687e61 43%,#405e4d 72%,#9a896b);box-shadow:inset 0 0 35px #17231d}
+.idle-map-ridge{position:absolute;inset:0;background:linear-gradient(135deg,transparent 35%,#d2c7a044 36%,transparent 43%),linear-gradient(35deg,transparent 54%,#1e392b66 55%,transparent 65%);clip-path:polygon(0 0,100% 0,100% 55%,0 80%)}
+.ridge-b{transform:rotate(180deg);opacity:.55}
+.idle-map-river{position:absolute;left:42%;top:-10%;width:13%;height:125%;transform:rotate(24deg);border-left:7px solid #a9d2d0aa;border-right:4px solid #d2e6d077;filter:blur(1px)}
+.idle-map-road{position:absolute;width:110%;height:5px;background:#d7c39a;box-shadow:0 1px 3px #26372b;transform:rotate(-25deg);left:-4%;top:47%}
+.road-b{transform:rotate(38deg);top:60%;left:-3%;width:105%;height:3px;background:#b6a17b}
+.idle-map-home{position:absolute;left:45%;top:48%;display:grid;place-items:center;width:56px;height:56px;border:1px solid #e2c48d;background:#35483a;color:#f4dfb4;transform:rotate(45deg);box-shadow:0 5px 12px #14201899}
+.idle-map-home span,.idle-map-home small{transform:rotate(-45deg)}
+.idle-map-home span{font-size:23px}.idle-map-home small{font-size:7px;letter-spacing:.1em}
+.idle-map-region[data-terrain="imperial"] .idle-map-landmass{background:linear-gradient(145deg,#b49a6c,#8c865e 45%,#4e6951)}
+.idle-map-region[data-terrain="northern"] .idle-map-landmass{background:linear-gradient(145deg,#c0c4bb,#7c928c 44%,#405d58)}
+.idle-map-region[data-terrain="floating"] .idle-map-landmass{clip-path:polygon(50% 0,94% 24%,85% 73%,54% 100%,12% 82%,0 38%);background:linear-gradient(145deg,#b9b9a0,#7b958c 50%,#4d6c6b);filter:drop-shadow(0 15px 8px #101c1b99)}
+.idle-map-marker{position:absolute;z-index:3;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:46px;max-width:90px;padding:4px 5px;border:1px solid #d6b87d;border-radius:4px;background:#202820eF;color:#f4e5c9;box-shadow:0 2px 7px #1119;transform:translate(-50%,-50%);touch-action:manipulation}
+.idle-map-marker span{font-size:18px;line-height:1.1;color:#e5c68e}
+.idle-map-marker small{font-size:7px;line-height:1.2;text-align:center}
+.idle-map-marker:active{transform:translate(-50%,-50%) scale(.95)}
+.idle-map-caption{position:absolute;left:10px;right:10px;bottom:9px;z-index:4;display:flex;justify-content:space-between;align-items:end;gap:8px;padding:8px;background:#172019c9;border:1px solid #b99a6655}
+.idle-map-caption span{font:16px Georgia,serif}.idle-map-caption small{font-size:7px;letter-spacing:.1em;color:#d4bd91;text-align:right}
+.idle-map-compass{position:absolute;right:10px;top:10px;z-index:4;width:28px;height:34px;text-align:center;font-size:9px;color:#fff0d0;text-shadow:0 1px 3px #000}
+.idle-destination-drawer{padding:8px 0 5px;border-bottom:1px solid #b99a6644}
+.idle-destination-heading{display:flex;justify-content:space-between;gap:6px;margin-bottom:5px;font-size:8px;letter-spacing:.12em;color:#d8c49f}
+.idle-destination-heading small{color:#a9a18e}
+.idle-global-places{display:flex;gap:5px;overflow-x:auto;padding:2px 1px 6px;scrollbar-width:thin}
+.idle-global-places .idle-map-marker{position:static;transform:none;flex:0 0 76px;min-height:48px;max-width:none}
+.idle-global-places .idle-map-marker:active{transform:scale(.96)}
+.idle-coming-panel{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 10px;margin-top:7px;border:1px solid #8f7956;background:#262d26}
+.idle-coming-panel strong{display:block;margin-top:3px;font:15px Georgia,serif;color:#f2e5cf}
+.idle-coming-panel p{margin:3px 0 0;color:#bdb9a9;font:10px/1.35 Georgia,serif}
+.idle-coming-tag{flex:0 0 auto;padding:5px;border:1px solid #b99a66;color:#d6b87d;font-size:7px;letter-spacing:.1em}
+.idle-home-footer{display:flex;justify-content:space-between;gap:6px;padding:8px 2px 2px;color:#a99c84;font-size:7px;letter-spacing:.1em}
+@media(max-height:620px){.idle-home-header{padding-bottom:5px}.idle-map-stage{min-height:180px}.idle-destination-drawer{padding:5px 0 2px}.idle-coming-panel{padding:6px;margin-top:4px}.idle-home-footer{padding-top:4px}}
+@media(max-width:360px){.idle-home-dialog{padding-left:8px;padding-right:8px}.idle-map-marker{min-width:38px;padding:3px}.idle-map-marker small{font-size:6px}}
+@media(prefers-reduced-motion:reduce){.idle-map-marker{transition:none}}
