@@ -3,6 +3,7 @@ import { animate } from "animejs";
 export const ARCANISTRY_LEVER_PULL_DISTANCE = 43;
 export const ARCANISTRY_TICKET_TEAR_DISTANCE = 62;
 export const ARCANISTRY_MIN_LOADING_MS = 3000;
+export const ARCANISTRY_CODE_LENGTH = 4;
 
 export function isArcanistryLeverEngaged(distance: number): boolean {
   return Number.isFinite(distance) && distance >= ARCANISTRY_LEVER_PULL_DISTANCE;
@@ -12,12 +13,21 @@ export function isArcanistryTicketTorn(distance: number): boolean {
   return Number.isFinite(distance) && distance >= ARCANISTRY_TICKET_TEAR_DISTANCE;
 }
 
+export function createArcanistryCode(random = Math.random): string {
+  return String(Math.floor(Math.max(0, Math.min(.999999999, random())) * 10000)).padStart(4, "0");
+}
+
+export function isArcanistryCodeCorrect(expected: string, entered: string): boolean {
+  return /^\d{4}$/.test(expected) && /^\d{4}$/.test(entered) && expected === entered;
+}
+
 type TravelHandler = (sceneId: string) => void | Promise<void>;
 
 export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: TravelHandler): () => void {
   const timers = new Set<number>();
   let activeTicket: { element: HTMLButtonElement; pointerId: number; startX: number; lastX: number; startY: number; distance: number } | null = null;
   let activeLever: { element: HTMLButtonElement; machine: HTMLElement; pointerId: number; startY: number; distance: number } | null = null;
+  let dialToken = 0;
   let disposed = false;
 
   const later = (callback: () => void, delay: number): number => {
@@ -46,8 +56,140 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     });
   };
 
+  const setInputDisplay = (machine: HTMLElement, value: string): void => {
+    machine.querySelectorAll<HTMLElement>("[data-code-input-digit]").forEach((digit, index) => {
+      digit.textContent = value[index] ?? "—";
+      digit.classList.toggle("is-filled", Boolean(value[index]));
+    });
+    const progress = machine.querySelector<HTMLElement>("[data-code-progress]");
+    if (progress) progress.textContent = value.length + " / 4 DIGITS ENTERED";
+  };
+
+  const resetAuthentication = (machine: HTMLElement, clearDestination = false): void => {
+    dialToken += 1;
+    machine.dataset.machineState = "idle";
+    machine.dataset.authCode = "";
+    machine.dataset.enteredCode = "";
+    machine.classList.remove("is-code-verified", "is-code-rejected", "is-code-entering");
+    const codeDigits = machine.querySelectorAll<HTMLElement>("[data-code-digit]");
+    codeDigits.forEach(digit => {
+      digit.textContent = "—";
+      digit.classList.remove("is-spinning");
+    });
+    setInputDisplay(machine, "");
+    const dial = machine.querySelector<HTMLElement>("[data-arcanistry-dial-rotor]");
+    dial?.style.removeProperty("--dial-turn");
+    machine.querySelectorAll<HTMLButtonElement>("[data-dial-digit]").forEach(button => { button.disabled = true; });
+    const generate = machine.querySelector<HTMLButtonElement>("[data-generate-code]");
+    if (generate) generate.disabled = !((machine.dataset.selectedAvailable === "true") && Boolean(machine.dataset.selectedScene));
+    const cancel = machine.querySelector<HTMLButtonElement>("[data-cancel-code]");
+    if (cancel) cancel.disabled = !machine.dataset.selectedScene;
+    const lever = machine.querySelector<HTMLButtonElement>("[data-arcanistry-lever]");
+    if (lever) {
+      lever.disabled = true;
+      lever.classList.remove("is-pulling", "is-pulled", "is-returning");
+      lever.style.removeProperty("--lever-angle");
+      lever.style.removeProperty("--lever-pull");
+      lever.setAttribute("aria-label", "Lever locked until code verification");
+    }
+    machine.querySelector<HTMLElement>("[data-arcanistry-dial-face]")?.removeAttribute("hidden");
+    machine.querySelector<HTMLElement>("[data-arcanistry-lever-face]")?.setAttribute("hidden", "");
+    if (clearDestination) {
+      machine.dataset.selectedScene = "";
+      machine.dataset.selectedAvailable = "false";
+      machine.dataset.selectedName = "";
+    }
+    const status = machine.querySelector<HTMLElement>("[data-arcanistry-status]");
+    if (status) status.textContent = clearDestination ? "SELECT A DESTINATION TO PREPARE THE ROUTE" : "DESTINATION SET · GENERATE ACCESS CODE";
+  };
+
+  const generateCode = (machine: HTMLElement): void => {
+    if (machine.dataset.machineState !== "idle" || machine.dataset.selectedAvailable !== "true" || !machine.dataset.selectedScene) return;
+    const code = createArcanistryCode();
+    machine.dataset.authCode = code;
+    machine.dataset.enteredCode = "";
+    machine.dataset.machineState = "code-ready";
+    machine.classList.remove("is-code-verified", "is-code-rejected");
+    const generate = machine.querySelector<HTMLButtonElement>("[data-generate-code]");
+    if (generate) generate.disabled = true;
+    const cancel = machine.querySelector<HTMLButtonElement>("[data-cancel-code]");
+    if (cancel) cancel.disabled = false;
+    machine.querySelectorAll<HTMLButtonElement>("[data-dial-digit]").forEach(button => { button.disabled = false; });
+    machine.querySelectorAll<HTMLElement>("[data-code-digit]").forEach((digit, index) => {
+      digit.classList.add("is-spinning");
+      digit.textContent = String(Math.floor(Math.random() * 10));
+      later(() => {
+        digit.textContent = code[index];
+        digit.classList.remove("is-spinning");
+      }, 420 + index * 170);
+    });
+    setInputDisplay(machine, "");
+    const status = machine.querySelector<HTMLElement>("[data-arcanistry-status]");
+    if (status) status.textContent = "ACCESS CODE GENERATED · ENTER FOUR DIGITS";
+  };
+
+  const verifyCode = (machine: HTMLElement): void => {
+    const entered = machine.dataset.enteredCode ?? "";
+    if (entered.length !== ARCANISTRY_CODE_LENGTH) return;
+    if (!isArcanistryCodeCorrect(machine.dataset.authCode ?? "", entered)) {
+      machine.dataset.machineState = "code-ready";
+      machine.dataset.enteredCode = "";
+      machine.classList.add("is-code-rejected");
+      setInputDisplay(machine, "");
+      const status = machine.querySelector<HTMLElement>("[data-arcanistry-status]");
+      if (status) status.textContent = "CODE MISMATCH · TRY AGAIN";
+      later(() => machine.classList.remove("is-code-rejected"), 650);
+      later(() => {
+        if (machine.dataset.machineState === "code-ready" && status) status.textContent = "ACCESS CODE RETAINED · RE-ENTER FOUR DIGITS";
+      }, 850);
+      return;
+    }
+
+    machine.dataset.machineState = "verified";
+    machine.classList.add("is-code-verified");
+    machine.classList.remove("is-code-rejected");
+    machine.querySelectorAll<HTMLButtonElement>("[data-dial-digit]").forEach(button => { button.disabled = true; });
+    machine.querySelector<HTMLElement>("[data-arcanistry-dial-face]")?.setAttribute("hidden", "");
+    const leverFace = machine.querySelector<HTMLElement>("[data-arcanistry-lever-face]");
+    leverFace?.removeAttribute("hidden");
+    const lever = machine.querySelector<HTMLButtonElement>("[data-arcanistry-lever]");
+    if (lever) {
+      lever.disabled = false;
+      lever.setAttribute("aria-label", "Pull lever downward to issue the travel ticket");
+    }
+    const status = machine.querySelector<HTMLElement>("[data-arcanistry-status]");
+    if (status) status.textContent = "CODE VERIFIED · TRANSMISSION UNLOCKED";
+  };
+
+  const enterDialDigit = (machine: HTMLElement, digit: string): void => {
+    if (!/^\d$/.test(digit) || (machine.dataset.machineState !== "code-ready" && machine.dataset.machineState !== "entering-code")) return;
+    const entered = machine.dataset.enteredCode ?? "";
+    if (entered.length >= ARCANISTRY_CODE_LENGTH) return;
+    const rotor = machine.querySelector<HTMLElement>("[data-arcanistry-dial-rotor]");
+    if (!rotor) return;
+    const token = ++dialToken;
+    machine.dataset.machineState = "entering-code";
+    machine.classList.add("is-code-entering");
+    machine.querySelectorAll<HTMLButtonElement>("[data-dial-digit]").forEach(button => { button.disabled = true; });
+    rotor.style.setProperty("--dial-turn", (Number(digit) * 36 + 360) + "deg");
+    later(() => {
+      if (token !== dialToken || disposed) return;
+      rotor.style.setProperty("--dial-turn", "0deg");
+      machine.dataset.enteredCode = entered + digit;
+      setInputDisplay(machine, entered + digit);
+      const next = entered + digit;
+      machine.dataset.machineState = "code-ready";
+      machine.classList.remove("is-code-entering");
+      if (next.length === ARCANISTRY_CODE_LENGTH) {
+        verifyCode(machine);
+      } else {
+        machine.querySelectorAll<HTMLButtonElement>("[data-dial-digit]").forEach(button => { button.disabled = false; });
+      }
+    }, 510);
+  };
+
   const startIssuance = (machine: HTMLElement, lever: HTMLButtonElement): void => {
-    if (machine.dataset.machineState !== "idle" || machine.dataset.selectedAvailable !== "true") return;
+    if (machine.dataset.machineState !== "verified" || machine.dataset.selectedAvailable !== "true") return;
     const sceneId = machine.dataset.selectedScene ?? "";
     if (!sceneId) return;
 
@@ -130,12 +272,8 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
           ticket.hidden = true;
           ticket.disabled = false;
           machine.dataset.machineState = "idle";
-          machine.classList.remove("is-traveling", "is-running", "is-printing");
-          const lever = machine.querySelector<HTMLButtonElement>("[data-arcanistry-lever]");
-          if (lever) {
-            lever.disabled = machine.dataset.selectedAvailable !== "true";
-            lever.setAttribute("aria-label", "Pull lever to issue a travel ticket");
-          }
+          machine.classList.remove("is-traveling", "is-running", "is-printing", "is-code-verified");
+          resetAuthentication(machine);
           if (status) status.textContent = "ROUTE INTERRUPTED · PLEASE TRY AGAIN";
         }
       }, Math.max(0, ARCANISTRY_MIN_LOADING_MS - (Date.now() - loadingStartedAt)));
@@ -145,17 +283,42 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
   const onClick = (event: MouseEvent): void => {
     const target = event.target;
     if (!(target instanceof Element)) return;
+
+    const machine = target.closest<HTMLElement>("[data-arcanistry-machine]");
+    if (!machine) return;
+
+    const cancel = target.closest<HTMLButtonElement>("[data-cancel-code]");
+    if (cancel) {
+      resetAuthentication(machine, true);
+      machine.querySelectorAll<HTMLElement>("[data-idle-place]").forEach(place => place.classList.remove("is-selected"));
+      return;
+    }
+    const generate = target.closest<HTMLButtonElement>("[data-generate-code]");
+    if (generate) {
+      generateCode(machine);
+      return;
+    }
+    const dialDigit = target.closest<HTMLButtonElement>("[data-dial-digit]");
+    if (dialDigit && !dialDigit.disabled) {
+      enterDialDigit(machine, dialDigit.dataset.dialDigit ?? "");
+      return;
+    }
+
     const lever = target.closest<HTMLButtonElement>("[data-arcanistry-lever]");
     if (lever) {
       if (event.detail !== 0) return;
-      const machine = lever.closest<HTMLElement>("[data-arcanistry-machine]");
-      if (machine) startIssuance(machine, lever);
+      startIssuance(machine, lever);
       return;
     }
     const ticket = target.closest<HTMLButtonElement>("[data-arcanistry-ticket]");
-    if (ticket && event.detail === 0 && ticket.closest<HTMLElement>("[data-arcanistry-machine]")?.dataset.machineState === "ticket-ready") {
+    if (ticket && event.detail === 0 && machine.dataset.machineState === "ticket-ready") {
       void tearTicket(ticket, ARCANISTRY_TICKET_TEAR_DISTANCE, "center");
     }
+  };
+
+  const onDestinationSelected = (event: Event): void => {
+    const machine = event.currentTarget as HTMLElement;
+    resetAuthentication(machine);
   };
 
   const onPointerDown = (event: PointerEvent): void => {
@@ -163,7 +326,7 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     if (!(target instanceof Element) || (event.pointerType === "mouse" && event.button !== 0)) return;
     const lever = target.closest<HTMLButtonElement>("[data-arcanistry-lever]");
     const leverMachine = lever?.closest<HTMLElement>("[data-arcanistry-machine]");
-    if (lever && leverMachine && !lever.disabled && leverMachine.dataset.machineState === "idle" && leverMachine.dataset.selectedAvailable === "true") {
+    if (lever && leverMachine && !lever.disabled && leverMachine.dataset.machineState === "verified" && leverMachine.dataset.selectedAvailable === "true") {
       activeLever = { element: lever, machine: leverMachine, pointerId: event.pointerId, startY: event.clientY, distance: 0 };
       try { lever.setPointerCapture(event.pointerId); } catch { /* WebView fallback */ }
       event.preventDefault();
@@ -181,7 +344,6 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     if (activeLever && activeLever.pointerId === event.pointerId) {
       const distance = Math.max(0, Math.min(58, event.clientY - activeLever.startY));
       activeLever.distance = distance;
-      // Keep the lever on a straight downward stroke; the shaft and grip travel together.
       activeLever.element.style.setProperty("--lever-angle", (distance * .12) + "deg");
       activeLever.element.style.setProperty("--lever-pull", (distance * .78) + "px");
       activeLever.element.classList.toggle("is-pulling", distance > 2);
@@ -235,6 +397,8 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     }, 440);
   };
 
+  const machine = root.querySelector<HTMLElement>("[data-arcanistry-machine]");
+  machine?.addEventListener("arcanistry:destination-selected", onDestinationSelected);
   root.addEventListener("click", onClick);
   root.addEventListener("pointerdown", onPointerDown, { passive: false });
   root.addEventListener("pointermove", onPointerMove, { passive: false });
@@ -247,6 +411,7 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     disposed = true;
     timers.forEach(id => window.clearTimeout(id));
     timers.clear();
+    machine?.removeEventListener("arcanistry:destination-selected", onDestinationSelected);
     root.removeEventListener("click", onClick);
     root.removeEventListener("pointerdown", onPointerDown);
     root.removeEventListener("pointermove", onPointerMove);
