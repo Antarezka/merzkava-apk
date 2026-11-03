@@ -406,6 +406,8 @@ This is a transparent checklist-completion index, **not** a prediction of remain
 
 ### 5C-2. Illustrated item tiles, category frames, and permanent character emblems
 
+**Scope clarification:** This item system belongs to the standalone Idle RPG / Offline Game only. The separate Convo experience does not impose its own content or catalog limits on Idle RPG. The expandable master checklist is maintained in [Idle RPG Master Item Candidate Checklist](./offline-game/IDLE_RPG_ITEM_CATALOG.md); it is intended to grow to thousands of individually reviewed entries with explicit provenance.
+
 **Status:** Visual/content-system direction recorded; asset inventory, item catalog, frame artwork, and implementation remain TODO. This section defines the intended presentation, not a claim that all item records or illustrations already exist.
 
 **Core presentation rule**
