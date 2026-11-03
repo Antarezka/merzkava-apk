@@ -150,7 +150,6 @@ function bindWorldMapEditor(dialog: HTMLElement): void {
   canvas.dataset.bound = "true";
   let markers = readWorldMarkers();
   let dragging: WorldMarkerId | null = null;
-  let hasUnsavedChanges = false;
   const exportField = dialog.querySelector<HTMLTextAreaElement>("[data-wmh-export]");
   const surface = canvas.querySelector<HTMLElement>("[data-wmh-map-surface]");
   const mapImage = surface?.querySelector<HTMLImageElement>("img");
@@ -193,7 +192,6 @@ function bindWorldMapEditor(dialog: HTMLElement): void {
     const marker = markers.find(item => item.id === id);
     if (!marker) return;
     marker.x = clamp(x); marker.y = clamp(y); paint(marker); refreshExport();
-    hasUnsavedChanges = true;
     setStatus(marker.name + " · X " + marker.x + "% · Y " + marker.y + "% · pending confirmation");
   };
   canvas.addEventListener("pointerdown", event => {
@@ -230,7 +228,6 @@ function bindWorldMapEditor(dialog: HTMLElement): void {
   const saveCoordinates = () => {
     try {
       localStorage.setItem(WORLD_MAP_COORDINATES_KEY, JSON.stringify(markers));
-      hasUnsavedChanges = false;
       setStatus("Positions confirmed and locked on this device. They will remain after leaving the map or closing the app.");
     } catch { setStatus("Could not save: device storage is unavailable. Copy the JSON reference as a backup."); }
   };
@@ -264,13 +261,13 @@ function bindWorldMapEditor(dialog: HTMLElement): void {
         const item = incoming.find((entry: any) => entry.id === base.id);
         return { ...base, x: clamp(Number(item.x)), y: clamp(Number(item.y)) };
       });
-      markers.forEach(paint); refreshExport(); hasUnsavedChanges = true;
+      markers.forEach(paint); refreshExport();
       setStatus("Imported coordinates are a preview. Confirm & lock positions to save them on this device.");
     } catch { setStatus("Import failed. Paste a valid Merzkava World Map JSON reference with all three area IDs."); }
   });
   dialog.querySelector<HTMLElement>('[data-wmh-action="editor-reset"]')?.addEventListener("click", () => {
     markers = defaultWorldMarkers.map(item => ({ ...item }));
-    markers.forEach(paint); refreshExport(); hasUnsavedChanges = true;
+    markers.forEach(paint); refreshExport();
     setStatus("Default positions restored in preview. Confirm & lock positions to save them.");
   });
 }
