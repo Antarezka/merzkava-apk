@@ -108,7 +108,7 @@ export function mountExpeditionAnimations(root: HTMLElement): () => void {
 
   const scope = createScope({ root, mediaQueries: { reduceMotion: "(prefers-reduced-motion: reduce)" } }).add(self => {
     if (!self || self.matches.reduceMotion) return;
-    const entranceTargets = root.querySelectorAll<HTMLElement>(".expedition-heading, .expedition-environment, .expedition-character-panel, .expedition-disposition-line, .expedition-dialogue, .expedition-footer");
+    const entranceTargets = root.querySelectorAll<HTMLElement>(".expedition-heading, .expedition-character-panel, .expedition-disposition-line, .expedition-dialogue, .expedition-footer");
     if (entranceTargets.length) animate(entranceTargets, { opacity: [0, 1], translateY: [13, 0], duration: 560, delay: stagger(72), ease: "outCubic" });
     const profileFields = root.querySelectorAll<HTMLElement>(".expedition-profile-meta span");
     if (profileFields.length) animate(profileFields, { opacity: [0, 1], translateY: [5, 0], duration: 340, delay: stagger(38), ease: "outQuad" });
