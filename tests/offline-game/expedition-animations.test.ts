@@ -26,6 +26,22 @@ describe("Eternal Path Anime.js motion",()=>{
   expect(mocks.animate).toHaveBeenCalledWith(narrative,expect.objectContaining({translateY:[9,0]}));
   dispose();expect(mocks.scope.revert).toHaveBeenCalledOnce();
  });
+ it("creates and animates weather particles with Anime.js and cleans them up",()=>{
+  const nodes: any[]=[];
+  const host={appendChild:vi.fn((node:any)=>nodes.push(node)),replaceChildren:vi.fn()};
+  const environment={dataset:{weather:"Rain",cycle:"Morning"}};
+  const selectors:Record<string,any>={".expedition-environment":environment,".expedition-weather-particles":host};
+  const root={querySelector:vi.fn((selector:string)=>selectors[selector]??null),querySelectorAll:vi.fn(()=>[])} as unknown as HTMLElement;
+  const animation={pause:vi.fn(),play:vi.fn()};
+  mocks.animate.mockReturnValue(animation);
+  const dispose=mountExpeditionAnimations(root);
+  expect(nodes).toHaveLength(17);
+  expect(nodes[0].className).toContain("expedition-particle-rain");
+  expect(mocks.animate).toHaveBeenCalledWith(nodes,expect.objectContaining({loop:true,duration:1050}));
+  dispose();
+  expect(animation.pause).toHaveBeenCalled();
+  expect(host.replaceChildren).toHaveBeenCalledOnce();
+ });
  it("animates uploaded weather plates with distinct motion and cycles lightning variants",()=>{
   const environment={dataset:{weather:"Rain",cycle:"Morning"}};
   const sun={},moon={},rays={},rain={},lightning={},lightningImage={src:"/game/scenery/shared/fx-08-lightning-flash-a.png"};
