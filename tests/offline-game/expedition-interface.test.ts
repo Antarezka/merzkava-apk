@@ -9,6 +9,18 @@ import {
 describe("Eternal Path live world scene", () => {
   beforeEach(() => resetEternalGame());
 
+  it("keeps Journey Manager behind the clerk-emblem dropdown before a journey starts", () => {
+    const html=renderExpeditionInterface();
+    expect(html).toContain('class="expedition-save-manager is-compact is-prestart"');
+    expect(html).toContain('class="expedition-manager-emblem"');
+    expect(html).toContain('data-eternal-manager-toggle aria-label="Open Journey Manager" aria-expanded="false"');
+    expect(html).toContain('aria-controls="eternal-save-manager-dialog"');
+    expect(html).toContain('class="expedition-manager-content" data-eternal-manager-content role="dialog" aria-modal="true" aria-labelledby="eternal-manager-title" hidden');
+    expect(html).toContain('id="eternal-start-form" class="expedition-start-form"');
+    expect(html).toContain("NO ACTIVE JOURNEY");
+    expect(html).toContain("AWAITING YOUR JOURNEY");
+  });
+
   it("renders the established scene window without temporary test controls", () => {
     const html=renderExpeditionInterface();
     expect(html).toContain('class="expedition-environment"');
@@ -103,7 +115,7 @@ describe("Eternal Path live world scene", () => {
     expect(html).toContain("DISPOSITION");
     expect(html).toContain("JOURNEY MANAGER");
     expect(html).toContain('class="expedition-manager-trigger"');
-    expect(html).toContain('data-eternal-manager-backdrop aria-label="Close Save Manager" hidden');
+    expect(html).toContain('data-eternal-manager-backdrop aria-label="Close Journey Manager" hidden');
     expect(html).toContain('aria-controls="eternal-save-manager-dialog"');
     expect(html).toContain('id="eternal-save-manager-dialog" class="expedition-manager-content" data-eternal-manager-content role="dialog" aria-modal="true" aria-labelledby="eternal-manager-title" hidden');
     expect(html).toContain('class="scene-coordinate scene-clock-ink"');
