@@ -770,6 +770,7 @@ window.addEventListener("popstate", () => {
   const idleNotice=root.querySelector<HTMLElement>("[data-idle-rpg-modal]");
   if(idleNotice&&!idleNotice.hidden){
     idleNotice.hidden=true;
+    root.querySelector(".app-shell")?.classList.remove("is-idle-world");
     root.querySelector<HTMLButtonElement>("[data-idle-rpg-open]")?.setAttribute("aria-expanded","false");
     root.querySelector<HTMLButtonElement>("[data-idle-rpg-open]")?.focus();
     return;
@@ -964,11 +965,13 @@ root.addEventListener("click", async (event: MouseEvent) => {
     const trigger=root.querySelector<HTMLButtonElement>("[data-idle-rpg-open]");
     if(modal&&!modal.hidden){
       modal.hidden=true;
+      root.querySelector(".app-shell")?.classList.remove("is-idle-world");
       trigger?.setAttribute("aria-expanded","false");
       trigger?.focus();
       if(history.state?.idleRpgNotice) history.back();
     } else if(modal){
       modal.hidden=false;
+      root.querySelector(".app-shell")?.classList.add("is-idle-world");
       trigger?.setAttribute("aria-expanded","true");
       history.pushState({idleRpgNotice:true},"");
       modal.querySelector<HTMLButtonElement>("[data-idle-rpg-close]")?.focus();
@@ -980,6 +983,7 @@ root.addEventListener("click", async (event: MouseEvent) => {
     const trigger=root.querySelector<HTMLButtonElement>("[data-idle-rpg-open]");
     if(modal&&!modal.hidden){
       modal.hidden=true;
+      root.querySelector(".app-shell")?.classList.remove("is-idle-world");
       trigger?.setAttribute("aria-expanded","false");
       trigger?.focus();
       if(history.state?.idleRpgNotice) history.back();
