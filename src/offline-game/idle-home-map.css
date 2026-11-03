@@ -233,7 +233,7 @@
 .arcanist-device-drawer.is-turning .arcanist-dial-ring{transition:none}
 .arcanist-dial-aperture{--hole-radius:96px;--hole-inset:96px;--hole-scale:1;--hole-opacity:1;touch-action:none;cursor:grab;opacity:var(--hole-opacity);transition:transform .22s ease,opacity .22s ease,filter .22s}
 .arcanist-dial-aperture:active{cursor:grabbing}
-.arcanist-dial-aperture{transform:rotate(var(--hole-angle)) translateY(calc(-1 * var(--hole-inset))) rotate(calc(var(--hole-angle)*-1)) scale(var(--hole-scale))}
+.arcanist-dial-aperture{transform:rotate(var(--hole-angle)) translateY(calc(0px - var(--hole-inset))) rotate(calc(var(--hole-angle)*-1)) scale(var(--hole-scale))}
 .arcanist-dial-aperture.is-selected{z-index:6;filter:drop-shadow(0 0 5px #f1cf86)}
 .arcanist-threadwork{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:2}
 .arcanist-red-thread{fill:none;stroke:#a83c35;stroke-width:1.15;stroke-linecap:round;stroke-dasharray:350;stroke-dashoffset:350;filter:drop-shadow(0 0 1px #e2a18b);transition:stroke-dashoffset .18s linear}
@@ -243,8 +243,8 @@
 .arcanist-drive-gear.gear-b{right:24px;top:78px;width:22px;height:22px;font-size:14px}
 .arcanist-drive-gear.gear-c{right:47px;bottom:23px;width:18px;height:18px;font-size:12px}
 .arcanist-device-drawer.is-turning .gear-a{transform:rotate(var(--gear-turn,0deg))}
-.arcanist-device-drawer.is-turning .gear-b{transform:rotate(calc(var(--gear-turn,0deg)*-1.35))}
-.arcanist-device-drawer.is-turning .gear-c{transform:rotate(calc(var(--gear-turn,0deg)*1.8))}
+.arcanist-device-drawer.is-turning .gear-b{transform:rotate(var(--gear-turn-reverse,0deg))}
+.arcanist-device-drawer.is-turning .gear-c{transform:rotate(var(--gear-turn-fast,0deg))}
 .arcanist-device-drawer.is-activating .arcanist-dial-ring,.arcanist-device-drawer.is-returning .arcanist-dial-ring{transform:rotate(0deg)}
 .arcanist-device-drawer.is-activating .arcanist-red-thread{stroke-dashoffset:0;transition-duration:.85s}
 .arcanist-device-drawer.is-returning .arcanist-red-thread{stroke-dashoffset:350;transition-duration:.65s}
