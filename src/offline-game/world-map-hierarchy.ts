@@ -45,7 +45,7 @@ function readWorldMarkers(): WorldMarker[] {
 function worldMapMarkerMarkup(marker: WorldMarker, editor = false): string {
   return '<button class="wmh-power wmh-power-' + (marker.id === "golden-dragon-empire" ? "gde" : marker.id === "tianhai-yunzhou" ? "ty" : "bg") +
     (editor ? ' wmh-editor-marker' : '') + '" style="left:' + marker.x + '%;top:' + marker.y + '%" ' +
-    (editor ? 'type="button" data-wmh-drag-marker="' + marker.id + '" aria-label="Drag ' + marker.name + '"' : 'data-wmh-region="' + marker.id + '"') +
+    (editor ? 'type="button" data-wmh-drag-marker="' + marker.id + '" aria-label="Drag ' + marker.name + '"' : 'data-wmh-info="' + marker.id + '"') +
     '><b>' + (marker.id === "golden-dragon-empire" ? "01" : marker.id === "tianhai-yunzhou" ? "02" : "03") + '</b><span>' + marker.name + '</span></button>';
 }
 function serializeWorldMapCoordinates(markers: WorldMarker[]): string {
@@ -66,20 +66,72 @@ function serializeWorldMapCoordinates(markers: WorldMarker[]): string {
 function bindWorldMapZoom(dialog: HTMLElement): void {
   const viewport = dialog.querySelector<HTMLElement>("[data-wmh-map-viewport]");
   const surface = dialog.querySelector<HTMLElement>("[data-wmh-map-surface]");
-  if (!viewport || !surface || surface.dataset.zoomBound === "true") return;
-  surface.dataset.zoomBound = "true";
+  if (!viewport || !surface || viewport.dataset.gesturesBound === "true") return;
+  viewport.dataset.gesturesBound = "true";
   let zoom = 1;
-  const applyZoom = () => {
+  const pointers = new Map<number, { x: number; y: number }>();
+  let panStart: { x: number; y: number; scrollLeft: number; scrollTop: number } | null = null;
+  let pinchStart: { distance: number; zoom: number; centerX: number; centerY: number } | null = null;
+  const distance = (a: {x:number;y:number}, b: {x:number;y:number}) => Math.hypot(a.x-b.x,a.y-b.y);
+  const midpoint = (a: {x:number;y:number}, b: {x:number;y:number}) => ({x:(a.x+b.x)/2,y:(a.y+b.y)/2});
+  const applyZoom = (next: number, focusX?: number, focusY?: number) => {
+    const previous = zoom;
+    zoom = Math.max(1, Math.min(2.5, next));
+    const localX = focusX == null ? viewport.clientWidth / 2 : focusX - viewport.getBoundingClientRect().left;
+    const localY = focusY == null ? viewport.clientHeight / 2 : focusY - viewport.getBoundingClientRect().top;
+    const anchoredX = viewport.scrollLeft + localX;
+    const anchoredY = viewport.scrollTop + localY;
     surface.style.width = (zoom * 100) + "%";
+    viewport.scrollLeft = anchoredX * zoom / previous - localX;
+    viewport.scrollTop = anchoredY * zoom / previous - localY;
     const level = dialog.querySelector<HTMLElement>("[data-wmh-zoom-level]");
     if (level) level.textContent = Math.round(zoom * 100) + "%";
   };
   dialog.querySelectorAll<HTMLElement>("[data-wmh-zoom]").forEach(button => button.addEventListener("click", () => {
     const action = button.dataset.wmhZoom;
-    zoom = action === "reset" ? 1 : action === "in" ? Math.min(2.5, zoom + .25) : Math.max(1, zoom - .25);
-    applyZoom();
+    applyZoom(action === "reset" ? 1 : action === "in" ? zoom + .25 : zoom - .25);
   }));
-  applyZoom();
+  viewport.addEventListener("pointerdown", event => {
+    pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    if (pointers.size === 1) {
+      if ((event.target as Element).closest(".wmh-power")) return;
+      panStart = { x: event.clientX, y: event.clientY, scrollLeft: viewport.scrollLeft, scrollTop: viewport.scrollTop };
+      try { viewport.setPointerCapture(event.pointerId); } catch { /* pointer capture may be unavailable */ }
+    } else if (pointers.size === 2) {
+      const pair = [...pointers.values()];
+      const center = midpoint(pair[0], pair[1]);
+      pinchStart = { distance: Math.max(1, distance(pair[0], pair[1])), zoom, centerX: center.x, centerY: center.y };
+      panStart = null;
+      for (const id of pointers.keys()) {
+        try { viewport.setPointerCapture(id); } catch { /* pointer capture may be unavailable */ }
+      }
+    }
+  });
+  viewport.addEventListener("pointermove", event => {
+    if (!pointers.has(event.pointerId)) return;
+    pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    if (pointers.size >= 2 && pinchStart) {
+      const pair = [...pointers.values()].slice(0,2);
+      const center = midpoint(pair[0], pair[1]);
+      applyZoom(pinchStart.zoom * distance(pair[0], pair[1]) / pinchStart.distance, center.x, center.y);
+      event.preventDefault();
+    } else if (pointers.size === 1 && panStart) {
+      viewport.scrollLeft = panStart.scrollLeft - (event.clientX - panStart.x);
+      viewport.scrollTop = panStart.scrollTop - (event.clientY - panStart.y);
+      event.preventDefault();
+    }
+  });
+  const endPointer = (event: PointerEvent) => {
+    pointers.delete(event.pointerId);
+    if (pointers.size < 2) pinchStart = null;
+    if (pointers.size === 1) {
+      const remaining = [...pointers.values()][0];
+      panStart = { x: remaining.x, y: remaining.y, scrollLeft: viewport.scrollLeft, scrollTop: viewport.scrollTop };
+    } else panStart = null;
+  };
+  viewport.addEventListener("pointerup", endPointer);
+  viewport.addEventListener("pointercancel", endPointer);
+  applyZoom(zoom);
 }
 
 function mapEditorMarkup(): string {
@@ -87,7 +139,7 @@ function mapEditorMarkup(): string {
   return '<div class="wmh-map-editor"><div class="wmh-editor-intro"><b>WORLD MAP · COORDINATE EDITOR</b><span>DRAG A MARKER OR EDIT ITS X / Y VALUES · 0–100%</span></div>' +
     '<div class="wmh-map-zoom" data-wmh-zoom-controls><button type="button" data-wmh-zoom="out" aria-label="Zoom out">−</button><span data-wmh-zoom-level>100%</span><button type="button" data-wmh-zoom="in" aria-label="Zoom in">+</button><button type="button" data-wmh-zoom="reset">RESET</button></div>' +
     '<div class="wmh-editor-canvas" data-wmh-editor-canvas><div class="wmh-editor-map-surface" data-wmh-map-surface><img src="/world/Untitled77_20261029054536.png" alt="World map coordinate canvas" />' +
-    markers.map(marker => worldMapMarkerMarkup(marker, true)).join("") + '<div class="wmh-editor-crosshair" aria-hidden="true"></div></div></div>'
+    markers.map(marker => worldMapMarkerMarkup(marker, true)).join("") + '<div class="wmh-editor-crosshair" aria-hidden="true"></div></div></div>' +
     '<div class="wmh-coordinate-table-wrap"><table class="wmh-coordinate-table"><thead><tr><th>AREA</th><th>X (%)</th><th>Y (%)</th></tr></thead><tbody>' +
     markers.map(marker => '<tr data-wmh-coordinate-row="' + marker.id + '"><td>' + marker.name + '</td><td><input type="number" min="0" max="100" step="0.1" value="' + marker.x + '" data-wmh-coordinate="' + marker.id + '" data-axis="x" aria-label="' + marker.name + ' X coordinate" /></td><td><input type="number" min="0" max="100" step="0.1" value="' + marker.y + '" data-wmh-coordinate="' + marker.id + '" data-axis="y" aria-label="' + marker.name + ' Y coordinate" /></td></tr>').join("") +
     '</tbody></table></div><section class="wmh-coordinate-transfer"><div class="wmh-transfer-heading"><b>COORDINATE REFERENCE</b><span>PORTABLE COPY · JSON</span></div><p>Copy this reference and keep it as the source of truth when placing areas, buildings, objects, or other map points.</p><textarea readonly spellcheck="false" data-wmh-export aria-label="Exportable world map coordinate reference"></textarea><div class="wmh-editor-actions"><button type="button" data-wmh-action="editor-copy">COPY COORDINATES</button><button type="button" data-wmh-action="editor-save">SAVE ON DEVICE</button></div><label class="wmh-import-label" for="wmh-coordinate-import">PASTE A PREVIOUS COORDINATE REFERENCE</label><textarea id="wmh-coordinate-import" spellcheck="false" data-wmh-import placeholder="Paste the copied JSON reference here..."></textarea><button class="wmh-import-button" type="button" data-wmh-action="editor-import">IMPORT PASTED COORDINATES</button></section><div class="wmh-editor-actions"><button type="button" data-wmh-action="editor-reset">RESET DEFAULTS</button><button type="button" data-wmh-action="editor-close">← WORLD MAP</button></div><p class="wmh-editor-status" data-wmh-editor-status>Changes are a preview until saved. Copy the reference to transfer it elsewhere.</p></div>';
@@ -252,7 +304,7 @@ export function renderWorldMapHierarchy(): string {
 }
 
 export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement, onAdvanceTime: (minutes: number) => void): boolean {
-  const action = target.closest<HTMLElement>("[data-wmh-action],[data-wmh-region],[data-wmh-site],[data-wmh-building],[data-wmh-npc],[data-wmh-plot]");
+  const action = target.closest<HTMLElement>("[data-wmh-action],[data-wmh-info],[data-wmh-site],[data-wmh-building],[data-wmh-npc],[data-wmh-plot]");
   if (!action) return false;
   const overlay = root.querySelector<HTMLElement>("[data-world-map-hierarchy]");
   const dialog = overlay?.querySelector<HTMLElement>("[data-wmh-dialog]");
@@ -270,10 +322,15 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
     overlay.dataset.level = next; dialog.innerHTML = panelMarkup(next,regionId,building); if (next === "world") bindWorldMapZoom(dialog); return true;
   }
   if (action.dataset.wmhAction === "home") { overlay.dataset.level = "home"; dialog.innerHTML = panelMarkup("home",regionId,building); return true; }
-  if (action.dataset.wmhRegion) {
-    const id = action.dataset.wmhRegion as RegionId; if (!regionData[id]) return true;
-    overlay.dataset.level = "regional"; overlay.dataset.region = id; dialog.innerHTML = panelMarkup("regional",id); return true;
+  if (action.dataset.wmhInfo) {
+    const id = action.dataset.wmhInfo as RegionId;
+    const info = regionData[id];
+    if (!info) return true;
+    dialog.querySelector(".wmh-marker-info")?.remove();
+    dialog.insertAdjacentHTML("beforeend", '<section class="wmh-marker-info"><div><small>POWER TERRITORY · MAP MARKER</small><b>' + info.name + '</b><span>' + info.subtitle + '</span></div><button type="button" data-wmh-action="dismiss-marker-info" aria-label="Close marker information">×</button></section>');
+    return true;
   }
+  if (action.dataset.wmhAction === "dismiss-marker-info") { dialog.querySelector(".wmh-marker-info")?.remove(); return true; }
   if (action.dataset.wmhSite) {
     if (action.dataset.wmhSite !== "Tianhai Academy" || action.dataset.wmhRegionId !== "golden-dragon-empire") {
       const site = action.dataset.wmhSite;
