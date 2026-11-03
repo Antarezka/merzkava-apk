@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isRotaryAligned, rotaryActivationProgress, rotaryAngularDistance, rotaryPointerDelta } from "../../src/offline-game/arcanistry-rotary";
+import { canCommitRotaryActivation, isRotaryAligned, parseRotaryApertureAngle, rotaryActivationProgress, rotaryAngularDistance, rotaryDragAngle, rotaryPointerDelta } from "../../src/offline-game/arcanistry-rotary";
 
 describe("Arcanistry rotary activation geometry",()=>{
   it("tracks clockwise and counter-clockwise pointer movement across the angle boundary",()=>{
@@ -20,9 +20,33 @@ describe("Arcanistry rotary activation geometry",()=>{
     expect(rotaryActivationProgress(45,-90,0)).toBe(0);
   });
 
-  it("activates only when released inside the dial alignment tolerance",()=>{
+  it("derives the aperture angle independently from the finger grab offset",()=>{
+    expect(rotaryDragAngle(42,0,20)).toBe(62);
+    expect(rotaryDragAngle(42,20,40)).toBe(62);
+    expect(rotaryDragAngle(42,170,-170)).toBe(62);
+    expect(rotaryDragAngle(42,-170,170)).toBe(22);
+  });
+
+  it("reads the authored aperture angle from its CSS custom property",()=>{
+    expect(parseRotaryApertureAngle("42deg")).toBe(42);
+    expect(parseRotaryApertureAngle("-90deg")).toBe(-90);
+    expect(parseRotaryApertureAngle("")).toBeNull();
+    expect(parseRotaryApertureAngle("not-an-angle")).toBeNull();
+  });
+
+  it("uses the fixed activation mark and includes the exact tolerance boundary",()=>{
     expect(isRotaryAligned(-90)).toBe(true);
-    expect(isRotaryAligned(-79)).toBe(true);
-    expect(isRotaryAligned(-74)).toBe(false);
+    expect(isRotaryAligned(-77)).toBe(true);
+    expect(isRotaryAligned(-103)).toBe(true);
+    expect(isRotaryAligned(-76.99)).toBe(false);
+    expect(isRotaryAligned(-103.01)).toBe(false);
+  });
+
+  it("does not commit merely by reaching threshold; a valid release is required",()=>{
+    expect(canCommitRotaryActivation(-90,{released:false,hasDestination:true})).toBe(false);
+    expect(canCommitRotaryActivation(-90,{released:true,cancelled:true,hasDestination:true})).toBe(false);
+    expect(canCommitRotaryActivation(-90,{released:true,hasDestination:false})).toBe(false);
+    expect(canCommitRotaryActivation(-90,{released:true,hasDestination:true})).toBe(true);
+    expect(canCommitRotaryActivation(-76,{released:true,hasDestination:true})).toBe(false);
   });
 });
