@@ -935,7 +935,7 @@ function selectArcanistDestination(place:HTMLElement):void{
     item.dataset.idlePlace===placeId && item.dataset.idleGroup===group &&
     (group==="global" || item.dataset.regionId===regionId)
   );
-  const sceneId=place.dataset.sceneId || card?.dataset.sceneId || (regionId==="golden-dragon-empire"?(placeId==="capital"?"gde-city":placeId==="academy"?"gde-academy"):"") || "";
+  const sceneId=place.dataset.sceneId || card?.dataset.sceneId || (regionId==="golden-dragon-empire"?(placeId==="capital"?"gde-city":placeId==="academy"?"gde-academy":""):"") || "";
   const available=Boolean(sceneId);
   const name=place.querySelector(".arcanist-destination-card-copy strong")?.textContent?.trim()
     ?? card?.querySelector(".arcanist-destination-card-copy strong")?.textContent?.trim()
