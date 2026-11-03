@@ -5,7 +5,8 @@ const mocks = vi.hoisted(() => {
   return { animate: vi.fn(), createScope: vi.fn(() => scope), scope, stagger: vi.fn((value:number)=>value) };
 });
 vi.mock("animejs",()=>({animate:mocks.animate,createScope:mocks.createScope,stagger:mocks.stagger}));
-import { animateExpeditionChoiceModal, mountExpeditionAnimations } from "../../src/offline-game/expedition-animations";
+let animateExpeditionChoiceModal: typeof import("../../src/offline-game/expedition-animations")["animateExpeditionChoiceModal"];
+let mountExpeditionAnimations: typeof import("../../src/offline-game/expedition-animations")["mountExpeditionAnimations"];
 
 function makeSceneRoot(weather="Clear",cycle="Morning",state="test-"+Math.random()) {
   const scene:any={dataset:{weather,cycle,location:"test-location",animationState:state},setAttribute:vi.fn(),addEventListener:vi.fn(),removeEventListener:vi.fn()};
@@ -44,8 +45,14 @@ function makeSceneRoot(weather="Clear",cycle="Morning",state="test-"+Math.random
 }
 
 describe("Eternal Path event-driven Anime.js motion",()=>{
- beforeEach(()=>{
+ beforeEach(async()=>{
+  vi.resetModules();
+  const animationModule = await import("../../src/offline-game/expedition-animations");
+  animateExpeditionChoiceModal = animationModule.animateExpeditionChoiceModal;
+  mountExpeditionAnimations = animationModule.mountExpeditionAnimations;
   vi.clearAllMocks();
+  Object.defineProperty(globalThis, "document", { configurable: true, value: { createElement: vi.fn(() => ({ className: "", style: { left: "", top: "", setProperty: vi.fn() } })) } });
+  Object.defineProperty(globalThis, "window", { configurable: true, value: { matchMedia: vi.fn(() => ({ matches: false })) } });
   mocks.animate.mockReturnValue({pause:vi.fn()});
   mocks.scope.add.mockImplementation((setup:(self:{matches:{reduceMotion:boolean}})=>void)=>{setup({matches:{reduceMotion:false}});return mocks.scope;});
  });
@@ -72,7 +79,7 @@ describe("Eternal Path event-driven Anime.js motion",()=>{
   expect(mocks.animate.mock.calls.some(call=>call[0]===nodes)).toBe(false);
   const click=scene.addEventListener.mock.calls.find((call:any[])=>call[0]==="click")?.[1];
   click();
-  const particleCall=mocks.animate.mock.calls.find(call=>call[0]===nodes);
+  const particleCall=mocks.animate.mock.calls.find(call=>Array.isArray(call[0]) && call[0].length===nodes.length && call[0][0]===nodes[0]);
   expect(particleCall).toBeTruthy();
   expect(particleCall?.[1]).not.toHaveProperty("loop");
   dispose();
@@ -91,6 +98,7 @@ describe("Eternal Path event-driven Anime.js motion",()=>{
   disposeNext();
  });
  it("does not animate scene motion when reduced motion is requested",()=>{
+  (window as any).matchMedia = vi.fn(() => ({ matches: true }));
   mocks.scope.add.mockImplementation((setup:(self:{matches:{reduceMotion:boolean}})=>void)=>{setup({matches:{reduceMotion:true}});return mocks.scope;});
   const {root,scene}=makeSceneRoot();
   mountExpeditionAnimations(root);
