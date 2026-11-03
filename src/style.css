@@ -2704,3 +2704,68 @@ body { color:var(--ui-ink); }
 :root[data-eternal-wallpaper="echoes"] .expedition-dialogue-locked{background-color:#302b25;background-image:url("/wallpapers/mythic-beasts.svg");background-size:360px 260px}
 :root[data-eternal-wallpaper="tower"] .expedition-dialogue-card,
 :root[data-eternal-wallpaper="tower"] .expedition-dialogue-locked{background-color:#2b3029;background-image:url("/wallpapers/ruined-relics.svg");background-size:360px 260px}
+
+
+/* Compact magical-archive dropdowns for the two narrative pattern selectors. */
+.narrative-wallpaper-settings .wallpaper-dropdown{
+  margin:12px 0 0;padding:0;border:1px solid #9b8053;border-radius:5px;
+  background:linear-gradient(110deg,#eee4cf,#e5d8bd 72%,#eee6d5);
+  box-shadow:0 3px 10px #17120b12,inset 0 1px #fff9;
+}
+.narrative-wallpaper-settings .wallpaper-dropdown-heading{
+  display:flex;align-items:center;gap:9px;min-height:52px;padding:8px 11px;
+  cursor:pointer;list-style:none;color:#443a2c;
+}
+.narrative-wallpaper-settings .wallpaper-dropdown-heading::-webkit-details-marker{display:none}
+.narrative-wallpaper-settings .wallpaper-heading-mark{
+  display:grid;place-items:center;flex:0 0 27px;width:27px;height:27px;
+  border:1px solid #a78a57;border-radius:50%;color:#9b7842;font:18px/1 Georgia,serif;
+  box-shadow:inset 0 0 0 2px #b99b5e22;
+}
+.narrative-wallpaper-settings .wallpaper-heading-copy{display:grid;gap:3px;min-width:0}
+.narrative-wallpaper-settings .wallpaper-heading-copy strong{font:600 11px/1.2 Cinzel,Georgia,serif;letter-spacing:.08em}
+.narrative-wallpaper-settings .wallpaper-heading-copy small{color:#887453;font:600 7px/1.2 system-ui,sans-serif;letter-spacing:.13em}
+.narrative-wallpaper-settings .wallpaper-current-label{
+  overflow:hidden;flex:1;min-width:0;color:#806b4b;font:italic 10px/1.2 Georgia,serif;
+  text-align:right;text-overflow:ellipsis;white-space:nowrap;
+}
+.narrative-wallpaper-settings .wallpaper-dropdown-arrow{
+  flex:0 0 18px;width:18px;color:#9b7842;font:22px/1 Georgia,serif;text-align:center;
+  transform:translateY(-2px);transition:transform .18s ease;
+}
+.narrative-wallpaper-settings .wallpaper-dropdown[open] .wallpaper-dropdown-arrow{transform:rotate(180deg) translateY(-2px)}
+.narrative-wallpaper-settings .wallpaper-dropdown-panel{
+  padding:7px 8px 9px;border-top:1px solid #aa91644f;
+  background:linear-gradient(180deg,#d9c9a844,#f3ead733);
+}
+.narrative-wallpaper-settings .wallpaper-choice-grid{
+  display:flex;gap:7px;overflow-x:auto;overscroll-behavior-x:contain;
+  padding:2px 1px 5px;scrollbar-width:thin;scrollbar-color:#a58a5b transparent;
+}
+.narrative-wallpaper-settings .wallpaper-choice{
+  display:flex;flex:0 0 142px;flex-direction:column;gap:5px;min-width:0;
+  padding:5px;border:1px solid #aa956f66;border-radius:4px;
+  background:#f1e8d7;color:#574a36;text-align:left;
+}
+.narrative-wallpaper-settings .wallpaper-choice.is-selected{
+  border-color:#9b7842;background:#e4d5b7;box-shadow:inset 0 0 0 1px #b99b5e66,0 1px 4px #57452a1c;
+}
+.narrative-wallpaper-settings .wallpaper-preview{height:34px;border-radius:2px}
+.narrative-wallpaper-settings .wallpaper-choice>span:last-child{
+  overflow:hidden;font:600 9px/1.25 Georgia,serif;text-overflow:ellipsis;white-space:nowrap;
+}
+:root[data-theme="dark"] .narrative-wallpaper-settings .wallpaper-dropdown{
+  border-color:#716344;background:linear-gradient(110deg,#252e28,#202720 72%,#2c2a22);
+}
+:root[data-theme="dark"] .narrative-wallpaper-settings .wallpaper-dropdown-heading{color:#e8dfcf}
+:root[data-theme="dark"] .narrative-wallpaper-settings .wallpaper-heading-mark{border-color:#8c754c;color:#d2b575}
+:root[data-theme="dark"] .narrative-wallpaper-settings .wallpaper-heading-copy small{color:#bba77f}
+:root[data-theme="dark"] .narrative-wallpaper-settings .wallpaper-current-label{color:#c6b48e}
+:root[data-theme="dark"] .narrative-wallpaper-settings .wallpaper-dropdown-panel{border-color:#716344;background:#171e1a88}
+:root[data-theme="dark"] .narrative-wallpaper-settings .wallpaper-choice{border-color:#786849;background:#30362e;color:#e7ddc8}
+:root[data-theme="dark"] .narrative-wallpaper-settings .wallpaper-choice.is-selected{border-color:#c2a365;background:#424333}
+@media(max-width:420px){
+  .narrative-wallpaper-settings .wallpaper-current-label{max-width:105px;font-size:9px}
+  .narrative-wallpaper-settings .wallpaper-choice{flex-basis:132px}
+}
+@media(prefers-reduced-motion:reduce){.narrative-wallpaper-settings .wallpaper-dropdown-arrow{transition:none}}
