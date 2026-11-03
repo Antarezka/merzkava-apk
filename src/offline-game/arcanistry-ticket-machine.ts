@@ -16,7 +16,7 @@ type TravelHandler = (sceneId: string) => void | Promise<void>;
 
 export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: TravelHandler): () => void {
   const timers = new Set<number>();
-  let activeTicket: { element: HTMLButtonElement; pointerId: number; startX: number; lastX: number; startY: number; distance: number } | null = null;
+  let activeTicket: { element: HTMLButtonElement; pointerId: number; startY: number; distance: number } | null = null;
   let activeLever: { element: HTMLButtonElement; machine: HTMLElement; pointerId: number; startY: number; distance: number } | null = null;
   let disposed = false;
 
@@ -80,8 +80,7 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
       ticket.disabled = false;
       ticket.classList.remove("is-returning", "is-torn", "is-under-tension");
       ticket.style.removeProperty("--ticket-pull");
-      ticket.style.removeProperty("--ticket-stretch");
-      ticket.style.removeProperty("--ticket-lean");
+      ticket.style.removeProperty("--ticket-extension");
       ticket.style.removeProperty("--tear-bias");
       ticket.style.removeProperty("clip-path");
     }
@@ -137,6 +136,7 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
       machine.querySelector<HTMLElement>("[data-card-warning-lamp]")?.classList.remove("is-lit");
       const indicator = machine.querySelector<HTMLElement>("[data-card-inserted-indicator]");
       if (indicator) indicator.hidden = false;
+      machine.querySelector<HTMLElement>("[data-card-reader-hint]")?.setAttribute("hidden", "");
       updateLever(machine);
       status(machine, machine.dataset.selectedAvailable === "true"
         ? "CARD ACCEPTED · PULL QUADRANT LEVER TO PRINT"
@@ -177,6 +177,7 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
       ticket.hidden = false;
       ticket.classList.remove("is-returning", "is-torn");
       ticket.style.removeProperty("--ticket-pull");
+      ticket.style.removeProperty("--ticket-extension");
       ticket.style.removeProperty("clip-path");
       const destination = ticket.querySelector<HTMLElement>("[data-ticket-destination]");
       if (destination) destination.textContent = machine.dataset.selectedName ?? "Selected Destination";
@@ -194,7 +195,7 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     }, 1480);
   };
 
-  const tearTicket = (ticket: HTMLButtonElement, distance: number, bias: number): void => {
+  const tearTicket = (ticket: HTMLButtonElement, distance: number): void => {
     const machine = ticket.closest<HTMLElement>("[data-arcanistry-machine]");
     if (!machine || machine.dataset.machineState !== "ticket-ready" || !isArcanistryTicketTorn(distance)) return;
     const sceneId = machine.dataset.selectedScene ?? "";
@@ -204,9 +205,8 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     machine.dataset.machineState = "ejecting-card";
     machine.classList.remove("has-ticket", "is-printing");
     machine.classList.add("is-traveling");
-    ticket.dataset.tearDirection = bias < -.12 ? "left-to-right" : bias > .12 ? "right-to-left" : "center";
-    ticket.style.setProperty("--tear-bias", String(bias));
-    const curve = Math.round(bias * 9);
+    ticket.dataset.tearDirection = "center";
+    ticket.style.removeProperty("--ticket-extension");
     const stub = ticket.cloneNode(true) as HTMLButtonElement;
     stub.className = "arcanist-ticket-stub";
     stub.removeAttribute("data-arcanistry-ticket");
@@ -219,7 +219,7 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     stub.style.removeProperty("--ticket-lean");
     stub.style.removeProperty("clip-path");
     ticket.parentElement?.appendChild(stub);
-    ticket.style.clipPath = "polygon(0 " + Math.max(36,45-curve) + "%,16% " + Math.max(33,42-curve*.7) + "%,34% " + Math.min(55,47+curve*.35) + "%,52% " + Math.max(35,43-curve*.25) + "%,72% " + Math.min(56,48+curve*.4) + "%,88% " + Math.max(36,44-curve*.45) + "%,100% " + Math.min(55,47+curve) + "%,100% 100%,0 100%)";
+    ticket.style.clipPath = "polygon(0 45%,16% 42%,34% 47%,52% 43%,72% 48%,88% 44%,100% 47%,100% 100%,0 100%)";
     stub.style.clipPath = "polygon(0 0,100% 0,100% 47%,88% 44%,72% 48%,52% 43%,34% 47%,16% 42%,0 45%)";
     ticket.classList.add("is-torn");
     ticket.disabled = true;
@@ -303,7 +303,7 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     const ticket = target.closest<HTMLButtonElement>("[data-arcanistry-ticket]");
     const machine = ticket?.closest<HTMLElement>("[data-arcanistry-machine]");
     if (!ticket || !machine || ticket.hidden || machine.dataset.machineState !== "ticket-ready") return;
-    activeTicket = { element: ticket, pointerId: event.pointerId, startX: event.clientX, lastX: event.clientX, startY: event.clientY, distance: 0 };
+    activeTicket = { element: ticket, pointerId: event.pointerId, startY: event.clientY, distance: 0 };
     try { ticket.setPointerCapture(event.pointerId); } catch { /* WebView fallback */ }
     event.preventDefault();
   };
@@ -314,7 +314,7 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
       activeLever.distance = distance;
       const progress = distance / 56;
       const curvedAngle = Math.pow(progress, .9) * -55;
-      activeLever.element.style.setProperty("--lever-angle", curvedAngle.toFixed(1) + "deg");
+      activeLever.element.querySelector<HTMLElement>(".arcanist-lever-arm")?.style.setProperty("--lever-angle", curvedAngle.toFixed(1) + "deg");
       activeLever.element.classList.toggle("is-pulling", distance > 2);
       event.preventDefault();
       return;
@@ -322,11 +322,7 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     if (!activeTicket || activeTicket.pointerId !== event.pointerId) return;
     const distance = Math.max(0, Math.min(112, event.clientY - activeTicket.startY));
     activeTicket.distance = distance;
-    activeTicket.lastX = event.clientX;
-    const stretch = 1 + (distance / 112) * .34;
-    const horizontalDrift = Math.max(-1, Math.min(1, (event.clientX - activeTicket.startX) / 54));
-    activeTicket.element.style.setProperty("--ticket-stretch", stretch.toFixed(3));
-    activeTicket.element.style.setProperty("--ticket-lean", (horizontalDrift * 1.6).toFixed(2) + "deg");
+    activeTicket.element.style.setProperty("--ticket-extension", Math.round(distance * .9) + "px");
     activeTicket.element.classList.toggle("is-under-tension", distance >= ARCANISTRY_TICKET_TEAR_DISTANCE * .72);
     event.preventDefault();
   };
@@ -344,7 +340,7 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
       else {
         active.element.classList.add("is-returning");
         later(() => {
-          active.element.style.removeProperty("--lever-angle");
+          active.element.querySelector<HTMLElement>(".arcanist-lever-arm")?.style.removeProperty("--lever-angle");
           active.element.style.removeProperty("--lever-pull");
           active.element.classList.remove("is-returning");
         }, 360);
@@ -356,10 +352,7 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     activeTicket = null;
     try { if (active.element.hasPointerCapture(event.pointerId)) active.element.releasePointerCapture(event.pointerId); } catch { /* already released */ }
     if (!cancelled && isArcanistryTicketTorn(active.distance)) {
-      const rect = active.element.getBoundingClientRect();
-      const fingerOffset = active.lastX - (rect.left + rect.width / 2);
-      const bias = Math.max(-1, Math.min(1, fingerOffset / (rect.width * .42)));
-      tearTicket(active.element, active.distance, bias);
+      tearTicket(active.element, active.distance);
       return;
     }
     active.element.classList.remove("is-under-tension");
@@ -368,8 +361,7 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     if (machine && active.distance > 8) shakeVertically(machine, 1.2);
     later(() => {
       active.element.style.removeProperty("--ticket-pull");
-      active.element.style.removeProperty("--ticket-stretch");
-      active.element.style.removeProperty("--ticket-lean");
+      active.element.style.removeProperty("--ticket-extension");
       active.element.classList.remove("is-returning");
     }, 440);
   };
