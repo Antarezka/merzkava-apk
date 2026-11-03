@@ -272,11 +272,6 @@
  box-shadow:inset 0 0 0 2px #090e0b,inset 0 0 0 3px #796142;
 }
 .arcanist-lever-label{grid-column:1/-1;align-self:center;padding:0 0 4px;border-bottom:1px solid #92784e55;text-align:center;font:700 7px system-ui,sans-serif;letter-spacing:.13em;color:#d6b77e}
-.arcanist-quadrant-lamp{position:absolute;z-index:6;top:29px;left:calc(25% - 11px);display:grid;place-items:center;width:23px;height:25px;pointer-events:none}
-.arcanist-quadrant-bulb{position:relative;display:grid;place-items:center;width:21px;height:23px;border:1px solid #9b7948;border-radius:48% 48% 42% 42%;background:radial-gradient(ellipse at 50% 42%,#604a2b 0 31%,#211d15 54%,#0c110d 72%);box-shadow:inset 0 0 0 2px #0a0e0b,0 0 0 2px #4b3924,0 0 8px #c28a3d66}
-.arcanist-quadrant-bulb i{position:relative;width:7px;height:10px;border:1px solid #f0c879;border-radius:50% 50% 35% 35%;background:radial-gradient(ellipse at 50% 70%,#fff2b4 0 14%,#f4b957 35%,#a65d25 72%,transparent 76%);box-shadow:0 0 5px 2px #e7b65d99,0 0 12px #e6a44877;animation:arcanist-quadrant-breathe 3.1s ease-in-out infinite}
-.arcanist-quadrant-bulb:before{content:"";position:absolute;left:6px;right:6px;bottom:-5px;height:6px;border:1px solid #9b7948;border-top:0;background:repeating-linear-gradient(180deg,#80633d 0 1px,#1a1d17 1px 3px)}
-@keyframes arcanist-quadrant-breathe{0%,100%{opacity:.46;filter:brightness(.7);box-shadow:0 0 3px 1px #d9a64e55}50%{opacity:1;filter:brightness(1.25);box-shadow:0 0 8px 3px #ffcf78cc,0 0 15px #e5a84e88}}
 .arcanist-quadrant-control{position:relative;display:flex;grid-column:1;grid-row:2;flex-direction:column;align-items:center;justify-content:flex-start;gap:3px;min-width:0;min-height:0}
 .arcanist-quadrant-caption{color:#c9ab77;font:700 6px system-ui,sans-serif;letter-spacing:.1em}
 .arcanist-quadrant-plate{position:relative;display:block;width:min(100%,116px);height:128px;min-height:0;flex:1 1 auto;border:1px solid #aa8a58;border-radius:48% 48% 5px 5px;background:linear-gradient(145deg,#403522,#171c16 50%,#4a3b27);box-shadow:inset 0 0 0 2px #111710,inset 0 0 0 3px #9b7b4c,0 3px 7px #0009}
@@ -286,7 +281,7 @@
 .arcanist-quadrant-pivot{position:absolute;left:50%;bottom:9px;width:20px;height:20px;transform:translateX(-50%);border:2px solid #d0ae73;border-radius:50%;background:radial-gradient(circle,#b48a4e 0 24%,#22271f 28% 62%,#c6a16a 65%);box-shadow:0 1px 4px #000b}
 .arcanist-quadrant-lever{position:absolute;z-index:8;left:50%;bottom:9px;margin-left:-29px;display:block;width:58px;height:104px;padding:0;border:0;background:transparent;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-user-drag:none;cursor:grab;pointer-events:auto}
 .arcanist-quadrant-lever:disabled{opacity:.45;filter:grayscale(.65);cursor:not-allowed}
-.arcanist-lever-arm{position:absolute;inset:0;display:block;transform:rotate(var(--lever-angle,0deg));transform-origin:50% calc(100% - 10px);transition:transform .42s cubic-bezier(.18,.75,.28,1)}
+.arcanist-lever-arm{position:absolute;inset:0;display:block;transform:rotate(0deg);transform-origin:50% calc(100% - 10px);transition:transform .42s cubic-bezier(.18,.75,.28,1);will-change:transform}
 .arcanist-quadrant-lever.is-pulling .arcanist-lever-arm{transition:none}
 .arcanist-quadrant-lever.is-returning .arcanist-lever-arm{transition:transform .42s cubic-bezier(.18,.75,.28,1)}
 .arcanist-quadrant-lever.is-pulled .arcanist-lever-arm{transform:rotate(-52deg)}
@@ -313,15 +308,15 @@
 @keyframes arcanist-card-swallow{0%{transform:translateY(0) scale(1);opacity:1}45%{transform:translateY(-8px) scale(.92,.86)}100%{transform:translateY(-30px) scale(.28,.16);opacity:0}}
 @keyframes arcanist-card-eject{0%{transform:translateY(-24px) scale(.3,.18);opacity:.2}70%{transform:translateY(3px) scale(1.03)}100%{transform:translateY(0) scale(1);opacity:1}}
 .arcanist-card-reader>small{color:#8f927e;font:600 5px system-ui,sans-serif;letter-spacing:.1em}
-.arcanist-transmission-bay{position:relative;z-index:1;display:block;flex:0 0 40px;height:40px;min-height:40px;margin:0 1px;overflow:hidden;border-top:1px solid #9b7c4e;border-bottom:1px solid #9b7c4e;background:linear-gradient(180deg,#111713,#2d332a 48%,#121813);box-shadow:inset 0 0 0 2px #080d0a,inset 0 0 0 3px #665337}
-.arcanist-wirework{position:absolute;inset:0;width:100%;height:100%;opacity:.78;fill:none;stroke:#c29b60;stroke-width:1.5;filter:drop-shadow(0 0 2px #c99d5a77);pointer-events:none}
+.arcanist-transmission-bay{position:relative;z-index:1;display:block;flex:0 0 48px;height:48px;min-height:48px;margin:0 1px;overflow:hidden;border-top:1px solid #9b7c4e;border-bottom:1px solid #9b7c4e;background:linear-gradient(180deg,#111713,#2d332a 48%,#121813);box-shadow:inset 0 0 0 2px #080d0a,inset 0 0 0 3px #665337}
+.arcanist-wirework{position:absolute;inset:0 0 12px;width:100%;height:calc(100% - 12px);opacity:.78;fill:none;stroke:#c29b60;stroke-width:1.5;filter:drop-shadow(0 0 2px #c99d5a77);pointer-events:none}
 .arcanist-wire-drop{stroke:#dfc18b;stroke-width:1}
 .arcanist-machine-gear{position:absolute;z-index:2;display:grid;place-items:center;width:15px;height:15px;border:2px solid #bd9b65;border-radius:50%;background:radial-gradient(circle,#655034 0 23%,#141a15 27% 59%,#c4a06a 62% 67%,#171d18 70%);box-shadow:inset 0 0 0 3px #111710,0 2px 7px #000b;color:#f0d49a;font:12px Georgia,serif}
 .arcanist-machine-gear.gear-a{left:12%;top:3px}.arcanist-machine-gear.gear-b{left:46%;top:3px}.arcanist-machine-gear.gear-c{right:11%;top:3px}
 .arcanist-machine-spring{position:absolute;left:32%;top:3px;width:18px;height:14px;border-left:2px solid #d3b27b;border-right:2px solid #d3b27b;background:repeating-linear-gradient(135deg,transparent 0 4px,#d5b477 4px 6px,transparent 6px 9px)}
 .arcanist-machine-pulley{position:absolute;top:5px;width:7px;height:7px;border:2px solid #e0c18a;border-radius:50%;background:#1a211b;box-shadow:0 0 0 2px #6d5638}
 .arcanist-machine-pulley.pulley-a{left:25%}.arcanist-machine-pulley.pulley-b{right:27%}
-.arcanist-transmission-caption{position:absolute;left:2px;right:2px;bottom:2px;overflow:hidden;text-align:center;white-space:nowrap;color:#b39a70;font:600 5px/1 system-ui,sans-serif;letter-spacing:.055em;text-overflow:clip}
+.arcanist-transmission-caption{position:absolute;left:2px;right:2px;bottom:1px;display:grid;grid-template-columns:1fr;gap:1px;overflow:hidden;text-align:center;white-space:normal;color:#d0b17b;font:700 5px/1.05 system-ui,sans-serif;letter-spacing:.08em}
 .arcanist-machine-shell.is-running .arcanist-machine-gear,.arcanist-machine-shell.is-traveling .arcanist-machine-gear{animation:arcanist-gear-spin .8s linear infinite}
 .arcanist-machine-shell.is-running .gear-b,.arcanist-machine-shell.is-traveling .gear-b{animation-direction:reverse;animation-duration:1.3s}
 .arcanist-machine-shell.is-running .arcanist-machine-spring{animation:arcanist-spring-pulse .28s ease-in-out infinite alternate}
@@ -332,7 +327,7 @@
 .arcanist-ticket-slot:before{content:"";position:absolute;z-index:4;left:50%;top:100%;width:min(190px,86%);height:15px;transform:translateX(-50%);background:linear-gradient(90deg,#d9c8a0,#f1e5c9 16%,#e9d9b7 85%,#c9b48a);clip-path:polygon(0 0,100% 0,100% 58%,94% 78%,87% 58%,80% 82%,72% 58%,64% 78%,56% 58%,48% 82%,40% 58%,32% 78%,24% 58%,16% 82%,8% 58%,0 78%);pointer-events:none}
 .arcanist-ticket-slot>span{position:absolute;bottom:23px;color:#b99a66;font:600 6px system-ui,sans-serif;letter-spacing:.16em;white-space:nowrap}
 .arcanist-ticket-slot>i{width:4px;height:4px;border-radius:50%;background:#c3a06b;box-shadow:0 0 3px #c3a06b}
-.arcanist-ticket{position:absolute;z-index:5;top:23px;left:50%;display:grid;align-content:start;justify-items:center;gap:5px;width:min(240px,78%);height:calc(var(--ticket-base-height,116px) + var(--ticket-extension,0px));min-height:0;box-sizing:border-box;padding:10px 12px 9px;border:1px solid #b18d57;background:linear-gradient(90deg,#d9c8a0,#f1e5c9 16%,#e9d9b7 85%,#c9b48a);color:#3b3326;box-shadow:0 4px 9px #0009;transform:translateX(-50%);transform-origin:50% 0;touch-action:none;pointer-events:auto;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;cursor:grab;transition:height .36s cubic-bezier(.2,.7,.25,1)}
+.arcanist-ticket{position:absolute;z-index:5;top:23px;left:50%;display:grid;align-content:start;justify-items:center;gap:5px;width:min(240px,78%);height:calc(var(--ticket-base-height,116px) + var(--ticket-extension,0px));min-height:0;box-sizing:border-box;padding:10px 12px 9px;border:1px solid #b18d57;background:linear-gradient(90deg,#d9c8a0,#f1e5c9 16%,#e9d9b7 85%,#c9b48a);color:#3b3326;box-shadow:0 4px 9px #0009;transform:translateX(-50%);transform-origin:50% 0;touch-action:none;pointer-events:auto;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;cursor:grab;transition:none;will-change:height}
 .arcanist-ticket[hidden]{display:none!important}
 .arcanist-ticket-top{font:700 6px system-ui,sans-serif;letter-spacing:.18em;color:#77603b}
 .arcanist-ticket strong{font:17px Georgia,serif;color:#342d22}
@@ -352,7 +347,7 @@
 .arcanist-route-loading span{font:11px Georgia,serif;color:#bdb29d}
 @keyframes arcanist-seal-turn{to{transform:rotate(360deg)}}
 .arcanist-machine-shell.is-traveling .arcanist-master-lamp i,.arcanist-machine-shell.is-running .arcanist-master-lamp i{animation:arcanist-master-flicker var(--lamp-flicker-duration,.73s) steps(1,end) infinite}
-.arcanist-machine-shell.is-card-required .arcanist-master-lamp i,.arcanist-machine-shell.is-card-required .arcanist-quadrant-bulb i{animation:arcanist-warning-master .47s steps(2,end) infinite}
+.arcanist-machine-shell.is-card-required .arcanist-master-lamp i{animation:arcanist-warning-master .47s steps(2,end) infinite}
 @keyframes arcanist-master-breathe{0%,100%{opacity:.48;filter:brightness(.72);box-shadow:0 0 3px 1px #d9a64e66}50%{opacity:1;filter:brightness(1.22);box-shadow:0 0 8px 3px #ffcf78cc,0 0 16px #e5a84e88}}
 @keyframes arcanist-master-flicker{0%{opacity:1;filter:brightness(1.7)}7%{opacity:.12;filter:brightness(.35)}13%{opacity:.92;filter:brightness(1.9)}24%{opacity:.28;filter:brightness(.5)}39%{opacity:1;filter:brightness(2.1)}43%{opacity:.08;filter:brightness(.25)}58%{opacity:.72;filter:brightness(1.3)}74%{opacity:.18;filter:brightness(.4)}88%{opacity:1;filter:brightness(1.9)}100%{opacity:.62;filter:brightness(1.1)}}
 @media(max-width:390px){
@@ -381,13 +376,13 @@
  .arcanist-lever-panel{flex-basis:148px;padding:5px}
  .arcanist-quadrant-plate{height:94px}
  .arcanist-quadrant-lever{height:78px}
- .arcanist-transmission-bay{flex-basis:36px;height:36px;min-height:36px}
+ .arcanist-transmission-bay{flex-basis:44px;height:44px;min-height:44px}
  .arcanist-ticket-dispenser{flex-basis:100px;min-height:100px}
  .arcanist-ticket{--ticket-base-height:82px;padding:7px}
  .arcanist-machine-status{min-height:24px;padding:5px}
 }
 @media(prefers-reduced-motion:reduce){
- .arcanist-destination-card:before,.arcanist-quadrant-bulb i,.arcanist-master-lamp i,
+ .arcanist-destination-card:before,.arcanist-master-lamp i,
  .arcanist-machine-shell.is-running .arcanist-machine-gear,.arcanist-machine-shell.is-running .arcanist-machine-spring,
  .arcanist-machine-shell.is-running .arcanist-wirework path,.arcanist-loading-seal,
  .arcanist-ticket.is-returning,.arcanist-ticket.is-torn,.arcanist-travel-card.is-swallowing,.arcanist-travel-card.is-ejecting{animation:none!important}
