@@ -13,6 +13,7 @@ on:
       - repair/restore-touch-clicks-2026-11-03
       - feature/arcanistry-victorian-ticket-machine-2026-11-03
       - feature/hierarchical-world-map-2026-11-03
+      - feature/arcanistry-destination-index-card-slot-2026-11-04
     paths:
       - "src/**"
       - "public/**"
