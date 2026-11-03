@@ -358,6 +358,52 @@ This is a transparent checklist-completion index, **not** a prediction of remain
 - [ ] Define save slots/state boundaries and safe persistence.
 - [~] Add clear mode identity so users know whether they are in connected AI gameplay or standalone offline gameplay; the first-pass Eternal Path route and screen label now exist, while the full mode-switch and save-boundary experience remains open.
 
+
+### 5C-1. Offline Idle World — isometric world, simulation, and NPC behavior design
+
+**Status:** Design recorded; detailed formulas, content tables, and implementation remain pending. This section records the current direction only. It does not authorize implementation or establish new Merzkava canon.
+
+**Offline and simulation boundary**
+- The Idle World is fully playable offline. It must not require an online service, server, AI agent, LLM, external API, or network connection for simulation, NPC decisions, timers, battles, economy, or save progression.
+- Use the device's system clock to calculate elapsed time for local timers and offline progress. On return to the app, resolve elapsed construction, production, worker, and other scheduled jobs from persisted timestamps. Anti-cheat/time-tampering protection is explicitly out of scope for this design.
+- NPC behavior is rule-based and locally computed. “Behavior engine” means deterministic game logic, not generative AI or an external intelligence service.
+
+**World map and activity model**
+- The world is an isometric 2D map built from structured, individually addressable world objects—not one flattened background image. Terrain, roads, buildings, facilities, resource nodes, and placed objects must be independently represented so they can be placed, moved, upgraded, damaged, removed, or animated where the rules allow.
+- The map is the world overview and activity hub, not a free-roaming character-control game. The player pans/zooms and taps a location, building, facility, or resource node to open its dedicated activity screen. Tapping eligible empty land may open the construction flow.
+- Connected Zones form the expansion model. Unlocking a Zone requires its defined conditions; unlocking it does not automatically construct or populate its facilities.
+- Buildings and locations must have functional purposes and open the relevant activity layer. They are not decorative map props only. Activities may include gathering, processing, crafting, construction, production, training, study, trade, social activities, and encounters as each system is designed.
+- Construction uses a defined blueprint, site/footprint and placement checks, prerequisites, required resources/tools/currency, duration, and completion state. Construction and production may progress while the app is closed, using the offline time model above.
+- Keep the renderer and asset pipeline lightweight and compatible with the APK's size and target-device performance constraints. Do not introduce a heavyweight game engine or graphics dependency without a measured technical need.
+
+**Shared Eternal Path economy and ownership**
+- Idle World uses the existing Eternal Path character, inventory, item identities, quantities, wallet, and progression as one integrated state. It must not create a parallel wallet, duplicate item catalog, or separate copy of character progression.
+- Item ownership, reservation, assignment, durability, and active use must be represented clearly. A tool or item cannot be simultaneously committed to incompatible jobs or activities.
+- Resource costs, rewards, production outputs, and trade must pass through the shared transaction/state layer so quantities cannot be duplicated or silently desynchronized between the map and other Eternal Path activities.
+
+**NPC and worker behavior framework**
+- NPCs/workers are locally simulated entities with defined profession or role, skills, workplace/assignment, schedule, capacity, needs/upkeep where applicable, and current task/state. Examples such as woodcutter, miner, farmer, builder, blacksmith, and merchant are illustrative roles, not a finalized profession list.
+- NPC behavior rules must be formulated from the NPC's **Spirit Realm** and, where applicable, **Arcanist Grade**, alongside relevant attributes, skills, Martial Soul/abilities, equipment, current HP/Energy/status, profession/specialization, activity type, and available resources.
+- Spirit Realm and Arcanist Grade are independent progression dimensions, not one combined rank. Spirit Realm informs the NPC's cultivation/combat capability and the complexity of relevant martial or combat decisions. Arcanist Grade informs Arcanistry knowledge, technical capability, and decisions in activities that actually use Arcanistry. A high value in one dimension must not automatically imply a high value in the other.
+- Arcanist Grade is applicable only where the NPC has an Arcanistry grade under the approved progression model. Do not fabricate a grade for an NPC who is not an Arcanist. Likewise, do not assume every NPC has awakened or entered a Spirit Realm; use the official progression state recorded for that character.
+- Higher progression may unlock more capable rule sets—such as evaluating more conditions, prioritizing targets, choosing among valid skills, responding to status effects, managing Energy/resources, coordinating with allies, or selecting more advanced technical procedures—but must not grant hidden information, invalid actions, free resources, or outcomes outside the NPC's actual capabilities.
+- Behavior is evaluated through explicit conditions, priorities, eligibility checks, and deterministic tie-break rules. The same saved state and inputs should produce the same NPC decision unless a separately approved game mechanic explicitly defines controlled randomness.
+- The exact behavior matrix must be authored against the official Merzkava Spirit Realm and Arcanist Grade values after their source data and gameplay formulas are verified. Do not invent realm/grade names, thresholds, multipliers, or canon abilities in this planning section.
+
+**Battle and activity layers**
+- One configurable battle engine supports both Solo and Party encounters. The activity/location defines which format is allowed; Solo and Party must not become separate incompatible combat systems.
+- Combat uses individual character Action Gauges and individual turns. Party members retain their own HP, Energy, attributes, skills, status effects, and gauge; turns are not grouped into one party-wide action.
+- Player-controlled turns pause and wait for the player's selected action. No automatic action or turn resolution may occur while waiting for player input. If the app closes during this pause, restore the pending turn and its valid choices on return.
+- NPC combatants use the same eligibility, gauge, cost, target, and resolution rules as the player. Their action selection is supplied by the rule-based NPC behavior framework above, informed by their Spirit Realm and applicable Arcanist Grade.
+- Party size, reserve/bench rules, gauge formula, detailed damage/status formulas, turn tie-breaks, and activity-specific Solo/Party permissions remain undecided until separately specified. Earlier examples are proposals, not approved values.
+
+**Design constraints and open decisions**
+- Keep map rendering, activity screens, simulation, battle logic, inventory transactions, and save persistence in clear modules with explicit ownership boundaries.
+- The map is a structured data model rendered in 2D; do not encode world state only in pixels or scenery assets.
+- Detailed Zone roster, map scale/grid/footprints, construction catalog and durations, worker capacity/upkeep, exact NPC behavior matrix, battle formulas, party limits, and reserve rules remain open design work.
+- Do not begin full Idle World implementation or mark this design complete until the shared-state contracts, official progression references, behavior matrix, map/object schema, offline-time rules, and activity/battle acceptance criteria have been reviewed.
+
+
 ### 5D. Offline reliability and QA
 
 **Purpose:** Prove Offline Game is genuinely standalone inside the shared APK and cannot contaminate connected Convo context, sessions, or saves.
