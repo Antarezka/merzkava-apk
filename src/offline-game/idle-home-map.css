@@ -467,3 +467,17 @@
 .arcanist-ticket{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;}
 .arcanist-ticket[hidden]{display:none!important;}
 @media(max-height:650px){.arcanist-destination-scroll{height:24vh;max-height:24vh}.arcanist-ticket-dispenser{flex-basis:160px;min-height:160px}.arcanist-transmission-bay{height:16px;min-height:16px;flex-basis:16px}}
+
+
+/* Dedicated exposed filament bulb above the quadrant lever. */
+.arcanist-quadrant-lamp{display:grid;justify-items:center;gap:3px;flex:0 0 auto;min-height:35px;margin:1px 0 3px;padding:2px 0 0}
+.arcanist-quadrant-bulb{position:relative;display:grid;place-items:center;width:23px;height:25px;border:1px solid #9b7948;border-radius:48% 48% 42% 42%;background:radial-gradient(ellipse at 50% 42%,#604a2b 0 31%,#211d15 54%,#0c110d 72%);box-shadow:inset 0 0 0 2px #0a0e0b,0 0 0 2px #4b3924,0 0 7px #c28a3d55}
+.arcanist-quadrant-bulb:before{content:"";position:absolute;left:7px;right:7px;bottom:-5px;height:6px;border:1px solid #9b7948;border-top:0;background:repeating-linear-gradient(180deg,#80633d 0 1px,#1a1d17 1px 3px)}
+.arcanist-quadrant-bulb i{position:relative;width:7px;height:10px;border:1px solid #f0c879;border-radius:50% 50% 35% 35%;background:radial-gradient(ellipse at 50% 70%,#fff2b4 0 14%,#f4b957 35%,#a65d25 72%,transparent 76%);box-shadow:0 0 5px 2px #e7b65d99,0 0 12px #e6a44877;animation:arcanist-quadrant-breathe 3.1s ease-in-out infinite}
+.arcanist-quadrant-bulb i:after{content:"";position:absolute;left:1px;right:1px;top:3px;height:4px;border-top:1px solid #fff0b5;border-radius:50%;transform:rotate(-12deg)}
+.arcanist-quadrant-lamp small{color:#a99169;font:600 4.5px/1.2 system-ui,sans-serif;letter-spacing:.12em;text-align:center}
+@keyframes arcanist-quadrant-breathe{0%,100%{opacity:.46;filter:brightness(.7);box-shadow:0 0 3px 1px #d9a64e55}50%{opacity:1;filter:brightness(1.25);box-shadow:0 0 8px 3px #ffcf78cc,0 0 15px #e5a84e88}}
+.arcanist-machine-shell.is-running .arcanist-quadrant-bulb i,.arcanist-machine-shell.is-traveling .arcanist-quadrant-bulb i{animation:arcanist-master-flicker var(--lamp-flicker-duration,.73s) steps(1,end) infinite}
+.arcanist-machine-shell.is-card-required .arcanist-quadrant-bulb i{animation:arcanist-warning-master .47s steps(2,end) infinite}
+@media(max-width:390px){.arcanist-quadrant-lamp{min-height:32px;margin:0 0 2px}.arcanist-quadrant-bulb{width:21px;height:23px}}
+@media(prefers-reduced-motion:reduce){.arcanist-quadrant-bulb i{animation:none!important}}
