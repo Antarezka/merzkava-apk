@@ -518,3 +518,49 @@
 @media(prefers-reduced-motion:reduce){.arcanist-quadrant-bulb i{animation:none!important}}
 .arcanist-machine-shell.is-running .arcanist-quadrant-bulb i,.arcanist-machine-shell.is-traveling .arcanist-quadrant-bulb i{animation:arcanist-master-flicker var(--lamp-flicker-duration,.73s) steps(1,end) infinite}
 .arcanist-machine-shell.is-card-required .arcanist-quadrant-bulb i{animation:arcanist-warning-master .47s steps(2,end) infinite}
+
+
+/* Tecno Spark Go 1 compact quadrant footprint: keep the complete control stack short. */
+.arcanist-control-panel{
+  box-sizing:border-box;
+  height:clamp(92px,13.2vh,108px);
+  min-height:0;
+  max-height:108px;
+  padding:3px 2px 2px;
+  gap:0;
+}
+.arcanist-lever-label{font-size:4.5px;line-height:1;margin:0;padding:0 0 2px}
+.arcanist-quadrant-control{gap:0;min-height:0}
+.arcanist-quadrant-caption{font-size:3.5px;line-height:1;margin:0}
+.arcanist-quadrant-plate{width:58px;height:43px;flex:0 0 43px}
+.arcanist-quadrant-lever{height:41px;bottom:8px}
+.arcanist-quadrant-lever .arcanist-lever-shaft{height:29px}
+.arcanist-control-panel .arcanist-lever-hint{display:none}
+.arcanist-card-reader{gap:1px;margin:2px 0 0;padding-top:2px}
+.arcanist-card-reader-label{font-size:4px;line-height:1}
+.arcanist-card-slot{height:5px;min-height:5px}
+.arcanist-travel-card{width:49px;height:20px;min-height:20px;padding:2px 4px;font-size:4px}
+.arcanist-card-reader>small{font-size:3.5px;line-height:1}
+.arcanist-quadrant-lamp{top:-34px}
+@media(max-width:390px){
+ .arcanist-control-panel{height:96px;max-height:96px;padding:2px 1px}
+ .arcanist-quadrant-plate{width:54px;height:40px;flex-basis:40px}
+ .arcanist-quadrant-lever{height:38px;bottom:7px}
+ .arcanist-quadrant-lever .arcanist-lever-shaft{height:27px}
+ .arcanist-travel-card{width:46px;height:19px;min-height:19px}
+ .arcanist-card-reader{margin-top:1px;padding-top:1px}
+}
+@media(max-height:700px){
+ .arcanist-control-panel{height:88px;max-height:88px}
+ .arcanist-quadrant-plate{height:36px;flex-basis:36px}
+ .arcanist-quadrant-lever{height:34px;bottom:6px}
+ .arcanist-quadrant-lever .arcanist-lever-shaft{height:24px}
+ .arcanist-travel-card{height:17px;min-height:17px}
+}
+@media(max-height:620px){
+ .arcanist-control-panel{height:78px;max-height:78px}
+ .arcanist-quadrant-plate{height:31px;flex-basis:31px}
+ .arcanist-quadrant-lever{height:30px;bottom:5px}
+ .arcanist-quadrant-lever .arcanist-lever-shaft{height:21px}
+ .arcanist-card-reader-label,.arcanist-card-reader>small{display:none}
+}
