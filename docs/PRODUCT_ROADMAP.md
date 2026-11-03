@@ -404,6 +404,59 @@ This is a transparent checklist-completion index, **not** a prediction of remain
 - Do not begin full Idle World implementation or mark this design complete until the shared-state contracts, official progression references, behavior matrix, map/object schema, offline-time rules, and activity/battle acceptance criteria have been reviewed.
 
 
+### 5C-2. Illustrated item tiles, category frames, and permanent character emblems
+
+**Status:** Visual/content-system direction recorded; asset inventory, item catalog, frame artwork, and implementation remain TODO. This section defines the intended presentation, not a claim that all item records or illustrations already exist.
+
+**Core presentation rule**
+- Every carried, collectible, stackable, usable, equipable, craftable, tradable, reward, or loot item must have an illustrated item tile. The tile displays the item's actual image/artwork inside its frame; a text-only row, generic emoji, or unillustrated placeholder is not the intended final presentation.
+- Standard item tiles use a compact, near-square silhouette inspired by the face buttons on a PlayStation controller. Keep a consistent tile footprint and image area so categories form a readable inventory grid.
+- Each item family receives its own recognizable frame treatment. Category identity may use distinct border geometry, engraved motifs, corner details, material texture, and restrained color accents; do not rely on color alone.
+- Permanent character-bound attachments/progression emblems use an octagonal frame at the same approximate outer dimensions as a standard square tile. Spirit Rings are the primary example: show each absorbed ring in its own octagonal slot/emblem in the character status/profile presentation. The octagon communicates a different state from ordinary carried inventory; it is not a second inventory copy.
+- The octagonal treatment is for things that are genuinely bound to, absorbed by, or permanently represented as part of the character's status under the approved rules. Do not put ordinary equipment, temporary buffs, Arcanist tools, or merely owned artifacts into permanent slots. Martial Soul/status representation may use this visual family only where it represents an established permanent character state, not as a tradable item.
+- Arcanist Grade, Arcanist Focus, Spirit Realm, and other numeric/progression values remain status data, not collectible item cards. Their associated physical tools, materials, books, patterns, formulations, and artifacts are ordinary illustrated item records unless an official rule makes a specific object permanently character-bound.
+
+**Item-frame families to design**
+- **Natural resources and gathered goods:** fish, meat, herbs, plants, wood, stone, ores, minerals, hides, fibers, shells, and other source-verified natural materials.
+- **Processed and crafting materials:** refined metals, cut stone, boards, ingots, textiles, components, energy-bearing materials, and other documented or approved game-only processing outputs.
+- **Food, ingredients, and cooking results:** raw ingredients, prepared meals, preserved food, drinks, and cooking outputs. Keep raw ingredients visually distinct from ready-to-consume food where useful.
+- **Medicine and recovery supplies:** herbs and ingredients, medicines, treatment supplies, antidotes, and other supported consumables. Do not imply an item has a medical effect unless its source or approved game rule establishes it.
+- **Tools and utility equipment:** gathering tools, mining/woodcutting tools, repair tools, containers, field equipment, and specialist implements.
+- **Weapons:** each weapon type and meaningful variant has its own illustration and category frame; equipment state is represented through the shared inventory/equipment data.
+- **Armor, clothing, and wearable equipment:** armor pieces, robes, everyday clothing, footwear, gloves, headwear, accessories, and other wearable items. Clothing and protective armor may share a broad equipment family but must remain distinguishable.
+- **Books, documents, and learning objects:** books, manuals, records, maps, scrolls, study materials, and approved Arcanistry learning resources.
+- **Arcanistry tools and workshop objects:** Engraver's Apprentice, Formation Engraver, forger tools, apparatus, measuring instruments, workbench components, and other source-supported specialist equipment. Exact names, ownership gates, functions, and grade requirements must follow the official Arcanistry source.
+- **Arcanistry materials, patterns, and formulations:** suitable metals, stone and special materials, base materials, formation patterns, formulation records, and processed outputs. Separate physical objects from knowledge/blueprint records; a learned formula is not automatically a consumable inventory item.
+- **Artifacts and relics:** keep Relic, Ancient Artifact, and Artificial Artifact origin families visually distinguishable, with individual item identity, provenance, condition, ownership, and known function. Unknown or undiscovered properties remain unknown; never invent a gallery of canon artifacts.
+- **Spirit Beast drops and encounter loot:** verified hides, parts, materials, and other actual drops. A drop is not guaranteed merely because a creature exists; record the real source and event. Never treat people or lineages as collectible loot.
+- **Quest, key, and special-purpose objects:** keys, tokens, mission objects, evidence, sealed packages, and other supported unique items. Their frame should communicate special purpose without falsely implying rarity or power.
+- **Currency:** keep the official wallet and denomination presentation authoritative. Coins may have their own small visual denomination symbols in the wallet; do not duplicate currency as ordinary crafting inventory or misclassify Zun Jade/Ancient Zun as crafting materials or artifacts.
+- **Spirit Rings:** use the permanent octagonal character-status frame after successful absorption. A ring that is merely available, carried/stored in a valid stasis state, or awaiting absorption remains a distinct unabsorbed item/state and must not be displayed as permanently attached.
+- **Other permanent character-bound records:** reserve octagonal slots for additional categories only when official rules confirm they become part of the character's permanent status. Do not pre-allocate invented slot types.
+
+**World objects excluded from item tiles**
+- Buildings, houses, workshops, facilities, roads, bridges, wells, farms, mines, resource nodes, terrain pieces, map decorations, large trees, and other placeable/world-scale objects are rendered as separate map objects with their own isometric sprites, footprints, interaction zones, construction/ownership state, and upgrade/damage state where supported.
+- A building's blueprint, construction material, tool requirement, or building component may still appear as an ordinary item tile when it is a carried/consumed/owned inventory record. The completed building itself remains a world Asset/map object, not an inventory icon.
+- Distinguish a harvestable resource node on the map from the gathered item produced by it: the node is a map object; harvested fish, wood, stone, ore, or other output is an illustrated inventory item.
+
+**Image and catalog requirements**
+- Build an item master catalog from the official Universe source material, the approved World Archive content, and explicitly labelled Eternal Path-only records. The World Archive is a lore/reference layer, not the authority for gameplay formulas or hidden/restricted facts.
+- For every record, track stable item ID, display name, category/subcategory, source/provenance (CANON, CANON_ADAPTATION, or IN_GAME_ORIGINAL), source dossier/path and source commit where applicable, visibility/discovery state, image asset, stackability, ownership/location, condition/durability if relevant, and supported gameplay uses.
+- Canon items must not be fabricated from generic genre expectations. The current canon artifact catalogue is intentionally sparse; only individually established artifacts may be represented as canon entries. Unknown objects retain the prescribed Unknown label and unknown properties until properly identified/appraised.
+- Create original 2D item artwork for every released catalog entry, designed to read clearly at small mobile sizes. Use category-consistent lighting, perspective, silhouette, scale, and transparent/clean backgrounds as appropriate. Do not reuse World Archive scenery images as item icons and do not copy protected game assets.
+- Use lightweight, reusable frame components and sprite assets. The item image is the main focus; the frame supports category recognition and rarity/condition metadata without obscuring the object.
+- Inventory, storage, loot/reward screens, crafting inputs/outputs, equipment slots, trade, and item detail views must all reference the same item ID and image asset. No duplicate visual-only item records or parallel inventories.
+- Include states for unknown/unidentified, undiscovered, locked, unavailable, equipped, reserved for a job, damaged, consumed, and permanently attached where relevant. A frame must not reveal hidden identity/function before the character legitimately discovers it.
+
+**Acceptance gate**
+- Approve the category taxonomy and square/octagon frame grammar.
+- Complete the source-backed item candidate register and visibility/provenance review before bulk illustration.
+- Verify that every released item record resolves to a unique, legible illustration and the correct category frame at target Android sizes.
+- Verify that absorbed Spirit Rings appear only in the permanent octagonal status slots and are not duplicated as carried inventory; unabsorbed rings remain in their actual current state.
+- Verify map buildings/world objects remain separate from carried inventory while construction materials and portable tools remain item tiles.
+- Verify all screens share one item identity, image, ownership, quantity, and condition state; no UI layer invents or duplicates item records.
+- Preserve APK size, memory, touch responsiveness, and scroll performance; do not add a heavyweight asset/rendering dependency without measured justification.
+
 ### 5D. Offline reliability and QA
 
 **Purpose:** Prove Offline Game is genuinely standalone inside the shared APK and cannot contaminate connected Convo context, sessions, or saves.
