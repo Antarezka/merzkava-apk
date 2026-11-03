@@ -26,7 +26,7 @@ type WorldMarkerId =
   | "golden-dragon-empire" | "tianhai-yunzhou" | "beiming-gu"
   | "lawless-territories" | "ashen-borderlands" | "black-tide-expanse" | "nine-frost-wastes"
   | "wanluo-sacred-expanse" | "azerion-forest" | "dead-zone" | "inner-azerion"
-  | "mega-colossal-labyrinth" | "high-cloud-sea-mountains" | "frostmirror-sea"
+  | "mega-colossal-labyrinth" | "high-cloud-sea-mountains" | "silverpine-wilds" | "frostmirror-sea"
   | "eastern-azure-sea" | "yunmeng-sea" | "wufeng-sea" | "black-tide-sea"
   | "guixu-canghai" | "lanternhook-isles";
 type WorldMarker = {
@@ -52,6 +52,7 @@ const defaultWorldMarkers: WorldMarker[] = [
   { id: "inner-azerion", name: "Inner Azerion", x: 51, y: 47, category: "landmark", subtitle: "HIDDEN HALF-BEAST CITY", description: "A concealed city in the northern part of Azerion Forest, hidden by extremely dense illusion fog. Safe routes are known only to veteran forest-goers and local hunter tribes.", placementStatus: "provisional" },
   { id: "mega-colossal-labyrinth", name: "Mega Colossal Labyrinth", x: 48, y: 53, category: "landmark", subtitle: "ANCIENT UNDERGROUND RUINS", description: "Reached through ruins beneath Azerion Forest's central lake and connected to an exit on the northern deep-sea coast. Its interior has no complete surveyed map.", placementStatus: "provisional" },
   { id: "high-cloud-sea-mountains", name: "High Cloud-Sea Mountains", x: 82, y: 13, category: "mountains", subtitle: "UNNAMED REMOTE MOUNTAIN REGION · PROVISIONAL", description: "Remote high peaks rising above the sea of clouds. Two distinct hidden traditions are associated with this remote mountain setting; exact names, coordinates, and routes are not established.", placementStatus: "provisional" },
+  { id: "silverpine-wilds", name: "Silverpine Wilds", x: 64, y: 24, category: "forest", subtitle: "BEIMING GU · PINE FOREST WILDERNESS", description: "A northern district of Beiming Gu known for pine forests, Spirit Beast habitat, herbs, and hunting. This is an internal Beiming region, not an independent world power.", placementStatus: "provisional" },
   { id: "frostmirror-sea", name: "Frostmirror Sea", x: 26, y: 10, category: "sea", subtitle: "NORTHERN COASTAL SEA", description: "The northern coastal waters of Beiming Gu, connected around the northeastern maritime margin to Eastern Azure Sea.", placementStatus: "provisional" },
   { id: "eastern-azure-sea", name: "Eastern Azure Sea", x: 92, y: 42, category: "sea", subtitle: "EASTERN COASTAL SEA", description: "The eastern maritime belt of Golden Dragon Empire, with the established eastern shipping lane and coastal ports.", placementStatus: "provisional" },
   { id: "yunmeng-sea", name: "Yunmeng Sea", x: 22, y: 61, category: "sea", subtitle: "SOUTHWESTERN HOME WATERS", description: "The ocean beneath and around Tianhai Yunzhou's floating island. Its eastern passage connects to Eastern Azure Sea; its western/southern approach faces Lawless Territories.", placementStatus: "provisional" },
@@ -77,7 +78,8 @@ function readWorldMarkers(): WorldMarker[] {
 function worldMapMarkerMarkup(marker: WorldMarker, editor = false): string {
   const number = String(defaultWorldMarkers.findIndex(item => item.id === marker.id) + 1).padStart(2, "0");
   const provisional = marker.placementStatus === "provisional" ? ' title="Provisional placement — adjust in Map Editor"' : "";
-  return '<button class="wmh-power wmh-marker-' + marker.category + (editor ? ' wmh-editor-marker' : '') +
+  const powerClass = marker.id === "golden-dragon-empire" ? " wmh-power-gde" : marker.id === "tianhai-yunzhou" ? " wmh-power-ty" : marker.id === "beiming-gu" ? " wmh-power-bg" : "";
+  return '<button class="wmh-power wmh-marker-' + marker.category + powerClass + (editor ? ' wmh-editor-marker' : '') +
     '" style="left:' + marker.x + '%;top:' + marker.y + '%" ' +
     (editor ? 'type="button" data-wmh-drag-marker="' + marker.id + '" aria-label="Drag ' + marker.name + '"' : 'data-wmh-info="' + marker.id + '"') +
     provisional + '><b>' + number + '</b><span>' + marker.name + '</span></button>';
@@ -329,7 +331,7 @@ function bindWorldMapEditor(dialog: HTMLElement): void {
       });
       markers.forEach(paint); refreshExport();
       setStatus("Imported coordinates are a preview. Confirm & lock positions to save them on this device.");
-    } catch { setStatus("Import failed. Paste a complete Merzkava world-map JSON reference containing all 20 marker IDs."); }
+    } catch { setStatus("Import failed. Paste a complete Merzkava world-map JSON reference containing all 21 marker IDs."); }
   });
   dialog.querySelector<HTMLElement>('[data-wmh-action="editor-reset"]')?.addEventListener("click", () => {
     markers = defaultWorldMarkers.map(item => ({ ...item }));
@@ -394,7 +396,7 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
   if (action.dataset.wmhAction === "home") { overlay.dataset.level = "home"; dialog.innerHTML = panelMarkup("home",regionId,building); return true; }
   if (action.dataset.wmhInfo) {
     const id = action.dataset.wmhInfo as WorldMarkerId;
-    const info = defaultWorldMarkers.find(item => item.id === id);
+    const info = readWorldMarkers().find(item => item.id === id);
     if (!info) return true;
     dialog.querySelector(".wmh-marker-info")?.remove();
     const placement = info.placementStatus === "provisional" ? '<em>PROVISIONAL MAP PLACEMENT · ADJUST IN MAP EDITOR</em>' : '<em>OWNER-POSITIONED MARKER</em>';
