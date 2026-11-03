@@ -963,7 +963,6 @@ root.addEventListener("click", async (event: MouseEvent) => {
     if(placeName) placeName.textContent="Choose a destination";
     if(placeNote) placeNote.textContent="Select a place from the index or directly on the map.";
     const routeStatus=root.querySelector<HTMLElement>("[data-arcanist-route-status]");if(routeStatus)routeStatus.textContent="PREVIEW ONLY";
-    const rotor=root.querySelector<HTMLElement>("[data-arcanist-rotor]");if(rotor)delete rotor.dataset.sceneId;
     const rotor=root.querySelector<HTMLElement>("[data-arcanist-rotor]");
     if(rotor&&activePanel){
       rotor.querySelectorAll(".arcanist-dial-aperture[data-idle-group='regional']").forEach(node=>node.remove());
