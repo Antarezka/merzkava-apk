@@ -91,3 +91,12 @@
 .wmh-marker-info b{font:19px Georgia,serif;color:#f4e6ca}
 .wmh-marker-info span{font:8px Arial,sans-serif;letter-spacing:.1em;color:#c6b18b}
 .wmh-marker-info button{flex:none;width:30px;height:30px;border:1px solid #92784e;background:#1d2922;color:#f2dfb9;font-size:20px}
+
+
+/* Marker lift keeps the selected marker visible above the touching finger. */
+.wmh-editor-marker-lifted{z-index:6!important;transform:translate(-50%,calc(-50% - 46px))!important;filter:drop-shadow(0 5px 5px #000b);pointer-events:none}
+.wmh-editor-marker{transition:filter .08s ease}
+.wmh-editor-confirm-bar{position:sticky;bottom:0;z-index:8;display:flex;align-items:center;justify-content:space-between;gap:10px;margin:12px -2px 0;padding:10px 8px max(10px,env(safe-area-inset-bottom));border:1px solid #c6a36c;background:linear-gradient(100deg,#17251cfa,#30291dfa);box-shadow:0 -5px 16px #0008}
+.wmh-editor-confirm-bar span{color:#d9bd8a;font:700 8px Arial,sans-serif;letter-spacing:.12em}
+.wmh-editor-confirm-bar button{flex:1;min-height:42px;padding:10px 8px;border:1px solid #e1c18a;background:linear-gradient(110deg,#806039,#5e472d);color:#fff0d1;font:700 10px Arial,sans-serif;letter-spacing:.06em}
+@media(max-width:360px){.wmh-editor-confirm-bar{gap:6px;padding-left:5px;padding-right:5px}.wmh-editor-confirm-bar span{font-size:7px}.wmh-editor-confirm-bar button{font-size:9px}}
