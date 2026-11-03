@@ -454,3 +454,10 @@ body.eternal-choice-open{overflow:hidden}
 :root[data-theme="dark"] .expedition-player-question p{color:#eee5d4!important}
 :root[data-theme="dark"] .expedition-outcome{border-color:#8e7950;background:#2e3b32;color:#e9dfcd}
 :root[data-theme="dark"] .expedition-outcome p{color:#e9dfcd}
+
+
+/* Eternal Path narrative wallpaper variants; low-contrast motifs stay behind the prose. */
+:root[data-eternal-wallpaper="spirit"] .expedition-dialogue-card{background-color:#282b26;background-image:radial-gradient(circle at 12px 12px,transparent 6px,#d6aa7022 6.5px 7px,transparent 7.5px),radial-gradient(circle at 0 0,#d6aa7030 1px,transparent 2px),repeating-linear-gradient(45deg,transparent 0 22px,#d6aa700d 22px 23px,transparent 23px 45px)}
+:root[data-eternal-wallpaper="clouds"] .expedition-dialogue-card{background-color:#293633;background-image:radial-gradient(ellipse at 10px 18px,transparent 7px,#d9ded022 7.5px 8px,transparent 8.5px),radial-gradient(ellipse at 27px 4px,transparent 7px,#d9ded01c 7.5px 8px,transparent 8.5px)}
+:root[data-eternal-wallpaper="echoes"] .expedition-dialogue-card{background-color:#302b25;background-image:radial-gradient(circle at 12px 12px,transparent 5px,#d6aa7028 5.5px 6px,transparent 6.5px),repeating-linear-gradient(45deg,transparent 0 18px,#d6aa7010 18px 19px,transparent 19px 37px)}
+:root[data-eternal-wallpaper="tower"] .expedition-dialogue-card{background-color:#2b3029;background-image:linear-gradient(90deg,transparent 48%,#d6aa7020 49% 50%,transparent 51%),linear-gradient(0deg,transparent 48%,#d6aa7020 49% 50%,transparent 51%),radial-gradient(circle at center,transparent 8px,#d6aa7024 8.5px 9px,transparent 9.5px);background-size:30px 30px}
