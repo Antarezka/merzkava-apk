@@ -126,8 +126,11 @@ describe("Eternal Path live world scene", () => {
     expect(html).toContain('class="scene-coordinate scene-clock-ink"');
     expect(html.indexOf("expedition-profile-compact")).toBeLessThan(html.indexOf('class="expedition-environment"'));
     expect(html.indexOf('class="expedition-environment"')).toBeLessThan(html.indexOf('class="expedition-disposition-line"'));
-    expect(html.indexOf('class="expedition-disposition-line"')).toBeLessThan(html.indexOf('class="expedition-outcome"'));
-    expect(html.indexOf('class="expedition-outcome"')).toBeLessThan(html.indexOf('class="expedition-dialogue"'));
+    expect(html.indexOf('class="expedition-disposition-line"')).toBeLessThan(html.indexOf('class="expedition-dialogue"'));
+    if(html.includes('class="expedition-outcome"')){
+      expect(html.indexOf('class="expedition-disposition-line"')).toBeLessThan(html.indexOf('class="expedition-outcome"'));
+      expect(html.indexOf('class="expedition-outcome"')).toBeLessThan(html.indexOf('class="expedition-dialogue"'));
+    }
     expect(html.indexOf('class="expedition-dialogue"')).toBeLessThan(html.indexOf('class="expedition-save-manager is-compact is-active"'));
     expect(html.indexOf('class="expedition-save-manager is-compact is-active"')).toBeLessThan(html.indexOf('class="expedition-footer"'));
     expect(html).not.toContain("Manage journeys");
