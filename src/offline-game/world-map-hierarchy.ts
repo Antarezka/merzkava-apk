@@ -25,7 +25,7 @@ function panelMarkup(level: Level, regionId: RegionId = "golden-dragon-empire", 
   const header = (kind: string, title: string, subtitle: string) =>
     '<header class="wmh-level-header"><div><span class="wmh-level-tag">' + kind + '</span><h3>' + title + '</h3><p>' + subtitle + '</p></div><button type="button" class="wmh-close" data-wmh-action="close" aria-label="Close map">×</button></header>';
   if (level === "world") return header("WORLD MAP", "Merzkava Universe", "THREE GREAT POWERS · SEAS · UNCHARTED LANDS") +
-    '<div class="wmh-world-map"><img src="/world/kanban-map-regions-cloud-gold-v2.svg" alt="Canonical Merzkava world and regions map" />' +
+    '<div class="wmh-world-map"><img src="/world/Untitled77_20261029054536.png" alt="Canonical Merzkava world and regions map" />' +
     '<button class="wmh-power wmh-power-gde" data-wmh-region="golden-dragon-empire"><b>01</b><span>Golden Dragon Empire</span></button>' +
     '<button class="wmh-power wmh-power-ty" data-wmh-region="tianhai-yunzhou"><b>02</b><span>Tianhai Yunzhou</span></button>' +
     '<button class="wmh-power wmh-power-bg" data-wmh-region="beiming-gu"><b>03</b><span>Beiming Gu</span></button></div>' +
