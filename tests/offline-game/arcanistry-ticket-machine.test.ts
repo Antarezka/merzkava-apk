@@ -9,10 +9,10 @@ import {
 
 describe("Arcanistry ticket interaction", () => {
   it("requires a complete physical quadrant-lever pull before issuing a ticket", () => {
-    expect(ARCANISTRY_LEVER_PULL_DISTANCE).toBe(43);
+    expect(ARCANISTRY_LEVER_PULL_DISTANCE).toBe(28);
     expect(isArcanistryLeverEngaged(0)).toBe(false);
-    expect(isArcanistryLeverEngaged(42.9)).toBe(false);
-    expect(isArcanistryLeverEngaged(43)).toBe(true);
+    expect(isArcanistryLeverEngaged(27.9)).toBe(false);
+    expect(isArcanistryLeverEngaged(28)).toBe(true);
     expect(isArcanistryLeverEngaged(Number.POSITIVE_INFINITY)).toBe(false);
   });
 
