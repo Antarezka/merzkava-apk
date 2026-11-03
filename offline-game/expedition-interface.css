@@ -1,0 +1,467 @@
+/* Offline Game / Expedition Interface. Scoped to this screen only. */
+.expedition-page{display:grid;gap:16px;padding-bottom:18px}
+.expedition-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:8px 2px 2px}
+.expedition-heading h2{margin:5px 0 8px;color:var(--text,#eee4d4);font:400 clamp(34px,9vw,49px)/.98 Georgia,serif;letter-spacing:-.035em}
+.expedition-heading h2 em{color:#d9aa6a;font-weight:400}
+.expedition-heading .muted{margin:0}
+.expedition-mode-mark{display:grid;place-items:center;flex:0 0 48px;width:48px;height:48px;border:1px solid #9a754b;color:#dfb879;font:600 16px Georgia,serif;letter-spacing:.08em}
+.expedition-environment{position:relative;isolation:isolate;display:flex;min-height:clamp(220px,58vw,330px);align-items:flex-end;overflow:hidden;padding:20px;border:1px solid #786044;border-radius:5px;background:linear-gradient(180deg,#24302d 0%,#39443d 42%,#171b19 100%);box-shadow:inset 0 0 0 4px #e4c58b0c,0 12px 28px #0004}
+.expedition-fog-layer{position:absolute;z-index:0;inset:-8%;background-image:url("/game/scenery/shared/fx-02-atmospheric-fog.png");background-position:center;background-size:cover;background-repeat:no-repeat;mix-blend-mode:screen;opacity:.72;pointer-events:none;will-change:transform,opacity}
+.expedition-environment:after{position:absolute;z-index:1;inset:0;content:"";background:linear-gradient(180deg,#10161405 25%,#111713d9 100%);pointer-events:none}
+.expedition-window-frame{position:absolute;z-index:3;inset:8px;border:1px solid #d5b47a88;box-shadow:inset 0 0 0 1px #161511aa,inset 0 0 22px #090b0a66;pointer-events:none}
+.expedition-window-frame:before{position:absolute;inset:5px;content:"";border:1px solid #ead4a52e}
+.expedition-window-label{position:absolute;z-index:4;top:17px;left:19px;padding:4px 7px;border:1px solid #d5b47a55;background:#171915a8;color:#e7c99a;font:600 7px/1.2 system-ui,sans-serif;letter-spacing:.17em;pointer-events:none}
+.expedition-scene-copy{position:relative;z-index:2;max-width:440px}
+.expedition-scene-copy .scene-kicker,.expedition-coordinate,.scene-coordinate{color:#e5c99b;font:600 8px/1.4 system-ui,sans-serif;letter-spacing:.18em}
+.expedition-scene-copy h3{margin:8px 0 4px;color:#f3e7d2;font:400 clamp(29px,8vw,40px)/1 Georgia,serif}
+.expedition-scene-copy p{margin:0;color:#d1c9b9;font-size:12px;line-height:1.6}
+.scene-coordinate{position:absolute;z-index:4;top:17px;right:19px;color:#e1d5bd;font-size:7px}
+.expedition-character-panel,.expedition-feature{padding:15px;border:1px solid var(--line,#51483e);border-radius:4px;background:linear-gradient(145deg,#292521eF,#211f1cF2)}
+.expedition-character-panel label{display:block;margin:13px 0 6px;color:#d7c8ae;font-size:11px}
+.expedition-character-panel select{width:100%;min-height:43px;padding:9px 11px;border:1px solid #67513b;border-radius:3px;background:#171614;color:#f0e5d4;font:inherit}
+.expedition-note{margin:10px 0 0;color:#aaa092;font-size:11px;line-height:1.6}
+.expedition-status-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.expedition-stat{min-width:0;padding:12px 9px;border:1px solid #514638;background:#24211d;text-align:center}
+.expedition-stat span,.expedition-stat small{display:block;color:#a99c89;font-size:8px;letter-spacing:.1em}
+.expedition-stat strong{display:block;margin:6px 0;color:#e7c58d;font:400 24px Georgia,serif}
+.expedition-stat small{font-size:8px;letter-spacing:0}
+.expedition-feature-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.expedition-feature>span{color:#d6aa70;font-size:8px;font-weight:700;letter-spacing:.13em}
+.expedition-feature h3{margin:8px 0 5px;color:#e9dfd0;font:400 19px Georgia,serif}
+.expedition-feature p{margin:0;color:#a99f91;font-size:11px;line-height:1.55}
+.expedition-footer{display:flex;justify-content:space-between;gap:10px;padding-top:10px;border-top:1px solid var(--line);color:#8e8375;font-size:7px;letter-spacing:.1em}
+@media(max-width:360px){.expedition-status-grid{gap:5px}.expedition-stat{padding:10px 4px}.expedition-stat strong{font-size:20px}.expedition-feature-grid{gap:7px}.expedition-feature{padding:12px 10px}.expedition-footer{font-size:6px}}
+
+/* Keep the expanded eight-destination bottom navigation usable on narrow phones. */
+.bottom-nav:has(.nav-item:nth-child(8)) .nav-item{padding-inline:0}
+.bottom-nav:has(.nav-item:nth-child(8)) .nav-item small{font-size:6px;letter-spacing:0}
+.bottom-nav:has(.nav-item:nth-child(8)) .nav-item .nav-icon{font-size:15px}
+
+
+/* Live scene composition: illustrated region first, translucent atmosphere above it. */
+.expedition-scene-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.expedition-scene-caption{color:#cbb99d;font-size:9px;letter-spacing:.08em}
+.expedition-environment{min-height:clamp(220px,58vw,330px);background:#1a201f;--scene-fog-opacity:.22}
+.expedition-scene-image{position:absolute;z-index:0;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 48%;filter:saturate(.86) contrast(1.04);pointer-events:none}
+.expedition-light-layer{position:absolute;z-index:1;inset:0;background:linear-gradient(180deg,#f3d9a00a,#17171355 90%);pointer-events:none;transition:background .7s ease,filter .7s ease}
+.expedition-weather-layer{position:absolute;z-index:2;inset:0;opacity:0;pointer-events:none;transition:opacity .6s ease}
+.expedition-fog-layer{position:absolute;z-index:3;inset:-8%;background-image:none;opacity:var(--scene-fog-opacity);mix-blend-mode:screen;pointer-events:none;overflow:hidden}
+.expedition-fog-motion{display:block;width:100%;height:100%;object-fit:cover;mix-blend-mode:screen;opacity:.85;filter:blur(1px)}
+.expedition-environment:after{z-index:4;background:linear-gradient(180deg,#10161408 16%,#111713a8 100%)}
+.expedition-window-frame{z-index:6}
+.expedition-window-label,.scene-coordinate{z-index:7}
+.expedition-scene-copy{z-index:5}
+.expedition-environment[data-cycle="Dawn"] .expedition-light-layer{background:linear-gradient(115deg,#d58b4b55,#e3b46b15 55%,#1b232a55)}
+.expedition-environment[data-cycle="Morning"] .expedition-light-layer{background:linear-gradient(115deg,#f0d19b18,#b7d0d122 60%,#101a2244)}
+.expedition-environment[data-cycle="Day"] .expedition-light-layer{background:linear-gradient(115deg,#f5d99a18,#ffffff08 48%,#1a273022)}
+.expedition-environment[data-cycle="Dusk"] .expedition-light-layer{background:linear-gradient(115deg,#c46c4b55,#8e527044 55%,#171b2c88)}
+.expedition-environment[data-cycle="Night"] .expedition-light-layer{background:linear-gradient(115deg,#101b3a99,#1a234a88 55%,#090d1dcc)}
+.expedition-environment[data-weather="Cloudy"] .expedition-light-layer{filter:brightness(.78) saturate(.78)}
+.expedition-environment[data-weather="Fog"] .expedition-fog-layer{opacity:calc(var(--scene-fog-opacity) + .08)}
+.expedition-environment[data-weather="Rain"] .expedition-weather-layer{opacity:.5;background:repeating-linear-gradient(105deg,transparent 0 17px,#d7e4ed35 18px,#d7e4ed35 19px,transparent 20px 33px)}
+.expedition-environment[data-weather="Snow"] .expedition-weather-layer{opacity:.58;background-image:radial-gradient(#fff9 1px,transparent 2px),radial-gradient(#fff8 1px,transparent 2px);background-size:37px 43px,59px 61px;background-position:0 0,18px 22px}
+.expedition-environment[data-weather="Clear"] .expedition-weather-layer{opacity:0}
+.expedition-dialogue-card,.expedition-dialogue-locked{padding:16px;border:1px solid #5d4a34;background:linear-gradient(145deg,#2b261f,#1d1b18)}
+.expedition-start-form label{display:block;margin:12px 0 6px;color:#d8c6a8;font-size:10px;letter-spacing:.06em}
+.expedition-start-form input,.expedition-start-form select{width:100%;min-height:42px;padding:9px 10px;border:1px solid #65523d;border-radius:3px;background:#171614;color:#f0e5d4;font:inherit;font-size:12px}
+.expedition-form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.expedition-start-form{margin-top:12px}
+.expedition-player-name{margin:10px 0 4px;color:#f0e5d4;font:400 25px Georgia,serif}
+.expedition-dialogue{display:grid;gap:10px}
+.expedition-dialogue-card h3{margin:7px 0 9px;color:#f0dfc5;font:400 23px Georgia,serif}
+.expedition-dialogue-card p,.expedition-dialogue-locked p{color:#d0c4b2;font:14px/1.7 Georgia,serif}
+.expedition-speaker{color:#d6aa70;font-size:9px;letter-spacing:.15em;text-transform:uppercase}
+.expedition-provenance{padding-top:8px;border-top:1px solid #4a4033;color:#b9a98f;font-size:8px;letter-spacing:.1em}
+.expedition-choice-list{display:grid;gap:8px;margin-top:14px}
+.expedition-choice{display:grid;grid-template-columns:28px 1fr;gap:2px 9px;width:100%;padding:11px;text-align:left;border:1px solid #65513a;background:#25211b;color:#e8ddcb}
+.expedition-choice>span{grid-row:span 2;color:#d5a96b;font:16px Georgia,serif}
+.expedition-choice strong{font-size:11px;font-weight:600}
+.expedition-choice small{color:#a99e8d;font-size:10px;line-height:1.45}
+.expedition-choice:active{background:#3b2c1e;border-color:#c18b45}
+@media(max-width:360px){.expedition-form-row{gap:6px}.expedition-dialogue-card{padding:12px}.expedition-choice{padding:9px}}
+@media(prefers-reduced-motion:reduce){.expedition-light-layer,.expedition-weather-layer{transition:none}.expedition-fog-motion{transform:none!important}}
+
+/* The window reads world region, clock cycle and weather from the local save. */
+.expedition-environment[data-region="tianhai-yunzhou"] .expedition-scene-image{filter:saturate(.92) contrast(1.02) hue-rotate(4deg) brightness(1.03)}
+.expedition-environment[data-region="beiming-gu"] .expedition-scene-image{filter:saturate(.72) contrast(1.08) hue-rotate(4deg) brightness(.96)}
+
+
+/* Eternal Path — compact identity, narrative-first hierarchy and choice focus. */
+.expedition-page{gap:11px}
+.expedition-heading{align-items:center;padding:0 2px 1px}
+.expedition-heading h2{margin:0;color:#e8d7bd;font:600 10px/1.4 system-ui,sans-serif;letter-spacing:.18em;white-space:nowrap}
+.expedition-heading .eyebrow{margin:0;font-size:8px}
+.expedition-mode-mark,.expedition-scene-toolbar{display:none!important}
+.expedition-environment{margin-top:0;min-height:clamp(220px,58vw,330px)}
+.expedition-character-panel{padding:11px 13px}
+.expedition-profile-compact{display:grid;gap:9px}
+.expedition-profile-identity{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.expedition-profile-kicker{color:#d6aa70;font-size:8px;font-weight:700;letter-spacing:.16em}
+.expedition-player-name{margin:3px 0 1px;font:400 20px/1.1 Georgia,serif}
+.expedition-profile-compact .expedition-note{margin:2px 0 0;font-size:10px}
+.expedition-disposition{flex:0 0 auto;padding:6px 9px;border:1px solid #98764e;color:#e6c38d;font:600 8px system-ui,sans-serif;letter-spacing:.1em}
+.expedition-profile-meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;padding-top:8px;border-top:1px solid #514638}
+.expedition-profile-meta span{display:grid;gap:3px;color:#a99c89;font-size:7px;letter-spacing:.1em}
+.expedition-profile-meta b{color:#e2d4c0;font-size:9px;font-weight:500;letter-spacing:0}
+.expedition-profile-compact>[data-eternal-end]{justify-self:end;font-size:9px}
+.expedition-disposition-line{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:1px 3px 0;color:#a99c89;font-size:8px;letter-spacing:.15em}
+.expedition-disposition-line strong{color:#e4c18b;font:500 11px Georgia,serif;letter-spacing:.04em}
+.expedition-dialogue{gap:8px}
+.expedition-dialogue-card{padding:15px;border-color:#695137;background:linear-gradient(150deg,#302820,#201d19)}
+.expedition-narrative-layer{margin-bottom:14px}
+.expedition-narrative-label{display:block;margin-bottom:5px;color:#d6aa70;font-size:8px;font-weight:700;letter-spacing:.16em}
+.expedition-narrative-layer p{margin:0;color:#d8cbb9;font:14px/1.72 Georgia,serif}
+.expedition-sensory-copy{color:#bfb3a2!important;font-size:13px!important}
+.expedition-narrative-layer h3{margin:3px 0 7px;color:#f0dfc5;font:400 25px/1.1 Georgia,serif}
+.expedition-npc-line{padding:11px 12px;border-left:2px solid #b88750;background:#17161388}
+.expedition-npc-line p{color:#f0e2cf}
+.expedition-provenance{margin-top:5px}
+.expedition-open-choices{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;margin-top:13px;padding:13px 14px;border:1px solid #9c7549;background:linear-gradient(120deg,#49331f,#30251b);color:#f0ddc1;font-size:11px;letter-spacing:.04em}
+.expedition-open-choices span{color:#e6b875}
+.expedition-choice-modal[hidden]{display:none!important}
+.expedition-choice-modal{position:fixed;z-index:80;inset:0;display:grid;align-items:end;justify-items:center;padding:16px max(16px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+.expedition-choice-backdrop{position:absolute;inset:0;width:100%;height:100%;border:0;background:#090807d9;backdrop-filter:blur(7px)}
+.expedition-choice-sheet{position:relative;z-index:1;width:min(100%,620px);max-height:min(78dvh,680px);overflow:auto;padding:17px;border:1px solid #a17b4f;background:linear-gradient(150deg,#302820,#171512);box-shadow:0 20px 70px #000b}
+.expedition-choice-topline{display:flex;align-items:center;justify-content:space-between;color:#d6aa70;font-size:8px;font-weight:700;letter-spacing:.18em}
+.expedition-choice-close{width:30px;height:30px;border:1px solid #66513a;background:#211d18;color:#e8d4b7;font-size:20px}
+.expedition-choice-sheet h3{margin:7px 0 3px;color:#f0dfc5;font:400 25px Georgia,serif}
+.expedition-choice-hint{margin:0;color:#a99e8d;font-size:10px}
+.expedition-choice-list{gap:9px;margin-top:15px}
+.expedition-choice{padding:13px;border-color:#71583d;background:#25211b}
+.expedition-choice strong{font-size:12px}
+.expedition-choice small{font-size:10px;line-height:1.5}
+body.eternal-choice-open{overflow:hidden}
+@media(max-width:360px){.expedition-profile-meta{gap:4px}.expedition-profile-meta span{font-size:6px}.expedition-profile-meta b{font-size:8px}.expedition-dialogue-card{padding:12px}.expedition-narrative-layer p{font-size:13px}}
+@media(min-width:600px){.expedition-choice-modal{align-items:center}.expedition-choice-sheet{max-height:78vh}}
+
+/* Keep the compact title on one horizontal line beside the standalone marker. */
+.expedition-heading>div{display:flex;align-items:center;gap:9px;min-width:0}
+.expedition-heading .eyebrow{flex:0 0 auto;font-size:8px;white-space:nowrap}
+.expedition-heading h2{font-size:8px;letter-spacing:.15em;overflow:hidden;text-overflow:clip}
+.expedition-profile-meta{grid-template-columns:repeat(4,minmax(0,1fr))}
+.expedition-profile-meta span{font-size:6px}
+.expedition-profile-meta b{font-size:8px}
+@media(max-width:360px){.expedition-heading>div{gap:6px}.expedition-heading h2{font-size:7px;letter-spacing:.11em}.expedition-profile-meta{grid-template-columns:repeat(4,minmax(0,1fr))}}
+
+/* Subtle responsive motion layers; Anime.js drives the actual movement. */
+.expedition-scene-image,.expedition-light-layer,.expedition-weather-layer,.expedition-fog-motion{will-change:transform,opacity}
+.expedition-weather-layer{background:radial-gradient(ellipse at 18% 8%,#e8d4b233,transparent 48%),linear-gradient(120deg,#c5d7dc0b,transparent 60%)}
+.expedition-disposition-line{position:relative;padding:7px 10px;border-left:1px solid #98764e;background:linear-gradient(90deg,#6b4a2926,transparent 80%)}
+.expedition-disposition-line:after{content:"";position:absolute;right:0;top:50%;width:32px;height:1px;background:linear-gradient(90deg,#a27b4b66,transparent)}
+@media(prefers-reduced-motion:reduce){.expedition-scene-image,.expedition-light-layer,.expedition-weather-layer,.expedition-fog-motion{will-change:auto}}
+
+.expedition-profile-actions{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:12px;padding-top:7px;border-top:1px solid #514638}
+.expedition-save-label{margin-right:auto;max-width:48%;overflow:hidden;color:#a99c89;font-size:8px;text-overflow:ellipsis;white-space:nowrap}
+.expedition-save-manager{padding:12px;border:1px solid #594a38;background:linear-gradient(145deg,#27231e,#1d1a17)}
+.expedition-manager-toggle{display:flex;align-items:center;justify-content:space-between;width:100%;padding:3px;border:0;background:transparent;color:#dfc49c;font-size:9px;letter-spacing:.16em}
+.expedition-manager-toggle small{color:#a99c89;font-size:7px}
+.expedition-manager-content{display:grid;gap:12px;padding-top:12px}
+.expedition-save-list{display:grid;gap:8px}
+.expedition-save-card{padding:10px;border:1px solid #554632;background:#211e1a}
+.expedition-save-card-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.expedition-save-card-heading strong,.expedition-save-card-heading small{display:block}
+.expedition-save-card-heading strong{color:#ead8bc;font:400 16px Georgia,serif}
+.expedition-save-card-heading small{margin-top:4px;color:#a99c89;font-size:9px}
+.expedition-save-card-heading>span{color:#d4aa73;font-size:7px;letter-spacing:.12em}
+.expedition-save-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}
+.expedition-save-actions button,.expedition-rename-form button{padding:6px 9px;border:1px solid #665039;background:#2a241e;color:#e4d4bd;font-size:9px}
+.expedition-save-actions .danger{color:#d78e78}
+.expedition-rename-form{display:grid;gap:8px;margin-top:10px;padding-top:9px;border-top:1px solid #514638}
+.expedition-rename-form label,.expedition-import-label{display:grid;gap:6px;color:#c9b99f;font-size:8px;letter-spacing:.12em}
+.expedition-rename-form input{width:100%;padding:9px;border:1px solid #665039;background:#171512;color:#f0e5d4;font:12px inherit}
+.expedition-import-label{padding:10px;border:1px dashed #6c563c}
+.expedition-import-label input{max-width:100%;font-size:9px}
+.expedition-save-footnote{margin:0;color:#8f8578;font-size:9px;line-height:1.5}
+@media(prefers-reduced-motion:reduce){.expedition-save-card,.expedition-manager-content{scroll-behavior:auto}}
+
+
+/* Scene Window FX stack. Every effect is clipped by .expedition-environment and never escapes into the app shell. */
+.expedition-environment{isolation:isolate;overflow:hidden}
+.expedition-scene-image{z-index:0}
+.expedition-cloud-layer{position:absolute;z-index:1;inset:-7%;overflow:hidden;pointer-events:none;mix-blend-mode:screen;opacity:.34}
+.expedition-cloud-motion{display:block;width:100%;height:100%;object-fit:cover;mix-blend-mode:screen;filter:blur(1.5px);will-change:transform,opacity}
+.expedition-light-layer{z-index:2}
+.expedition-sun-glow,.expedition-moon-glow{position:absolute;z-index:3;top:-17%;right:8%;width:clamp(100px,32vw,210px);aspect-ratio:1;border-radius:50%;pointer-events:none;mix-blend-mode:screen;filter:blur(2px);will-change:transform,opacity}
+.expedition-sun-glow{background:radial-gradient(circle,#fff4c9 0%,#ffd58b88 22%,#f0a34a35 48%,transparent 72%);opacity:0}
+.expedition-moon-glow{top:-19%;right:12%;background:radial-gradient(circle,#e5efffbb 0%,#b6d4ff55 24%,#9eb9ef20 48%,transparent 72%);opacity:0}
+.expedition-environment[data-cycle="Dawn"] .expedition-sun-glow,.expedition-environment[data-cycle="Morning"] .expedition-sun-glow,.expedition-environment[data-cycle="Day"] .expedition-sun-glow,.expedition-environment[data-cycle="Dusk"] .expedition-sun-glow{opacity:.78}
+.expedition-environment[data-cycle="Night"] .expedition-moon-glow{opacity:.64}
+.expedition-light-rays{position:absolute;z-index:3;inset:-32%;pointer-events:none;mix-blend-mode:screen;opacity:0;background:repeating-conic-gradient(from 8deg at 72% 24%,#ffe6b51b 0deg 4deg,transparent 4deg 13deg);mask-image:radial-gradient(ellipse at 72% 24%,#000 0%,transparent 62%);will-change:transform,opacity}
+.expedition-environment[data-cycle="Dawn"] .expedition-light-rays,.expedition-environment[data-cycle="Morning"] .expedition-light-rays,.expedition-environment[data-cycle="Day"] .expedition-light-rays{opacity:.24}
+.expedition-weather-layer{z-index:4}
+.expedition-weather-particles{position:absolute;z-index:5;inset:0;overflow:hidden;pointer-events:none}
+.expedition-particle{position:absolute;display:block;pointer-events:none;will-change:transform,opacity}
+.expedition-particle-rain{width:1px;height:18px;background:linear-gradient(180deg,transparent,#d9e9f4b8);transform:rotate(17deg);filter:blur(.2px)}
+.expedition-particle-snow{width:3px;height:3px;border-radius:50%;background:#fff9;box-shadow:0 0 4px #fff8}
+.expedition-particle-petal{width:7px;height:10px;border-radius:80% 10% 80% 10%;background:linear-gradient(135deg,#f4b6b0cc,#fff0e0aa);filter:blur(.15px)}
+.expedition-particle-leaf{width:8px;height:13px;border-radius:90% 5% 90% 5%;background:linear-gradient(135deg,#d6a45ecc,#87965eaa)}
+.expedition-lightning-layer{position:absolute;z-index:6;inset:0;pointer-events:none;opacity:0;background:radial-gradient(ellipse at 65% 18%,#dceaff22,transparent 55%);mix-blend-mode:screen}
+.expedition-fog-layer{z-index:7;inset:-8%;background:none;mix-blend-mode:screen;pointer-events:none;overflow:hidden}
+.expedition-fog-motion{mix-blend-mode:screen;opacity:.85;filter:blur(1px);will-change:transform,opacity}
+.expedition-environment:after{z-index:8}
+.expedition-scene-copy{z-index:10}
+.expedition-window-frame{z-index:11}
+.expedition-window-label,.scene-coordinate{z-index:12}
+@media(prefers-reduced-motion:reduce){.expedition-cloud-motion,.expedition-sun-glow,.expedition-moon-glow,.expedition-light-rays,.expedition-particle,.expedition-fog-motion{will-change:auto}.expedition-weather-particles{display:none}}
+
+
+/* Uploaded FX image plates. All compositing stays clipped to the Scene Window. */
+.expedition-sun-glow,.expedition-moon-glow{inset:0;top:0;right:0;width:auto;aspect-ratio:auto;overflow:hidden;background:none}
+.expedition-sun-glow-image,.expedition-moon-glow-image,.expedition-light-rays-image,
+.expedition-rain-streak-image,.expedition-snow-texture img,.expedition-petal-texture img,
+.expedition-leaf-texture img,.expedition-lightning-flash-image,.expedition-window-frost-image{
+  position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover;pointer-events:none;
+  mix-blend-mode:screen;
+}
+.expedition-sun-glow-image{opacity:.78}
+.expedition-moon-glow-image{opacity:.64}
+.expedition-light-rays{overflow:hidden}
+.expedition-light-rays-image{inset:-12%;width:124%;height:124%;opacity:.72}
+.expedition-rain-streaks,.expedition-snow-texture,.expedition-petal-texture,.expedition-leaf-texture{
+  position:absolute;inset:0;overflow:hidden;pointer-events:none;mix-blend-mode:screen;opacity:0
+}
+.expedition-rain-streaks{z-index:4.5}
+.expedition-snow-texture,.expedition-petal-texture,.expedition-leaf-texture{z-index:4.6}
+.expedition-environment[data-weather="Rain"] .expedition-rain-streaks{opacity:.68}
+.expedition-environment[data-weather="Snow"] .expedition-snow-texture{opacity:.62}
+.expedition-environment[data-cycle="Dawn"]:not([data-weather="Snow"]):not([data-weather="Rain"]) .expedition-petal-texture{opacity:.48}
+.expedition-environment[data-cycle="Dusk"]:not([data-weather="Snow"]):not([data-weather="Rain"]) .expedition-leaf-texture{opacity:.48}
+.expedition-lightning-layer img{width:100%;height:100%;object-fit:cover;mix-blend-mode:screen}
+.expedition-window-frost{position:absolute;z-index:9;inset:0;overflow:hidden;pointer-events:none;opacity:0;mix-blend-mode:screen;
+  -webkit-mask-image:radial-gradient(ellipse at center,#0000 35%,#000 78%);mask-image:radial-gradient(ellipse at center,#0000 35%,#000 78%)}
+.expedition-environment[data-weather="Snow"] .expedition-window-frost{opacity:.68}
+.expedition-window-frost-image{opacity:.8}
+.expedition-scene-copy{z-index:10}
+@media(prefers-reduced-motion:reduce){
+  .expedition-rain-streaks,.expedition-snow-texture,.expedition-petal-texture,.expedition-leaf-texture{will-change:auto}
+  .expedition-window-frost{opacity:.58}
+}
+
+
+/* UI-EP-003/004/005 — active-journey composition and hidden Save Manager. */
+.expedition-page{gap:0}
+.expedition-heading{margin-bottom:10px}
+.expedition-disposition-line{margin:0 0 5px;padding:6px 10px}
+.expedition-dialogue{margin:0}
+.expedition-dialogue-card{border-top-left-radius:0;border-top-right-radius:0}
+.expedition-profile-compact{margin-top:14px}
+.expedition-save-manager.is-compact{position:fixed;z-index:70;right:max(14px,env(safe-area-inset-right));bottom:calc(78px + env(safe-area-inset-bottom));width:auto;padding:0;border:0;background:transparent;box-shadow:none}
+.expedition-manager-trigger{display:grid;place-items:center;width:34px;height:34px;border:1px solid #9a774e;border-radius:50%;background:linear-gradient(145deg,#30271eec,#171512ed);box-shadow:0 4px 16px #0008,inset 0 1px #e7c58c33;color:#e3c18e;font:16px/1 Georgia,serif}
+.expedition-manager-trigger:active{transform:scale(.96)}
+.expedition-manager-content[hidden]{display:none!important}
+.expedition-save-manager.is-compact .expedition-manager-content{position:fixed;z-index:72;right:max(12px,env(safe-area-inset-right));bottom:calc(74px + env(safe-area-inset-bottom));display:grid;width:min(420px,calc(100vw - 24px));max-height:min(72dvh,620px);overflow:auto;padding:14px;border:1px solid #9a774e;border-radius:5px;background:linear-gradient(150deg,#302820f7,#171512fa);box-shadow:0 18px 60px #000b;overscroll-behavior:contain}
+.expedition-save-manager.is-compact .expedition-manager-content[hidden]{display:none!important}
+.expedition-manager-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;color:#d9b984;font-size:8px;font-weight:700;letter-spacing:.15em}
+.expedition-manager-backdrop[hidden]{display:none!important}
+.expedition-save-manager.is-compact .expedition-manager-backdrop{position:fixed;z-index:71;inset:0;width:100vw;height:100dvh;padding:0;border:0;background:#08070670;backdrop-filter:blur(2px);cursor:default}
+.expedition-save-manager.is-compact .expedition-manager-content{z-index:72}
+.expedition-manager-close{width:29px;height:29px;border:1px solid #66513a;background:#211d18;color:#ead8bc;font-size:19px}
+.scene-clock-ink{position:relative;isolation:isolate;display:inline-block;width:max-content;max-width:calc(100% - 30px);padding:5px 10px 5px 8px;border:0;border-radius:1px;color:#f1e7d5;font:600 7px/1.2 system-ui,sans-serif;letter-spacing:.13em;background:transparent;box-shadow:none;opacity:.9;backdrop-filter:blur(2px)}
+.scene-clock-ink:before{position:absolute;z-index:-1;inset:0;content:"";background:linear-gradient(90deg,#050605e8 0%,#080907d9 72%,#080907a8 88%,#08090700 100%);clip-path:polygon(0 9%,93% 0,100% 18%,96% 34%,100% 47%,92% 63%,97% 82%,84% 100%,0 91%)}
+.scene-clock-ink:after{position:absolute;z-index:-1;top:0;right:-15px;width:22px;height:100%;content:"";background:linear-gradient(90deg,#080907a8,#08090700);clip-path:polygon(0 8%,100% 0,63% 31%,100% 54%,22% 78%,0 100%);opacity:.72}
+.expedition-scene-copy{max-width:min(440px,100%)}
+.expedition-dialogue-card{padding:14px 15px}
+.expedition-narrative-layer{margin-bottom:12px}
+.expedition-narrative-layer:last-of-type{margin-bottom:8px}
+@media(max-width:360px){
+  .expedition-save-manager.is-compact .expedition-manager-content{right:8px;width:calc(100vw - 16px);padding:11px}
+  .expedition-manager-trigger{width:32px;height:32px}
+}
+@media(prefers-reduced-motion:reduce){
+  .expedition-manager-trigger:active{transform:none}
+}
+
+
+/* Narrative viewport: long chronicles scroll inside their own reading surface. */
+.expedition-dialogue{
+  max-height:min(48vh,520px);
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:thin;
+  scrollbar-color:#9b8056 transparent;
+}
+.expedition-dialogue::-webkit-scrollbar{width:4px}
+.expedition-dialogue::-webkit-scrollbar-thumb{background:#9b8056;border-radius:8px}
+.expedition-story-placeholder{padding:18px 16px}
+.expedition-story-placeholder h3{margin:7px 0 10px;font-family:"Cormorant Garamond",Georgia,serif;font-size:1.45rem;font-weight:600;color:#eadfc9}
+.expedition-story-placeholder p{line-height:1.65;color:#c7bdad}
+
+
+/* Eternal Path — match the app's arcane academy palette without flattening the scene window. */
+.expedition-heading {color:#293d38;}
+.expedition-mode-mark {
+  border-color:#a68d5e;
+  background:linear-gradient(145deg,#eee7d6,#d9cdb3);
+  color:#8e7951;
+}
+.expedition-character-panel,.expedition-feature,.expedition-save-manager {
+  border-color:#b7a982;
+  border-radius:4px;
+  background:linear-gradient(145deg,#eee7d6,#e2dac7);
+  color:#293d38;
+  box-shadow:0 5px 18px #293d3812,inset 0 1px #fff8;
+}
+.expedition-character-panel h3,.expedition-feature h3,
+.expedition-player-name,.expedition-save-card strong {color:#293d38;}
+.expedition-character-panel p,.expedition-feature p,.expedition-note,
+.expedition-profile-meta span {color:#6d786d;}
+.expedition-profile-meta b {color:#40594a;}
+.expedition-stat {
+  border-color:#c7bea9;
+  background:linear-gradient(145deg,#f3eddf,#e5ddca);
+  color:#293d38;
+}
+.expedition-stat strong {color:#40594a;}
+.expedition-character-panel select,
+.expedition-start-form input,.expedition-start-form select,
+.expedition-rename-form input {
+  border-color:#b9ad8e;
+  border-radius:3px;
+  background:#f5efdf;
+  color:#293d38;
+}
+.expedition-dialogue-card,.expedition-dialogue-locked,
+.expedition-save-card {
+  border-color:#b7a982;
+  border-radius:4px;
+  background:linear-gradient(145deg,#f2ead9,#e7deca);
+  color:#293d38;
+}
+.expedition-dialogue-card h3 {color:#35483d;}
+.expedition-dialogue-card p,.expedition-dialogue-locked p {color:#4f6255;}
+.expedition-npc-line {border-left-color:#a68d5e;background:#dcd2bd;color:#34483d;}
+.expedition-choice {
+  border-color:#b8a77f;
+  border-radius:3px;
+  background:linear-gradient(120deg,#eee7d6,#e1d7c1);
+  color:#34483d;
+}
+.expedition-choice:active,.expedition-choice:focus-visible {
+  border-color:#8d7950;
+  background:#e0d3b4;
+}
+.expedition-open-choices {
+  border-color:#a68d5e;
+  border-radius:3px;
+  background:linear-gradient(120deg,#526b5d,#344a3e);
+  color:#f2ead9;
+}
+.expedition-choice-sheet {
+  border-color:#b49b68;
+  border-radius:5px;
+  background:linear-gradient(150deg,#f1eadb,#e2d8c3);
+  color:#293d38;
+  box-shadow:0 20px 70px #0008,inset 0 0 0 4px #a68d5e12;
+}
+.expedition-choice-sheet h2,.expedition-choice-sheet h3 {color:#293d38;}
+.expedition-choice-close {
+  border-color:#b49b68;
+  background:#e8dfcb;
+  color:#40564a;
+}
+.expedition-save-manager.is-compact .expedition-manager-trigger {
+  border-color:#b49b68;
+  border-radius:50%;
+  background:linear-gradient(145deg,#526b5d,#293f36);
+  color:#f1e6cf;
+  box-shadow:0 4px 16px #17231f55,inset 0 1px #ffffff45;
+}
+.expedition-save-manager.is-compact .expedition-manager-content {
+  border-color:#b49b68;
+  border-radius:5px;
+  background:linear-gradient(150deg,#f1eadb,#e1d7c2);
+  color:#293d38;
+  box-shadow:0 18px 60px #0008,inset 0 0 0 4px #a68d5e12;
+}
+.expedition-save-card {border-color:#c7bea9;background:#f4eddd;}
+.expedition-save-actions button,.expedition-rename-form button {
+  border-color:#b49b68;
+  border-radius:3px;
+  background:#e6dcc5;
+  color:#40564a;
+}
+.expedition-import-label {border-color:#b49b68;color:#657267;}
+:root[data-theme="dark"] .expedition-character-panel,
+:root[data-theme="dark"] .expedition-feature,
+:root[data-theme="dark"] .expedition-save-manager,
+:root[data-theme="dark"] .expedition-dialogue-card,
+:root[data-theme="dark"] .expedition-dialogue-locked,
+:root[data-theme="dark"] .expedition-save-card {
+  border-color:#596653;
+  background:linear-gradient(145deg,#344138,#29342d);
+  color:#e8dfcf;
+}
+:root[data-theme="dark"] .expedition-character-panel h3,
+:root[data-theme="dark"] .expedition-feature h3,
+:root[data-theme="dark"] .expedition-player-name,
+:root[data-theme="dark"] .expedition-save-card strong,
+:root[data-theme="dark"] .expedition-dialogue-card h3 {color:#eee5d4;}
+:root[data-theme="dark"] .expedition-character-panel p,
+:root[data-theme="dark"] .expedition-feature p,
+:root[data-theme="dark"] .expedition-note,
+:root[data-theme="dark"] .expedition-profile-meta span,
+:root[data-theme="dark"] .expedition-dialogue-card p,
+:root[data-theme="dark"] .expedition-dialogue-locked p {color:#bdc4b3;}
+:root[data-theme="dark"] .expedition-profile-meta b {color:#e0ca98;}
+:root[data-theme="dark"] .expedition-stat {
+  border-color:#536052;background:#29352e;color:#e8dfcf;
+}
+:root[data-theme="dark"] .expedition-stat strong {color:#e0ca98;}
+:root[data-theme="dark"] .expedition-character-panel select,
+:root[data-theme="dark"] .expedition-start-form input,
+:root[data-theme="dark"] .expedition-start-form select,
+:root[data-theme="dark"] .expedition-rename-form input {
+  border-color:#596653;background:#202b24;color:#e8dfcf;
+}
+:root[data-theme="dark"] .expedition-npc-line {border-left-color:#c1a875;background:#26332b;color:#d9d5c5;}
+:root[data-theme="dark"] .expedition-choice {
+  border-color:#596653;background:linear-gradient(120deg,#344138,#29342d);color:#e8dfcf;
+}
+:root[data-theme="dark"] .expedition-choice:active,
+:root[data-theme="dark"] .expedition-choice:focus-visible {border-color:#c1a875;background:#3b493d;}
+:root[data-theme="dark"] .expedition-choice-sheet {
+  border-color:#8c7950;background:linear-gradient(150deg,#344138,#202b24);color:#e8dfcf;
+}
+:root[data-theme="dark"] .expedition-choice-sheet h2,
+:root[data-theme="dark"] .expedition-choice-sheet h3 {color:#eee5d4;}
+:root[data-theme="dark"] .expedition-choice-close,
+:root[data-theme="dark"] .expedition-save-actions button,
+:root[data-theme="dark"] .expedition-rename-form button {
+  border-color:#756847;background:#303b33;color:#e8dfcf;
+}
+:root[data-theme="dark"] .expedition-save-manager.is-compact .expedition-manager-content {
+  border-color:#8c7950;background:linear-gradient(150deg,#344138,#202b24);color:#e8dfcf;
+}
+:root[data-theme="dark"] .expedition-save-card {border-color:#536052;background:#29352e;}
+:root[data-theme="dark"] .expedition-import-label {border-color:#8c7950;color:#bdc4b3;}
+@media(max-width:390px) {
+  .expedition-choice-sheet {padding:13px;}
+  .expedition-character-panel,.expedition-feature {padding:12px;}
+}
+
+
+/* Context-aware narrative node presentation */
+.expedition-scene-action>p{margin:0 0 9px;padding-left:10px;border-left:1px solid #a88b5b;color:#d8cbb9;font:13px/1.72 Georgia,serif}
+.expedition-knowledge-note{margin-top:7px!important;color:#a99e8d!important;font-size:11px!important}
+.expedition-player-question{padding:12px 13px;border-left:2px solid #a88b5b;background:#29251e}
+.expedition-player-question p{color:#eadfc9!important;font-style:italic}
+.expedition-outcome{margin:0 0 9px;padding:12px 14px;border:1px solid #8d7852;background:#e8dec8;color:#40564a}
+.expedition-outcome p{margin:5px 0 0;color:#40564a;font:13px/1.65 Georgia,serif}
+:root[data-theme="dark"] .expedition-scene-action>p{color:#d8cbb9}
+:root[data-theme="dark"] .expedition-knowledge-note{color:#b7ad9c!important}
+:root[data-theme="dark"] .expedition-player-question{background:#292d26}
+:root[data-theme="dark"] .expedition-player-question p{color:#eee5d4!important}
+:root[data-theme="dark"] .expedition-outcome{border-color:#8e7950;background:#2e3b32;color:#e9dfcd}
+:root[data-theme="dark"] .expedition-outcome p{color:#e9dfcd}
+
+
+/* Eternal Path narrative wallpaper variants; keep the scene card's text and controls above the pattern. */
+:root[data-eternal-wallpaper="spirit"] .expedition-dialogue-card{background-color:#282b26;background-image:radial-gradient(circle at 12px 12px,transparent 6px,#d6aa7022 6.5px 7px,transparent 7.5px),radial-gradient(circle at 0 0,#d6aa7030 1px,transparent 2px),repeating-linear-gradient(45deg,transparent 0 22px,#d6aa700d 22px 23px,transparent 23px 45px)}
+:root[data-eternal-wallpaper="clouds"] .expedition-dialogue-card{background-color:#293633;background-image:radial-gradient(ellipse at 10px 18px,transparent 7px,#d9ded022 7.5px 8px,transparent 8.5px),radial-gradient(ellipse at 27px 4px,transparent 7px,#d9ded01c 7.5px 8px,transparent 8.5px)}
+:root[data-eternal-wallpaper="echoes"] .expedition-dialogue-card{background-color:#302b25;background-image:radial-gradient(circle at 12px 12px,transparent 5px,#d6aa7028 5.5px 6px,transparent 6.5px),repeating-linear-gradient(45deg,transparent 0 18px,#d6aa7010 18px 19px,transparent 19px 37px)}
+:root[data-eternal-wallpaper="tower"] .expedition-dialogue-card{background-color:#2b3029;background-image:linear-gradient(90deg,transparent 48%,#d6aa7020 49% 50%,transparent 51%),linear-gradient(0deg,transparent 48%,#d6aa7020 49% 50%,transparent 51%),radial-gradient(circle at center,transparent 8px,#d6aa7024 8.5px 9px,transparent 9.5px);background-size:30px 30px}
+:root[data-theme="dark"][data-eternal-wallpaper="spirit"] .expedition-dialogue-card{background-color:#282b26}
+:root[data-theme="dark"][data-eternal-wallpaper="clouds"] .expedition-dialogue-card{background-color:#293633}
+:root[data-theme="dark"][data-eternal-wallpaper="echoes"] .expedition-dialogue-card{background-color:#302b25}
+:root[data-theme="dark"][data-eternal-wallpaper="tower"] .expedition-dialogue-card{background-color:#2b3029}
