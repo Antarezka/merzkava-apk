@@ -139,3 +139,37 @@
  .idle-coming-panel{padding:5px 8px;margin-top:4px}
  .idle-home-footer{padding-top:4px}
 }
+
+
+/* Clockwork calendar: an angular Persona 4-style rail, suspended cables and meshed gears. */
+.idle-calendar-hud{
+ position:absolute;z-index:9;top:5px;right:5px;width:min(236px,72%);height:78px;min-height:0;
+ padding:0;color:#f3e5c9;background:transparent;border:0;clip-path:none;box-shadow:none;backdrop-filter:none;overflow:visible
+}
+.idle-clockwork{position:absolute;inset:0;width:100%;height:100%;overflow:visible;fill:none;pointer-events:none}
+.idle-clock-cable{fill:none;stroke:#e1c28a;stroke-width:1.15;stroke-linecap:round;stroke-linejoin:miter;filter:drop-shadow(0 1px 1px #111)}
+.idle-cable-b{stroke:#92764c;stroke-width:.7;opacity:.9}
+.idle-cable-drop,.idle-cable-link{stroke:#d5b77e;stroke-width:.9}
+.idle-clock-jewel{fill:#f1d9a6;stroke:#57442b;stroke-width:1}
+.idle-clock-gear{fill:#1a211cdd;stroke:#e4c58e;stroke-width:1.15;stroke-linejoin:round;filter:drop-shadow(0 2px 2px #0b100d)}
+.idle-clock-gear path{stroke:#e4c58e;stroke-width:1.5;stroke-linecap:square}
+.idle-clock-gear .idle-gear-hole{fill:#d9b77c;stroke:#493a25;stroke-width:1}
+.idle-calendar-data{position:absolute;left:0;bottom:1px;display:grid;grid-template-columns:1fr 1fr;align-items:end;gap:10px;width:148px;padding:0 4px 2px 7px}
+.idle-calendar-day{display:grid;grid-template-columns:auto auto;align-items:baseline;column-gap:5px}
+.idle-calendar-day-label{font:700 7px/1 system-ui,sans-serif;letter-spacing:.18em;color:#e0bd7f}
+.idle-calendar-day strong{font:700 19px/.9 Georgia,serif;color:#f6e4c3;letter-spacing:.04em;text-shadow:0 1px 3px #111}
+.idle-calendar-weekday{grid-column:1/-1;margin-top:4px;font:600 5.5px/1 system-ui,sans-serif;letter-spacing:.15em;color:#d2c09f;white-space:nowrap}
+.idle-calendar-time{display:grid;justify-items:end;gap:4px}
+.idle-calendar-time>strong{font:400 17px/.9 Georgia,serif;letter-spacing:.025em;color:#f4d9a1;font-variant-numeric:tabular-nums;text-shadow:0 1px 3px #111}
+.idle-calendar-cycle{display:flex;align-items:center;gap:4px;font:700 6px/1 system-ui,sans-serif;letter-spacing:.1em;color:#e5c58c;white-space:nowrap}
+.idle-calendar-cycle i{font-style:normal;font-size:11px;line-height:8px}
+.idle-calendar-icons{display:none}
+.idle-calendar-hud.is-time-moving .idle-gear-large{animation:idle-gear-drive .72s cubic-bezier(.2,.75,.25,1) both}
+.idle-calendar-hud.is-time-moving .idle-gear-small{animation:idle-gear-drive-reverse .72s cubic-bezier(.2,.75,.25,1) both}
+.idle-calendar-hud.is-time-moving .idle-gear-pin{animation:idle-gear-drive .48s cubic-bezier(.2,.75,.25,1) both}
+.idle-calendar-hud.is-time-moving .idle-clock-cable{animation:idle-cable-tremor .48s ease-out both;transform-box:fill-box;transform-origin:center}
+@keyframes idle-gear-drive{0%{transform:rotate(0deg)}18%{transform:rotate(8deg)}35%{transform:rotate(4deg)}68%{transform:rotate(34deg)}82%{transform:rotate(30deg)}100%{transform:rotate(36deg)}}
+@keyframes idle-gear-drive-reverse{0%{transform:rotate(0deg)}18%{transform:rotate(-10deg)}35%{transform:rotate(-6deg)}68%{transform:rotate(-42deg)}82%{transform:rotate(-38deg)}100%{transform:rotate(-45deg)}}
+@keyframes idle-cable-tremor{0%,100%{transform:translate(0,0)}18%{transform:translate(-1px,1px)}36%{transform:translate(1.5px,-.5px)}58%{transform:translate(-.7px,.5px)}78%{transform:translate(.4px,-.3px)}}
+@media(max-width:360px){.idle-calendar-hud{width:min(218px,70%);top:4px;right:4px}.idle-calendar-data{width:138px;gap:6px}.idle-calendar-time>strong{font-size:15px}.idle-calendar-day strong{font-size:17px}}
+@media(prefers-reduced-motion:reduce){.idle-calendar-hud.is-time-moving .idle-clock-gear,.idle-calendar-hud.is-time-moving .idle-clock-cable{animation:none!important}}
