@@ -765,6 +765,13 @@ root.addEventListener("scroll", event => {
 }, true);
 
 window.addEventListener("popstate", () => {
+  const idleNotice=root.querySelector<HTMLElement>("[data-idle-rpg-modal]");
+  if(idleNotice&&!idleNotice.hidden){
+    idleNotice.hidden=true;
+    root.querySelector<HTMLButtonElement>("[data-idle-rpg-open]")?.setAttribute("aria-expanded","false");
+    root.querySelector<HTMLButtonElement>("[data-idle-rpg-open]")?.focus();
+    return;
+  }
   const manager=root.querySelector<HTMLElement>("[data-eternal-manager-content]");
   if(manager&&!manager.hidden){
     manager.hidden=true;
@@ -780,6 +787,23 @@ window.addEventListener("popstate", () => {
   document.body.classList.remove("eternal-choice-open");
 });
 root.addEventListener("keydown", event => {
+  const idleNotice=root.querySelector<HTMLElement>("[data-idle-rpg-modal]");
+  if(event.key==="Escape"&&idleNotice&&!idleNotice.hidden){
+    idleNotice.hidden=true;
+    root.querySelector<HTMLButtonElement>("[data-idle-rpg-open]")?.setAttribute("aria-expanded","false");
+    root.querySelector<HTMLButtonElement>("[data-idle-rpg-open]")?.focus();
+    if(history.state?.idleRpgNotice) history.back();
+    return;
+  }
+  if(event.key==="Tab"&&idleNotice&&!idleNotice.hidden){
+    const focusable=Array.from(idleNotice.querySelectorAll<HTMLElement>('button:not(:disabled),a[href],[tabindex]:not([tabindex="-1"])'));
+    if(focusable.length){
+      const first=focusable[0],last=focusable[focusable.length-1];
+      if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
+      else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
+    }
+    return;
+  }
   const manager=root.querySelector<HTMLElement>("[data-eternal-manager-content]");
   if(event.key==="Escape"&&manager&&!manager.hidden){
     manager.hidden=true;
@@ -904,6 +928,33 @@ root.addEventListener("click", async (event: MouseEvent) => {
   if (eternalChoice) { if(eternalChoice.disabled) return; const modal=root.querySelector<HTMLElement>("[data-eternal-choice-modal]"); modal?.querySelectorAll<HTMLButtonElement>("[data-eternal-choice]").forEach(button=>{button.disabled=true;}); document.body.classList.remove("eternal-choice-open"); if(history.state?.eternalChoiceModal) history.back(); const choiceId=eternalChoice.dataset.eternalChoice??""; if(modal) animateExpeditionChoiceModal(modal,false,()=>{const result=resolveEternalSituationChoice(choiceId);notice=result? "The moment has been recorded in your journey.": "That response is no longer available.";render();}); else {const result=resolveEternalSituationChoice(choiceId);notice=result? "The moment has been recorded in your journey.": "That response is no longer available.";render();} return; }
   if (target.closest("[data-eternal-open-choices]")) { const modal=root.querySelector<HTMLElement>("[data-eternal-choice-modal]"); if(modal){animateExpeditionChoiceModal(modal,true);document.body.classList.add("eternal-choice-open");history.pushState({eternalChoiceModal:true},"");modal.querySelector<HTMLButtonElement>(".expedition-choice-close")?.focus();} return; }
 
+  if (target.closest("[data-idle-rpg-open]")) {
+    const modal=root.querySelector<HTMLElement>("[data-idle-rpg-modal]");
+    const trigger=root.querySelector<HTMLButtonElement>("[data-idle-rpg-open]");
+    if(modal&&!modal.hidden){
+      modal.hidden=true;
+      trigger?.setAttribute("aria-expanded","false");
+      trigger?.focus();
+      if(history.state?.idleRpgNotice) history.back();
+    } else if(modal){
+      modal.hidden=false;
+      trigger?.setAttribute("aria-expanded","true");
+      history.pushState({idleRpgNotice:true},"");
+      modal.querySelector<HTMLButtonElement>("[data-idle-rpg-close]")?.focus();
+    }
+    return;
+  }
+  if (target.closest("[data-idle-rpg-close]")) {
+    const modal=root.querySelector<HTMLElement>("[data-idle-rpg-modal]");
+    const trigger=root.querySelector<HTMLButtonElement>("[data-idle-rpg-open]");
+    if(modal&&!modal.hidden){
+      modal.hidden=true;
+      trigger?.setAttribute("aria-expanded","false");
+      trigger?.focus();
+      if(history.state?.idleRpgNotice) history.back();
+    }
+    return;
+  }
   if (target.closest("[data-eternal-manager-toggle]")) {
     const panel=root.querySelector<HTMLElement>("[data-eternal-manager-content]");
     const trigger=root.querySelector<HTMLButtonElement>(".expedition-manager-trigger");

@@ -83,6 +83,27 @@ export function renderExpeditionInterface():string {
   const disposition=save?`<div class="expedition-disposition-line"><span>DISPOSITION</span><strong>${escapeHtml(save.disposition.label)}</strong></div>`:"";
   const activeJourneyLayout=save?`${startPanel}<div class="expedition-scene-narrative-group">${sceneWindow}${disposition}${outcome}${story}</div>${managerPanel}`:`${startPanel}<div class="expedition-scene-narrative-group">${sceneWindow}${story}</div>${managerPanel}`;
   return `<section class="expedition-page" aria-label="Merzkava Eternal Path"><header class="expedition-heading"><div><p class="eyebrow">STANDALONE</p><h2>✦ MERZKAVA: ETERNAL PATH</h2></div></header>
-    ${activeJourneyLayout}${choiceModal}
+    ${activeJourneyLayout}
+    <div class="expedition-idle-gateway" aria-label="Idle RPG gateway">
+      <button type="button" class="expedition-idle-trigger" data-idle-rpg-open aria-label="Open Idle RPG" aria-haspopup="dialog" aria-expanded="false" title="Idle RPG · Coastal Receiver">
+        <svg class="expedition-idle-emblem" viewBox="0 0 52 52" aria-hidden="true" focusable="false">
+          <path d="M26 15 17 5M26 15 35 5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M25 14v3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M8 19Q8 16 12 16h28q4 0 4 4v20q0 4-4 4H12q-4 0-4-4z" fill="#171512" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M14 45v2m24-2v2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <div class="expedition-idle-modal" data-idle-rpg-modal hidden>
+        <button type="button" class="expedition-idle-backdrop" data-idle-rpg-close aria-label="Close Idle RPG notice"></button>
+        <section class="expedition-idle-dialog" role="dialog" aria-modal="true" aria-labelledby="idle-rpg-title">
+          <div class="expedition-idle-heading"><span>COASTAL SIGNAL RECEIVER</span><span>✦</span></div>
+          <h3 id="idle-rpg-title">Idle RPG</h3>
+          <p>The receiver is still being tuned. A new journey of quiet progress and a living micro-economy will arrive here.</p>
+          <div class="expedition-idle-status"><span></span> SIGNAL NOT YET AVAILABLE</div>
+          <button type="button" class="expedition-idle-dismiss" data-idle-rpg-close>Understood</button>
+        </section>
+      </div>
+    </div>
+    ${choiceModal}
     <footer class="expedition-footer"><span>ETERNAL PATH · LOCAL JOURNEY</span><span>WORLD ARCHIVE · READ ONLY</span></footer></section>`;
 }

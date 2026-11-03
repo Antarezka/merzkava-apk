@@ -491,3 +491,33 @@ body.eternal-choice-open{overflow:hidden}
     max-height:78dvh;
   }
 }
+
+
+/* Idle RPG gateway — a separate coastal tube receiver, paired with but distinct from the Registrar. */
+.expedition-idle-trigger{
+  position:fixed;z-index:70;left:max(14px,env(safe-area-inset-left));bottom:calc(78px + env(safe-area-inset-bottom));
+  display:grid;place-items:center;width:46px;height:46px;padding:5px;
+  border:1px solid #b49b68;border-radius:8px 8px 10px 10px;
+  background:linear-gradient(145deg,#526b5d,#293f36);color:#e6c58e;
+  box-shadow:0 4px 16px #0008,inset 0 1px #ffffff45;
+  cursor:pointer;touch-action:manipulation;
+}
+.expedition-idle-emblem{display:block;width:35px;height:35px;overflow:visible}
+.expedition-idle-trigger:active{transform:scale(.96)}
+.expedition-idle-trigger:focus-visible{outline:2px solid #e6c58e;outline-offset:3px}
+.expedition-idle-modal[hidden]{display:none!important}
+.expedition-idle-modal{position:fixed;z-index:90;inset:0;display:grid;place-items:center;padding:18px max(16px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+.expedition-idle-backdrop{position:absolute;inset:0;width:100%;height:100%;border:0;background:#090807d9;backdrop-filter:blur(6px)}
+.expedition-idle-dialog{position:relative;z-index:1;width:min(100%,360px);padding:19px;border:1px solid #b49b68;border-radius:5px;background:linear-gradient(150deg,#f1eadb,#e1d7c2);color:#293d38;box-shadow:0 20px 70px #000b,inset 0 0 0 4px #a68d5e12}
+.expedition-idle-heading{display:flex;align-items:center;justify-content:space-between;padding-bottom:9px;border-bottom:1px solid #c7bea9;color:#8e7951;font-size:8px;font-weight:700;letter-spacing:.16em}
+.expedition-idle-dialog h3{margin:16px 0 7px;color:#293d38;font:400 28px Georgia,serif}
+.expedition-idle-dialog p{margin:0;color:#58675c;font:13px/1.65 Georgia,serif}
+.expedition-idle-status{display:flex;align-items:center;gap:7px;margin-top:16px;padding:9px;border:1px solid #c7bea9;background:#e9e2d2;color:#8e7951;font-size:8px;font-weight:700;letter-spacing:.1em}
+.expedition-idle-status span{width:7px;height:7px;border-radius:50%;background:#b88750;box-shadow:0 0 0 3px #b8875022}
+.expedition-idle-dismiss{width:100%;min-height:40px;margin-top:14px;border:1px solid #66796d;border-radius:3px;background:linear-gradient(120deg,#526b5d,#293f36);color:#f0e8d8;font-size:11px}
+:root[data-theme="dark"] .expedition-idle-dialog{border-color:#8c7950;background:linear-gradient(150deg,#344138,#202b24);color:#e8dfcf}
+:root[data-theme="dark"] .expedition-idle-heading{border-bottom-color:#536052;color:#d0b77e}
+:root[data-theme="dark"] .expedition-idle-dialog h3{color:#eee5d4}
+:root[data-theme="dark"] .expedition-idle-dialog p{color:#bdc1b0}
+:root[data-theme="dark"] .expedition-idle-status{border-color:#596653;background:#29342d;color:#d0b77e}
+@media(prefers-reduced-motion:reduce){.expedition-idle-trigger{transition:none}}
