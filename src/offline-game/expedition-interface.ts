@@ -45,10 +45,23 @@ export function renderExpeditionInterface():string {
   const createJourneyForm=`<form id="eternal-start-form" class="expedition-start-form" ${save?"hidden":""}><div class="section-heading"><span>NEW JOURNEY</span><small>NON-CANON · LOCAL SAVE</small></div><label for="eternal-name">Character name</label><input id="eternal-name" name="name" minlength="2" maxlength="32" required placeholder="Your adventurer's name" />
       <div class="expedition-form-row"><div><label for="eternal-age">Age</label><input id="eternal-age" name="age" type="number" min="1" max="120" value="14" required /></div><div><label for="eternal-region">Starting region</label><select id="eternal-region" name="region"><option value="golden-dragon-empire">Golden Dragon Empire</option><option value="tianhai-yunzhou">Tianhai Yunzhou</option><option value="beiming-gu">Beiming Gu</option></select></div></div>
       <button type="submit" class="action-button">Begin new journey <span>↗</span></button></form>`;
-  const managerPanel=`<section class="expedition-save-manager ${save?"is-compact":""}" aria-label="Eternal Path save manager">
-    ${save?`<button type="button" class="expedition-manager-trigger" data-eternal-manager-toggle aria-label="Open Save Manager" aria-expanded="false" aria-controls="eternal-save-manager-dialog" title="Save Manager"><span aria-hidden="true">▤</span></button><button type="button" class="expedition-manager-backdrop" data-eternal-manager-backdrop aria-label="Close Save Manager" hidden></button>`:`<div class="section-heading"><span>JOURNEY MANAGER</span><small>${savedSlots.length} SAVED</small></div>`}
-    <div id="eternal-save-manager-dialog" class="expedition-manager-content" data-eternal-manager-content ${save?'role="dialog" aria-modal="true" aria-labelledby="eternal-manager-title" hidden':""}>
-      ${save?`<div class="expedition-manager-heading"><span id="eternal-manager-title">JOURNEY MANAGER · ${savedSlots.length} SAVED</span><button type="button" class="expedition-manager-close" data-eternal-manager-toggle aria-label="Close Save Manager">×</button></div>`:""}
+  const managerPanel=`<section class="expedition-save-manager is-compact ${save?"is-active":"is-prestart"}" aria-label="Eternal Path Journey Manager">
+    <button type="button" class="expedition-manager-trigger" data-eternal-manager-toggle aria-label="Open Journey Manager" aria-expanded="false" aria-controls="eternal-save-manager-dialog" title="Journey Manager">
+      <svg class="expedition-manager-emblem" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
+        <path d="M14 18 11 7l10 6h6l10-6-3 12" fill="#171713" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M16 19c0-6 4-9 8-9s8 3 8 9v5c0 5-3 8-8 8s-8-3-8-8z" fill="#171713" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M20 22h1m6 0h1" stroke="#e6c58e" stroke-width="2" stroke-linecap="round"/>
+        <path d="M12 36c1-7 5-10 12-10s11 3 12 10v4H12z" fill="#171713" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M5 35h38v4H5z" fill="#8e6b43" stroke="currentColor" stroke-width="1.2"/>
+        <path d="M9 29h8l3 5H9z" fill="#e8dcc4" stroke="#8e6b43" stroke-width="1"/>
+        <path d="M31 28h8v7h-8z" fill="#e8dcc4" stroke="#8e6b43" stroke-width="1"/>
+        <path d="m28 28 3-5 2 1-3 6" fill="none" stroke="#e6c58e" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M13 42h22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </button>
+    <button type="button" class="expedition-manager-backdrop" data-eternal-manager-backdrop aria-label="Close Journey Manager" hidden></button>
+    <div id="eternal-save-manager-dialog" class="expedition-manager-content" data-eternal-manager-content role="dialog" aria-modal="true" aria-labelledby="eternal-manager-title" hidden>
+      <div class="expedition-manager-heading"><span id="eternal-manager-title">JOURNEY MANAGER · ${savedSlots.length} SAVED</span><button type="button" class="expedition-manager-close" data-eternal-manager-toggle aria-label="Close Journey Manager">×</button></div>
       <div class="expedition-save-list">${saveCards||`<p class="expedition-note">No saved journeys yet. Your first journey will appear here.</p>`}</div>
       ${save?`<button type="button" class="text-button" data-eternal-new-form>＋ Create another journey</button>`:""}
       ${createJourneyForm}
