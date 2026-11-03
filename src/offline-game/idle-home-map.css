@@ -389,3 +389,11 @@
 .arcanist-lever-button.is-pulling .arcanist-lever-shaft,.arcanist-lever-button.is-pulling .arcanist-lever-handle{transition:none}
 .arcanist-lever-button.is-returning .arcanist-lever-shaft,.arcanist-lever-button.is-returning .arcanist-lever-handle{transition:transform .34s cubic-bezier(.18,.72,.25,1)}
 .arcanist-lever-button.is-pulled .arcanist-lever-shaft,.arcanist-lever-button.is-pulled .arcanist-lever-handle{transform:rotate(18deg)}
+
+
+.arcanist-lever-shaft{transform:rotate(calc(-17deg + var(--lever-angle,0deg)));transition:transform .28s cubic-bezier(.2,.7,.2,1)}
+.arcanist-lever-handle{transform:rotate(calc(-17deg + var(--lever-angle,0deg)));transition:transform .28s cubic-bezier(.2,.7,.2,1)}
+.arcanist-lever-button{touch-action:none;user-select:none}
+.arcanist-lever-button.is-pulling .arcanist-lever-shaft,.arcanist-lever-button.is-pulling .arcanist-lever-handle{transition:none}
+.arcanist-lever-button.is-returning .arcanist-lever-shaft,.arcanist-lever-button.is-returning .arcanist-lever-handle{transition:transform .34s cubic-bezier(.18,.72,.25,1)}
+.arcanist-lever-button.is-pulled .arcanist-lever-shaft,.arcanist-lever-button.is-pulled .arcanist-lever-handle{transform:rotate(18deg)}
