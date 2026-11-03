@@ -1056,33 +1056,54 @@ function escapeLore(value: string): string {
   return value.replace(/[&<>"']/g, char => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" })[char] ?? char);
 }
 
-function loreLinks(text: string, currentId: string): string {
-  const currentEntry = getPublicLoreEntries().find(entry => entry.id === currentId);
+type LoreLinkReference = {
+  label: string;
+  normalizedLabel: string;
+  id: string;
+  priority: number;
+  placeholder: boolean;
+  status?: LoreEntityStatus;
+};
+
+const PUBLIC_LORE_BY_ID = new Map(PUBLIC_LORE_ENTRIES.map(entry => [entry.id, entry]));
+const loreLinkReferenceCache = new Map<string, LoreLinkReference[]>();
+
+function getLoreLinkReferences(currentId: string): LoreLinkReference[] {
+  const cached = loreLinkReferenceCache.get(currentId);
+  if (cached) return cached;
+  const currentEntry = PUBLIC_LORE_BY_ID.get(currentId);
   const crossReferences = new Set(currentEntry?.crossReferenceIds ?? []);
-  const references = [
-    ...getPublicLoreEntries().filter(entry => crossReferences.has(entry.id)).flatMap(entry => [
-      { label: entry.title, id: entry.id, priority: 2, placeholder: false, status: undefined },
-      ...entry.aliases.map(label => ({ label, id: entry.id, priority: 1, placeholder: false, status: undefined }))
+  const references: LoreLinkReference[] = [
+    ...PUBLIC_LORE_ENTRIES.filter(entry => crossReferences.has(entry.id)).flatMap(entry => [
+      { label: entry.title, normalizedLabel: entry.title.toLocaleLowerCase(), id: entry.id, priority: 2, placeholder: false },
+      ...entry.aliases.map(label => ({ label, normalizedLabel: label.toLocaleLowerCase(), id: entry.id, priority: 1, placeholder: false }))
     ]),
     ...LORE_PLACEHOLDERS.flatMap(item => [
-      { label: item.title, id: item.id, priority: 2, placeholder: true, status: item.status },
-      ...item.aliases.map(label => ({ label, id: item.id, priority: 1, placeholder: true, status: item.status }))
+      { label: item.title, normalizedLabel: item.title.toLocaleLowerCase(), id: item.id, priority: 2, placeholder: true, status: item.status },
+      ...item.aliases.map(label => ({ label, normalizedLabel: label.toLocaleLowerCase(), id: item.id, priority: 1, placeholder: true, status: item.status }))
     ])
   ].sort((a, b) => b.label.length - a.label.length || b.priority - a.priority || a.id.localeCompare(b.id));
+  loreLinkReferenceCache.set(currentId, references);
+  return references;
+}
+
+function loreLinks(text: string, currentId: string): string {
+  const references = getLoreLinkReferences(currentId);
+  const normalizedText = text.toLocaleLowerCase();
   let result = "";
   let cursor = 0;
   while (cursor < text.length) {
-    let match: { index: number; label: string; id: string; priority: number; placeholder: boolean; status?: LoreEntityStatus } | null = null;
+    let match: LoreLinkReference & { index: number } | null = null;
     for (const reference of references) {
-      const index = text.toLocaleLowerCase().indexOf(reference.label.toLocaleLowerCase(), cursor);
+      const index = normalizedText.indexOf(reference.normalizedLabel, cursor);
       if (index < 0) continue;
       const before = index > 0 ? text[index - 1] : "";
       const after = text[index + reference.label.length] ?? "";
-      const wordLike = /[\p{L}\p{N}_]/u;
+      const wordLike = /[\\p{L}\\p{N}_]/u;
       if ((before && wordLike.test(before) && wordLike.test(reference.label[0])) ||
           (after && wordLike.test(after) && wordLike.test(reference.label[reference.label.length - 1]))) continue;
       if (!match || index < match.index || (index === match.index && (reference.priority > match.priority || (reference.priority === match.priority && reference.label.length > match.label.length)))) {
-        match = { index, label: reference.label, id: reference.id, priority: reference.priority, placeholder: reference.placeholder, status: reference.status };
+        match = { ...reference, index };
       }
     }
     if (!match) { result += escapeLore(text.slice(cursor)); break; }
