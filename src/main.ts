@@ -67,6 +67,21 @@ function saveAppPreferences(): void {
     localStorage.setItem(ETERNAL_WALLPAPER_KEY, eternalWallpaper);
   } catch { /* Preferences remain active for this app session. */ }
 }
+function updateWallpaperSelectionUI(): void {
+  root.querySelectorAll<HTMLButtonElement>("[data-wallpaper-select]").forEach(button => {
+    const selected = button.dataset.wallpaperSelect === "convo"
+      ? button.dataset.wallpaperValue === convoWallpaper
+      : button.dataset.wallpaperValue === eternalWallpaper;
+    button.classList.toggle("is-selected", selected);
+    button.setAttribute("aria-pressed", String(selected));
+  });
+  const selectedConvo = root.querySelector<HTMLButtonElement>(`[data-wallpaper-select="convo"][data-wallpaper-value="${convoWallpaper}"]`);
+  const selectedEternal = root.querySelector<HTMLButtonElement>(`[data-wallpaper-select="eternal"][data-wallpaper-value="${eternalWallpaper}"]`);
+  const convoLabel = root.querySelector<HTMLElement>('[data-wallpaper-current="convo"]');
+  const eternalLabel = root.querySelector<HTMLElement>('[data-wallpaper-current="eternal"]');
+  if (convoLabel && selectedConvo) convoLabel.textContent = selectedConvo.textContent?.trim() ?? "";
+  if (eternalLabel && selectedEternal) eternalLabel.textContent = selectedEternal.textContent?.trim() ?? "";
+}
 applyAppPreferences();
 let menuRevealPending = false;
 let menuToggleAnimationPending = false;
@@ -545,13 +560,7 @@ function render(): void {
     button.classList.toggle("is-selected", selected);
     button.setAttribute("aria-pressed", String(selected));
   });
-  root.querySelectorAll<HTMLButtonElement>("[data-wallpaper-select]").forEach(button => {
-    const selected = button.dataset.wallpaperSelect === "convo"
-      ? button.dataset.wallpaperValue === convoWallpaper
-      : button.dataset.wallpaperValue === eternalWallpaper;
-    button.classList.toggle("is-selected", selected);
-    button.setAttribute("aria-pressed", String(selected));
-  });
+  updateWallpaperSelectionUI();
   const soundToggle = root.querySelector<HTMLButtonElement>("[data-sound-toggle]");
   if (soundToggle) {
     soundToggle.setAttribute("aria-pressed", String(soundEnabled));
@@ -1100,7 +1109,7 @@ root.addEventListener("click", async (event: MouseEvent) => {
     if (group === "eternal" && value && ["spirit","clouds","echoes","tower"].includes(value)) eternalWallpaper = value as EternalWallpaper;
     applyAppPreferences();
     saveAppPreferences();
-    render();
+    updateWallpaperSelectionUI();
     return;
   }
 
