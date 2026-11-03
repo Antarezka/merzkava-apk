@@ -84,6 +84,9 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
       ticket.style.removeProperty("--tear-bias");
       ticket.style.removeProperty("clip-path");
     }
+    machine.querySelector<HTMLElement>("[data-card-reader-hint]")?.removeAttribute("hidden");
+    const indicator = machine.querySelector<HTMLElement>("[data-card-inserted-indicator]");
+    if (indicator) indicator.hidden = true;
     machine.classList.remove("has-ticket", "is-printing", "is-running", "is-traveling");
   };
 
@@ -236,6 +239,7 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
       }
       const indicator = machine.querySelector<HTMLElement>("[data-card-inserted-indicator]");
       if (indicator) indicator.hidden = true;
+      machine.querySelector<HTMLElement>("[data-card-reader-hint]")?.removeAttribute("hidden");
       later(() => {
         if (card) {
           card.classList.remove("is-ejecting");
