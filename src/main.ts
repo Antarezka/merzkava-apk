@@ -36,6 +36,7 @@ import { closeLoreEntry, closeLoreSource, closeLorePlaceholder, openLoreEntry, o
 const app = document.querySelector<HTMLDivElement>("#app");
 if (!app) throw new Error("App root element was not found.");
 const root = app;
+root.addEventListener("arcanistry:lever-lock", () => playClockworkRatchet());
 mountArcanistryTicketMachine(root, async sceneId => {
   setEternalLocation(sceneId);
   const drawer = root.querySelector<HTMLElement>("[data-arcanist-device]");
