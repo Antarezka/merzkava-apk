@@ -927,7 +927,7 @@ window.addEventListener("keydown", (event: KeyboardEvent) => {
 
 function selectArcanistDestination(place:HTMLElement):void{
   const machine=root.querySelector<HTMLElement>("[data-arcanistry-machine]");
-  if(machine && machine.dataset.machineState!=="idle") return;
+  if(machine && ["printing","ticket-ready","traveling"].includes(machine.dataset.machineState??"")) return;
   const placeId=place.dataset.idlePlace??"";
   const group=place.dataset.idleGroup??"regional";
   const regionId=place.dataset.regionId??place.closest<HTMLElement>("[data-idle-map-region]")?.dataset.idleMapRegion??"golden-dragon-empire";
@@ -949,6 +949,11 @@ function selectArcanistDestination(place:HTMLElement):void{
   machine.dataset.selectedScene=sceneId;
   machine.dataset.selectedAvailable=String(available);
   machine.dataset.selectedName=name;
+  machine.dispatchEvent(new CustomEvent("arcanistry:destination-selected", { bubbles: true }));
+  const generate=machine.querySelector<HTMLButtonElement>("[data-generate-code]");
+  if(generate) generate.disabled=!available;
+  const cancel=machine.querySelector<HTMLButtonElement>("[data-cancel-code]");
+  if(cancel) cancel.disabled=!available;
   const lever=machine.querySelector<HTMLButtonElement>("[data-arcanistry-lever]");
   if(lever){
     lever.disabled=!available;
