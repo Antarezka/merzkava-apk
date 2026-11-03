@@ -77,7 +77,7 @@ Rules:
 ### Stage 2 — Input geometry and threshold
 - [ ] Derive selected-aperture position and threshold from the actual rotary geometry, not an unrelated pointer angle.
 - [ ] Verify pointer/touch drag tracking in both directions and across angle wraparound.
-- [ ] Reaching threshold alone does not lock, load, or travel.
+- [ ] Reaching threshold alone does not lock, load, or travel; the gesture must cross into the threshold from outside, so tapping an aperture that starts aligned cannot activate it.
 - [ ] Releasing inside the threshold commits success exactly once.
 - [ ] Releasing outside threshold and pointer cancellation take the failure path.
 - [ ] Add automated tests for threshold boundary, release semantics, cancellation, and unsupported destinations.
