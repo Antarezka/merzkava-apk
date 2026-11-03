@@ -942,7 +942,7 @@ root.addEventListener("click", async (event: MouseEvent) => {
     });
     root.querySelectorAll<HTMLButtonElement>("[data-idle-region]").forEach(button=>button.classList.toggle("is-active",button===idleRegionButton));
     const activePanel=root.querySelector<HTMLElement>("[data-idle-map-region='"+regionId+"']");
-    const regionName=idleRegionButton.textContent?.replace(/^\\d+/,"").trim()??"";
+    const regionName=idleRegionButton.textContent?.replace(/^\d+/,"").trim()??"";
     const caption=root.querySelector<HTMLElement>("[data-idle-region-name]");
     const subtitle=root.querySelector<HTMLElement>("[data-idle-region-subtitle]");
     if(caption) caption.textContent=regionName;
