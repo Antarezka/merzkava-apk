@@ -956,11 +956,11 @@ function selectArcanistDestination(place:HTMLElement):void{
   if(cancel) cancel.disabled=!available;
   const lever=machine.querySelector<HTMLButtonElement>("[data-arcanistry-lever]");
   if(lever){
-    lever.disabled=!available;
-    lever.setAttribute("aria-label",available?"Pull lever to issue a travel ticket":"This route is not available yet");
+    lever.disabled=true;
+    lever.setAttribute("aria-label",available?"Lever locked until code verification":"This route is not available yet");
   }
   const status=machine.querySelector<HTMLElement>("[data-arcanistry-status]");
-  if(status) status.textContent=available?"ROUTE VERIFIED · PULL THE LEVER TO ISSUE A TICKET":"ROUTE UNAVAILABLE · COMING SOON";
+  if(status) status.textContent=available?"DESTINATION SET · GENERATE ACCESS CODE":"ROUTE UNAVAILABLE · COMING SOON";
 }
 root.addEventListener("click", async (event: MouseEvent) => {
   const target = event.target;
