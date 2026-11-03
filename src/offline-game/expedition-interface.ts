@@ -94,7 +94,7 @@ export function renderExpeditionInterface():string {
           <path d="M14 45v2m24-2v2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
         </svg>
       </button>
-      ${renderIdleHomeMap()}
+      ${renderIdleHomeMap(save?{day:save.day,hour:save.hour,minute:save.minute,cycle:atmosphere.cycle}:null)}
     </div>
     ${choiceModal}
     <footer class="expedition-footer"><span>ETERNAL PATH · LOCAL JOURNEY</span><span>WORLD ARCHIVE · READ ONLY</span></footer></section>`;
