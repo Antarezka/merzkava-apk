@@ -56,6 +56,12 @@ jobs:
       - name: Prepare full application version label
         run: echo "VITE_APP_VERSION=v.1.01.${GITHUB_RUN_NUMBER}-${GITHUB_SHA:0:3}" >> "$GITHUB_ENV"
 
+      - name: Generate AI-readable build record
+        env:
+          GITHUB_EVENT_BEFORE: ${{ github.event.before || '' }}
+          VITE_APP_VERSION: v.1.01.${{ github.run_number }}-${{ github.sha }}
+        run: node scripts/generate-build-notes.mjs
+
       - name: Build web application
         run: npm run build
         env:
@@ -186,12 +192,20 @@ jobs:
           echo "APK signature:"
           "$BUILD_TOOLS/apksigner" verify --verbose --print-certs "$APK"
 
-      # Preserve a verified APK artifact even if the hosted emulator service is unstable.
-      - name: Upload verified APK artifact
+      # Ship the APK and its matching AI-readable change record together.
+      - name: Prepare APK and build record package
+        run: |
+          set -euo pipefail
+          mkdir -p release-artifacts
+          cp android/app/build/outputs/apk/debug/app-debug.apk release-artifacts/Merzkava.apk
+          cp public/BUILD_NOTES.md release-artifacts/BUILD_NOTES.md
+
+      # Preserve the verified APK and matching notes even if the hosted emulator is unstable.
+      - name: Upload verified APK and build record
         uses: actions/upload-artifact@v4
         with:
-          name: merzkava-debug-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          name: merzkava-build-${{ github.run_number }}
+          path: release-artifacts/
           if-no-files-found: error
           retention-days: 7
 
