@@ -63,7 +63,7 @@ const defaultWorldMarkers: WorldMarker[] = [
 ];
 function readWorldMarkers(): WorldMarker[] {
   try {
-    const saved = JSON.parse(localStorage.getItem(WORLD_MAP_COORDINATES_KEY) || "null");
+    const saved = JSON.parse(localStorage.getItem(WORLD_MAP_COORDINATES_KEY) || localStorage.getItem("merzkava.world-map.coordinates.v2") || "null");
     if (Array.isArray(saved)) {
       return defaultWorldMarkers.map(item => {
         const entry = saved.find((value: any) => value?.id === item.id);
@@ -318,20 +318,21 @@ function bindWorldMapEditor(dialog: HTMLElement): void {
     try {
       const parsed = JSON.parse(field?.value || "");
       const incoming = Array.isArray(parsed) ? parsed : parsed?.markers;
-      if (!Array.isArray(incoming) || !defaultWorldMarkers.every(base => incoming.some((item: any) =>
-        item?.id === base.id && Number.isFinite(Number(item.x)) && Number.isFinite(Number(item.y))))) {
-        throw new Error("Missing or invalid marker coordinates");
+      if (!Array.isArray(incoming) || !incoming.length || incoming.some((item: any) =>
+        !defaultWorldMarkers.some(base => base.id === item?.id) ||
+        !Number.isFinite(Number(item?.x)) || !Number.isFinite(Number(item?.y)))) {
+        throw new Error("Invalid marker coordinates");
       }
       markers = defaultWorldMarkers.map(base => {
         const item = incoming.find((entry: any) => entry.id === base.id);
-        return {
+        return item ? {
           ...base, x: clamp(Number(item.x)), y: clamp(Number(item.y)),
           placementStatus: item.placementStatus === "owner-set" ? "owner-set" : base.placementStatus
-        };
+        } : { ...base };
       });
       markers.forEach(paint); refreshExport();
       setStatus("Imported coordinates are a preview. Confirm & lock positions to save them on this device.");
-    } catch { setStatus("Import failed. Paste a complete Merzkava world-map JSON reference containing all 21 marker IDs."); }
+    } catch { setStatus("Import failed. Paste a complete Merzkava world-map JSON reference containing at least one known marker ID."); }
   });
   dialog.querySelector<HTMLElement>('[data-wmh-action="editor-reset"]')?.addEventListener("click", () => {
     markers = defaultWorldMarkers.map(item => ({ ...item }));
