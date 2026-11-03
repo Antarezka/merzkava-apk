@@ -113,7 +113,7 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     later(() => shake(machine, 3.1), 230);
     lever.classList.add("is-returning");
     later(() => {
-      lever.querySelector<HTMLElement>(".arcanist-lever-arm")?.style.removeProperty("--lever-angle");
+      lever.querySelector<HTMLElement>(".arcanist-lever-arm")?.style.removeProperty("transform");
       lever.style.removeProperty("--lever-pull");
       lever.classList.remove("is-returning", "is-pulling");
       machine.dataset.machineState = "idle";
@@ -169,6 +169,8 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     lever.disabled = true;
     lever.classList.remove("is-pulling", "is-returning");
     lever.classList.add("is-pulled");
+    const leverArm = lever.querySelector<HTMLElement>(".arcanist-lever-arm");
+    if (leverArm) leverArm.style.transform = "rotate(-52deg)";
     status(machine, "TRANSMISSION ENGAGED · PRINTING DESTINATION TICKET");
     shake(machine, 3.2);
     later(() => shake(machine, 6.5), 280);
@@ -176,7 +178,7 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
 
     later(() => {
       machine.classList.add("is-printing");
-      shake(machine, 4.4);
+      shakeVertically(machine, 4.4);
       ticket.hidden = false;
       ticket.classList.remove("is-returning", "is-torn");
       ticket.style.removeProperty("--ticket-pull");
@@ -190,7 +192,7 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
       machine.classList.remove("is-running");
       lever.classList.remove("is-pulled");
       lever.classList.add("is-returning");
-      lever.querySelector<HTMLElement>(".arcanist-lever-arm")?.style.removeProperty("--lever-angle");
+      lever.querySelector<HTMLElement>(".arcanist-lever-arm")?.style.removeProperty("transform");
       lever.style.removeProperty("--lever-pull");
       lever.disabled = true;
       later(() => lever.classList.remove("is-returning"), 620);
@@ -306,6 +308,7 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     const machine = ticket?.closest<HTMLElement>("[data-arcanistry-machine]");
     if (!ticket || !machine || ticket.hidden || machine.dataset.machineState !== "ticket-ready") return;
     activeTicket = { element: ticket, pointerId: event.pointerId, startY: event.clientY, distance: 0 };
+    ticket.style.setProperty("--ticket-extension", "0px");
     try { ticket.setPointerCapture(event.pointerId); } catch { /* WebView fallback */ }
     event.preventDefault();
   };
@@ -316,7 +319,8 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
       activeLever.distance = distance;
       const progress = distance / 56;
       const curvedAngle = Math.pow(progress, .9) * -55;
-      activeLever.element.querySelector<HTMLElement>(".arcanist-lever-arm")?.style.setProperty("--lever-angle", curvedAngle.toFixed(1) + "deg");
+      const leverArm = activeLever.element.querySelector<HTMLElement>(".arcanist-lever-arm");
+      if (leverArm) leverArm.style.transform = "rotate(" + curvedAngle.toFixed(1) + "deg)";
       activeLever.element.classList.toggle("is-pulling", distance > 2);
       event.preventDefault();
       return;
@@ -324,7 +328,7 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     if (!activeTicket || activeTicket.pointerId !== event.pointerId) return;
     const distance = Math.max(0, Math.min(112, event.clientY - activeTicket.startY));
     activeTicket.distance = distance;
-    activeTicket.element.style.setProperty("--ticket-extension", Math.round(distance * .9) + "px");
+    activeTicket.element.style.setProperty("--ticket-extension", Math.round(distance) + "px");
     activeTicket.element.classList.toggle("is-under-tension", distance >= ARCANISTRY_TICKET_TEAR_DISTANCE * .72);
     event.preventDefault();
   };
@@ -342,7 +346,7 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
       else {
         active.element.classList.add("is-returning");
         later(() => {
-          active.element.querySelector<HTMLElement>(".arcanist-lever-arm")?.style.removeProperty("--lever-angle");
+          active.element.querySelector<HTMLElement>(".arcanist-lever-arm")?.style.removeProperty("transform");
           active.element.style.removeProperty("--lever-pull");
           active.element.classList.remove("is-returning");
         }, 360);
