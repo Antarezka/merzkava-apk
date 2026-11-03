@@ -2669,96 +2669,38 @@ body { color:var(--ui-ink); }
 .app-shell.is-nav-collapsed .nav-toggle-handle{bottom:calc(7px + env(safe-area-inset-bottom,0px) + 20px)!important}
 
 
-/* Built-in narrative wallpaper collection: subdued seamless doodles behind Convo text. */
-.narrative-wallpaper-settings{margin-top:18px;padding-top:14px;border-top:1px solid var(--line,#c9bea7)}
-.wallpaper-settings-heading{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px;color:var(--accent,#a68d5e);font-size:8px;font-weight:800;letter-spacing:.15em}
-.wallpaper-settings-heading small{color:var(--muted,#788074);font-size:7px;letter-spacing:.08em;text-align:right}
-.wallpaper-setting-group+.wallpaper-setting-group{margin-top:16px}
-.wallpaper-setting-group h3{margin:0 0 4px;color:var(--r99-ink,#394e44);font:600 14px Georgia,serif}
-.wallpaper-setting-group>p{margin:0 0 9px;color:var(--muted,#788074);font-size:10px;line-height:1.5}
-.wallpaper-choice-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-.wallpaper-choice{display:grid;grid-template-columns:48px minmax(0,1fr);align-items:center;gap:9px;min-width:0;padding:7px;border:1px solid var(--line,#c9bea7);border-radius:7px;background:var(--r99-paper,#f5efdf);color:var(--r99-ink,#394e44);text-align:left;font:600 10px/1.25 system-ui,sans-serif}
-.wallpaper-choice.is-selected{border-color:var(--accent,#a68d5e);box-shadow:0 0 0 1px var(--accent,#a68d5e),inset 0 0 0 1px #a68d5e22}
-.wallpaper-preview{display:block;width:48px;height:38px;border:1px solid #9c8b6c66;border-radius:4px;background-color:#282d29;background-size:24px 24px}
-.preview-astral{background-image:radial-gradient(circle at 6px 6px,#d3b77a 1px,transparent 1.5px),radial-gradient(circle at 18px 18px,#d3b77a 1px,transparent 1.5px),repeating-linear-gradient(45deg,transparent 0 10px,#c1a87555 10px 11px,transparent 11px 20px)}
-.preview-scholar{background-color:#ded2b8;background-image:repeating-linear-gradient(135deg,transparent 0 10px,#806e4c66 10px 11px,transparent 11px 21px),radial-gradient(circle at 6px 6px,#806e4c88 1px,transparent 2px)}
-.preview-imperial{background-color:#302b25;background-image:repeating-linear-gradient(45deg,transparent 0 9px,#d4ad6a77 9px 10px,transparent 10px 19px),repeating-linear-gradient(-45deg,transparent 0 9px,#d4ad6a55 9px 10px,transparent 10px 19px)}
-.preview-arcanist{background-color:#202a29;background-image:linear-gradient(90deg,#d59a4b66 1px,transparent 1px),linear-gradient(#d59a4b66 1px,transparent 1px),radial-gradient(circle at 12px 12px,transparent 4px,#d59a4b66 4.5px 5px,transparent 5.5px);background-size:16px 16px,16px 16px,32px 32px}
-.preview-spirit{background-color:#242b2a;background-image:radial-gradient(circle at 12px 12px,transparent 5px,#c1a87588 5.5px 6px,transparent 6.5px),radial-gradient(circle at 0 0,#c1a87588 1px,transparent 2px)}
-.preview-clouds{background-color:#34413e;background-image:radial-gradient(ellipse at 6px 18px,transparent 6px,#d7d0bf66 6.5px 7px,transparent 7.5px),radial-gradient(ellipse at 20px 6px,transparent 6px,#d7d0bf55 6.5px 7px,transparent 7.5px)}
-.preview-echoes{background-color:#292720;background-image:radial-gradient(circle at 12px 12px,transparent 4px,#d6aa7077 4.5px 5px,transparent 5.5px),repeating-linear-gradient(45deg,transparent 0 11px,#d6aa7044 11px 12px,transparent 12px 22px)}
-.preview-tower{background-color:#302b25;background-image:linear-gradient(90deg,transparent 45%,#d6aa7077 46% 48%,transparent 49%),linear-gradient(0deg,transparent 45%,#d6aa7077 46% 48%,transparent 49%),radial-gradient(circle at center,transparent 6px,#d6aa7066 6.5px 7px,transparent 7.5px);background-size:24px 24px}
-:root[data-convo-wallpaper="astral"] .chat-message.gm{background-color:#f5efdf;background-image:radial-gradient(circle at 8px 8px,#a68d5e30 1px,transparent 1.6px),radial-gradient(circle at 20px 20px,#a68d5e26 1px,transparent 1.6px),repeating-linear-gradient(45deg,transparent 0 18px,#a68d5e12 18px 19px,transparent 19px 36px)}
-:root[data-convo-wallpaper="scholar"] .chat-message.gm{background-color:#eee4cf;background-image:repeating-linear-gradient(135deg,transparent 0 16px,#806e4c20 16px 17px,transparent 17px 33px),radial-gradient(circle at 7px 7px,#806e4c35 1px,transparent 2px)}
-:root[data-convo-wallpaper="imperial"] .chat-message.gm{background-color:#f0e6d4;background-image:repeating-linear-gradient(45deg,transparent 0 13px,#a47b4520 13px 14px,transparent 14px 27px),repeating-linear-gradient(-45deg,transparent 0 13px,#a47b4518 13px 14px,transparent 14px 27px)}
-:root[data-convo-wallpaper="arcanist"] .chat-message.gm{background-color:#e9e8dd;background-image:linear-gradient(90deg,#66796b20 1px,transparent 1px),linear-gradient(#66796b20 1px,transparent 1px),radial-gradient(circle at 16px 16px,transparent 5px,#a68d5e22 5.5px 6px,transparent 6.5px);background-size:22px 22px,22px 22px,44px 44px}
-:root[data-theme="dark"][data-convo-wallpaper="astral"] .chat-message.gm{background-color:#26302a;background-image:radial-gradient(circle at 8px 8px,#c1a87535 1px,transparent 1.6px),radial-gradient(circle at 20px 20px,#c1a8752b 1px,transparent 1.6px),repeating-linear-gradient(45deg,transparent 0 18px,#c1a87514 18px 19px,transparent 19px 36px)}
-:root[data-theme="dark"][data-convo-wallpaper="scholar"] .chat-message.gm{background-color:#302f27;background-image:repeating-linear-gradient(135deg,transparent 0 16px,#d5c39b20 16px 17px,transparent 17px 33px),radial-gradient(circle at 7px 7px,#d5c39b35 1px,transparent 2px)}
-:root[data-theme="dark"][data-convo-wallpaper="imperial"] .chat-message.gm{background-color:#302b25;background-image:repeating-linear-gradient(45deg,transparent 0 13px,#d6aa7020 13px 14px,transparent 14px 27px),repeating-linear-gradient(-45deg,transparent 0 13px,#d6aa7018 13px 14px,transparent 14px 27px)}
-:root[data-theme="dark"][data-convo-wallpaper="arcanist"] .chat-message.gm{background-color:#293530;background-image:linear-gradient(90deg,#9db19d20 1px,transparent 1px),linear-gradient(#9db19d20 1px,transparent 1px),radial-gradient(circle at 16px 16px,transparent 5px,#c1a87522 5.5px 6px,transparent 6.5px);background-size:22px 22px,22px 22px,44px 44px}
-.wallpaper-choice:focus-visible{outline:2px solid var(--accent,#a68d5e);outline-offset:2px}
-
-
-/* Convo follows the chat-wallpaper model: the pattern sits behind message bubbles. */
-:root[data-convo-wallpaper="astral"] .conversation-feed{background-color:#eee7d7;background-image:radial-gradient(circle at 8px 8px,#a68d5e30 1px,transparent 1.6px),radial-gradient(circle at 20px 20px,#a68d5e26 1px,transparent 1.6px),repeating-linear-gradient(45deg,transparent 0 18px,#a68d5e12 18px 19px,transparent 19px 36px);background-size:36px 36px,36px 36px,36px 36px}
-:root[data-convo-wallpaper="scholar"] .conversation-feed{background-color:#eee4cf;background-image:repeating-linear-gradient(135deg,transparent 0 16px,#806e4c20 16px 17px,transparent 17px 33px),radial-gradient(circle at 7px 7px,#806e4c35 1px,transparent 2px);background-size:33px 33px,33px 33px}
-:root[data-convo-wallpaper="imperial"] .conversation-feed{background-color:#f0e6d4;background-image:repeating-linear-gradient(45deg,transparent 0 13px,#a47b4520 13px 14px,transparent 14px 27px),repeating-linear-gradient(-45deg,transparent 0 13px,#a47b4518 13px 14px,transparent 14px 27px);background-size:27px 27px}
-:root[data-convo-wallpaper="arcanist"] .conversation-feed{background-color:#e9e8dd;background-image:linear-gradient(90deg,#66796b20 1px,transparent 1px),linear-gradient(#66796b20 1px,transparent 1px),radial-gradient(circle at 16px 16px,transparent 5px,#a68d5e22 5.5px 6px,transparent 6.5px);background-size:22px 22px,22px 22px,44px 44px}
-:root[data-theme="dark"][data-convo-wallpaper="astral"] .conversation-feed{background-color:#202923;background-image:radial-gradient(circle at 8px 8px,#c1a87535 1px,transparent 1.6px),radial-gradient(circle at 20px 20px,#c1a8752b 1px,transparent 1.6px),repeating-linear-gradient(45deg,transparent 0 18px,#c1a87514 18px 19px,transparent 19px 36px)}
-:root[data-theme="dark"][data-convo-wallpaper="scholar"] .conversation-feed{background-color:#28271f;background-image:repeating-linear-gradient(135deg,transparent 0 16px,#d5c39b20 16px 17px,transparent 17px 33px),radial-gradient(circle at 7px 7px,#d5c39b35 1px,transparent 2px)}
-:root[data-theme="dark"][data-convo-wallpaper="imperial"] .conversation-feed{background-color:#28231e;background-image:repeating-linear-gradient(45deg,transparent 0 13px,#d6aa7020 13px 14px,transparent 14px 27px),repeating-linear-gradient(-45deg,transparent 0 13px,#d6aa7018 13px 14px,transparent 14px 27px)}
-:root[data-theme="dark"][data-convo-wallpaper="arcanist"] .conversation-feed{background-color:#202a25;background-image:linear-gradient(90deg,#9db19d20 1px,transparent 1px),linear-gradient(#9db19d20 1px,transparent 1px),radial-gradient(circle at 16px 16px,transparent 5px,#c1a87522 5.5px 6px,transparent 6.5px);background-size:22px 22px,22px 22px,44px 44px}
-:root[data-convo-wallpaper] .chat-message.gm{background-image:none}
-
-
-/* Doodle selectors: independent settings cards with a landscape preview window. */
-.narrative-wallpaper-settings .wallpaper-setting-group{
-  padding:12px;
-  border:1px solid var(--line,#c9bea7);
-  border-radius:7px;
-  background:color-mix(in srgb,var(--r99-paper,#f5efdf) 76%,transparent);
-}
-.narrative-wallpaper-settings .wallpaper-setting-group+.wallpaper-setting-group{margin-top:12px}
-.narrative-wallpaper-settings .wallpaper-setting-group h3{
-  display:flex;align-items:center;gap:7px;
-  color:var(--accent,#a68d5e);
-  font-size:13px;letter-spacing:.035em;
-}
+/* Illustrated World Archive doodles — transparent line-art tiles, kept deliberately quiet behind prose. */
+.wallpaper-preview{background-color:#282d29;background-repeat:repeat;background-size:180px 130px}
+.preview-astral{background-image:url("/wallpapers/celestial-fieldnotes.svg")}
+.preview-scholar{background-image:url("/wallpapers/arcanist-notebook.svg")}
+.preview-imperial{background-image:url("/wallpapers/explorer-records.svg")}
+.preview-arcanist{background-image:url("/wallpapers/bestiary-sketchbook.svg")}
+.preview-spirit{background-image:url("/wallpapers/pilgrims-route.svg")}
+.preview-clouds{background-image:url("/wallpapers/forgotten-sea.svg")}
+.preview-echoes{background-image:url("/wallpapers/mythic-beasts.svg")}
+.preview-tower{background-image:url("/wallpapers/ruined-relics.svg")}
 .narrative-wallpaper-settings .wallpaper-choice-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
-.narrative-wallpaper-settings .wallpaper-choice{
-  display:grid;grid-template-columns:minmax(0,1fr);gap:6px;
-  padding:7px;align-content:start;
-}
-.narrative-wallpaper-settings .wallpaper-preview{
-  position:relative;isolation:isolate;overflow:hidden;
-  width:100%;height:42px;min-width:0;
-  border:1px solid #a68d5e88;border-radius:4px;
-  background-size:24px 24px;
-  box-shadow:inset 0 0 0 2px #17151222;
-}
-.narrative-wallpaper-settings .wallpaper-preview:before{
-  position:absolute;z-index:1;top:4px;left:6px;
-  content:"MERZKAVA";color:#f1dfbd;
-  font:700 6px/1.2 Georgia,serif;letter-spacing:.2em;
-  text-shadow:0 1px 3px #000;
-}
-.narrative-wallpaper-settings .wallpaper-preview:after{
-  position:absolute;z-index:1;right:5px;bottom:4px;
-  content:"✦  WORLD ARCHIVE  ✦";
-  color:#ead6ae;font:600 5px/1 system-ui,sans-serif;
-  letter-spacing:.13em;text-shadow:0 1px 3px #000;
-}
-:root[data-theme="dark"] .narrative-wallpaper-settings .wallpaper-setting-group{
-  border-color:#596653;background:color-mix(in srgb,#29352e 84%,transparent);
-}
-
-/* The selected Eternal Path doodle belongs only to its narrative window,
-   including the pre-journey empty narrative state. */
+.narrative-wallpaper-settings .wallpaper-choice{display:grid;grid-template-columns:minmax(0,1fr);gap:6px;padding:7px;align-content:start}
+.narrative-wallpaper-settings .wallpaper-preview{position:relative;isolation:isolate;overflow:hidden;width:100%;height:54px;min-width:0;border:1px solid #a68d5e88;border-radius:4px;background-size:180px 130px;background-position:center;box-shadow:inset 0 0 0 2px #17151222}
+.narrative-wallpaper-settings .wallpaper-preview:before{position:absolute;z-index:1;top:5px;left:7px;content:"MERZKAVA";color:#f1dfbd;font:700 6px/1.2 Georgia,serif;letter-spacing:.2em;text-shadow:0 1px 3px #000}
+.narrative-wallpaper-settings .wallpaper-preview:after{position:absolute;z-index:1;right:6px;bottom:5px;content:"✦ WORLD ARCHIVE ✦";color:#ead6ae;font:600 5px/1 system-ui,sans-serif;letter-spacing:.13em;text-shadow:0 1px 3px #000}
+:root[data-theme="dark"] .wallpaper-preview{background-color:#202923}
+:root[data-theme="dark"] .narrative-wallpaper-settings .wallpaper-setting-group{border-color:#596653;background:color-mix(in srgb,#29352e 84%,transparent)}
+:root[data-theme="light"] .wallpaper-preview{background-color:#e7dcc4}
+:root[data-convo-wallpaper="astral"] .conversation-feed{background-color:#eee7d7;background-image:url("/wallpapers/celestial-fieldnotes.svg");background-size:360px 260px}
+:root[data-convo-wallpaper="scholar"] .conversation-feed{background-color:#eee4cf;background-image:url("/wallpapers/arcanist-notebook.svg");background-size:360px 260px}
+:root[data-convo-wallpaper="imperial"] .conversation-feed{background-color:#f0e6d4;background-image:url("/wallpapers/explorer-records.svg");background-size:360px 260px}
+:root[data-convo-wallpaper="arcanist"] .conversation-feed{background-color:#e9e8dd;background-image:url("/wallpapers/bestiary-sketchbook.svg");background-size:360px 260px}
+:root[data-theme="dark"][data-convo-wallpaper="astral"] .conversation-feed{background-color:#202923}
+:root[data-theme="dark"][data-convo-wallpaper="scholar"] .conversation-feed{background-color:#28271f}
+:root[data-theme="dark"][data-convo-wallpaper="imperial"] .conversation-feed{background-color:#28231e}
+:root[data-theme="dark"][data-convo-wallpaper="arcanist"] .conversation-feed{background-color:#202a25}
+:root[data-convo-wallpaper] .chat-message.gm{background-image:none}
 :root[data-eternal-wallpaper="spirit"] .expedition-dialogue-card,
-:root[data-eternal-wallpaper="spirit"] .expedition-dialogue-locked{background-color:#282b26;background-image:radial-gradient(circle at 12px 12px,transparent 6px,#d6aa7022 6.5px 7px,transparent 7.5px),radial-gradient(circle at 0 0,#d6aa7030 1px,transparent 2px),repeating-linear-gradient(45deg,transparent 0 22px,#d6aa700d 22px 23px,transparent 23px 45px)}
+:root[data-eternal-wallpaper="spirit"] .expedition-dialogue-locked{background-color:#282b26;background-image:url("/wallpapers/pilgrims-route.svg");background-size:360px 260px}
 :root[data-eternal-wallpaper="clouds"] .expedition-dialogue-card,
-:root[data-eternal-wallpaper="clouds"] .expedition-dialogue-locked{background-color:#293633;background-image:radial-gradient(ellipse at 10px 18px,transparent 7px,#d9ded022 7.5px 8px,transparent 8.5px),radial-gradient(ellipse at 27px 4px,transparent 7px,#d9ded01c 7.5px 8px,transparent 8.5px)}
+:root[data-eternal-wallpaper="clouds"] .expedition-dialogue-locked{background-color:#293633;background-image:url("/wallpapers/forgotten-sea.svg");background-size:360px 260px}
 :root[data-eternal-wallpaper="echoes"] .expedition-dialogue-card,
-:root[data-eternal-wallpaper="echoes"] .expedition-dialogue-locked{background-color:#302b25;background-image:radial-gradient(circle at 12px 12px,transparent 5px,#d6aa7028 5.5px 6px,transparent 6.5px),repeating-linear-gradient(45deg,transparent 0 18px,#d6aa7010 18px 19px,transparent 19px 37px)}
+:root[data-eternal-wallpaper="echoes"] .expedition-dialogue-locked{background-color:#302b25;background-image:url("/wallpapers/mythic-beasts.svg");background-size:360px 260px}
 :root[data-eternal-wallpaper="tower"] .expedition-dialogue-card,
-:root[data-eternal-wallpaper="tower"] .expedition-dialogue-locked{background-color:#2b3029;background-image:linear-gradient(90deg,transparent 48%,#d6aa7020 49% 50%,transparent 51%),linear-gradient(0deg,transparent 48%,#d6aa7020 49% 50%,transparent 51%),radial-gradient(circle at center,transparent 8px,#d6aa7024 8.5px 9px,transparent 9.5px);background-size:30px 30px}
+:root[data-eternal-wallpaper="tower"] .expedition-dialogue-locked{background-color:#2b3029;background-image:url("/wallpapers/ruined-relics.svg");background-size:360px 260px}
