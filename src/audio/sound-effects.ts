@@ -6,6 +6,21 @@ let voiceAudio: HTMLAudioElement | null = null;
 let pendingAudioFinish: (() => void) | null = null;
 let buttonAudio: HTMLAudioElement | null = null;
 
+// Reuse one Web Audio context for all short interface effects.
+let sharedAudioContext: AudioContext | null = null;
+function getSharedAudioContext(): AudioContext | null {
+  const AudioContextConstructor = window.AudioContext;
+  if (!AudioContextConstructor) return null;
+  try {
+    sharedAudioContext ??= new AudioContextConstructor();
+    if (sharedAudioContext.state === "suspended") void sharedAudioContext.resume().catch(error => console.warn("Merzkava audio context could not resume:", error));
+    return sharedAudioContext;
+  } catch (error) {
+    console.warn("Merzkava audio context could not initialize:", error);
+    return null;
+  }
+}
+
 const openingChimes = [
   "/audio/A_delicate_Japanese__%231-1793404302182.mp3"
 ];
@@ -86,7 +101,8 @@ export function playButtonSound(): void {
 export function playWarningBeep(): void {
   if (!soundEnabled) return;
   try {
-    const context = new window.AudioContext();
+    const context = getSharedAudioContext();
+    if (!context) return;
     const now = context.currentTime;
     [0, 0.105].forEach((offset, index) => {
       const oscillator = context.createOscillator();
@@ -101,7 +117,6 @@ export function playWarningBeep(): void {
       oscillator.start(now + offset);
       oscillator.stop(now + offset + 0.08);
     });
-    window.setTimeout(() => { void context.close(); }, 280);
   } catch (error) {
     console.warn("Merzkava warning beep could not play:", error);
   }
@@ -112,9 +127,8 @@ export function playSnapshotSlideSound(direction: "down" | "up"): void {
 
   // A short, filtered noise sweep gives the snapshot strip a soft paper-on-paper glide.
   try {
-    const AudioContextConstructor = window.AudioContext;
-    if (AudioContextConstructor) {
-      const context = new AudioContextConstructor();
+    const context = getSharedAudioContext();
+    if (context) {
       const duration = direction === "down" ? 0.2 : 0.17;
       const frameCount = Math.max(1, Math.floor(context.sampleRate * duration));
       const buffer = context.createBuffer(1, frameCount, context.sampleRate);
@@ -139,7 +153,6 @@ export function playSnapshotSlideSound(direction: "down" | "up"): void {
       source.connect(filter);
       filter.connect(volume);
       volume.connect(context.destination);
-      source.onended = () => { void context.close(); };
       if (context.state === "suspended") void context.resume();
       source.start();
     }
@@ -158,7 +171,8 @@ export function playSnapshotSlideSound(direction: "down" | "up"): void {
 export function playNavigationTick(): void {
   if (!soundEnabled) return;
   try {
-    const context = new window.AudioContext();
+    const context = getSharedAudioContext();
+    if (!context) return;
     const now = context.currentTime;
     const bursts = [0, 0.032, 0.064];
     bursts.forEach((offset, index) => {
@@ -178,7 +192,6 @@ export function playNavigationTick(): void {
       oscillator.start(now + offset);
       oscillator.stop(now + offset + 0.02);
     });
-    window.setTimeout(() => { void context.close(); }, 180);
   } catch (error) {
     console.warn("Merzkava navigation tick could not play:", error);
   }
@@ -193,7 +206,8 @@ export function playClockworkRatchet(): void {
   if (stamp - lastClockworkRatchetAt < 42) return;
   lastClockworkRatchetAt = stamp;
   try {
-    const context = new window.AudioContext();
+    const context = getSharedAudioContext();
+    if (!context) return;
     const now = context.currentTime;
     const sampleCount = Math.floor(context.sampleRate * 0.12);
     const buffer = context.createBuffer(1, sampleCount, context.sampleRate);
@@ -237,7 +251,6 @@ export function playClockworkRatchet(): void {
       pawl.start(now + offset);
       pawl.stop(now + offset + 0.03);
     });
-    window.setTimeout(() => { void context.close(); }, 220);
   } catch (error) {
     console.warn("Merzkava clockwork ratchet could not play:", error);
   }
