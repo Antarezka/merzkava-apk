@@ -4,6 +4,7 @@ import {
   ARCANISTRY_MIN_LOADING_MS,
   ARCANISTRY_TICKET_TEAR_DISTANCE,
   getArcanistryLeverAngle,
+  getArcanistryTicketExtension,
   isArcanistryLeverEngaged,
   isArcanistryTicketTorn
 } from "../../src/offline-game/arcanistry-ticket-machine";
@@ -24,6 +25,14 @@ describe("Arcanistry ticket interaction", () => {
     expect(getArcanistryLeverAngle(-28)).toBeLessThan(0);
     expect(getArcanistryLeverAngle(28)).toBeGreaterThan(0);
     expect(getArcanistryLeverAngle(Number.NaN)).toBe(0);
+  });
+
+  it("extends the ticket only along a downward gesture", () => {
+    expect(getArcanistryTicketExtension(0)).toBe(0);
+    expect(getArcanistryTicketExtension(48)).toBe(48);
+    expect(getArcanistryTicketExtension(-20)).toBe(0);
+    expect(getArcanistryTicketExtension(180)).toBe(112);
+    expect(getArcanistryTicketExtension(Number.NaN)).toBe(0);
   });
 
   it("uses downward ticket travel and keeps the tear at the upper perforation", () => {
