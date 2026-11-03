@@ -212,7 +212,7 @@
 .arcanist-machine-heading strong{font:19px/1.05 Georgia,serif;letter-spacing:.015em;color:#f4e8d1}
 .arcanist-machine-heading small{font:600 6px system-ui,sans-serif;letter-spacing:.16em;color:#9eaa9a}
 .arcanist-machine-heading>button{width:30px;height:30px;border:1px solid #8f744b;background:#202820;color:#e8d2a7;font:21px Georgia,serif}
-.arcanist-machine-main{position:relative;z-index:2;display:grid;grid-template-columns:minmax(0,1fr) 104px;gap:9px;padding:10px 0 7px}
+.arcanist-machine-main{position:relative;z-index:2;display:grid;grid-template-columns:minmax(0,1fr) 116px;gap:9px;padding:10px 0 7px}
 .arcanist-destination-panel{min-width:0;min-height:0;border:1px solid #92784e;background:linear-gradient(120deg,#141a16ed,#222720ed);box-shadow:inset 0 0 0 2px #080d0a,inset 0 0 0 3px #6f5838}
 .arcanist-panel-title{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:7px 8px;border-bottom:1px solid #94784f66;background:linear-gradient(90deg,#4a3b27,#1d241e)}
 .arcanist-panel-title span{font:700 7px system-ui,sans-serif;letter-spacing:.14em;color:#f0d7a4}
