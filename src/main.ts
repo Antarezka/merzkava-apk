@@ -29,7 +29,7 @@ import { getLanguage, languagePanelMarkup, translateLabel, translateRenderedCont
 import { animateOpeningSplash, animateSplashCurtain } from "./ui/splash-animation";
 import { animateAppScreen } from "./ui/app-shell-motion";
 import { initializeGravityPullCord } from "./ui/gravity-pull-cord";
-import { canCommitRotaryActivation, isRotaryAligned, parseRotaryApertureAngle, rotaryActivationProgress, rotaryPointerDelta, ARCANISTRY_ACTIVATION_ANGLE } from "./offline-game/arcanistry-rotary";
+import { canCommitRotaryActivation, isRotaryAligned, parseRotaryApertureAngle, rotaryActivationProgress, rotaryDragAngle, ARCANISTRY_ACTIVATION_ANGLE } from "./offline-game/arcanistry-rotary";
 import { closeLoreEntry, closeLoreSource, closeLorePlaceholder, openLoreEntry, openLoreSource, openLorePlaceholder, setLoreCategory, setLoreSearch, renderLoreResults } from "./world-archive/lore-library";
 
 const app = document.querySelector<HTMLDivElement>("#app");
@@ -936,7 +936,7 @@ function selectArcanistDestination(place:HTMLElement):void{
  if(rotor)rotor.dataset.sceneId=sceneId;
  root.querySelectorAll<HTMLButtonElement>("[data-idle-place]").forEach(button=>button.classList.toggle("is-selected",button.dataset.idlePlace===placeId&&button.dataset.idleGroup===group));
 }
-let activeArcanistDial:{element:HTMLElement;selected:HTMLElement;pointerId:number;lastAngle:number;startAngle:number;turned:number;sceneId:string}|null=null;
+let activeArcanistDial:{element:HTMLElement;selected:HTMLElement;pointerId:number;pointerStartAngle:number;startAngle:number;turned:number;sceneId:string}|null=null;
 root.addEventListener("pointerdown",event=>{
  const target=event.target;if(!(target instanceof Element)||(event.pointerType==="mouse"&&event.button!==0))return;
  const aperture=target.closest<HTMLElement>(".arcanist-dial-aperture[data-idle-place]");
@@ -946,7 +946,7 @@ root.addEventListener("pointerdown",event=>{
  const pointerAngle=arcanistPointerAngle(rotor,event);
  const apertureAngle=parseRotaryApertureAngle(aperture.style.getPropertyValue("--hole-angle"));
  if(apertureAngle===null)return;
- activeArcanistDial={element:rotor,selected:aperture,pointerId:event.pointerId,lastAngle:pointerAngle,startAngle:apertureAngle,turned:0,sceneId:rotor.dataset.sceneId??""};
+ activeArcanistDial={element:rotor,selected:aperture,pointerId:event.pointerId,pointerStartAngle:pointerAngle,startAngle:apertureAngle,turned:0,sceneId:rotor.dataset.sceneId??""};
  rotor.dataset.activationThreshold="pending";
  rotor.closest<HTMLElement>("[data-arcanist-device]")?.classList.remove("is-at-threshold");
  try{rotor.setPointerCapture(event.pointerId);}catch{/* WebView fallback */}
@@ -955,10 +955,9 @@ root.addEventListener("pointerdown",event=>{
 root.addEventListener("pointermove",event=>{
  const active=activeArcanistDial;if(!active||active.pointerId!==event.pointerId)return;
  const next=arcanistPointerAngle(active.element,event);
- const delta=rotaryPointerDelta(active.lastAngle,next);active.lastAngle=next;
- if(Math.abs(delta)>0.08){
-  active.turned+=delta;
-  const angle=active.startAngle+active.turned;
+ const angle=rotaryDragAngle(active.startAngle,active.pointerStartAngle,next);
+ active.turned=angle-active.startAngle;
+ if(Math.abs(active.turned)>0.08){
   const progress=rotaryActivationProgress(angle,ARCANISTRY_ACTIVATION_ANGLE,active.startAngle);
   const thresholdReached=isRotaryAligned(angle,ARCANISTRY_ACTIVATION_ANGLE);
   const device=active.element.closest<HTMLElement>("[data-arcanist-device]");
@@ -989,8 +988,7 @@ function finishArcanistDial(event:PointerEvent,cancelled=false):void{
  activeArcanistDial=null;
  if(!cancelled){
   const releaseAngle=arcanistPointerAngle(active.element,event);
-  active.turned+=rotaryPointerDelta(active.lastAngle,releaseAngle);
-  active.lastAngle=releaseAngle;
+  active.turned=rotaryDragAngle(active.startAngle,active.pointerStartAngle,releaseAngle)-active.startAngle;
  }
  try{if(active.element.hasPointerCapture(event.pointerId))active.element.releasePointerCapture(event.pointerId);}catch{/* already released */}
  const finalAngle=active.startAngle+active.turned;
