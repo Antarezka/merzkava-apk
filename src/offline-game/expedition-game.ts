@@ -154,7 +154,7 @@ function ensureLegacyMigration():EternalSaveSlot[] {
     const migrated=normalizeSave(JSON.parse(raw));
     if(!migrated) return slots;
     const slot:EternalSaveSlot={id:migrated.saveId,name:migrated.saveName,createdAt:migrated.createdAt,updatedAt:migrated.updatedAt,save:migrated};
-    writeSlots([slot]);storageSet(ACTIVE_SAVE_KEY,slot.id);storageSet(SAVE_KEY,JSON.stringify(migrated));
+    writeSlots([slot]);storageSet(ACTIVE_SAVE_KEY,slot.id);storageRemove(SAVE_KEY);
     return [slot];
   } catch { return slots; }
 }
@@ -170,7 +170,9 @@ function persist():void {
   const index=slots.findIndex(slot=>slot.id===save!.saveId);
   const record:EternalSaveSlot={id:save.saveId,name:save.saveName,createdAt:save.createdAt,updatedAt:now,save};
   if(index>=0) slots[index]=record; else slots.push(record);
-  writeSlots(slots);storageSet(ACTIVE_SAVE_KEY,save.saveId);storageSet(SAVE_KEY,JSON.stringify(save));
+  // The slot collection is the authoritative save store; avoid serializing and
+  // writing the active save a second time under the retired single-save key.
+  writeSlots(slots);storageSet(ACTIVE_SAVE_KEY,save.saveId);
 }
 function readActiveSave():EternalSave|null {
   const slots=ensureLegacyMigration();let activeId="";
@@ -202,7 +204,7 @@ export function renameEternalSave(id:string,name:string):boolean {
   const nextName=name.trim();if(nextName.length<2||nextName.length>48) return false;
   const slots=ensureLegacyMigration();const slot=slots.find(item=>item.id===id);if(!slot) return false;
   slot.name=nextName;slot.save.saveName=nextName;slot.updatedAt=new Date().toISOString();
-  if(save?.saveId===id){save.saveName=nextName;save.updatedAt=slot.updatedAt;storageSet(SAVE_KEY,JSON.stringify(save));}
+  if(save?.saveId===id){save.saveName=nextName;save.updatedAt=slot.updatedAt;}
   writeSlots(slots);return true;
 }
 export function deleteEternalSave(id:string):boolean {
