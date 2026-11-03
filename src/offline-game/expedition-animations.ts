@@ -85,8 +85,9 @@ export function mountExpeditionAnimations(root: HTMLElement): () => void {
   const scene = root.querySelector<HTMLElement>(".expedition-environment");
   const particleMount = mountSceneParticles(root);
   let disposed = false;
+  let motionAllowed = !reducedMotion();
   const playScene = () => {
-    if (disposed || reducedMotion() || !scene) return;
+    if (disposed || !motionAllowed || !scene) return;
     activeSceneAnimations.splice(0).forEach(animation => animation.pause?.());
     playSceneBeat(root, particleMount.nodes, animation => activeSceneAnimations.push(animation));
   };
@@ -107,7 +108,9 @@ export function mountExpeditionAnimations(root: HTMLElement): () => void {
   }
 
   const scope = createScope({ root, mediaQueries: { reduceMotion: "(prefers-reduced-motion: reduce)" } }).add(self => {
-    if (!self || self.matches.reduceMotion) return;
+    if (!self) return;
+    motionAllowed = !self.matches.reduceMotion && !reducedMotion();
+    if (self.matches.reduceMotion) return;
     const entranceTargets = root.querySelectorAll<HTMLElement>(".expedition-heading, .expedition-character-panel, .expedition-disposition-line, .expedition-dialogue, .expedition-footer");
     if (entranceTargets.length) animate(entranceTargets, { opacity: [0, 1], translateY: [13, 0], duration: 560, delay: stagger(72), ease: "outCubic" });
     const profileFields = root.querySelectorAll<HTMLElement>(".expedition-profile-meta span");
