@@ -793,6 +793,7 @@ root.addEventListener("keydown", event => {
   const idleNotice=root.querySelector<HTMLElement>("[data-idle-rpg-modal]");
   if(event.key==="Escape"&&idleNotice&&!idleNotice.hidden){
     idleNotice.hidden=true;
+    root.querySelector(".app-shell")?.classList.remove("is-idle-world");
     root.querySelector<HTMLButtonElement>("[data-idle-rpg-open]")?.setAttribute("aria-expanded","false");
     root.querySelector<HTMLButtonElement>("[data-idle-rpg-open]")?.focus();
     if(history.state?.idleRpgNotice) history.back();
