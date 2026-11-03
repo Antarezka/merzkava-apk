@@ -63,6 +63,7 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     lever.classList.remove("is-pulling", "is-returning");
     lever.classList.add("is-pulled");
     lever.style.removeProperty("--lever-angle");
+    lever.style.removeProperty("--lever-pull");
     lever.setAttribute("aria-label", "Printing travel ticket");
     if (status) status.textContent = "TRANSMISSION ENGAGED · PRINTING ROUTE TICKET";
 
@@ -111,7 +112,9 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     machine.classList.add("is-traveling");
     ticket.dataset.tearDirection = tearDirection;
     ticket.classList.add("is-torn");
-    ticket.closest<HTMLElement>(".arcanist-ticket-dispenser")?.classList.add("has-ticket-stub");
+    const dispenser = ticket.closest<HTMLElement>(".arcanist-ticket-dispenser");
+    dispenser?.classList.add("has-ticket-stub");
+    if (dispenser) dispenser.dataset.tearDirection = tearDirection;
     ticket.disabled = true;
     if (status) status.textContent = "TICKET ACCEPTED · ROUTE SEALED";
     shake(machine, 7.4);
@@ -205,7 +208,7 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
         startIssuance(active.machine, active.element);
       } else {
         active.element.classList.add("is-returning");
-        later(() => { active.element.style.removeProperty("--lever-angle"); active.element.classList.remove("is-returning"); }, 360);
+        later(() => { active.element.style.removeProperty("--lever-angle"); active.element.style.removeProperty("--lever-pull"); active.element.classList.remove("is-returning"); }, 360);
       }
       return;
     }
