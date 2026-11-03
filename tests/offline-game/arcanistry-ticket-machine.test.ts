@@ -1,11 +1,19 @@
 import { describe, expect, it } from "vitest";
 import {
+  ARCANISTRY_LEVER_PULL_DISTANCE,
   ARCANISTRY_MIN_LOADING_MS,
   ARCANISTRY_TICKET_TEAR_DISTANCE,
+  isArcanistryLeverEngaged,
   isArcanistryTicketTorn
 } from "../../src/offline-game/arcanistry-ticket-machine";
 
 describe("Arcanistry ticket interaction", () => {
+  it("requires a complete physical lever pull before issuing a ticket", () => {
+    expect(ARCANISTRY_LEVER_PULL_DISTANCE).toBe(43);
+    expect(isArcanistryLeverEngaged(42.9)).toBe(false);
+    expect(isArcanistryLeverEngaged(43)).toBe(true);
+  });
+
   it("requires a deliberate downward pull before the ticket tears", () => {
     expect(ARCANISTRY_TICKET_TEAR_DISTANCE).toBe(62);
     expect(isArcanistryTicketTorn(0)).toBe(false);
