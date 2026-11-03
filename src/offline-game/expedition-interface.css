@@ -522,3 +522,11 @@ body.eternal-choice-open{overflow:hidden}
 :root[data-theme="dark"] .expedition-idle-dialog p{color:#bdc1b0}
 :root[data-theme="dark"] .expedition-idle-status{border-color:#596653;background:#29342d;color:#d0b77e}
 @media(prefers-reduced-motion:reduce){.expedition-idle-trigger{transition:none}}
+
+
+/* World Navigation is an immersive Eternal Path surface: hide only the global app chrome while it is open. */
+.app-shell.is-idle-world>.app-header,
+.app-shell.is-idle-world>.bottom-nav,
+.app-shell.is-idle-world>.gravity-pull-cord{
+  display:none!important;
+}
