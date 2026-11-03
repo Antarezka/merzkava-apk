@@ -56,13 +56,12 @@ export function renderWorldMapHierarchy(): string {
     panelMarkup("world","Merzkava Universe","") + '</div></section>';
 }
 
-export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement): boolean {
+export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement, onAdvanceTime: (minutes: number) => void): boolean {
   const action = target.closest<HTMLElement>("[data-wmh-action],[data-wmh-region],[data-wmh-site],[data-wmh-building],[data-wmh-npc],[data-wmh-plot]");
   if (!action) return false;
   const overlay = root.querySelector<HTMLElement>("[data-world-map-hierarchy]");
   const dialog = overlay?.querySelector<HTMLElement>("[data-wmh-dialog]");
   if (!overlay || !dialog) return false;
-  const state = overlay as HTMLElement & { dataset: DOMStringMap };
   const current = (overlay.dataset.level as Level) || "world";
   const regionId = (overlay.dataset.region as RegionId) || "golden-dragon-empire";
   const building = overlay.dataset.building || "Tianhai Academy";
@@ -104,8 +103,8 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement)
     dialog.insertAdjacentHTML("beforeend", '<div class="wmh-toast">' + action.dataset.wmhPlot + ' · function details coming soon</div>'); return true;
   }
   if (action.dataset.wmhAction === "exit-local") {
+    onAdvanceTime(180);
     overlay.dataset.level = "regional"; dialog.innerHTML = panelMarkup("regional",regionId);
-    const clock = root.querySelector<HTMLElement>("[data-idle-calendar-time]"); if (clock) clock.dataset.timeNotice = "World time advances by 3 hours when leaving this complex.";
     return true;
   }
   return false;
