@@ -67,6 +67,8 @@ function finishDrag(event: PointerEvent): void {
   if (active.moved) {
     suppressNextClick = true;
     persistPosition();
+    // A cancelled synthetic click must not suppress the next deliberate tap.
+    window.setTimeout(() => { suppressNextClick = false; }, 450);
   }
   active.button.classList.remove("is-dragging");
   try {
