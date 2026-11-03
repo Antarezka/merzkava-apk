@@ -217,7 +217,7 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     machine.dataset.machineState = "ejecting-card";
     machine.classList.remove("has-ticket", "is-printing");
     machine.classList.add("is-traveling");
-    ticket.dataset.tearDirection = "center";
+    ticket.dataset.tearDirection = "down";
     const stub = ticket.cloneNode(true) as HTMLButtonElement;
     stub.className = "arcanist-ticket-stub";
     stub.removeAttribute("data-arcanistry-ticket");
@@ -229,8 +229,8 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     stub.style.removeProperty("--ticket-extension");
     stub.style.removeProperty("clip-path");
     ticket.parentElement?.appendChild(stub);
-    ticket.style.clipPath = "polygon(0 45%,16% 42%,34% 47%,52% 43%,72% 48%,88% 44%,100% 47%,100% 100%,0 100%)";
-    stub.style.clipPath = "polygon(0 0,100% 0,100% 47%,88% 44%,72% 48%,52% 43%,34% 47%,16% 42%,0 45%)";
+    ticket.style.clipPath = "polygon(0 0,16% 3%,34% 0,52% 4%,72% 1%,88% 5%,100% 2%,100% 100%,0 100%)";
+    stub.style.clipPath = "polygon(0 0,100% 0,100% 2%,88% 5%,72% 1%,52% 4%,34% 0,16% 3%,0 0)";
     ticket.classList.add("is-torn");
     ticket.disabled = true;
     status(machine, "TICKET TORN · TRAVEL CARD EJECTING");
@@ -336,7 +336,7 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     if (!activeTicket || activeTicket.pointerId !== event.pointerId) return;
     const distance = Math.max(0, Math.min(112, event.clientY - activeTicket.startY));
     activeTicket.distance = distance;
-    activeTicket.element.style.setProperty("--ticket-extension", Math.round(distance) + "px");
+    activeTicket.element.style.setProperty("--ticket-pull", Math.round(distance) + "px");
     activeTicket.element.classList.toggle("is-under-tension", distance >= ARCANISTRY_TICKET_TEAR_DISTANCE * .72);
     event.preventDefault();
   };
