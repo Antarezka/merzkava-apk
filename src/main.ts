@@ -530,9 +530,6 @@ function render(): void {
   </div>`;
   if (activeScreen === "offline-game") {
     initializeIdleTriggerDrag();
-    const destinationMenu=root.querySelector<HTMLElement>("[data-arcanist-drawer]");
-    const destinationHost=root.querySelector<HTMLElement>(".arcanist-index-slot");
-    if(destinationMenu&&destinationHost) destinationHost.append(destinationMenu);
   }
   translateRenderedContent(root, currentLanguage);
   // Preserve the rail's manual roulette offset and each independent mechanical dial angle across rerenders.
@@ -921,7 +918,7 @@ window.addEventListener("keydown", (event: KeyboardEvent) => {
 
 let activeArcanistDial:{element:HTMLElement;pointerId:number;lastAngle:number;turned:number}|null=null;
 function arcanistPointerAngle(element:HTMLElement,event:PointerEvent):number{const rect=element.getBoundingClientRect();return Math.atan2(event.clientY-(rect.top+rect.height/2),event.clientX-(rect.left+rect.width/2))*180/Math.PI;}
-root.addEventListener("pointerdown",event=>{const target=event.target;if(!(target instanceof Element))return;const rotor=target.closest<HTMLElement>("[data-arcanist-rotor]");if(!rotor||(event.pointerType==="mouse"&&event.button!==0))return;activeArcanistDial={element:rotor,pointerId:event.pointerId,lastAngle:arcanistPointerAngle(rotor,event),turned:0};try{rotor.setPointerCapture(event.pointerId);}catch{/* WebView fallback */}event.preventDefault();},{passive:false});
+root.addEventListener("pointerdown",event=>{const target=event.target;if(!(target instanceof Element))return;if(target.closest("[data-idle-place]"))return;const rotor=target.closest<HTMLElement>("[data-arcanist-rotor]");if(!rotor||(event.pointerType==="mouse"&&event.button!==0))return;activeArcanistDial={element:rotor,pointerId:event.pointerId,lastAngle:arcanistPointerAngle(rotor,event),turned:0};try{rotor.setPointerCapture(event.pointerId);}catch{/* WebView fallback */}event.preventDefault();},{passive:false});
 root.addEventListener("pointermove",event=>{const active=activeArcanistDial;if(!active||active.pointerId!==event.pointerId)return;const next=arcanistPointerAngle(active.element,event);let delta=next-active.lastAngle;if(delta>180)delta-=360;if(delta< -180)delta+=360;active.lastAngle=next;if(delta>0.15){active.turned=Math.min(135,active.turned+delta);active.element.style.setProperty("--dial-angle",active.turned+"deg");active.element.setAttribute("aria-valuenow",String(Math.round(active.turned)));active.element.closest<HTMLElement>("[data-arcanist-device]")?.classList.add("is-turning");playClockworkRatchet();suppressNextPointerClick=true;}event.preventDefault();},{passive:false});
 function finishArcanistDial(event:PointerEvent,cancelled=false):void{const active=activeArcanistDial;if(!active||active.pointerId!==event.pointerId)return;activeArcanistDial=null;try{if(active.element.hasPointerCapture(event.pointerId))active.element.releasePointerCapture(event.pointerId);}catch{/* already released */}const completed=!cancelled&&active.turned>=108;const sceneId=active.element.dataset.sceneId??"";active.element.style.setProperty("--dial-angle","0deg");active.element.setAttribute("aria-valuenow","0");active.element.closest<HTMLElement>("[data-arcanist-device]")?.classList.remove("is-turning");if(completed&&sceneId){playNavigationTick();setEternalLocation(sceneId);const drawer=root.querySelector<HTMLElement>("[data-arcanist-device]");if(drawer)drawer.hidden=true;root.querySelector<HTMLButtonElement>("[data-arcanist-pull]")?.setAttribute("aria-expanded","false");notice=sceneId==="gde-academy"?"Arrived at the Academy.":"Returned to the Imperial Capital.";render();}else if(active.turned>3){playNavigationTick();}}
 root.addEventListener("pointerup",event=>finishArcanistDial(event),{passive:true});
@@ -967,26 +964,26 @@ root.addEventListener("click", async (event: MouseEvent) => {
     if(placeNote) placeNote.textContent="Select a place from the index or directly on the map.";
     const routeStatus=root.querySelector<HTMLElement>("[data-arcanist-route-status]");if(routeStatus)routeStatus.textContent="PREVIEW ONLY";
     const rotor=root.querySelector<HTMLElement>("[data-arcanist-rotor]");if(rotor)delete rotor.dataset.sceneId;
-    const destinationList=root.querySelector<HTMLElement>("[data-idle-destination-list]");
-    if(destinationList&&activePanel){
-      destinationList.replaceChildren();
-      const mapMarkers=Array.from(activePanel.querySelectorAll<HTMLButtonElement>("[data-idle-place]"));
-      mapMarkers.forEach((marker,index)=>{
-        const option=document.createElement("button");
-        option.type="button";
-        option.className="idle-destination-option";
-        option.dataset.idlePlace=marker.dataset.idlePlace??"";
-        option.dataset.idleGroup="regional";
-        option.dataset.regionId=regionId;
-        option.dataset.idleNote=marker.dataset.idleNote??"";
-        const number=document.createElement("span"); number.className="idle-destination-index"; number.textContent=String(index+1).padStart(2,"0");
-        const symbol=document.createElement("span"); symbol.className="idle-destination-symbol"; symbol.textContent=marker.querySelector("span")?.textContent??"◇";
-        const name=document.createElement("span"); name.className="idle-destination-name"; name.textContent=marker.querySelector("small")?.textContent?.trim()??"Destination";
-        const arrow=document.createElement("span"); arrow.className="idle-destination-arrow"; arrow.textContent="›";
-        option.append(number,symbol,name,arrow); destinationList.append(option);
+    const rotor=root.querySelector<HTMLElement>("[data-arcanist-rotor]");
+    if(rotor&&activePanel){
+      rotor.querySelectorAll(".arcanist-dial-aperture[data-idle-group='regional']").forEach(node=>node.remove());
+      const regionalMarkers=Array.from(activePanel.querySelectorAll<HTMLButtonElement>("[data-idle-place]"));
+      const total=regionalMarkers.length+rotor.querySelectorAll(".arcanist-dial-aperture[data-idle-group='global']").length;
+      regionalMarkers.forEach((marker,index)=>{
+        const aperture=document.createElement("button");
+        aperture.type="button";aperture.className="arcanist-dial-aperture"+(index===0?" is-selected":"");
+        aperture.dataset.idlePlace=marker.dataset.idlePlace??"";
+        aperture.dataset.idleGroup="regional";aperture.dataset.regionId=regionId??"";
+        aperture.dataset.idleNote=marker.dataset.idleNote??"";
+        aperture.style.setProperty("--hole-angle",(360/total*index)+"deg");
+        const symbol=document.createElement("span");symbol.textContent=marker.querySelector("span")?.textContent??"◇";
+        const label=document.createElement("small");label.textContent=marker.querySelector("small")?.textContent?.trim()??"Place";
+        aperture.append(symbol,label);rotor.append(aperture);
       });
-      const count=root.querySelector<HTMLElement>("[data-idle-destination-count]");
-      if(count) count.textContent=String(mapMarkers.length).padStart(2,"0")+" LOCATIONS";
+      rotor.querySelectorAll<HTMLElement>(".arcanist-dial-aperture[data-idle-group='global']").forEach((aperture,index)=>{
+        aperture.style.setProperty("--hole-angle",(360/total*(regionalMarkers.length+index))+"deg");
+      });
+      delete rotor.dataset.sceneId;
     }
     return;
   }
