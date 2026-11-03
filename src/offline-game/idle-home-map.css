@@ -47,3 +47,24 @@
 @media(max-height:620px){.idle-home-header{padding-bottom:5px}.idle-map-stage{min-height:180px}.idle-destination-drawer{padding:5px 0 2px}.idle-coming-panel{padding:6px;margin-top:4px}.idle-home-footer{padding-top:4px}}
 @media(max-width:360px){.idle-home-dialog{padding-left:8px;padding-right:8px}.idle-map-marker{min-width:38px;padding:3px}.idle-map-marker small{font-size:6px}}
 @media(prefers-reduced-motion:reduce){.idle-map-marker{transition:none}}
+
+
+/* Persona 4-inspired angular calendar rail; Merzkava ornamental treatment. */
+.idle-map-stage{isolation:isolate}
+.idle-calendar-hud{position:absolute;z-index:8;top:8px;right:9px;width:min(194px,58%);min-height:67px;padding:8px 9px 7px;color:#f0e4cf;background:linear-gradient(105deg,#171a18dc,#24221cdd 72%,#171916e8);border:1px solid #c4a16a55;clip-path:polygon(7% 0,100% 0,100% 100%,0 100%,0 28%);box-shadow:0 4px 14px #080b0a66;backdrop-filter:blur(3px)}
+.idle-calendar-rail{position:absolute;left:0;right:0;top:-1px;width:100%;height:24px;overflow:visible;fill:none;stroke:#d0ad72;stroke-width:1.5;stroke-linecap:square;stroke-linejoin:miter;opacity:.95}
+.idle-calendar-rail-inner{stroke:#8d754f;stroke-width:.8}
+.idle-calendar-ticks{stroke:#e5c991;stroke-width:1}
+.idle-calendar-data{position:relative;display:flex;align-items:center;justify-content:space-between;gap:7px;padding-top:14px}
+.idle-calendar-day{display:grid;grid-template-columns:auto auto;align-items:baseline;column-gap:4px}
+.idle-calendar-day-label{font:700 7px/1 system-ui,sans-serif;letter-spacing:.17em;color:#c9a76f}
+.idle-calendar-day strong{font:700 18px/.9 Georgia,serif;color:#f2dfbd;letter-spacing:.04em}
+.idle-calendar-weekday{grid-column:1/-1;margin-top:3px;font:600 7px/1 system-ui,sans-serif;letter-spacing:.16em;color:#b9aa91}
+.idle-calendar-time{display:grid;justify-items:end;gap:3px}
+.idle-calendar-time>strong{font:400 17px/.9 Georgia,serif;letter-spacing:.035em;color:#f0d7a5;font-variant-numeric:tabular-nums}
+.idle-calendar-cycle{display:flex;align-items:center;gap:3px;font:600 6px/1 system-ui,sans-serif;letter-spacing:.12em;color:#d5b77f}
+.idle-calendar-cycle i{font-style:normal;font-size:11px;line-height:8px}
+.idle-calendar-icons{position:absolute;right:7px;bottom:-12px;display:flex;gap:4px}
+.idle-calendar-icons span{display:grid;place-items:center;width:13px;height:13px;border:1px solid #b99a66;background:#25251f;color:#d9bd88;font:8px Georgia,serif}
+.idle-map-compass{left:10px;right:auto;top:10px}
+@media(max-width:360px){.idle-calendar-hud{width:min(174px,57%);right:6px;top:6px;padding:7px 7px 6px}.idle-calendar-time>strong{font-size:15px}.idle-calendar-day strong{font-size:16px}.idle-calendar-icons{right:5px}}
