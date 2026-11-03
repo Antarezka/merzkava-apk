@@ -110,7 +110,7 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     later(() => shake(machine, 3.1), 230);
     lever.classList.add("is-returning");
     later(() => {
-      lever.style.removeProperty("--lever-angle");
+      lever.querySelector<HTMLElement>(".arcanist-lever-arm")?.style.removeProperty("--lever-angle");
       lever.style.removeProperty("--lever-pull");
       lever.classList.remove("is-returning", "is-pulling");
       machine.dataset.machineState = "idle";
@@ -187,7 +187,7 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
       machine.classList.remove("is-running");
       lever.classList.remove("is-pulled");
       lever.classList.add("is-returning");
-      lever.style.removeProperty("--lever-angle");
+      lever.querySelector<HTMLElement>(".arcanist-lever-arm")?.style.removeProperty("--lever-angle");
       lever.style.removeProperty("--lever-pull");
       lever.disabled = true;
       later(() => lever.classList.remove("is-returning"), 620);
@@ -215,8 +215,7 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     stub.disabled = true;
     stub.hidden = false;
     stub.style.removeProperty("--ticket-pull");
-    stub.style.removeProperty("--ticket-stretch");
-    stub.style.removeProperty("--ticket-lean");
+    stub.style.removeProperty("--ticket-extension");
     stub.style.removeProperty("clip-path");
     ticket.parentElement?.appendChild(stub);
     ticket.style.clipPath = "polygon(0 45%,16% 42%,34% 47%,52% 43%,72% 48%,88% 44%,100% 47%,100% 100%,0 100%)";
@@ -285,7 +284,7 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     }
     const ticket = target.closest<HTMLButtonElement>("[data-arcanistry-ticket]");
     if (ticket && event.detail === 0 && machine.dataset.machineState === "ticket-ready") {
-      tearTicket(ticket, ARCANISTRY_TICKET_TEAR_DISTANCE, 0);
+      tearTicket(ticket, ARCANISTRY_TICKET_TEAR_DISTANCE);
     }
   };
 
