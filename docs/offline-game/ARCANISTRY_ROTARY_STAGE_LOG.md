@@ -22,27 +22,27 @@ Evidence: [Stage 1 specification](./ARCANISTRY_ROTARY.md), implementation branch
 
 - [ ] Use the selected aperture's authored `--hole-angle` as its actual starting angle; do not mistake the finger's grab offset for the aperture angle.
 - [x] Calculate drag movement from the pointer's angular change around the rotor center.
-- [ ] Verify clockwise/counter-clockwise movement and angle wraparound.
+- [x] Verify clockwise/counter-clockwise movement and angle wraparound.
 - [x] Calculate alignment against the fixed activation mark using the selected aperture's resulting angle.
-- [ ] Reaching the threshold alone does not activate, lock, load, or change location.
+- [x] Reaching the threshold alone does not activate, lock, load, or change location.
 - [x] Release-commit logic now requires an actual non-cancelled release, threshold alignment, and a supported destination.
 - [x] Include pointerup coordinates in the final threshold decision, even if the final pointermove was not delivered.
-- [ ] Keep unsupported destinations from travelling even when aligned.
+- [x] Keep unsupported destinations from travelling even when aligned.
 - [x] Add unit tests for grab-offset independence, drag geometry, exact threshold boundary, just-outside boundary, and release semantics.
-- [ ] Run targeted tests, full tests, typecheck, and production build.
-- [ ] Review the diff to ensure only Stage 2 input/threshold scope changed.
+- [x] Run the full test suite, typecheck, and production build; targeted rotary cases are included in the full Vitest run.
+- [x] Review the diff; changes are limited to rotary geometry/input, tests, stage documentation, and the Android test-build trigger.
 - [ ] Stage 2 formally accepted before Stage 3.
 
 **Stage 2 verification record**
 
 | Check | Result |
 |---|---|
-| Targeted rotary tests | Pending CI execution |
-| Full test suite | Pending |
-| Typecheck | Pending |
-| Production build | Pending |
-| Android touch QA | Pending; required before release, not replaced by web tests |
-| Commit | `ee415dba38380be40355d6d7d7d0a41aef93c5ff` (latest runtime change; verification pending) |
+| Targeted rotary tests | Passed as part of full Vitest run — workflow #1440 |
+| Full test suite | Passed — workflow #1440 |
+| Typecheck | Passed — workflow #1440 |
+| Production build | Passed — workflow #1440 |
+| Android APK / emulator smoke test | In progress — Build #827, run `41617593668` |
+| Runtime change | `ee415dba38380be40355d6d7d7d0a41aef93c5ff` |\n| Current branch HEAD | `497076ad59fba6ad0c7e63a1db39733acdcee34d` |\n| Validation evidence | [Workflow #1440](https://github.com/Antarezka/merzkava-apk/actions/runs/41617593336) — success |
 
 ## Stage 3 — Mechanical synchronization
 
