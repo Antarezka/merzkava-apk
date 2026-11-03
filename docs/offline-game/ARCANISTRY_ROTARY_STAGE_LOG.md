@@ -4,7 +4,7 @@ This file records explicit stage acceptance and implementation evidence. Work is
 
 ## Stage 1 — Audit and specification
 
-<badge>Owner-approved in chat, 2026-11-03</badge>
+**Accepted by owner in chat:** 2026-11-03
 
 - [x] Read the forbidden-technology policy and Android PixiJS incident record.
 - [x] Read the existing Anime.js animation-system rules.
@@ -18,17 +18,17 @@ Evidence: [Stage 1 specification](./ARCANISTRY_ROTARY.md), implementation branch
 
 ## Stage 2 — Input geometry and activation threshold
 
-**Status:** In progress. Do not begin Stage 3 until every item below passes.
+**Status:** In progress. Input geometry code and unit coverage have been updated; verification is pending. Do not begin Stage 3 until every item below passes.
 
 - [ ] Use the selected aperture's authored `--hole-angle` as its actual starting angle; do not mistake the finger's grab offset for the aperture angle.
-- [ ] Calculate drag movement from the pointer's angular change around the rotor center.
+- [x] Calculate drag movement from the pointer's angular change around the rotor center.
 - [ ] Verify clockwise/counter-clockwise movement and angle wraparound.
-- [ ] Calculate alignment against the fixed activation mark using the selected aperture's resulting angle.
+- [x] Calculate alignment against the fixed activation mark using the selected aperture's resulting angle.
 - [ ] Reaching the threshold alone does not activate, lock, load, or change location.
-- [ ] Releasing inside the threshold commits success once; releasing outside or cancelling does not.
-- [ ] Include the pointerup coordinates in the final threshold decision, even if the final pointermove was not delivered.
+- [x] Release-commit logic now requires an actual non-cancelled release, threshold alignment, and a supported destination.
+- [x] Include pointerup coordinates in the final threshold decision, even if the final pointermove was not delivered.
 - [ ] Keep unsupported destinations from travelling even when aligned.
-- [ ] Add unit tests for grab-offset independence, drag geometry, exact threshold boundary, just-outside boundary, and release semantics.
+- [x] Add unit tests for grab-offset independence, drag geometry, exact threshold boundary, just-outside boundary, and release semantics.
 - [ ] Run targeted tests, full tests, typecheck, and production build.
 - [ ] Review the diff to ensure only Stage 2 input/threshold scope changed.
 - [ ] Stage 2 formally accepted before Stage 3.
@@ -37,12 +37,12 @@ Evidence: [Stage 1 specification](./ARCANISTRY_ROTARY.md), implementation branch
 
 | Check | Result |
 |---|---|
-| Targeted rotary tests | Pending |
+| Targeted rotary tests | Pending CI execution |
 | Full test suite | Pending |
 | Typecheck | Pending |
 | Production build | Pending |
 | Android touch QA | Pending; required before release, not replaced by web tests |
-| Commit | Pending |
+| Commit | `ee415dba38380be40355d6d7d7d0a41aef93c5ff` (latest runtime change; verification pending) |
 
 ## Stage 3 — Mechanical synchronization
 
