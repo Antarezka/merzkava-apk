@@ -7,6 +7,7 @@ import { getGameplaySessionRecord, initializeDatabase, saveGameplaySessionRecord
 import { createCharacter, deleteCharacter, listCharacters, type Character } from "./convo/characters/character-repository";
 import { validateCharacterDraft } from "./convo/engine/character-validation";
 import { renderScreen, type ScreenId } from "./app/screens";
+import { initializeIdleTriggerDrag } from "./offline-game/idle-trigger-drag";
 import { animateExpeditionChoiceModal, animateExpeditionPanel, mountExpeditionAnimations } from "./offline-game/expedition-animations";
 import { deleteEternalSave, exportEternalSave, importEternalSave, loadEternalSave, renameEternalSave, resetEternalGame, resolveEternalSituationChoice, startEternalGame, unloadEternalGame, type EternalRegion } from "./offline-game/expedition-game";
 import { getCanonIndex, getCanonStatus, loadCanonModule, loadPlayerRegistry, loadRegisteredPlayerProfile, refreshCanon, refreshLatestPlayerRegistry, type CanonDocument } from "./convo/canon/canon-loader";
@@ -304,6 +305,7 @@ function renderChat(): void {
       field("Background", character.background || "—") +
       '</dl></details><details><summary>INV & KEUANGAN</summary><p>Inventory: ' + escapeHtml(profileValue(currentProfile, "Inventory")) + '</p><p>Assets Bangunan: ' + escapeHtml(profileValue(currentProfile, "Assets Bangunan")) + '</p><p>Wallet (wealth): ' + escapeHtml(profileValue(currentProfile, "Wallet (wealth)", "Belum diverifikasi · xc | xs | xg | zj | az")) + '</p></details><details><summary>TEKNIK & TUJUAN</summary><p>Teknik / Kemampuan: ' + escapeHtml(profileValue(currentProfile, "Teknik / Kemampuan")) + '</p><p>Tujuan Saat Ini: ' + escapeHtml(profileValue(currentProfile, "Tujuan Saat Ini")) + '</p></details><details><summary>CATATAN PEMAIN & KONSISTENSI</summary><p>' + (currentProfile ? "Nilai terakhir berasal dari respons GM dan masih menunggu verifikasi mekanik serta persetujuan pemain." : "Belum ada profil gameplay dari GM. Aplikasi tidak mengarang atau mengubah nilai yang belum diverifikasi.") + '</p></details>'
     : "Pilih karakter untuk melihat catatan lokalnya.";
+  initializeIdleTriggerDrag();
   translateRenderedContent(root, currentLanguage);
 }
 
