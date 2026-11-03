@@ -16,7 +16,7 @@ type TravelHandler = (sceneId: string) => void | Promise<void>;
 
 export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: TravelHandler): () => void {
   const timers = new Set<number>();
-  let activeTicket: { element: HTMLButtonElement; pointerId: number; startY: number; distance: number } | null = null;
+  let activeTicket: { element: HTMLButtonElement; pointerId: number; startX: number; startY: number; distance: number } | null = null;
   let activeLever: { element: HTMLButtonElement; machine: HTMLElement; pointerId: number; startY: number; distance: number } | null = null;
   let disposed = false;
 
@@ -95,7 +95,7 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     }, 1480);
   };
 
-  const tearTicket = async (ticket: HTMLButtonElement, distance: number): Promise<void> => {
+  const tearTicket = async (ticket: HTMLButtonElement, distance: number, tearDirection: "left-to-right" | "right-to-left" | "center" = "center"): Promise<void> => {
     const machine = ticket.closest<HTMLElement>("[data-arcanistry-machine]");
     if (!machine || machine.dataset.machineState !== "ticket-ready") return;
     if (!isArcanistryTicketTorn(distance)) return;
@@ -109,7 +109,9 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     machine.dataset.machineState = "traveling";
     machine.classList.remove("has-ticket", "is-printing");
     machine.classList.add("is-traveling");
+    ticket.dataset.tearDirection = tearDirection;
     ticket.classList.add("is-torn");
+    ticket.closest<HTMLElement>(".arcanist-ticket-dispenser")?.classList.add("has-ticket-stub");
     ticket.disabled = true;
     if (status) status.textContent = "TICKET ACCEPTED · ROUTE SEALED";
     shake(machine, 7.4);
@@ -152,7 +154,7 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     }
     const ticket = target.closest<HTMLButtonElement>("[data-arcanistry-ticket]");
     if (ticket && event.detail === 0 && ticket.closest<HTMLElement>("[data-arcanistry-machine]")?.dataset.machineState === "ticket-ready") {
-      void tearTicket(ticket, ARCANISTRY_TICKET_TEAR_DISTANCE);
+      void tearTicket(ticket, ARCANISTRY_TICKET_TEAR_DISTANCE, "center");
     }
   };
 
@@ -170,7 +172,7 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     const ticket = target.closest<HTMLButtonElement>("[data-arcanistry-ticket]");
     const machine = ticket?.closest<HTMLElement>("[data-arcanistry-machine]");
     if (!ticket || !machine || ticket.hidden || machine.dataset.machineState !== "ticket-ready") return;
-    activeTicket = { element: ticket, pointerId: event.pointerId, startY: event.clientY, distance: 0 };
+    activeTicket = { element: ticket, pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, distance: 0 };
     try { ticket.setPointerCapture(event.pointerId); } catch { /* WebView fallback */ }
     event.preventDefault();
   };
@@ -179,7 +181,8 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     if (activeLever && activeLever.pointerId === event.pointerId) {
       const distance = Math.max(0, Math.min(58, event.clientY - activeLever.startY));
       activeLever.distance = distance;
-      activeLever.element.style.setProperty("--lever-angle", (distance * .82) + "deg");
+      activeLever.element.style.setProperty("--lever-angle", (distance * .48) + "deg");
+      activeLever.element.style.setProperty("--lever-pull", (distance * .18) + "px");
       activeLever.element.classList.toggle("is-pulling", distance > 2);
       event.preventDefault();
       return;
@@ -214,7 +217,11 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     } catch { /* already released */ }
     const machine = active.element.closest<HTMLElement>("[data-arcanistry-machine]");
     if (!cancelled && isArcanistryTicketTorn(active.distance)) {
-      void tearTicket(active.element, active.distance);
+      const rect = active.element.getBoundingClientRect();
+      const fingerOffset = active.startX - (rect.left + rect.width / 2);
+      const bias = Math.max(-1, Math.min(1, fingerOffset / (rect.width * .42)));
+      const direction = bias < -.12 ? "left-to-right" : bias > .12 ? "right-to-left" : "center";
+      void tearTicket(active.element, active.distance, direction);
       return;
     }
     active.element.classList.remove("is-under-tension");
