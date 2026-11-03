@@ -19,6 +19,7 @@ export function renderExpeditionInterface():string {
     <div class="expedition-light-rays" aria-hidden="true"><img class="expedition-light-rays-image" src="/game/scenery/shared/fx-05-volumetric-light-rays.png" alt="" /></div>
     <div class="expedition-weather-layer" aria-hidden="true"></div>
     <div class="expedition-rain-streaks" aria-hidden="true"><img class="expedition-rain-streak-image" src="/game/scenery/shared/fx-06-rain-streaks.png" alt="" /></div>
+    <div class="expedition-rain-glass" aria-hidden="true"><img class="expedition-rain-glass-image" src="/game/scenery/shared/fx-06-rain-glass.png" alt="" /></div>
     <div class="expedition-snow-texture" aria-hidden="true"><img src="/game/scenery/shared/fx-07a-floating-snow.png" alt="" /></div>
     <div class="expedition-petal-texture" aria-hidden="true"><img src="/game/scenery/shared/fx-07b-floating-petals.png" alt="" /></div>
     <div class="expedition-leaf-texture" aria-hidden="true"><img src="/game/scenery/shared/fx-07c-floating-autumn-leaves.png" alt="" /></div>

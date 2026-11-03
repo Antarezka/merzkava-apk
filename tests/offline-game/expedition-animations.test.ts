@@ -25,6 +25,7 @@ function makeSceneRoot(weather="Clear",cycle="Morning",state="test-"+Math.random
     ".expedition-light-rays":{},
     ".expedition-light-rays-image":{},
     ".expedition-rain-streak-image":{},
+     ".expedition-rain-glass-image":{},
     ".expedition-snow-texture":{},
     ".expedition-window-frost-image":{},
     ".expedition-petal-texture":{},

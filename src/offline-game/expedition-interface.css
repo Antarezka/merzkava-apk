@@ -208,7 +208,7 @@ body.eternal-choice-open{overflow:hidden}
 /* Uploaded FX image plates. All compositing stays clipped to the Scene Window. */
 .expedition-sun-glow,.expedition-moon-glow{inset:0;top:0;right:0;width:auto;aspect-ratio:auto;overflow:hidden;background:none}
 .expedition-sun-glow-image,.expedition-moon-glow-image,.expedition-light-rays-image,
-.expedition-rain-streak-image,.expedition-snow-texture img,.expedition-petal-texture img,
+.expedition-rain-streak-image,.expedition-rain-glass-image,.expedition-snow-texture img,.expedition-petal-texture img,
 .expedition-leaf-texture img,.expedition-lightning-flash-image,.expedition-window-frost-image{
   position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover;pointer-events:none;
   mix-blend-mode:screen;
@@ -223,6 +223,9 @@ body.eternal-choice-open{overflow:hidden}
 .expedition-rain-streaks{z-index:4.5}
 .expedition-snow-texture,.expedition-petal-texture,.expedition-leaf-texture{z-index:4.6}
 .expedition-environment[data-weather="Rain"] .expedition-rain-streaks{opacity:.68}
+.expedition-rain-glass{position:absolute;z-index:7.5;inset:0;overflow:hidden;pointer-events:none;mix-blend-mode:screen;opacity:0}
+.expedition-environment[data-weather="Rain"] .expedition-rain-glass{opacity:.78}
+.expedition-rain-glass-image{opacity:.88;filter:saturate(.92) contrast(1.04)}
 .expedition-environment[data-weather="Snow"] .expedition-snow-texture{opacity:.62}
 .expedition-environment[data-cycle="Dawn"]:not([data-weather="Snow"]):not([data-weather="Rain"]) .expedition-petal-texture{opacity:.48}
 .expedition-environment[data-cycle="Dusk"]:not([data-weather="Snow"]):not([data-weather="Rain"]) .expedition-leaf-texture{opacity:.48}

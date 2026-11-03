@@ -58,6 +58,7 @@ function playSceneBeat(root: HTMLElement, particles: HTMLElement[], onAnimation:
 
   if (weather === "Rain") {
     run(root.querySelector(".expedition-rain-streak-image"), { translateY: ["-2%", "4%"], translateX: ["1%", "-1%"], opacity: [.45, .8], duration: 1050, ease: "linear" });
+    run(root.querySelector(".expedition-rain-glass-image"), { translateY: ["-.25%", ".25%"], translateX: ["-.18%", ".18%"], scale: [1.005, 1.015], opacity: [.68, .88], duration: 1250, ease: "inOutSine" });
     if (particles.length) run(particles, { translateY: ["-24px", "360px"], translateX: (_: unknown, i: number) => ((((i ?? 0) % 5) - 2) * 13) + "px", opacity: [0, .72, 0], duration: 1050, delay: stagger(24), ease: "linear" });
     const flash = root.querySelector<HTMLElement>(".expedition-lightning-layer");
     const flashImage = root.querySelector<HTMLImageElement>(".expedition-lightning-flash-image");
