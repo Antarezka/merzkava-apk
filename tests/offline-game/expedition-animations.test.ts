@@ -5,7 +5,8 @@ const mocks = vi.hoisted(() => {
   return { animate: vi.fn(), createScope: vi.fn(() => scope), scope, stagger: vi.fn((value:number)=>value) };
 });
 vi.mock("animejs",()=>({animate:mocks.animate,createScope:mocks.createScope,stagger:mocks.stagger}));
-import { animateExpeditionChoiceModal, mountExpeditionAnimations } from "../../src/offline-game/expedition-animations";
+let animateExpeditionChoiceModal: typeof import("../../src/offline-game/expedition-animations")["animateExpeditionChoiceModal"];
+let mountExpeditionAnimations: typeof import("../../src/offline-game/expedition-animations")["mountExpeditionAnimations"];
 
 function makeSceneRoot(weather="Clear",cycle="Morning",state="test-"+Math.random()) {
   const scene:any={dataset:{weather,cycle,location:"test-location",animationState:state},setAttribute:vi.fn(),addEventListener:vi.fn(),removeEventListener:vi.fn()};
@@ -43,7 +44,11 @@ function makeSceneRoot(weather="Clear",cycle="Morning",state="test-"+Math.random
 }
 
 describe("Eternal Path event-driven Anime.js motion",()=>{
- beforeEach(()=>{
+ beforeEach(async()=>{
+  vi.resetModules();
+  const animationModule = await import("../../src/offline-game/expedition-animations");
+  animateExpeditionChoiceModal = animationModule.animateExpeditionChoiceModal;
+  mountExpeditionAnimations = animationModule.mountExpeditionAnimations;
   vi.clearAllMocks();
   Object.defineProperty(globalThis, "document", { configurable: true, value: { createElement: vi.fn(() => ({ className: "", style: { left: "", top: "", setProperty: vi.fn() } })) } });
   Object.defineProperty(globalThis, "window", { configurable: true, value: { matchMedia: vi.fn(() => ({ matches: false })) } });
