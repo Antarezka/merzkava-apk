@@ -1024,7 +1024,8 @@ function finishArcanistDial(event:PointerEvent,cancelled=false):void{
   if(Math.abs(active.turned)>3)playNavigationTick();
   window.setTimeout(()=>{
    active.element.querySelectorAll<HTMLElement>(".arcanist-dial-aperture").forEach(aperture=>{
-    aperture.style.setProperty("--hole-inset","96px");aperture.style.setProperty("--hole-scale","1");aperture.style.setProperty("--hole-opacity","1");
+    const radius=parseFloat(getComputedStyle(aperture).getPropertyValue("--hole-radius"))||96;
+    aperture.style.setProperty("--hole-inset",radius+"px");aperture.style.setProperty("--hole-scale","1");aperture.style.setProperty("--hole-opacity","1");
    });
    active.element.querySelectorAll<HTMLElement>(".arcanist-red-thread").forEach(thread=>thread.style.strokeDashoffset="350px");
    device?.classList.remove("is-returning");
