@@ -478,7 +478,8 @@ body.eternal-choice-open{overflow:hidden}
   left:50%!important;
   right:auto!important;
   bottom:auto!important;
-  transform:translate(-50%,-50%);
+  /* Anime.js animates transform: keep centering on the independent CSS translate property. */
+  translate:-50% -50%;
   width:min(420px,calc(100vw - 24px));
   max-height:min(78dvh,620px);
   overflow:auto;
