@@ -20,8 +20,11 @@ export function rotaryPointerDelta(previous:number,next:number):number {
 }
 
 /** Other apertures close progressively as the selected aperture approaches the activation mark. */
-export function rotaryActivationProgress(angle:number,target=ARCANISTRY_ACTIVATION_ANGLE):number {
-  return Math.max(0,Math.min(1,1-rotaryAngularDistance(angle,target)/180));
+export function rotaryActivationProgress(angle:number,target=ARCANISTRY_ACTIVATION_ANGLE,startAngle=target+180):number {
+  const startingDistance=rotaryAngularDistance(startAngle,target);
+  const currentDistance=rotaryAngularDistance(angle,target);
+  if(startingDistance===0) return currentDistance===0?1:0;
+  return Math.max(0,Math.min(1,(startingDistance-currentDistance)/startingDistance));
 }
 
 export function isRotaryAligned(angle:number,target=ARCANISTRY_ACTIVATION_ANGLE,tolerance=ARCANISTRY_ACTIVATION_TOLERANCE):boolean {
