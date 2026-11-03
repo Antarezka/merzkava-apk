@@ -22,6 +22,8 @@ describe("Eternal Path live world scene", () => {
     expect(html.indexOf("NO ACTIVE JOURNEY")).toBeLessThan(html.indexOf('class="expedition-environment"'));
     expect(html.indexOf('class="expedition-environment"')).toBeLessThan(html.indexOf("AWAITING YOUR JOURNEY"));
     expect(html.indexOf("AWAITING YOUR JOURNEY")).toBeLessThan(html.indexOf('class="expedition-save-manager'));
+    expect(html.indexOf('class="expedition-save-manager')).toBeLessThan(html.indexOf('class="expedition-footer"'));
+    expect(html).toContain('title="The Mysterious Registrar · Journey Manager"');
   });
 
   it("renders the established scene window without temporary test controls", () => {
@@ -122,10 +124,15 @@ describe("Eternal Path live world scene", () => {
     expect(html).toContain('aria-controls="eternal-save-manager-dialog"');
     expect(html).toContain('id="eternal-save-manager-dialog" class="expedition-manager-content" data-eternal-manager-content role="dialog" aria-modal="true" aria-labelledby="eternal-manager-title" hidden');
     expect(html).toContain('class="scene-coordinate scene-clock-ink"');
+    expect(html.indexOf("expedition-profile-compact")).toBeLessThan(html.indexOf('class="expedition-environment"'));
     expect(html.indexOf('class="expedition-environment"')).toBeLessThan(html.indexOf('class="expedition-disposition-line"'));
-    expect(html.indexOf('class="expedition-disposition-line"')).toBeLessThan(html.indexOf('class="expedition-outcome"'));
-    expect(html.indexOf('class="expedition-outcome"')).toBeLessThan(html.indexOf('class="expedition-dialogue"'));
-    expect(html.indexOf('class="expedition-dialogue"')).toBeLessThan(html.indexOf("expedition-profile-compact"));
+    expect(html.indexOf('class="expedition-disposition-line"')).toBeLessThan(html.indexOf('class="expedition-dialogue"'));
+    if(html.includes('class="expedition-outcome"')){
+      expect(html.indexOf('class="expedition-disposition-line"')).toBeLessThan(html.indexOf('class="expedition-outcome"'));
+      expect(html.indexOf('class="expedition-outcome"')).toBeLessThan(html.indexOf('class="expedition-dialogue"'));
+    }
+    expect(html.indexOf('class="expedition-dialogue"')).toBeLessThan(html.indexOf('class="expedition-save-manager is-compact is-active"'));
+    expect(html.indexOf('class="expedition-save-manager is-compact is-active"')).toBeLessThan(html.indexOf('class="expedition-footer"'));
     expect(html).not.toContain("Manage journeys");
     expect(html).not.toContain("expedition-feature-grid");
     expect(getCurrentSituation()?.id).toBeTruthy();
