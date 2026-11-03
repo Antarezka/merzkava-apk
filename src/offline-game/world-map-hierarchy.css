@@ -10,7 +10,7 @@
 .wmh-world-map{position:relative;flex:1;min-height:420px;margin:12px 0;background:radial-gradient(ellipse at 50% 45%,#536b58,#18251e 70%);border:1px solid #a78b5e;overflow:hidden;display:flex;align-items:center;justify-content:center}
 .wmh-world-map img{height:100%;max-height:620px;max-width:78%;object-fit:contain;filter:drop-shadow(0 8px 12px #0008)}
 .wmh-power{position:absolute;display:flex;align-items:center;gap:6px;padding:7px 9px;border:1px solid #e0c38d;background:#18221de8;color:#f5e5c6;box-shadow:0 3px 10px #0008;font-size:9px;touch-action:manipulation}
-.wmh-power b{color:#e8c27f}.wmh-power-gde{left:3%;top:20%}.wmh-power-ty{right:2%;top:52%}.wmh-power-bg{left:3%;bottom:14%}
+.wmh-power b{color:#e8c27f}.wmh-power{transform:translate(-50%,-50%)}.wmh-power-gde,.wmh-power-ty,.wmh-power-bg{right:auto;bottom:auto}
 .wmh-bottom-actions{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0;color:#c6b18b;font-size:8px;letter-spacing:.1em}
 .wmh-bottom-actions button,.wmh-local-footer button{border:1px solid #b89964;background:#29372e;color:#f2dfbb;padding:9px;font-size:9px}
 .wmh-region-scene,.wmh-local-scene{position:relative;min-height:190px;flex:1;margin:12px 0;overflow:hidden;border:1px solid #aa8b59;background:#25382d}
@@ -39,3 +39,27 @@
 .wmh-dialogue small{color:#d9b978;font-size:8px;letter-spacing:.14em}.wmh-dialogue p{margin:5px 0 0;font:13px/1.35 Georgia,serif}.wmh-dialogue button{margin-left:auto;align-self:flex-start;background:transparent;border:0;color:#f2dfbd;font-size:20px}
 .wmh-toast{position:sticky;bottom:0;margin-top:8px;padding:10px;background:#111914;border:1px solid #b99a66;color:#f3dfb9;font-size:11px}
 @media(max-width:360px){.wmh-dialog{padding-left:8px;padding-right:8px}.wmh-power{font-size:7px;padding:6px}.wmh-avatar{width:30px;height:30px}.wmh-local-footer{font-size:6px}}
+
+/* Flat world-map coordinate editor */
+.wmh-bottom-actions{flex-wrap:wrap}
+.wmh-editor-intro{display:flex;flex-direction:column;gap:5px;padding:10px 2px;color:#efd7a9}
+.wmh-editor-intro b{font:700 11px Georgia,serif;letter-spacing:.12em}
+.wmh-editor-intro span,.wmh-editor-status{font:8px/1.4 Arial,sans-serif;letter-spacing:.08em;color:#c4b28f}
+.wmh-editor-canvas{position:relative;width:100%;height:clamp(260px,48vh,440px);overflow:hidden;border:1px solid #b89964;background:#17231c;touch-action:none;isolation:isolate}
+.wmh-editor-canvas>img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none;user-select:none}
+.wmh-editor-canvas:before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background-image:linear-gradient(#e4d0a522 1px,transparent 1px),linear-gradient(90deg,#e4d0a522 1px,transparent 1px);background-size:10% 10%}
+.wmh-editor-marker{z-index:2;cursor:grab;touch-action:none;user-select:none;white-space:nowrap}
+.wmh-editor-marker:active{cursor:grabbing;z-index:4}
+.wmh-editor-marker span{pointer-events:none}
+.wmh-editor-crosshair{position:absolute;inset:50% auto auto 50%;width:12px;height:12px;transform:translate(-50%,-50%);border:1px solid #f3d79b;border-radius:50%;pointer-events:none;z-index:1;opacity:.45}
+.wmh-coordinate-table-wrap{overflow-x:auto;margin-top:12px;border:1px solid #806b49}
+.wmh-coordinate-table{width:100%;border-collapse:collapse;font:9px Arial,sans-serif}
+.wmh-coordinate-table th{padding:8px 5px;background:#29372e;color:#e6c990;text-align:left;letter-spacing:.1em}
+.wmh-coordinate-table td{padding:7px 5px;border-top:1px solid #756244;color:#f0e2c6}
+.wmh-coordinate-table td:first-child{font:12px Georgia,serif}
+.wmh-coordinate-table input{width:68px;max-width:100%;padding:7px 5px;border:1px solid #92784e;border-radius:0;background:#101914;color:#fff0cf;font:12px Arial,sans-serif}
+.wmh-editor-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+.wmh-editor-actions button{flex:1;min-width:90px;padding:10px 7px;border:1px solid #b89964;background:#29372e;color:#f2dfbb;font:700 9px Arial,sans-serif;letter-spacing:.06em}
+.wmh-editor-actions button[data-wmh-action="editor-save"]{background:#715633;color:#fff0cf}
+.wmh-editor-status{min-height:18px;margin:8px 2px 0}
+@media(max-width:380px){.wmh-editor-marker{gap:3px;padding:5px;font-size:7px}.wmh-coordinate-table input{width:56px}.wmh-coordinate-table td:first-child{font-size:10px}}
