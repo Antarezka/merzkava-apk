@@ -184,7 +184,7 @@
 .idle-clock-cable{stroke-dasharray:none}
 
 /* Arcanistry route engine — concealed pull-out, anchored lower-left. */
-.idle-destination-menu{position:absolute;z-index:24;left:10px;bottom:68px;width:min(330px,calc(100vw - 40px));max-height:min(55dvh,390px);flex:none;overflow:auto;border:1px solid #c8a56d;background:linear-gradient(145deg,#242820f5,#111713f8 72%,#29231af5);box-shadow:0 12px 32px #050806b8,inset 0 0 0 3px #c7a66a18}
+.idle-destination-menu{position:static;z-index:auto;width:auto;max-height:175px;flex:none;overflow:auto;border:1px solid #c8a56d;background:linear-gradient(145deg,#242820f5,#111713f8 72%,#29231af5);box-shadow:0 12px 32px #050806b8,inset 0 0 0 3px #c7a66a18}
 .idle-destination-menu[hidden],.arcanist-device-drawer[hidden]{display:none!important}
 .idle-destination-menu .idle-destination-list{max-height:135px;grid-template-columns:1fr 1fr}
 .arcanist-pull-tab{position:absolute;z-index:25;left:10px;bottom:10px;display:flex;align-items:center;gap:8px;min-height:42px;padding:0 12px;border:1px solid #c8a56d;border-left:3px solid #e0bd7c;background:linear-gradient(105deg,#1a211c,#303025);color:#ead7b5;box-shadow:0 4px 15px #070a08a6;font:700 8px system-ui,sans-serif;letter-spacing:.14em;touch-action:pan-y}
@@ -202,3 +202,5 @@
 .arcanist-device-drawer.is-turning .arcanist-dial-ring{filter:drop-shadow(0 0 7px #e0b96a88)}
 @media(max-width:370px){.arcanist-device-drawer{width:calc(100vw - 28px);left:8px}.arcanist-device-body{grid-template-columns:104px minmax(0,1fr);gap:6px}.arcanist-dial-ring{width:94px;height:94px}.arcanist-dial-core{inset:32px}.arcanist-dial-grip{left:37px;transform-origin:10px 44px}.arcanist-dial-tooth{left:41px;transform-origin:5px 52px}.arcanist-destination-side{grid-template-columns:70px minmax(0,1fr)}.arcanist-preview-frame{height:78px}}
 @media(prefers-reduced-motion:reduce){.arcanist-dial-grip,.arcanist-pull-chevron{transition:none}}
+
+.arcanist-index-slot{margin-top:5px;max-height:175px;overflow:auto}.arcanist-index-slot .idle-destination-menu{border:0;border-top:1px solid #b99a6655;box-shadow:none;background:transparent;padding:4px 0 0}.arcanist-index-slot .idle-destination-menu .idle-destination-list{max-height:95px}
