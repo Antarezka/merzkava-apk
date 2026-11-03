@@ -1,7 +1,12 @@
 import { animate } from "animejs";
 
+export const ARCANISTRY_LEVER_PULL_DISTANCE = 43;
 export const ARCANISTRY_TICKET_TEAR_DISTANCE = 62;
 export const ARCANISTRY_MIN_LOADING_MS = 3000;
+
+export function isArcanistryLeverEngaged(distance: number): boolean {
+  return Number.isFinite(distance) && distance >= ARCANISTRY_LEVER_PULL_DISTANCE;
+}
 
 export function isArcanistryTicketTorn(distance: number): boolean {
   return Number.isFinite(distance) && distance >= ARCANISTRY_TICKET_TEAR_DISTANCE;
@@ -193,7 +198,7 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
       activeLever = null;
       try { if (active.element.hasPointerCapture(event.pointerId)) active.element.releasePointerCapture(event.pointerId); } catch { /* already released */ }
       active.element.classList.remove("is-pulling");
-      if (!cancelled && active.distance >= 43) {
+      if (!cancelled && isArcanistryLeverEngaged(active.distance)) {
         startIssuance(active.machine, active.element);
       } else {
         active.element.classList.add("is-returning");
