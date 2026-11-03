@@ -44,6 +44,21 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     });
   };
 
+  const shakeVertically = (machine: HTMLElement, strength: number): void => {
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+    animate(machine, {
+      keyframes: [
+        { translateY: -strength },
+        { translateY: strength * .72 },
+        { translateY: -strength * .46 },
+        { translateY: strength * .24 },
+        { translateY: 0 }
+      ],
+      duration: strength > 5 ? 620 : 390,
+      ease: "inOutSine"
+    });
+  };
+
   const status = (machine: HTMLElement, message: string): void => {
     const node = machine.querySelector<HTMLElement>("[data-arcanistry-status]");
     if (node) node.textContent = message;
@@ -205,8 +220,8 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     ticket.classList.add("is-torn");
     ticket.disabled = true;
     status(machine, "TICKET TORN · TRAVEL CARD EJECTING");
-    shake(machine, 7.4);
-    later(() => shake(machine, 3.2), 190);
+    shakeVertically(machine, 3.4);
+    later(() => shakeVertically(machine, 1.8), 190);
 
     later(() => {
       ticket.hidden = true;
@@ -343,7 +358,7 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     active.element.classList.remove("is-under-tension");
     active.element.classList.add("is-returning");
     const machine = active.element.closest<HTMLElement>("[data-arcanistry-machine]");
-    if (machine && active.distance > 8) shake(machine, 1.2);
+    if (machine && active.distance > 8) shakeVertically(machine, 1.2);
     later(() => {
       active.element.style.removeProperty("--ticket-pull");
       active.element.classList.remove("is-returning");
