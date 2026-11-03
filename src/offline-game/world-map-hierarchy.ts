@@ -19,9 +19,8 @@ const regionData: Record<RegionId, { name: string; subtitle: string; image: stri
     sites: ["Beiming Heartland", "Dojo Network", "Local Market", "Grand Hall", "Mountain Pass", "Frozen Basin"]
   }
 };
-const regionIds: RegionId[] = ["golden-dragon-empire", "tianhai-yunzhou", "beiming-gu"];
 
-function panelMarkup(level: Level, regionId: RegionId, selectedBuilding = "Tianhai Academy"): string {
+function panelMarkup(level: Level, regionId: RegionId = "golden-dragon-empire", selectedBuilding = "Tianhai Academy"): string {
   const region = regionData[regionId];
   const header = (kind: string, title: string, subtitle: string) =>
     '<header class="wmh-level-header"><div><span class="wmh-level-tag">' + kind + '</span><h3>' + title + '</h3><p>' + subtitle + '</p></div><button type="button" class="wmh-close" data-wmh-action="close" aria-label="Close map">×</button></header>';
@@ -33,7 +32,7 @@ function panelMarkup(level: Level, regionId: RegionId, selectedBuilding = "Tianh
     '<div class="wmh-bottom-actions"><button data-wmh-action="home">⌂ &nbsp; OPEN HOME MAP</button><span>SELECT A POWER TO EXPLORE ITS TERRITORY</span></div>';
   if (level === "regional") return header("REGIONAL MAP", region.name, region.subtitle) +
     '<div class="wmh-region-scene"><img src="' + region.image + '" alt="" /><div class="wmh-scene-shade"></div><span class="wmh-map-stamp">REGIONAL TERRITORY</span></div>' +
-    '<div class="wmh-site-grid">' + region.sites.map((site, i) =>
+    '<div class="wmh-site-grid">' + region.sites.map((site) =>
       '<button class="wmh-site-card" data-wmh-site="' + site + '" data-wmh-region-id="' + regionId + '"><span>' + ["♜","⌘","▤","⚓","⌑","⚔"][i] + '</span><b>' + site + '</b><small>' + (regionId === "golden-dragon-empire" && site === "Tianhai Academy" ? "EXPLORE COMPLEX" : "COMING SOON") + '</small></button>'
     ).join("") + '</div><div class="wmh-bottom-actions"><button data-wmh-action="back">← WORLD MAP</button><span>SELECT A LOCATION</span></div>';
   if (level === "local") return header("LOCAL AREA", selectedBuilding, "ACADEMY COMPLEX · BUILDINGS & GROUNDS") +
@@ -53,7 +52,7 @@ function panelMarkup(level: Level, regionId: RegionId, selectedBuilding = "Tianh
 export function renderWorldMapHierarchy(): string {
   return '<button type="button" class="wmh-open" data-wmh-action="open">✧ &nbsp; EXPLORE WORLD MAP</button>' +
     '<section class="wmh-overlay" data-world-map-hierarchy hidden aria-label="World map navigation"><div class="wmh-dialog" data-wmh-dialog>' +
-    panelMarkup("world","Merzkava Universe","") + '</div></section>';
+    panelMarkup("world") + '</div></section>';
 }
 
 export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement, onAdvanceTime: (minutes: number) => void): boolean {
