@@ -928,6 +928,35 @@ root.addEventListener("click", async (event: MouseEvent) => {
   if (eternalChoice) { if(eternalChoice.disabled) return; const modal=root.querySelector<HTMLElement>("[data-eternal-choice-modal]"); modal?.querySelectorAll<HTMLButtonElement>("[data-eternal-choice]").forEach(button=>{button.disabled=true;}); document.body.classList.remove("eternal-choice-open"); if(history.state?.eternalChoiceModal) history.back(); const choiceId=eternalChoice.dataset.eternalChoice??""; if(modal) animateExpeditionChoiceModal(modal,false,()=>{const result=resolveEternalSituationChoice(choiceId);notice=result? "The moment has been recorded in your journey.": "That response is no longer available.";render();}); else {const result=resolveEternalSituationChoice(choiceId);notice=result? "The moment has been recorded in your journey.": "That response is no longer available.";render();} return; }
   if (target.closest("[data-eternal-open-choices]")) { const modal=root.querySelector<HTMLElement>("[data-eternal-choice-modal]"); if(modal){animateExpeditionChoiceModal(modal,true);document.body.classList.add("eternal-choice-open");history.pushState({eternalChoiceModal:true},"");modal.querySelector<HTMLButtonElement>(".expedition-choice-close")?.focus();} return; }
 
+  const idleRegionButton=target.closest<HTMLButtonElement>("[data-idle-region]");
+  if(idleRegionButton){
+    const regionId=idleRegionButton.dataset.idleRegion;
+    root.querySelectorAll<HTMLElement>("[data-idle-map-region]").forEach(panel=>{
+      const active=panel.dataset.idleMapRegion===regionId;
+      panel.hidden=!active;
+      panel.classList.toggle("is-active",active);
+    });
+    root.querySelectorAll<HTMLButtonElement>("[data-idle-region]").forEach(button=>button.classList.toggle("is-active",button===idleRegionButton));
+    const activePanel=root.querySelector<HTMLElement>("[data-idle-map-region='"+regionId+"']");
+    const regionName=idleRegionButton.textContent?.trim()??"";
+    const caption=root.querySelector<HTMLElement>("[data-idle-region-name]");
+    const subtitle=root.querySelector<HTMLElement>("[data-idle-region-subtitle]");
+    if(caption) caption.textContent=regionName;
+    if(subtitle) subtitle.textContent=activePanel?.dataset.terrain?.toUpperCase()??"REGIONAL TERRITORY";
+    const placeName=root.querySelector<HTMLElement>("[data-idle-place-name]");
+    const placeNote=root.querySelector<HTMLElement>("[data-idle-place-note]");
+    if(placeName) placeName.textContent="Choose a map marker";
+    if(placeNote) placeNote.textContent="Tap a location directly on the map to preview its destination.";
+    return;
+  }
+  const idlePlaceButton=target.closest<HTMLButtonElement>("[data-idle-place]");
+  if(idlePlaceButton){
+    const placeName=root.querySelector<HTMLElement>("[data-idle-place-name]");
+    const placeNote=root.querySelector<HTMLElement>("[data-idle-place-note]");
+    if(placeName) placeName.textContent=idlePlaceButton.querySelector("small")?.textContent?.trim()??"Destination";
+    if(placeNote) placeNote.textContent=idlePlaceButton.dataset.idleNote??"This destination is reserved for a future update.";
+    return;
+  }
   if (target.closest("[data-idle-rpg-open]")) {
     const modal=root.querySelector<HTMLElement>("[data-idle-rpg-modal]");
     const trigger=root.querySelector<HTMLButtonElement>("[data-idle-rpg-open]");
