@@ -258,3 +258,12 @@
 @media(prefers-reduced-motion:reduce){
  .arcanist-dial-ring,.arcanist-dial-aperture,.arcanist-red-thread,.arcanist-drive-gear{transition:none!important}
 }
+
+.arcanist-route-loading{position:absolute;z-index:120;inset:0;display:grid;align-content:center;justify-items:center;gap:9px;padding:24px;background:radial-gradient(circle at 50% 44%,#273128f7,#090d0bf7 72%);color:#f0dfbd;text-align:center}
+.arcanist-route-loading[hidden]{display:none!important}
+.arcanist-loading-seal{display:grid;place-items:center;width:58px;height:58px;border:1px solid #c8a56d;border-radius:50%;box-shadow:inset 0 0 0 5px #161d17,inset 0 0 0 6px #c8a56d66,0 0 18px #d3ac6b55;color:#e8c98e;font:32px/1 Georgia,serif;animation:arcanist-seal-turn 2.4s linear infinite}
+.arcanist-route-loading strong{font:700 9px system-ui,sans-serif;letter-spacing:.2em;color:#e6c68d}
+.arcanist-route-loading span{font:11px Georgia,serif;color:#bdb29d}
+.arcanist-device-drawer.is-activating .arcanist-device-heading button{pointer-events:none;opacity:.35}
+@keyframes arcanist-seal-turn{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.arcanist-loading-seal{animation:none}}
