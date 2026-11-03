@@ -12,6 +12,7 @@ type TravelHandler = (sceneId: string) => void | Promise<void>;
 export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: TravelHandler): () => void {
   const timers = new Set<number>();
   let activeTicket: { element: HTMLButtonElement; pointerId: number; startY: number; distance: number } | null = null;
+  let activeLever: { element: HTMLButtonElement; machine: HTMLElement; pointerId: number; startY: number; distance: number } | null = null;
   let disposed = false;
 
   const later = (callback: () => void, delay: number): number => {
@@ -54,7 +55,9 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     machine.classList.add("is-running");
     machine.classList.remove("has-ticket", "is-traveling");
     lever.disabled = true;
+    lever.classList.remove("is-pulling", "is-returning");
     lever.classList.add("is-pulled");
+    lever.style.removeProperty("--lever-angle");
     lever.setAttribute("aria-label", "Printing travel ticket");
     if (status) status.textContent = "TRANSMISSION ENGAGED · PRINTING ROUTE TICKET";
 
@@ -107,30 +110,29 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     shake(machine, 7.4);
     later(() => shake(machine, 3.2), 190);
 
-    const startedAt = Date.now();
     later(() => {
       ticket.hidden = true;
       loading.hidden = false;
-    }, 360);
-
-    later(async () => {
-      if (status) status.textContent = "ARCANISTRY TRANSIT · SYNCHRONIZING";
-      try {
-        await onTravel(sceneId);
-      } catch {
-        loading.hidden = true;
-        ticket.hidden = true;
-        ticket.disabled = false;
-        machine.dataset.machineState = "idle";
-        machine.classList.remove("is-traveling", "is-running", "is-printing");
-        const lever = machine.querySelector<HTMLButtonElement>("[data-arcanistry-lever]");
-        if (lever) {
-          lever.disabled = machine.dataset.selectedAvailable !== "true";
-          lever.setAttribute("aria-label", "Pull lever to issue a travel ticket");
+      const loadingStartedAt = Date.now();
+      later(async () => {
+        if (status) status.textContent = "ARCANISTRY TRANSIT · SYNCHRONIZING";
+        try {
+          await onTravel(sceneId);
+        } catch {
+          loading.hidden = true;
+          ticket.hidden = true;
+          ticket.disabled = false;
+          machine.dataset.machineState = "idle";
+          machine.classList.remove("is-traveling", "is-running", "is-printing");
+          const lever = machine.querySelector<HTMLButtonElement>("[data-arcanistry-lever]");
+          if (lever) {
+            lever.disabled = machine.dataset.selectedAvailable !== "true";
+            lever.setAttribute("aria-label", "Pull lever to issue a travel ticket");
+          }
+          if (status) status.textContent = "ROUTE INTERRUPTED · PLEASE TRY AGAIN";
         }
-        if (status) status.textContent = "ROUTE INTERRUPTED · PLEASE TRY AGAIN";
-      }
-    }, Math.max(0, ARCANISTRY_MIN_LOADING_MS - (Date.now() - startedAt)));
+      }, Math.max(0, ARCANISTRY_MIN_LOADING_MS - (Date.now() - loadingStartedAt)));
+    }, 360);
   };
 
   const onClick = (event: MouseEvent): void => {
@@ -138,6 +140,7 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     if (!(target instanceof Element)) return;
     const lever = target.closest<HTMLButtonElement>("[data-arcanistry-lever]");
     if (lever) {
+      if (event.detail !== 0) return;
       const machine = lever.closest<HTMLElement>("[data-arcanistry-machine]");
       if (machine) startIssuance(machine, lever);
       return;
@@ -151,6 +154,14 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
   const onPointerDown = (event: PointerEvent): void => {
     const target = event.target;
     if (!(target instanceof Element) || (event.pointerType === "mouse" && event.button !== 0)) return;
+    const lever = target.closest<HTMLButtonElement>("[data-arcanistry-lever]");
+    const leverMachine = lever?.closest<HTMLElement>("[data-arcanistry-machine]");
+    if (lever && leverMachine && !lever.disabled && leverMachine.dataset.machineState === "idle" && leverMachine.dataset.selectedAvailable === "true") {
+      activeLever = { element: lever, machine: leverMachine, pointerId: event.pointerId, startY: event.clientY, distance: 0 };
+      try { lever.setPointerCapture(event.pointerId); } catch { /* WebView fallback */ }
+      event.preventDefault();
+      return;
+    }
     const ticket = target.closest<HTMLButtonElement>("[data-arcanistry-ticket]");
     const machine = ticket?.closest<HTMLElement>("[data-arcanistry-machine]");
     if (!ticket || !machine || ticket.hidden || machine.dataset.machineState !== "ticket-ready") return;
@@ -160,6 +171,14 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
   };
 
   const onPointerMove = (event: PointerEvent): void => {
+    if (activeLever && activeLever.pointerId === event.pointerId) {
+      const distance = Math.max(0, Math.min(58, event.clientY - activeLever.startY));
+      activeLever.distance = distance;
+      activeLever.element.style.setProperty("--lever-angle", (distance * .82) + "deg");
+      activeLever.element.classList.toggle("is-pulling", distance > 2);
+      event.preventDefault();
+      return;
+    }
     if (!activeTicket || activeTicket.pointerId !== event.pointerId) return;
     const distance = Math.max(0, Math.min(112, event.clientY - activeTicket.startY));
     activeTicket.distance = distance;
@@ -169,6 +188,19 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
   };
 
   const onPointerEnd = (event: PointerEvent, cancelled = false): void => {
+    if (activeLever && activeLever.pointerId === event.pointerId) {
+      const active = activeLever;
+      activeLever = null;
+      try { if (active.element.hasPointerCapture(event.pointerId)) active.element.releasePointerCapture(event.pointerId); } catch { /* already released */ }
+      active.element.classList.remove("is-pulling");
+      if (!cancelled && active.distance >= 43) {
+        startIssuance(active.machine, active.element);
+      } else {
+        active.element.classList.add("is-returning");
+        later(() => { active.element.style.removeProperty("--lever-angle"); active.element.classList.remove("is-returning"); }, 360);
+      }
+      return;
+    }
     if (!activeTicket || activeTicket.pointerId !== event.pointerId) return;
     const active = activeTicket;
     activeTicket = null;
