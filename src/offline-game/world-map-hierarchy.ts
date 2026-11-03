@@ -234,8 +234,8 @@ function bindWorldMapEditor(dialog: HTMLElement): void {
     const marker = markers.find(item => item.id === id);
     if (!marker) return;
     const bounds = mapBounds();
-    marker.x = clamp(((clientX - bounds.left) / bounds.width) * 100);
-    marker.y = clamp(((clientY - bounds.top) / bounds.height) * 100);
+    marker.x = clamp(((centerX - bounds.left) / bounds.width) * 100);
+    marker.y = clamp(((centerY - bounds.top) / bounds.height) * 100);
     marker.placementStatus = "owner-set";
     paint(marker); refreshExport();
     setStatus(marker.name + " · X " + marker.x + "% · Y " + marker.y + "% · pending confirmation");
