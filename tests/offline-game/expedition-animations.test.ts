@@ -7,85 +7,94 @@ const mocks = vi.hoisted(() => {
 vi.mock("animejs",()=>({animate:mocks.animate,createScope:mocks.createScope,stagger:mocks.stagger}));
 import { animateExpeditionChoiceModal, mountExpeditionAnimations } from "../../src/offline-game/expedition-animations";
 
-describe("Eternal Path Anime.js motion",()=>{
+function makeSceneRoot(weather="Clear",cycle="Morning",state="test-"+Math.random()) {
+  const scene:any={dataset:{weather,cycle,location:"test-location",animationState:state},setAttribute:vi.fn(),addEventListener:vi.fn(),removeEventListener:vi.fn()};
+  const host:any={appendChild:vi.fn(),replaceChildren:vi.fn()};
+  const selectors:Record<string,any>={
+    ".expedition-environment":scene,
+    ".expedition-weather-particles":host,
+    ".expedition-scene-image":{},
+    ".expedition-cloud-motion":{},
+    ".expedition-light-layer":{},
+    ".expedition-weather-layer":{},
+    ".expedition-fog-motion":{},
+    ".expedition-sun-glow":{},
+    ".expedition-sun-glow-image":{},
+    ".expedition-moon-glow":{},
+    ".expedition-moon-glow-image":{},
+    ".expedition-light-rays":{},
+    ".expedition-light-rays-image":{},
+    ".expedition-rain-streak-image":{},
+    ".expedition-snow-texture":{},
+    ".expedition-window-frost-image":{},
+    ".expedition-petal-texture":{},
+    ".expedition-leaf-texture":{},
+    ".expedition-lightning-layer":{},
+    ".expedition-lightning-flash-image":{src:"/game/scenery/shared/fx-08-lightning-flash-a.png"},
+  };
+  const lists:Record<string,any[]>={
+    ".expedition-heading, .expedition-environment, .expedition-character-panel, .expedition-disposition-line, .expedition-dialogue, .expedition-footer":[],
+    ".expedition-profile-meta span":[],
+    ".expedition-narrative-layer":[],
+    "button":[],
+  };
+  const root:any={querySelector:vi.fn((selector:string)=>selectors[selector]??null),querySelectorAll:vi.fn((selector:string)=>lists[selector]??[])};
+  return {root,scene,host,selectors};
+}
+
+describe("Eternal Path event-driven Anime.js motion",()=>{
  beforeEach(()=>{
   vi.clearAllMocks();
+  mocks.animate.mockReturnValue({pause:vi.fn()});
   mocks.scope.add.mockImplementation((setup:(self:{matches:{reduceMotion:boolean}})=>void)=>{setup({matches:{reduceMotion:false}});return mocks.scope;});
  });
- it("animates the scene, profile, narrative and fog within its own scope",()=>{
-  const entrance=[{},{}],image={},light={},weather={},fog={},cloud={},fields=[{},{}],badge={},narrative=[{},{}];
-  const selectors:Record<string,unknown>={".expedition-scene-image":image,".expedition-light-layer":light,".expedition-weather-layer":weather,".expedition-fog-motion":fog,".expedition-cloud-motion":cloud,".expedition-disposition":badge};
-  const lists:Record<string,unknown[]>={".expedition-heading, .expedition-environment, .expedition-character-panel, .expedition-disposition-line, .expedition-dialogue, .expedition-footer":entrance,".expedition-profile-meta span":fields,".expedition-narrative-layer":narrative,"button":[]};
-  const root={querySelectorAll:vi.fn((selector:string)=>lists[selector]??[]),querySelector:vi.fn((selector:string)=>selectors[selector]??null)} as unknown as HTMLElement;
+ it("keeps scene motion idle until the Scene Window itself is activated",()=>{
+  const {root,scene}=makeSceneRoot();
   const dispose=mountExpeditionAnimations(root);
-  expect(mocks.createScope).toHaveBeenCalledWith(expect.objectContaining({root}));
-  expect(mocks.animate).toHaveBeenCalledWith(entrance,expect.objectContaining({opacity:[0,1],translateY:[13,0]}));
-  expect(mocks.animate).toHaveBeenCalledWith(image,expect.objectContaining({loop:true,alternate:true}));
-  expect(mocks.animate).toHaveBeenCalledWith(fog,expect.objectContaining({loop:true,alternate:true,ease:"inOutSine"}));
-  expect(mocks.animate).toHaveBeenCalledWith(fields,expect.objectContaining({delay:expect.anything()}));
-  expect(mocks.animate).toHaveBeenCalledWith(narrative,expect.objectContaining({translateY:[9,0]}));
-  dispose();expect(mocks.scope.revert).toHaveBeenCalledOnce();
+  expect(mocks.animate.mock.calls.some(call=>call[0]===root.querySelector(".expedition-scene-image"))).toBe(false);
+  const click=scene.addEventListener.mock.calls.find((call:any[])=>call[0]==="click")?.[1];
+  expect(click).toBeTypeOf("function");
+  click();
+  const sceneCall=mocks.animate.mock.calls.find(call=>call[0]===root.querySelector(".expedition-scene-image"));
+  expect(sceneCall).toBeTruthy();
+  expect(sceneCall?.[1]).not.toHaveProperty("loop");
+  dispose();
+  expect(scene.removeEventListener).toHaveBeenCalledWith("click",click);
  });
- it("creates and animates weather particles with Anime.js and cleans them up",()=>{
-  const nodes: any[]=[];
-  const host={appendChild:vi.fn((node:any)=>nodes.push(node)),replaceChildren:vi.fn()};
-  const environment={dataset:{weather:"Rain",cycle:"Morning"}};
-  const selectors:Record<string,any>={".expedition-environment":environment,".expedition-weather-particles":host};
-  const root={querySelector:vi.fn((selector:string)=>selectors[selector]??null),querySelectorAll:vi.fn(()=>[])} as unknown as HTMLElement;
-  const animation={pause:vi.fn(),play:vi.fn()};
-  mocks.animate.mockReturnValue(animation);
+ it("creates weather particles once and animates them only during a scene beat",()=>{
+  const {root,scene,host}=makeSceneRoot("Rain");
+  const nodes:any[]=[];
+  host.appendChild.mockImplementation((node:any)=>nodes.push(node));
   const dispose=mountExpeditionAnimations(root);
   expect(nodes).toHaveLength(17);
   expect(nodes[0].className).toContain("expedition-particle-rain");
-  expect(mocks.animate).toHaveBeenCalledWith(nodes,expect.objectContaining({loop:true,duration:1050}));
+  expect(mocks.animate.mock.calls.some(call=>call[0]===nodes)).toBe(false);
+  const click=scene.addEventListener.mock.calls.find((call:any[])=>call[0]==="click")?.[1];
+  click();
+  const particleCall=mocks.animate.mock.calls.find(call=>call[0]===nodes);
+  expect(particleCall).toBeTruthy();
+  expect(particleCall?.[1]).not.toHaveProperty("loop");
   dispose();
-  expect(animation.pause).toHaveBeenCalled();
   expect(host.replaceChildren).toHaveBeenCalledOnce();
  });
- it("animates uploaded weather plates with distinct motion and cycles lightning variants",()=>{
-  const environment={dataset:{weather:"Rain",cycle:"Morning"}};
-  const sun={},moon={},rays={},rain={},lightning={},lightningImage={src:"/game/scenery/shared/fx-08-lightning-flash-a.png"};
-  const selectors:Record<string,any>={".expedition-environment":environment,".expedition-sun-glow-image":sun,".expedition-moon-glow-image":moon,".expedition-light-rays-image":rays,".expedition-rain-streak-image":rain,".expedition-lightning-layer":lightning,".expedition-lightning-flash-image":lightningImage};
-  const root={querySelector:vi.fn((selector:string)=>selectors[selector]??null),querySelectorAll:vi.fn(()=>[])} as unknown as HTMLElement;
-  mountExpeditionAnimations(root);
-  expect(mocks.animate).toHaveBeenCalledWith(sun,expect.objectContaining({duration:15000,alternate:true}));
-  expect(mocks.animate).toHaveBeenCalledWith(rays,expect.objectContaining({duration:28000,alternate:true}));
-  expect(mocks.animate).toHaveBeenCalledWith(rain,expect.objectContaining({duration:2600,alternate:true}));
-  const flash=mocks.animate.mock.calls.find(call=>call[0]===lightning);
-  expect(flash).toBeTruthy();
-  flash?.[1].onLoop();
-  expect(lightningImage.src).toBe("/game/scenery/shared/fx-08-lightning-flash-b.png");
- });
- it("animates snow and frost only for Snow weather",()=>{
-  const environment={dataset:{weather:"Snow",cycle:"Night"}};
-  const snow={},frost={};
-  const selectors:Record<string,unknown>={".expedition-environment":environment,".expedition-snow-texture":snow,".expedition-window-frost-image":frost};
-  const root={querySelector:vi.fn((selector:string)=>selectors[selector]??null),querySelectorAll:vi.fn(()=>[])} as unknown as HTMLElement;
-  mountExpeditionAnimations(root);
-  expect(mocks.animate).toHaveBeenCalledWith(snow,expect.objectContaining({duration:11500,alternate:true}));
-  expect(mocks.animate).toHaveBeenCalledWith(frost,expect.objectContaining({duration:12500,alternate:true}));
- });
- it("animates moonlight only at Night and seasonal plates only in their matching cycle",()=>{
-  const night={dataset:{weather:"Clear",cycle:"Night"}};
-  const moon={},moonImage={};
-  const nightRoot={querySelector:vi.fn((selector:string)=>({".expedition-environment":night,".expedition-moon-glow":moon,".expedition-moon-glow-image":moonImage}[selector]??null)),querySelectorAll:vi.fn(()=>[])} as unknown as HTMLElement;
-  mountExpeditionAnimations(nightRoot);
-  expect(mocks.animate).toHaveBeenCalledWith(moon,expect.objectContaining({duration:11800,alternate:true}));
-  expect(mocks.animate).toHaveBeenCalledWith(moonImage,expect.objectContaining({duration:19000,alternate:true}));
+ it("plays one scene beat when the authoritative world-time key changes on narrative rerender",()=>{
+  const first=makeSceneRoot("Clear","Morning","journey:day1:08:00");
+  const disposeFirst=mountExpeditionAnimations(first.root);
+  disposeFirst();
   vi.clearAllMocks();
-  const dawn={dataset:{weather:"Clear",cycle:"Dawn"}},petal={};
-  const dawnRoot={querySelector:vi.fn((selector:string)=>({".expedition-environment":dawn,".expedition-petal-texture":petal}[selector]??null)),querySelectorAll:vi.fn(()=>[])} as unknown as HTMLElement;
-  mountExpeditionAnimations(dawnRoot);
-  expect(mocks.animate).toHaveBeenCalledWith(petal,expect.objectContaining({duration:18000,alternate:true}));
-  vi.clearAllMocks();
-  const dusk={dataset:{weather:"Clear",cycle:"Dusk"}},leaf={};
-  const duskRoot={querySelector:vi.fn((selector:string)=>({".expedition-environment":dusk,".expedition-leaf-texture":leaf}[selector]??null)),querySelectorAll:vi.fn(()=>[])} as unknown as HTMLElement;
-  mountExpeditionAnimations(duskRoot);
-  expect(mocks.animate).toHaveBeenCalledWith(leaf,expect.objectContaining({duration:21000,alternate:true}));
+  mocks.animate.mockReturnValue({pause:vi.fn()});
+  const next=makeSceneRoot("Rain","Dusk","journey:day1:18:15");
+  const disposeNext=mountExpeditionAnimations(next.root);
+  expect(mocks.animate.mock.calls.some(call=>call[0]===next.root.querySelector(".expedition-scene-image"))).toBe(true);
+  expect(mocks.animate.mock.calls.every(call=>!Object.prototype.hasOwnProperty.call(call[1]??{},"loop"))).toBe(true);
+  disposeNext();
  });
- it("does not animate when reduced motion is requested",()=>{
+ it("does not animate scene motion when reduced motion is requested",()=>{
   mocks.scope.add.mockImplementation((setup:(self:{matches:{reduceMotion:boolean}})=>void)=>{setup({matches:{reduceMotion:true}});return mocks.scope;});
-  mountExpeditionAnimations({querySelectorAll:vi.fn(()=>[{}]),querySelector:vi.fn(()=>({}))} as unknown as HTMLElement);
+  const {root,scene}=makeSceneRoot();
+  mountExpeditionAnimations(root);
+  const click=scene.addEventListener.mock.calls.find((call:any[])=>call[0]==="click")?.[1];
+  click();
   expect(mocks.animate).not.toHaveBeenCalled();
  });
  it("animates the choice sheet in and out without changing game state",()=>{
