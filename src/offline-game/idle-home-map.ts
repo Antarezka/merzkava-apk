@@ -42,7 +42,7 @@ function marker(p:Place,index:number,group:string):string {
  return '<button type="button" class="idle-map-marker '+(index===0?"is-selected":"")+'" data-idle-place="'+p.id+'" data-idle-group="'+group+'" data-idle-note="'+p.note+'" style="'+positions[index%positions.length]+'" aria-label="'+p.name+' · Coming Soon"><span>'+p.icon+'</span><small>'+p.name+'</small></button>';
 }
 function destinationHole(p:Place,group:string,index:number,total:number,regionId="golden-dragon-empire"):string {
- const angle=18+(360/total)*index;
+ const angle=42+(360/total)*index;
  return '<button type="button" class="arcanist-dial-aperture '+(index===0&&group==="regional"?"is-selected":"") + '" data-idle-place="'+p.id+'" data-idle-group="'+group+'" data-region-id="'+regionId+'" data-idle-note="'+p.note+'" style="--hole-angle:'+angle+'deg" aria-label="Drag '+p.name+' toward the activation mark"><span>'+p.icon+'</span><small>'+p.name+'</small></button>';
 }
 let previousClockStamp:string|null=null;
