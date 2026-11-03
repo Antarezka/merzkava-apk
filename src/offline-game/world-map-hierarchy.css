@@ -100,3 +100,22 @@
 .wmh-editor-confirm-bar span{color:#d9bd8a;font:700 8px Arial,sans-serif;letter-spacing:.12em}
 .wmh-editor-confirm-bar button{flex:1;min-height:42px;padding:10px 8px;border:1px solid #e1c18a;background:linear-gradient(110deg,#806039,#5e472d);color:#fff0d1;font:700 10px Arial,sans-serif;letter-spacing:.06em}
 @media(max-width:360px){.wmh-editor-confirm-bar{gap:6px;padding-left:5px;padding-right:5px}.wmh-editor-confirm-bar span{font-size:7px}.wmh-editor-confirm-bar button{font-size:9px}}
+
+/* World-map geography marker categories */
+.wmh-power.wmh-marker-territory{border-color:#c58d67;background:#30231feF;color:#f4d7b8}
+.wmh-power.wmh-marker-forest{border-color:#8dbb83;background:#172c20ed;color:#d8f0c8}
+.wmh-power.wmh-marker-sea{border-color:#82b9d0;background:#142b3bed;color:#d5efff}
+.wmh-power.wmh-marker-landmark{border-color:#b6a0d4;background:#29213aed;color:#eee0ff}
+.wmh-power.wmh-marker-mountains{border-color:#b9c3c4;background:#293238ed;color:#e9eeee}
+.wmh-power.wmh-marker-territory b{background:#85553c}
+.wmh-power.wmh-marker-forest b{background:#477348}
+.wmh-power.wmh-marker-sea b{background:#356c8b}
+.wmh-power.wmh-marker-landmark b{background:#6b5587}
+.wmh-power.wmh-marker-mountains b{background:#65767a}
+.wmh-marker-info p{margin:7px 0 4px;color:#eadcc3;font:12px/1.45 Georgia,serif}
+.wmh-marker-info em{display:block;margin-top:6px;color:#e0bb79;font:700 8px Georgia,serif;letter-spacing:.1em;font-style:normal}
+.wmh-editor-canvas{scroll-snap-type:none;overflow-anchor:none;scroll-behavior:auto}
+.wmh-editor-marker{touch-action:none;-webkit-user-select:none}
+.wmh-editor-marker-lifted{pointer-events:none}
+.wmh-coordinate-table th:first-child,.wmh-coordinate-table td:first-child{white-space:nowrap}
+.wmh-coordinate-table td:nth-child(2){min-width:132px}
