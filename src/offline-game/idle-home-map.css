@@ -491,7 +491,7 @@
 .arcanist-ticket-dispenser{display:flex;flex-direction:column;align-items:center;min-height:0}
 .arcanist-ticket-slot{flex:0 0 auto}
 .arcanist-control-panel{perspective:600px}
-.arcanist-folding-assembly{position:relative;display:block;width:100%;min-height:206px;transform-style:preserve-3d}
+.arcanist-folding-assembly{position:relative;display:block;width:100%;min-height:242px;transform-style:preserve-3d}
 .arcanist-dial-face,.arcanist-lever-face{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;backface-visibility:hidden;transition:transform .58s cubic-bezier(.2,.72,.25,1),opacity .36s ease}
 .arcanist-lever-face[hidden],.arcanist-dial-face[hidden]{display:none!important}
 .arcanist-dial-face{opacity:1;transform:rotateY(0deg);transform-origin:left center}
