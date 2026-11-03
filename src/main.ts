@@ -936,7 +936,7 @@ function selectArcanistDestination(place:HTMLElement):void{
  if(rotor)rotor.dataset.sceneId=sceneId;
  root.querySelectorAll<HTMLButtonElement>("[data-idle-place]").forEach(button=>button.classList.toggle("is-selected",button.dataset.idlePlace===placeId&&button.dataset.idleGroup===group));
 }
-let activeArcanistDial:{element:HTMLElement;selected:HTMLElement;pointerId:number;pointerStartAngle:number;startAngle:number;turned:number;sceneId:string}|null=null;
+let activeArcanistDial:{element:HTMLElement;selected:HTMLElement;pointerId:number;pointerStartAngle:number;startAngle:number;turned:number;thresholdReachedDuringDrag:boolean;sceneId:string}|null=null;
 root.addEventListener("pointerdown",event=>{
  const target=event.target;if(!(target instanceof Element)||(event.pointerType==="mouse"&&event.button!==0))return;
  const aperture=target.closest<HTMLElement>(".arcanist-dial-aperture[data-idle-place]");
@@ -946,7 +946,7 @@ root.addEventListener("pointerdown",event=>{
  const pointerAngle=arcanistPointerAngle(rotor,event);
  const apertureAngle=parseRotaryApertureAngle(aperture.style.getPropertyValue("--hole-angle"));
  if(apertureAngle===null)return;
- activeArcanistDial={element:rotor,selected:aperture,pointerId:event.pointerId,pointerStartAngle:pointerAngle,startAngle:apertureAngle,turned:0,sceneId:rotor.dataset.sceneId??""};
+ activeArcanistDial={element:rotor,selected:aperture,pointerId:event.pointerId,pointerStartAngle:pointerAngle,startAngle:apertureAngle,turned:0,thresholdReachedDuringDrag:false,sceneId:rotor.dataset.sceneId??""};
  rotor.dataset.activationThreshold="pending";
  rotor.closest<HTMLElement>("[data-arcanist-device]")?.classList.remove("is-at-threshold");
  try{rotor.setPointerCapture(event.pointerId);}catch{/* WebView fallback */}
@@ -955,7 +955,9 @@ root.addEventListener("pointerdown",event=>{
 root.addEventListener("pointermove",event=>{
  const active=activeArcanistDial;if(!active||active.pointerId!==event.pointerId)return;
  const next=arcanistPointerAngle(active.element,event);
+ const previousAngle=active.startAngle+active.turned;
  const angle=rotaryDragAngle(active.startAngle,active.pointerStartAngle,next);
+ if(!isRotaryAligned(previousAngle,ARCANISTRY_ACTIVATION_ANGLE)&&isRotaryAligned(angle,ARCANISTRY_ACTIVATION_ANGLE))active.thresholdReachedDuringDrag=true;
  active.turned=angle-active.startAngle;
  if(Math.abs(active.turned)>0.08){
   const progress=rotaryActivationProgress(angle,ARCANISTRY_ACTIVATION_ANGLE,active.startAngle);
@@ -987,13 +989,16 @@ function finishArcanistDial(event:PointerEvent,cancelled=false):void{
  const active=activeArcanistDial;if(!active||active.pointerId!==event.pointerId)return;
  activeArcanistDial=null;
  if(!cancelled){
+  const previousAngle=active.startAngle+active.turned;
   const releaseAngle=arcanistPointerAngle(active.element,event);
-  active.turned=rotaryDragAngle(active.startAngle,active.pointerStartAngle,releaseAngle)-active.startAngle;
+  const finalDragAngle=rotaryDragAngle(active.startAngle,active.pointerStartAngle,releaseAngle);
+  if(!isRotaryAligned(previousAngle,ARCANISTRY_ACTIVATION_ANGLE)&&isRotaryAligned(finalDragAngle,ARCANISTRY_ACTIVATION_ANGLE))active.thresholdReachedDuringDrag=true;
+  active.turned=finalDragAngle-active.startAngle;
  }
  try{if(active.element.hasPointerCapture(event.pointerId))active.element.releasePointerCapture(event.pointerId);}catch{/* already released */}
  const finalAngle=active.startAngle+active.turned;
  const aligned=!cancelled&&isRotaryAligned(finalAngle,ARCANISTRY_ACTIVATION_ANGLE);
- const completed=canCommitRotaryActivation(finalAngle,{released:!cancelled,cancelled,hasDestination:Boolean(active.sceneId)});
+ const completed=canCommitRotaryActivation(finalAngle,{released:!cancelled,cancelled,hasDestination:Boolean(active.sceneId),thresholdReachedDuringDrag:active.thresholdReachedDuringDrag});
  const device=active.element.closest<HTMLElement>("[data-arcanist-device]");
  active.element.dataset.activationThreshold=aligned?"reached":"pending";
  device?.classList.remove("is-at-threshold");
