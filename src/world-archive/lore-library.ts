@@ -882,6 +882,10 @@ export const LORE_ENTRIES: LoreEntry[] = LORE_ENTRY_DRAFTS.map(entry => ({
   crossReferenceIds: []
 }));
 
+// The published collection is immutable after module initialization; reuse it
+// instead of allocating a filtered array for every Archive lookup and render.
+const PUBLIC_LORE_ENTRIES = LORE_ENTRIES.filter(entry => entry.visibility === "PUBLISHED");
+
 function hasLoreReference(text: string, label: string): boolean {
   const lowerText = text.toLocaleLowerCase();
   const lowerLabel = label.toLocaleLowerCase();
@@ -914,7 +918,7 @@ const CATEGORY_LABELS: Record<LoreCategory | "ALL", string> = {
 };
 
 export function getPublicLoreEntries(): LoreEntry[] {
-  return LORE_ENTRIES.filter(entry => entry.visibility === "PUBLISHED");
+  return PUBLIC_LORE_ENTRIES;
 }
 
 export function resolveLorePlaceholder(label: string): LorePlaceholder | undefined {
@@ -1033,6 +1037,17 @@ const PARTIAL_PUBLIC_SOURCE_PATHS = new Set([
   "world/GEOGRAPHY_AND_TRAVEL.md"
 ]);
 
+// Searchable text is normalized once; typing in the Archive search field then
+// performs only category checks and substring lookups, not repeated joins/lowercasing.
+const LORE_ENTRY_SEARCH_INDEX = new Map(LORE_ENTRIES.map(entry => [
+  entry.id,
+  [entry.title, entry.summary, entry.eyebrow, ...entry.aliases, ...entry.paragraphs].join(" ").toLocaleLowerCase()
+] as const));
+const LORE_PLACEHOLDER_SEARCH_INDEX = new Map(LORE_PLACEHOLDERS.map(item => [
+  item.id,
+  [item.title, item.summary, item.status, ...item.aliases].join(" ").toLocaleLowerCase()
+] as const));
+
 function formatLoreEntityStatus(status: LoreEntityStatus): string {
   return status === "NON_CANON" ? "NON-CANON" : "ON PLAN";
 }
@@ -1114,11 +1129,11 @@ export function renderLoreResults(): string {
   const query = activeLoreQuery.trim().toLocaleLowerCase();
   const entries = getPublicLoreEntries().filter(entry =>
     (activeLoreCategory === "ALL" || entry.category === activeLoreCategory) &&
-    (!query || [entry.title, entry.summary, entry.eyebrow, ...entry.aliases, ...entry.paragraphs].join(" ").toLocaleLowerCase().includes(query))
+    (!query || (LORE_ENTRY_SEARCH_INDEX.get(entry.id)?.includes(query) ?? false))
   );
   const placeholders = LORE_PLACEHOLDERS.filter(item =>
     (activeLoreCategory === "ALL" || item.category === activeLoreCategory) &&
-    (!query || [item.title, item.summary, item.status, ...item.aliases].join(" ").toLocaleLowerCase().includes(query))
+    (!query || (LORE_PLACEHOLDER_SEARCH_INDEX.get(item.id)?.includes(query) ?? false))
   );
   if (!entries.length && !placeholders.length) return '<div class="lore-empty"><span>⌕</span><h3>No matching records</h3><p>Coba kata kunci lain atau pilih kategori berbeda.</p></div>';
   return '<div class="lore-card-grid">' + entries.map((entry, index) =>
