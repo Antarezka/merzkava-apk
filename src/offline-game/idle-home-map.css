@@ -218,3 +218,23 @@
 .arcanist-index-slot .idle-global-menu{padding:0 2px 5px}
 .arcanist-index-slot .idle-global-menu .idle-destination-menu-head{margin-top:3px}
 @media(max-width:360px){.arcanist-index-slot{max-height:138px}.arcanist-index-slot .idle-destination-list{grid-template-columns:repeat(4,minmax(0,1fr));gap:3px}.arcanist-index-slot .idle-destination-option{min-height:46px}}
+
+/* Unified Arcanistry rotary: every aperture is a destination; no separate index panel. */
+.arcanist-device-drawer{width:min(370px,calc(100vw - 28px));}
+.arcanist-device-body{grid-template-columns:minmax(0,1fr);gap:7px;padding:8px 2px 5px;}
+.arcanist-dial-assembly{gap:6px;}
+.arcanist-dial-ring{width:246px;height:246px;margin:2px auto 0;overflow:visible;touch-action:none;}
+.arcanist-dial-ring:before{inset:9px;}
+.arcanist-dial-ring:after{inset:26px;}
+.arcanist-dial-core{inset:92px;width:58px;height:58px;}
+.arcanist-dial-grip{left:112px;top:8px;transform-origin:10px 113px;}
+.arcanist-dial-tooth{left:118px;top:-5px;transform-origin:5px 128px;}
+.arcanist-dial-tooth.tooth-b{transform:rotate(90deg)}.arcanist-dial-tooth.tooth-c{transform:rotate(180deg)}.arcanist-dial-tooth.tooth-d{transform:rotate(270deg)}
+.arcanist-dial-aperture{position:absolute;z-index:4;left:50%;top:50%;width:43px;height:43px;margin:-21.5px 0 0 -21.5px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:3px;border:1px solid #b99a65;border-radius:50%;background:radial-gradient(circle at 38% 28%,#46503c,#151b17 72%);color:#f0dfbd;box-shadow:inset 0 0 0 3px #080d0a,inset 0 0 0 4px #c8a56b44,0 2px 6px #000a;touch-action:manipulation;transform:rotate(var(--hole-angle)) translateY(-96px) rotate(calc(var(--hole-angle)*-1));}
+.arcanist-dial-aperture span{font:17px/1 Georgia,serif;color:#f0d092}
+.arcanist-dial-aperture small{display:block;max-width:36px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:600 5px/1.1 system-ui,sans-serif;color:#e8d9bc}
+.arcanist-dial-aperture.is-selected{border-color:#ffe0a0;background:radial-gradient(circle,#82643b,#1a211b 76%);box-shadow:inset 0 0 0 3px #171b15,inset 0 0 0 4px #f1d08a,0 0 9px #d2a95b88}
+.arcanist-destination-side{grid-template-columns:76px minmax(0,1fr);max-width:100%}
+.arcanist-preview-frame{height:70px}
+.arcanist-index-slot,.idle-destination-menu{display:none!important}
+@media(max-width:370px){.arcanist-device-drawer{width:calc(100vw - 20px);left:6px}.arcanist-dial-ring{width:226px;height:226px}.arcanist-dial-core{inset:84px;width:56px;height:56px}.arcanist-dial-grip{left:102px;transform-origin:10px 103px}.arcanist-dial-tooth{left:108px;transform-origin:5px 118px}.arcanist-dial-aperture{transform:rotate(var(--hole-angle)) translateY(-87px) rotate(calc(var(--hole-angle)*-1));}}
