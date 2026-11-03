@@ -955,7 +955,7 @@ root.addEventListener("pointermove",event=>{
  if(Math.abs(delta)>0.08){
   active.turned+=delta;
   const angle=active.startAngle+active.turned;
-  const progress=rotaryActivationProgress(angle,ARCANISTRY_ACTIVATION_ANGLE);
+  const progress=rotaryActivationProgress(angle,ARCANISTRY_ACTIVATION_ANGLE,active.startAngle);
   const device=active.element.closest<HTMLElement>("[data-arcanist-device]");
   active.element.style.setProperty("--dial-angle",active.turned+"deg");
   active.element.style.setProperty("--gear-turn",(active.turned*2.4)+"deg");
@@ -988,6 +988,7 @@ function finishArcanistDial(event:PointerEvent,cancelled=false):void{
  device?.classList.add(completed?"is-activating":"is-returning");
  active.element.style.setProperty("--dial-angle","0deg");
  active.element.style.setProperty("--gear-turn","0deg");
+ active.element.querySelectorAll<HTMLElement>(".arcanist-red-thread").forEach(thread=>thread.style.strokeDashoffset=completed?"0px":"350px");
  active.element.setAttribute("aria-label",completed?"Arcanistry route activated":"Arcanistry rotor returned to its resting position");
  active.element.querySelectorAll<HTMLElement>(".arcanist-dial-aperture").forEach(aperture=>{
   const close=completed&&aperture!==active.selected;
