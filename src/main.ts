@@ -528,7 +528,12 @@ function render(): void {
     ${activeScreen === "home" && noticeboardVisible ? noticeboardMarkup() : ""}
     ${bugPanelMarkup()}
   </div>`;
-  if (activeScreen === "offline-game") initializeIdleTriggerDrag();
+  if (activeScreen === "offline-game") {
+    initializeIdleTriggerDrag();
+    const destinationMenu=root.querySelector<HTMLElement>("[data-arcanist-drawer]");
+    const destinationHost=root.querySelector<HTMLElement>(".arcanist-index-slot");
+    if(destinationMenu&&destinationHost) destinationHost.append(destinationMenu);
+  }
   translateRenderedContent(root, currentLanguage);
   // Preserve the rail's manual roulette offset and each independent mechanical dial angle across rerenders.
   const renderedNavigation = root.querySelector<HTMLElement>(".nav-roulette-track");
