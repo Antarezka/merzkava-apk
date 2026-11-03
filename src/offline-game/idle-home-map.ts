@@ -39,7 +39,7 @@ const globalPlaces:Place[]=[
 ];
 const positions=["left:15%;top:27%","left:43%;top:18%","left:76%;top:30%","left:22%;top:57%","left:54%;top:48%","left:78%;top:69%","left:39%;top:79%","left:65%;top:84%"];
 function marker(p:Place,index:number,group:string):string {
- return '<button type="button" class="idle-map-marker" data-idle-place="'+p.id+'" data-idle-group="'+group+'" data-idle-note="'+p.note+'" style="'+positions[index%positions.length]+'" aria-label="'+p.name+' · Coming Soon"><span>'+p.icon+'</span><small>'+p.name+'</small></button>';
+ return '<button type="button" class="idle-map-marker '+(index===0?"is-selected":"")+'" data-idle-place="'+p.id+'" data-idle-group="'+group+'" data-idle-note="'+p.note+'" style="'+positions[index%positions.length]+'" aria-label="'+p.name+' · Coming Soon"><span>'+p.icon+'</span><small>'+p.name+'</small></button>';
 }
 function destination(p:Place,group:string,index:number):string {
  return '<button type="button" class="idle-destination-option '+(index===0?'is-selected':'')+'" data-idle-place="'+p.id+'" data-idle-group="'+group+'" data-idle-note="'+p.note+'"><span class="idle-destination-index">'+String(index+1).padStart(2,"0")+'</span><span class="idle-destination-symbol">'+p.icon+'</span><span class="idle-destination-name">'+p.name+'</span><span class="idle-destination-status">COMING SOON</span><span class="idle-destination-arrow">›</span></button>';
