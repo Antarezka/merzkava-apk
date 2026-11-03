@@ -369,7 +369,7 @@ body.eternal-choice-open{overflow:hidden}
 }
 .expedition-save-manager.is-compact .expedition-manager-trigger {
   border-color:#b49b68;
-  border-radius:50%;
+  border-radius:5px;
   background:linear-gradient(145deg,#526b5d,#293f36);
   color:#f1e6cf;
   box-shadow:0 4px 16px #17231f55,inset 0 1px #ffffff45;
