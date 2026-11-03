@@ -240,7 +240,7 @@
  background:linear-gradient(150deg,#293129,#171d18);color:#e9dec9;touch-action:pan-x;
 }
 .arcanist-destination-card:before{content:"";position:absolute;inset:1px;border:1px solid var(--route-light,#d98a48);opacity:.55;pointer-events:none;animation:arcanist-lamp-breathe 2.7s ease-in-out infinite}
-.arcanist-destination-card[data-available="false"],.arcanist-destination-card[data-available="true"]{--route-light:#d98a48}
+.arcanist-destination-card[data-available="false"]{--route-light:#c95748}.arcanist-destination-card[data-available="true"]{--route-light:#d98a48}.arcanist-destination-card.is-selected{--route-light:#fff0c2}
 .arcanist-destination-card.is-selected{border-color:#f4dca8;background:linear-gradient(110deg,#52452f,#262b22);box-shadow:inset 0 0 0 1px #e2c58c55,0 0 10px #d8b77b44}
 .arcanist-destination-art-frame{position:relative;display:block;width:100%;height:100%;min-height:48px;overflow:hidden;border:1px solid #a58a5b;background:#303b32;box-shadow:inset 0 0 0 2px #111}
 .arcanist-destination-art-frame img,.arcanist-destination-art{display:block;width:100%;height:100%;object-fit:cover}
@@ -250,7 +250,7 @@
 .arcanist-destination-card-copy{display:grid;gap:3px;min-width:0;width:100%;text-align:center}
 .arcanist-destination-card-copy strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:9px/1.05 Georgia,serif;color:#f0e4cd}
 .arcanist-destination-card-copy small{font:600 5px/1.1 system-ui,sans-serif;letter-spacing:.04em;color:#d9ad70}
-.arcanist-destination-card[data-available="false"] .arcanist-destination-card-copy small{color:#d89a61}
+.arcanist-destination-card[data-available="false"] .arcanist-destination-card-copy small{color:#df7060}
 .arcanist-destination-card.is-selected .arcanist-destination-card-copy strong{color:#fff0cc}
 .arcanist-status-lamp{position:absolute;right:4px;top:4px;width:4px;height:4px;border-radius:50%;background:var(--route-light);box-shadow:0 0 5px var(--route-light)}
 @keyframes arcanist-lamp-breathe{0%,100%{opacity:.25;box-shadow:inset 0 0 3px var(--route-light),0 0 2px var(--route-light)}50%{opacity:.9;box-shadow:inset 0 0 6px var(--route-light),0 0 7px var(--route-light)}}
