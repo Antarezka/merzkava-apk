@@ -975,6 +975,7 @@ root.addEventListener("click", async (event: MouseEvent) => {
         option.className="idle-destination-option";
         option.dataset.idlePlace=marker.dataset.idlePlace??"";
         option.dataset.idleGroup="regional";
+        option.dataset.regionId=regionId;
         option.dataset.idleNote=marker.dataset.idleNote??"";
         const number=document.createElement("span"); number.className="idle-destination-index"; number.textContent=String(index+1).padStart(2,"0");
         const symbol=document.createElement("span"); symbol.className="idle-destination-symbol"; symbol.textContent=marker.querySelector("span")?.textContent??"◇";
@@ -996,7 +997,8 @@ root.addEventListener("click", async (event: MouseEvent) => {
     if(placeNote) placeNote.textContent=idlePlaceButton.dataset.idleNote??"This destination is reserved for a future update.";
     const placeId=idlePlaceButton.dataset.idlePlace;
     const placeGroup=idlePlaceButton.dataset.idleGroup??"regional";
-    const sceneId=placeId==="capital"?"gde-city":placeId==="academy"?"gde-academy":"";
+    const regionId=idlePlaceButton.dataset.regionId??idlePlaceButton.closest<HTMLElement>("[data-idle-map-region]")?.dataset.idleMapRegion??"golden-dragon-empire";
+    const sceneId=regionId==="golden-dragon-empire"?(placeId==="capital"?"gde-city":placeId==="academy"?"gde-academy":""):"";
     const routeStatus=root.querySelector<HTMLElement>("[data-arcanist-route-status]");
     const previewImage=root.querySelector<HTMLImageElement>("[data-arcanist-preview-image]");
     if(routeStatus) routeStatus.textContent=sceneId?"READY TO DIAL":"PREVIEW ONLY";
