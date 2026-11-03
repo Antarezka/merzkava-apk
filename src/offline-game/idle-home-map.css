@@ -224,7 +224,7 @@
 .arcanist-machine-title small{font:600 7px/1.2 system-ui,sans-serif;letter-spacing:.18em;color:#c6a36d}
 .arcanist-machine-heading>button{width:30px;height:30px;border:1px solid #8f744b;background:#202820;color:#e8d2a7;font:21px Georgia,serif}
 .arcanist-machine-main{position:relative;z-index:2;display:flex;flex:0 0 auto;flex-direction:column;gap:7px;min-width:0;padding:0}
-.arcanist-destination-panel{display:flex;flex:0 0 132px;flex-direction:column;min-width:0;min-height:0;overflow:hidden;border:1px solid #92784e;background:linear-gradient(120deg,#141a16ed,#222720ed);box-shadow:inset 0 0 0 2px #080d0a,inset 0 0 0 3px #6f5838}
+.arcanist-destination-panel{display:flex;flex:0 0 154px;flex-direction:column;min-width:0;min-height:0;overflow:hidden;border:1px solid #92784e;background:linear-gradient(120deg,#141a16ed,#222720ed);box-shadow:inset 0 0 0 2px #080d0a,inset 0 0 0 3px #6f5838}
 .arcanist-panel-title{display:flex;flex:0 0 auto;align-items:center;justify-content:space-between;gap:6px;padding:7px 8px;border-bottom:1px solid #94784f66;background:linear-gradient(90deg,#4a3b27,#1d241e)}
 .arcanist-panel-title span{font:700 7px system-ui,sans-serif;letter-spacing:.14em;color:#f0d7a4}
 .arcanist-panel-title small{font:600 5px system-ui,sans-serif;letter-spacing:.1em;color:#a99b80;text-align:right}
@@ -247,9 +247,9 @@
 .arcanist-destination-card.is-selected .arcanist-destination-art-frame{border-color:#ffe3a9;box-shadow:0 0 0 1px #e6c98a,0 0 12px #ffe1a0aa}
 .arcanist-destination-card.is-selected .arcanist-destination-art-frame img{filter:brightness(1.42) sepia(.22) saturate(1.12)}
 .arcanist-destination-card.is-selected .arcanist-destination-art-frame:after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at center,#fff1c966,#eacb8a22 62%,transparent 100%);mix-blend-mode:screen;pointer-events:none}
-.arcanist-destination-card-copy{display:grid;gap:3px;min-width:0;width:100%;text-align:center}
-.arcanist-destination-card-copy strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:9px/1.05 Georgia,serif;color:#f0e4cd}
-.arcanist-destination-card-copy small{font:600 5px/1.1 system-ui,sans-serif;letter-spacing:.04em;color:#d9ad70}
+.arcanist-destination-card-copy{display:grid;align-content:start;gap:4px;min-width:0;width:100%;min-height:30px;text-align:center}
+.arcanist-destination-card-copy strong{display:-webkit-box;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow-wrap:anywhere;font:9px/1.12 Georgia,serif;color:#f0e4cd}
+.arcanist-destination-card-copy small{display:block;white-space:normal;font:600 6px/1.15 system-ui,sans-serif;letter-spacing:.035em;color:#d9ad70}
 .arcanist-destination-card[data-available="false"] .arcanist-destination-card-copy small{color:#df7060}
 .arcanist-destination-card.is-selected .arcanist-destination-card-copy strong{color:#fff0cc}
 .arcanist-status-lamp{position:absolute;right:4px;top:4px;width:4px;height:4px;border-radius:50%;background:var(--route-light);box-shadow:0 0 5px var(--route-light)}
@@ -284,14 +284,14 @@
 .arcanist-quadrant-mark{position:absolute;width:4px;height:4px;border-radius:50%;background:#e0c18a;box-shadow:0 0 3px #e0c18a}
 .arcanist-quadrant-mark.mark-a{left:15px;top:53px}.arcanist-quadrant-mark.mark-b{left:29px;top:22px}.arcanist-quadrant-mark.mark-c{right:29px;top:22px}.arcanist-quadrant-mark.mark-d{right:15px;top:53px}
 .arcanist-quadrant-pivot{position:absolute;left:50%;bottom:9px;width:20px;height:20px;transform:translateX(-50%);border:2px solid #d0ae73;border-radius:50%;background:radial-gradient(circle,#b48a4e 0 24%,#22271f 28% 62%,#c6a16a 65%);box-shadow:0 1px 4px #000b}
-.arcanist-quadrant-lever{position:absolute;z-index:8;left:50%;bottom:14px;display:block;width:58px;height:104px;padding:0;border:0;background:transparent;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-user-drag:none;transform:translateX(-50%) rotate(var(--lever-angle,0deg));transform-origin:50% calc(100% - 10px);cursor:grab;pointer-events:auto}
+.arcanist-quadrant-lever{position:absolute;z-index:8;left:50%;bottom:9px;margin-left:-29px;display:block;width:58px;height:104px;padding:0;border:0;background:transparent;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-user-drag:none;transform:rotate(var(--lever-angle,0deg));transform-origin:50% calc(100% - 10px);cursor:grab;pointer-events:auto}
 .arcanist-quadrant-lever:disabled{opacity:.45;filter:grayscale(.65);cursor:not-allowed}
 .arcanist-quadrant-lever .arcanist-lever-shaft{position:absolute;left:calc(50% - 3px);top:13px;width:7px;height:77px;border:1px solid #e2c58e;border-radius:5px;background:linear-gradient(90deg,#4c3924,#f0d7a0 32%,#87683d 62%,#2c281f);box-shadow:0 0 0 1px #0b100d,0 2px 5px #000b}
 .arcanist-quadrant-lever .arcanist-lever-handle{position:absolute;left:calc(50% - 13px);top:0;width:26px;height:23px;border:1px solid #f0d59b;border-radius:48%;background:radial-gradient(circle at 35% 28%,#f0dfb5,#79603a 52%,#211c14 78%);box-shadow:inset 0 0 0 2px #34291c,0 3px 5px #000b}
 .arcanist-quadrant-lever .arcanist-lever-handle i{position:absolute;left:5px;right:5px;top:4px;height:2px;border-radius:3px;background:#f6e3b8aa}
 .arcanist-quadrant-lever.is-pulling{filter:brightness(1.18);transition:none}
 .arcanist-quadrant-lever.is-returning{transition:transform .42s cubic-bezier(.18,.75,.28,1)}
-.arcanist-quadrant-lever.is-pulled{transform:translateX(-50%) rotate(-52deg)}
+.arcanist-quadrant-lever.is-pulled{transform:rotate(-52deg)}
 .arcanist-lever-hint{margin:0;text-align:center;color:#9d927c;font:600 5px/1.5 system-ui,sans-serif;letter-spacing:.1em}
 .arcanist-card-reader{position:relative;display:flex;grid-column:2;grid-row:2;flex-direction:column;align-items:center;justify-content:center;gap:9px;min-width:0;margin:0;padding:6px 4px;border-left:1px solid #92784e55}
 .arcanist-card-reader-label{color:#bda477;font:700 6px system-ui,sans-serif;letter-spacing:.1em;text-align:center}
@@ -312,7 +312,7 @@
 @keyframes arcanist-card-swallow{0%{transform:translateY(0) scale(1);opacity:1}45%{transform:translateY(-8px) scale(.92,.86)}100%{transform:translateY(-30px) scale(.28,.16);opacity:0}}
 @keyframes arcanist-card-eject{0%{transform:translateY(-24px) scale(.3,.18);opacity:.2}70%{transform:translateY(3px) scale(1.03)}100%{transform:translateY(0) scale(1);opacity:1}}
 .arcanist-card-reader>small{color:#8f927e;font:600 5px system-ui,sans-serif;letter-spacing:.1em}
-.arcanist-transmission-bay{position:relative;z-index:1;display:block;flex:0 0 24px;height:24px;min-height:24px;margin:0 1px;overflow:hidden;border-top:1px solid #9b7c4e;border-bottom:1px solid #9b7c4e;background:linear-gradient(180deg,#111713,#2d332a 48%,#121813);box-shadow:inset 0 0 0 2px #080d0a,inset 0 0 0 3px #665337}
+.arcanist-transmission-bay{position:relative;z-index:1;display:block;flex:0 0 40px;height:40px;min-height:40px;margin:0 1px;overflow:hidden;border-top:1px solid #9b7c4e;border-bottom:1px solid #9b7c4e;background:linear-gradient(180deg,#111713,#2d332a 48%,#121813);box-shadow:inset 0 0 0 2px #080d0a,inset 0 0 0 3px #665337}
 .arcanist-wirework{position:absolute;inset:0;width:100%;height:100%;opacity:.78;fill:none;stroke:#c29b60;stroke-width:1.5;filter:drop-shadow(0 0 2px #c99d5a77);pointer-events:none}
 .arcanist-wire-drop{stroke:#dfc18b;stroke-width:1}
 .arcanist-machine-gear{position:absolute;z-index:2;display:grid;place-items:center;width:15px;height:15px;border:2px solid #bd9b65;border-radius:50%;background:radial-gradient(circle,#655034 0 23%,#141a15 27% 59%,#c4a06a 62% 67%,#171d18 70%);box-shadow:inset 0 0 0 3px #111710,0 2px 7px #000b;color:#f0d49a;font:12px Georgia,serif}
@@ -359,11 +359,11 @@
  .arcanist-device-drawer{padding:6px}
  .arcanist-machine-shell{padding:8px 7px 7px;gap:6px}
  .arcanist-machine-main{gap:6px}
- .arcanist-destination-panel{flex-basis:122px}
+ .arcanist-destination-panel{flex-basis:144px}
  .arcanist-destination-scroll{gap:5px;padding:6px}
  .arcanist-destination-card{flex-basis:calc((100% - 15px)/4);padding:3px}
  .arcanist-destination-card-copy strong{font-size:8px}
- .arcanist-destination-card-copy small{font-size:4px}
+ .arcanist-destination-card-copy small{font-size:5.5px}
  .arcanist-lever-panel{grid-template-columns:minmax(0,1fr) minmax(96px,.82fr);flex-basis:178px;padding:6px}
  .arcanist-quadrant-plate{width:min(100%,104px);height:112px}
  .arcanist-quadrant-lever{height:91px;width:54px}
@@ -381,7 +381,7 @@
  .arcanist-lever-panel{flex-basis:148px;padding:5px}
  .arcanist-quadrant-plate{height:94px}
  .arcanist-quadrant-lever{height:78px}
- .arcanist-transmission-bay{flex-basis:19px;height:19px;min-height:19px}
+ .arcanist-transmission-bay{flex-basis:36px;height:36px;min-height:36px}
  .arcanist-ticket-dispenser{flex-basis:100px;min-height:100px}
  .arcanist-ticket{min-height:82px;padding:7px}
  .arcanist-machine-status{min-height:24px;padding:5px}
