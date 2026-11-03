@@ -305,7 +305,6 @@ function renderChat(): void {
       field("Background", character.background || "—") +
       '</dl></details><details><summary>INV & KEUANGAN</summary><p>Inventory: ' + escapeHtml(profileValue(currentProfile, "Inventory")) + '</p><p>Assets Bangunan: ' + escapeHtml(profileValue(currentProfile, "Assets Bangunan")) + '</p><p>Wallet (wealth): ' + escapeHtml(profileValue(currentProfile, "Wallet (wealth)", "Belum diverifikasi · xc | xs | xg | zj | az")) + '</p></details><details><summary>TEKNIK & TUJUAN</summary><p>Teknik / Kemampuan: ' + escapeHtml(profileValue(currentProfile, "Teknik / Kemampuan")) + '</p><p>Tujuan Saat Ini: ' + escapeHtml(profileValue(currentProfile, "Tujuan Saat Ini")) + '</p></details><details><summary>CATATAN PEMAIN & KONSISTENSI</summary><p>' + (currentProfile ? "Nilai terakhir berasal dari respons GM dan masih menunggu verifikasi mekanik serta persetujuan pemain." : "Belum ada profil gameplay dari GM. Aplikasi tidak mengarang atau mengubah nilai yang belum diverifikasi.") + '</p></details>'
     : "Pilih karakter untuk melihat catatan lokalnya.";
-  initializeIdleTriggerDrag();
   translateRenderedContent(root, currentLanguage);
 }
 
@@ -529,6 +528,7 @@ function render(): void {
     ${activeScreen === "home" && noticeboardVisible ? noticeboardMarkup() : ""}
     ${bugPanelMarkup()}
   </div>`;
+  if (activeScreen === "offline-game") initializeIdleTriggerDrag();
   translateRenderedContent(root, currentLanguage);
   // Preserve the rail's manual roulette offset and each independent mechanical dial angle across rerenders.
   const renderedNavigation = root.querySelector<HTMLElement>(".nav-roulette-track");
