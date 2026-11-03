@@ -206,7 +206,6 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     machine.classList.remove("has-ticket", "is-printing");
     machine.classList.add("is-traveling");
     ticket.dataset.tearDirection = "center";
-    ticket.style.removeProperty("--ticket-extension");
     const stub = ticket.cloneNode(true) as HTMLButtonElement;
     stub.className = "arcanist-ticket-stub";
     stub.removeAttribute("data-arcanistry-ticket");
