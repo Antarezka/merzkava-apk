@@ -928,20 +928,14 @@ window.addEventListener("keydown", (event: KeyboardEvent) => {
 
 function selectArcanistDestination(place:HTMLElement):void{
   const machine=root.querySelector<HTMLElement>("[data-arcanistry-machine]");
-  if(machine && ["printing","ticket-ready","traveling"].includes(machine.dataset.machineState??"")) return;
+  if(machine && ["printing","ticket-ready","traveling","inserting-card","ejecting-card"].includes(machine.dataset.machineState??"")) return;
   const placeId=place.dataset.idlePlace??"";
   const group=place.dataset.idleGroup??"regional";
   const regionId=place.dataset.regionId??place.closest<HTMLElement>("[data-idle-map-region]")?.dataset.idleMapRegion??"golden-dragon-empire";
-  const card=Array.from(root.querySelectorAll<HTMLElement>("[data-arcanistry-destination]")).find(item=>
-    item.dataset.idlePlace===placeId && item.dataset.idleGroup===group &&
-    (group==="global" || item.dataset.regionId===regionId)
-  );
-  const sceneId=place.dataset.sceneId || card?.dataset.sceneId || (regionId==="golden-dragon-empire"?(placeId==="capital"?"gde-city":placeId==="academy"?"gde-academy":""):"") || "";
+  const card=Array.from(root.querySelectorAll<HTMLElement>("[data-arcanistry-destination]")).find(item=>item.dataset.idlePlace===placeId && item.dataset.idleGroup===group && (group==="global" || item.dataset.regionId===regionId));
+  const sceneId=place.dataset.sceneId || card?.dataset.sceneId || (regionId==="golden-dragon-empire"?(placeId==="capital"?"gde-city":placeId==="academy"?"gde-academy":"") : "") || "";
   const available=Boolean(sceneId);
-  const name=place.querySelector(".arcanist-destination-card-copy strong")?.textContent?.trim()
-    ?? card?.querySelector(".arcanist-destination-card-copy strong")?.textContent?.trim()
-    ?? place.querySelector("small")?.textContent?.trim()
-    ?? "Destination";
+  const name=place.querySelector(".arcanist-destination-card-copy strong")?.textContent?.trim() ?? card?.querySelector(".arcanist-destination-card-copy strong")?.textContent?.trim() ?? place.querySelector("small")?.textContent?.trim() ?? "Destination";
   root.querySelectorAll<HTMLElement>("[data-idle-place]").forEach(button=>{
     const buttonRegion=button.dataset.regionId??button.closest<HTMLElement>("[data-idle-map-region]")?.dataset.idleMapRegion??"golden-dragon-empire";
     button.classList.toggle("is-selected",button.dataset.idlePlace===placeId&&button.dataset.idleGroup===group&&(group==="global"||buttonRegion===regionId));
@@ -951,17 +945,8 @@ function selectArcanistDestination(place:HTMLElement):void{
   machine.dataset.selectedAvailable=String(available);
   machine.dataset.selectedName=name;
   machine.dispatchEvent(new CustomEvent("arcanistry:destination-selected", { bubbles: true }));
-  const generate=machine.querySelector<HTMLButtonElement>("[data-generate-code]");
-  if(generate) generate.disabled=!available;
-  const cancel=machine.querySelector<HTMLButtonElement>("[data-cancel-code]");
-  if(cancel) cancel.disabled=!available;
-  const lever=machine.querySelector<HTMLButtonElement>("[data-arcanistry-lever]");
-  if(lever){
-    lever.disabled=true;
-    lever.setAttribute("aria-label",available?"Lever locked until code verification":"This route is not available yet");
-  }
   const status=machine.querySelector<HTMLElement>("[data-arcanistry-status]");
-  if(status) status.textContent=available?"DESTINATION SET · GENERATE ACCESS CODE":"ROUTE UNAVAILABLE · COMING SOON";
+  if(status) status.textContent=available ? (machine.dataset.cardInserted==="true" ? "DESTINATION SET · CARD ACCEPTED · PULL LEVER" : "DESTINATION SET · INSERT TRAVEL CARD, THEN PULL LEVER") : "ROUTE UNAVAILABLE · COMING SOON";
 }
 root.addEventListener("click", async (event: MouseEvent) => {
   const target = event.target;
