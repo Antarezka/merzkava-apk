@@ -481,3 +481,40 @@
 .arcanist-machine-shell.is-card-required .arcanist-quadrant-bulb i{animation:arcanist-warning-master .47s steps(2,end) infinite}
 @media(max-width:390px){.arcanist-quadrant-lamp{min-height:32px;margin:0 0 2px}.arcanist-quadrant-bulb{width:21px;height:23px}}
 @media(prefers-reduced-motion:reduce){.arcanist-quadrant-bulb i{animation:none!important}}
+
+
+/* Layout correction: filament sits in the header band, not inside the control stack. */
+.arcanist-machine-heading{position:relative;overflow:visible}
+.arcanist-control-panel{position:relative;overflow:visible;justify-content:flex-start;gap:2px;padding:4px 3px 5px}
+.arcanist-quadrant-lamp{position:absolute;z-index:6;top:-37px;right:39px;display:grid;place-items:center;width:23px;height:25px;margin:0;padding:0;pointer-events:none}
+.arcanist-quadrant-bulb{position:relative;display:grid;place-items:center;width:21px;height:23px;border:1px solid #9b7948;border-radius:48% 48% 42% 42%;background:radial-gradient(ellipse at 50% 42%,#604a2b 0 31%,#211d15 54%,#0c110d 72%);box-shadow:inset 0 0 0 2px #0a0e0b,0 0 0 2px #4b3924,0 0 8px #c28a3d66}
+.arcanist-quadrant-bulb:before{content:"";position:absolute;left:6px;right:6px;bottom:-5px;height:6px;border:1px solid #9b7948;border-top:0;background:repeating-linear-gradient(180deg,#80633d 0 1px,#1a1d17 1px 3px)}
+.arcanist-quadrant-bulb i{position:relative;width:7px;height:10px;border:1px solid #f0c879;border-radius:50% 50% 35% 35%;background:radial-gradient(ellipse at 50% 70%,#fff2b4 0 14%,#f4b957 35%,#a65d25 72%,transparent 76%);box-shadow:0 0 5px 2px #e7b65d99,0 0 12px #e6a44877;animation:arcanist-quadrant-breathe 3.1s ease-in-out infinite}
+.arcanist-quadrant-lamp small{display:none}
+.arcanist-lever-label{order:0;padding:0 0 3px;margin-top:0;font-size:5px}
+.arcanist-quadrant-control{order:1;flex:0 0 auto;gap:1px;justify-content:flex-start;margin:0}
+.arcanist-quadrant-caption{font-size:4px;line-height:1.1}
+.arcanist-quadrant-plate{width:69px;height:61px}
+.arcanist-quadrant-lever{height:55px;bottom:13px}
+.arcanist-quadrant-lever .arcanist-lever-shaft{height:39px}
+.arcanist-card-reader{order:2;gap:2px;margin:4px 0 0;padding-top:4px;border-top:1px solid #92784e55}
+.arcanist-card-reader-label{font-size:4.5px}
+.arcanist-card-slot{height:7px}
+.arcanist-travel-card{width:61px;height:28px}
+.arcanist-card-reader>small{font-size:4px}
+.arcanist-control-panel .arcanist-lever-hint{font-size:4px}
+.arcanist-machine-main{align-items:start}
+.arcanist-ticket-dispenser{margin-top:-3px;padding-top:0}
+.arcanist-ticket-slot{top:1px}
+.arcanist-ticket{top:15px}
+@media(max-width:390px){
+ .arcanist-quadrant-lamp{top:-34px;right:34px;width:21px;height:23px}
+ .arcanist-quadrant-plate{width:63px;height:56px}
+ .arcanist-quadrant-lever{height:51px;bottom:11px}
+ .arcanist-quadrant-lever .arcanist-lever-shaft{height:36px}
+ .arcanist-travel-card{width:57px;height:26px}
+ .arcanist-card-reader{margin-top:3px;padding-top:3px}
+}
+@media(prefers-reduced-motion:reduce){.arcanist-quadrant-bulb i{animation:none!important}}
+.arcanist-machine-shell.is-running .arcanist-quadrant-bulb i,.arcanist-machine-shell.is-traveling .arcanist-quadrant-bulb i{animation:arcanist-master-flicker var(--lamp-flicker-duration,.73s) steps(1,end) infinite}
+.arcanist-machine-shell.is-card-required .arcanist-quadrant-bulb i{animation:arcanist-warning-master .47s steps(2,end) infinite}
