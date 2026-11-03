@@ -30,3 +30,14 @@ export function rotaryActivationProgress(angle:number,target=ARCANISTRY_ACTIVATI
 export function isRotaryAligned(angle:number,target=ARCANISTRY_ACTIVATION_ANGLE,tolerance=ARCANISTRY_ACTIVATION_TOLERANCE):boolean {
   return rotaryAngularDistance(angle,target)<=tolerance;
 }
+/** Resulting aperture angle after the pointer moves around the rotor center. */
+export function rotaryDragAngle(startApertureAngle:number,pointerStartAngle:number,pointerCurrentAngle:number):number {
+  return startApertureAngle+rotaryPointerDelta(pointerStartAngle,pointerCurrentAngle);
+}
+
+/** Parse the authored aperture angle without including the player's finger-grab offset. */
+export function parseRotaryApertureAngle(value:string|null|undefined):number|null {
+  if(!value) return null;
+  const parsed=Number.parseFloat(value.replace(/deg\s*$/i,""));
+  return Number.isFinite(parsed)?parsed:null;
+}
