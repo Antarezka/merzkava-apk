@@ -12,6 +12,7 @@ on:
       - safe/cord-clasp-2026-11-02
       - repair/restore-touch-clicks-2026-11-03
       - feature/arcanistry-victorian-ticket-machine-2026-11-03
+      - feature/hierarchical-world-map-2026-11-03
     paths:
       - "src/**"
       - "public/**"
