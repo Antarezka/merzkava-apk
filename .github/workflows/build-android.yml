@@ -11,7 +11,7 @@ on:
       - fix/floating-lever-detached
       - safe/cord-clasp-2026-11-02
       - repair/restore-touch-clicks-2026-11-03
-      - feature/arcanistry-rotary-stage2-threshold-2026-11-03
+      - feature/arcanistry-victorian-ticket-machine-2026-11-03
     paths:
       - "src/**"
       - "public/**"
