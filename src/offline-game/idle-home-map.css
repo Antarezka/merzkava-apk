@@ -381,3 +381,11 @@
 @media(max-width:390px){.arcanist-device-drawer{padding:6px}.arcanist-machine-shell{padding:8px 7px 10px}.arcanist-machine-main{grid-template-columns:minmax(0,1fr) 86px;gap:6px}.arcanist-destination-grid{gap:4px}.arcanist-destination-card{grid-template-columns:37px minmax(0,1fr);min-height:49px;gap:4px;padding:3px}.arcanist-destination-art-frame{width:37px;height:39px}.arcanist-destination-card-copy strong{font-size:9px}.arcanist-lever-cage{width:70px;height:172px}.arcanist-destination-scroll{max-height:clamp(200px,37vh,330px)}}
 @media(max-height:650px){.arcanist-destination-scroll{max-height:31vh}.arcanist-lever-cage{height:150px}.arcanist-transmission-bay{height:59px}.arcanist-ticket-dispenser{min-height:42px}}
 @media(prefers-reduced-motion:reduce){.arcanist-destination-card:before,.arcanist-machine-shell.is-running .arcanist-machine-gear,.arcanist-machine-shell.is-running .arcanist-machine-spring,.arcanist-machine-shell.is-running .arcanist-wirework path,.arcanist-loading-seal{animation:none!important}.arcanist-ticket.is-returning,.arcanist-ticket.is-torn{animation:none!important}}
+
+
+.arcanist-lever-shaft{transform:rotate(calc(-17deg + var(--lever-angle,0deg)));transition:transform .28s cubic-bezier(.2,.7,.2,1)}
+.arcanist-lever-handle{transform:rotate(calc(-17deg + var(--lever-angle,0deg)));transition:transform .28s cubic-bezier(.2,.7,.2,1)}
+.arcanist-lever-button{touch-action:none;user-select:none}
+.arcanist-lever-button.is-pulling .arcanist-lever-shaft,.arcanist-lever-button.is-pulling .arcanist-lever-handle{transition:none}
+.arcanist-lever-button.is-returning .arcanist-lever-shaft,.arcanist-lever-button.is-returning .arcanist-lever-handle{transition:transform .34s cubic-bezier(.18,.72,.25,1)}
+.arcanist-lever-button.is-pulled .arcanist-lever-shaft,.arcanist-lever-button.is-pulled .arcanist-lever-handle{transform:rotate(18deg)}
