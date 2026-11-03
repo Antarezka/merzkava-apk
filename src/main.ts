@@ -942,23 +942,50 @@ root.addEventListener("click", async (event: MouseEvent) => {
     });
     root.querySelectorAll<HTMLButtonElement>("[data-idle-region]").forEach(button=>button.classList.toggle("is-active",button===idleRegionButton));
     const activePanel=root.querySelector<HTMLElement>("[data-idle-map-region='"+regionId+"']");
-    const regionName=idleRegionButton.textContent?.trim()??"";
+    const regionName=idleRegionButton.textContent?.replace(/^\\d+/,"").trim()??"";
     const caption=root.querySelector<HTMLElement>("[data-idle-region-name]");
     const subtitle=root.querySelector<HTMLElement>("[data-idle-region-subtitle]");
     if(caption) caption.textContent=regionName;
     if(subtitle) subtitle.textContent=activePanel?.dataset.terrain?.toUpperCase()??"REGIONAL TERRITORY";
     const placeName=root.querySelector<HTMLElement>("[data-idle-place-name]");
     const placeNote=root.querySelector<HTMLElement>("[data-idle-place-note]");
-    if(placeName) placeName.textContent="Choose a map marker";
-    if(placeNote) placeNote.textContent="Tap a location directly on the map to preview its destination.";
+    if(placeName) placeName.textContent="Choose a destination";
+    if(placeNote) placeNote.textContent="Select a place from the index or directly on the map.";
+    const destinationList=root.querySelector<HTMLElement>("[data-idle-destination-list]");
+    if(destinationList&&activePanel){
+      destinationList.replaceChildren();
+      const mapMarkers=Array.from(activePanel.querySelectorAll<HTMLButtonElement>("[data-idle-place]"));
+      mapMarkers.forEach((marker,index)=>{
+        const option=document.createElement("button");
+        option.type="button";
+        option.className="idle-destination-option";
+        option.dataset.idlePlace=marker.dataset.idlePlace??"";
+        option.dataset.idleGroup="regional";
+        option.dataset.idleNote=marker.dataset.idleNote??"";
+        const number=document.createElement("span"); number.className="idle-destination-index"; number.textContent=String(index+1).padStart(2,"0");
+        const symbol=document.createElement("span"); symbol.className="idle-destination-symbol"; symbol.textContent=marker.querySelector("span")?.textContent??"◇";
+        const name=document.createElement("span"); name.className="idle-destination-name"; name.textContent=marker.querySelector("small")?.textContent?.trim()??"Destination";
+        const arrow=document.createElement("span"); arrow.className="idle-destination-arrow"; arrow.textContent="›";
+        option.append(number,symbol,name,arrow); destinationList.append(option);
+      });
+      const count=root.querySelector<HTMLElement>("[data-idle-destination-count]");
+      if(count) count.textContent=String(mapMarkers.length).padStart(2,"0")+" LOCATIONS";
+    }
     return;
   }
   const idlePlaceButton=target.closest<HTMLButtonElement>("[data-idle-place]");
   if(idlePlaceButton){
     const placeName=root.querySelector<HTMLElement>("[data-idle-place-name]");
     const placeNote=root.querySelector<HTMLElement>("[data-idle-place-note]");
-    if(placeName) placeName.textContent=idlePlaceButton.querySelector("small")?.textContent?.trim()??"Destination";
+    const selectedName=idlePlaceButton.querySelector(".idle-destination-name,small")?.textContent?.trim()??"Destination";
+    if(placeName) placeName.textContent=selectedName;
     if(placeNote) placeNote.textContent=idlePlaceButton.dataset.idleNote??"This destination is reserved for a future update.";
+    const placeId=idlePlaceButton.dataset.idlePlace;
+    const placeGroup=idlePlaceButton.dataset.idleGroup??"regional";
+    root.querySelectorAll<HTMLButtonElement>("[data-idle-place]").forEach(button=>{
+      const selected=button.dataset.idlePlace===placeId&&button.dataset.idleGroup===placeGroup;
+      button.classList.toggle("is-selected",selected);
+    });
     return;
   }
   if (target.closest("[data-idle-rpg-open]")) {
