@@ -61,8 +61,8 @@ Rules:
 - [x] Inspect the current branch's rotary markup, CSS, interaction handler, helper functions, and tests.
 - [x] Record the current baseline and known implementation gaps.
 - [x] Lock the interaction contract, mechanical progress contract, state machine, and stage gates in this document.
-- [ ] Owner reviews/accepts this recorded Stage 1 specification.
-- [ ] Stage 1 gate formally marked passed before Stage 2 work begins.
+- [x] Owner reviewed and approved the staged specification in chat on 2026-11-03.
+- [x] Stage 1 gate passed before Stage 2 implementation began.
 
 **Stage 1 audit findings (baseline branch):**
 - The current markup already renders destination apertures directly on the rotary, a fixed activation marker, two SVG thread paths, three gear elements, and a route-loading overlay.
@@ -126,5 +126,5 @@ Rules:
 
 | Stage | Result | Evidence |
 |---|---|---|
-| Stage 1 | Specification and source audit recorded; awaiting owner acceptance | This document; baseline branch `repair/restore-touch-clicks-2026-11-03` |
+| Stage 1 | **PASSED** — specification approved; Stage 2 implementation is isolated on its own branch | This document; baseline branch `repair/restore-touch-clicks-2026-11-03` |
 | Stage 2–6 | Not started | Strict stage gate |
