@@ -142,7 +142,7 @@ function mapEditorMarkup(): string {
     markers.map(marker => worldMapMarkerMarkup(marker, true)).join("") + '<div class="wmh-editor-crosshair" aria-hidden="true"></div></div></div>' +
     '<div class="wmh-coordinate-table-wrap"><table class="wmh-coordinate-table"><thead><tr><th>AREA</th><th>X (%)</th><th>Y (%)</th></tr></thead><tbody>' +
     markers.map(marker => '<tr data-wmh-coordinate-row="' + marker.id + '"><td>' + marker.name + '</td><td><input type="number" min="0" max="100" step="0.1" value="' + marker.x + '" data-wmh-coordinate="' + marker.id + '" data-axis="x" aria-label="' + marker.name + ' X coordinate" /></td><td><input type="number" min="0" max="100" step="0.1" value="' + marker.y + '" data-wmh-coordinate="' + marker.id + '" data-axis="y" aria-label="' + marker.name + ' Y coordinate" /></td></tr>').join("") +
-    '</tbody></table></div><section class="wmh-coordinate-transfer"><div class="wmh-transfer-heading"><b>COORDINATE REFERENCE</b><span>PORTABLE COPY · JSON</span></div><p>Copy this reference and keep it as the source of truth when placing areas, buildings, objects, or other map points.</p><textarea readonly spellcheck="false" data-wmh-export aria-label="Exportable world map coordinate reference"></textarea><div class="wmh-editor-actions"><button type="button" data-wmh-action="editor-copy">COPY COORDINATES</button><button type="button" data-wmh-action="editor-save">SAVE ON DEVICE</button></div><label class="wmh-import-label" for="wmh-coordinate-import">PASTE A PREVIOUS COORDINATE REFERENCE</label><textarea id="wmh-coordinate-import" spellcheck="false" data-wmh-import placeholder="Paste the copied JSON reference here..."></textarea><button class="wmh-import-button" type="button" data-wmh-action="editor-import">IMPORT PASTED COORDINATES</button></section><div class="wmh-editor-actions"><button type="button" data-wmh-action="editor-reset">RESET DEFAULTS</button><button type="button" data-wmh-action="editor-close">← WORLD MAP</button></div><p class="wmh-editor-status" data-wmh-editor-status>Changes are a preview until saved. Copy the reference to transfer it elsewhere.</p></div>';
+    '</tbody></table></div><section class="wmh-coordinate-transfer"><div class="wmh-transfer-heading"><b>COORDINATE REFERENCE</b><span>PORTABLE COPY · JSON</span></div><p>Copy this reference and keep it as the source of truth when placing areas, buildings, objects, or other map points.</p><textarea readonly spellcheck="false" data-wmh-export aria-label="Exportable world map coordinate reference"></textarea><div class="wmh-editor-actions"><button type="button" data-wmh-action="editor-copy">COPY COORDINATES</button></div><label class="wmh-import-label" for="wmh-coordinate-import">PASTE A PREVIOUS COORDINATE REFERENCE</label><textarea id="wmh-coordinate-import" spellcheck="false" data-wmh-import placeholder="Paste the copied JSON reference here..."></textarea><button class="wmh-import-button" type="button" data-wmh-action="editor-import">IMPORT PASTED COORDINATES</button></section><div class="wmh-editor-actions"><button type="button" data-wmh-action="editor-reset">RESET DEFAULTS</button><button type="button" data-wmh-action="editor-close">← WORLD MAP</button></div><p class="wmh-editor-status" data-wmh-editor-status>Move markers, then confirm to lock their positions on this device.</p><div class="wmh-editor-confirm-bar"><span>POSITION PREVIEW</span><button type="button" data-wmh-action="editor-confirm">✓ &nbsp; CONFIRM &amp; LOCK POSITIONS</button></div></div>';
 }
 function bindWorldMapEditor(dialog: HTMLElement): void {
   const canvas = dialog.querySelector<HTMLElement>("[data-wmh-editor-canvas]");
@@ -150,6 +150,7 @@ function bindWorldMapEditor(dialog: HTMLElement): void {
   canvas.dataset.bound = "true";
   let markers = readWorldMarkers();
   let dragging: WorldMarkerId | null = null;
+  let hasUnsavedChanges = false;
   const exportField = dialog.querySelector<HTMLTextAreaElement>("[data-wmh-export]");
   const surface = canvas.querySelector<HTMLElement>("[data-wmh-map-surface]");
   const mapImage = surface?.querySelector<HTMLImageElement>("img");
@@ -192,7 +193,8 @@ function bindWorldMapEditor(dialog: HTMLElement): void {
     const marker = markers.find(item => item.id === id);
     if (!marker) return;
     marker.x = clamp(x); marker.y = clamp(y); paint(marker); refreshExport();
-    setStatus(marker.name + " · X " + marker.x + "% · Y " + marker.y + "% · unsaved preview");
+    hasUnsavedChanges = true;
+    setStatus(marker.name + " · X " + marker.x + "% · Y " + marker.y + "% · pending confirmation");
   };
   canvas.addEventListener("pointerdown", event => {
     const target = event.target as Element;
@@ -200,6 +202,7 @@ function bindWorldMapEditor(dialog: HTMLElement): void {
     if (!markerButton) return;
     event.preventDefault();
     dragging = markerButton.dataset.wmhDragMarker as WorldMarkerId;
+    markerButton.classList.add("wmh-editor-marker-lifted");
     try { canvas.setPointerCapture(event.pointerId); } catch { /* pointer capture may be unavailable */ }
   });
   canvas.addEventListener("pointermove", event => {
@@ -207,7 +210,10 @@ function bindWorldMapEditor(dialog: HTMLElement): void {
     const bounds = mapBounds();
     update(dragging, ((event.clientX - bounds.left) / bounds.width) * 100, ((event.clientY - bounds.top) / bounds.height) * 100);
   });
-  const stop = () => { dragging = null; };
+  const stop = () => {
+    if (dragging) canvas.querySelector<HTMLElement>('[data-wmh-drag-marker="' + dragging + '"]')?.classList.remove("wmh-editor-marker-lifted");
+    dragging = null;
+  };
   canvas.addEventListener("pointerup", stop);
   canvas.addEventListener("pointercancel", stop);
   dialog.querySelectorAll<HTMLInputElement>("[data-wmh-coordinate]").forEach(input => {
@@ -224,10 +230,11 @@ function bindWorldMapEditor(dialog: HTMLElement): void {
   const saveCoordinates = () => {
     try {
       localStorage.setItem(WORLD_MAP_COORDINATES_KEY, JSON.stringify(markers));
-      setStatus("Coordinates saved on this device. The portable JSON reference is ready to copy.");
+      hasUnsavedChanges = false;
+      setStatus("Positions confirmed and locked on this device. They will remain after leaving the map or closing the app.");
     } catch { setStatus("Could not save: device storage is unavailable. Copy the JSON reference as a backup."); }
   };
-  dialog.querySelector<HTMLElement>('[data-wmh-action="editor-save"]')?.addEventListener("click", saveCoordinates);
+  dialog.querySelector<HTMLElement>('[data-wmh-action="editor-confirm"]')?.addEventListener("click", saveCoordinates);
   dialog.querySelector<HTMLElement>('[data-wmh-action="editor-copy"]')?.addEventListener("click", async () => {
     refreshExport();
     const value = exportField?.value || serializeWorldMapCoordinates(markers);
@@ -257,14 +264,14 @@ function bindWorldMapEditor(dialog: HTMLElement): void {
         const item = incoming.find((entry: any) => entry.id === base.id);
         return { ...base, x: clamp(Number(item.x)), y: clamp(Number(item.y)) };
       });
-      markers.forEach(paint); refreshExport(); saveCoordinates();
-      setStatus("Imported and saved. These coordinates now control the World Map markers on this device.");
+      markers.forEach(paint); refreshExport(); hasUnsavedChanges = true;
+      setStatus("Imported coordinates are a preview. Confirm & lock positions to save them on this device.");
     } catch { setStatus("Import failed. Paste a valid Merzkava World Map JSON reference with all three area IDs."); }
   });
   dialog.querySelector<HTMLElement>('[data-wmh-action="editor-reset"]')?.addEventListener("click", () => {
     markers = defaultWorldMarkers.map(item => ({ ...item }));
-    markers.forEach(paint); refreshExport();
-    setStatus("Default coordinates restored in preview. Save on device to keep them.");
+    markers.forEach(paint); refreshExport(); hasUnsavedChanges = true;
+    setStatus("Default positions restored in preview. Confirm & lock positions to save them.");
   });
 }
 
@@ -315,7 +322,7 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
   if (action.dataset.wmhAction === "open") { overlay.hidden = false; overlay.dataset.level = "world"; dialog.innerHTML = panelMarkup("world"); bindWorldMapZoom(dialog); return true; }
   if (action.dataset.wmhAction === "editor-open") { overlay.dataset.level = "map-editor"; dialog.innerHTML = panelMarkup("map-editor"); bindWorldMapEditor(dialog); return true; }
   if (action.dataset.wmhAction === "editor-close") { overlay.dataset.level = "world"; dialog.innerHTML = panelMarkup("world"); bindWorldMapZoom(dialog); return true; }
-  if (action.dataset.wmhAction === "editor-save" || action.dataset.wmhAction === "editor-reset") return true;
+  if (action.dataset.wmhAction === "editor-confirm" || action.dataset.wmhAction === "editor-reset") return true;
   if (action.dataset.wmhAction === "close") { overlay.hidden = true; return true; }
   if (action.dataset.wmhAction === "back") {
     const next: Level = current === "interior" ? "local" : current === "local" ? "regional" : "world";
