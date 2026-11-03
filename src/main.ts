@@ -29,12 +29,20 @@ import { getLanguage, languagePanelMarkup, translateLabel, translateRenderedCont
 import { animateOpeningSplash, animateSplashCurtain } from "./ui/splash-animation";
 import { animateAppScreen } from "./ui/app-shell-motion";
 import { initializeGravityPullCord } from "./ui/gravity-pull-cord";
-import { isRotaryAligned, rotaryActivationProgress, rotaryPointerDelta, ARCANISTRY_ACTIVATION_ANGLE } from "./offline-game/arcanistry-rotary";
+import { mountArcanistryTicketMachine } from "./offline-game/arcanistry-ticket-machine";
 import { closeLoreEntry, closeLoreSource, closeLorePlaceholder, openLoreEntry, openLoreSource, openLorePlaceholder, setLoreCategory, setLoreSearch, renderLoreResults } from "./world-archive/lore-library";
 
 const app = document.querySelector<HTMLDivElement>("#app");
 if (!app) throw new Error("App root element was not found.");
 const root = app;
+mountArcanistryTicketMachine(root, async sceneId => {
+  setEternalLocation(sceneId);
+  const drawer = root.querySelector<HTMLElement>("[data-arcanist-device]");
+  if (drawer) drawer.hidden = true;
+  root.querySelector<HTMLButtonElement>("[data-arcanist-pull]")?.setAttribute("aria-expanded", "false");
+  notice = sceneId === "gde-academy" ? "Arrived at the Academy." : "Arrived at the Imperial Capital.";
+  render();
+});
 document.title = APP_NAME + " · " + APP_VERSION;
 
 
@@ -917,125 +925,43 @@ window.addEventListener("keydown", (event: KeyboardEvent) => {
 });
 
 
-function arcanistPointerAngle(element:HTMLElement,event:PointerEvent):number{const rect=element.getBoundingClientRect();return Math.atan2(event.clientY-(rect.top+rect.height/2),event.clientX-(rect.left+rect.width/2))*180/Math.PI;}
 function selectArcanistDestination(place:HTMLElement):void{
- const placeId=place.dataset.idlePlace??"";
- const group=place.dataset.idleGroup??"regional";
- const regionId=place.dataset.regionId??place.closest<HTMLElement>("[data-idle-map-region]")?.dataset.idleMapRegion??"golden-dragon-empire";
- const name=place.querySelector(".idle-destination-name,small")?.textContent?.trim()??"Destination";
- const sceneId=regionId==="golden-dragon-empire"?(placeId==="capital"?"gde-city":placeId==="academy"?"gde-academy":""):"";
- const rotor=root.querySelector<HTMLElement>("[data-arcanist-rotor]");
- const placeName=root.querySelector<HTMLElement>("[data-idle-place-name]");
- const placeNote=root.querySelector<HTMLElement>("[data-idle-place-note]");
- const routeStatus=root.querySelector<HTMLElement>("[data-arcanist-route-status]");
- const preview=root.querySelector<HTMLImageElement>("[data-arcanist-preview-image]");
- if(placeName)placeName.textContent=name;
- if(placeNote)placeNote.textContent=place.dataset.idleNote??"This destination is reserved for a future update.";
- if(routeStatus)routeStatus.textContent=sceneId?"READY · DRAG TO ACTIVATE":"PREVIEW ONLY";
- if(preview&&sceneId)preview.src=sceneId==="gde-academy"?"/game/scenery/golden-dragon-empire/gde-05-cultivation-academy-courtyard.png":"/game/scenery/golden-dragon-empire/establishing-views/gde-01-imperial-city-panorama.png";
- if(rotor)rotor.dataset.sceneId=sceneId;
- root.querySelectorAll<HTMLButtonElement>("[data-idle-place]").forEach(button=>button.classList.toggle("is-selected",button.dataset.idlePlace===placeId&&button.dataset.idleGroup===group));
-}
-let activeArcanistDial:{element:HTMLElement;selected:HTMLElement;pointerId:number;lastAngle:number;startAngle:number;turned:number;sceneId:string}|null=null;
-root.addEventListener("pointerdown",event=>{
- const target=event.target;if(!(target instanceof Element)||(event.pointerType==="mouse"&&event.button!==0))return;
- const aperture=target.closest<HTMLElement>(".arcanist-dial-aperture[data-idle-place]");
- const rotor=aperture?.closest<HTMLElement>("[data-arcanist-rotor]");
- if(!aperture||!rotor)return;
- selectArcanistDestination(aperture);
- const angle=arcanistPointerAngle(rotor,event);
- activeArcanistDial={element:rotor,selected:aperture,pointerId:event.pointerId,lastAngle:angle,startAngle:angle,turned:0,sceneId:rotor.dataset.sceneId??""};
- try{rotor.setPointerCapture(event.pointerId);}catch{/* WebView fallback */}
- event.preventDefault();
-},{passive:false});
-root.addEventListener("pointermove",event=>{
- const active=activeArcanistDial;if(!active||active.pointerId!==event.pointerId)return;
- const next=arcanistPointerAngle(active.element,event);
- const delta=rotaryPointerDelta(active.lastAngle,next);active.lastAngle=next;
- if(Math.abs(delta)>0.08){
-  active.turned+=delta;
-  const angle=active.startAngle+active.turned;
-  const progress=rotaryActivationProgress(angle,ARCANISTRY_ACTIVATION_ANGLE,active.startAngle);
-  const device=active.element.closest<HTMLElement>("[data-arcanist-device]");
-  active.element.style.setProperty("--dial-angle",active.turned+"deg");
-  active.element.style.setProperty("--gear-turn",(active.turned*2.4)+"deg");
-  active.element.style.setProperty("--gear-turn-reverse",(active.turned*-3.24)+"deg");
-  active.element.style.setProperty("--gear-turn-fast",(active.turned*4.32)+"deg");
-  active.element.style.setProperty("--thread-dash-offset",(350*(1-progress))+"px");
-  active.element.querySelectorAll<HTMLElement>(".arcanist-red-thread").forEach(thread=>thread.style.strokeDashoffset=(350*(1-progress))+"px");
-  active.element.querySelectorAll<HTMLElement>(".arcanist-dial-aperture").forEach(aperture=>{
-   const selected=aperture===active.selected;
-   const radius=parseFloat(getComputedStyle(aperture).getPropertyValue("--hole-radius"))||96;
-   const inset=selected?radius:radius-58*progress;
-   aperture.style.setProperty("--hole-inset",inset+"px");
-   aperture.style.setProperty("--hole-scale",selected?"1":String(1-.72*progress));
-   aperture.style.setProperty("--hole-opacity",selected?"1":String(1-.78*progress));
+  const machine=root.querySelector<HTMLElement>("[data-arcanistry-machine]");
+  if(machine && ["printing","ticket-ready","traveling"].includes(machine.dataset.machineState??"")) return;
+  const placeId=place.dataset.idlePlace??"";
+  const group=place.dataset.idleGroup??"regional";
+  const regionId=place.dataset.regionId??place.closest<HTMLElement>("[data-idle-map-region]")?.dataset.idleMapRegion??"golden-dragon-empire";
+  const card=Array.from(root.querySelectorAll<HTMLElement>("[data-arcanistry-destination]")).find(item=>
+    item.dataset.idlePlace===placeId && item.dataset.idleGroup===group &&
+    (group==="global" || item.dataset.regionId===regionId)
+  );
+  const sceneId=place.dataset.sceneId || card?.dataset.sceneId || (regionId==="golden-dragon-empire"?(placeId==="capital"?"gde-city":placeId==="academy"?"gde-academy":""):"") || "";
+  const available=Boolean(sceneId);
+  const name=place.querySelector(".arcanist-destination-card-copy strong")?.textContent?.trim()
+    ?? card?.querySelector(".arcanist-destination-card-copy strong")?.textContent?.trim()
+    ?? place.querySelector("small")?.textContent?.trim()
+    ?? "Destination";
+  root.querySelectorAll<HTMLElement>("[data-idle-place]").forEach(button=>{
+    const buttonRegion=button.dataset.regionId??button.closest<HTMLElement>("[data-idle-map-region]")?.dataset.idleMapRegion??"golden-dragon-empire";
+    button.classList.toggle("is-selected",button.dataset.idlePlace===placeId&&button.dataset.idleGroup===group&&(group==="global"||buttonRegion===regionId));
   });
-  device?.classList.add("is-turning");device?.classList.remove("is-returning","is-activating");
-  playClockworkRatchet();
-  if(Math.abs(active.turned)>3)suppressNextPointerClick=true;
- }
- event.preventDefault();
-},{passive:false});
-function finishArcanistDial(event:PointerEvent,cancelled=false):void{
- const active=activeArcanistDial;if(!active||active.pointerId!==event.pointerId)return;
- activeArcanistDial=null;
- try{if(active.element.hasPointerCapture(event.pointerId))active.element.releasePointerCapture(event.pointerId);}catch{/* already released */}
- const finalAngle=active.startAngle+active.turned;
- const aligned=!cancelled&&isRotaryAligned(finalAngle,ARCANISTRY_ACTIVATION_ANGLE);
- const completed=aligned&&Boolean(active.sceneId);
- const device=active.element.closest<HTMLElement>("[data-arcanist-device]");
- const drawer=active.element.closest<HTMLElement>("[data-arcanist-device]");
- const reducedMotion=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
- device?.classList.remove("is-turning");
- device?.classList.add(completed?"is-activating":"is-returning");
- active.element.style.setProperty("--dial-angle","0deg");
- active.element.style.setProperty("--gear-turn","0deg");
- active.element.style.setProperty("--gear-turn-reverse","0deg");
- active.element.style.setProperty("--gear-turn-fast","0deg");
- active.element.querySelectorAll<HTMLElement>(".arcanist-red-thread").forEach(thread=>thread.style.strokeDashoffset=completed?"0px":"350px");
- active.element.setAttribute("aria-label",completed?"Arcanistry route activated":"Arcanistry rotor returned to its resting position");
- active.element.querySelectorAll<HTMLElement>(".arcanist-dial-aperture").forEach(aperture=>{
-  const close=completed&&aperture!==active.selected;
-  const radius=parseFloat(getComputedStyle(aperture).getPropertyValue("--hole-radius"))||96;
-  aperture.style.setProperty("--hole-inset",close?Math.max(22,radius*.29)+"px":radius+"px");
-  aperture.style.setProperty("--hole-scale",close?"0.18":"1");
-  aperture.style.setProperty("--hole-opacity",close?"0.04":"1");
- });
- if(completed){
-  active.selected.classList.add("is-route-locked");
-  playNavigationTick();
-  const finishTravel=()=>{
-   if(!drawer)return;
-   setEternalLocation(active.sceneId);
-   drawer.hidden=true;
-   root.querySelector<HTMLButtonElement>("[data-arcanist-pull]")?.setAttribute("aria-expanded","false");
-   notice=active.sceneId==="gde-academy"?"Arrived at the Academy.":"Arrived at the Imperial Capital.";
-   render();
-  };
-  const beginSceneLoading=()=>{
-   const loading=root.querySelector<HTMLElement>("[data-arcanist-loading]");
-   if(loading)loading.hidden=false;
-   window.setTimeout(finishTravel,reducedMotion?0:560);
-  };
-  window.setTimeout(beginSceneLoading,reducedMotion?0:880);
- }else{
-  if(aligned&&!active.sceneId){const status=root.querySelector<HTMLElement>("[data-arcanist-route-status]");if(status)status.textContent="ROUTE NOT CONNECTED";}
-  if(Math.abs(active.turned)>3)playNavigationTick();
-  window.setTimeout(()=>{
-   active.element.querySelectorAll<HTMLElement>(".arcanist-dial-aperture").forEach(aperture=>{
-    const radius=parseFloat(getComputedStyle(aperture).getPropertyValue("--hole-radius"))||96;
-    aperture.style.setProperty("--hole-inset",radius+"px");aperture.style.setProperty("--hole-scale","1");aperture.style.setProperty("--hole-opacity","1");
-   });
-   active.element.querySelectorAll<HTMLElement>(".arcanist-red-thread").forEach(thread=>thread.style.strokeDashoffset="350px");
-   device?.classList.remove("is-returning");
-   active.element.style.setProperty("--thread-dash-offset","350px");
-  },reducedMotion?0:690);
- }
+  if(!machine) return;
+  machine.dataset.selectedScene=sceneId;
+  machine.dataset.selectedAvailable=String(available);
+  machine.dataset.selectedName=name;
+  machine.dispatchEvent(new CustomEvent("arcanistry:destination-selected", { bubbles: true }));
+  const generate=machine.querySelector<HTMLButtonElement>("[data-generate-code]");
+  if(generate) generate.disabled=!available;
+  const cancel=machine.querySelector<HTMLButtonElement>("[data-cancel-code]");
+  if(cancel) cancel.disabled=!available;
+  const lever=machine.querySelector<HTMLButtonElement>("[data-arcanistry-lever]");
+  if(lever){
+    lever.disabled=true;
+    lever.setAttribute("aria-label",available?"Lever locked until code verification":"This route is not available yet");
+  }
+  const status=machine.querySelector<HTMLElement>("[data-arcanistry-status]");
+  if(status) status.textContent=available?"DESTINATION SET · GENERATE ACCESS CODE":"ROUTE UNAVAILABLE · COMING SOON";
 }
-root.addEventListener("pointerup",event=>finishArcanistDial(event),{passive:true});
-root.addEventListener("pointercancel",event=>finishArcanistDial(event,true),{passive:true});
-
 root.addEventListener("click", async (event: MouseEvent) => {
   const target = event.target;
   if (!(target instanceof Element)) return;
@@ -1070,38 +996,14 @@ root.addEventListener("click", async (event: MouseEvent) => {
     const subtitle=root.querySelector<HTMLElement>("[data-idle-region-subtitle]");
     if(caption) caption.textContent=regionName;
     if(subtitle) subtitle.textContent=activePanel?.dataset.terrain?.toUpperCase()??"REGIONAL TERRITORY";
-    const placeName=root.querySelector<HTMLElement>("[data-idle-place-name]");
-    const placeNote=root.querySelector<HTMLElement>("[data-idle-place-note]");
-    if(placeName) placeName.textContent="Choose a destination";
-    if(placeNote) placeNote.textContent="Select a place from the index or directly on the map.";
-    const routeStatus=root.querySelector<HTMLElement>("[data-arcanist-route-status]");if(routeStatus)routeStatus.textContent="PREVIEW ONLY";
-    const rotor=root.querySelector<HTMLElement>("[data-arcanist-rotor]");
-    if(rotor&&activePanel){
-      rotor.querySelectorAll(".arcanist-dial-aperture[data-idle-group='regional']").forEach(node=>node.remove());
-      const regionalMarkers=Array.from(activePanel.querySelectorAll<HTMLButtonElement>("[data-idle-place]"));
-      const total=regionalMarkers.length+rotor.querySelectorAll(".arcanist-dial-aperture[data-idle-group='global']").length;
-      regionalMarkers.forEach((marker,index)=>{
-        const aperture=document.createElement("button");
-        aperture.type="button";aperture.className="arcanist-dial-aperture"+(index===0?" is-selected":"");
-        aperture.dataset.idlePlace=marker.dataset.idlePlace??"";
-        aperture.dataset.idleGroup="regional";aperture.dataset.regionId=regionId??"";
-        aperture.dataset.idleNote=marker.dataset.idleNote??"";
-        aperture.style.setProperty("--hole-angle",(360/total*index)+"deg");
-        const symbol=document.createElement("span");symbol.textContent=marker.querySelector("span")?.textContent??"◇";
-        const label=document.createElement("small");label.textContent=marker.querySelector("small")?.textContent?.trim()??"Place";
-        aperture.append(symbol,label);rotor.append(aperture);
-      });
-      rotor.querySelectorAll<HTMLElement>(".arcanist-dial-aperture[data-idle-group='global']").forEach((aperture,index)=>{
-        aperture.style.setProperty("--hole-angle",(360/total*(regionalMarkers.length+index))+"deg");
-      });
-      delete rotor.dataset.sceneId;
-    }
+    const machineStatus=root.querySelector<HTMLElement>("[data-arcanistry-status]");
+    if(machineStatus&&root.querySelector<HTMLElement>("[data-arcanistry-machine]")?.dataset.machineState==="idle") machineStatus.textContent="SELECT A DESTINATION TO PREPARE THE ROUTE";
     return;
   }
   const idlePlaceButton=target.closest<HTMLButtonElement>("[data-idle-place]");
   if(idlePlaceButton){selectArcanistDestination(idlePlaceButton);return;}
-  if(target.closest("[data-arcanist-pull]")){const drawer=root.querySelector<HTMLElement>("[data-arcanist-device]");const trigger=root.querySelector<HTMLButtonElement>("[data-arcanist-pull]");if(drawer&&trigger){drawer.hidden=!drawer.hidden;trigger.setAttribute("aria-expanded",String(!drawer.hidden));}return;}
-  if(target.closest("[data-arcanist-close]")){const drawer=root.querySelector<HTMLElement>("[data-arcanist-device]");const trigger=root.querySelector<HTMLButtonElement>("[data-arcanist-pull]");if(drawer&&trigger){drawer.hidden=true;trigger.setAttribute("aria-expanded","false");}return;}
+  if(target.closest("[data-arcanist-pull]")){const drawer=root.querySelector<HTMLElement>("[data-arcanist-device]");const trigger=root.querySelector<HTMLButtonElement>("[data-arcanist-pull]");const machine=root.querySelector<HTMLElement>("[data-arcanistry-machine]");if(drawer&&trigger){if(!drawer.hidden&&machine?.dataset.machineState!=="idle")return;drawer.hidden=!drawer.hidden;trigger.setAttribute("aria-expanded",String(!drawer.hidden));}return;}
+  if(target.closest("[data-arcanist-close]")){const drawer=root.querySelector<HTMLElement>("[data-arcanist-device]");const trigger=root.querySelector<HTMLButtonElement>("[data-arcanist-pull]");const machine=root.querySelector<HTMLElement>("[data-arcanistry-machine]");if(machine&&machine.dataset.machineState!=="idle")return;if(drawer&&trigger){drawer.hidden=true;trigger.setAttribute("aria-expanded","false");}return;}
   if (target.closest("[data-idle-rpg-open]")) {
     const modal=root.querySelector<HTMLElement>("[data-idle-rpg-modal]");
     const trigger=root.querySelector<HTMLButtonElement>("[data-idle-rpg-open]");

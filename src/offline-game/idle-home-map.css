@@ -267,3 +267,247 @@
 .arcanist-device-drawer.is-activating .arcanist-device-heading button{pointer-events:none;opacity:.35}
 @keyframes arcanist-seal-turn{to{transform:rotate(360deg)}}
 @media(prefers-reduced-motion:reduce){.arcanist-loading-seal{animation:none}}
+
+
+/* Victorian Arcanistry ticket engine — replacement for the former rotary selector. */
+.arcanist-device-drawer{
+ position:absolute;z-index:40;inset:0;width:100%;height:100%;max-height:100%;left:0;bottom:auto;
+ overflow:auto;padding:9px;background:radial-gradient(ellipse at 48% 15%,#394239 0%,#171d19 58%,#090d0b 100%);
+ border:1px solid #c5a16a;box-shadow:inset 0 0 0 4px #0b100d,inset 0 0 0 5px #94764b,0 12px 32px #000c;
+ scrollbar-color:#9b7b4d #111713;
+}
+.arcanist-device-drawer[hidden]{display:none!important}
+.arcanist-machine-shell{position:relative;min-height:100%;padding:10px 10px 13px;overflow:hidden;border:1px solid #a98a59;background:linear-gradient(145deg,#31382f 0%,#1a211b 35%,#111713 72%,#2b2b22 100%);box-shadow:inset 0 0 0 2px #0b100d,inset 0 0 0 3px #806642,inset 0 0 30px #000b;color:#efe3cc}
+.arcanist-machine-shell:before,.arcanist-machine-shell:after{content:"";position:absolute;z-index:0;pointer-events:none;inset:5px;border:1px solid #b99a6633}
+.arcanist-machine-shell:after{inset:10px;border:1px solid #d4b77b18}
+.arcanist-machine-heading{position:relative;z-index:2;display:grid;grid-template-columns:38px minmax(0,1fr) 32px;align-items:center;gap:9px;padding:3px 2px 10px;border-bottom:1px solid #b99a6655}
+.arcanist-machine-crest{display:grid;place-items:center;width:36px;height:36px;border:1px solid #d1b477;border-radius:50%;background:radial-gradient(circle,#685536,#171c17 72%);box-shadow:inset 0 0 0 3px #111710,0 0 12px #d4b47733;color:#f3d99e;font:21px Georgia,serif}
+.arcanist-machine-heading>div:nth-child(2){display:grid;gap:2px;min-width:0}
+.arcanist-machine-heading>div:nth-child(2)>span{font:700 7px system-ui,sans-serif;letter-spacing:.19em;color:#c6a36d}
+.arcanist-machine-heading strong{font:19px/1.05 Georgia,serif;letter-spacing:.015em;color:#f4e8d1}
+.arcanist-machine-heading small{font:600 6px system-ui,sans-serif;letter-spacing:.16em;color:#9eaa9a}
+.arcanist-machine-heading>button{width:30px;height:30px;border:1px solid #8f744b;background:#202820;color:#e8d2a7;font:21px Georgia,serif}
+.arcanist-machine-main{position:relative;z-index:2;display:grid;grid-template-columns:minmax(0,1fr) 104px;gap:9px;padding:10px 0 7px}
+.arcanist-destination-panel{min-width:0;min-height:0;border:1px solid #92784e;background:linear-gradient(120deg,#141a16ed,#222720ed);box-shadow:inset 0 0 0 2px #080d0a,inset 0 0 0 3px #6f5838}
+.arcanist-panel-title{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:7px 8px;border-bottom:1px solid #94784f66;background:linear-gradient(90deg,#4a3b27,#1d241e)}
+.arcanist-panel-title span{font:700 7px system-ui,sans-serif;letter-spacing:.14em;color:#f0d7a4}
+.arcanist-panel-title small{font:600 5px system-ui,sans-serif;letter-spacing:.1em;color:#a99b80;text-align:right}
+.arcanist-destination-scroll{max-height:clamp(230px,39vh,360px);overflow:auto;padding:6px;scrollbar-width:thin;scrollbar-color:#9a7c50 #171d19;overscroll-behavior:contain}
+.arcanist-destination-group+.arcanist-destination-group{margin-top:8px;padding-top:6px;border-top:1px solid #92784e55}
+.arcanist-destination-group h4{display:flex;align-items:center;gap:5px;margin:0 0 5px;color:#d9c39d;font:600 8px Georgia,serif;letter-spacing:.06em}
+.arcanist-destination-group h4 span{color:#c9a46d;font:700 7px system-ui,sans-serif}
+.arcanist-destination-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
+.arcanist-destination-card{position:relative;display:grid;grid-template-columns:45px minmax(0,1fr);align-items:center;gap:6px;min-width:0;min-height:54px;padding:4px 7px 4px 4px;overflow:hidden;text-align:left;border:1px solid #766347;background:linear-gradient(110deg,#293129,#171d18);color:#e9dec9;touch-action:manipulation}
+.arcanist-destination-card:before{content:"";position:absolute;inset:1px;border:1px solid var(--route-light,#6ebbd9);opacity:.62;pointer-events:none;animation:arcanist-lamp-breathe 2.7s ease-in-out infinite}
+.arcanist-destination-card[data-available="false"]{--route-light:#d98a48}
+.arcanist-destination-card[data-available="true"]{--route-light:#73c4e4}
+.arcanist-destination-card.is-selected{border-color:#e0c58f;background:linear-gradient(110deg,#52452f,#262b22);box-shadow:inset 0 0 0 1px #e2c58c55,0 0 10px #d8b77b24}
+.arcanist-destination-art-frame{position:relative;display:block;width:45px;height:43px;overflow:hidden;border:1px solid #a58a5b;background:#303b32;box-shadow:inset 0 0 0 2px #111}
+.arcanist-destination-art-frame img,.arcanist-destination-art{display:block;width:100%;height:100%;object-fit:cover}
+.arcanist-destination-card.is-selected .arcanist-destination-art-frame{border-color:#ffe3a9;box-shadow:0 0 0 1px #e6c98a,0 0 12px #ffe1a0aa}
+.arcanist-destination-card.is-selected .arcanist-destination-art-frame img{filter:brightness(1.42) sepia(.22) saturate(1.12)}
+.arcanist-destination-card.is-selected .arcanist-destination-art-frame:after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at center,#fff1c966,#eacb8a22 62%,transparent 100%);mix-blend-mode:screen;pointer-events:none}
+.arcanist-destination-card-copy{display:grid;gap:4px;min-width:0}
+.arcanist-destination-card-copy strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:11px/1.1 Georgia,serif;color:#f0e4cd}
+.arcanist-destination-card-copy small{font:600 5px system-ui,sans-serif;letter-spacing:.1em;color:#91c9df}
+.arcanist-destination-card[data-available="false"] .arcanist-destination-card-copy small{color:#d89a61}
+.arcanist-destination-card.is-selected .arcanist-destination-card-copy strong{color:#fff0cc}
+.arcanist-status-lamp{position:absolute;right:3px;top:4px;width:3px;height:3px;border-radius:50%;background:var(--route-light);box-shadow:0 0 5px var(--route-light)}
+@keyframes arcanist-lamp-breathe{0%,100%{opacity:.25;box-shadow:inset 0 0 3px var(--route-light),0 0 2px var(--route-light)}50%{opacity:.9;box-shadow:inset 0 0 6px var(--route-light),0 0 7px var(--route-light)}}
+.arcanist-destination-art{position:relative;display:grid;place-items:center;overflow:hidden;background:linear-gradient(145deg,#a78d63,#526e5e 55%,#1e342b)}
+.arcanist-destination-art:before,.arcanist-destination-art:after{content:"";position:absolute;left:-15%;width:130%;height:65%;border-radius:50% 50% 0 0;transform:rotate(-12deg)}
+.arcanist-destination-art:before{bottom:3%;background:linear-gradient(145deg,#d0c49b,#5b7258 70%)}
+.arcanist-destination-art:after{bottom:-27%;background:linear-gradient(145deg,#586b54,#172a25)}
+.arcanist-destination-art span{position:relative;z-index:2;color:#f7dfad;font:20px Georgia,serif;text-shadow:0 1px 4px #172019}
+.arcanist-destination-art i,.arcanist-destination-art b{position:absolute;z-index:1;top:9px;width:2px;height:19px;background:#e3d4b1aa;transform:rotate(24deg)}
+.arcanist-destination-art b{top:15px;left:66%;height:14px;transform:rotate(-22deg)}
+.arcanist-destination-art.art-beiming-gu{background:linear-gradient(145deg,#d3d8d4,#829b9c 50%,#3b5d65)}
+.arcanist-destination-art.art-tianhai-yunzhou{background:linear-gradient(145deg,#b9d3d0,#829b9c 48%,#526d78)}
+.arcanist-destination-art.art-lawless{background:linear-gradient(145deg,#c5a06c,#685346 50%,#242421)}
+.arcanist-destination-art.art-1{filter:hue-rotate(12deg)}.arcanist-destination-art.art-2{filter:hue-rotate(-18deg)}.arcanist-destination-art.art-3{filter:saturate(.7)}
+.arcanist-lever-panel{position:relative;display:flex;flex-direction:column;align-items:center;min-width:0;padding:7px 4px;border:1px solid #94784f;background:linear-gradient(155deg,#34392f,#171d18 68%,#29271f);box-shadow:inset 0 0 0 2px #090e0b,inset 0 0 0 3px #796142}
+.arcanist-lever-label{align-self:stretch;padding-bottom:7px;border-bottom:1px solid #92784e55;text-align:center;font:700 7px system-ui,sans-serif;letter-spacing:.13em;color:#d6b77e}
+.arcanist-lever-cage{position:relative;width:78px;height:190px;margin-top:12px;border:1px solid #aa8a58;background:linear-gradient(90deg,#111712,#51452f 16%,#1a211b 34%,#4b3b27 82%,#111712);box-shadow:inset 0 0 0 3px #111710,inset 0 0 0 4px #9b7b4c,0 4px 10px #0009}
+.arcanist-lever-pivot{position:absolute;left:50%;top:38px;width:44px;height:44px;transform:translateX(-50%);border:2px solid #c6a36d;border-radius:50%;background:radial-gradient(circle,#6b5838 0 24%,#151b17 27% 60%,#b08c55 62% 66%,#22271e 70%);box-shadow:0 2px 7px #000a}
+.arcanist-lever-rivet{position:absolute;width:4px;height:4px;border-radius:50%;background:#e2c58d;box-shadow:0 0 2px #f5dfa9}
+.arcanist-lever-rivet:nth-child(1){left:5px;top:5px}.arcanist-lever-rivet:nth-child(2){right:5px;top:5px}.arcanist-lever-rivet:nth-child(3){left:5px;bottom:5px}.arcanist-lever-rivet:nth-child(4){right:5px;bottom:5px}
+.arcanist-lever-button{position:absolute;z-index:4;inset:0;width:100%;height:100%;border:0;background:transparent;touch-action:manipulation}
+.arcanist-lever-button:disabled{opacity:.4;filter:grayscale(.7)}
+.arcanist-lever-shaft{position:absolute;left:calc(50% - 4px);top:21px;width:8px;height:111px;border:1px solid #e2c58e;border-radius:6px;background:linear-gradient(90deg,#4c3924,#f0d7a0 32%,#87683d 62%,#2c281f);box-shadow:0 0 0 2px #0b100d,0 2px 5px #000b;transform-origin:50% 19px;transform:rotate(-17deg)}
+.arcanist-lever-handle{position:absolute;left:calc(50% - 15px);top:9px;width:30px;height:24px;border:1px solid #f0d59b;border-radius:12px 12px 8px 8px;background:linear-gradient(90deg,#5b4528,#d2b178 42%,#76552e);box-shadow:inset 0 0 0 2px #34291c,0 3px 5px #000b;transform-origin:50% 18px;transform:rotate(-17deg)}
+.arcanist-lever-handle i{position:absolute;left:5px;right:5px;top:5px;height:3px;border-radius:3px;background:#f6e3b8aa}
+.arcanist-lever-base{position:absolute;left:6px;right:6px;bottom:6px;display:flex;justify-content:space-around;padding:4px 1px;border-top:1px solid #9e8052;color:#c8a66d;font:700 5px system-ui,sans-serif;letter-spacing:.12em}
+.arcanist-lever-hint{margin-top:8px;text-align:center;color:#9d927c;font:600 6px/1.6 system-ui,sans-serif;letter-spacing:.13em}
+.arcanist-machine-shell[data-selected-available="true"] .arcanist-lever-button{cursor:pointer}
+.arcanist-machine-shell[data-selected-available="false"] .arcanist-lever-button{cursor:not-allowed}
+.arcanist-transmission-bay{position:relative;z-index:1;height:73px;margin:0 1px 7px;overflow:hidden;border-top:1px solid #9b7c4e;border-bottom:1px solid #9b7c4e;background:linear-gradient(180deg,#111713,#2d332a 48%,#121813);box-shadow:inset 0 0 0 2px #080d0a,inset 0 0 0 3px #665337}
+.arcanist-wirework{position:absolute;inset:0;width:100%;height:100%;fill:none;stroke:#c29b60;stroke-width:1.5;filter:drop-shadow(0 0 2px #c99d5a77)}
+.arcanist-wire-drop{stroke:#dfc18b;stroke-width:1}
+.arcanist-machine-gear{position:absolute;z-index:2;display:grid;place-items:center;width:42px;height:42px;border:2px solid #bd9b65;border-radius:50%;background:radial-gradient(circle,#655034 0 23%,#141a15 27% 59%,#c4a06a 62% 67%,#171d18 70%);box-shadow:inset 0 0 0 3px #111710,0 2px 7px #000b;color:#f0d49a;font:27px Georgia,serif}
+.arcanist-machine-gear.gear-a{left:12%;top:12px}.arcanist-machine-gear.gear-b{left:46%;top:4px;width:35px;height:35px;font-size:22px}.arcanist-machine-gear.gear-c{right:11%;top:17px;width:30px;height:30px;font-size:19px}
+.arcanist-machine-spring{position:absolute;left:32%;top:13px;width:34px;height:32px;border-left:2px solid #d3b27b;border-right:2px solid #d3b27b;background:repeating-linear-gradient(135deg,transparent 0 4px,#d5b477 4px 6px,transparent 6px 9px);filter:drop-shadow(0 0 2px #d5b47766)}
+.arcanist-machine-pulley{position:absolute;top:25px;width:14px;height:14px;border:2px solid #e0c18a;border-radius:50%;background:#1a211b;box-shadow:0 0 0 2px #6d5638}
+.arcanist-machine-pulley.pulley-a{left:25%}.arcanist-machine-pulley.pulley-b{right:27%}
+.arcanist-transmission-caption{position:absolute;left:0;right:0;bottom:2px;text-align:center;color:#b39a70;font:600 5px system-ui,sans-serif;letter-spacing:.18em}
+.arcanist-machine-shell.is-running .arcanist-machine-gear{animation:arcanist-gear-spin 1.15s linear infinite}
+.arcanist-machine-shell.is-running .gear-b{animation-direction:reverse;animation-duration:1.7s}
+.arcanist-machine-shell.is-running .gear-c{animation-duration:.82s}
+.arcanist-machine-shell.is-running .arcanist-machine-spring{animation:arcanist-spring-pulse .28s ease-in-out infinite alternate}
+.arcanist-machine-shell.is-running .arcanist-wirework path{stroke-dasharray:8 4;animation:arcanist-cable-travel .65s linear infinite}
+@keyframes arcanist-gear-spin{to{transform:rotate(360deg)}}@keyframes arcanist-spring-pulse{to{transform:scaleY(.7)}}@keyframes arcanist-cable-travel{to{stroke-dashoffset:-24}}
+.arcanist-ticket-dispenser{position:relative;z-index:3;display:flex;justify-content:center;min-height:49px;margin:0 0 7px;padding-top:0}
+.arcanist-ticket-slot{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;gap:7px;width:76%;height:19px;border:1px solid #b18d57;background:linear-gradient(180deg,#080d0a,#30352b 42%,#090d0a);box-shadow:inset 0 0 0 2px #080b09,0 2px 5px #0009}
+.arcanist-ticket-slot span{position:absolute;bottom:22px;color:#b99a66;font:600 5px system-ui,sans-serif;letter-spacing:.16em}
+.arcanist-ticket-slot i{width:4px;height:4px;border-radius:50%;background:#c3a06b;box-shadow:0 0 3px #c3a06b}
+.arcanist-ticket{position:absolute;z-index:1;top:12px;left:50%;display:grid;justify-items:center;gap:4px;width:min(210px,72%);min-height:94px;padding:9px 12px 8px;border:1px solid #b18d57;background:linear-gradient(90deg,#d9c8a0,#f1e5c9 16%,#e9d9b7 85%,#c9b48a);color:#3b3326;box-shadow:0 4px 9px #0009;transform:translate(-50%,var(--ticket-pull,0px));touch-action:none;user-select:none;cursor:grab}
+.arcanist-ticket[hidden]{display:none!important}
+.arcanist-ticket-top{font:700 6px system-ui,sans-serif;letter-spacing:.18em;color:#77603b}
+.arcanist-ticket strong{font:17px Georgia,serif;color:#342d22}
+.arcanist-ticket-route{font:600 6px system-ui,sans-serif;letter-spacing:.15em;color:#765f3d}
+.arcanist-ticket-perforation{width:100%;height:1px;margin-top:2px;border-top:1px dashed #826a45}
+.arcanist-ticket small{font:700 6px system-ui,sans-serif;letter-spacing:.16em;color:#886b3d}
+.arcanist-ticket.is-under-tension{filter:brightness(1.08);box-shadow:0 7px 14px #000b,0 0 9px #f0d7a2}
+.arcanist-ticket.is-returning{animation:arcanist-ticket-return .42s cubic-bezier(.2,.8,.3,1) forwards}
+@keyframes arcanist-ticket-return{to{transform:translate(-50%,0)}}
+.arcanist-ticket.is-torn{animation:arcanist-ticket-tear .38s ease-in forwards}
+@keyframes arcanist-ticket-tear{to{transform:translate(-50%,75px) rotate(3deg);opacity:0}}
+.arcanist-machine-status{position:relative;z-index:2;padding:7px 5px 2px;border-top:1px solid #9b7b4e55;text-align:center;color:#c7ad7d;font:600 6px system-ui,sans-serif;letter-spacing:.14em}
+.arcanist-route-loading{position:absolute;z-index:20;inset:0;display:grid;align-content:center;justify-items:center;gap:10px;padding:24px;background:radial-gradient(circle at 50% 42%,#344035f5,#090d0bf7 72%);color:#f0dfbd;text-align:center}
+.arcanist-route-loading[hidden]{display:none!important}
+.arcanist-loading-seal{display:grid;place-items:center;width:64px;height:64px;border:1px solid #c8a56d;border-radius:50%;box-shadow:inset 0 0 0 5px #161d17,inset 0 0 0 6px #c8a56d66,0 0 18px #d3ac6b55;color:#e8c98e;font:35px Georgia,serif;animation:arcanist-seal-turn 2.4s linear infinite}
+.arcanist-route-loading strong{font:700 9px system-ui,sans-serif;letter-spacing:.2em;color:#e6c68d}
+.arcanist-route-loading span{font:11px Georgia,serif;color:#bdb29d}
+.arcanist-machine-shell.is-traveling .arcanist-machine-gear{animation:arcanist-gear-spin .8s linear infinite}
+@media(max-width:390px){.arcanist-device-drawer{padding:6px}.arcanist-machine-shell{padding:8px 7px 10px}.arcanist-machine-main{grid-template-columns:minmax(0,1fr) 86px;gap:6px}.arcanist-destination-grid{gap:4px}.arcanist-destination-card{grid-template-columns:37px minmax(0,1fr);min-height:49px;gap:4px;padding:3px}.arcanist-destination-art-frame{width:37px;height:39px}.arcanist-destination-card-copy strong{font-size:9px}.arcanist-lever-cage{width:70px;height:172px}.arcanist-destination-scroll{max-height:clamp(200px,37vh,330px)}}
+@media(max-height:650px){.arcanist-destination-scroll{max-height:31vh}.arcanist-lever-cage{height:150px}.arcanist-transmission-bay{height:59px}.arcanist-ticket-dispenser{min-height:42px}}
+@media(prefers-reduced-motion:reduce){.arcanist-destination-card:before,.arcanist-machine-shell.is-running .arcanist-machine-gear,.arcanist-machine-shell.is-running .arcanist-machine-spring,.arcanist-machine-shell.is-running .arcanist-wirework path,.arcanist-loading-seal{animation:none!important}.arcanist-ticket.is-returning,.arcanist-ticket.is-torn{animation:none!important}}
+
+
+.arcanist-lever-shaft{transform:rotate(calc(-17deg + var(--lever-angle,0deg)));transition:transform .28s cubic-bezier(.2,.7,.2,1)}
+.arcanist-lever-handle{transform:rotate(calc(-17deg + var(--lever-angle,0deg)));transition:transform .28s cubic-bezier(.2,.7,.2,1)}
+.arcanist-lever-button{touch-action:none;user-select:none}
+.arcanist-lever-button.is-pulling .arcanist-lever-shaft,.arcanist-lever-button.is-pulling .arcanist-lever-handle{transition:none}
+.arcanist-lever-button.is-returning .arcanist-lever-shaft,.arcanist-lever-button.is-returning .arcanist-lever-handle{transition:transform .34s cubic-bezier(.18,.72,.25,1)}
+.arcanist-lever-button.is-pulled .arcanist-lever-shaft,.arcanist-lever-button.is-pulled .arcanist-lever-handle{transform:rotate(18deg)}
+
+
+.arcanist-lever-shaft{transform:rotate(calc(-17deg + var(--lever-angle,0deg)));transition:transform .28s cubic-bezier(.2,.7,.2,1)}
+.arcanist-lever-handle{transform:rotate(calc(-17deg + var(--lever-angle,0deg)));transition:transform .28s cubic-bezier(.2,.7,.2,1)}
+.arcanist-lever-button{touch-action:none;user-select:none}
+.arcanist-lever-button.is-pulling .arcanist-lever-shaft,.arcanist-lever-button.is-pulling .arcanist-lever-handle{transition:none}
+.arcanist-lever-button.is-returning .arcanist-lever-shaft,.arcanist-lever-button.is-returning .arcanist-lever-handle{transition:transform .34s cubic-bezier(.18,.72,.25,1)}
+.arcanist-lever-button.is-pulled .arcanist-lever-shaft,.arcanist-lever-button.is-pulled .arcanist-lever-handle{transform:rotate(18deg)}
+
+
+/* Physical pull correction: the lever follows a short, downward weighted arc. */
+.arcanist-lever-shaft{transform:rotate(calc(-17deg + var(--lever-angle,0deg)));transform-origin:50% 19px}
+.arcanist-lever-handle{transform:translateY(var(--lever-pull,0px)) rotate(calc(-17deg + var(--lever-angle,0deg)));transform-origin:50% 18px}
+.arcanist-lever-button.is-pulling .arcanist-lever-shaft,.arcanist-lever-button.is-pulling .arcanist-lever-handle{transition:none}
+.arcanist-lever-button.is-returning .arcanist-lever-shaft,.arcanist-lever-button.is-returning .arcanist-lever-handle{transition:transform .38s cubic-bezier(.18,.72,.25,1)}
+.arcanist-lever-button.is-pulled .arcanist-lever-shaft{transform:rotate(11deg)}
+.arcanist-lever-button.is-pulled .arcanist-lever-handle{transform:translateY(11px) rotate(11deg)}
+.arcanist-lever-button:not(.is-pulling):not(.is-pulled) .arcanist-lever-shaft,.arcanist-lever-button:not(.is-pulling):not(.is-pulled) .arcanist-lever-handle{transition:transform .38s cubic-bezier(.18,.72,.25,1)}
+
+/* The ticket stays threaded in the issue slot; only the lower sheet tears away. */
+.arcanist-ticket-slot{position:relative}
+.arcanist-ticket-slot:after{content:"";position:absolute;z-index:4;left:50%;top:100%;width:min(190px,68%);height:15px;transform:translateX(-50%);background:linear-gradient(90deg,#d9c8a0,#f1e5c9 16%,#e9d9b7 85%,#c9b48a);clip-path:polygon(0 0,100% 0,100% 58%,94% 78%,87% 58%,80% 82%,72% 58%,64% 78%,56% 58%,48% 82%,40% 58%,32% 78%,24% 58%,16% 82%,8% 58%,0 78%);opacity:0;pointer-events:none}
+.arcanist-ticket-dispenser.has-ticket-stub .arcanist-ticket-slot:after{opacity:1}
+.arcanist-ticket{transform:translate(-50%,var(--ticket-pull,0px));will-change:transform,clip-path}
+.arcanist-ticket-perforation{position:absolute;top:0;left:0;right:0;width:100%;height:8px;margin:0;border:0;border-top:1px dashed #826a45;opacity:.85}
+.arcanist-ticket.is-torn{animation:arcanist-ticket-tear-down .42s cubic-bezier(.18,.68,.24,1) forwards}
+.arcanist-ticket.is-torn[data-tear-direction="left-to-right"]{clip-path:polygon(0 9%,10% 4%,20% 11%,30% 6%,40% 14%,50% 8%,60% 16%,70% 10%,80% 19%,90% 13%,100% 22%,100% 100%,0 100%)}
+.arcanist-ticket.is-torn[data-tear-direction="right-to-left"]{clip-path:polygon(0 22%,10% 13%,20% 19%,30% 10%,40% 16%,50% 8%,60% 14%,70% 6%,80% 11%,90% 4%,100% 9%,100% 100%,0 100%)}
+@keyframes arcanist-ticket-tear-down{0%{transform:translate(-50%,var(--ticket-pull,62px)) rotate(0deg);opacity:1}100%{transform:translate(-50%,calc(var(--ticket-pull,62px) + 74px)) rotate(-1.5deg);opacity:0}}
+@media(prefers-reduced-motion:reduce){.arcanist-ticket.is-torn{animation:none!important;opacity:0}}
+
+.arcanist-ticket-dispenser[data-tear-direction="left-to-right"] .arcanist-ticket-slot:after{clip-path:polygon(0 0,100% 0,100% 22%,90% 13%,80% 19%,70% 10%,60% 16%,50% 8%,40% 14%,30% 6%,20% 11%,10% 4%,0 9%)}
+.arcanist-ticket-dispenser[data-tear-direction="right-to-left"] .arcanist-ticket-slot:after{clip-path:polygon(0 0,100% 0,100% 9%,90% 4%,80% 11%,70% 6%,60% 14%,50% 8%,40% 16%,30% 10%,20% 19%,10% 13%,0 22%)}
+
+/* Follow-up: straight, weighted downward lever stroke with a spring return. */
+.arcanist-lever-shaft,
+.arcanist-lever-handle{
+  transform:translateY(var(--lever-pull,0px)) rotate(calc(var(--lever-angle,0deg)));
+  transform-origin:50% 18px;
+}
+.arcanist-lever-button.is-pulling .arcanist-lever-shaft,
+.arcanist-lever-button.is-pulling .arcanist-lever-handle{transition:none}
+.arcanist-lever-button.is-pulled .arcanist-lever-shaft,
+.arcanist-lever-button.is-pulled .arcanist-lever-handle{
+  transform:translateY(45px) rotate(7deg);
+}
+.arcanist-lever-button.is-returning .arcanist-lever-shaft,
+.arcanist-lever-button.is-returning .arcanist-lever-handle{
+  transition:transform .62s cubic-bezier(.2,1.35,.42,1);
+}
+.arcanist-lever-button:not(.is-pulling):not(.is-pulled):not(.is-returning) .arcanist-lever-shaft,
+.arcanist-lever-button:not(.is-pulling):not(.is-pulled):not(.is-returning) .arcanist-lever-handle{
+  transition:transform .38s cubic-bezier(.2,.7,.2,1);
+}
+
+/* Lock ticket travel to the vertical axis; the tear animation keeps its existing profile. */
+.arcanist-ticket{
+  transform:translateX(-50%);
+  translate:0 var(--ticket-pull,0px);
+}
+.arcanist-ticket.is-returning{animation:arcanist-ticket-return .42s cubic-bezier(.2,.8,.3,1) forwards}
+@keyframes arcanist-ticket-return{
+  to{transform:translateX(-50%);translate:0 0}
+}
+.arcanist-ticket.is-torn{animation:arcanist-ticket-tear-down .42s cubic-bezier(.18,.68,.24,1) forwards}
+@keyframes arcanist-ticket-tear-down{
+  0%{transform:translateX(-50%) rotate(0deg);translate:0 var(--ticket-pull,62px);opacity:1}
+  100%{transform:translateX(-50%) rotate(-1.5deg);translate:0 calc(var(--ticket-pull,62px) + 74px);opacity:0}
+}
+@media(prefers-reduced-motion:reduce){
+  .arcanist-lever-button.is-returning .arcanist-lever-shaft,
+  .arcanist-lever-button.is-returning .arcanist-lever-handle{transition:none!important}
+}
+
+
+/* Arcanist access-code register and fold-away rotary control. */
+.arcanist-machine-heading{position:relative}
+.arcanist-master-lamp{position:relative;display:grid;place-items:center;flex:0 0 15px;width:15px;height:15px;margin-right:5px;border:1px solid #9a7947;border-radius:50%;background:radial-gradient(circle,#4a3b24 0 38%,#171c16 44%);box-shadow:inset 0 0 0 2px #0c110d,0 0 4px #b98c4d55}
+.arcanist-master-lamp i{display:block;width:7px;height:7px;border-radius:50%;background:#d8a64d;box-shadow:0 0 5px 2px #e5b65c99,0 0 10px #d89a3d66;animation:arcanist-master-breathe 3.1s ease-in-out infinite}
+@keyframes arcanist-master-breathe{0%,100%{opacity:.48;filter:brightness(.72);box-shadow:0 0 3px 1px #d9a64e66}50%{opacity:1;filter:brightness(1.22);box-shadow:0 0 8px 3px #ffcf78cc,0 0 16px #e5a84e88}}
+.arcanist-machine-shell.is-code-verified .arcanist-master-lamp i{animation:none;opacity:1;filter:brightness(1.35);box-shadow:0 0 9px 3px #ffcf78dd,0 0 18px #e5a84eaa}
+.arcanist-machine-shell.is-running .arcanist-master-lamp i{animation:arcanist-master-flicker var(--lamp-flicker-duration, .73s) steps(1,end) infinite}
+@keyframes arcanist-master-flicker{0%{opacity:1;filter:brightness(1.7);box-shadow:0 0 13px 5px #ffe2a0}7%{opacity:.12;filter:brightness(.35);box-shadow:0 0 1px #b8863d}13%{opacity:.92;filter:brightness(1.9);box-shadow:0 0 16px 6px #ffe3a6}24%{opacity:.28;filter:brightness(.5);box-shadow:0 0 2px #b8863d}39%{opacity:1;filter:brightness(2.1);box-shadow:0 0 18px 7px #fff0bf}43%{opacity:.08;filter:brightness(.25);box-shadow:none}58%{opacity:.72;filter:brightness(1.3);box-shadow:0 0 9px 3px #ffd17d}74%{opacity:.18;filter:brightness(.4);box-shadow:0 0 2px #b8863d}88%{opacity:1;filter:brightness(1.9);box-shadow:0 0 15px 6px #ffe6ad}100%{opacity:.62;filter:brightness(1.1);box-shadow:0 0 7px 2px #e6ad55}}
+.arcanist-code-module{position:relative;z-index:3;display:grid;justify-items:center;gap:5px;width:min(230px,88%);margin:0 auto 7px;padding:6px 8px 5px;border:1px solid #9c7d50;background:linear-gradient(180deg,#30352c,#111712 70%);box-shadow:inset 0 0 0 2px #090e0b,inset 0 0 0 3px #705a39,0 2px 6px #0008}
+.arcanist-code-heading{display:flex;justify-content:space-between;align-items:center;width:100%;gap:6px;color:#d4b77e;font:700 6px system-ui,sans-serif;letter-spacing:.12em}
+.arcanist-code-heading small{color:#8f9c83;font-size:5px;letter-spacing:.08em}
+.arcanist-code-windows{display:flex;justify-content:center;gap:6px}
+.arcanist-code-window{display:grid;place-items:center;width:28px;height:31px;border:1px solid #9c8054;background:linear-gradient(180deg,#080d0a,#252a20 48%,#090e0b);box-shadow:inset 0 0 0 2px #080b09,0 0 5px #0008;color:#f4d89e}
+.arcanist-code-window b{font:700 20px/1 Georgia,serif;text-shadow:0 0 6px #e8c27c77}
+.arcanist-code-window b.is-spinning{animation:arcanist-counter-roll .17s linear infinite;filter:blur(.6px)}
+@keyframes arcanist-counter-roll{0%{transform:translateY(-5px);opacity:.4}50%{transform:translateY(0);opacity:1}100%{transform:translateY(5px);opacity:.45}}
+.arcanist-code-actions{display:grid;grid-template-columns:42px minmax(0,1fr) 42px;align-items:center;width:100%;gap:5px}
+.arcanist-code-action{display:grid;justify-items:center;gap:1px;min-height:30px;padding:2px;border:1px solid #806a48;background:linear-gradient(180deg,#3a3b30,#171c16);color:#e5c68b;touch-action:manipulation}
+.arcanist-code-action span{font:17px/1 Georgia,serif}
+.arcanist-code-action small{font:700 5px system-ui,sans-serif;letter-spacing:.08em}
+.arcanist-code-action:disabled{opacity:.32;filter:grayscale(.7)}
+.arcanist-code-cancel{color:#d8b58a}
+.arcanist-code-generate{color:#f1d59a}
+.arcanist-code-progress{text-align:center;color:#a99b7d;font:600 5px system-ui,sans-serif;letter-spacing:.1em}
+.arcanist-ticket-dispenser{display:flex;flex-direction:column;align-items:center;min-height:0}
+.arcanist-ticket-slot{flex:0 0 auto}
+.arcanist-control-panel{perspective:600px}
+.arcanist-folding-assembly{position:relative;display:block;width:100%;min-height:242px;transform-style:preserve-3d}
+.arcanist-dial-face,.arcanist-lever-face{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;backface-visibility:hidden;transition:transform .58s cubic-bezier(.2,.72,.25,1),opacity .36s ease}
+.arcanist-lever-face[hidden],.arcanist-dial-face[hidden]{display:none!important}
+.arcanist-dial-face{opacity:1;transform:rotateY(0deg);transform-origin:left center}
+.arcanist-lever-face{opacity:0;pointer-events:none;transform:rotateY(88deg);transform-origin:right center}
+.arcanist-machine-shell.is-code-verified .arcanist-dial-face{opacity:0;pointer-events:none;transform:rotateY(-88deg) translateX(-9px)}
+.arcanist-machine-shell.is-code-verified .arcanist-lever-face{opacity:1;pointer-events:auto;transform:rotateY(0deg)}
+.arcanist-dial-caption{width:100%;margin:2px 0 8px;text-align:center;color:#d6b77e;font:700 6px system-ui,sans-serif;letter-spacing:.11em}
+.arcanist-combination-dial{position:relative;display:grid;place-items:center;width:104px;height:104px;border:2px solid #a98855;border-radius:50%;background:radial-gradient(circle,#151b15 0 48%,#6f5734 50% 54%,#111711 57% 70%,#c09a61 72% 75%,#1b211a 78%);box-shadow:inset 0 0 0 3px #0a100c,inset 0 0 0 5px #8d7047,0 3px 8px #000b}
+.arcanist-combination-dial:before{content:"";position:absolute;inset:8px;border:1px dashed #c6a36b77;border-radius:50%;pointer-events:none}
+.arcanist-dial-rotor{position:absolute;inset:0;border-radius:50%;transform:rotate(var(--dial-turn,0deg));transition:transform .48s cubic-bezier(.16,.82,.2,1.14)}
+.arcanist-dial-number{position:absolute;left:50%;top:50%;display:grid;place-items:center;width:21px;height:21px;padding:0;border:1px solid #9c8054;border-radius:50%;background:radial-gradient(circle at 35% 30%,#e2c58f,#6e5431 70%,#2a251b);color:#fff0ca;font:700 9px Georgia,serif;text-shadow:0 1px 2px #20180e;box-shadow:0 1px 3px #000b;touch-action:manipulation;cursor:pointer}
+.arcanist-dial-number:active:not(:disabled){filter:brightness(1.45);box-shadow:0 0 8px #e8c27c}
+.arcanist-dial-number:disabled{opacity:.36;cursor:not-allowed}
+.arcanist-dial-hub{position:absolute;left:50%;top:50%;display:grid;place-items:center;width:31px;height:31px;transform:translate(-50%,-50%);border:2px solid #c6a36d;border-radius:50%;background:radial-gradient(circle,#8a6b3e,#28271d 65%,#0c120d);box-shadow:inset 0 0 0 2px #171b14,0 1px 4px #000b;color:#f2d69d;font:13px Georgia,serif;pointer-events:none}
+.arcanist-machine-shell.is-code-rejected .arcanist-code-windows{animation:arcanist-code-reject .22s ease-in-out 2}
+@keyframes arcanist-code-reject{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+.arcanist-machine-shell.is-code-verified .arcanist-code-window{border-color:#d4b77e;box-shadow:inset 0 0 0 2px #080b09,0 0 8px #f2cb7a88}
+@media(max-width:390px){.arcanist-code-module{width:92%;padding:5px}.arcanist-folding-assembly{min-height:190px}.arcanist-combination-dial{width:94px;height:94px}.arcanist-dial-number{width:19px;height:19px}.arcanist-code-window{width:25px;height:28px}}
+@media(prefers-reduced-motion:reduce){.arcanist-master-lamp i,.arcanist-code-window b.is-spinning{animation:none!important}.arcanist-dial-face,.arcanist-lever-face,.arcanist-dial-rotor{transition:none!important}}
