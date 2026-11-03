@@ -316,7 +316,10 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
       activeLever = null;
       try { if (active.element.hasPointerCapture(event.pointerId)) active.element.releasePointerCapture(event.pointerId); } catch { /* already released */ }
       active.element.classList.remove("is-pulling");
-      if (!cancelled && isArcanistryLeverEngaged(active.distance)) startIssuance(active.machine, active.element);
+      if (!cancelled && isArcanistryLeverEngaged(active.distance)) {
+        active.machine.dispatchEvent(new CustomEvent("arcanistry:lever-lock", { bubbles: true }));
+        startIssuance(active.machine, active.element);
+      }
       else {
         active.element.classList.add("is-returning");
         later(() => {
