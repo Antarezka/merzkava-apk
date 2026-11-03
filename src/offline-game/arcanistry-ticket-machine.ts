@@ -189,8 +189,19 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     machine.classList.add("is-traveling");
     ticket.dataset.tearDirection = bias < -.12 ? "left-to-right" : bias > .12 ? "right-to-left" : "center";
     ticket.style.setProperty("--tear-bias", String(bias));
-    const curve = Math.round(bias * 18);
-    ticket.style.clipPath = `polygon(0 0,100% 0,100% 100%,${Math.max(0, 52 + curve)}% 94%,${Math.max(0, 34 + curve * .65)}% 100%,${Math.max(0, 16 + curve * .3)}% 94%,0 100%)`;
+    const curve = Math.round(bias * 9);
+    const stub = ticket.cloneNode(true) as HTMLButtonElement;
+    stub.className = "arcanist-ticket-stub";
+    stub.removeAttribute("data-arcanistry-ticket");
+    stub.removeAttribute("aria-label");
+    stub.setAttribute("aria-hidden", "true");
+    stub.disabled = true;
+    stub.hidden = false;
+    stub.style.removeProperty("--ticket-pull");
+    stub.style.removeProperty("clip-path");
+    ticket.parentElement?.appendChild(stub);
+    ticket.style.clipPath = "polygon(0 " + Math.max(36,45-curve) + "%,16% " + Math.max(33,42-curve*.7) + "%,34% " + Math.min(55,47+curve*.35) + "%,52% " + Math.max(35,43-curve*.25) + "%,72% " + Math.min(56,48+curve*.4) + "%,88% " + Math.max(36,44-curve*.45) + "%,100% " + Math.min(55,47+curve) + "%,100% 100%,0 100%)";
+    stub.style.clipPath = "polygon(0 0,100% 0,100% 47%,88% 44%,72% 48%,52% 43%,34% 47%,16% 42%,0 45%)";
     ticket.classList.add("is-torn");
     ticket.disabled = true;
     status(machine, "TICKET TORN · TRAVEL CARD EJECTING");
@@ -199,6 +210,7 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
 
     later(() => {
       ticket.hidden = true;
+      machine.querySelector<HTMLElement>(".arcanist-ticket-stub")?.remove();
       const card = machine.querySelector<HTMLButtonElement>("[data-arcanistry-card-insert]");
       if (card) {
         card.hidden = false;
@@ -281,8 +293,10 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     if (activeLever && activeLever.pointerId === event.pointerId) {
       const distance = Math.max(0, Math.min(58, event.clientY - activeLever.startY));
       activeLever.distance = distance;
-      activeLever.element.style.setProperty("--lever-angle", (distance * .95) + "deg");
-      activeLever.element.style.setProperty("--lever-pull", (distance * .38) + "px");
+      const progress = distance / 58;
+      const curvedAngle = Math.pow(progress, .82) * 66;
+      activeLever.element.style.setProperty("--lever-angle", curvedAngle.toFixed(1) + "deg");
+      activeLever.element.style.setProperty("--lever-pull", (Math.sin(progress * Math.PI / 2) * 3.5).toFixed(1) + "px");
       activeLever.element.classList.toggle("is-pulling", distance > 2);
       event.preventDefault();
       return;
