@@ -679,3 +679,77 @@
   .wmh-overlay-modal{padding-left:5px!important;padding-right:5px!important}
   .wmh-overlay-modal>.wmh-overlay-tools{height:34dvh;min-height:128px}
 }
+
+
+/* Give the Academy map a real pan margin on every side of the isometric board.
+   The camera reserves one viewport of empty space around the artwork. */
+.wmh-isometric-camera{
+  display:block!important;
+  position:relative!important;
+  min-width:0!important;
+  min-height:0!important;
+  max-width:none!important;
+  max-height:none!important;
+  flex:none!important;
+}
+.wmh-isometric-board.is-exterior{
+  flex:none!important;
+  max-width:none!important;
+}
+
+/* Compact workbench: a short bottom sheet by default, with its own scroll. */
+.wmh-overlay-modal{
+  display:flex!important;
+  align-items:flex-end!important;
+  justify-content:center!important;
+  padding:0 8px max(6px,env(safe-area-inset-bottom))!important;
+  overflow:hidden!important;
+  background:transparent!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+  pointer-events:none!important;
+}
+.wmh-overlay-modal>.wmh-overlay-tools{
+  pointer-events:auto!important;
+  box-sizing:border-box!important;
+  width:min(100%,520px)!important;
+  height:min(15dvh,132px);
+  min-height:88px;
+  max-height:72dvh;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+  touch-action:pan-y;
+  flex:none!important;
+  margin:0!important;
+  padding:8px 10px!important;
+  border-radius:12px 12px 0 0;
+}
+.wmh-overlay-resize-grip{
+  position:sticky!important;
+  top:0!important;
+  z-index:10!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:100%!important;
+  height:24px!important;
+  min-height:24px!important;
+  margin:-2px 0 5px!important;
+  cursor:ns-resize!important;
+  touch-action:none!important;
+  user-select:none!important;
+  -webkit-user-select:none!important;
+}
+.wmh-overlay-resize-grip span{
+  width:48px!important;
+  height:5px!important;
+  border-radius:5px!important;
+  background:#e0c18a!important;
+  box-shadow:0 1px 4px #000b!important;
+}
+@media(max-width:390px){
+  .wmh-overlay-modal{padding-left:5px!important;padding-right:5px!important}
+  .wmh-overlay-modal>.wmh-overlay-tools{height:min(14dvh,120px);min-height:84px;padding:7px 8px!important}
+}
