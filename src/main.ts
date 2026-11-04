@@ -59,8 +59,8 @@ root.addEventListener("arcanistry:lever-lock", () => playClockworkRatchet());
 mountArcanistryTicketMachine(root, async sceneId => {
   setEternalLocation(sceneId);
   const drawer = root.querySelector<HTMLElement>("[data-arcanist-device]");
-  if (drawer) drawer.hidden = true;
-  root.querySelector<HTMLButtonElement>("[data-arcanist-pull]")?.setAttribute("aria-expanded", "false");
+  const trigger = root.querySelector<HTMLButtonElement>("[data-arcanist-pull]");
+  if (drawer && trigger) setArcanistryDrawerOpen(drawer, trigger, false);
   notice = sceneId === "gde-academy" ? "Arrived at the Academy." : "Arrived at the Imperial Capital.";
   render();
 });
