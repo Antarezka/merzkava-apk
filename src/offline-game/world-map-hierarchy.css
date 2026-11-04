@@ -1596,7 +1596,7 @@
   border:1px solid #111!important;
   border-radius:50%!important;
   box-shadow:0 0 0 1px #fff9,0 1px 4px #000b!important;
-  transform:translate(-50%,-50%) scale(calc(1 / var(--wmh-camera-zoom,1)))!important;
+  transform:translate(-50%,-50%) scale(var(--wmh-camera-inverse-zoom,1))!important;
   transition:left .13s linear,top .13s linear,filter .15s ease!important;
 }
 .wmh-isometric-board.is-minimap-style .wmh-player-token{
@@ -1620,7 +1620,6 @@
 .wmh-isometric-board.is-minimap-style .wmh-character-token[data-token-label]::after{
   display:none!important;
 }
-.wmh-isometric-play-screen .wmh-isometric-play-screen{}
 .wmh-isometric-play-screen:has(.wmh-isometric-board.is-minimap-style) .wmh-rpg-minimap{
   display:none!important;
 }
