@@ -450,7 +450,7 @@ const ACADEMY_MAP_ART_PATH = "maps/academy/full-map/1_academy.jpg";
 
 function academyMapArtUrl(): string {
   // Resolve against the app document so browser and packaged APK use the same asset path.
-  return new URL(ACADEMY_MAP_ART_PATH, document.baseURI).href;
+  return new URL("/" + ACADEMY_MAP_ART_PATH.replace(/^\\/+/, ""), document.baseURI).href;
 }
 
 function bindIsometricMapArt(dialog: HTMLElement): void {
