@@ -161,6 +161,56 @@ function captureTestArea(event: Event): void {
   mountYard(dialog);
 }
 
+
+type AtlasPointer = {
+  dialog: HTMLElement;
+  startX: number;
+  startY: number;
+  startScrollTop: number;
+  mode: "undecided" | "page" | "map" | "pinch";
+};
+const atlasPointers = new Map<number, AtlasPointer>();
+
+function trackAtlasPointer(event: PointerEvent): void {
+  const target = event.target instanceof Element ? event.target : null;
+  if (!target || target.closest(".wmh-power,.wmh-selection-card")) return;
+  const viewport = target.closest<HTMLElement>(".wmh-world-map");
+  const dialog = viewport?.closest<HTMLElement>(".wmh-dialog");
+  if (!viewport || !dialog) return;
+  atlasPointers.set(event.pointerId, {
+    dialog,
+    startX: event.clientX,
+    startY: event.clientY,
+    startScrollTop: dialog.scrollTop,
+    mode: "undecided",
+  });
+  if (atlasPointers.size > 1) {
+    atlasPointers.forEach(pointer => { pointer.mode = "pinch"; });
+  }
+}
+
+function routeAtlasVerticalScroll(event: PointerEvent): void {
+  const pointer = atlasPointers.get(event.pointerId);
+  if (!pointer || pointer.mode === "pinch" || pointer.mode === "map") return;
+  const dx = event.clientX - pointer.startX;
+  const dy = event.clientY - pointer.startY;
+  if (pointer.mode === "undecided" && Math.hypot(dx, dy) > 6) {
+    pointer.mode = Math.abs(dy) > Math.abs(dx) * 1.15 ? "page" : "map";
+  }
+  if (pointer.mode !== "page") return;
+  event.preventDefault();
+  event.stopImmediatePropagation();
+  pointer.dialog.scrollTop = pointer.startScrollTop - dy;
+}
+
+function finishAtlasPointer(event: PointerEvent): void {
+  atlasPointers.delete(event.pointerId);
+}
+
 if (typeof document !== "undefined") {
   document.addEventListener("click", captureTestArea, true);
+  document.addEventListener("pointerdown", trackAtlasPointer, true);
+  document.addEventListener("pointermove", routeAtlasVerticalScroll, true);
+  document.addEventListener("pointerup", finishAtlasPointer, true);
+  document.addEventListener("pointercancel", finishAtlasPointer, true);
 }
