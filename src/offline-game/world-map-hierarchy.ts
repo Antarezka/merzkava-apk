@@ -457,7 +457,7 @@ function academyMiniMapMarkup(): string {
 }
 
 function bindAcademyMapArt(dialog: HTMLElement): void {
-  dialog.querySelectorAll<HTMLImageElement>("[data-wmh-academy-map-art]").forEach(image => {
+  dialog.querySelectorAll<HTMLImageElement>("[data-wmh-academy-map-art],[data-wmh-map-art]").forEach(image => {
     if(image.dataset.mapArtBound==="true")return;
     image.dataset.mapArtBound="true";
     image.addEventListener("error",()=>{
@@ -501,7 +501,7 @@ function tileMapMarkup(interior = false, mapId = "academy-exterior", mapImage = 
     const classes=(feature?'has-feature feature-'+feature:'')+(structure?' building-footprint building-'+structure.id+(blocked?' building-blocked':' building-occlusion'):'');
     return '<button type="button" class="wmh-tile wmh-tile-'+surface+' '+classes+'" data-wmh-tile data-x="'+x+'" data-y="'+y+'" data-z="0" data-tile-id="tile-'+x+'-'+y+'" data-surface="'+surface+'" style="--tile-x:'+x+';--tile-y:'+y+'" '+(blocked?'data-wmh-blocked="true"':'')+' '+(occlusion?'data-wmh-occlusion="true"':'')+' '+(structureAnchor?'data-wmh-building="'+building+'"':'')+' aria-label="Tile X '+x+', Y '+y+', Z 0 · '+(label||surface)+'"><span class="wmh-tile-coord">('+x+','+y+',0)</span>'+(label?'<b>'+label+'</b>':'')+'</button>';
   }).join("")).join("");
-  return '<div class="wmh-iso-controls"><button type="button" data-wmh-iso-zoom="out" aria-label="Zoom out">−</button><span data-wmh-iso-level>100%</span><button type="button" data-wmh-iso-zoom="in" aria-label="Zoom in">+</button><button type="button" data-wmh-iso-zoom="reset">RESET</button><button type="button" data-wmh-iso-center aria-label="Center Academy map">CENTER MAP</button><small>DRAG TO PAN · PINCH TO ZOOM</small></div><div class="wmh-isometric-wrap" data-wmh-iso-viewport><div class="wmh-isometric-camera" data-wmh-iso-camera><div class="wmh-isometric-board '+(interior?'is-interior':'is-exterior')+(mapImage?' has-map-base':'')+'" data-wmh-board style="--tile-cols:'+cols+';--tile-rows:'+rows+';--iso-center-x:'+(rows*32)+'px;--iso-board-width:'+((cols+rows-1)*32+32)+'px;--iso-board-height:'+((cols+rows-2)*16+39)+'px;--tile-w:64px;--tile-h:32px;--slab-depth:7px" data-cols="'+cols+'" data-rows="'+rows+'" data-map-id="'+escapeMapEditorText(mapId)+'">'+tiles+''+(mapImage?'<img class="wmh-academy-map-art wmh-isometric-map-base" data-wmh-map-art data-wmh-academy-map-art src="'+mapImage+'" alt="Isometric map base" draggable="false" loading="eager" decoding="async"/><canvas class="wmh-isometric-foreground" data-wmh-foreground-canvas aria-hidden="true"></canvas>':'')+'<svg class="wmh-area-overlay-svg" data-wmh-overlay-svg viewBox="0 0 '+((cols+rows-1)*32+32)+' '+((cols+rows-2)*16+39)+'" preserveAspectRatio="none"><g data-wmh-overlay-marks></g><g data-wmh-manual-marks></g><g data-wmh-transition-marks></g><path data-wmh-overlay-preview class="wmh-area-mark-preview" d=""></path></svg>'+
+  return '<div class="wmh-iso-controls"><button type="button" data-wmh-iso-zoom="out" aria-label="Zoom out">−</button><span data-wmh-iso-level>100%</span><button type="button" data-wmh-iso-zoom="in" aria-label="Zoom in">+</button><button type="button" data-wmh-iso-zoom="reset">RESET</button><button type="button" data-wmh-iso-center aria-label="Center Academy map">CENTER MAP</button><small>DRAG TO PAN · PINCH TO ZOOM</small></div><div class="wmh-isometric-wrap" data-wmh-iso-viewport><div class="wmh-isometric-camera" data-wmh-iso-camera><div class="wmh-isometric-board '+(interior?'is-interior':'is-exterior')+(mapImage?' has-map-base':'')+'" data-wmh-board style="--tile-cols:'+cols+';--tile-rows:'+rows+';--iso-center-x:'+(rows*32)+'px;--iso-board-width:'+((cols+rows-1)*32+32)+'px;--iso-board-height:'+((cols+rows-2)*16+39)+'px;--tile-w:64px;--tile-h:32px;--slab-depth:7px" data-cols="'+cols+'" data-rows="'+rows+'" data-map-id="'+escapeMapEditorText(mapId)+'">'+tiles+''+(mapImage?'<img class="wmh-isometric-map-base" data-wmh-map-art src="'+mapImage+'" alt="Isometric map base" draggable="false" loading="eager" decoding="async"/><canvas class="wmh-isometric-foreground" data-wmh-foreground-canvas aria-hidden="true"></canvas>':'')+'<svg class="wmh-area-overlay-svg" data-wmh-overlay-svg viewBox="0 0 '+((cols+rows-1)*32+32)+' '+((cols+rows-2)*16+39)+'" preserveAspectRatio="none"><g data-wmh-overlay-marks></g><g data-wmh-manual-marks></g><g data-wmh-transition-marks></g><path data-wmh-overlay-preview class="wmh-area-mark-preview" d=""></path></svg>'+
     '<button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token data-x="5" data-y="'+(interior?8:17)+'" style="--token-x:5;--token-y:'+(interior?8:17)+'" aria-label="Player character"><i></i></button>'+
     (interior ? '<button type="button" class="wmh-character-token wmh-npc-token is-male" data-wmh-npc="teacher" data-x="6" data-y="2" style="--token-x:6;--token-y:2" aria-label="Teacher"><i></i></button><button type="button" class="wmh-character-token wmh-npc-token is-female" data-wmh-npc="student-lin" data-x="3" data-y="4" style="--token-x:3;--token-y:4" aria-label="Student Lin"><i></i></button>' :
       '<button type="button" class="wmh-character-token wmh-npc-token is-female" data-wmh-npc="student-lin" data-x="7" data-y="4" style="--token-x:7;--token-y:4" aria-label="Student Lin"><i></i></button>'+
@@ -550,6 +550,31 @@ function drawIsometricForeground(board:HTMLElement,data=readIsoMapData(board)):v
   const canvas=board.querySelector<HTMLCanvasElement>("[data-wmh-foreground-canvas]");
   const image=board.querySelector<HTMLImageElement>("[data-wmh-map-art]");
   if(!canvas||!image||!image.complete||!image.naturalWidth||!image.naturalHeight)return;
+  const dataGrid=data.grid;
+  const projectedWidth=(dataGrid.cols+dataGrid.rows-2)*dataGrid.tileW/2+dataGrid.tileW;
+  const projectedHeight=(dataGrid.cols+dataGrid.rows-2)*dataGrid.tileH/2+dataGrid.tileH+7;
+  const boardWidth=Math.max(projectedWidth,image.naturalWidth);
+  const boardHeight=Math.max(projectedHeight,image.naturalHeight);
+  const dimensionsChanged=board.offsetWidth!==boardWidth||board.offsetHeight!==boardHeight;
+  if(dimensionsChanged){
+    board.style.setProperty("--iso-board-width",boardWidth+"px");
+    board.style.setProperty("--iso-board-height",boardHeight+"px");
+    board.style.width=boardWidth+"px";board.style.height=boardHeight+"px";
+    board.querySelector<SVGSVGElement>("[data-wmh-overlay-svg]")?.setAttribute("viewBox","0 0 "+boardWidth+" "+boardHeight);
+    const camera=board.closest<HTMLElement>("[data-wmh-iso-camera]");
+    const viewport=board.closest<HTMLElement>("[data-wmh-iso-viewport]");
+    if(camera&&viewport){
+      const padX=Number.parseFloat(board.style.getPropertyValue("--wmh-camera-pad-x"))||Math.max(1,viewport.clientWidth)*4;
+      const padY=Number.parseFloat(board.style.getPropertyValue("--wmh-camera-pad-y"))||Math.max(1,viewport.clientHeight)*4;
+      const zoom=Number.parseFloat(board.style.getPropertyValue("--wmh-camera-zoom"))||1;
+      camera.style.width=(boardWidth*zoom+padX*2)+"px";
+      camera.style.height=(boardHeight*zoom+padY*2)+"px";
+      board.style.setProperty("--wmh-camera-pad-x",padX+"px");
+      board.style.setProperty("--wmh-camera-pad-y",padY+"px");
+      viewport.scrollLeft=padX+boardWidth*zoom/2-viewport.clientWidth/2;
+      viewport.scrollTop=padY+boardHeight*zoom/2-viewport.clientHeight/2;
+    }
+  }
   const width=image.clientWidth||image.naturalWidth,height=image.clientHeight||image.naturalHeight;
   const dpr=Math.max(1,Math.min(2,window.devicePixelRatio||1));
   canvas.width=Math.max(1,Math.round(width*dpr));canvas.height=Math.max(1,Math.round(height*dpr));
