@@ -439,34 +439,40 @@ function bindWorldMapEditor(dialog: HTMLElement): void {
 }
 
 function tileMapMarkup(interior = false): string {
-  const cols = 12, rows = 10;
+  const cols = interior ? 12 : 24, rows = interior ? 10 : 20;
   const features: Record<string,string> = interior
     ? {"2-1":"blackboard","5-1":"teacher-desk","3-3":"desk","5-3":"desk","7-3":"desk","3-5":"desk","5-5":"desk","7-5":"desk","10-8":"door"}
-    : {"5-1":"pond","6-1":"pond","7-1":"pond","8-1":"pond","1-2":"tree","2-2":"tree","10-2":"tree","1-3":"flower","3-3":"flower","9-3":"flower","11-3":"tree","2-5":"garden","3-5":"garden","8-5":"garden","9-5":"garden","4-7":"gate","5-7":"gate","6-7":"gate","7-7":"gate","2-8":"bench","9-8":"bench","3-2":"study-hall","9-4":"teachers-house","5-6":"learning-building"};
+    : {"5-1":"pond","6-1":"pond","7-1":"pond","8-1":"pond","1-2":"tree","2-2":"tree","10-2":"tree","1-3":"flower","3-3":"flower","9-3":"flower","11-3":"tree","2-9":"garden","3-9":"garden","8-9":"garden","9-9":"garden","2-14":"bench","9-14":"bench","3-2":"study-hall","9-2":"teachers-house","3-10":"learning-building","20-2":"simple-house"};
   const buildingSpecs = interior ? [] : [
-    {id:"study-hall",name:"Study Hall",x:3,y:2},
-    {id:"teachers-house",name:"Teachers’ Hall",x:9,y:4},
-    {id:"learning-building",name:"Learning Hall",x:5,y:6}
+    {id:"study-hall",name:"Study Hall",x:3,y:2,w:4,h:4},
+    {id:"teachers-house",name:"Teachers’ Hall",x:9,y:2,w:4,h:4},
+    {id:"learning-building",name:"Learning Hall",x:3,y:10,w:4,h:4},
+    {id:"simple-house",name:"Simple House",x:20,y:2,w:2,h:2}
   ];
+  const sparring={x:14,y:8,w:8,h:8};
   const tiles = Array.from({length: rows}, (_,y) => Array.from({length:cols},(_,x) => {
-    const key=x+"-"+y, feature=features[key] || "";
-    const structure=buildingSpecs.find(item=>x>=item.x-1&&x<=item.x+1&&y>=item.y&&y<=item.y+1);
+    const key=x+"-"+y;
+    const road=!interior&&(y===6||y===7||x===12||x===13);
+    const inSparring=!interior&&x>=sparring.x&&x<sparring.x+sparring.w&&y>=sparring.y&&y<sparring.y+sparring.h;
+    const feature=features[key]||(road?"road":inSparring?"sparring-ground":"");
+    const structure=buildingSpecs.find(item=>x>=item.x&&x<item.x+item.w&&y>=item.y&&y<item.y+item.h);
     const structureAnchor=!!structure&&x===structure.x&&y===structure.y;
-    const blocked=!!structure&&y===structure.y+1;
-    const occlusion=!!structure&&y===structure.y;
-    const surface = interior ? (y<2?"wood":"tile") : (feature==="pond"?"wet":feature==="gate"?"stone":feature==="tree"||feature==="flower"||feature==="garden"?"earth":y>7?"stone":"earth");
-    const label = feature==="pond"?"POND":feature==="tree"?"TREE":feature==="flower"?"FLOWER":feature==="garden"?"GARDEN":feature==="gate"?"ACADEMY GATE":feature==="bench"?"BENCH":feature==="blackboard"?"BOARD":feature==="teacher-desk"?"TEACHER":feature==="desk"?"DESK":feature==="door"?"DOOR":feature==="study-hall"?"STUDY HALL":feature==="teachers-house"?"TEACHERS’ HALL":feature==="learning-building"?"LEARNING HALL":"";
-    const building=feature==="study-hall"?"Study Hall":feature==="teachers-house"?"Teachers’ Hall":feature==="learning-building"?"Learning Hall":"";
+    const depthRow=structure?y-structure.y:-1;
+    const blocked=!!structure&&depthRow>=Math.ceil(structure.h/2);
+    const occlusion=!!structure&&!blocked;
+    const surface = interior ? (y<2?"wood":"tile") : (feature==="pond"?"wet":feature==="gate"||feature==="road"?"stone":feature==="tree"||feature==="flower"||feature==="garden"?"earth":feature==="sparring-ground"?"tile":y>15?"stone":"earth");
+    const label = feature==="pond"?"POND":feature==="tree"?"TREE":feature==="flower"?"FLOWER":feature==="garden"?"GARDEN":feature==="gate"?"ACADEMY GATE":feature==="bench"?"BENCH":feature==="blackboard"?"BOARD":feature==="teacher-desk"?"TEACHER":feature==="desk"?"DESK":feature==="door"?"DOOR":feature==="study-hall"?"STUDY HALL":feature==="teachers-house"?"TEACHERS’ HALL":feature==="learning-building"?"LEARNING HALL":feature==="simple-house"?"HOUSE":feature==="sparring-ground"&&x===sparring.x&&y===sparring.y?"SPARRING GROUND":"";
+    const building=structure?.name||"";
     const classes=(feature?'has-feature feature-'+feature:'')+(structure?' building-footprint building-'+structure.id+(blocked?' building-blocked':' building-occlusion'):'');
     return '<button type="button" class="wmh-tile wmh-tile-'+surface+' '+classes+'" data-wmh-tile data-x="'+x+'" data-y="'+y+'" data-z="0" data-tile-id="tile-'+x+'-'+y+'" data-surface="'+surface+'" style="--tile-x:'+x+';--tile-y:'+y+'" '+(blocked?'data-wmh-blocked="true"':'')+' '+(occlusion?'data-wmh-occlusion="true"':'')+' '+(structureAnchor?'data-wmh-building="'+building+'"':'')+' aria-label="Tile X '+x+', Y '+y+', Z 0 · '+(label||surface)+'"><span class="wmh-tile-coord">('+x+','+y+',0)</span>'+(label?'<b>'+label+'</b>':'')+'</button>';
   }).join("")).join("");
-  return '<div class="wmh-iso-controls"><button type="button" data-wmh-iso-zoom="out" aria-label="Zoom out">−</button><span data-wmh-iso-level>100%</span><button type="button" data-wmh-iso-zoom="in" aria-label="Zoom in">+</button><button type="button" data-wmh-iso-zoom="reset">RESET</button><small>DRAG TO PAN · PINCH TO ZOOM</small></div><div class="wmh-isometric-wrap" data-wmh-iso-viewport><div class="wmh-isometric-camera" data-wmh-iso-camera><div class="wmh-isometric-board '+(interior?'is-interior':'is-exterior')+'" data-wmh-board style="--tile-cols:'+cols+';--tile-rows:'+rows+';--tile-w:64px;--tile-h:32px;--slab-depth:7px">'+tiles+
-    '<button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token data-x="5" data-y="8" style="--token-x:5;--token-y:8" aria-label="Player character"><i></i></button>'+
+  return '<div class="wmh-iso-controls"><button type="button" data-wmh-iso-zoom="out" aria-label="Zoom out">−</button><span data-wmh-iso-level>100%</span><button type="button" data-wmh-iso-zoom="in" aria-label="Zoom in">+</button><button type="button" data-wmh-iso-zoom="reset">RESET</button><small>DRAG TO PAN · PINCH TO ZOOM</small></div><div class="wmh-isometric-wrap" data-wmh-iso-viewport><div class="wmh-isometric-camera" data-wmh-iso-camera><div class="wmh-isometric-board '+(interior?'is-interior':'is-exterior')+'" data-wmh-board style="--tile-cols:'+cols+';--tile-rows:'+rows+';--iso-center-x:'+(rows*32)+'px;--iso-board-width:'+((cols+rows)*32+64)+'px;--iso-board-height:'+((cols+rows)*16+80)+'px;--tile-w:64px;--tile-h:32px;--slab-depth:7px" data-cols="'+cols+'" data-rows="'+rows+'">'+tiles+
+    '<button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token data-x="5" data-y="'+(interior?8:17)+'" style="--token-x:5;--token-y:'+(interior?8:17)+'" aria-label="Player character"><i></i></button>'+
     (interior ? '<button type="button" class="wmh-character-token wmh-npc-token is-male" data-wmh-npc="teacher" data-x="6" data-y="2" style="--token-x:6;--token-y:2" aria-label="Teacher"><i></i></button><button type="button" class="wmh-character-token wmh-npc-token is-female" data-wmh-npc="student-lin" data-x="3" data-y="4" style="--token-x:3;--token-y:4" aria-label="Student Lin"><i></i></button>' :
-      '<button type="button" class="wmh-character-token wmh-npc-token is-female" data-wmh-npc="student-lin" data-x="5" data-y="3" style="--token-x:5;--token-y:3" aria-label="Student Lin"><i></i></button>'+
-      '<button type="button" class="wmh-character-token wmh-npc-token is-male" data-wmh-npc="student-wei" data-x="11" data-y="5" style="--token-x:11;--token-y:5" aria-label="Student Wei"><i></i></button>'+
-      '<button type="button" class="wmh-character-token wmh-npc-token is-female" data-wmh-npc="teacher-mei" data-x="2" data-y="6" style="--token-x:2;--token-y:6" aria-label="Instructor Mei"><i></i></button>'+
-      '<button type="button" class="wmh-character-token wmh-npc-token is-male" data-wmh-npc="groundskeeper" data-x="10" data-y="2" style="--token-x:10;--token-y:2" aria-label="Groundskeeper"><i></i></button>')+
+      '<button type="button" class="wmh-character-token wmh-npc-token is-female" data-wmh-npc="student-lin" data-x="7" data-y="4" style="--token-x:7;--token-y:4" aria-label="Student Lin"><i></i></button>'+
+      '<button type="button" class="wmh-character-token wmh-npc-token is-male" data-wmh-npc="student-wei" data-x="10" data-y="9" style="--token-x:10;--token-y:9" aria-label="Student Wei"><i></i></button>'+
+      '<button type="button" class="wmh-character-token wmh-npc-token is-female" data-wmh-npc="teacher-mei" data-x="6" data-y="15" style="--token-x:6;--token-y:15" aria-label="Instructor Mei"><i></i></button>'+
+      '<button type="button" class="wmh-character-token wmh-npc-token is-male" data-wmh-npc="groundskeeper" data-x="22" data-y="5" style="--token-x:22;--token-y:5" aria-label="Groundskeeper"><i></i></button>')+
     '</div></div></div>';
 }
 function bindIsometricCamera(dialog:HTMLElement):void {
@@ -518,10 +524,10 @@ function panelMarkup(level: Level, regionId: RegionId = "golden-dragon-empire", 
     '<div class="wmh-area-legend"><span>ACADEMY GATE</span><span>GARDEN & POND</span><span>CLASSROOMS</span><span>TEACHERS’ COURT</span></div>'+
     tileMapMarkup(false)+
     '<div class="wmh-local-footer"><span>PLAYER TOKEN · TAP WALKABLE TILES · NPC INTERACTION REQUIRES 1-TILE DISTANCE</span><button data-wmh-action="back">← REGIONAL MAP</button></div>'+
-    '<section class="wmh-chat-panel" data-wmh-chat hidden><div class="wmh-chat-thread" data-wmh-thread></div><div class="wmh-chat-input-row"><span>YOUR RESPONSE</span><div data-wmh-replies></div></div></section>';
+    '<section class="wmh-chat-panel" data-wmh-chat hidden role="dialog" aria-label="Character conversation"><div class="wmh-chat-card"><button type="button" class="wmh-chat-close" data-wmh-action="chat-close" aria-label="Close conversation">×</button><div class="wmh-chat-thread" data-wmh-thread></div><div class="wmh-chat-input-row"><span>YOUR RESPONSE</span><div data-wmh-replies></div></div></div></section>';
   if (level === "interior") return header("BUILDING INTERIOR",selectedBuilding,"ISOMETRIC TILE PLACEHOLDER · TAP TO EXPLORE")+
     tileMapMarkup(true)+'<div class="wmh-local-footer"><span>INTERIOR FLOOR PLAN · PLACEHOLDER</span><button data-wmh-action="back">← EXTERIOR AREA</button></div>'+
-    '<section class="wmh-chat-panel" data-wmh-chat hidden><div class="wmh-chat-thread" data-wmh-thread></div><div class="wmh-chat-input-row"><span>YOUR RESPONSE</span><div data-wmh-replies></div></div></section>';
+    '<section class="wmh-chat-panel" data-wmh-chat hidden role="dialog" aria-label="Character conversation"><div class="wmh-chat-card"><button type="button" class="wmh-chat-close" data-wmh-action="chat-close" aria-label="Close conversation">×</button><div class="wmh-chat-thread" data-wmh-thread></div><div class="wmh-chat-input-row"><span>YOUR RESPONSE</span><div data-wmh-replies></div></div></div></section>';
   return header("PERSONAL GROUNDS","Personal Grounds","ISOMETRIC HOME · PLOTS & FACILITIES")+
     '<div class="wmh-home-grid">'+[["Farmland","▧"],["Building Plot","⌂"],["Training Area","⚔"],["Warehouse","▤"],["Fish Pond","◉"],["Lumber Area","♧"]].map(([name,icon])=>'<button data-wmh-plot="'+name+'"><span>'+icon+'</span><b>'+name+'</b><small>VIEW FUNCTION</small></button>').join("")+'</div><div class="wmh-bottom-actions"><button data-wmh-action="back">← WORLD MAP</button><span>PERSONAL DEVELOPMENT AREA</span></div>';
 }
@@ -578,7 +584,7 @@ function startNpcWander(dialog:HTMLElement):void {
       if(Math.random()>.48)return;
       const x=Number(npc.dataset.x||0),y=Number(npc.dataset.y||0);
       const options=[[x+1,y],[x-1,y],[x,y+1],[x,y-1]].filter(([nx,ny])=>
-        nx>=0&&nx<12&&ny>=0&&ny<10&&
+        nx>=0&&nx<Number(board.dataset.cols||12)&&ny>=0&&ny<Number(board.dataset.rows||10)&&
         !board.querySelector<HTMLElement>('[data-wmh-tile][data-x="'+nx+'"][data-y="'+ny+'"][data-wmh-blocked="true"]')&&
         !(Number(player?.dataset.x||5)===nx&&Number(player?.dataset.y||8)===ny)
       );
@@ -596,7 +602,13 @@ function renderChat(dialog:HTMLElement,npcId:string):void {
   const thread=dialog.querySelector<HTMLElement>("[data-wmh-thread]");
   const replies=dialog.querySelector<HTMLElement>("[data-wmh-replies]");
   if(!chat||!thread||!replies)return;
+  stopNpcWander(dialog);
+  const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
+  const player=board?.querySelector<HTMLElement>("[data-wmh-player-token]");
+  const moveTimer=Number(player?.dataset.moveTimer||0);
+  if(moveTimer){window.clearTimeout(moveTimer);delete player!.dataset.moveTimer;}
   chat.hidden=false;
+  chat.setAttribute("aria-modal","true");
   thread.innerHTML='<article class="wmh-chat-message npc-message"><div class="wmh-chat-bust '+npc.gender+'"><i></i></div><div class="wmh-chat-copy"><b>'+npc.name+'</b><p>'+npc.greeting+'</p></div></article>';
   replies.innerHTML=npc.choices.map((choice,i)=>'<button type="button" data-wmh-reply="'+i+'" data-npc-id="'+npcId+'">'+choice+'</button>').join("");
 }
@@ -604,7 +616,7 @@ function walkToTile(dialog:HTMLElement,targetX:number,targetY:number,surface:str
   const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
   const player=board?.querySelector<HTMLElement>("[data-wmh-player-token]");
   if(!board||!player)return;
-  const cols=12,rows=10;
+  const cols=Number(board.dataset.cols||12),rows=Number(board.dataset.rows||10);
   if(!Number.isInteger(targetX)||!Number.isInteger(targetY)||targetX<0||targetX>=cols||targetY<0||targetY>=rows)return;
   const destination=board.querySelector<HTMLElement>('[data-wmh-tile][data-x="'+targetX+'"][data-y="'+targetY+'"]');
   if(!destination||destination.dataset.wmhBlocked==="true")return;
@@ -670,6 +682,12 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
   if(action.dataset.wmhAction==="back"){
     const next:Level=current==="interior"?"local":current==="local"?"regional":"world";
     stopNpcWander(dialog);overlay.dataset.level=next;dialog.innerHTML=panelMarkup(next,regionId,building);if(next==="world")bindWorldMapZoom(dialog);if(next==="local"){bindIsometricCamera(dialog);startNpcWander(dialog);}return true;
+  }
+  if(action.dataset.wmhAction==="chat-close"){
+    const chat=dialog.querySelector<HTMLElement>("[data-wmh-chat]");
+    if(chat){chat.hidden=true;chat.removeAttribute("aria-modal");}
+    if(current==="local")startNpcWander(dialog);
+    return true;
   }
   if(action.dataset.wmhInfo){
     const info=readWorldMarkers().find(item=>item.id===action.dataset.wmhInfo);if(!info)return true;
