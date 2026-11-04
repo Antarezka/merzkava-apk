@@ -731,7 +731,31 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
   const transitionField=panel.querySelector<HTMLInputElement>("[data-wmh-transition-label]");
   const exportField=panel.querySelector<HTMLTextAreaElement>("[data-wmh-overlay-export]");
   const importField=panel.querySelector<HTMLTextAreaElement>("[data-wmh-overlay-import-text]");
+  const workbench=panel.querySelector<HTMLElement>(".wmh-overlay-tools");
+  const dock=dialog.querySelector<HTMLElement>("[data-wmh-editor-dock]");
+  const uiKey="merzkava.iso-editor-ui.v1:"+encodeURIComponent(data.mapId);
   const grid:IsoMapGridConfig={...data.grid};
+  const saveEditorUi=()=>{
+    if(!dock||!workbench)return;
+    const dockRect=dock.getBoundingClientRect(),bubbleRect=toggle.getBoundingClientRect(),panelRect=workbench.getBoundingClientRect();
+    const value={
+      bubble:{left:Math.round(bubbleRect.left-dockRect.left),top:Math.round(bubbleRect.top-dockRect.top)},
+      panel:{left:Math.round(panelRect.left-dockRect.left),top:Math.round(panelRect.top-dockRect.top),width:Math.round(panelRect.width),height:Math.round(panelRect.height)}
+    };
+    try{localStorage.setItem(uiKey,JSON.stringify(value));}catch{}
+  };
+  try{
+    const saved=JSON.parse(localStorage.getItem(uiKey)||"null");
+    if(saved?.bubble&&Number.isFinite(saved.bubble.left)&&Number.isFinite(saved.bubble.top)){
+      toggle.style.left=saved.bubble.left+"px";toggle.style.top=saved.bubble.top+"px";toggle.style.right="auto";toggle.style.bottom="auto";
+    }
+    if(saved?.panel&&workbench&&Number.isFinite(saved.panel.left)&&Number.isFinite(saved.panel.top)){
+      workbench.style.left=saved.panel.left+"px";workbench.style.top=saved.panel.top+"px";
+      workbench.style.right="auto";workbench.style.bottom="auto";
+      if(Number.isFinite(saved.panel.width))workbench.style.width=saved.panel.width+"px";
+      if(Number.isFinite(saved.panel.height))workbench.style.height=saved.panel.height+"px";
+    }
+  }catch{}
   const remember=()=>{history.push(JSON.parse(JSON.stringify(data)) as IsoMapEditorData);if(history.length>40)history.shift();};
   const redraw=()=>{
     if(cellGroup){
@@ -786,9 +810,107 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     });
     redraw();drawIsometricForeground(board,data);syncIsoDepthAndOcclusion(board);
   };
-  const setActive=(active:boolean)=>{board.classList.toggle("wmh-overlay-editing",active);panel.hidden=!active;toggle.setAttribute("aria-pressed",String(active));if(!active)selectedTransitionId=null;};
-  toggle.addEventListener("click",()=>setActive(panel.hidden));
+  const setActive=(active:boolean)=>{
+    if(active){
+      stopNpcWander(dialog);
+      const chat=dialog.querySelector<HTMLElement>("[data-wmh-chat]");
+      board.dataset.editorChatWasVisible=String(!!chat&&!chat.hidden);
+      if(chat)chat.hidden=true;
+      const player=board.querySelector<HTMLElement>("[data-wmh-player-token]");
+      const movementTimer=Number(player?.dataset.moveTimer||0);
+      if(movementTimer){window.clearTimeout(movementTimer);delete player!.dataset.moveTimer;}
+      board.dataset.editorPaused="true";
+      board.classList.add("wmh-overlay-editing","wmh-editor-paused");
+      board.querySelectorAll<HTMLElement>("[data-wmh-player-token],[data-wmh-npc]").forEach(token=>token.getAnimations().forEach(animation=>animation.pause()));
+      if(!relocateActorsFromBlockedCells(board,data))setStatus("Warning: this map has no free cell for one or more characters. Clear some X cells before resuming play.");
+    }else{
+      board.dataset.editorPaused="false";
+      board.classList.remove("wmh-overlay-editing","wmh-editor-paused");
+      board.querySelectorAll<HTMLElement>("[data-wmh-player-token],[data-wmh-npc]").forEach(token=>token.getAnimations().forEach(animation=>animation.play()));
+      const chat=dialog.querySelector<HTMLElement>("[data-wmh-chat]");
+      const chatWasVisible=board.dataset.editorChatWasVisible==="true";
+      if(chat)chat.hidden=!chatWasVisible;
+      delete board.dataset.editorChatWasVisible;
+      if(!chatWasVisible&&dialog.closest<HTMLElement>("[data-world-map-hierarchy]")?.dataset.level==="local")startNpcWander(dialog);
+      renderIsometricMinimap(board);
+      renderIsometricWorldStatus(dialog);
+      selectedTransitionId=null;
+    }
+    panel.hidden=!active;
+    toggle.hidden=active;
+    toggle.setAttribute("aria-pressed",String(active));
+    toggle.setAttribute("aria-expanded",String(active));
+    if(!active)saveEditorUi();
+  };
+  let suppressToggleClick=false;
+  toggle.addEventListener("click",()=>{if(suppressToggleClick){suppressToggleClick=false;return;}setActive(panel.hidden);});
   dialog.querySelector<HTMLElement>("[data-wmh-overlay-close]")?.addEventListener("click",()=>setActive(false));
+
+  // The bubble can be dragged anywhere inside the isometric play area.
+  toggle.addEventListener("pointerdown",event=>{
+    if(!panel.hidden)return;
+    event.preventDefault();
+    const startX=event.clientX,startY=event.clientY;
+    const startLeft=toggle.offsetLeft,startTop=toggle.offsetTop;
+    let moved=false;
+    const move=(next:PointerEvent)=>{
+      const dx=next.clientX-startX,dy=next.clientY-startY;
+      if(!moved&&Math.hypot(dx,dy)<5)return;
+      moved=true;next.preventDefault();
+      const maxX=Math.max(0,(dock?.clientWidth||window.innerWidth)-toggle.offsetWidth);
+      const maxY=Math.max(0,(dock?.clientHeight||window.innerHeight)-toggle.offsetHeight);
+      toggle.style.left=Math.max(0,Math.min(maxX,startLeft+dx))+"px";
+      toggle.style.top=Math.max(0,Math.min(maxY,startTop+dy))+"px";
+      toggle.style.right="auto";toggle.style.bottom="auto";
+    };
+    const end=(next:PointerEvent)=>{
+      window.removeEventListener("pointermove",move);window.removeEventListener("pointerup",end);window.removeEventListener("pointercancel",end);
+      if(moved){suppressToggleClick=true;saveEditorUi();}
+    };
+    window.addEventListener("pointermove",move,{passive:false});window.addEventListener("pointerup",end);window.addEventListener("pointercancel",end);
+  });
+
+  // Drag the workbench by its top header; controls and the close button remain clickable.
+  const dragHandle=workbench?.querySelector<HTMLElement>("[data-wmh-overlay-drag-handle]");
+  dragHandle?.addEventListener("pointerdown",event=>{
+    if((event.target as Element).closest("[data-wmh-overlay-close],[data-wmh-panel-resize-handle]"))return;
+    event.preventDefault();
+    const container=panel.getBoundingClientRect(),rect=workbench!.getBoundingClientRect();
+    const startX=event.clientX,startY=event.clientY,left=rect.left-container.left,top=rect.top-container.top;
+    const move=(next:PointerEvent)=>{
+      if(next.buttons===0)return;
+      next.preventDefault();
+      workbench!.style.left=Math.max(0,Math.min(container.width-workbench!.offsetWidth,left+next.clientX-startX))+"px";
+      workbench!.style.top=Math.max(0,Math.min(container.height-workbench!.offsetHeight,top+next.clientY-startY))+"px";
+      workbench!.style.right="auto";workbench!.style.bottom="auto";
+    };
+    const end=()=>{
+      window.removeEventListener("pointermove",move);window.removeEventListener("pointerup",end);window.removeEventListener("pointercancel",end);saveEditorUi();
+    };
+    window.addEventListener("pointermove",move,{passive:false});window.addEventListener("pointerup",end);window.addEventListener("pointercancel",end);
+  });
+
+  // The small upper-left grip resizes from that corner while the opposite corner stays fixed.
+  const grip=workbench?.querySelector<HTMLElement>("[data-wmh-panel-resize-handle]");
+  grip?.addEventListener("pointerdown",event=>{
+    event.preventDefault();event.stopPropagation();
+    const container=panel.getBoundingClientRect(),rect=workbench!.getBoundingClientRect();
+    const startX=event.clientX,startY=event.clientY;
+    const right=rect.right-container.left,bottom=rect.bottom-container.top;
+    const move=(next:PointerEvent)=>{
+      next.preventDefault();
+      const left=Math.max(0,Math.min(right-220,rect.left-container.left+next.clientX-startX));
+      const top=Math.max(0,Math.min(bottom-170,rect.top-container.top+next.clientY-startY));
+      workbench!.style.left=left+"px";workbench!.style.top=top+"px";
+      workbench!.style.right="auto";workbench!.style.bottom="auto";
+      workbench!.style.width=Math.max(220,right-left)+"px";
+      workbench!.style.height=Math.max(170,bottom-top)+"px";
+    };
+    const end=()=>{
+      window.removeEventListener("pointermove",move);window.removeEventListener("pointerup",end);window.removeEventListener("pointercancel",end);saveEditorUi();
+    };
+    window.addEventListener("pointermove",move,{passive:false});window.addEventListener("pointerup",end);window.addEventListener("pointercancel",end);
+  });
   modeSelect?.addEventListener("change",()=>{
     if(transitionTools)transitionTools.hidden=mode()!=="transition";
   if(mode()==="foreground"&&!board.querySelector("[data-wmh-map-art]")) {
@@ -818,8 +940,13 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       persist();setStatus("Transition selected. Enter its destination name to turn it blue.");return;
     }
     const layer:IsoCellLayer=mode()==="blocked"?"blockedCells":mode()==="opacity"?"opacityCells":"foregroundCells";
-    remember();const enabled=toggleIsoCellLayer(data,layer,cell.x,cell.y);persist();
-    setStatus((layer==="foregroundCells"?"○ foreground":layer==="blockedCells"?"X blocked":"Opacity")+(enabled?" enabled":" cleared")+" at ("+cell.x+","+cell.y+").");
+    remember();const enabled=toggleIsoCellLayer(data,layer,cell.x,cell.y);
+    if(layer==="blockedCells"&&enabled&&!relocateActorsFromBlockedCells(board,data)){
+      toggleIsoCellLayer(data,layer,cell.x,cell.y);history.pop();redraw();
+      setStatus("Cannot block that cell: no safe destination is available for every character. Clear another X cell first.");return;
+    }
+    persist();
+    setStatus((layer==="foregroundCells"?"○ foreground":layer==="blockedCells"?"X blocked":"Opacity")+(enabled?" enabled":" cleared")+" at ("+cell.x+","+cell.y+"). Characters occupying a newly blocked cell are moved to the nearest safe cell.");
   });
   panel.querySelector<HTMLElement>("[data-wmh-transition-apply]")?.addEventListener("click",()=>{
     const marker=data.transitions.find(m=>m.id===selectedTransitionId);if(!marker){setStatus("Select a transition marker first.");return;}
@@ -835,7 +962,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       remember();const property=input.dataset.wmhGridControl as keyof IsoMapGridConfig;grid[property]=Number(input.value);
       const valid=(key:string)=>{const [x,y]=key.split(",").map(Number);return x<grid.cols&&y<grid.rows;};
       data.foregroundCells=data.foregroundCells.filter(valid);data.blockedCells=data.blockedCells.filter(valid);data.opacityCells=data.opacityCells.filter(valid);
-      data.transitions=data.transitions.filter(m=>m.x<grid.cols&&m.y<grid.rows);applyGrid();persist();
+      data.transitions=data.transitions.filter(m=>m.x<grid.cols&&m.y<grid.rows);applyGrid();if(!relocateActorsFromBlockedCells(board,data))setStatus("Grid resized, but no free cell exists for every character.");persist();
     };
     input.addEventListener("change",update);
     input.closest<HTMLElement>("[data-wmh-grid-row]")?.querySelectorAll<HTMLButtonElement>("[data-wmh-grid-step]").forEach(button=>button.addEventListener("click",()=>{
@@ -861,7 +988,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     catch{if(exportField){exportField.focus();exportField.select();}setStatus("Clipboard unavailable. JSON backup is shown below.");}
   });
   panel.querySelector<HTMLElement>("[data-wmh-overlay-import]")?.addEventListener("click",()=>{
-    try{const imported=normalizeIsoMapEditorData(JSON.parse(importField?.value||""),data.mapId,grid);remember();data=imported;Object.assign(grid,data.grid);applyGrid();persist();if(exportField)exportField.hidden=true;setStatus("Map data imported for "+data.mapId+".");}
+    try{const imported=normalizeIsoMapEditorData(JSON.parse(importField?.value||""),data.mapId,grid);remember();data=imported;Object.assign(grid,data.grid);applyGrid();if(!relocateActorsFromBlockedCells(board,data))throw new Error("No safe cell available for a character.");persist();if(exportField)exportField.hidden=true;setStatus("Map data imported for "+data.mapId+". Characters in blocked cells were relocated.");}
     catch{setStatus("Import failed. Paste a valid isometric-map editor JSON backup.");}
   });
   // Preserve the previous resizable editor window interaction.
@@ -872,7 +999,9 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     const end=(v:PointerEvent)=>{if(v.pointerId!==id)return;window.removeEventListener("pointermove",move);window.removeEventListener("pointerup",end);window.removeEventListener("pointercancel",end);};
     window.addEventListener("pointermove",move,{passive:false});window.addEventListener("pointerup",end);window.addEventListener("pointercancel",end);
   });
-  applyGrid();redraw();drawIsometricForeground(board,data);syncIsoDepthAndOcclusion(board);
+  applyGrid();
+  if(!relocateActorsFromBlockedCells(board,data))setStatus("Warning: some characters could not be relocated. Clear blocked cells to restore safe movement.");
+  redraw();drawIsometricForeground(board,data);syncIsoDepthAndOcclusion(board);
 }
 
 function bindIsometricCamera(dialog:HTMLElement):void {
