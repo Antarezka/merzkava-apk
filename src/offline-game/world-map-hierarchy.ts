@@ -914,7 +914,8 @@ function walkToTile(dialog:HTMLElement,targetX:number,targetY:number,surface:str
   if(!destination||!isoCanWalkTile(board,destination,targetX,targetY))return;
   const oldTimer=Number(player.dataset.moveTimer||0);
   if(oldTimer)window.clearTimeout(oldTimer);
-  const startX=Number(player.dataset.x||5),startY=Number(player.dataset.y||8);\n  const mapData=readIsoMapData(board);
+  const startX=Number(player.dataset.x||5),startY=Number(player.dataset.y||8);
+  const mapData=readIsoMapData(board);
   // Fixed-order breadth-first path: every tap resolves to the exact tile's
   // stored grid coordinates; no random destination or visual-position guess.
   const queue:Array<[number,number]>=[[startX,startY]];
