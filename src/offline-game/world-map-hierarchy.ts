@@ -632,7 +632,7 @@ function renderIsometricMinimap(board:HTMLElement):void {
   const style=getComputedStyle(board);
   const boardWidth=Number.parseFloat(style.getPropertyValue("--iso-board-width"))||board.offsetWidth||1;
   const boardHeight=Number.parseFloat(style.getPropertyValue("--iso-board-height"))||board.offsetHeight||1;
-  world.style.aspectRatio=boardWidth+" / "+boardHeight;
+  world.style.setProperty("aspect-ratio",boardWidth+" / "+boardHeight,"important");
   const position=(token:HTMLElement)=>{
     const center=isoCellCenter(Number(token.dataset.x||0),Number(token.dataset.y||0),data.grid);
     return {
@@ -642,7 +642,7 @@ function renderIsometricMinimap(board:HTMLElement):void {
   };
   const player=board.querySelector<HTMLElement>("[data-wmh-player-token]");
   const items:string[]=[];
-  if(player){
+  if(!board.classList.contains("wmh-overlay-editing")&&player){
     const p=position(player);
     items.push('<span class="wmh-minimap-dot is-player" data-minimap-player style="left:'+p.x+'%;top:'+p.y+'%" aria-label="Player position"></span>');
   }
