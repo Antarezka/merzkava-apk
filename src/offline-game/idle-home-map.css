@@ -185,7 +185,7 @@
 
 /* World-route drawer trigger retained; rotary and aperture styling removed. */
 /* Original World-route pull tab and open/close drawer behavior. */
-.arcanist-pull-tab{position:absolute;z-index:25;right:10px;left:auto;bottom:10px;display:flex;align-items:center;gap:8px;min-height:42px;padding:0 12px;border:1px solid #c8a56d;border-right:3px solid #e0bd7c;background:linear-gradient(105deg,#303025,#1a211c);color:#ead7b5;box-shadow:0 4px 15px #070a08a6;font:700 8px system-ui,sans-serif;letter-spacing:.14em;touch-action:pan-y;will-change:transform}
+.arcanist-pull-tab{position:absolute;z-index:66;left:10px;right:auto;bottom:10px;display:flex;align-items:center;gap:8px;min-height:42px;padding:0 12px;border:1px solid #c8a56d;border-right:3px solid #e0bd7c;background:linear-gradient(105deg,#303025,#1a211c);color:#ead7b5;box-shadow:0 4px 15px #070a08a6;font:700 8px system-ui,sans-serif;letter-spacing:.14em;touch-action:pan-y;will-change:transform}
 .arcanist-pull-glyph{font:22px Georgia,serif;color:#e4c18a;transform:rotate(-18deg)}
 .arcanist-pull-chevron{font-size:12px;color:#c7a46d;transition:transform .25s}
 .arcanist-pull-tab[aria-expanded="true"] .arcanist-pull-chevron{transform:rotate(180deg)}
@@ -197,13 +197,13 @@
 @keyframes arcanist-seal-turn{to{transform:rotate(360deg)}}
 /* Victorian Arcanistry route engine — rebuilt as one responsive, working mechanism. */
 .arcanist-device-drawer{
- position:absolute;z-index:40;inset:0;display:flex;flex-direction:column;
- width:100%;height:100%;min-width:0;max-width:100%;box-sizing:border-box;
+ position:absolute;z-index:65;top:0;right:auto;bottom:0;left:0;display:flex;flex-direction:column;
+ width:min(560px,100%);height:100%;min-width:0;max-width:100%;box-sizing:border-box;
  overflow-x:hidden;overflow-y:auto;padding:8px;
  background:radial-gradient(ellipse at 48% 12%,#394239 0%,#171d19 58%,#090d0b 100%);
  border:1px solid #c5a16a;box-shadow:inset 0 0 0 4px #0b100d,inset 0 0 0 5px #94764b,0 12px 32px #000c;
  scrollbar-color:#9b7b4d #111713;overscroll-behavior:contain;
-}
+ }
 .arcanist-device-drawer[hidden]{display:none!important}
 .arcanist-machine-shell{
  position:relative;isolation:isolate;display:flex;flex:1 0 auto;flex-direction:column;gap:7px;
