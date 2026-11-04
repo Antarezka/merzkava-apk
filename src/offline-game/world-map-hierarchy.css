@@ -753,3 +753,120 @@
   .wmh-overlay-modal{padding-left:5px!important;padding-right:5px!important}
   .wmh-overlay-modal>.wmh-overlay-tools{height:min(14dvh,120px);min-height:84px;padding:7px 8px!important}
 }
+
+
+/* Academy map restoration: preserve the full-size 24×20 canvas and full artwork.
+   The previous mobile fallback accidentally forced a 12×10 grid, making the
+   Academy surface look compressed even though the outer camera had pan margins. */
+.wmh-isometric-wrap{
+  flex:1 1 0!important;
+  min-height:min(62dvh,560px)!important;
+  height:auto!important;
+  width:100%!important;
+  box-sizing:border-box!important;
+  display:block!important;
+  overflow:auto!important;
+  padding:14px 4px!important;
+  touch-action:pan-x pan-y!important;
+}
+.wmh-isometric-camera{
+  display:block!important;
+  width:max-content!important;
+  height:max-content!important;
+  min-width:0!important;
+  min-height:0!important;
+  flex:none!important;
+}
+.wmh-isometric-board{
+  display:grid!important;
+  grid-template-columns:repeat(var(--tile-cols),64px)!important;
+  grid-template-rows:repeat(var(--tile-rows),32px)!important;
+  width:var(--iso-board-width)!important;
+  height:var(--iso-board-height)!important;
+  min-width:0!important;
+  min-height:0!important;
+  max-width:none!important;
+  max-height:none!important;
+  aspect-ratio:auto!important;
+  gap:0!important;
+  transform:none!important;
+  transform-origin:top left!important;
+}
+.wmh-isometric-board.is-exterior{
+  width:1408px!important;
+  height:768px!important;
+}
+.wmh-isometric-board.is-exterior .wmh-academy-map-art{
+  width:1408px!important;
+  height:768px!important;
+  object-fit:fill!important;
+}
+
+/* The launcher is the only always-visible control. Open tools in a movable-size
+   mini-window; keep the rest of the Academy map fully interactive. */
+.wmh-overlay-float{
+  width:56px!important;
+  height:56px!important;
+  display:grid!important;
+  place-items:center!important;
+  padding:0!important;
+  border-radius:50%!important;
+}
+.wmh-tool-map{
+  position:relative;
+  display:block;
+  width:27px;
+  height:22px;
+  border:2px solid #e2c18a;
+  border-radius:3px;
+  background:linear-gradient(90deg,#526b4d 0 31%,#d5b77e 31% 36%,#344b39 36% 66%,#d5b77e 66% 71%,#526b4d 71%);
+  box-shadow:0 1px 4px #0009;
+  transform:perspective(40px) rotateY(-12deg);
+}
+.wmh-tool-map:before,.wmh-tool-map:after{
+  content:"";
+  position:absolute;
+  top:-4px;
+  width:7px;
+  height:26px;
+  border:1px solid #e2c18a;
+  background:#6d815d;
+}
+.wmh-tool-map:before{left:-3px;transform:skewY(18deg)}
+.wmh-tool-map:after{right:-3px;transform:skewY(-18deg)}
+
+/* Compact, centered editor mini-window instead of a bottom workbench sheet. */
+.wmh-overlay-modal{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  padding:max(12px,env(safe-area-inset-top)) 12px max(12px,env(safe-area-inset-bottom))!important;
+  overflow:hidden!important;
+  background:transparent!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+  pointer-events:none!important;
+}
+.wmh-overlay-modal>.wmh-overlay-tools{
+  pointer-events:auto!important;
+  width:min(92vw,440px)!important;
+  height:min(52dvh,480px)!important;
+  min-height:180px!important;
+  max-height:78dvh!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  overscroll-behavior:contain!important;
+  -webkit-overflow-scrolling:touch!important;
+  touch-action:pan-y!important;
+  margin:0!important;
+  padding:10px 12px!important;
+  border:1px solid #d2b47b!important;
+  border-radius:12px!important;
+  box-shadow:0 16px 46px #000c,inset 0 1px #fff3!important;
+}
+.wmh-overlay-modal-head{position:sticky;top:0;z-index:5;background:linear-gradient(145deg,#293a2e,#293a2e 75%,#101812);padding-top:3px}
+.wmh-overlay-resize-grip{height:22px!important;min-height:22px!important;cursor:ns-resize!important;touch-action:none!important}
+@media(max-width:390px){
+  .wmh-isometric-wrap{min-height:min(60dvh,520px)!important}
+  .wmh-overlay-modal>.wmh-overlay-tools{width:min(94vw,420px)!important;height:min(54dvh,460px)!important;min-height:170px!important;padding:9px!important}
+}
