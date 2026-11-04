@@ -366,3 +366,122 @@
 }
 .wmh-tile.building-footprint{transition:opacity .18s ease}
 .wmh-character-token{transition:filter .15s ease;will-change:left,top,transform}
+
+
+/* Larger world-space footprints: small homes 2x2, academy buildings 4x4,
+   sparring grounds 8x8, with two-tile-wide crossing paths. */
+.wmh-isometric-board{
+  width:var(--iso-board-width)!important;
+  height:var(--iso-board-height)!important;
+  min-width:0;
+  margin:0!important;
+}
+.wmh-tile{
+  left:calc((var(--tile-x) - var(--tile-y))*32px + var(--iso-center-x))!important;
+  top:calc((var(--tile-x) + var(--tile-y))*16px)!important;
+}
+.wmh-tile.feature-road:after{
+  background:linear-gradient(145deg,#c4b28e,#82745c)!important;
+  box-shadow:inset 0 0 0 1px #ead6ad88, inset 0 -3px 0 #574a38;
+}
+.wmh-tile.feature-sparring-ground:after{
+  background:linear-gradient(145deg,#b39a70,#796345)!important;
+  box-shadow:inset 0 0 0 1px #e5c89466, inset 0 -3px 0 #4c3d2a;
+}
+.wmh-tile.feature-sparring-ground[data-x="14"][data-y="8"]:after{
+  background:linear-gradient(145deg,#c5a979,#8a7049)!important;
+}
+.wmh-tile.building-footprint:after{
+  background:linear-gradient(145deg,#bba27a,#806648 68%,#574631)!important;
+  box-shadow:inset 0 0 0 2px #e1c18b99,inset 0 -4px 0 #493a2a!important;
+}
+.wmh-tile.building-blocked:before{
+  background:linear-gradient(90deg,#443628,#72583b 50%,#3b3024)!important;
+}
+.wmh-tile.building-occlusion:after{
+  filter:drop-shadow(0 4px 3px #0008);
+}
+.wmh-tile.feature-sparring-ground b{
+  font:700 8px Georgia,serif;
+  color:#fff0cf;
+  text-shadow:0 2px 5px #000;
+}
+
+/* Conversation is a true centered modal. The backdrop intercepts all map input,
+   blurs the exploration scene, and the simulation is paused while it is open. */
+.wmh-chat-panel{
+  position:fixed!important;
+  z-index:10000!important;
+  inset:0!important;
+  width:100vw!important;
+  height:100vh!important;
+  height:100dvh!important;
+  max-height:none!important;
+  margin:0!important;
+  padding:max(14px,env(safe-area-inset-top)) 14px max(14px,env(safe-area-inset-bottom))!important;
+  box-sizing:border-box!important;
+  display:grid!important;
+  place-items:center!important;
+  overflow:hidden!important;
+  border:0!important;
+  background:#07100bb8!important;
+  -webkit-backdrop-filter:blur(7px) saturate(.72)!important;
+  backdrop-filter:blur(7px) saturate(.72)!important;
+  touch-action:none;
+}
+.wmh-chat-panel[hidden]{display:none!important}
+.wmh-chat-card{
+  position:relative;
+  width:min(100%,520px);
+  max-height:min(82dvh,680px);
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  padding:24px 14px 14px;
+  box-sizing:border-box;
+  border:1px solid #d0b078;
+  background:linear-gradient(145deg,#27382d,#101812 78%);
+  box-shadow:0 20px 60px #000d,inset 0 1px #fff2;
+  border-radius:12px;
+  color:#f2e5cc;
+  touch-action:pan-y;
+}
+.wmh-chat-thread{gap:12px}
+.wmh-chat-message{max-width:100%;align-items:flex-end}
+.wmh-chat-copy{max-width:min(78%,390px);padding:10px 12px}
+.wmh-chat-copy p{font-size:14px;line-height:1.5}
+.wmh-chat-bust{width:62px;height:74px}
+.wmh-chat-close{
+  position:sticky;
+  z-index:2;
+  top:0;
+  float:right;
+  display:grid;
+  place-items:center;
+  width:34px;
+  height:34px;
+  margin:-15px -5px 2px 8px;
+  border:1px solid #c6a56d;
+  border-radius:50%;
+  background:#17241c;
+  color:#f4dfb8;
+  font:24px/1 Georgia,serif;
+}
+.wmh-chat-input-row{
+  clear:both;
+  position:sticky;
+  bottom:-14px;
+  margin-top:14px;
+  padding:12px 0 2px;
+  background:linear-gradient(0deg,#111b14 80%,#111b14e8);
+}
+.wmh-chat-input-row [data-wmh-replies] button{
+  min-height:40px;
+  padding:9px 12px;
+  border-radius:7px;
+  font-size:11px;
+}
+@media(max-width:390px){
+  .wmh-chat-card{width:100%;max-height:84dvh;padding:22px 10px 12px}
+  .wmh-chat-copy p{font-size:13px}
+  .wmh-chat-bust{width:48px;height:58px}
+}
