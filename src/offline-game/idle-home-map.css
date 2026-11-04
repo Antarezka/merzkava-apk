@@ -295,10 +295,10 @@
 .arcanist-card-slot{position:relative;display:flex;align-items:center;justify-content:center;width:90%;height:13px;border:1px solid #b8945c;border-radius:2px;background:linear-gradient(180deg,#050806,#1d211a 48%,#050806);box-shadow:inset 0 0 0 2px #090d0a,0 1px 4px #000b,0 0 4px #d2ad6b22}
 .arcanist-card-slot:before{content:"";position:absolute;left:12%;right:12%;top:5px;height:1px;background:#d4b57866;box-shadow:0 0 4px #d4b57855}
 .arcanist-card-slot>i{position:absolute;left:50%;top:50%;width:3px;height:3px;transform:translate(-50%,-50%);border-radius:50%;background:#d8a24c;opacity:.25}
-.arcanist-card-warning-lamp{position:absolute;right:4px;top:50%;width:7px;height:7px;transform:translateY(-50%);border:1px solid #8a6236;border-radius:50%;background:#4a2c16}
+.arcanist-card-warning-lamp{position:absolute;right:-12px;top:50%;width:7px;height:7px;transform:translateY(-50%);border:1px solid #8a6236;border-radius:50%;background:#4a2c16}
 .arcanist-card-warning-lamp.is-lit{background:#ff9b32;box-shadow:0 0 5px 2px #ff8a27,0 0 12px #ff9d3caa;animation:arcanist-warning-flicker .43s steps(2,end) infinite}
 @keyframes arcanist-warning-flicker{0%,100%{opacity:1}31%{opacity:.35}54%{opacity:.9}72%{opacity:.18}}
-.arcanist-card-inserted-indicator{position:absolute;z-index:3;left:50%;top:50%;bottom:auto;transform:translate(-50%,-50%);max-width:90%;padding:1px 4px;border-radius:2px;background:#101713;color:#e8ca8d;font:700 5px/1.2 system-ui,sans-serif;letter-spacing:.04em;text-align:center;white-space:nowrap;text-shadow:0 0 5px #edc77b}
+.arcanist-card-inserted-indicator{position:absolute;left:50%;top:auto;bottom:-14px;transform:translateX(-50%);white-space:nowrap;color:#e8ca8d;font:700 6px system-ui,sans-serif;letter-spacing:.08em;text-shadow:0 0 5px #edc77b}
 .arcanist-card-inserted-indicator[hidden]{display:none!important}
 .arcanist-travel-card{position:relative;display:flex;align-items:center;justify-content:space-between;gap:5px;width:92px;height:48px;padding:5px 7px;border:1px solid #c0a16c;border-radius:3px;background:linear-gradient(145deg,#d9c49a,#8d744b 56%,#4b3d2a);box-shadow:inset 0 0 0 2px #5a472d,0 2px 5px #0009;color:#382d1d;text-align:left;font:700 6px/1.3 Georgia,serif;letter-spacing:.06em;touch-action:manipulation;cursor:pointer}
 .arcanist-travel-card[hidden]{display:none!important}

@@ -4,7 +4,6 @@ import {
   ARCANISTRY_MIN_LOADING_MS,
   ARCANISTRY_TICKET_TEAR_DISTANCE,
   getArcanistryLeverAngle,
-  getArcanistryLeverPullDelta,
   getArcanistryTicketExtension,
   isArcanistryLeverEngaged,
   isArcanistryTicketTorn
@@ -19,10 +18,7 @@ describe("Arcanistry ticket interaction", () => {
     expect(isArcanistryLeverEngaged(Number.POSITIVE_INFINITY)).toBe(false);
   });
 
-  it("uses the dominant horizontal or downward gesture to move the quadrant lever", () => {
-    expect(getArcanistryLeverPullDelta(0, 46)).toBe(-46);
-    expect(getArcanistryLeverPullDelta(46, 0)).toBe(46);
-    expect(getArcanistryLeverPullDelta(-24, 40)).toBe(-40);
+  it("rotates the quadrant lever in the direction of the horizontal gesture", () => {
     expect(getArcanistryLeverAngle(0)).toBe(0);
     expect(getArcanistryLeverAngle(-56)).toBeCloseTo(-55);
     expect(getArcanistryLeverAngle(56)).toBeCloseTo(55);
