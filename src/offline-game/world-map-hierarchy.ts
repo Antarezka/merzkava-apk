@@ -446,19 +446,6 @@ function bindWorldMapEditor(dialog: HTMLElement): void {
   });
 }
 
-const ACADEMY_MAP_ART_PATH = "maps/academy/full-map/1_academy.jpg";
-
-function academyMapArtUrl(): string {
-  // Vite is configured with a relative base for Capacitor. Resolve against the
-  // app document so the packaged APK and browser build use the same asset path.
-  return new URL(ACADEMY_MAP_ART_PATH, document.baseURI).href;
-}
-
-function academyMiniMapMarkup(): string {
-  const src=academyMapArtUrl();
-  return '<div class="wmh-academy-map-jump"><button type="button" class="wmh-academy-mini-map" data-wmh-action="academy-home" aria-label="Return to the Academy exterior map"><span class="wmh-academy-mini-map-thumb"><img class="wmh-academy-mini-map-art" data-wmh-academy-map-art src="'+src+'" alt="" draggable="false"/></span><span class="wmh-academy-mini-map-copy"><b>TIANHAI ACADEMY</b><small>CLICK TO RETURN TO ACADEMY</small></span><span class="wmh-academy-mini-map-arrow" aria-hidden="true">↗</span></button></div>';
-}
-
 function bindIsometricMapArt(dialog: HTMLElement): void {
   const images = Array.from(dialog.querySelectorAll<HTMLImageElement>("[data-wmh-academy-map-art],[data-wmh-map-art]"));
   images.forEach(image => {
