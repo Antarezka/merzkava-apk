@@ -185,6 +185,14 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
     const level = dialog.querySelector<HTMLElement>("[data-wmh-zoom-level]");
     if (level) level.textContent = "100%";
   };
+  // World-map markers are fixed map anchors: their pointer gestures must never
+  // enter the viewport pan/pinch tracker. Keep click bubbling for the preview handler.
+  viewport.querySelectorAll<HTMLElement>(".wmh-power:not(.wmh-editor-marker)").forEach(marker => {
+    for (const type of ["pointerdown", "pointermove", "pointerup", "pointercancel"]) {
+      marker.addEventListener(type, event => event.stopPropagation());
+    }
+    marker.addEventListener("dragstart", event => event.preventDefault());
+  });
   dialog.querySelectorAll<HTMLElement>("[data-wmh-zoom]").forEach(button => button.addEventListener("click", () => {
     const action = button.dataset.wmhZoom;
     if (action === "reset") { centerMap(); return; }
