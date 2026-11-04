@@ -416,7 +416,7 @@ function tileMapMarkup(interior = false): string {
     return '<button type="button" class="wmh-tile wmh-tile-'+surface+' '+(feature?'has-feature feature-'+feature:'')+'" data-wmh-tile data-x="'+x+'" data-y="'+y+'" data-surface="'+surface+'" '+(building?'data-wmh-building="'+building+'"':'')+' aria-label="'+(label||surface)+'">'+(label?'<span>'+label+'</span>':'')+'</button>';
   }).join("")).join("");
   return '<div class="wmh-isometric-wrap"><div class="wmh-isometric-board '+(interior?'is-interior':'is-exterior')+'" data-wmh-board style="--tile-cols:'+cols+';--tile-rows:'+rows+'">'+tiles+
-    '<button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token style="grid-column:6;grid-row:9" aria-label="Player character"><i></i></button>'+
+    '<button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token data-x="5" data-y="8" style="grid-column:6;grid-row:9" aria-label="Player character"><i></i></button>'+
     (interior ? '<button type="button" class="wmh-character-token wmh-npc-token is-male" data-wmh-npc="teacher" data-x="6" data-y="2" style="grid-column:7;grid-row:3" aria-label="Teacher"><i></i></button><button type="button" class="wmh-character-token wmh-npc-token is-female" data-wmh-npc="student-lin" data-x="3" data-y="4" style="grid-column:4;grid-row:5" aria-label="Student Lin"><i></i></button>' :
       '<button type="button" class="wmh-character-token wmh-npc-token is-female" data-wmh-npc="student-lin" data-x="5" data-y="3" style="grid-column:6;grid-row:4" aria-label="Student Lin"><i></i></button>'+
       '<button type="button" class="wmh-character-token wmh-npc-token is-male" data-wmh-npc="student-wei" data-x="9" data-y="5" style="grid-column:10;grid-row:6" aria-label="Student Wei"><i></i></button>'+
@@ -459,6 +459,16 @@ const npcData: Record<string,{name:string;gender:string;greeting:string;choices:
   "groundskeeper":{name:"Uncle Qiao",gender:"male",greeting:"Mind the wet stones around the pond, young one. The moss makes them slippery after watering.",choices:["Ask about the garden","Ask about the pond","Thank him"],replies:["The flowering shrubs were planted by the first academy groundskeeper.","The pond is shallow near the bridge, but deep beside the willow.","Take care where you step."]},
   "teacher":{name:"Instructor",gender:"male",greeting:"Settle down. The lesson will begin shortly.",choices:["Ask about the lesson","Ask for guidance"],replies:["Today we review the foundations.","Observe carefully and ask when you are ready."]}
 };
+function animateGridMove(token:HTMLElement,update:()=>void):void {
+  const before=token.getBoundingClientRect();
+  update();
+  const after=token.getBoundingClientRect();
+  const dx=before.left-after.left,dy=before.top-after.top;
+  token.animate([
+    {transform:"translate("+dx+"px,"+dy+"px) translateY(-6px)"},
+    {transform:"translateY(-6px)"}
+  ],{duration:125,easing:"ease-out"});
+}
 function stopNpcWander(dialog:HTMLElement):void {
   const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
   const timer=Number(board?.dataset.npcTimer||0);
@@ -480,7 +490,7 @@ function startNpcWander(dialog:HTMLElement):void {
       if(!options.length)return;
       const [nx,ny]=options[Math.floor(Math.random()*options.length)];
       npc.dataset.x=String(nx);npc.dataset.y=String(ny);
-      npc.style.gridColumn=String(nx+1);npc.style.gridRow=String(ny+1);
+      animateGridMove(npc,()=>{npc.style.gridColumn=String(nx+1);npc.style.gridRow=String(ny+1);});
     });
   },2400);
   board.dataset.npcTimer=String(timer);
@@ -503,7 +513,7 @@ function walkToTile(dialog:HTMLElement,targetX:number,targetY:number,surface:str
   const move=()=>{
     if(x===targetX&&y===targetY)return;
     if(x!==targetX)x+=Math.sign(targetX-x); else y+=Math.sign(targetY-y);
-    player.style.gridColumn=String(x+1); player.style.gridRow=String(y+1);
+    animateGridMove(player,()=>{player.style.gridColumn=String(x+1); player.style.gridRow=String(y+1);});
     player.dataset.x=String(x);player.dataset.y=String(y);
     const tile=board.querySelector<HTMLElement>('[data-wmh-tile][data-x="'+x+'"][data-y="'+y+'"]');
     const material=tile?.dataset.surface||surface;
@@ -545,10 +555,6 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
     overlay.dataset.level="local";overlay.dataset.building=action.dataset.wmhSite;
     dialog.innerHTML=panelMarkup("local",regionId,action.dataset.wmhSite);startNpcWander(dialog);return true;
   }
-  if(action.dataset.wmhBuilding){
-    overlay.dataset.level="interior";overlay.dataset.building=action.dataset.wmhBuilding;
-    dialog.innerHTML=panelMarkup("interior",regionId,action.dataset.wmhBuilding);return true;
-  }
   if(action.dataset.wmhBuilding && current==="local"){
     stopNpcWander(dialog);
     overlay.dataset.level="interior";overlay.dataset.building=action.dataset.wmhBuilding;
@@ -564,7 +570,7 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
     const px=Number(player?.dataset.x||5),py=Number(player?.dataset.y||8);
     const nx=Number(action.dataset.x||0),ny=Number(action.dataset.y||0);
     const distance=Math.abs(px-nx)+Math.abs(py-ny);
-    if(distance<1){dialog.insertAdjacentHTML("beforeend",'<div class="wmh-toast">Move one tile closer before interacting.</div>');return true;}
+    if(distance<1){dialog.insertAdjacentHTML("beforeend",'<div class="wmh-toast">Stand at least one tile away to interact.</div>');return true;}
     renderChat(dialog,npcId);return true;
   }
   if(action.dataset.wmhReply!==undefined){
