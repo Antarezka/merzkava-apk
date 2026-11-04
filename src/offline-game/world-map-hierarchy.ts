@@ -624,31 +624,45 @@ function bindIsometricCamera(dialog:HTMLElement):void {
   syncIsoDepthAndOcclusion(board);
   let zoom=1;
   const baseW=board.offsetWidth,baseH=board.offsetHeight;
+  // Large empty travel field around the Academy canvas. Keep the map itself
+  // unchanged; the viewport can scroll several screen-widths beyond every edge.
+  const padX=()=>Math.max(1,viewport.clientWidth)*4;
+  const padY=()=>Math.max(1,viewport.clientHeight)*4;
+  const centerMap=()=>{
+    viewport.scrollLeft=padX()+baseW*zoom/2-viewport.clientWidth/2;
+    viewport.scrollTop=padY()+baseH*zoom/2-viewport.clientHeight/2;
+  };
   const apply=(next:number,focusX?:number,focusY?:number)=>{
     const old=zoom;zoom=Math.max(.65,Math.min(2.4,next));
-    const rect=viewport.getBoundingClientRect(),padX=viewport.clientWidth,padY=viewport.clientHeight;
+    const rect=viewport.getBoundingClientRect(),px=padX(),py=padY();
     const fx=focusX==null?viewport.clientWidth/2:focusX-rect.left;
     const fy=focusY==null?viewport.clientHeight/2:focusY-rect.top;
-    const ax=viewport.scrollLeft+fx-padX,ay=viewport.scrollTop+fy-padY;
-    camera.style.width=(baseW*zoom+padX*2)+"px";camera.style.height=(baseH*zoom+padY*2)+"px";
-    board.style.margin="0";board.style.marginLeft=padX+"px";board.style.marginTop=padY+"px";
-    board.style.transform="scale("+zoom+")";board.style.transformOrigin="top left";
-    viewport.scrollLeft=padX+ax*zoom/old-fx;viewport.scrollTop=padY+ay*zoom/old-fy;
+    const ax=viewport.scrollLeft+fx-px,ay=viewport.scrollTop+fy-py;
+    camera.style.width=(baseW*zoom+px*2)+"px";
+    camera.style.height=(baseH*zoom+py*2)+"px";
+    board.style.margin="0";
+    board.style.marginLeft=px+"px";
+    board.style.marginTop=py+"px";
+    board.style.transform="scale("+zoom+")";
+    board.style.transformOrigin="top left";
+    viewport.scrollLeft=px+ax*zoom/old-fx;
+    viewport.scrollTop=py+ay*zoom/old-fy;
     const label=dialog.querySelector<HTMLElement>("[data-wmh-iso-level]");
     if(label)label.textContent=Math.round(zoom*100)+"%";
   };
   apply(zoom);
-  viewport.scrollLeft=viewport.clientWidth;viewport.scrollTop=viewport.clientHeight;
+  centerMap();
   dialog.querySelectorAll<HTMLElement>("[data-wmh-iso-zoom]").forEach(button=>button.addEventListener("click",()=>{
-    const a=button.dataset.wmhIsoZoom;apply(a==="reset"?1:zoom+(a==="in"?.2:-.2));
-    if(button.dataset.wmhIsoZoom==="reset"){viewport.scrollLeft=viewport.clientWidth;viewport.scrollTop=viewport.clientHeight;}
+    const a=button.dataset.wmhIsoZoom;
+    apply(a==="reset"?1:zoom+(a==="in"?.2:-.2));
+    if(button.dataset.wmhIsoZoom==="reset")centerMap();
   }));
   const pts=new Map<number,{x:number;y:number}>();let pinch:{distance:number;zoom:number}|null=null;
   const dist=(a:{x:number;y:number},b:{x:number;y:number})=>Math.hypot(a.x-b.x,a.y-b.y);
   viewport.addEventListener("pointerdown",e=>{pts.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pts.size===2){const p=[...pts.values()];pinch={distance:Math.max(1,dist(p[0],p[1])),zoom};}});
   viewport.addEventListener("pointermove",e=>{if(!pts.has(e.pointerId))return;pts.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pts.size===2&&pinch){const p=[...pts.values()];apply(pinch.zoom*dist(p[0],p[1])/pinch.distance,(p[0].x+p[1].x)/2,(p[0].y+p[1].y)/2);e.preventDefault();}});
-  const end=(e:PointerEvent)=>{pts.delete(e.pointerId);if(pts.size<2)pinch=null;};
-  viewport.addEventListener("pointerup",end);viewport.addEventListener("pointercancel",end);
+  const finish=(e:PointerEvent)=>{pts.delete(e.pointerId);if(pts.size<2)pinch=null;};
+  viewport.addEventListener("pointerup",finish);viewport.addEventListener("pointercancel",finish);
 }
 function panelMarkup(level: Level, regionId: RegionId = "golden-dragon-empire", selectedBuilding = "Tianhai Academy", selectedArea?: WorldMarker): string {
   const region = regionData[regionId];
