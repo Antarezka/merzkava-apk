@@ -65,8 +65,8 @@ describe("shared isometric map editor data", () => {
   });
 
   it("uses a fresh storage namespace for the reinstalled isometric areas", () => {
-    expect(isoMapStorageKey("golden-dragon-empire:tianhai-academy:exterior"))
-      .toMatch(/^merzkava\\.isometric-map-editor\\.v2:/);
+    expect(isoMapStorageKey("golden-dragon-empire:tianhai-academy:exterior")
+      .startsWith("merzkava.isometric-map-editor.v2:")).toBe(true);
     expect(isoMapStorageKey("golden-dragon-empire:tianhai-academy:exterior"))
       .not.toBe(isoMapStorageKey("golden-dragon-empire:tianhai-academy:interior"));
     expect(isoMapStorageKey("golden-dragon-empire:tianhai-academy:exterior"))
