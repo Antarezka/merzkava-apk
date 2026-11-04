@@ -745,14 +745,21 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
   const dock=dialog.querySelector<HTMLElement>("[data-wmh-editor-dock]");
   const uiKey="merzkava.iso-editor-ui.v1:"+encodeURIComponent(data.mapId);
   const grid:IsoMapGridConfig={...data.grid};
-  const saveEditorUi=()=>{
-    if(!dock||!workbench)return;
-    const dockRect=dock.getBoundingClientRect(),bubbleRect=toggle.getBoundingClientRect(),panelRect=workbench.getBoundingClientRect();
-    const value={
-      bubble:{left:Math.round(bubbleRect.left-dockRect.left),top:Math.round(bubbleRect.top-dockRect.top)},
-      panel:{left:Math.round(panelRect.left-dockRect.left),top:Math.round(panelRect.top-dockRect.top),width:Math.round(panelRect.width),height:Math.round(panelRect.height)}
-    };
-    try{localStorage.setItem(uiKey,JSON.stringify(value));}catch{}
+  const readUiPrefs=()=>{
+    try{return JSON.parse(localStorage.getItem(uiKey)||"{}") as Record<string,any>;}catch{return {};}
+  };
+  const writeUiPrefs=(value:Record<string,any>)=>{try{localStorage.setItem(uiKey,JSON.stringify(value));}catch{}};
+  const saveBubbleUi=()=>{
+    if(!dock||toggle.hidden)return;
+    const dockRect=dock.getBoundingClientRect(),bubbleRect=toggle.getBoundingClientRect(),value=readUiPrefs();
+    value.bubble={left:Math.round(bubbleRect.left-dockRect.left),top:Math.round(bubbleRect.top-dockRect.top)};
+    writeUiPrefs(value);
+  };
+  const savePanelUi=()=>{
+    if(!panel||panel.hidden||!workbench||!dock)return;
+    const dockRect=dock.getBoundingClientRect(),panelRect=workbench.getBoundingClientRect(),value=readUiPrefs();
+    value.panel={left:Math.round(panelRect.left-dockRect.left),top:Math.round(panelRect.top-dockRect.top),width:Math.round(panelRect.width),height:Math.round(panelRect.height)};
+    writeUiPrefs(value);
   };
   try{
     const saved=JSON.parse(localStorage.getItem(uiKey)||"null");
@@ -762,8 +769,8 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     if(saved?.panel&&workbench&&Number.isFinite(saved.panel.left)&&Number.isFinite(saved.panel.top)){
       workbench.style.left=saved.panel.left+"px";workbench.style.top=saved.panel.top+"px";
       workbench.style.right="auto";workbench.style.bottom="auto";
-      if(Number.isFinite(saved.panel.width))workbench.style.width=saved.panel.width+"px";
-      if(Number.isFinite(saved.panel.height))workbench.style.height=saved.panel.height+"px";
+      if(Number.isFinite(saved.panel.width)&&saved.panel.width>=220)workbench.style.width=saved.panel.width+"px";
+      if(Number.isFinite(saved.panel.height)&&saved.panel.height>=170)workbench.style.height=saved.panel.height+"px";
     }
   }catch{}
   const remember=()=>{history.push(JSON.parse(JSON.stringify(data)) as IsoMapEditorData);if(history.length>40)history.shift();};
@@ -847,7 +854,6 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       renderIsometricWorldStatus(dialog);
       selectedTransitionId=null;
     }
-    if(!active)saveEditorUi();
     panel.hidden=!active;
     toggle.hidden=active;
     toggle.setAttribute("aria-pressed",String(active));
@@ -875,7 +881,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     };
     const end=(_next:PointerEvent)=>{
       window.removeEventListener("pointermove",move);window.removeEventListener("pointerup",end);window.removeEventListener("pointercancel",end);
-      if(moved){suppressToggleClick=true;saveEditorUi();}
+      if(moved){suppressToggleClick=true;saveBubbleUi();}
     };
     window.addEventListener("pointermove",move,{passive:false});window.addEventListener("pointerup",end);window.addEventListener("pointercancel",end);
   });
@@ -895,7 +901,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       workbench!.style.right="auto";workbench!.style.bottom="auto";
     };
     const end=()=>{
-      window.removeEventListener("pointermove",move);window.removeEventListener("pointerup",end);window.removeEventListener("pointercancel",end);saveEditorUi();
+      window.removeEventListener("pointermove",move);window.removeEventListener("pointerup",end);window.removeEventListener("pointercancel",end);savePanelUi();
     };
     window.addEventListener("pointermove",move,{passive:false});window.addEventListener("pointerup",end);window.addEventListener("pointercancel",end);
   });
