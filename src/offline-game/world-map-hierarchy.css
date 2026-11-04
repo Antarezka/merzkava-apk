@@ -1079,7 +1079,7 @@
 }
 .wmh-isometric-foreground{
   position:absolute!important;
-  z-index:120!important;
+  z-index:250!important;
   display:block!important;
   max-width:none!important;
   max-height:none!important;
