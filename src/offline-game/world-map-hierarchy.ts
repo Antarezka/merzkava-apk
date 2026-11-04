@@ -457,21 +457,59 @@ function academyMiniMapMarkup(): string {
   return '<div class="wmh-academy-map-jump"><button type="button" class="wmh-academy-mini-map" data-wmh-action="academy-home" aria-label="Return to the Academy exterior map"><span class="wmh-academy-mini-map-thumb"><img class="wmh-academy-mini-map-art" data-wmh-academy-map-art src="'+src+'" alt="" draggable="false"/></span><span class="wmh-academy-mini-map-copy"><b>TIANHAI ACADEMY</b><small>CLICK TO RETURN TO ACADEMY</small></span><span class="wmh-academy-mini-map-arrow" aria-hidden="true">↗</span></button></div>';
 }
 
+let academyMapPngDataUrl: string | null = null;
+
 function bindIsometricMapArt(dialog: HTMLElement): void {
-  dialog.querySelectorAll<HTMLImageElement>("[data-wmh-academy-map-art],[data-wmh-map-art]").forEach(image => {
-    if(image.dataset.mapArtBound==="true")return;
-    image.dataset.mapArtBound="true";
-    image.addEventListener("error",()=>{
+  const images = Array.from(dialog.querySelectorAll<HTMLImageElement>("[data-wmh-academy-map-art],[data-wmh-map-art]"));
+  const convertAllToPng = (source: HTMLImageElement): void => {
+    if (!academyMapPngDataUrl) {
+      try {
+        if (source.currentSrc.startsWith("data:image/png")) {
+          academyMapPngDataUrl = source.currentSrc;
+        } else {
+          const canvas = document.createElement("canvas");
+          canvas.width = source.naturalWidth;
+          canvas.height = source.naturalHeight;
+          const context = canvas.getContext("2d");
+          if (!context || !canvas.width || !canvas.height) return;
+          context.drawImage(source, 0, 0);
+          academyMapPngDataUrl = canvas.toDataURL("image/png");
+        }
+      } catch {
+        // The original same-origin image remains usable if PNG canvas export is unavailable.
+        return;
+      }
+    }
+    if (!academyMapPngDataUrl) return;
+    for (const image of images) {
+      if (image.dataset.mapPngConverted === "true") continue;
+      image.dataset.mapPngConverted = "true";
+      const board = image.closest<HTMLElement>("[data-wmh-board]");
+      const draw = () => { if (board) drawIsometricForeground(board); };
+      if (image.src === academyMapPngDataUrl) {
+        draw();
+      } else {
+        image.addEventListener("load", draw, { once: true });
+        image.src = academyMapPngDataUrl;
+      }
+    }
+  };
+  images.forEach(image => {
+    if (image.dataset.mapArtBound === "true") return;
+    image.dataset.mapArtBound = "true";
+    image.addEventListener("error", () => {
       image.closest<HTMLElement>(".wmh-academy-mini-map-thumb,[data-wmh-board]")?.classList.add("wmh-map-art-missing");
       image.remove();
-    },{once:true});
-    if(image.complete&&image.naturalWidth===0)image.dispatchEvent(new Event("error"));
-    const board=image.closest<HTMLElement>("[data-wmh-board]");
-    if(board){
-      const draw=()=>drawIsometricForeground(board);
-      if(image.complete&&image.naturalWidth)draw();
-      else image.addEventListener("load",draw,{once:true});
-    }
+    }, { once: true });
+    const board = image.closest<HTMLElement>("[data-wmh-board]");
+    const ready = () => {
+      if (!image.naturalWidth) return;
+      convertAllToPng(image);
+      if (board && image.dataset.mapPngConverted === "true") drawIsometricForeground(board);
+    };
+    if (image.complete && image.naturalWidth) ready();
+    else if (image.complete && image.naturalWidth === 0) image.dispatchEvent(new Event("error"));
+    else image.addEventListener("load", ready, { once: true });
   });
 }
 
@@ -513,7 +551,8 @@ function tileMapMarkup(interior = false, mapId = "academy-exterior", mapImage = 
 }
 function isometricMapBaseFor(regionId: RegionId, selectedBuilding: string, interior: boolean): string {
   if (interior) return "";
-  if (regionId === "golden-dragon-empire" && selectedBuilding === "Tianhai Academy") return academyMapArtUrl();
+  const place = selectedBuilding.trim().toLowerCase().replace(/\s+/g, " ");
+  if (regionId === "golden-dragon-empire" && (place === "tianhai academy" || place === "academy")) return academyMapArtUrl();
   return "";
 }
 function makeIsometricMapId(regionId: RegionId, selectedBuilding: string, interior: boolean): string {
@@ -1045,7 +1084,7 @@ function bindIsometricCamera(dialog:HTMLElement):void {
   if(!viewport||!camera||!board||viewport.dataset.cameraBound==="true")return;
   viewport.dataset.cameraBound="true";
   syncIsoDepthAndOcclusion(board);
-  let zoom=1,baseW=0,baseH=0;
+  let zoom=.85,baseW=0,baseH=0;
   const padX=()=>Math.max(1,viewport.clientWidth)*4;
   const padY=()=>Math.max(1,viewport.clientHeight)*4;
   const measure=()=>{
