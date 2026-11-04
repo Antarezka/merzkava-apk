@@ -1622,3 +1622,39 @@
   display:none!important;
 }
 /* The Academy Map Base is also shown in its compact HUD minimap. */
+
+
+/* Academy parity fix: render the exact minimap grid SVG over the full-size Map
+   Base. Keep both artwork and grid pinned to the same board coordinate bounds. */
+.wmh-isometric-board.is-minimap-style>.wmh-isometric-map-base{
+  position:absolute!important;
+  inset:0 auto auto 0!important;
+  width:var(--iso-board-width,2816px)!important;
+  height:var(--iso-board-height,1536px)!important;
+  max-width:none!important;
+  max-height:none!important;
+  display:block!important;
+  object-fit:fill!important;
+  opacity:.72!important;
+  visibility:visible!important;
+  pointer-events:none!important;
+}
+.wmh-isometric-board.is-minimap-style>.wmh-area-scene-svg.wmh-minimap-grid{
+  position:absolute!important;
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
+  display:block!important;
+  overflow:hidden!important;
+  opacity:.55!important;
+  pointer-events:none!important;
+  z-index:1!important;
+}
+.wmh-isometric-board.is-minimap-style .wmh-vector-cells polygon.wmh-minimap-cell[data-wmh-tile]{
+  fill:none!important;
+  fill-opacity:0!important;
+  stroke:#f6e9be!important;
+  stroke-width:12px!important;
+  stroke-opacity:.34!important;
+  pointer-events:all!important;
+}
