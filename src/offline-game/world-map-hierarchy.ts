@@ -836,7 +836,11 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       if(chat)chat.hidden=true;
       const player=board.querySelector<HTMLElement>("[data-wmh-player-token]");
       const movementTimer=Number(player?.dataset.moveTimer||0);
-      if(movementTimer){window.clearTimeout(movementTimer);delete player!.dataset.moveTimer;}
+      if(movementTimer){
+        window.clearTimeout(movementTimer);delete player!.dataset.moveTimer;
+        if((board as HTMLElement & {__wmhPendingPlayerDestination?:{x:number;y:number;surface:string}}).__wmhPendingPlayerDestination)
+          board.dataset.editorResumePlayerAfterEdit="true";
+      }
       board.dataset.editorPaused="true";
       board.classList.add("wmh-overlay-editing","wmh-editor-paused");
       board.querySelectorAll<HTMLElement>("[data-wmh-player-token],[data-wmh-npc]").forEach(token=>token.getAnimations().forEach(animation=>animation.pause()));
@@ -850,6 +854,12 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       if(chat)chat.hidden=!chatWasVisible;
       delete board.dataset.editorChatWasVisible;
       if(!chatWasVisible&&dialog.closest<HTMLElement>("[data-world-map-hierarchy]")?.dataset.level==="local")startNpcWander(dialog);
+      if(board.dataset.editorResumePlayerAfterEdit==="true"&&!chatWasVisible){
+        const runtime=board as HTMLElement & {__wmhPendingPlayerDestination?:{x:number;y:number;surface:string}};
+        const pending=runtime.__wmhPendingPlayerDestination;
+        delete board.dataset.editorResumePlayerAfterEdit;
+        if(pending)walkToTile(dialog,pending.x,pending.y,pending.surface);
+      }
       renderIsometricMinimap(board);
       renderIsometricWorldStatus(dialog);
       selectedTransitionId=null;
@@ -1258,10 +1268,12 @@ function walkToTile(dialog:HTMLElement,targetX:number,targetY:number,surface:str
   if(board?.dataset.editorPaused==="true"||board?.classList.contains("wmh-overlay-editing"))return;
   const player=board?.querySelector<HTMLElement>("[data-wmh-player-token]");
   if(!board||!player)return;
+  const runtime=board as HTMLElement & {__wmhPendingPlayerDestination?:{x:number;y:number;surface:string}};
   const cols=Number(board.dataset.cols||12),rows=Number(board.dataset.rows||10);
   if(!Number.isInteger(targetX)||!Number.isInteger(targetY)||targetX<0||targetX>=cols||targetY<0||targetY>=rows)return;
   const destination=board.querySelector<HTMLElement>('[data-wmh-tile][data-x="'+targetX+'"][data-y="'+targetY+'"]');
-  if(!destination||!isoCanWalkTile(board,destination,targetX,targetY))return;
+  if(!destination||!isoCanWalkTile(board,destination,targetX,targetY)){delete runtime.__wmhPendingPlayerDestination;return;}
+  runtime.__wmhPendingPlayerDestination={x:targetX,y:targetY,surface};
   const oldTimer=Number(player.dataset.moveTimer||0);
   if(oldTimer)window.clearTimeout(oldTimer);
   const startX=Number(player.dataset.x||5),startY=Number(player.dataset.y||8);
@@ -1283,7 +1295,7 @@ function walkToTile(dialog:HTMLElement,targetX:number,targetY:number,surface:str
     }
   }
   const targetKey=targetX+","+targetY;
-  if(!previous.has(targetKey))return;
+  if(!previous.has(targetKey)){delete runtime.__wmhPendingPlayerDestination;return;}
   const path:Array<[number,number]>=[];
   let cursor:string|null=targetKey;
   while(cursor){
@@ -1293,7 +1305,7 @@ function walkToTile(dialog:HTMLElement,targetX:number,targetY:number,surface:str
   path.shift();
   let step=0;
   const move=()=>{
-    if(step>=path.length){delete player.dataset.moveTimer;return;}
+    if(step>=path.length){delete player.dataset.moveTimer;delete runtime.__wmhPendingPlayerDestination;return;}
     const [x,y]=path[step++];
     const tile=board.querySelector<HTMLElement>('[data-wmh-tile][data-x="'+x+'"][data-y="'+y+'"]');
     animateGridMove(player,()=>{
