@@ -63,20 +63,20 @@ const defaultWorldMarkers: WorldMarker[] = [
   { id: "black-tide-sea", name: "Black Tide Sea", x: 60.8, y: 78.8, category: "sea", subtitle: "ORDINARY SOUTHERN SEA", description: "Ordinary open water south of Lawless Territories and around Black Tide Expanse. It separates the Lawless maritime region from Guixu Canghai.", placementStatus: "owner-set" },
   { id: "guixu-canghai", name: "Guixu Canghai", x: 50.6, y: 88.8, category: "sea", subtitle: "FAR-SOUTHERN POLAR OCEAN", description: "The world's farthest-southern, frigid, most dangerous ocean system, beyond the southern outer boundary of ordinary Black Tide Sea.", placementStatus: "owner-set" },
   { id: "lanternhook-isles", name: "Lanternhook Isles", x: 68.9, y: 74.6, category: "landmark", subtitle: "ARCHIPELAGO IN ORDINARY BLACK TIDE SEA", description: "A small archipelago with Red Lantern Cay (entertainment), Bitterglass Isle (specialist physicians and medicinal trade), and Dicewake Isle (gambling and wagers).", placementStatus: "owner-set" },
-  { id: "mega-colossal-labyrinth-exit", name: "Mega Colossal Labyrinth Exit", x: 8, y: 88, category: "landmark", subtitle: "POSITION PENDING · OWNER TO PLACE", description: "This location has been added to the world map marker list. Its geographic position has not been assigned; place it manually in the Map Editor.", placementStatus: "provisional" },
-  { id: "lantern-passage", name: "Lantern Passage", x: 22, y: 88, category: "sea", subtitle: "POSITION PENDING · OWNER TO PLACE", description: "This location has been added to the world map marker list. Its geographic position has not been assigned; place it manually in the Map Editor.", placementStatus: "provisional" },
-  { id: "changqion-harbour", name: "Changqion Harbour", x: 36, y: 88, category: "landmark", subtitle: "POSITION PENDING · OWNER TO PLACE", description: "This location has been added to the world map marker list. Its geographic position has not been assigned; place it manually in the Map Editor.", placementStatus: "provisional" },
-  { id: "three-lantern-passage", name: "Three Lantern Passage", x: 50, y: 88, category: "sea", subtitle: "POSITION PENDING · OWNER TO PLACE", description: "This location has been added to the world map marker list. Its geographic position has not been assigned; place it manually in the Map Editor.", placementStatus: "provisional" },
-  { id: "southwake-port", name: "Southwake Port", x: 64, y: 88, category: "landmark", subtitle: "POSITION PENDING · OWNER TO PLACE", description: "This location has been added to the world map marker list. Its geographic position has not been assigned; place it manually in the Map Editor.", placementStatus: "provisional" },
-  { id: "bitterglass-isle", name: "Bitterglass Isle", x: 78, y: 88, category: "landmark", subtitle: "POSITION PENDING · OWNER TO PLACE", description: "This location has been added to the world map marker list. Its geographic position has not been assigned; place it manually in the Map Editor.", placementStatus: "provisional" },
-  { id: "dicewake-isle", name: "Dicewake Isle", x: 92, y: 88, category: "landmark", subtitle: "POSITION PENDING · OWNER TO PLACE", description: "This location has been added to the world map marker list. Its geographic position has not been assigned; place it manually in the Map Editor.", placementStatus: "provisional" },
-  { id: "dongxing-port", name: "Dongxing Port", x: 8, y: 96, category: "landmark", subtitle: "POSITION PENDING · OWNER TO PLACE", description: "This location has been added to the world map marker list. Its geographic position has not been assigned; place it manually in the Map Editor.", placementStatus: "provisional" },
-  { id: "mingzhu-port", name: "Mingzhu Port", x: 22, y: 96, category: "landmark", subtitle: "POSITION PENDING · OWNER TO PLACE", description: "This location has been added to the world map marker list. Its geographic position has not been assigned; place it manually in the Map Editor.", placementStatus: "provisional" },
-  { id: "lanfan-port", name: "Lanfan Port", x: 36, y: 96, category: "landmark", subtitle: "POSITION PENDING · OWNER TO PLACE", description: "This location has been added to the world map marker list. Its geographic position has not been assigned; place it manually in the Map Editor.", placementStatus: "provisional" },
-  { id: "chaoguan-port", name: "Chaoguan Port", x: 50, y: 96, category: "landmark", subtitle: "POSITION PENDING · OWNER TO PLACE", description: "This location has been added to the world map marker list. Its geographic position has not been assigned; place it manually in the Map Editor.", placementStatus: "provisional" },
-  { id: "yuhai-port", name: "Yuhai Port", x: 64, y: 96, category: "landmark", subtitle: "POSITION PENDING · OWNER TO PLACE", description: "This location has been added to the world map marker list. Its geographic position has not been assigned; place it manually in the Map Editor.", placementStatus: "provisional" },
-  { id: "yuandeng-port", name: "Yuandeng Port", x: 78, y: 96, category: "landmark", subtitle: "POSITION PENDING · OWNER TO PLACE", description: "This location has been added to the world map marker list. Its geographic position has not been assigned; place it manually in the Map Editor.", placementStatus: "provisional" },
-  { id: "longchao-port", name: "Longchao Port", x: 92, y: 96, category: "landmark", subtitle: "POSITION PENDING · OWNER TO PLACE", description: "This location has been added to the world map marker list. Its geographic position has not been assigned; place it manually in the Map Editor.", placementStatus: "provisional" }
+  { id: "mega-colossal-labyrinth-exit", name: "Mega Colossal Labyrinth Exit", x: 25.1, y: 22.7, category: "landmark", subtitle: "OWNER-POSITIONED", description: "Position confirmed by the owner on the canonical Merzkava world map.", placementStatus: "owner-set" },
+  { id: "lantern-passage", name: "Lantern Passage", x: 34.9, y: 43.8, category: "sea", subtitle: "OWNER-POSITIONED", description: "Position confirmed by the owner on the canonical Merzkava world map.", placementStatus: "owner-set" },
+  { id: "changqion-harbour", name: "Changqion Harbour", x: 26.5, y: 61.4, category: "landmark", subtitle: "OWNER-POSITIONED", description: "Position confirmed by the owner on the canonical Merzkava world map.", placementStatus: "owner-set" },
+  { id: "three-lantern-passage", name: "Three Lantern Passage", x: 55.7, y: 43.8, category: "sea", subtitle: "OWNER-POSITIONED", description: "Position confirmed by the owner on the canonical Merzkava world map.", placementStatus: "owner-set" },
+  { id: "southwake-port", name: "Southwake Port", x: 64.1, y: 66.9, category: "landmark", subtitle: "OWNER-POSITIONED", description: "Position confirmed by the owner on the canonical Merzkava world map.", placementStatus: "owner-set" },
+  { id: "bitterglass-isle", name: "Bitterglass Isle", x: 68.4, y: 84.6, category: "landmark", subtitle: "OWNER-POSITIONED", description: "Position confirmed by the owner on the canonical Merzkava world map.", placementStatus: "owner-set" },
+  { id: "dicewake-isle", name: "Dicewake Isle", x: 75.6, y: 78, category: "landmark", subtitle: "OWNER-POSITIONED", description: "Position confirmed by the owner on the canonical Merzkava world map.", placementStatus: "owner-set" },
+  { id: "dongxing-port", name: "Dongxing Port", x: 89.9, y: 25.7, category: "landmark", subtitle: "OWNER-POSITIONED", description: "Position confirmed by the owner on the canonical Merzkava world map.", placementStatus: "owner-set" },
+  { id: "mingzhu-port", name: "Mingzhu Port", x: 89.2, y: 33.5, category: "landmark", subtitle: "OWNER-POSITIONED", description: "Position confirmed by the owner on the canonical Merzkava world map.", placementStatus: "owner-set" },
+  { id: "lanfan-port", name: "Lanfan Port", x: 85.7, y: 41.8, category: "landmark", subtitle: "OWNER-POSITIONED", description: "Position confirmed by the owner on the canonical Merzkava world map.", placementStatus: "owner-set" },
+  { id: "chaoguan-port", name: "Chaoguan Port", x: 82.9, y: 45.6, category: "landmark", subtitle: "OWNER-POSITIONED", description: "Position confirmed by the owner on the canonical Merzkava world map.", placementStatus: "owner-set" },
+  { id: "yuhai-port", name: "Yuhai Port", x: 85.8, y: 54.7, category: "landmark", subtitle: "OWNER-POSITIONED", description: "Position confirmed by the owner on the canonical Merzkava world map.", placementStatus: "owner-set" },
+  { id: "yuandeng-port", name: "Yuandeng Port", x: 85, y: 60.5, category: "landmark", subtitle: "OWNER-POSITIONED", description: "Position confirmed by the owner on the canonical Merzkava world map.", placementStatus: "owner-set" },
+  { id: "longchao-port", name: "Longchao Port", x: 83.4, y: 65.8, category: "landmark", subtitle: "OWNER-POSITIONED", description: "Position confirmed by the owner on the canonical Merzkava world map.", placementStatus: "owner-set" }
 ];
 function readWorldMarkers(): WorldMarker[] {
   try {
@@ -402,100 +402,150 @@ function bindWorldMapEditor(dialog: HTMLElement): void {
   });
 }
 
+function tileMapMarkup(interior = false): string {
+  const cols = 12, rows = 10;
+  const features: Record<string,string> = interior
+    ? {"2-1":"blackboard","5-1":"teacher-desk","3-3":"desk","5-3":"desk","7-3":"desk","3-5":"desk","5-5":"desk","7-5":"desk","10-8":"door"}
+    : {"5-1":"pond","6-1":"pond","7-1":"pond","8-1":"pond","1-2":"tree","2-2":"tree","10-2":"tree","1-3":"flower","3-3":"flower","9-3":"flower","11-3":"tree","2-5":"garden","3-5":"garden","8-5":"garden","9-5":"garden","4-7":"gate","5-7":"gate","6-7":"gate","7-7":"gate","2-8":"bench","9-8":"bench"};
+  const tiles = Array.from({length: rows}, (_,y) => Array.from({length:cols},(_,x) => {
+    const key=x+"-"+y, feature=features[key] || "";
+    const surface = interior ? (y<2?"wood":"tile") : (feature==="pond"?"wet":feature==="gate"?"stone":feature==="tree"||feature==="flower"||feature==="garden"?"earth":y>7?"stone":"earth");
+    const label = feature==="pond"?"POND":feature==="tree"?"TREE":feature==="flower"?"FLOWER":feature==="garden"?"GARDEN":feature==="gate"?"ACADEMY GATE":feature==="bench"?"BENCH":feature==="blackboard"?"BOARD":feature==="teacher-desk"?"TEACHER":feature==="desk"?"DESK":feature==="door"?"DOOR":"";
+    return '<button type="button" class="wmh-tile wmh-tile-'+surface+' '+(feature?'has-feature feature-'+feature:'')+'" data-wmh-tile data-x="'+x+'" data-y="'+y+'" data-surface="'+surface+'" aria-label="'+(label||surface)+'">'+(label?'<span>'+label+'</span>':'')+'</button>';
+  }).join("")).join("");
+  return '<div class="wmh-isometric-wrap"><div class="wmh-isometric-board '+(interior?'is-interior':'is-exterior')+'" data-wmh-board style="--tile-cols:'+cols+';--tile-rows:'+rows+'">'+tiles+
+    '<button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token style="grid-column:6;grid-row:9" aria-label="Player character"><i></i></button>'+
+    (interior ? '<button type="button" class="wmh-character-token wmh-npc-token is-male" data-wmh-npc="teacher" data-x="6" data-y="2" style="grid-column:7;grid-row:3" aria-label="Teacher"><i></i></button><button type="button" class="wmh-character-token wmh-npc-token is-female" data-wmh-npc="student-lin" data-x="3" data-y="4" style="grid-column:4;grid-row:5" aria-label="Student Lin"><i></i></button>' :
+      '<button type="button" class="wmh-character-token wmh-npc-token is-female" data-wmh-npc="student-lin" data-x="5" data-y="3" style="grid-column:6;grid-row:4" aria-label="Student Lin"><i></i></button>'+
+      '<button type="button" class="wmh-character-token wmh-npc-token is-male" data-wmh-npc="student-wei" data-x="9" data-y="5" style="grid-column:10;grid-row:6" aria-label="Student Wei"><i></i></button>'+
+      '<button type="button" class="wmh-character-token wmh-npc-token is-female" data-wmh-npc="teacher-mei" data-x="2" data-y="6" style="grid-column:3;grid-row:7" aria-label="Instructor Mei"><i></i></button>'+
+      '<button type="button" class="wmh-character-token wmh-npc-token is-male" data-wmh-npc="groundskeeper" data-x="10" data-y="2" style="grid-column:11;grid-row:3" aria-label="Groundskeeper"><i></i></button>')+
+    '</div></div>';
+}
 function panelMarkup(level: Level, regionId: RegionId = "golden-dragon-empire", selectedBuilding = "Tianhai Academy"): string {
   const region = regionData[regionId];
   const header = (kind: string, title: string, subtitle: string) =>
-    '<header class="wmh-level-header"><div><span class="wmh-level-tag">' + kind + '</span><h3>' + title + '</h3><p>' + subtitle + '</p></div><button type="button" class="wmh-close" data-wmh-action="close" aria-label="Close map">×</button></header>';
-  if (level === "world") return header("WORLD MAP", "Merzkava Universe", "THREE GREAT POWERS · EXTERNAL TERRITORIES · FORESTS · SIX SEAS") +
-    '<div class="wmh-map-zoom" data-wmh-zoom-controls><button type="button" data-wmh-zoom="out" aria-label="Zoom out">−</button><span data-wmh-zoom-level>100%</span><button type="button" data-wmh-zoom="in" aria-label="Zoom in">+</button><button type="button" data-wmh-zoom="reset">RESET</button></div>' +
-    '<div class="wmh-world-map" data-wmh-map-viewport><div class="wmh-world-map-image" data-wmh-map-surface><img src="/world/Untitled77_20261029054536.png" alt="Canonical Merzkava world and regions map" />' +
-    readWorldMarkers().map(marker => worldMapMarkerMarkup(marker)).join("") + '</div></div>' +
-    '<div class="wmh-bottom-actions"><button data-wmh-action="home">⌂ &nbsp; OPEN HOME MAP</button><button data-wmh-action="editor-open">⊞ &nbsp; MAP EDITOR</button><span>SELECT A POWER TO EXPLORE ITS TERRITORY</span></div>';
-  if (level === "map-editor") return header("WORLD MAP TOOLS", "Map Editor", "FLAT WORLD MAP · NORMALIZED COORDINATES") + mapEditorMarkup();
-  if (level === "regional") return header("REGIONAL MAP", region.name, region.subtitle) +
-    '<div class="wmh-region-scene"><img src="' + region.image + '" alt="" /><div class="wmh-scene-shade"></div><span class="wmh-map-stamp">REGIONAL TERRITORY</span></div>' +
-    '<div class="wmh-site-grid">' + region.sites.map((site, i) =>
-      '<button class="wmh-site-card" data-wmh-site="' + site + '" data-wmh-region-id="' + regionId + '"><span>' + ["♜","⌘","▤","⚓","⌑","⚔"][i] + '</span><b>' + site + '</b><small>' + (regionId === "golden-dragon-empire" && site === "Tianhai Academy" ? "EXPLORE COMPLEX" : "COMING SOON") + '</small></button>'
-    ).join("") + '</div><div class="wmh-bottom-actions"><button data-wmh-action="back">← WORLD MAP</button><span>SELECT A LOCATION</span></div>';
-  if (level === "local") return header("LOCAL AREA", selectedBuilding, "ACADEMY COMPLEX · BUILDINGS & GROUNDS") +
-    '<div class="wmh-local-scene"><img src="/game/scenery/golden-dragon-empire/gde-05-cultivation-academy-courtyard.png" alt="" />' +
-    '<div class="wmh-local-overlay"><button class="wmh-building wmh-building-class" data-wmh-building="Classroom">CLASSROOM</button><button class="wmh-building wmh-building-dean" data-wmh-building="Dean’s Office">DEAN’S OFFICE</button><button class="wmh-building wmh-building-garden" data-wmh-building="Academy Garden">GARDEN</button><button class="wmh-building wmh-building-training" data-wmh-building="Training Grounds">TRAINING GROUNDS</button>' +
-    '<button class="wmh-avatar wmh-player" data-wmh-npc="You" aria-label="Player"><span>✦</span></button><button class="wmh-avatar wmh-npc-one" data-wmh-npc="Student" aria-label="Nearby student"><span>●</span></button><button class="wmh-avatar wmh-npc-two" data-wmh-npc="Academy attendant" aria-label="Academy attendant"><span>●</span></button></div></div>' +
-    '<div class="wmh-local-footer"><span>● PLAYER &nbsp; ○ NPC · TAP A BUILDING OR CHARACTER</span><button data-wmh-action="exit-local">← EXIT TO CITY · +3 HOURS</button></div>';
-  if (level === "interior") return header("INTERIOR MAP", selectedBuilding, "ISOMETRIC FLOOR PLAN · CLASSROOM") +
-    '<div class="wmh-interior"><div class="wmh-classroom-floor"><div class="wmh-blackboard">LESSON BOARD</div><div class="wmh-teacher-desk">TEACHER</div>' +
-    '<div class="wmh-desks">' + Array.from({length:6},()=>'<div class="wmh-desk">DESK</div>').join("") + '</div>' +
-    '<button class="wmh-avatar wmh-interior-player" data-wmh-npc="You" aria-label="Player"><span>✦</span></button><button class="wmh-avatar wmh-interior-npc-a" data-wmh-npc="Student" aria-label="Student"><span>●</span></button><button class="wmh-avatar wmh-interior-npc-b" data-wmh-npc="Student" aria-label="Student"><span>●</span></button><button class="wmh-avatar wmh-interior-npc-c" data-wmh-npc="Teacher" aria-label="Teacher"><span>●</span></button><div class="wmh-door">DOOR</div></div></div>' +
-    '<div class="wmh-local-footer"><span>CHARACTERS ARE SHOWN AS ROUND PORTRAIT TOKENS</span><button data-wmh-action="back">← BACK TO LOCAL AREA</button></div><div class="wmh-dialogue" data-wmh-dialogue hidden><div class="wmh-dialogue-portrait">◉</div><div><small data-wmh-speaker>STUDENT</small><p data-wmh-line>“The lesson has already started. I should return to my seat.”</p></div><button data-wmh-action="dismiss-dialogue">×</button></div>';
-  return header("HOME MAP", "Personal Grounds", "ISOMETRIC HOME · PLOTS & FACILITIES") +
-    '<div class="wmh-home-grid">' + [["Farmland","▧"],["Building Plot","⌂"],["Training Area","⚔"],["Warehouse","▤"],["Fish Pond","◉"],["Lumber Area","♧"]].map(([name,icon])=>'<button data-wmh-plot="' + name + '"><span>' + icon + '</span><b>' + name + '</b><small>VIEW FUNCTION</small></button>').join("") + '</div><div class="wmh-bottom-actions"><button data-wmh-action="back">← WORLD MAP</button><span>PERSONAL DEVELOPMENT AREA</span></div>';
+    '<header class="wmh-level-header"><div><span class="wmh-level-tag">'+kind+'</span><h3>'+title+'</h3><p>'+subtitle+'</p></div><button type="button" class="wmh-close" data-wmh-action="close" aria-label="Close map">×</button></header>';
+  if (level === "world") return header("WORLD MAP","Merzkava Universe","THREE GREAT POWERS · EXTERNAL TERRITORIES · SEAS")+
+    '<div class="wmh-map-zoom"><button type="button" data-wmh-zoom="out">−</button><span data-wmh-zoom-level>100%</span><button type="button" data-wmh-zoom="in">+</button><button type="button" data-wmh-zoom="reset">RESET</button></div>'+
+    '<div class="wmh-world-map" data-wmh-map-viewport><div class="wmh-world-map-image" data-wmh-map-surface><img src="/world/Untitled77_20261029054536.png" alt="Merzkava Universe world map"/>'+readWorldMarkers().map(marker=>worldMapMarkerMarkup(marker)).join("")+'</div></div>'+
+    '<div class="wmh-bottom-actions"><span>SELECT A POWER TO OPEN ITS REGIONAL MAP</span><button data-wmh-action="editor-open">⊞ MAP EDITOR</button></div>';
+  if (level === "map-editor") return header("WORLD MAP TOOLS","Map Editor","FLAT WORLD MAP · NORMALIZED COORDINATES")+mapEditorMarkup();
+  if (level === "regional") return header("REGIONAL MAP",region.name,region.subtitle)+
+    '<div class="wmh-regional-placeholder"><div class="wmh-regional-land"><span class="wmh-regional-river"></span><span class="wmh-regional-road road-one"></span><span class="wmh-regional-road road-two"></span><span class="wmh-regional-road road-three"></span><span class="wmh-regional-label">REGIONAL MAP ART · PLACEHOLDER</span>'+
+    region.sites.map((site,i)=>'<button type="button" class="wmh-regional-site site-'+i+'" data-wmh-site="'+site+'" data-wmh-region-id="'+regionId+'"><i>'+["♜","⌘","▤","⚓","⌑","⚔"][i%6]+'</i><b>'+site+'</b></button>').join("")+'</div></div>'+
+    '<div class="wmh-bottom-actions"><button data-wmh-action="back">← WORLD MAP</button><span>SELECT A PLACE · LOCAL MAPS OPEN HERE</span></div>';
+  if (level === "local") return header("EXTERIOR AREA",selectedBuilding, "PLACEHOLDER MAP · TAP A TILE TO WALK · NPCs TO CHAT")+
+    '<div class="wmh-area-legend"><span>ACADEMY GATE</span><span>GARDEN & POND</span><span>CLASSROOMS</span><span>TEACHERS’ COURT</span></div>'+
+    tileMapMarkup(false)+
+    '<div class="wmh-local-footer"><span>PLAYER TOKEN · TAP WALKABLE TILES · NPC INTERACTION REQUIRES 1-TILE DISTANCE</span><button data-wmh-action="back">← REGIONAL MAP</button></div>'+
+    '<section class="wmh-chat-panel" data-wmh-chat hidden><div class="wmh-chat-thread" data-wmh-thread></div><div class="wmh-chat-input-row"><span>YOUR RESPONSE</span><div data-wmh-replies></div></div></section>';
+  if (level === "interior") return header("BUILDING INTERIOR",selectedBuilding,"ISOMETRIC TILE PLACEHOLDER · TAP TO EXPLORE")+
+    tileMapMarkup(true)+'<div class="wmh-local-footer"><span>INTERIOR FLOOR PLAN · PLACEHOLDER</span><button data-wmh-action="back">← EXTERIOR AREA</button></div>'+
+    '<section class="wmh-chat-panel" data-wmh-chat hidden><div class="wmh-chat-thread" data-wmh-thread></div><div class="wmh-chat-input-row"><span>YOUR RESPONSE</span><div data-wmh-replies></div></div></section>';
+  return header("PERSONAL GROUNDS","Personal Grounds","ISOMETRIC HOME · PLOTS & FACILITIES")+
+    '<div class="wmh-home-grid">'+[["Farmland","▧"],["Building Plot","⌂"],["Training Area","⚔"],["Warehouse","▤"],["Fish Pond","◉"],["Lumber Area","♧"]].map(([name,icon])=>'<button data-wmh-plot="'+name+'"><span>'+icon+'</span><b>'+name+'</b><small>VIEW FUNCTION</small></button>').join("")+'</div><div class="wmh-bottom-actions"><button data-wmh-action="back">← WORLD MAP</button><span>PERSONAL DEVELOPMENT AREA</span></div>';
 }
-
 export function renderWorldMapHierarchy(): string {
-  return '<button type="button" class="wmh-open" data-wmh-action="open">✧ &nbsp; EXPLORE WORLD MAP</button>' +
-    '<section class="wmh-overlay" data-world-map-hierarchy hidden aria-label="World map navigation"><div class="wmh-dialog" data-wmh-dialog>' +
-    panelMarkup("world") + '</div></section>';
+  return '<button type="button" class="wmh-open" data-wmh-action="open">✧ &nbsp; MAP NAVIGATION</button>'+
+    '<section class="wmh-overlay" data-world-map-hierarchy hidden aria-label="Map Navigation"><div class="wmh-dialog" data-wmh-dialog>'+panelMarkup("world")+'</div></section>';
 }
-
+const npcData: Record<string,{name:string;gender:string;greeting:string;choices:string[];replies:string[]}> = {
+  "student-lin":{name:"Lin Yue",gender:"female",greeting:"The academy garden is peaceful this early. I come here whenever the study halls get too noisy.",choices:["Ask about the academy","Ask about the pond","Wish her a good day"],replies:["The instructors rotate lessons between the eastern and western study halls.","The pond is fed by a spring beneath the old cedar. The fish are surprisingly tame.","You too! May your studies go smoothly."]},
+  "student-wei":{name:"Shen Wei",gender:"male",greeting:"I was told to practice footwork, but the groundskeeper keeps sending me to carry things. Hah.",choices:["Ask about training","Offer to help","End conversation"],replies:["The sparring court is beyond the southern gate. Keep your stance low.","Really? Thanks. Those planters are heavier than they look.","See you around."]},
+  "teacher-mei":{name:"Instructor Mei",gender:"female",greeting:"A student should learn to observe before acting. Even a quiet garden has much to teach.",choices:["Ask about today's lessons","Ask for advice","Take your leave"],replies:["Foundational theory is being taught in the eastern classroom today.","Watch the flow of Spirit Qi, but do not force it. Patience is part of discipline.","Return when you have a question worth asking."]},
+  "groundskeeper":{name:"Uncle Qiao",gender:"male",greeting:"Mind the wet stones around the pond, young one. The moss makes them slippery after watering.",choices:["Ask about the garden","Ask about the pond","Thank him"],replies:["The flowering shrubs were planted by the first academy groundskeeper.","The pond is shallow near the bridge, but deep beside the willow.","Take care where you step."]},
+  "teacher":{name:"Instructor",gender:"male",greeting:"Settle down. The lesson will begin shortly.",choices:["Ask about the lesson","Ask for guidance"],replies:["Today we review the foundations.","Observe carefully and ask when you are ready."]}
+};
+function renderChat(dialog:HTMLElement,npcId:string):void {
+  const npc=npcData[npcId]; if(!npc)return;
+  const chat=dialog.querySelector<HTMLElement>("[data-wmh-chat]");
+  const thread=dialog.querySelector<HTMLElement>("[data-wmh-thread]");
+  const replies=dialog.querySelector<HTMLElement>("[data-wmh-replies]");
+  if(!chat||!thread||!replies)return;
+  chat.hidden=false;
+  thread.innerHTML='<article class="wmh-chat-message npc-message"><div class="wmh-chat-bust '+npc.gender+'"><i></i></div><div class="wmh-chat-copy"><b>'+npc.name+'</b><p>'+npc.greeting+'</p></div></article>';
+  replies.innerHTML=npc.choices.map((choice,i)=>'<button type="button" data-wmh-reply="'+i+'" data-npc-id="'+npcId+'">'+choice+'</button>').join("");
+}
+function walkToTile(dialog:HTMLElement,targetX:number,targetY:number,surface:string):void {
+  const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
+  const player=board?.querySelector<HTMLElement>("[data-wmh-player-token]");
+  if(!board||!player)return;
+  let x=Number(player.dataset.x||5), y=Number(player.dataset.y||8);
+  const move=()=>{
+    if(x===targetX&&y===targetY)return;
+    if(x!==targetX)x+=Math.sign(targetX-x); else y+=Math.sign(targetY-y);
+    player.style.gridColumn=String(x+1); player.style.gridRow=String(y+1);
+    player.dataset.x=String(x);player.dataset.y=String(y);
+    const tile=board.querySelector<HTMLElement>('[data-wmh-tile][data-x="'+x+'"][data-y="'+y+'"]');
+    const material=tile?.dataset.surface||surface;
+    window.dispatchEvent(new CustomEvent("merzkava:footstep",{detail:{surface:material}}));
+    if(x!==targetX||y!==targetY)window.setTimeout(move,135);
+  };
+  move();
+}
 export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement, onAdvanceTime: (minutes: number) => void): boolean {
-  const action = target.closest<HTMLElement>("[data-wmh-action],[data-wmh-info],[data-wmh-site],[data-wmh-building],[data-wmh-npc],[data-wmh-plot]");
-  if (!action) return false;
-  const overlay = root.querySelector<HTMLElement>("[data-world-map-hierarchy]");
-  const dialog = overlay?.querySelector<HTMLElement>("[data-wmh-dialog]");
-  if (!overlay || !dialog) return false;
-  const current = (overlay.dataset.level as Level) || "world";
-  const regionId = (overlay.dataset.region as RegionId) || "golden-dragon-empire";
-  const building = overlay.dataset.building || "Tianhai Academy";
-  if (action.dataset.wmhAction === "open") { overlay.hidden = false; overlay.dataset.level = "world"; dialog.innerHTML = panelMarkup("world"); bindWorldMapZoom(dialog); return true; }
-  if (action.dataset.wmhAction === "editor-open") { overlay.dataset.level = "map-editor"; dialog.innerHTML = panelMarkup("map-editor"); bindWorldMapEditor(dialog); return true; }
-  if (action.dataset.wmhAction === "editor-close") { overlay.dataset.level = "world"; dialog.innerHTML = panelMarkup("world"); bindWorldMapZoom(dialog); return true; }
-  if (action.dataset.wmhAction === "editor-confirm" || action.dataset.wmhAction === "editor-reset") return true;
-  if (action.dataset.wmhAction === "close") { overlay.hidden = true; return true; }
-  if (action.dataset.wmhAction === "back") {
-    const next: Level = current === "interior" ? "local" : current === "local" ? "regional" : "world";
-    overlay.dataset.level = next; dialog.innerHTML = panelMarkup(next,regionId,building); if (next === "world") bindWorldMapZoom(dialog); return true;
+  const action=target.closest<HTMLElement>("[data-wmh-action],[data-wmh-info],[data-wmh-site],[data-wmh-building],[data-wmh-npc],[data-wmh-plot],[data-wmh-tile],[data-wmh-reply]");
+  if(!action)return false;
+  const overlay=root.querySelector<HTMLElement>("[data-world-map-hierarchy]");
+  const dialog=overlay?.querySelector<HTMLElement>("[data-wmh-dialog]");
+  if(!overlay||!dialog)return false;
+  const current=(overlay.dataset.level as Level)||"world";
+  const regionId=(overlay.dataset.region as RegionId)||"golden-dragon-empire";
+  const building=overlay.dataset.building||"Tianhai Academy";
+  if(action.dataset.wmhAction==="open"){overlay.hidden=false;overlay.dataset.level="world";dialog.innerHTML=panelMarkup("world");bindWorldMapZoom(dialog);return true;}
+  if(action.dataset.wmhAction==="editor-open"){overlay.dataset.level="map-editor";dialog.innerHTML=panelMarkup("map-editor");bindWorldMapEditor(dialog);return true;}
+  if(action.dataset.wmhAction==="editor-close"){overlay.dataset.level="world";dialog.innerHTML=panelMarkup("world");bindWorldMapZoom(dialog);return true;}
+  if(action.dataset.wmhAction==="editor-confirm"||action.dataset.wmhAction==="editor-reset")return true;
+  if(action.dataset.wmhAction==="close"){overlay.hidden=true;return true;}
+  if(action.dataset.wmhAction==="back"){
+    const next:Level=current==="interior"?"local":current==="local"?"regional":"world";
+    overlay.dataset.level=next;dialog.innerHTML=panelMarkup(next,regionId,building);if(next==="world")bindWorldMapZoom(dialog);return true;
   }
-  if (action.dataset.wmhAction === "home") { overlay.dataset.level = "home"; dialog.innerHTML = panelMarkup("home",regionId,building); return true; }
-  if (action.dataset.wmhInfo) {
-    const id = action.dataset.wmhInfo as WorldMarkerId;
-    const info = readWorldMarkers().find(item => item.id === id);
-    if (!info) return true;
-    dialog.querySelector(".wmh-marker-info")?.remove();
-    const placement = info.placementStatus === "provisional" ? '<em>PROVISIONAL MAP PLACEMENT · ADJUST IN MAP EDITOR</em>' : '<em>OWNER-POSITIONED MARKER</em>';
-    dialog.insertAdjacentHTML("beforeend", '<section class="wmh-marker-info"><div><small>' + info.category.toUpperCase() + ' · MAP MARKER</small><b>' + info.name + '</b><span>' + info.subtitle + '</span><p>' + info.description + '</p>' + placement + '</div><button type="button" data-wmh-action="dismiss-marker-info" aria-label="Close marker information">×</button></section>');
-    return true;
-  }
-  if (action.dataset.wmhAction === "dismiss-marker-info") { dialog.querySelector(".wmh-marker-info")?.remove(); return true; }
-  if (action.dataset.wmhSite) {
-    if (action.dataset.wmhSite !== "Tianhai Academy" || action.dataset.wmhRegionId !== "golden-dragon-empire") {
-      const site = action.dataset.wmhSite;
-      dialog.insertAdjacentHTML("beforeend", '<div class="wmh-toast">This location is reserved for a future map update: ' + site + '</div>'); return true;
+  if(action.dataset.wmhInfo){
+    const id=action.dataset.wmhInfo as WorldMarkerId;
+    const info=readWorldMarkers().find(item=>item.id===id);if(!info)return true;
+    if(["golden-dragon-empire","tianhai-yunzhou","beiming-gu"].includes(id)){
+      overlay.dataset.region=id;overlay.dataset.level="regional";dialog.innerHTML=panelMarkup("regional",id as RegionId);return true;
     }
-    overlay.dataset.level = "local"; overlay.dataset.building = "Tianhai Academy";
-    dialog.innerHTML = panelMarkup("local",regionId,"Tianhai Academy"); return true;
+    dialog.querySelector(".wmh-marker-info")?.remove();
+    const placement=info.placementStatus==="provisional"?"<em>PROVISIONAL</em>":"<em>OWNER-POSITIONED</em>";
+    dialog.insertAdjacentHTML("beforeend",'<section class="wmh-marker-info"><div><small>'+info.category.toUpperCase()+' · MAP LOCATION</small><b>'+info.name+'</b><span>'+info.subtitle+'</span><p>'+info.description+'</p>'+placement+'</div><button type="button" data-wmh-action="dismiss-marker-info">×</button></section>');return true;
   }
-  if (action.dataset.wmhBuilding) {
-    overlay.dataset.level = "interior"; overlay.dataset.building = action.dataset.wmhBuilding;
-    dialog.innerHTML = panelMarkup("interior",regionId,action.dataset.wmhBuilding); return true;
+  if(action.dataset.wmhAction==="dismiss-marker-info"){dialog.querySelector(".wmh-marker-info")?.remove();return true;}
+  if(action.dataset.wmhSite){
+    overlay.dataset.level="local";overlay.dataset.building=action.dataset.wmhSite;
+    dialog.innerHTML=panelMarkup("local",regionId,action.dataset.wmhSite);return true;
   }
-  if (action.dataset.wmhNpc) {
-    const speaker = dialog.querySelector<HTMLElement>("[data-wmh-speaker]");
-    const line = dialog.querySelector<HTMLElement>("[data-wmh-line]");
-    const portrait = dialog.querySelector<HTMLElement>(".wmh-dialogue-portrait");
-    if (speaker) speaker.textContent = action.dataset.wmhNpc.toUpperCase();
-    if (line) line.textContent = action.dataset.wmhNpc === "You" ? "You look around the room." : "“The lesson is underway. I should finish what I am doing.”";
-    if (portrait) portrait.textContent = action.dataset.wmhNpc === "You" ? "✦" : "◉";
-    const box = dialog.querySelector<HTMLElement>("[data-wmh-dialogue]"); if (box) box.hidden = false;
+  if(action.dataset.wmhBuilding){
+    overlay.dataset.level="interior";overlay.dataset.building=action.dataset.wmhBuilding;
+    dialog.innerHTML=panelMarkup("interior",regionId,action.dataset.wmhBuilding);return true;
+  }
+  if(action.dataset.wmhTile){
+    walkToTile(dialog,Number(action.dataset.x),Number(action.dataset.y),action.dataset.surface||"earth");return true;
+  }
+  if(action.dataset.wmhNpc){
+    const npcId=action.dataset.wmhNpc;
+    const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
+    const player=board?.querySelector<HTMLElement>("[data-wmh-player-token]");
+    const px=Number(player?.dataset.x||5),py=Number(player?.dataset.y||8);
+    const nx=Number(action.dataset.x||0),ny=Number(action.dataset.y||0);
+    const distance=Math.abs(px-nx)+Math.abs(py-ny);
+    if(distance<1){dialog.insertAdjacentHTML("beforeend",'<div class="wmh-toast">Move one tile closer before interacting.</div>');return true;}
+    renderChat(dialog,npcId);return true;
+  }
+  if(action.dataset.wmhReply!==undefined){
+    const npcId=action.dataset.npcId||"",npc=npcData[npcId],index=Number(action.dataset.wmhReply);
+    const thread=dialog.querySelector<HTMLElement>("[data-wmh-thread]");
+    const replies=dialog.querySelector<HTMLElement>("[data-wmh-replies]");
+    if(!npc||!thread||!replies)return true;
+    const choice=npc.choices[index]||"";
+    const reply=npc.replies[index]||"The character gives a small nod.";
+    thread.insertAdjacentHTML("beforeend",'<article class="wmh-chat-message player-message"><div class="wmh-chat-copy"><b>YOU</b><p>'+choice+'</p></div><div class="wmh-chat-bust player"><i></i></div></article><article class="wmh-chat-message npc-message"><div class="wmh-chat-bust '+npc.gender+'"><i></i></div><div class="wmh-chat-copy"><b>'+npc.name+'</b><p>'+reply+'</p></div></article>');
+    replies.innerHTML=npc.choices.map((c,i)=>'<button type="button" data-wmh-reply="'+i+'" data-npc-id="'+npcId+'">'+c+'</button>').join("");
     return true;
   }
-  if (action.dataset.wmhAction === "dismiss-dialogue") { const box=dialog.querySelector<HTMLElement>("[data-wmh-dialogue]"); if(box) box.hidden=true; return true; }
-  if (action.dataset.wmhPlot) {
-    dialog.insertAdjacentHTML("beforeend", '<div class="wmh-toast">' + action.dataset.wmhPlot + ' · function details coming soon</div>'); return true;
-  }
-  if (action.dataset.wmhAction === "exit-local") {
-    onAdvanceTime(180);
-    overlay.dataset.level = "regional"; dialog.innerHTML = panelMarkup("regional",regionId);
-    return true;
-  }
+  if(action.dataset.wmhAction==="exit-local"){onAdvanceTime(180);overlay.dataset.level="regional";dialog.innerHTML=panelMarkup("regional",regionId);return true;}
+  if(action.dataset.wmhPlot){dialog.insertAdjacentHTML("beforeend",'<div class="wmh-toast">'+action.dataset.wmhPlot+' · function details coming soon</div>');return true;}
   return false;
 }
