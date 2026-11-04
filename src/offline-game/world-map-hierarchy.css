@@ -1561,11 +1561,42 @@
 .wmh-academy-empty-screen{
   background:#101512!important;
 }
+.wmh-academy-map-viewport{
+  position:absolute!important;inset:0!important;overflow:auto!important;display:grid!important;place-items:center!important;
+  background:#101512!important;scrollbar-width:none!important;overscroll-behavior:contain!important;
+}
+.wmh-academy-map-viewport::-webkit-scrollbar{display:none!important}
 .wmh-academy-empty-surface{
-  position:absolute!important;
-  inset:0!important;
+  position:absolute!important;inset:0!important;
   background:#101512 url("https://raw.githubusercontent.com/Antarezka/merzkava-apk/df799046bd2a4d6c7893973afe0e4bd6ed597307/public/maps/academy/full-map/1_academy.jpg") center center / contain no-repeat!important;
+  transform:translate(0,0) scale(1);transform-origin:center center;will-change:transform;
 }
-.wmh-academy-empty-screen>.wmh-map-back{
-  z-index:540!important;
+.wmh-academy-map-controls{
+  position:absolute!important;z-index:570!important;right:max(12px,env(safe-area-inset-right))!important;
+  bottom:calc(76px + env(safe-area-inset-bottom))!important;display:flex!important;flex-direction:column!important;gap:7px!important;
+  padding:7px!important;border:1px solid #d2b66e!important;border-radius:10px!important;
+  background:#111d18ed!important;box-shadow:0 4px 14px #0009!important;pointer-events:auto!important;
 }
+.wmh-academy-map-controls button{
+  display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:8px!important;
+  min-width:112px!important;min-height:34px!important;padding:6px 9px!important;border:1px solid #806f45!important;
+  border-radius:6px!important;background:#202b23!important;color:#f4e6c7!important;
+  font:800 8px/1 Arial,sans-serif!important;letter-spacing:.12em!important;
+}
+.wmh-css-reset-icon{width:13px!important;height:13px!important;border:2px solid #e6cf83!important;border-right-color:transparent!important;border-radius:50%!important;position:relative!important}
+.wmh-css-reset-icon:after{content:"";position:absolute;right:-2px;top:-3px;border-left:4px solid #e6cf83;border-top:3px solid transparent;border-bottom:3px solid transparent}
+.wmh-css-center-icon{width:14px!important;height:14px!important;position:relative!important;background:linear-gradient(#e6cf83,#e6cf83) center/2px 100% no-repeat,linear-gradient(90deg,#e6cf83,#e6cf83) center/100% 2px no-repeat}
+.wmh-css-center-icon:after{content:"";position:absolute;inset:2px;border:1px solid #e6cf83;border-radius:50%}
+.wmh-academy-empty-screen>.wmh-academy-map-back{
+  z-index:580!important;min-height:40px!important;gap:9px!important;padding:6px 12px!important;
+}
+.wmh-academy-back-icon{
+  display:inline-block!important;width:15px!important;height:15px!important;position:relative!important;flex:none!important;
+}
+.wmh-academy-back-icon:before{
+  content:"";position:absolute;left:1px;top:6px;width:12px;height:2px;background:#f5d94f;
+}
+.wmh-academy-back-icon:after{
+  content:"";position:absolute;left:1px;top:3px;width:7px;height:7px;border-left:2px solid #f5d94f;border-bottom:2px solid #f5d94f;transform:rotate(45deg);
+}
+.wmh-academy-map-back b{font-size:7px!important;letter-spacing:.1em!important}
