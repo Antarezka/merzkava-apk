@@ -1,3 +1,4 @@
+import "./world-map-hierarchy-scroll.css";
 export type IsoMapGridConfig = {
   cols: number;
   rows: number;
