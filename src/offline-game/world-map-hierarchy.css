@@ -1104,3 +1104,10 @@
 .wmh-transition-marker circle{fill:#bd3939;stroke:#ffd0c8;stroke-width:2;vector-effect:non-scaling-stroke;filter:drop-shadow(0 2px 3px #000b)}
 .wmh-transition-marker.is-named circle{fill:#287acb;stroke:#c5e4ff}
 .wmh-transition-marker.is-selected circle{stroke:#ffe59b;stroke-width:4}
+
+
+/* Cell metadata and transition pins are editor overlays, not gameplay artwork. */
+.wmh-isometric-board:not(.wmh-overlay-editing) [data-wmh-manual-marks],
+.wmh-isometric-board:not(.wmh-overlay-editing) [data-wmh-transition-marks]{
+  visibility:hidden!important;
+}
