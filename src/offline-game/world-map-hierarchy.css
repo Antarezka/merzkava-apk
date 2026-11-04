@@ -559,7 +559,7 @@
 /* Academy composition: the isometric base remains underneath the full map art.
    The transparent editor grid is the topmost layer, never a colored tile fill. */
 .wmh-isometric-board.is-exterior{position:relative;isolation:isolate;background:#172019}
-.wmh-academy-map-art{position:absolute;z-index:50;left:0;top:0;right:auto;bottom:auto;width:1408px;height:768px;max-width:none;max-height:none;object-fit:contain;pointer-events:none;user-select:none}
+.wmh-academy-map-art{position:absolute;z-index:0;left:0;top:0;right:auto;bottom:auto;width:1408px;height:768px;max-width:none;max-height:none;object-fit:contain;pointer-events:none;user-select:none}
 .wmh-area-overlay-svg{z-index:300!important}
 .wmh-isometric-board.wmh-overlay-editing .wmh-tile{
   z-index:70!important;
@@ -1042,3 +1042,55 @@
   .wmh-academy-mini-map-copy b{font-size:10px}
   .wmh-academy-mini-map-copy small{font-size:6px}
 }
+
+
+/* Shared isometric map layers: the complete JPG stays behind actors and only
+   foreground-priority cell portions are redrawn above them. */
+.wmh-isometric-board.has-map-base .wmh-academy-map-art,
+.wmh-isometric-board.has-map-base .wmh-isometric-map-base{
+  z-index:0!important;
+  pointer-events:none!important;
+}
+.wmh-isometric-board.has-map-base .wmh-tile:before,
+.wmh-isometric-board.has-map-base .wmh-tile:after{
+  display:none!important;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+}
+.wmh-isometric-board.wmh-overlay-editing.has-map-base .wmh-tile:before{display:none!important}
+.wmh-isometric-board.wmh-overlay-editing.has-map-base .wmh-tile:after{
+  display:block!important;
+  inset:0!important;
+  background:transparent!important;
+  border:1px solid rgba(255,255,255,.72)!important;
+  box-shadow:none!important;
+  clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)!important;
+}
+.wmh-isometric-foreground{
+  position:absolute!important;
+  z-index:120!important;
+  display:block!important;
+  max-width:none!important;
+  max-height:none!important;
+  pointer-events:none!important;
+}
+.wmh-character-token{
+  transition:left .13s linear,top .13s linear,filter .15s ease,opacity .16s ease!important;
+}
+.wmh-cell-mark{pointer-events:none}
+.wmh-cell-mark polygon{stroke-width:2;vector-effect:non-scaling-stroke}
+.wmh-cell-mark text{
+  font:700 12px Arial,sans-serif;
+  fill:#fff;
+  text-shadow:0 1px 3px #000;
+  pointer-events:none;
+}
+.wmh-cell-mark.is-foreground polygon{fill:#367ec4aa;stroke:#9bd3ff}
+.wmh-cell-mark.is-blocked polygon{fill:#c63d43aa;stroke:#ffaaa8}
+.wmh-cell-mark.is-opacity polygon{fill:#9165c5aa;stroke:#ddc2ff}
+.wmh-editor-mode-note{margin:7px 0;color:#d5c49f;font:10px/1.45 Arial,sans-serif}
+.wmh-transition-marker{pointer-events:all;cursor:pointer}
+.wmh-transition-marker circle{fill:#bd3939;stroke:#ffd0c8;stroke-width:2;vector-effect:non-scaling-stroke;filter:drop-shadow(0 2px 3px #000b)}
+.wmh-transition-marker.is-named circle{fill:#287acb;stroke:#c5e4ff}
+.wmh-transition-marker.is-selected circle{stroke:#ffe59b;stroke-width:4}
