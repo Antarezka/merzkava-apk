@@ -438,7 +438,7 @@ function tileMapMarkup(interior = false): string {
       '<button type="button" class="wmh-character-token wmh-npc-token is-male" data-wmh-npc="groundskeeper" data-x="10" data-y="2" style="grid-column:11;grid-row:3" aria-label="Groundskeeper"><i></i></button>')+
     '</div></div>';
 }
-function panelMarkup(level: Level, regionId: RegionId = "golden-dragon-empire", selectedBuilding = "Tianhai Academy"): string {
+function panelMarkup(level: Level, regionId: RegionId = "golden-dragon-empire", selectedBuilding = "Tianhai Academy", selectedArea?: WorldMarker): string {
   const region = regionData[regionId];
   const header = (kind: string, title: string, subtitle: string) =>
     '<header class="wmh-level-header"><div><span class="wmh-level-tag">'+kind+'</span><h3>'+title+'</h3><p>'+subtitle+'</p></div><button type="button" class="wmh-close" data-wmh-action="close" aria-label="Close map">×</button></header>';
@@ -447,9 +447,9 @@ function panelMarkup(level: Level, regionId: RegionId = "golden-dragon-empire", 
     '<div class="wmh-world-map" data-wmh-map-viewport><div class="wmh-world-map-image" data-wmh-map-surface><img src="/world/Untitled77_20261029054536.png" alt="Merzkava Universe world map"/>'+readWorldMarkers().map(marker=>worldMapMarkerMarkup(marker)).join("")+'</div><div data-wmh-selection-host></div></div>'+
     '<div class="wmh-bottom-actions"><span>SELECT A POWER TO OPEN ITS REGIONAL MAP</span><button data-wmh-action="editor-open">⊞ MAP EDITOR</button></div>';
   if (level === "map-editor") return header("WORLD MAP TOOLS","Map Editor","FLAT WORLD MAP · NORMALIZED COORDINATES")+mapEditorMarkup();
-  if (level === "regional") return header("REGIONAL MAP",region.name,region.subtitle)+
-    '<div class="wmh-regional-placeholder"><div class="wmh-regional-land"><span class="wmh-regional-river"></span><span class="wmh-regional-road road-one"></span><span class="wmh-regional-road road-two"></span><span class="wmh-regional-road road-three"></span><span class="wmh-regional-label">REGIONAL MAP ART · PLACEHOLDER</span>'+
-    region.sites.map((site,i)=>'<button type="button" class="wmh-regional-site site-'+i+'" data-wmh-site="'+site+'" data-wmh-region-id="'+regionId+'"><i>'+["♜","⌘","▤","⚓","⌑","⚔"][i%6]+'</i><b>'+site+'</b></button>').join("")+'</div></div>'+
+  if (level === "regional") return header("REGIONAL MAP",selectedArea?.name||region.name,selectedArea?.subtitle||region.subtitle)+
+    '<div class="wmh-regional-placeholder"><div class="wmh-regional-land"><span class="wmh-regional-river"></span><span class="wmh-regional-road road-one"></span><span class="wmh-regional-road road-two"></span><span class="wmh-regional-road road-three"></span><span class="wmh-regional-label">'+(selectedArea?selectedArea.name.toUpperCase():"REGIONAL MAP ART · PLACEHOLDER")+'</span>'+
+    (selectedArea?["Central District","Local Settlement","Market Quarter","Public Grounds","Transport Gate","Nearby Landmark"]:region.sites).map((site,i)=>'<button type="button" class="wmh-regional-site site-'+i+'" data-wmh-site="'+site+'" data-wmh-region-id="'+regionId+'"><i>'+["♜","⌘","▤","⚓","⌑","⚔"][i%6]+'</i><b>'+site+'</b></button>').join("")+'</div></div>'+
     '<div class="wmh-bottom-actions"><button data-wmh-action="back">← WORLD MAP</button><span>SELECT A PLACE · LOCAL MAPS OPEN HERE</span></div>';
   if (level === "local") return header("EXTERIOR AREA",selectedBuilding, "PLACEHOLDER MAP · TAP A TILE TO WALK · NPCs TO CHAT")+
     '<div class="wmh-area-legend"><span>ACADEMY GATE</span><span>GARDEN & POND</span><span>CLASSROOMS</span><span>TEACHERS’ COURT</span></div>'+
