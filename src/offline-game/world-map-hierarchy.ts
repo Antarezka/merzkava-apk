@@ -504,20 +504,28 @@ function isoTileRule(board:HTMLElement,x:number,y:number):IsoManualRule|"default
  const marks=isoManualForTile(board,x,y);
  if(!marks.length)return "default";
  const rules=marks.map(m=>m.rule);
- if(rules.includes("blocked"))return "blocked";
- if(rules.includes("behind"))return "behind";
  if(rules.includes("walkable"))return "walkable";
+ if(rules.includes("behind"))return "behind";
+ if(rules.filter(rule=>rule==="blocked").length>=4)return "blocked";
  return "default";
 }
 function isoAreaRuleAt(board:HTMLElement,x:number,y:number):"road"|"object"|"default" {
  const key=board.dataset.overlayStorageKey||"";
  try{
   const data=JSON.parse(localStorage.getItem(key)||"{}");
-  const center={x:(x-y)*32+Number.parseFloat(getComputedStyle(board).getPropertyValue("--iso-center-x")||"640"),y:(x+y)*16+19};
+  const center={x:(x-y)*32+Number.parseFloat(getComputedStyle(board).getPropertyValue("--iso-center-x")||"640"),y:(x+y)*16+16};
   let found:IsoOverlayMark|null=null,best=Infinity;
   for(const mark of (Array.isArray(data.areas)?data.areas:[]) as IsoOverlayMark[]){const dist=isoDistanceToPath(center,mark.points);if(dist<=mark.width/2&&dist<best){best=dist;found=mark;}}
   return found?.category||"default";
  }catch{return "default";}
+}
+function isoCanWalkTile(board:HTMLElement,tile:HTMLElement|null,x:number,y:number):boolean {
+ if(!tile)return false;
+ const rule=isoTileRule(board,x,y);
+ if(rule==="blocked")return false;
+ if(rule==="walkable"||rule==="behind")return true;
+ if(tile.dataset.wmhBlocked==="true")return false;
+ return isoAreaRuleAt(board,x,y)!=="object";
 }
 function bindIsoAreaEditor(dialog:HTMLElement):void {
  const board=dialog.querySelector<HTMLElement>("[data-wmh-board]"),svg=board?.querySelector<SVGSVGElement>("[data-wmh-overlay-svg]");
@@ -530,7 +538,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
  try{const d=JSON.parse(localStorage.getItem(key)||"{}");if(Array.isArray(d.areas))areas=d.areas;if(Array.isArray(d.manual))manual=d.manual;}catch{}
  const redraw=()=>{
   if(areaGroup)areaGroup.innerHTML=areas.map(m=>'<path d="'+m.path+'" class="wmh-area-mark mark-'+m.category+'" stroke-width="'+m.width+'"><title>'+m.category.toUpperCase()+' AREA</title></path>').join("");
-  if(manualGroup)manualGroup.innerHTML=manual.map(m=>{const cx=(m.x-m.y)*32+Number(board.dataset.rows||20)*32+(m.quarter%2?.75:.25)*64-(m.quarter>=2?32:0);const cy=(m.x+m.y)*16+((m.quarter>=2?.75:.25)*32);const symbol=m.rule==="walkable"?"✓":m.rule==="blocked"?"×":"○";return '<g class="wmh-manual-mark manual-'+m.rule+'" transform="translate('+cx+' '+cy+')"><circle r="8"></circle><text text-anchor="middle" dominant-baseline="central">'+symbol+'</text></g>';}).join("");
+  if(manualGroup)manualGroup.innerHTML=manual.map(m=>{const qx=m.quarter%2?.75:.25,qy=m.quarter>=2?.75:.25;const cx=(m.x-m.y)*32+Number(board.dataset.rows||20)*32+(qx-qy)*32;const cy=(m.x+m.y)*16+(qx+qy)*16;const symbol=m.rule==="walkable"?"✓":m.rule==="blocked"?"×":"○";return '<g class="wmh-manual-mark manual-'+m.rule+'" transform="translate('+cx+' '+cy+')"><circle r="8"></circle><text text-anchor="middle" dominant-baseline="central">'+symbol+'</text></g>';}).join("");
  };
  const persist=()=>{localStorage.setItem(key,JSON.stringify({format:"merzkava-isometric-area-overlays",version:2,areas,manual}));redraw();};
  redraw();
@@ -724,7 +732,7 @@ function walkToTile(dialog:HTMLElement,targetX:number,targetY:number,surface:str
   const cols=Number(board.dataset.cols||12),rows=Number(board.dataset.rows||10);
   if(!Number.isInteger(targetX)||!Number.isInteger(targetY)||targetX<0||targetX>=cols||targetY<0||targetY>=rows)return;
   const destination=board.querySelector<HTMLElement>('[data-wmh-tile][data-x="'+targetX+'"][data-y="'+targetY+'"]');
-  if(!destination||destination.dataset.wmhBlocked==="true"||isoManualForTile(board,targetX,targetY).some(m=>m.rule==="blocked")||isoAreaRuleAt(board,targetX,targetY)==="object")return;
+  if(!destination||!isoCanWalkTile(board,destination,targetX,targetY))return;
   const oldTimer=Number(player.dataset.moveTimer||0);
   if(oldTimer)window.clearTimeout(oldTimer);
   const startX=Number(player.dataset.x||5),startY=Number(player.dataset.y||8);
@@ -740,7 +748,7 @@ function walkToTile(dialog:HTMLElement,targetX:number,targetY:number,surface:str
       const key=nx+","+ny;
       if(nx<0||nx>=cols||ny<0||ny>=rows||previous.has(key))continue;
       const nextTile=board.querySelector<HTMLElement>('[data-wmh-tile][data-x="'+nx+'"][data-y="'+ny+'"]');
-      if(nextTile?.dataset.wmhBlocked==="true"||isoManualForTile(board,nx,ny).some(m=>m.rule==="blocked")||isoAreaRuleAt(board,nx,ny)==="object")continue;
+      if(!isoCanWalkTile(board,nextTile,nx,ny))continue;
       previous.set(key,x+","+y);queue.push([nx,ny]);
     }
   }
