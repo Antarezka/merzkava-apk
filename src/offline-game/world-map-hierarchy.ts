@@ -1,4 +1,5 @@
 import "./world-map-hierarchy.css";
+import "./world-map-hierarchy-scroll.css";
 import { playFootstep } from "../audio/sound-effects";
 import { animateExpeditionPanel } from "./expedition-animations";
 import { getEternalSave, getExpeditionAtmosphere } from "./expedition-game";
