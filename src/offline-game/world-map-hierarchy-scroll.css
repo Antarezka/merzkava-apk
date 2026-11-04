@@ -94,3 +94,84 @@
   letter-spacing:.08em!important;white-space:nowrap!important;pointer-events:none!important;text-shadow:0 1px 2px #000!important;
 }
 .wmh-vector-yard>.wmh-map-back{z-index:640!important;bottom:max(15px,env(safe-area-inset-bottom))!important}
+
+
+/* Shared SVG-ground surface for every playable isometric map.
+   The Atlas test yard above remains its own, untouched reference implementation. */
+.wmh-isometric-play-screen .wmh-isometric-board.wmh-svg-ground-map{
+  display:block!important;
+  position:absolute!important;
+  overflow:visible!important;
+  isolation:isolate!important;
+  background:transparent!important;
+  outline:0!important;
+}
+.wmh-isometric-board.wmh-svg-ground-map.is-placeholder{
+  background:transparent!important;
+}
+.wmh-isometric-board.wmh-svg-ground-map>.wmh-area-scene-svg{
+  display:block!important;
+  position:absolute!important;
+  z-index:1!important;
+  left:0!important;
+  top:0!important;
+  width:100%!important;
+  height:100%!important;
+  max-width:none!important;
+  max-height:none!important;
+  overflow:visible!important;
+  pointer-events:none!important;
+}
+.wmh-isometric-board.wmh-svg-ground-map .wmh-vector-cells polygon[data-wmh-tile]{
+  pointer-events:all!important;
+  cursor:pointer!important;
+  stroke-linejoin:round!important;
+  vector-effect:non-scaling-stroke!important;
+}
+.wmh-isometric-board.wmh-svg-ground-map .wmh-vector-cells polygon[data-wmh-tile]:active{
+  filter:brightness(1.3)!important;
+}
+.wmh-isometric-board.wmh-svg-ground-map.has-map-base{
+  background:transparent!important;
+}
+.wmh-isometric-board.wmh-svg-ground-map.has-map-base>.wmh-isometric-map-base{
+  display:block!important;
+  position:absolute!important;
+  z-index:0!important;
+  left:0!important;
+  top:0!important;
+  right:auto!important;
+  bottom:auto!important;
+  width:var(--iso-board-width,2816px)!important;
+  height:var(--iso-board-height,1536px)!important;
+  max-width:none!important;
+  max-height:none!important;
+  object-fit:fill!important;
+  visibility:visible!important;
+  opacity:1!important;
+  pointer-events:none!important;
+}
+.wmh-isometric-board.wmh-svg-ground-map.has-map-base>.wmh-isometric-foreground{
+  display:block!important;
+  position:absolute!important;
+  z-index:250!important;
+  left:0!important;
+  top:0!important;
+  max-width:none!important;
+  max-height:none!important;
+  pointer-events:none!important;
+}
+.wmh-isometric-board.wmh-svg-ground-map>.wmh-area-overlay-svg{
+  z-index:300!important;
+}
+.wmh-isometric-board.wmh-svg-ground-map.wmh-overlay-editing>.wmh-area-overlay-svg{
+  z-index:400!important;
+}
+.wmh-isometric-board.wmh-svg-ground-map.wmh-overlay-editing .wmh-vector-cells polygon[data-wmh-tile]{
+  fill-opacity:.08!important;
+  stroke:#fff8e8!important;
+  stroke-opacity:.74!important;
+}
+.wmh-isometric-board.wmh-svg-ground-map .wmh-character-token{
+  z-index:var(--character-z,180)!important;
+}
