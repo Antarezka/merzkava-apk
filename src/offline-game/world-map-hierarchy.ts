@@ -446,13 +446,6 @@ function bindWorldMapEditor(dialog: HTMLElement): void {
   });
 }
 
-const ACADEMY_MAP_ART_PATH = "maps/academy/full-map/1_academy.jpg";
-
-function academyMapArtUrl(): string {
-  // Resolve against the app document so browser and packaged APK use the same asset path.
-  return new URL("/" + ACADEMY_MAP_ART_PATH.replace(/^\\/+/, ""), document.baseURI).href;
-}
-
 function bindIsometricMapArt(dialog: HTMLElement): void {
   const images = Array.from(dialog.querySelectorAll<HTMLImageElement>("[data-wmh-academy-map-art],[data-wmh-map-art]"));
   images.forEach(image => {
@@ -480,9 +473,6 @@ function bindIsometricMapArt(dialog: HTMLElement): void {
 
 function isometricNpcTokensMarkup(mapId:string,interior:boolean):string {
   const maps:Record<string,Array<{id:string;x:number;y:number;gender:"male"|"female"}>>={
-    "golden-dragon-empire:tianhai-academy:exterior":[
-      {id:"student-lin",x:7,y:4,gender:"female"},{id:"student-wei",x:10,y:9,gender:"male"},
-      {id:"teacher-mei",x:6,y:15,gender:"female"},{id:"groundskeeper",x:22,y:5,gender:"male"}],
     "golden-dragon-empire:public-arena:exterior":[
       {id:"arena-referee",x:10,y:3,gender:"male"},{id:"arena-fighter",x:15,y:8,gender:"female"},{id:"arena-spectator",x:19,y:15,gender:"male"}],
     "golden-dragon-empire:sparring-arena:exterior":[
@@ -504,8 +494,6 @@ function isometricNpcTokensMarkup(mapId:string,interior:boolean):string {
     ? [{id:"teacher",x:6,y:2,gender:"male" as const},{id:"student-lin",x:3,y:4,gender:"female" as const}]
     : mapId.startsWith("isometric-render-test:")
       ? [{id:"test-guide",x:3,y:3,gender:"female" as const},{id:"test-scholar",x:12,y:4,gender:"male" as const},{id:"test-mechanic",x:11,y:9,gender:"female" as const}]
-      : mapId.startsWith("golden-dragon-empire:tianhai-academy:exterior")
-      ? [{id:"student-lin",x:7,y:4,gender:"female" as const},{id:"student-wei",x:10,y:9,gender:"male" as const},{id:"teacher-mei",x:6,y:15,gender:"female" as const},{id:"groundskeeper",x:22,y:5,gender:"male" as const}]
       : mapId.startsWith("tianhai-yunzhou:")
         ? [{id:"ty-clerk",x:4,y:4,gender:"female" as const},{id:"ty-sailor",x:12,y:9,gender:"male" as const},{id:"ty-arcanist",x:20,y:5,gender:"female" as const}]
         : mapId.startsWith("beiming-gu:")
@@ -595,7 +583,8 @@ function tileMapMarkup(
 function isometricMapBaseFor(regionId: RegionId, selectedBuilding: string, interior: boolean): string {
   if (interior) return "";
   const place = selectedBuilding.trim().toLowerCase().replace(/\s+/g, " ");
-  if (regionId === "golden-dragon-empire" && (place === "tianhai academy" || place === "academy")) return academyMapArtUrl();
+  // Tianhai Academy is intentionally rebuilt as an empty area; do not mount its former JPG base.
+  if (regionId === "golden-dragon-empire" && (place === "tianhai academy" || place === "academy")) return "";
   return "";
 }
 function makeIsometricMapId(regionId: RegionId, selectedBuilding: string, interior: boolean): string {
@@ -1321,6 +1310,15 @@ function isometricHudMarkup(title: string, mapImage: string): string {
     minimapMarkup+'</div>';
 }
 function isometricPlayMarkup(regionId: RegionId, selectedBuilding: string, interior: boolean): string {
+  const isEmptyAcademy = !interior && regionId === "golden-dragon-empire" &&
+    selectedBuilding.trim().toLowerCase() === "tianhai academy";
+  if (isEmptyAcademy) {
+    // Fresh Academy shell: no old artwork, tiles, grid, actors, NPCs, minimap, or editor.
+    return '<div class="wmh-isometric-play-screen wmh-academy-empty-screen" data-wmh-isometric-play-screen>'+
+      '<div class="wmh-academy-empty-surface" aria-label="Empty Tianhai Academy area"></div>'+
+      '<button type="button" class="wmh-map-back" data-wmh-action="back" aria-label="Leave Tianhai Academy"><span>‹</span><b>BACK</b></button>'+
+      '</div>';
+  }
   const mapId=makeIsometricMapId(regionId,selectedBuilding,interior);
   const mapImage=isometricMapBaseFor(regionId,selectedBuilding,interior);
   const title=selectedBuilding+(interior?" · INTERIOR":"");
@@ -1366,12 +1364,13 @@ export function renderWorldMapHierarchy(): string {
 }
 function resetLegacyIsometricMapLayouts(): void {
   // Clear only Tianhai Academy exterior once; other regions keep their saved editor data.
-  const academyMarker="merzkava.isometric-map-academy-reset.v1";
+  const academyMarker="merzkava.isometric-map-academy-reset.v2";
   try {
     if(localStorage.getItem(academyMarker)!=="done"){
       const academyId="golden-dragon-empire:tianhai-academy:exterior";
       localStorage.removeItem(isoMapStorageKey(academyId));
       localStorage.removeItem("merzkava.iso-editor-ui.v1:"+encodeURIComponent(academyId));
+      localStorage.removeItem("merzkava.iso-area-overlays.v2:"+encodeURIComponent(academyId));
       localStorage.setItem(academyMarker,"done");
     }
   } catch { /* the Academy starts clean when local persistence is available */ }
