@@ -596,6 +596,121 @@ function isoCanWalkTile(board:HTMLElement,tile:HTMLElement|null,x:number,y:numbe
   if(!tile)return false;
   return !isoCellHasLayer(data,"blockedCells",x,y);
 }
+function renderIsometricWorldStatus(dialog:HTMLElement):void {
+  const hud=dialog.querySelector<HTMLElement>("[data-wmh-isometric-hud]");
+  if(!hud)return;
+  const save=getEternalSave();
+  const atmosphere=getExpeditionAtmosphere();
+  const cycle:Record<string,{label:string;icon:string;caption:string}>={
+    Dawn:{label:"SUBUH",icon:"◔",caption:"FIRST LIGHT"},
+    Morning:{label:"PAGI",icon:"☀",caption:"MORNING"},
+    Day:{label:"SIANG",icon:"☼",caption:"DAYLIGHT"},
+    Dusk:{label:"SENJA",icon:"◒",caption:"SUNSET"},
+    Night:{label:"MALAM",icon:"☾",caption:"NIGHTFALL"},
+  };
+  const weather:Record<string,{label:string;icon:string}>={
+    Clear:{label:"CERAH",icon:"☀"},Cloudy:{label:"BERAWAN",icon:"☁"},
+    Fog:{label:"KABUT",icon:"≋"},Rain:{label:"HUJAN",icon:"☂"},Snow:{label:"SALJU",icon:"❄"},
+  };
+  const c=cycle[atmosphere.cycle]||cycle.Morning;
+  const w=weather[atmosphere.weather]||weather.Clear;
+  const hour=String(save?.hour??8).padStart(2,"0");
+  const minute=String(save?.minute??0).padStart(2,"0");
+  const set=(selector:string,value:string)=>{const node=hud.querySelector<HTMLElement>(selector);if(node)node.textContent=value;};
+  set("[data-wmh-cycle-icon]",c.icon);set("[data-wmh-cycle-label]",c.label);set("[data-wmh-cycle-caption]",c.caption);
+  set("[data-wmh-weather-icon]",w.icon);set("[data-wmh-weather-label]",w.label);
+  set("[data-wmh-day]","HARI "+String(save?.day??1).padStart(2,"0"));
+  set("[data-wmh-time]",hour+":"+minute);
+  const overlay=dialog.closest<HTMLElement>("[data-world-map-hierarchy]");
+  if(overlay){overlay.dataset.wmhCycle=atmosphere.cycle.toLowerCase();overlay.dataset.wmhWeather=atmosphere.weather.toLowerCase();}
+}
+function renderIsometricMinimap(board:HTMLElement):void {
+  const world=board.closest<HTMLElement>("[data-wmh-isometric-play-screen]")?.querySelector<HTMLElement>("[data-wmh-minimap-world]");
+  const actors=world?.querySelector<HTMLElement>("[data-wmh-minimap-actors]");
+  if(!world||!actors)return;
+  const cols=Math.max(1,Number(board.dataset.cols)||1),rows=Math.max(1,Number(board.dataset.rows)||1);
+  const position=(token:HTMLElement)=>({
+    x:Math.max(0,Math.min(100,Number(token.dataset.x||0)/Math.max(1,cols-1)*100)),
+    y:Math.max(0,Math.min(100,Number(token.dataset.y||0)/Math.max(1,rows-1)*100)),
+  });
+  const player=board.querySelector<HTMLElement>("[data-wmh-player-token]");
+  const items:string[]=[];
+  if(player){
+    const p=position(player);
+    items.push('<span class="wmh-minimap-dot is-player" data-minimap-player style="left:'+p.x+'%;top:'+p.y+'%" aria-label="Player position"></span>');
+  }
+  board.querySelectorAll<HTMLElement>("[data-wmh-npc]").forEach((npc,index)=>{
+    const p=position(npc);
+    items.push('<span class="wmh-minimap-dot is-npc '+(npc.classList.contains("is-female")?"is-female":"is-male")+'" data-minimap-npc="'+index+'" style="left:'+p.x+'%;top:'+p.y+'%" title="NPC"></span>');
+  });
+  actors.innerHTML=items.join("");
+}
+function bindIsometricHud(dialog:HTMLElement):void {
+  const hud=dialog.querySelector<HTMLElement>("[data-wmh-isometric-hud]");
+  const minimap=dialog.querySelector<HTMLButtonElement>("[data-wmh-minimap]");
+  const world=minimap?.querySelector<HTMLElement>("[data-wmh-minimap-world]");
+  const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
+  if(!hud||!minimap||!world||!board)return;
+  if(minimap.dataset.bound!=="true"){
+    minimap.dataset.bound="true";
+    minimap.addEventListener("click",event=>{
+      if(board.classList.contains("wmh-overlay-editing"))return;
+      const rect=world.getBoundingClientRect();
+      const nx=Math.max(0,Math.min(.999999,(event.clientX-rect.left)/Math.max(1,rect.width)));
+      const ny=Math.max(0,Math.min(.999999,(event.clientY-rect.top)/Math.max(1,rect.height)));
+      const cols=Number(board.dataset.cols)||12,rows=Number(board.dataset.rows)||10;
+      const x=Math.min(cols-1,Math.floor(nx*cols));
+      const y=Math.min(rows-1,Math.floor(ny*rows));
+      walkToTile(dialog,x,y,"earth");
+    });
+  }
+  renderIsometricWorldStatus(dialog);
+  renderIsometricMinimap(board);
+}
+function relocateActorsFromBlockedCells(board:HTMLElement,data:IsoMapEditorData):boolean {
+  const actors=Array.from(board.querySelectorAll<HTMLElement>("[data-wmh-player-token],[data-wmh-npc]"));
+  const reserved=new Set<string>();
+  const placements:Array<{actor:HTMLElement;x:number;y:number}>=[];
+  const cols=data.grid.cols,rows=data.grid.rows;
+  const nearestSafe=(startX:number,startY:number):{x:number;y:number}|null=>{
+    const sx=Math.max(0,Math.min(cols-1,startX)),sy=Math.max(0,Math.min(rows-1,startY));
+    const queue:Array<[number,number]>=[[sx,sy]],visited=new Set<string>([sx+","+sy]);
+    for(let cursor=0;cursor<queue.length;cursor++){
+      const [x,y]=queue[cursor],key=x+","+y;
+      if(!isoCellHasLayer(data,"blockedCells",x,y)&&!reserved.has(key))return{x,y};
+      const neighbors:[[number,number],[number,number],[number,number],[number,number]]=[[x,y-1],[x+1,y],[x,y+1],[x-1,y]];
+      for(const [nx,ny] of neighbors){
+        const next=nx+","+ny;
+        if(nx<0||ny<0||nx>=cols||ny>=rows||visited.has(next))continue;
+        visited.add(next);queue.push([nx,ny]);
+      }
+    }
+    return null;
+  };
+  // Player gets first claim on its safe cell; NPCs are moved afterward if needed.
+  actors.sort((a,b)=>(a.hasAttribute("data-wmh-player-token")?-1:0)-(b.hasAttribute("data-wmh-player-token")?-1:0));
+  for(const actor of actors){
+    const x=Number(actor.dataset.x||0),y=Number(actor.dataset.y||0);
+    const inside=x>=0&&y>=0&&x<cols&&y<rows;
+    const key=x+","+y;
+    if(inside&&!isoCellHasLayer(data,"blockedCells",x,y)&&!reserved.has(key)){
+      reserved.add(key);placements.push({actor,x,y});continue;
+    }
+    const safe=nearestSafe(x,y);
+    if(!safe)return false;
+    reserved.add(safe.x+","+safe.y);placements.push({actor,x:safe.x,y:safe.y});
+  }
+  for(const placement of placements){
+    const {actor,x,y}=placement;
+    if(Number(actor.dataset.x||0)===x&&Number(actor.dataset.y||0)===y)continue;
+    actor.dataset.x=String(x);actor.dataset.y=String(y);
+    actor.style.setProperty("--token-x",String(x));actor.style.setProperty("--token-y",String(y));
+    actor.dataset.relocatedFromBlocked="true";
+  }
+  syncIsoDepthAndOcclusion(board);
+  return true;
+}
+
 function bindIsoAreaEditor(dialog:HTMLElement):void {
   const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
   const svg=board?.querySelector<SVGSVGElement>("[data-wmh-overlay-svg]");
