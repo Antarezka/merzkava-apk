@@ -1167,6 +1167,9 @@ function syncIsoDepthAndOcclusion(board:HTMLElement):void {
     token.style.zIndex=String(20+x+y);
     token.style.opacity=isoCellHasLayer(data,"opacityCells",x,y)?"0.42":"1";
   });
+  renderIsometricMinimap(board);
+  const dialog=board.closest<HTMLElement>("[data-wmh-dialog]");
+  if(dialog)renderIsometricWorldStatus(dialog);
 }
 
 function animateGridMove(token:HTMLElement,update:()=>void):void {
@@ -1183,10 +1186,12 @@ function stopNpcWander(dialog:HTMLElement):void {
   const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
   const timer=Number(board?.dataset.npcTimer||0);
   if(timer)window.clearInterval(timer);
+  if(board)delete board.dataset.npcTimer;
 }
 function startNpcWander(dialog:HTMLElement):void {
   const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
-  if(!board)return;
+  if(!board||board.dataset.editorPaused==="true"||board.classList.contains("wmh-overlay-editing"))return;
+  if(dialog.querySelector<HTMLElement>("[data-wmh-chat]")?.hidden===false)return;
   stopNpcWander(dialog);
   const timer=window.setInterval(()=>{
     const mapData=readIsoMapData(board);
@@ -1226,6 +1231,7 @@ function renderChat(dialog:HTMLElement,npcId:string):void {
 }
 function walkToTile(dialog:HTMLElement,targetX:number,targetY:number,surface:string):void {
   const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
+  if(board?.dataset.editorPaused==="true"||board?.classList.contains("wmh-overlay-editing"))return;
   const player=board?.querySelector<HTMLElement>("[data-wmh-player-token]");
   if(!board||!player)return;
   const cols=Number(board.dataset.cols||12),rows=Number(board.dataset.rows||10);
@@ -1310,7 +1316,7 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
   }
   if(action.dataset.wmhAction==="back"){
     const next:Level=current==="interior"?"local":current==="local"?"regional":"world";
-    stopNpcWander(dialog);overlay.dataset.level=next;dialog.innerHTML=panelMarkup(next,regionId,building);if(next==="world")bindWorldMapZoom(dialog);if(next==="regional")bindIsometricMapArt(dialog);if(next==="local"){bindIsoAreaEditor(dialog);bindIsometricCamera(dialog);bindIsometricMapArt(dialog);startNpcWander(dialog);}return true;
+    stopNpcWander(dialog);overlay.dataset.level=next;dialog.innerHTML=panelMarkup(next,regionId,building);if(next==="world")bindWorldMapZoom(dialog);if(next==="regional")bindIsometricMapArt(dialog);if(next==="local"){bindIsoAreaEditor(dialog);bindIsometricCamera(dialog);bindIsometricMapArt(dialog);bindIsometricHud(dialog);startNpcWander(dialog);}return true;
   }
   if(action.dataset.wmhAction==="chat-close"){
     const chat=dialog.querySelector<HTMLElement>("[data-wmh-chat]");
