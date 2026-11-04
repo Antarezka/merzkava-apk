@@ -554,7 +554,7 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
     overlay.dataset.level="interior";overlay.dataset.building=action.dataset.wmhBuilding;
     dialog.innerHTML=panelMarkup("interior",regionId,action.dataset.wmhBuilding);return true;
   }
-  if(action.dataset.wmhTile){
+  if(action.hasAttribute("data-wmh-tile")){
     walkToTile(dialog,Number(action.dataset.x),Number(action.dataset.y),action.dataset.surface||"earth");return true;
   }
   if(action.dataset.wmhNpc){
