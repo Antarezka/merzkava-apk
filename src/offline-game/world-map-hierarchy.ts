@@ -634,7 +634,7 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
   if(action.dataset.wmhAction==="close"){const outerClose=root.querySelector<HTMLButtonElement>("[data-idle-rpg-close]");if(outerClose)outerClose.click();else overlay.hidden=true;return true;}
   if(action.dataset.wmhAction==="back"){
     const next:Level=current==="interior"?"local":current==="local"?"regional":"world";
-    stopNpcWander(dialog);overlay.dataset.level=next;dialog.innerHTML=panelMarkup(next,regionId,building);if(next==="world")bindWorldMapZoom(dialog);if(next==="local"){bindIsometricCamera(dialog);startNpcWander(dialog);}if(next==="interior")bindIsometricCamera(dialog);return true;
+    stopNpcWander(dialog);overlay.dataset.level=next;dialog.innerHTML=panelMarkup(next,regionId,building);if(next==="world")bindWorldMapZoom(dialog);if(next==="local"){bindIsometricCamera(dialog);startNpcWander(dialog);}return true;
   }
   if(action.dataset.wmhInfo){
     const info=readWorldMarkers().find(item=>item.id===action.dataset.wmhInfo);if(!info)return true;
