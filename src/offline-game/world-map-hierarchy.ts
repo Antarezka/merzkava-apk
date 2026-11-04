@@ -435,7 +435,7 @@ function tileMapMarkup(interior = false): string {
     const building=feature==="study-hall"?"Study Hall":feature==="teachers-house"?"Teachers’ Hall":feature==="learning-building"?"Learning Hall":"";
     return '<button type="button" class="wmh-tile wmh-tile-'+surface+' '+(feature?'has-feature feature-'+feature:'')+'" data-wmh-tile data-x="'+x+'" data-y="'+y+'" data-z="0" data-tile-id="tile-'+x+'-'+y+'" data-surface="'+surface+'" style="--tile-x:'+x+';--tile-y:'+y+'" '+(building?'data-wmh-building="'+building+'"':'')+' aria-label="Tile X '+x+', Y '+y+', Z 0 · '+(label||surface)+'"><span class="wmh-tile-coord">('+x+','+y+',0)</span>'+(label?'<b>'+label+'</b>':'')+'</button>';
   }).join("")).join("");
-  return '<div class="wmh-isometric-wrap" data-wmh-iso-viewport><div class="wmh-isometric-camera" data-wmh-iso-camera><div class="wmh-isometric-board '+(interior?'is-interior':'is-exterior')+'" data-wmh-board style="--tile-cols:'+cols+';--tile-rows:'+rows+';--tile-w:64px;--tile-h:32px;--slab-depth:7px">'+tiles+
+  return '<div class="wmh-iso-controls"><button type="button" data-wmh-iso-zoom="out" aria-label="Zoom out">−</button><span data-wmh-iso-level>100%</span><button type="button" data-wmh-iso-zoom="in" aria-label="Zoom in">+</button><button type="button" data-wmh-iso-zoom="reset">RESET</button><small>DRAG TO PAN · PINCH TO ZOOM</small></div><div class="wmh-isometric-wrap" data-wmh-iso-viewport><div class="wmh-isometric-camera" data-wmh-iso-camera><div class="wmh-isometric-board '+(interior?'is-interior':'is-exterior')+'" data-wmh-board style="--tile-cols:'+cols+';--tile-rows:'+rows+';--tile-w:64px;--tile-h:32px;--slab-depth:7px">'+tiles+
     '<button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token data-x="5" data-y="8" style="--token-x:5;--token-y:8" aria-label="Player character"><i></i></button>'+
     (interior ? '<button type="button" class="wmh-character-token wmh-npc-token is-male" data-wmh-npc="teacher" data-x="6" data-y="2" style="--token-x:6;--token-y:2" aria-label="Teacher"><i></i></button><button type="button" class="wmh-character-token wmh-npc-token is-female" data-wmh-npc="student-lin" data-x="3" data-y="4" style="--token-x:3;--token-y:4" aria-label="Student Lin"><i></i></button>' :
       '<button type="button" class="wmh-character-token wmh-npc-token is-female" data-wmh-npc="student-lin" data-x="5" data-y="3" style="--token-x:5;--token-y:3" aria-label="Student Lin"><i></i></button>'+
@@ -443,6 +443,37 @@ function tileMapMarkup(interior = false): string {
       '<button type="button" class="wmh-character-token wmh-npc-token is-female" data-wmh-npc="teacher-mei" data-x="2" data-y="6" style="--token-x:2;--token-y:6" aria-label="Instructor Mei"><i></i></button>'+
       '<button type="button" class="wmh-character-token wmh-npc-token is-male" data-wmh-npc="groundskeeper" data-x="10" data-y="2" style="--token-x:10;--token-y:2" aria-label="Groundskeeper"><i></i></button>')+
     '</div></div></div>';
+}
+function bindIsometricCamera(dialog:HTMLElement):void {
+  const viewport=dialog.querySelector<HTMLElement>("[data-wmh-iso-viewport]");
+  const camera=dialog.querySelector<HTMLElement>("[data-wmh-iso-camera]");
+  const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
+  if(!viewport||!camera||!board||viewport.dataset.cameraBound==="true")return;
+  viewport.dataset.cameraBound="true";
+  let zoom=1;
+  const baseW=704,baseH=368;
+  const apply=(next:number,focusX?:number,focusY?:number)=>{
+    const old=zoom;zoom=Math.max(.65,Math.min(2.4,next));
+    const rect=viewport.getBoundingClientRect();
+    const fx=focusX==null?viewport.clientWidth/2:focusX-rect.left;
+    const fy=focusY==null?viewport.clientHeight/2:focusY-rect.top;
+    const ax=viewport.scrollLeft+fx,ay=viewport.scrollTop+fy;
+    camera.style.width=(baseW*zoom)+"px";camera.style.height=(baseH*zoom)+"px";
+    board.style.transform="scale("+zoom+")";board.style.transformOrigin="top left";
+    viewport.scrollLeft=ax*zoom/old-fx;viewport.scrollTop=ay*zoom/old-fy;
+    const label=dialog.querySelector<HTMLElement>("[data-wmh-iso-level]");
+    if(label)label.textContent=Math.round(zoom*100)+"%";
+  };
+  dialog.querySelectorAll<HTMLElement>("[data-wmh-iso-zoom]").forEach(button=>button.addEventListener("click",()=>{
+    const a=button.dataset.wmhIsoZoom;apply(a==="reset"?1:zoom+(a==="in"?.2:-.2));
+    if(button.dataset.wmhIsoZoom==="reset"){viewport.scrollLeft=0;viewport.scrollTop=0;}
+  }));
+  const pts=new Map<number,{x:number;y:number}>();let pinch:{distance:number;zoom:number}|null=null;
+  const dist=(a:{x:number;y:number},b:{x:number;y:number})=>Math.hypot(a.x-b.x,a.y-b.y);
+  viewport.addEventListener("pointerdown",e=>{pts.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pts.size===2){const p=[...pts.values()];pinch={distance:Math.max(1,dist(p[0],p[1])),zoom};}});
+  viewport.addEventListener("pointermove",e=>{if(!pts.has(e.pointerId))return;pts.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pts.size===2&&pinch){const p=[...pts.values()];apply(pinch.zoom*dist(p[0],p[1])/pinch.distance,(p[0].x+p[1].x)/2,(p[0].y+p[1].y)/2);e.preventDefault();}});
+  const end=(e:PointerEvent)=>{pts.delete(e.pointerId);if(pts.size<2)pinch=null;};
+  viewport.addEventListener("pointerup",end);viewport.addEventListener("pointercancel",end);
 }
 function panelMarkup(level: Level, regionId: RegionId = "golden-dragon-empire", selectedBuilding = "Tianhai Academy", selectedArea?: WorldMarker): string {
   const region = regionData[regionId];
@@ -595,7 +626,7 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
   if(action.dataset.wmhAction==="close"){const outerClose=root.querySelector<HTMLButtonElement>("[data-idle-rpg-close]");if(outerClose)outerClose.click();else overlay.hidden=true;return true;}
   if(action.dataset.wmhAction==="back"){
     const next:Level=current==="interior"?"local":current==="local"?"regional":"world";
-    stopNpcWander(dialog);overlay.dataset.level=next;dialog.innerHTML=panelMarkup(next,regionId,building);if(next==="world")bindWorldMapZoom(dialog);if(next==="local")startNpcWander(dialog);return true;
+    stopNpcWander(dialog);overlay.dataset.level=next;dialog.innerHTML=panelMarkup(next,regionId,building);if(next==="world")bindWorldMapZoom(dialog);if(next==="local"){bindIsometricCamera(dialog);startNpcWander(dialog);}if(next==="interior")bindIsometricCamera(dialog);return true;
   }
   if(action.dataset.wmhInfo){
     const info=readWorldMarkers().find(item=>item.id===action.dataset.wmhInfo);if(!info)return true;
@@ -615,12 +646,12 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
   }
   if(action.dataset.wmhSite){
     overlay.dataset.level="local";overlay.dataset.building=action.dataset.wmhSite;
-    dialog.innerHTML=panelMarkup("local",regionId,action.dataset.wmhSite);startNpcWander(dialog);return true;
+    dialog.innerHTML=panelMarkup("local",regionId,action.dataset.wmhSite);bindIsometricCamera(dialog);startNpcWander(dialog);return true;
   }
   if(action.dataset.wmhBuilding && current==="local"){
     stopNpcWander(dialog);
     overlay.dataset.level="interior";overlay.dataset.building=action.dataset.wmhBuilding;
-    dialog.innerHTML=panelMarkup("interior",regionId,action.dataset.wmhBuilding);return true;
+    dialog.innerHTML=panelMarkup("interior",regionId,action.dataset.wmhBuilding);bindIsometricCamera(dialog);return true;
   }
   if(action.hasAttribute("data-wmh-tile")){
     walkToTile(dialog,Number(action.dataset.x),Number(action.dataset.y),action.dataset.surface||"earth");return true;
