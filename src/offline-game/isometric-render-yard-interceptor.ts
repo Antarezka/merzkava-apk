@@ -1,5 +1,3 @@
-type YardElement = HTMLElement & { dataset: DOMStringMap };
-
 const WIDTH = 784;
 const HEIGHT = 527;
 const COLS = 16;
@@ -95,7 +93,7 @@ function actorMarkup(id: string, label: string, x: number, y: number, gender: "m
     (player ? "Player character" : "Talk to " + id) + '"><i></i></button>';
 }
 
-function renderYard(): string {
+export function renderIsometricVectorYard(): string {
   const viewport = '<div class="wmh-isometric-wrap wmh-vector-viewport" data-wmh-iso-viewport>' +
     '<div class="wmh-isometric-camera wmh-vector-camera" data-wmh-iso-camera>' +
     '<div class="wmh-isometric-board is-exterior is-vector-test" data-wmh-board ' +
@@ -117,7 +115,7 @@ function renderYard(): string {
 }
 
 function mountYard(dialog: HTMLElement): void {
-  dialog.innerHTML = renderYard();
+  dialog.innerHTML = renderIsometricVectorYard();
   const viewport = dialog.querySelector<HTMLElement>("[data-wmh-iso-viewport]");
   const camera = dialog.querySelector<HTMLElement>("[data-wmh-iso-camera]");
   const board = dialog.querySelector<HTMLElement>("[data-wmh-board]");
@@ -129,8 +127,8 @@ function mountYard(dialog: HTMLElement): void {
     const cameraH = Math.max(viewport.clientHeight, HEIGHT * zoom);
     camera.style.width = cameraW + "px";
     camera.style.height = cameraH + "px";
-    board.style.left = (cameraW / 2) + "px";
-    board.style.top = (cameraH / 2) + "px";
+    board.style.setProperty("--vector-left", (cameraW / 2) + "px");
+    board.style.setProperty("--vector-top", (cameraH / 2) + "px");
     board.style.setProperty("--vector-zoom", String(zoom));
     viewport.scrollLeft = Math.max(0, (cameraW - viewport.clientWidth) / 2);
     viewport.scrollTop = Math.max(0, (cameraH - viewport.clientHeight) / 2);
