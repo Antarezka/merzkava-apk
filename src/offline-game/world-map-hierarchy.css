@@ -1173,6 +1173,7 @@
 .wmh-status-day{padding:4px 5px;border:1px solid #171717;background:#fff4c0;font:900 7px/1 Arial Black,Arial,sans-serif;white-space:nowrap}
 .wmh-world-status-bottom strong{min-width:39px;font:900 12px/1 ui-monospace,monospace;letter-spacing:-.05em}
 .wmh-status-location{display:block;margin-top:5px;padding-top:4px;border-top:1px dashed #17171799;overflow:hidden;font:800 6px/1.2 Arial,sans-serif;letter-spacing:.14em;text-overflow:ellipsis;white-space:nowrap}
+.wmh-status-coordinates{display:block;margin-top:4px;color:#292516;font:900 7px/1.1 ui-monospace,monospace;letter-spacing:.06em;white-space:nowrap}
 
 /* Live RPG minimap: position dots mirror the actual world-grid coordinates. */
 .wmh-rpg-minimap{
@@ -1189,10 +1190,16 @@
 }
 .wmh-minimap-world>img{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:fill!important;opacity:.72!important;pointer-events:none!important}
 .wmh-minimap-grid{
-  position:absolute;inset:0;z-index:1;opacity:.27;
-  background-image:linear-gradient(#f6e9be66 1px,transparent 1px),linear-gradient(90deg,#f6e9be66 1px,transparent 1px);
-  background-size:10% 10%;pointer-events:none;
+  position:absolute!important;inset:0!important;z-index:1!important;display:block!important;
+  width:100%!important;height:100%!important;overflow:hidden!important;opacity:.55!important;
+  pointer-events:none!important;
 }
+.wmh-minimap-cell{fill:none;stroke:#f6e9be;stroke-width:12;vector-effect:non-scaling-stroke;opacity:.34}
+.wmh-minimap-cell.is-foreground{fill:#367ec455;stroke:#9bd3ff;opacity:.82}
+.wmh-minimap-cell.is-blocked{fill:#c63d4355;stroke:#ffaaa8;opacity:.9}
+.wmh-minimap-cell.is-opacity{fill:#9467c655;stroke:#d8b8ff;opacity:.85}
+.wmh-minimap-transition{fill:#bd3939;stroke:#ffd0c8;stroke-width:12;vector-effect:non-scaling-stroke}
+.wmh-minimap-transition.is-named{fill:#287acb;stroke:#c5e4ff}
 .wmh-minimap-actors{position:absolute;inset:0;z-index:3;pointer-events:none}
 .wmh-minimap-dot{
   position:absolute;display:block;width:5px;height:5px;border-radius:50%;transform:translate(-50%,-50%);
@@ -1426,9 +1433,9 @@
   min-height:46px!important;
   margin:0!important;
   transform:translate(-50%,-100%)!important;
-  z-index:180!important;
+  z-index:var(--character-z,180)!important;
   visibility:visible!important;
-  opacity:1!important;
+  opacity:var(--character-opacity,1)!important;
   animation:none!important;
   pointer-events:auto!important;
 }
