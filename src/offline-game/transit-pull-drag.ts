@@ -63,7 +63,7 @@ export function initializeArcanistryTransitDrag(root: HTMLElement): void {
     drag.moved = true;
     event.preventDefault();
 
-    const maxTravel = Math.min(220, Math.max(96, root.clientWidth * 0.62));
+    const maxTravel = Math.max(0, Math.min(drag.button.offsetWidth - 28, root.clientWidth * 0.62));
     const offset = clamp(drag.originX + dx, -maxTravel, 0);
     drag.button.style.transform = "translateX(" + offset + "px)";
     drag.button.dataset.transitOffset = String(offset);
@@ -84,7 +84,7 @@ export function initializeArcanistryTransitDrag(root: HTMLElement): void {
     suppressClickUntil = Date.now() + CLICK_SUPPRESSION_MS;
     drag.button.classList.remove("is-transit-dragging");
 
-    const maxTravel = Math.min(220, Math.max(96, root.clientWidth * 0.62));
+    const maxTravel = Math.max(0, Math.min(drag.button.offsetWidth - 28, root.clientWidth * 0.62));
     const current = Number.parseFloat(drag.button.dataset.transitOffset ?? "0") || 0;
     const target = cancelled ? drag.originX : event.clientX < drag.startX ? -maxTravel : 0;
     animate(drag.button, {
