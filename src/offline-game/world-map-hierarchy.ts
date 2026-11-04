@@ -28,7 +28,10 @@ type WorldMarkerId =
   | "wanluo-sacred-expanse" | "azerion-forest" | "dead-zone" | "inner-azerion"
   | "mega-colossal-labyrinth" | "high-cloud-sea-mountains" | "silverpine-wilds" | "frostmirror-sea"
   | "eastern-azure-sea" | "yunmeng-sea" | "wufeng-sea" | "black-tide-sea"
-  | "guixu-canghai" | "lanternhook-isles";
+  | "guixu-canghai" | "lanternhook-isles"
+  | "mega-colossal-labyrinth-exit" | "lantern-passage" | "changqion-harbour" | "three-lantern-passage"
+  | "southwake-port" | "bitterglass-isle" | "dicewake-isle" | "dongxing-port" | "mingzhu-port"
+  | "lanfan-port" | "chaoguan-port" | "yuhai-port" | "yuandeng-port" | "longchao-port";
 type WorldMarker = {
   id: WorldMarkerId; name: string; x: number; y: number;
   category: WorldMarkerCategory; subtitle: string; description: string;
@@ -59,7 +62,21 @@ const defaultWorldMarkers: WorldMarker[] = [
   { id: "wufeng-sea", name: "Wufeng Sea", x: 45, y: 43.7, category: "sea", subtitle: "THE WINDLESS SEA", description: "A still-water basin with no wind, waves, or currents anywhere within its boundaries. Lantern Passage connects it to Yunmeng Sea; Three-Lantern Passage links toward Eastern Azure Sea.", placementStatus: "owner-set" },
   { id: "black-tide-sea", name: "Black Tide Sea", x: 60.8, y: 78.8, category: "sea", subtitle: "ORDINARY SOUTHERN SEA", description: "Ordinary open water south of Lawless Territories and around Black Tide Expanse. It separates the Lawless maritime region from Guixu Canghai.", placementStatus: "owner-set" },
   { id: "guixu-canghai", name: "Guixu Canghai", x: 50.6, y: 88.8, category: "sea", subtitle: "FAR-SOUTHERN POLAR OCEAN", description: "The world's farthest-southern, frigid, most dangerous ocean system, beyond the southern outer boundary of ordinary Black Tide Sea.", placementStatus: "owner-set" },
-  { id: "lanternhook-isles", name: "Lanternhook Isles", x: 68.9, y: 74.6, category: "landmark", subtitle: "ARCHIPELAGO IN ORDINARY BLACK TIDE SEA", description: "A small archipelago with Red Lantern Cay (entertainment), Bitterglass Isle (specialist physicians and medicinal trade), and Dicewake Isle (gambling and wagers).", placementStatus: "owner-set" }
+  { id: "lanternhook-isles", name: "Lanternhook Isles", x: 68.9, y: 74.6, category: "landmark", subtitle: "ARCHIPELAGO IN ORDINARY BLACK TIDE SEA", description: "A small archipelago with Red Lantern Cay (entertainment), Bitterglass Isle (specialist physicians and medicinal trade), and Dicewake Isle (gambling and wagers).", placementStatus: "owner-set" },
+  { id: "mega-colossal-labyrinth-exit", name: "Mega Colossal Labyrinth Exit", x: 8, y: 88, category: "landmark", subtitle: "POSITION PENDING · OWNER TO PLACE", description: "This location has been added to the world map marker list. Its geographic position has not been assigned; place it manually in the Map Editor.", placementStatus: "provisional" },
+  { id: "lantern-passage", name: "Lantern Passage", x: 22, y: 88, category: "sea", subtitle: "POSITION PENDING · OWNER TO PLACE", description: "This location has been added to the world map marker list. Its geographic position has not been assigned; place it manually in the Map Editor.", placementStatus: "provisional" },
+  { id: "changqion-harbour", name: "Changqion Harbour", x: 36, y: 88, category: "landmark", subtitle: "POSITION PENDING · OWNER TO PLACE", description: "This location has been added to the world map marker list. Its geographic position has not been assigned; place it manually in the Map Editor.", placementStatus: "provisional" },
+  { id: "three-lantern-passage", name: "Three Lantern Passage", x: 50, y: 88, category: "sea", subtitle: "POSITION PENDING · OWNER TO PLACE", description: "This location has been added to the world map marker list. Its geographic position has not been assigned; place it manually in the Map Editor.", placementStatus: "provisional" },
+  { id: "southwake-port", name: "Southwake Port", x: 64, y: 88, category: "landmark", subtitle: "POSITION PENDING · OWNER TO PLACE", description: "This location has been added to the world map marker list. Its geographic position has not been assigned; place it manually in the Map Editor.", placementStatus: "provisional" },
+  { id: "bitterglass-isle", name: "Bitterglass Isle", x: 78, y: 88, category: "landmark", subtitle: "POSITION PENDING · OWNER TO PLACE", description: "This location has been added to the world map marker list. Its geographic position has not been assigned; place it manually in the Map Editor.", placementStatus: "provisional" },
+  { id: "dicewake-isle", name: "Dicewake Isle", x: 92, y: 88, category: "landmark", subtitle: "POSITION PENDING · OWNER TO PLACE", description: "This location has been added to the world map marker list. Its geographic position has not been assigned; place it manually in the Map Editor.", placementStatus: "provisional" },
+  { id: "dongxing-port", name: "Dongxing Port", x: 8, y: 96, category: "landmark", subtitle: "POSITION PENDING · OWNER TO PLACE", description: "This location has been added to the world map marker list. Its geographic position has not been assigned; place it manually in the Map Editor.", placementStatus: "provisional" },
+  { id: "mingzhu-port", name: "Mingzhu Port", x: 22, y: 96, category: "landmark", subtitle: "POSITION PENDING · OWNER TO PLACE", description: "This location has been added to the world map marker list. Its geographic position has not been assigned; place it manually in the Map Editor.", placementStatus: "provisional" },
+  { id: "lanfan-port", name: "Lanfan Port", x: 36, y: 96, category: "landmark", subtitle: "POSITION PENDING · OWNER TO PLACE", description: "This location has been added to the world map marker list. Its geographic position has not been assigned; place it manually in the Map Editor.", placementStatus: "provisional" },
+  { id: "chaoguan-port", name: "Chaoguan Port", x: 50, y: 96, category: "landmark", subtitle: "POSITION PENDING · OWNER TO PLACE", description: "This location has been added to the world map marker list. Its geographic position has not been assigned; place it manually in the Map Editor.", placementStatus: "provisional" },
+  { id: "yuhai-port", name: "Yuhai Port", x: 64, y: 96, category: "landmark", subtitle: "POSITION PENDING · OWNER TO PLACE", description: "This location has been added to the world map marker list. Its geographic position has not been assigned; place it manually in the Map Editor.", placementStatus: "provisional" },
+  { id: "yuandeng-port", name: "Yuandeng Port", x: 78, y: 96, category: "landmark", subtitle: "POSITION PENDING · OWNER TO PLACE", description: "This location has been added to the world map marker list. Its geographic position has not been assigned; place it manually in the Map Editor.", placementStatus: "provisional" },
+  { id: "longchao-port", name: "Longchao Port", x: 92, y: 96, category: "landmark", subtitle: "POSITION PENDING · OWNER TO PLACE", description: "This location has been added to the world map marker list. Its geographic position has not been assigned; place it manually in the Map Editor.", placementStatus: "provisional" }
 ];
 function readWorldMarkers(): WorldMarker[] {
   try {
@@ -76,6 +93,8 @@ function readWorldMarkers(): WorldMarker[] {
   return defaultWorldMarkers.map(item => ({ ...item }));
 }
 function worldMapMarkerMarkup(marker: WorldMarker, editor = false): string {
+  // Unplaced additions stay off the canonical world view until the owner assigns coordinates.
+  if (!editor && marker.placementStatus === "provisional") return "";
   const number = String(defaultWorldMarkers.findIndex(item => item.id === marker.id) + 1).padStart(2, "0");
   const provisional = marker.placementStatus === "provisional" ? ' title="Provisional placement — adjust in Map Editor"' : "";
   const powerClass = marker.id === "golden-dragon-empire" ? " wmh-power-gde" : marker.id === "tianhai-yunzhou" ? " wmh-power-ty" : marker.id === "beiming-gu" ? " wmh-power-bg" : "";
