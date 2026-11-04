@@ -41,7 +41,10 @@ describe("shared SVG isometric map renderer", () => {
     expect(html).toContain('viewBox="0 0 2816 1536"');
     expect((html.match(/<polygon class="wmh-vector-cell/g) || []).length).toBe(480);
     expect(html).toContain('fill="transparent" fill-opacity="0"');
-    expect(html).toContain('stroke="#fff3d7"');
+    expect(html).toContain('stroke="#fff8e8"');
+    expect(html).toContain('stroke-opacity="0.22" stroke-width="0.85"');
+    expect((24 + 20 - 2) * 128 / 2 + 128).toBe(2816);
+    expect((24 + 20 - 2) * 69.5 / 2 + 69.5 + 7).toBe(1536);
     expect(html).not.toContain("PAVILION");
     expect(html).not.toContain("<rect width=");
   });
