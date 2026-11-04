@@ -1161,6 +1161,8 @@ function bindIsometricCamera(dialog:HTMLElement):void {
     board.style.setProperty("--wmh-camera-pad-x",px+"px");
     board.style.setProperty("--wmh-camera-pad-y",py+"px");
     board.style.setProperty("--wmh-camera-zoom",String(zoom));
+    const scaleLabel=dialog.querySelector<HTMLElement>("[data-wmh-iso-level]");
+    if(scaleLabel)scaleLabel.textContent=Math.round(zoom*100)+"%";
   };
   const centerMap=()=>{
     if(!baseW||!baseH)measure();
@@ -1186,7 +1188,7 @@ function bindIsometricCamera(dialog:HTMLElement):void {
   };
   dialog.querySelectorAll<HTMLElement>("[data-wmh-iso-zoom]").forEach(button=>button.addEventListener("click",()=>{
     const action=button.dataset.wmhIsoZoom;
-    if(action==="reset"){zoom=1;measure();centerMap();const label=dialog.querySelector<HTMLElement>("[data-wmh-iso-level]");if(label)label.textContent="100%";return;}
+    if(action==="reset"){initialFitApplied=false;measure();centerMap();return;}
     apply(zoom+(action==="in"?.2:-.2));
   }));
   dialog.querySelector<HTMLElement>("[data-wmh-iso-center]")?.addEventListener("click",()=>{measure();centerMap();});
