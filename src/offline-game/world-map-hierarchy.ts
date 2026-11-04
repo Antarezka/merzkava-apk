@@ -483,7 +483,7 @@ function bindIsometricCamera(dialog:HTMLElement):void {
   viewport.dataset.cameraBound="true";
   syncIsoDepthAndOcclusion(board);
   let zoom=1;
-  const baseW=704,baseH=368;
+  const baseW=board.offsetWidth,baseH=board.offsetHeight;
   const apply=(next:number,focusX?:number,focusY?:number)=>{
     const old=zoom;zoom=Math.max(.65,Math.min(2.4,next));
     const rect=viewport.getBoundingClientRect();
