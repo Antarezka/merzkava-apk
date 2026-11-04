@@ -640,11 +640,9 @@ function bindIsometricCamera(dialog:HTMLElement):void {
     const ax=viewport.scrollLeft+fx-px,ay=viewport.scrollTop+fy-py;
     camera.style.width=(baseW*zoom+px*2)+"px";
     camera.style.height=(baseH*zoom+py*2)+"px";
-    board.style.margin="0";
-    board.style.marginLeft=px+"px";
-    board.style.marginTop=py+"px";
-    board.style.transform="scale("+zoom+")";
-    board.style.transformOrigin="top left";
+    board.style.setProperty("--wmh-camera-pad-x",px+"px");
+    board.style.setProperty("--wmh-camera-pad-y",py+"px");
+    board.style.setProperty("--wmh-camera-zoom",String(zoom));
     viewport.scrollLeft=px+ax*zoom/old-fx;
     viewport.scrollTop=py+ay*zoom/old-fy;
     const label=dialog.querySelector<HTMLElement>("[data-wmh-iso-level]");
