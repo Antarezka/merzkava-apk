@@ -923,7 +923,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       workbench!.style.height=Math.max(170,bottom-top)+"px";
     };
     const end=()=>{
-      window.removeEventListener("pointermove",move);window.removeEventListener("pointerup",end);window.removeEventListener("pointercancel",end);saveEditorUi();
+      window.removeEventListener("pointermove",move);window.removeEventListener("pointerup",end);window.removeEventListener("pointercancel",end);savePanelUi();
     };
     window.addEventListener("pointermove",move,{passive:false});window.addEventListener("pointerup",end);window.addEventListener("pointercancel",end);
   });
