@@ -1555,152 +1555,17 @@
 .wmh-isometric-test-caption span{font:700 6px/1 Arial,sans-serif!important;letter-spacing:.1em!important;color:#d5bd90!important}
 
 
-/* Tianhai Academy: promote the minimap image/grid composition to the main
-   play canvas. The JPG remains the only map artwork; every cell is a clear,
-   hairline coordinate guide with no colored ground fill. */
-.wmh-isometric-board.is-minimap-style{
-  background:transparent!important;
-  isolation:isolate!important;
-}
-.wmh-isometric-board.is-minimap-style>.wmh-isometric-map-base{
-  z-index:0!important;
-  display:block!important;
-  opacity:.72!important;
-  visibility:visible!important;
-  object-fit:fill!important;
-}
-.wmh-isometric-board.is-minimap-style>.wmh-area-scene-svg{
-  z-index:1!important;
-  display:block!important;
-  opacity:.55!important;
-  pointer-events:none!important;
-}
-.wmh-isometric-board.is-minimap-style .wmh-vector-cells polygon[data-wmh-tile]{
-  fill:transparent!important;
-  fill-opacity:0!important;
-  stroke:#f6e9be!important;
-  stroke-width:12px!important;
-  stroke-opacity:.34!important;
-  pointer-events:all!important;
-}
-.wmh-isometric-board.is-minimap-style>.wmh-isometric-foreground{
-  z-index:250!important;
-}
-.wmh-isometric-board.is-minimap-style>.wmh-area-overlay-svg{
-  z-index:300!important;
-}
-.wmh-isometric-board.is-minimap-style .wmh-character-token{
-  width:8px!important;
-  height:8px!important;
-  min-width:8px!important;
-  min-height:8px!important;
-  border:1px solid #111!important;
-  border-radius:50%!important;
-  box-shadow:0 0 0 1px #fff9,0 1px 4px #000b!important;
-  transform:translate(-50%,-50%) scale(var(--wmh-camera-inverse-zoom,1))!important;
-  transition:left .13s linear,top .13s linear,filter .15s ease!important;
-}
-.wmh-isometric-board.is-minimap-style .wmh-player-token{
-  background:#ffe64f!important;
-  border-color:#111!important;
-}
-.wmh-isometric-board.is-minimap-style .wmh-npc-token{
-  width:5px!important;
-  height:5px!important;
-  min-width:5px!important;
-  min-height:5px!important;
-  background:#65c5ff!important;
-  border-color:#111!important;
-}
-.wmh-isometric-board.is-minimap-style .wmh-npc-token.is-female{
-  background:#f38ab8!important;
-}
-.wmh-isometric-board.is-minimap-style .wmh-character-token>i{
-  display:none!important;
-}
-.wmh-isometric-board.is-minimap-style .wmh-character-token[data-token-label]::after{
-  display:none!important;
-}
-/* The Academy Map Base is also shown in its compact HUD minimap. */
 
 
-/* Academy parity fix: render the exact minimap grid SVG over the full-size Map
-   Base. Keep both artwork and grid pinned to the same board coordinate bounds. */
-.wmh-isometric-board.is-minimap-style>.wmh-isometric-map-base{
-  position:absolute!important;
-  inset:0 auto auto 0!important;
-  width:var(--iso-board-width,2816px)!important;
-  height:var(--iso-board-height,1536px)!important;
-  max-width:none!important;
-  max-height:none!important;
-  display:block!important;
-  object-fit:fill!important;
-  opacity:.72!important;
-  visibility:visible!important;
-  pointer-events:none!important;
+/* Fresh Tianhai Academy shell: deliberately blank until its new layout is designed. */
+.wmh-academy-empty-screen{
+  background:#101512!important;
 }
-.wmh-isometric-board.is-minimap-style>.wmh-area-scene-svg.wmh-minimap-grid{
+.wmh-academy-empty-surface{
   position:absolute!important;
   inset:0!important;
-  width:100%!important;
-  height:100%!important;
-  display:block!important;
-  overflow:hidden!important;
-  opacity:.55!important;
-  pointer-events:none!important;
-  z-index:1!important;
+  background:#101512!important;
 }
-.wmh-isometric-board.is-minimap-style .wmh-vector-cells polygon.wmh-minimap-cell[data-wmh-tile]{
-  fill:none!important;
-  fill-opacity:0!important;
-  stroke:#f6e9be!important;
-  stroke-width:12px!important;
-  stroke-opacity:.34!important;
-  pointer-events:all!important;
-}
-
-
-/* Tianhai Academy image-only presentation: show the artwork cleanly like the
-   World Map image surface, without a dimmed image or isometric grid overlay. */
-.wmh-isometric-board.is-minimap-style>.wmh-isometric-map-base{
-  opacity:1!important;
-  visibility:visible!important;
-  display:block!important;
-  object-fit:fill!important;
-}
-.wmh-isometric-board.is-minimap-style.wmh-academy-grid-disabled>.wmh-area-scene-svg{
-  display:none!important;
-}
-.wmh-rpg-minimap .wmh-minimap-world>img[data-wmh-academy-map-art]{
-  opacity:1!important;
-  visibility:visible!important;
-}
-
-
-/* Main Academy viewport recovery: the artwork is the ground itself, not a
-   dimmed background. Keep it above the board's painted background while
-   leaving actor tokens and HUD layers above it. */
-.wmh-isometric-play-screen .wmh-isometric-board.has-map-base{
-  background:transparent!important;
-  background-image:none!important;
-}
-.wmh-isometric-play-screen .wmh-isometric-board.has-map-base>.wmh-isometric-map-base{
-  display:block!important;
-  position:absolute!important;
-  left:0!important;
-  top:0!important;
-  right:auto!important;
-  bottom:auto!important;
-  width:var(--iso-board-width,2816px)!important;
-  height:var(--iso-board-height,1536px)!important;
-  max-width:none!important;
-  max-height:none!important;
-  object-fit:fill!important;
-  opacity:1!important;
-  visibility:visible!important;
-  z-index:2!important;
-  pointer-events:none!important;
-}
-.wmh-isometric-play-screen .wmh-isometric-board.wmh-academy-grid-disabled>.wmh-area-scene-svg{
-  display:none!important;
+.wmh-academy-empty-screen>.wmh-map-back{
+  z-index:540!important;
 }
