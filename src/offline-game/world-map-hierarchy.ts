@@ -801,19 +801,80 @@ function renderIsometricMinimap(board:HTMLElement):void {
 }
 function bindAcademyMapControls(dialog:HTMLElement):void {
   const viewport=dialog.querySelector<HTMLElement>("[data-wmh-academy-map-viewport]");
-  const surface=viewport?.querySelector<HTMLElement>(".wmh-academy-empty-surface");
+  const surface=viewport?.querySelector<HTMLElement>(".wmh-academy-map-surface");
+  const image=surface?.querySelector<HTMLImageElement>("img");
   const reset=dialog.querySelector<HTMLButtonElement>("[data-wmh-academy-map-reset]");
   const center=dialog.querySelector<HTMLButtonElement>("[data-wmh-academy-map-center]");
-  if(!viewport||!surface||viewport.dataset.controlsBound==="true")return;
+  const zoomOut=dialog.querySelector<HTMLButtonElement>("[data-wmh-academy-map-zoom-out]");
+  const zoomIn=dialog.querySelector<HTMLButtonElement>("[data-wmh-academy-map-zoom-in]");
+  if(!viewport||!surface||!image||viewport.dataset.controlsBound==="true")return;
   viewport.dataset.controlsBound="true";
-  let zoom=1;
-  const apply=()=>{surface.style.transform="translate(0,0) scale("+zoom+")";};
-  reset?.addEventListener("click",()=>{zoom=1;apply();viewport.scrollTo({left:0,top:0,behavior:"smooth"});});
-  center?.addEventListener("click",()=>{
-    viewport.scrollTo({left:Math.max(0,(viewport.scrollWidth-viewport.clientWidth)/2),top:Math.max(0,(viewport.scrollHeight-viewport.clientHeight)/2),behavior:"smooth"});
-    surface.style.transformOrigin="center center";
+  let zoom=1,x=0,y=0,drag:{pointerId:number;startX:number;startY:number;originX:number;originY:number}|null=null;
+  const baseScale=()=>Math.max(viewport.clientHeight/Math.max(1,image.naturalHeight),viewport.clientWidth/Math.max(1,image.naturalWidth));
+  const measure=()=>{
+    const scale=baseScale();
+    surface.style.width=(image.naturalWidth*scale)+"px";
+    surface.style.height=(image.naturalHeight*scale)+"px";
+    return scale;
+  };
+  const apply=()=>{
+    surface.style.transform="translate3d("+x+"px,"+y+"px,0) scale("+zoom+")";
+    const label=dialog.querySelector<HTMLElement>("[data-wmh-academy-map-zoom-level]");
+    if(label)label.textContent=Math.round(zoom*100)+"%";
+  };
+  const centerMap=()=>{
+    const scale=measure();
+    zoom=1;
+    x=(viewport.clientWidth-surface.offsetWidth)/2;
+    y=(viewport.clientHeight-surface.offsetHeight)/2;
     apply();
+    return scale;
+  };
+  const setZoom=(next:number,focusX=viewport.clientWidth/2,focusY=viewport.clientHeight/2)=>{
+    const old=zoom;zoom=Math.max(1,Math.min(3.5,next));
+    const rect=viewport.getBoundingClientRect();
+    const fx=focusX,fy=focusY;
+    const mapX=(fx-x)/old,mapY=(fy-y)/old;
+    x=fx-mapX*zoom;y=fy-mapY*zoom;apply();
+  };
+  const start=()=>{
+    if(!image.complete||!image.naturalWidth)return;
+    centerMap();
+  };
+  if(image.complete)start();else image.addEventListener("load",start,{once:true});
+  viewport.addEventListener("pointerdown",event=>{
+    if(event.pointerType==="mouse"&&event.button!==0)return;
+    drag={pointerId:event.pointerId,startX:event.clientX,startY:event.clientY,originX:x,originY:y};
+    viewport.setPointerCapture?.(event.pointerId);
+    viewport.classList.add("is-panning");
+    event.preventDefault();
   });
+  viewport.addEventListener("pointermove",event=>{
+    if(!drag||drag.pointerId!==event.pointerId)return;
+    x=drag.originX+event.clientX-drag.startX;
+    y=drag.originY+event.clientY-drag.startY;
+    apply();event.preventDefault();
+  });
+  const endDrag=(event:PointerEvent)=>{
+    if(!drag||drag.pointerId!==event.pointerId)return;
+    drag=null;viewport.classList.remove("is-panning");
+  };
+  viewport.addEventListener("pointerup",endDrag);
+  viewport.addEventListener("pointercancel",endDrag);
+  viewport.addEventListener("lostpointercapture",()=>{drag=null;viewport.classList.remove("is-panning");});
+  viewport.addEventListener("wheel",event=>{
+    event.preventDefault();
+    const rect=viewport.getBoundingClientRect();
+    setZoom(zoom*(event.deltaY<0?1.12:.89),event.clientX-rect.left,event.clientY-rect.top);
+  },{passive:false});
+  zoomOut?.addEventListener("click",()=>setZoom(zoom/1.2));
+  zoomIn?.addEventListener("click",()=>setZoom(zoom*1.2));
+  reset?.addEventListener("click",()=>{zoom=1;centerMap();});
+  center?.addEventListener("click",()=>{centerMap();});
+  if(typeof ResizeObserver!=="undefined"){
+    const observer=new ResizeObserver(()=>{if(zoom===1)centerMap();});
+    observer.observe(viewport);
+  }
 }
 function bindIsometricHud(dialog:HTMLElement):void {
   const hud=dialog.querySelector<HTMLElement>("[data-wmh-isometric-hud]");
@@ -1339,10 +1400,15 @@ function isometricPlayMarkup(regionId: RegionId, selectedBuilding: string, inter
     selectedBuilding.trim().toLowerCase() === "tianhai academy";
   if (isEmptyAcademy) {
     const academyMapImage="/maps/academy/full-map/1_academy.jpg";
-    const academyMapId=makeIsometricMapId(regionId,selectedBuilding,false);
     return '<div class="wmh-isometric-play-screen wmh-academy-empty-screen" data-wmh-isometric-play-screen>'+
-      tileMapMarkup(false,academyMapId,academyMapImage,regionId,selectedBuilding)+
-      isometricHudMarkup("Tianhai Academy",academyMapImage)+
+      '<div class="wmh-academy-map-viewport" data-wmh-academy-map-viewport aria-label="Tianhai Academy map. Drag to explore." tabindex="0">'+
+      '<div class="wmh-academy-map-surface"><img src="'+academyMapImage+'" alt="Full Tianhai Academy map" draggable="false" loading="eager" decoding="async"/></div></div>'+
+      '<div class="wmh-academy-map-controls" aria-label="Academy map controls">'+
+      '<button type="button" data-wmh-academy-map-zoom-in aria-label="Zoom in">＋</button>'+
+      '<span data-wmh-academy-map-zoom-level>100%</span>'+
+      '<button type="button" data-wmh-academy-map-zoom-out aria-label="Zoom out">－</button>'+
+      '<button type="button" data-wmh-academy-map-center>RECENTER</button>'+
+      '<button type="button" data-wmh-academy-map-reset>RESET</button></div>'+
       '<button type="button" class="wmh-map-back wmh-academy-map-back" data-wmh-action="back" aria-label="Return to Golden Dragon Empire map"><i class="wmh-academy-back-icon" aria-hidden="true"></i><b>GOLDEN DRAGON EMPIRE</b></button>'+
       '<section class="wmh-chat-panel" data-wmh-chat hidden role="dialog" aria-label="Character conversation"><div class="wmh-chat-card"><button type="button" class="wmh-chat-close" data-wmh-action="chat-close" aria-label="Close conversation">×</button><div class="wmh-chat-thread" data-wmh-thread></div><div class="wmh-chat-input-row"><span>YOUR RESPONSE</span><div data-wmh-replies></div></div></div></section>'+
       '</div>';
