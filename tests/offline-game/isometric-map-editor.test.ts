@@ -64,6 +64,15 @@ describe("shared isometric map editor data", () => {
     });
   });
 
+  it("starts the Academy image map with an empty editable surface", () => {
+    const data = createIsoMapEditorData("golden-dragon-empire:tianhai-academy:exterior", ACADEMY_ISOMETRIC_GRID);
+    expect(data.grid).toMatchObject({ cols: 24, rows: 20, tileW: 128, tileH: 69.5 });
+    expect(data.foregroundCells).toEqual([]);
+    expect(data.blockedCells).toEqual([]);
+    expect(data.opacityCells).toEqual([]);
+    expect(data.transitions).toEqual([]);
+  });
+
   it("uses a fresh storage namespace for the reinstalled isometric areas", () => {
     expect(isoMapStorageKey("golden-dragon-empire:tianhai-academy:exterior")
       .startsWith("merzkava.isometric-map-editor.v2:")).toBe(true);
