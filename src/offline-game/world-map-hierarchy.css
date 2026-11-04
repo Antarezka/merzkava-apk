@@ -850,8 +850,8 @@
 .wmh-overlay-modal>.wmh-overlay-tools{
   pointer-events:auto!important;
   width:min(92vw,440px)!important;
-  height:min(52dvh,480px)!important;
-  min-height:180px!important;
+  height:min(52dvh,480px);
+  min-height:88px;
   max-height:78dvh!important;
   overflow-x:hidden!important;
   overflow-y:auto!important;
@@ -868,5 +868,5 @@
 .wmh-overlay-resize-grip{height:22px!important;min-height:22px!important;cursor:ns-resize!important;touch-action:none!important}
 @media(max-width:390px){
   .wmh-isometric-wrap{min-height:min(60dvh,520px)!important}
-  .wmh-overlay-modal>.wmh-overlay-tools{width:min(94vw,420px)!important;height:min(54dvh,460px)!important;min-height:170px!important;padding:9px!important}
+  .wmh-overlay-modal>.wmh-overlay-tools{width:min(94vw,420px)!important;height:min(54dvh,460px);min-height:88px;padding:9px!important}
 }
