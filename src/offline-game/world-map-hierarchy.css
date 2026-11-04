@@ -222,3 +222,56 @@
 .wmh-tile{clip-path:none;border-radius:1px;transform:none;box-shadow:inset 0 0 0 1px #f1e5c522}
 .wmh-tile span{transform:translate(-50%,-50%) rotateX(-53deg);font-size:6px}
 .wmh-character-token{transform:translateY(-7px)}
+
+/* Mobile corrections: true isometric projection, fixed viewport modal, stable marker taps. */
+.wmh-isometric-wrap{overflow:auto;min-width:0;min-height:300px;touch-action:pan-x pan-y}
+.wmh-isometric-board{
+  width:460px;
+  max-width:none;
+  aspect-ratio:12 / 10;
+  grid-template-columns:repeat(12,minmax(0,1fr));
+  grid-template-rows:repeat(10,minmax(0,1fr));
+  transform:perspective(900px) rotateX(53deg) rotateZ(45deg) scale(.72);
+  transform-origin:center;
+  transform-style:preserve-3d;
+}
+.wmh-tile{min-width:0;min-height:0;clip-path:none;border-radius:1px;touch-action:manipulation}
+.wmh-character-token{transform:translateY(-7px)}
+.wmh-world-map .wmh-power{touch-action:none;-webkit-tap-highlight-color:transparent}
+.wmh-selection-backdrop{
+  position:fixed;
+  inset:0;
+  width:100vw;
+  height:100vh;
+  height:100dvh;
+  box-sizing:border-box;
+  display:grid;
+  place-items:center;
+  padding:max(14px,env(safe-area-inset-top)) 12px max(14px,env(safe-area-inset-bottom));
+  overflow-y:auto;
+}
+.wmh-world-map>[data-wmh-selection-host]{
+  position:fixed;
+  z-index:9999;
+  inset:0;
+  width:100vw;
+  height:100vh;
+  height:100dvh;
+  pointer-events:none;
+}
+.wmh-selection-card{
+  box-sizing:border-box;
+  width:min(100%,390px);
+  max-width:calc(100vw - 24px);
+  max-height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 28px);
+  overflow-y:auto;
+  overscroll-behavior:contain;
+}
+.wmh-selection-art{height:clamp(135px,28dvh,230px);min-height:0}
+.wmh-selection-question{padding-top:10px}
+@media(max-width:390px){
+  .wmh-isometric-board{transform:perspective(900px) rotateX(53deg) rotateZ(45deg) scale(.66)}
+  .wmh-selection-card{padding:8px}
+  .wmh-selection-question p{font-size:13px}
+  .wmh-selection-question button{min-height:40px;font-size:9px}
+}
