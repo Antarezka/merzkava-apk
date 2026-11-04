@@ -1272,11 +1272,12 @@ function isometricEditorMarkup(): string {
     '<small data-wmh-overlay-status>Choose a tool, then tap individual diamond cells. The world pauses while the editor is open.</small></section></div></div>';
 }
 function isometricHudMarkup(title: string, mapImage: string): string {
-  // Academy promotes the minimap's image-and-grid presentation to the main
-  // play surface. Other locations keep the compact field minimap in the HUD.
-  const minimapMarkup=mapImage?"":
+  // Keep the compact minimap in the HUD for every area, including Academy.
+  // Academy uses the same full Map Base image with its matching grid and actor layer.
+  const minimapMarkup=
     '<button type="button" class="wmh-rpg-minimap" data-wmh-minimap aria-label="Minimap. Tap a location to walk there." title="Tap the map to move">'+
     '<span class="wmh-minimap-heading">FIELD MAP <i>⌖</i></span><span class="wmh-minimap-world" data-wmh-minimap-world>'+
+    (mapImage?'<img data-wmh-academy-map-art src="'+mapImage+'" alt="" aria-hidden="true" draggable="false"/>':"")+
     '<svg class="wmh-minimap-grid" data-wmh-minimap-grid viewBox="0 0 2816 1536" preserveAspectRatio="none" aria-hidden="true"></svg><span class="wmh-minimap-actors" data-wmh-minimap-actors></span></span>'+
     '<span class="wmh-minimap-footer" data-wmh-minimap-footer>YOU · X 05 / Y 17 · TAP TO MOVE</span></button>';
   return '<div class="wmh-isometric-hud" data-wmh-isometric-hud>'+
