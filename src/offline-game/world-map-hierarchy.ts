@@ -991,14 +991,6 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     try{const imported=normalizeIsoMapEditorData(JSON.parse(importField?.value||""),data.mapId,grid);remember();data=imported;Object.assign(grid,data.grid);applyGrid();if(!relocateActorsFromBlockedCells(board,data))throw new Error("No safe cell available for a character.");persist();if(exportField)exportField.hidden=true;setStatus("Map data imported for "+data.mapId+". Characters in blocked cells were relocated.");}
     catch{setStatus("Import failed. Paste a valid isometric-map editor JSON backup.");}
   });
-  // Preserve the previous resizable editor window interaction.
-  const grip=panel.querySelector<HTMLElement>("[data-wmh-panel-resize-handle]");
-  grip?.addEventListener("pointerdown",e=>{
-    e.preventDefault();const id=e.pointerId,sy=e.clientY,sh=panel.getBoundingClientRect().height;
-    const move=(v:PointerEvent)=>{if(v.pointerId===id)panel.style.height=Math.max(120,Math.min(window.innerHeight*.78,sh+sy-v.clientY))+"px";};
-    const end=(v:PointerEvent)=>{if(v.pointerId!==id)return;window.removeEventListener("pointermove",move);window.removeEventListener("pointerup",end);window.removeEventListener("pointercancel",end);};
-    window.addEventListener("pointermove",move,{passive:false});window.addEventListener("pointerup",end);window.addEventListener("pointercancel",end);
-  });
   applyGrid();
   if(!relocateActorsFromBlockedCells(board,data))setStatus("Warning: some characters could not be relocated. Clear blocked cells to restore safe movement.");
   redraw();drawIsometricForeground(board,data);syncIsoDepthAndOcclusion(board);
