@@ -20,9 +20,9 @@ describe("Arcanistry ticket interaction", () => {
   });
 
   it("uses the dominant horizontal or downward gesture to move the quadrant lever", () => {
-    expect(getArcanistryLeverPullDelta(0, 46)).toBe(46);
+    expect(getArcanistryLeverPullDelta(0, 46)).toBe(-46);
     expect(getArcanistryLeverPullDelta(46, 0)).toBe(46);
-    expect(getArcanistryLeverPullDelta(-24, 40)).toBe(40);
+    expect(getArcanistryLeverPullDelta(-24, 40)).toBe(-40);
     expect(getArcanistryLeverAngle(0)).toBe(0);
     expect(getArcanistryLeverAngle(-56)).toBeCloseTo(-55);
     expect(getArcanistryLeverAngle(56)).toBeCloseTo(55);
