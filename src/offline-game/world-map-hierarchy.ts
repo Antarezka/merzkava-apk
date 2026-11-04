@@ -575,7 +575,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
  svg.addEventListener("pointerdown",e=>{
   if(!active)return;e.preventDefault();e.stopPropagation();
   if(mode()==="manual"){addManual(pt(e));return;}
-  if(mode()==="transition"){const p=pt(e),hx=grid.tileW/2,hy=grid.tileH/2,cx=grid.rows*hx+grid.offsetX,wx=(p.x-cx)/hx+p.y/hy,wy=p.y/hy-(p.x-cx)/hx,x=Math.floor(wx),y=Math.floor(wy);if(x>=0&&y>=0&&x<grid.cols&&y<grid.rows){const id="transition-"+Date.now();transitions.push({id,x,y,label:""});selectedTransitionId=id;const v=panel.querySelector<HTMLInputElement>("[data-wmh-transition-label]");if(v)v.value="";persist();}return;}
+  if(mode()==="transition"){const existing=(e.target as Element).closest<SVGGElement>("[data-transition-id]");if(existing){selectedTransitionId=existing.dataset.transitionId||null;const marker=transitions.find(m=>m.id===selectedTransitionId),field=panel.querySelector<HTMLInputElement>("[data-wmh-transition-label]");if(field)field.value=marker?.label||"";redraw();return;}const p=pt(e),hx=grid.tileW/2,hy=grid.tileH/2,cx=grid.rows*hx+grid.offsetX,wx=(p.x-cx)/hx+p.y/hy,wy=p.y/hy-(p.x-cx)/hx,x=Math.floor(wx),y=Math.floor(wy);if(x>=0&&y>=0&&x<grid.cols&&y<grid.rows){const id="transition-"+Date.now();transitions.push({id,x,y,label:""});selectedTransitionId=id;const v=panel.querySelector<HTMLInputElement>("[data-wmh-transition-label]");if(v)v.value="";persist();}return;}
   drawing=true;points=[pt(e)];try{svg.setPointerCapture(e.pointerId);}catch{}
  });
  svg.addEventListener("pointermove",e=>{if(!active||!drawing)return;e.preventDefault();e.stopPropagation();const p=pt(e),last=points[points.length-1];if(!last||Math.hypot(p.x-last.x,p.y-last.y)>4)points.push(p);preview?.setAttribute("d",isoSmoothPath(points));});
