@@ -496,3 +496,28 @@
   text-shadow:0 1px 3px #000,0 0 3px #000!important;
   z-index:4!important;
 }
+
+/* Isometric local-map-only vector area overlay editor. */
+.wmh-overlay-editor{margin:8px 0;color:#ead9b8;font:10px Arial,sans-serif}
+.wmh-overlay-editor>[data-wmh-overlay-toggle]{width:100%;min-height:38px;border:1px solid #b99a66;background:linear-gradient(120deg,#27382d,#17231b);color:#f2dfbb;font:700 10px Arial;letter-spacing:.08em}
+.wmh-overlay-tools{margin-top:7px;padding:10px;border:1px solid #a88b5c;background:#101a14;color:#ead9b8}
+.wmh-overlay-tools[hidden],.wmh-overlay-review[hidden]{display:none!important}
+.wmh-overlay-tool-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.wmh-overlay-tool-row label,.wmh-overlay-tools>label{display:flex;flex-direction:column;gap:5px;color:#d7bd8e;font:700 8px Arial;letter-spacing:.08em}
+.wmh-overlay-tools select,.wmh-overlay-tools textarea{width:100%;box-sizing:border-box;border:1px solid #92794f;background:#1c2b21;color:#f2e5cc;padding:8px;font:11px Arial}
+.wmh-overlay-tools p{font:10px/1.4 Arial;color:#c8b995}
+.wmh-overlay-tool-actions,.wmh-overlay-review>div{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.wmh-overlay-tools button{min-height:34px;padding:7px 9px;border:1px solid #a88b5c;background:#26372b;color:#f4e5c6;font:700 8px Arial}
+.wmh-overlay-review{padding:9px;border:1px solid #d4b77c;background:#26372b}
+.wmh-overlay-review b,.wmh-overlay-review span{display:block;margin-bottom:6px}
+.wmh-overlay-review span{font:9px Arial;color:#e6c98f}
+.wmh-overlay-tools textarea{min-height:76px;margin:5px 0;resize:vertical}
+.wmh-overlay-tools small{display:block;margin-top:7px;color:#cdb98e;line-height:1.4}
+.wmh-area-overlay-svg{position:absolute;inset:0;width:100%;height:100%;z-index:90;overflow:visible;pointer-events:none}
+.wmh-area-mark{fill-opacity:.22;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke;pointer-events:none}
+.wmh-area-mark.mark-walkable{fill:#36b875;stroke:#7af0ad}
+.wmh-area-mark.mark-blocked{fill:#c44848;stroke:#ff8a7d}
+.wmh-area-mark.mark-behind{fill:#438bd5;stroke:#8bc8ff;stroke-dasharray:8 4}
+.wmh-area-mark-preview{fill:#f4d58a22;stroke:#fff0b5;stroke-width:3;stroke-dasharray:5 4;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+.wmh-isometric-board.wmh-overlay-editing .wmh-area-overlay-svg{pointer-events:auto;z-index:200;touch-action:none;cursor:crosshair}
+.wmh-isometric-board.wmh-overlay-editing .wmh-character-token{pointer-events:none}
