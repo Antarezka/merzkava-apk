@@ -1551,3 +1551,76 @@
 }
 .wmh-isometric-test-caption b{font:900 8px/1 Arial Black,Arial,sans-serif!important;letter-spacing:.12em!important}
 .wmh-isometric-test-caption span{font:700 6px/1 Arial,sans-serif!important;letter-spacing:.1em!important;color:#d5bd90!important}
+
+
+/* Tianhai Academy: promote the minimap image/grid composition to the main
+   play canvas. The JPG remains the only map artwork; every cell is a clear,
+   hairline coordinate guide with no colored ground fill. */
+.wmh-isometric-board.is-minimap-style{
+  background:transparent!important;
+  isolation:isolate!important;
+}
+.wmh-isometric-board.is-minimap-style>.wmh-isometric-map-base{
+  z-index:0!important;
+  display:block!important;
+  opacity:.72!important;
+  visibility:visible!important;
+  object-fit:fill!important;
+}
+.wmh-isometric-board.is-minimap-style>.wmh-area-scene-svg{
+  z-index:1!important;
+  display:block!important;
+  opacity:.55!important;
+  pointer-events:none!important;
+}
+.wmh-isometric-board.is-minimap-style .wmh-vector-cells polygon[data-wmh-tile]{
+  fill:transparent!important;
+  fill-opacity:0!important;
+  stroke:#f6e9be!important;
+  stroke-width:.85px!important;
+  stroke-opacity:.34!important;
+  vector-effect:non-scaling-stroke!important;
+  pointer-events:all!important;
+}
+.wmh-isometric-board.is-minimap-style>.wmh-isometric-foreground{
+  z-index:250!important;
+}
+.wmh-isometric-board.is-minimap-style>.wmh-area-overlay-svg{
+  z-index:300!important;
+}
+.wmh-isometric-board.is-minimap-style .wmh-character-token{
+  width:8px!important;
+  height:8px!important;
+  min-width:8px!important;
+  min-height:8px!important;
+  border:1px solid #111!important;
+  border-radius:50%!important;
+  box-shadow:0 0 0 1px #fff9,0 1px 4px #000b!important;
+  transform:translate(-50%,-50%) scale(calc(1 / var(--wmh-camera-zoom,1)))!important;
+  transition:left .13s linear,top .13s linear,filter .15s ease!important;
+}
+.wmh-isometric-board.is-minimap-style .wmh-player-token{
+  background:#ffe64f!important;
+  border-color:#111!important;
+}
+.wmh-isometric-board.is-minimap-style .wmh-npc-token{
+  width:5px!important;
+  height:5px!important;
+  min-width:5px!important;
+  min-height:5px!important;
+  background:#65c5ff!important;
+  border-color:#111!important;
+}
+.wmh-isometric-board.is-minimap-style .wmh-npc-token.is-female{
+  background:#f38ab8!important;
+}
+.wmh-isometric-board.is-minimap-style .wmh-character-token>i{
+  display:none!important;
+}
+.wmh-isometric-board.is-minimap-style .wmh-character-token[data-token-label]::after{
+  display:none!important;
+}
+.wmh-isometric-play-screen .wmh-isometric-play-screen{}
+.wmh-isometric-play-screen:has(.wmh-isometric-board.is-minimap-style) .wmh-rpg-minimap{
+  display:none!important;
+}
