@@ -646,7 +646,7 @@ function renderIsometricMinimap(board:HTMLElement):void {
     const p=position(player);
     items.push('<span class="wmh-minimap-dot is-player" data-minimap-player style="left:'+p.x+'%;top:'+p.y+'%" aria-label="Player position"></span>');
   }
-  board.querySelectorAll<HTMLElement>("[data-wmh-npc]").forEach((npc,index)=>{
+  if(!board.classList.contains("wmh-overlay-editing"))board.querySelectorAll<HTMLElement>("[data-wmh-npc]").forEach((npc,index)=>{
     const p=position(npc);
     items.push('<span class="wmh-minimap-dot is-npc '+(npc.classList.contains("is-female")?"is-female":"is-male")+'" data-minimap-npc="'+index+'" style="left:'+p.x+'%;top:'+p.y+'%" title="NPC"></span>');
   });
