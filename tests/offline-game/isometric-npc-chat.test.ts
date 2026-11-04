@@ -14,8 +14,8 @@ describe("isometric NPC conversations", () => {
   });
 
   it("centers the conversation as a full-screen modal instead of docking it below the map", () => {
-    const rules = [...chatStyles.matchAll(/\.wmh-isometric-play-screen \.wmh-chat-panel\\?\{([^}]*)\}/g)];
-    const finalRule = rules.at(-1)?.[1] ?? "";
+    const rules = [...chatStyles.matchAll(/\.wmh-isometric-play-screen \.wmh-chat-panel\{([^}]*)\}/g)];
+    const finalRule = rules[rules.length - 1]?.[1] ?? "";
     expect(finalRule).toContain("position:fixed");
     expect(finalRule).toContain("inset:0");
     expect(finalRule).toContain("display:grid");
