@@ -633,15 +633,14 @@ function drawIsometricForeground(board:HTMLElement,data=readIsoMapData(board)):v
   const sourceUrl=image.currentSrc||image.src;
   if(sourceUrl){
     const escaped=sourceUrl.replace(/"/g,"%22");
-    board.style.setProperty("--iso-map-base-image",'url("'+escaped+'")');
-    board.style.setProperty("--iso-map-base-size",image.naturalWidth+"px "+image.naturalHeight+"px");
-    board.style.backgroundImage='url("'+escaped+'")';
-    board.style.backgroundSize=image.naturalWidth+"px "+image.naturalHeight+"px";
-    board.style.backgroundPosition="left top";
-    board.style.backgroundRepeat="no-repeat";
+    // Keep the source image as a real DOM image layer. Do not rely on a
+    // CSS background URL: Android WebView may reject very large data-URL
+    // backgrounds even while the same image element works in the minimap.
     image.style.width=image.naturalWidth+"px";
     image.style.height=image.naturalHeight+"px";
-    image.style.opacity="0";
+    image.style.opacity="1";
+    image.style.visibility="visible";
+    image.style.display="block";
   }
   const projectedWidth=(dataGrid.cols+dataGrid.rows-2)*dataGrid.tileW/2+dataGrid.tileW;
   const projectedHeight=(dataGrid.cols+dataGrid.rows-2)*dataGrid.tileH/2+dataGrid.tileH+7;
