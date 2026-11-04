@@ -112,7 +112,10 @@ jobs:
           test -s "$MAP_SOURCE"
           test -s "$MAP_OUTPUT"
           cmp "$MAP_SOURCE" "$MAP_OUTPUT"
-          echo "Verified Academy map artwork is packaged at dist/maps/academy/full-map/1_academy.jpg"
+          MAGIC="$(od -An -tx1 -N3 "$MAP_SOURCE" | tr -d ' \\n')"
+          test "$MAGIC" = "ffd8ff"
+          file "$MAP_SOURCE" "$MAP_OUTPUT"
+          echo "Verified JPEG signature and packaged Academy map at dist/maps/academy/full-map/1_academy.jpg"
           node --input-type=module - <<'NODE'
           import { readFileSync, readdirSync } from "node:fs";
           const bundle = readdirSync("dist/assets").filter(name => name.endsWith(".js"))
