@@ -881,7 +881,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     };
     const end=(_next:PointerEvent)=>{
       window.removeEventListener("pointermove",move);window.removeEventListener("pointerup",end);window.removeEventListener("pointercancel",end);
-      if(moved){suppressToggleClick=true;saveBubbleUi();}
+      if(moved){suppressToggleClick=true;saveBubbleUi();window.setTimeout(()=>{suppressToggleClick=false;},450);}
     };
     window.addEventListener("pointermove",move,{passive:false});window.addEventListener("pointerup",end);window.addEventListener("pointercancel",end);
   });
@@ -975,10 +975,17 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
   });
   panel.querySelectorAll<HTMLInputElement>("[data-wmh-grid-control]").forEach(input=>{
     const update=()=>{
+      const previous=JSON.parse(JSON.stringify(data)) as IsoMapEditorData;
+      const previousGrid={...grid};
       remember();const property=input.dataset.wmhGridControl as keyof IsoMapGridConfig;grid[property]=Number(input.value);
       const valid=(key:string)=>{const [x,y]=key.split(",").map(Number);return x<grid.cols&&y<grid.rows;};
       data.foregroundCells=data.foregroundCells.filter(valid);data.blockedCells=data.blockedCells.filter(valid);data.opacityCells=data.opacityCells.filter(valid);
-      data.transitions=data.transitions.filter(m=>m.x<grid.cols&&m.y<grid.rows);applyGrid();if(!relocateActorsFromBlockedCells(board,data))setStatus("Grid resized, but no free cell exists for every character.");persist();
+      data.transitions=data.transitions.filter(m=>m.x<grid.cols&&m.y<grid.rows);applyGrid();
+      if(!relocateActorsFromBlockedCells(board,data)){
+        data=previous;Object.assign(grid,previousGrid);history.pop();input.value=String(grid[property]);applyGrid();
+        setStatus("Grid change cancelled: there is no safe destination for every character.");return;
+      }
+      persist();
     };
     input.addEventListener("change",update);
     input.closest<HTMLElement>("[data-wmh-grid-row]")?.querySelectorAll<HTMLButtonElement>("[data-wmh-grid-step]").forEach(button=>button.addEventListener("click",()=>{
@@ -1004,8 +1011,17 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     catch{if(exportField){exportField.focus();exportField.select();}setStatus("Clipboard unavailable. JSON backup is shown below.");}
   });
   panel.querySelector<HTMLElement>("[data-wmh-overlay-import]")?.addEventListener("click",()=>{
-    try{const imported=normalizeIsoMapEditorData(JSON.parse(importField?.value||""),data.mapId,grid);remember();data=imported;Object.assign(grid,data.grid);applyGrid();if(!relocateActorsFromBlockedCells(board,data))throw new Error("No safe cell available for a character.");persist();if(exportField)exportField.hidden=true;setStatus("Map data imported for "+data.mapId+". Characters in blocked cells were relocated.");}
-    catch{setStatus("Import failed. Paste a valid isometric-map editor JSON backup.");}
+    const previous=JSON.parse(JSON.stringify(data)) as IsoMapEditorData;
+    const previousGrid={...grid};
+    try{
+      const imported=normalizeIsoMapEditorData(JSON.parse(importField?.value||""),data.mapId,grid);
+      remember();data=imported;Object.assign(grid,data.grid);applyGrid();
+      if(!relocateActorsFromBlockedCells(board,data)){
+        data=previous;Object.assign(grid,previousGrid);history.pop();applyGrid();
+        setStatus("Import rejected: the new X cells leave no safe destination for every character.");return;
+      }
+      persist();if(exportField)exportField.hidden=true;setStatus("Map data imported for "+data.mapId+". Characters inside X cells were moved to safe cells.");
+    }catch{data=previous;Object.assign(grid,previousGrid);setStatus("Import failed. Paste a valid isometric-map JSON backup.");}
   });
   applyGrid();
   if(!relocateActorsFromBlockedCells(board,data))setStatus("Warning: some characters could not be relocated. Clear blocked cells to restore safe movement.");
