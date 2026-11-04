@@ -521,3 +521,17 @@
 .wmh-area-mark-preview{fill:#f4d58a22;stroke:#fff0b5;stroke-width:3;stroke-dasharray:5 4;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
 .wmh-isometric-board.wmh-overlay-editing .wmh-area-overlay-svg{pointer-events:auto;z-index:200;touch-action:none;cursor:crosshair}
 .wmh-isometric-board.wmh-overlay-editing .wmh-character-token{pointer-events:none}
+
+/* Broad categories: road strokes default walkable; object strokes default blocked. */
+.wmh-area-mark{fill:none;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke;opacity:.78;pointer-events:none}
+.wmh-area-mark.mark-road{stroke:#55e69a;filter:drop-shadow(0 1px 2px #102b1b)}
+.wmh-area-mark.mark-object{stroke:#f0b65f;stroke-dasharray:5 3;filter:drop-shadow(0 1px 2px #281b0b)}
+.wmh-area-mark-preview{fill:none;stroke:#fff0b5;stroke-width:28;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+.wmh-manual-mark{pointer-events:none}
+.wmh-manual-mark circle{stroke:#fff1cf;stroke-width:1.4;vector-effect:non-scaling-stroke}
+.wmh-manual-mark text{font:700 11px Arial;fill:#fff}
+.wmh-manual-mark.manual-walkable circle{fill:#26794a}
+.wmh-manual-mark.manual-blocked circle{fill:#a33e42}
+.wmh-manual-mark.manual-behind circle{fill:#3976b7;stroke-dasharray:2 1}
+.wmh-overlay-editor [data-wmh-overlay-mode],.wmh-overlay-editor [data-wmh-overlay-category],.wmh-overlay-editor [data-wmh-overlay-manual]{min-height:34px}
+.wmh-overlay-editor input[type=range]{width:100%;accent-color:#d6b578}
