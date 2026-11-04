@@ -598,7 +598,7 @@
 @keyframes wmh-transition-pulse{50%{opacity:.62}}
 /* Runtime geometry follows the editor's calibration variables. */
 .wmh-isometric-board .wmh-tile{left:calc((var(--tile-x) - var(--tile-y))*var(--iso-half-w,32px) + var(--iso-center-x))!important;top:calc((var(--tile-x) + var(--tile-y))*var(--iso-half-h,16px) + var(--iso-offset-y,0px))!important;width:var(--tile-w,64px)!important;height:calc(var(--tile-h,32px) + var(--slab-depth,7px))!important}
-.wmh-isometric-board .wmh-character-token{left:calc((var(--token-x) - var(--token-y))*var(--iso-half-w,32px) + var(--iso-center-x))!important;top:calc((var(--token-x) + var(--token-y))*var(--iso-half-h,16px) + var(--iso-offset-y,0px) + 8px)!important}
+.wmh-isometric-board .wmh-character-token{left:calc((var(--token-x) - var(--token-y))*var(--iso-half-w,32px) + var(--iso-center-x))!important;top:calc((var(--token-x) + var(--token-y))*var(--iso-half-h,16px) + var(--iso-offset-y,0px) + var(--iso-half-h,16px))!important}
 .wmh-isometric-board .wmh-player-token{scale:var(--player-scale,1)}
 .wmh-isometric-board .wmh-npc-token{scale:var(--npc-scale,1)}
 
@@ -1346,4 +1346,45 @@
 .wmh-isometric-board.has-map-base:not(.wmh-overlay-editing) .wmh-tile-coord,
 .wmh-isometric-board.has-map-base:not(.wmh-overlay-editing) .wmh-tile>b{
   display:none!important;
+}
+
+
+/* Map Base is painted on the board itself; the source img feeds foreground-cell redraw only. */
+.wmh-isometric-board.has-map-base{
+  background-color:transparent!important;
+  background-image:var(--iso-map-base-image)!important;
+  background-position:left top!important;
+  background-repeat:no-repeat!important;
+  background-size:var(--iso-map-base-size,100% 100%)!important;
+}
+.wmh-isometric-board.has-map-base>.wmh-isometric-map-base{
+  opacity:0!important;visibility:visible!important;display:block!important;
+}
+.wmh-isometric-board.has-map-base>.wmh-tile{
+  background:transparent!important;border:0!important;box-shadow:none!important;
+}
+.wmh-isometric-board.has-map-base>.wmh-tile:before,
+.wmh-isometric-board.has-map-base>.wmh-tile:after{display:none!important}
+.wmh-isometric-board.is-placeholder{
+  background:radial-gradient(ellipse at 50% 45%,#29372e 0%,#17221c 70%,#101813 100%)!important;
+}
+.wmh-isometric-board.is-placeholder>.wmh-tile{
+  background:transparent!important;border:0!important;color:transparent!important;
+}
+.wmh-isometric-board.is-placeholder>.wmh-tile:before{display:none!important}
+.wmh-isometric-board.is-placeholder>.wmh-tile:after{
+  display:block!important;inset:0 0 7px!important;
+  clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)!important;
+  background:linear-gradient(145deg,#d1c6a70a,#a8b39b05)!important;
+  border:1px solid #c8d1bb55!important;box-shadow:none!important;opacity:.75;
+}
+.wmh-isometric-board.is-placeholder.wmh-overlay-editing>.wmh-tile:after{
+  background:transparent!important;border:1px solid #fff9!important;opacity:1;
+}
+.wmh-rpg-minimap .wmh-minimap-world>img{
+  position:absolute!important;inset:0!important;width:100%!important;height:100%!important;
+  object-fit:fill!important;display:block!important;
+}
+@media(max-width:600px){
+  .wmh-isometric-play-screen>.wmh-isometric-wrap{padding:0!important}
 }

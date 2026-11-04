@@ -513,12 +513,50 @@ function bindIsometricMapArt(dialog: HTMLElement): void {
   });
 }
 
+function isometricNpcTokensMarkup(mapId:string,interior:boolean):string {
+  const maps:Record<string,Array<{id:string;x:number;y:number;gender:"male"|"female"}>>={
+    "golden-dragon-empire:public-arena:exterior":[
+      {id:"arena-referee",x:10,y:3,gender:"male"},{id:"arena-fighter",x:15,y:8,gender:"female"},{id:"arena-spectator",x:19,y:15,gender:"male"}],
+    "golden-dragon-empire:sparring-arena:exterior":[
+      {id:"arena-referee",x:10,y:3,gender:"male"},{id:"arena-fighter",x:15,y:8,gender:"female"},{id:"arena-spectator",x:19,y:15,gender:"male"}],
+    "golden-dragon-empire:imperial-capital:exterior":[
+      {id:"gde-warden",x:3,y:4,gender:"male"},{id:"gde-herbalist",x:12,y:9,gender:"female"},{id:"gde-courier",x:20,y:5,gender:"male"}],
+    "golden-dragon-empire:imperial-market:exterior":[
+      {id:"gde-herbalist",x:8,y:7,gender:"female"},{id:"gde-courier",x:17,y:12,gender:"male"}],
+    "tianhai-yunzhou:yunxiao-terrace:exterior":[
+      {id:"ty-clerk",x:4,y:4,gender:"female"},{id:"ty-sailor",x:12,y:9,gender:"male"},{id:"ty-arcanist",x:20,y:5,gender:"female"}],
+    "tianhai-yunzhou:cangqiong-harbor:exterior":[
+      {id:"ty-clerk",x:4,y:4,gender:"female"},{id:"ty-sailor",x:12,y:9,gender:"male"}],
+    "beiming-gu:beiming-heartland:exterior":[
+      {id:"bg-guide",x:4,y:4,gender:"male"},{id:"bg-trainee",x:12,y:9,gender:"female"},{id:"bg-attendant",x:20,y:5,gender:"male"}],
+    "beiming-gu:mountain-pass:exterior":[
+      {id:"bg-guide",x:4,y:4,gender:"male"},{id:"bg-trainee",x:12,y:9,gender:"female"}]
+  };
+  const fallback=interior
+    ? [{id:"teacher",x:6,y:2,gender:"male" as const},{id:"student-lin",x:3,y:4,gender:"female" as const}]
+    : mapId.startsWith("golden-dragon-empire:tianhai-academy:exterior")
+      ? [{id:"student-lin",x:7,y:4,gender:"female" as const},{id:"student-wei",x:10,y:9,gender:"male" as const},{id:"teacher-mei",x:6,y:15,gender:"female" as const},{id:"groundskeeper",x:22,y:5,gender:"male" as const}]
+      : [{id:"gde-warden",x:3,y:4,gender:"male" as const},{id:"gde-herbalist",x:12,y:9,gender:"female" as const}];
+  return (maps[mapId]||fallback).map(npc =>
+    '<button type="button" class="wmh-character-token wmh-npc-token '+(npc.gender==="female"?"is-female":"is-male")+'" data-wmh-npc="'+npc.id+'" data-x="'+npc.x+'" data-y="'+npc.y+'" style="--token-x:'+npc.x+';--token-y:'+npc.y+'" aria-label="Talk to '+npc.id+'"><i></i></button>'
+  ).join("");
+}
+
 function tileMapMarkup(interior = false, mapId = "academy-exterior", mapImage = ""): string {
+  const academyExterior = !interior && mapId.startsWith("golden-dragon-empire:tianhai-academy:exterior");
   const cols = interior ? 12 : 24, rows = interior ? 10 : 20;
+  const tileW = academyExterior ? 128 : 64, tileH = academyExterior ? 69.5 : 32;
+  const baseWidth = mapImage ? 2816 : 0, baseHeight = mapImage ? 1536 : 0;
+  const projectedWidth = (cols + rows - 2) * tileW / 2 + tileW;
+  const projectedHeight = (cols + rows - 2) * tileH / 2 + tileH + 7;
+  const boardWidth = Math.max(projectedWidth, baseWidth);
+  const boardHeight = Math.max(projectedHeight, baseHeight);
   const features: Record<string,string> = interior
     ? {"2-1":"blackboard","5-1":"teacher-desk","3-3":"desk","5-3":"desk","7-3":"desk","3-5":"desk","5-5":"desk","7-5":"desk","10-8":"door"}
-    : {"5-1":"pond","6-1":"pond","7-1":"pond","8-1":"pond","1-2":"tree","2-2":"tree","10-2":"tree","1-3":"flower","3-3":"flower","9-3":"flower","11-3":"tree","2-9":"garden","3-9":"garden","8-9":"garden","9-9":"garden","2-14":"bench","9-14":"bench","3-2":"study-hall","9-2":"teachers-house","3-10":"learning-building","20-2":"simple-house"};
-  const buildingSpecs = interior ? [] : [
+    : academyExterior
+      ? {"5-1":"pond","6-1":"pond","7-1":"pond","8-1":"pond","1-2":"tree","2-2":"tree","10-2":"tree","1-3":"flower","3-3":"flower","9-3":"flower","11-3":"tree","2-9":"garden","3-9":"garden","8-9":"garden","9-9":"garden","2-14":"bench","9-14":"bench","3-2":"study-hall","9-2":"teachers-house","3-10":"learning-building","20-2":"simple-house"}
+      : {};
+  const buildingSpecs = !academyExterior ? [] : [
     {id:"study-hall",name:"Study Hall",x:3,y:2,w:4,h:4},
     {id:"teachers-house",name:"Teachers’ Hall",x:9,y:2,w:4,h:4},
     {id:"learning-building",name:"Learning Hall",x:3,y:10,w:4,h:4},
@@ -527,27 +565,25 @@ function tileMapMarkup(interior = false, mapId = "academy-exterior", mapImage = 
   const sparring={x:14,y:8,w:8,h:8};
   const tiles = Array.from({length: rows}, (_,y) => Array.from({length:cols},(_,x) => {
     const key=x+"-"+y;
-    const road=!interior&&(y===6||y===7||x===12||x===13);
-    const inSparring=!interior&&x>=sparring.x&&x<sparring.x+sparring.w&&y>=sparring.y&&y<sparring.y+sparring.h;
+    const road=academyExterior&&(y===6||y===7||x===12||x===13);
+    const inSparring=academyExterior&&x>=sparring.x&&x<sparring.x+sparring.w&&y>=sparring.y&&y<sparring.y+sparring.h;
     const feature=features[key]||(road?"road":inSparring?"sparring-ground":"");
     const structure=buildingSpecs.find(item=>x>=item.x&&x<item.x+item.w&&y>=item.y&&y<item.y+item.h);
     const structureAnchor=!!structure&&x===structure.x&&y===structure.y;
-    const blocked=false;
-    const occlusion=false;
-    const surface = interior ? (y<2?"wood":"tile") : (feature==="pond"?"wet":feature==="gate"||feature==="road"?"stone":feature==="tree"||feature==="flower"||feature==="garden"?"earth":feature==="sparring-ground"?"tile":y>15?"stone":"earth");
+    const surface = interior ? (y<2?"wood":"tile") : academyExterior
+      ? (feature==="pond"?"wet":feature==="gate"||feature==="road"?"stone":feature==="tree"||feature==="flower"||feature==="garden"?"earth":feature==="sparring-ground"?"tile":y>15?"stone":"earth")
+      : "tile";
     const label = feature==="pond"?"POND":feature==="tree"?"TREE":feature==="flower"?"FLOWER":feature==="garden"?"GARDEN":feature==="gate"?"ACADEMY GATE":feature==="bench"?"BENCH":feature==="blackboard"?"BOARD":feature==="teacher-desk"?"TEACHER":feature==="desk"?"DESK":feature==="door"?"DOOR":feature==="study-hall"?"STUDY HALL":feature==="teachers-house"?"TEACHERS’ HALL":feature==="learning-building"?"LEARNING HALL":feature==="simple-house"?"HOUSE":feature==="sparring-ground"&&x===sparring.x&&y===sparring.y?"SPARRING GROUND":"";
     const building=structure?.name||"";
-    const classes=(feature?'has-feature feature-'+feature:'')+(structure?' building-footprint building-'+structure.id+(blocked?' building-blocked':' building-occlusion'):'');
-    return '<button type="button" class="wmh-tile wmh-tile-'+surface+' '+classes+'" data-wmh-tile data-x="'+x+'" data-y="'+y+'" data-z="0" data-tile-id="tile-'+x+'-'+y+'" data-surface="'+surface+'" style="--tile-x:'+x+';--tile-y:'+y+'" '+(blocked?'data-wmh-blocked="true"':'')+' '+(occlusion?'data-wmh-occlusion="true"':'')+' '+(structureAnchor?'data-wmh-building="'+building+'"':'')+' aria-label="Tile X '+x+', Y '+y+', Z 0 · '+(label||surface)+'"><span class="wmh-tile-coord">('+x+','+y+',0)</span>'+(label?'<b>'+label+'</b>':'')+'</button>';
+    const classes=(feature?'has-feature feature-'+feature:'')+(structure?' building-footprint building-'+structure.id+' building-occlusion':'');
+    return '<button type="button" class="wmh-tile wmh-tile-'+surface+' '+classes+'" data-wmh-tile data-x="'+x+'" data-y="'+y+'" data-z="0" data-tile-id="tile-'+x+'-'+y+'" data-surface="'+surface+'" style="--tile-x:'+x+';--tile-y:'+y+'" '+(structureAnchor?'data-wmh-building="'+building+'"':'')+' aria-label="Tile X '+x+', Y '+y+', Z 0 · '+(label||surface)+'"><span class="wmh-tile-coord">('+x+','+y+',0)</span>'+(label?'<b>'+label+'</b>':'')+'</button>';
   }).join("")).join("");
-  return '<div class="wmh-iso-controls"><button type="button" data-wmh-iso-zoom="out" aria-label="Zoom out">−</button><span data-wmh-iso-level>100%</span><button type="button" data-wmh-iso-zoom="in" aria-label="Zoom in">+</button><button type="button" data-wmh-iso-zoom="reset">RESET</button><button type="button" data-wmh-iso-center aria-label="Center isometric map">CENTER MAP</button><small>DRAG TO PAN · PINCH TO ZOOM</small></div><div class="wmh-isometric-wrap" data-wmh-iso-viewport><div class="wmh-isometric-camera" data-wmh-iso-camera><div class="wmh-isometric-board '+(interior?'is-interior':'is-exterior')+(mapImage?' has-map-base':'')+'" data-wmh-board style="--tile-cols:'+cols+';--tile-rows:'+rows+';--iso-center-x:'+(rows*32)+'px;--iso-board-width:'+((cols+rows-1)*32+32)+'px;--iso-board-height:'+((cols+rows-2)*16+39)+'px;--tile-w:64px;--tile-h:32px;--slab-depth:7px" data-cols="'+cols+'" data-rows="'+rows+'" data-map-id="'+escapeMapEditorText(mapId)+'">'+tiles+''+(mapImage?'<img class="wmh-isometric-map-base" data-wmh-map-art src="'+mapImage+'" alt="Isometric map base" draggable="false" loading="eager" decoding="async"/><canvas class="wmh-isometric-foreground" data-wmh-foreground-canvas aria-hidden="true"></canvas>':'')+'<svg class="wmh-area-overlay-svg" data-wmh-overlay-svg viewBox="0 0 '+((cols+rows-1)*32+32)+' '+((cols+rows-2)*16+39)+'" preserveAspectRatio="none"><g data-wmh-overlay-marks></g><g data-wmh-manual-marks></g><g data-wmh-transition-marks></g><path data-wmh-overlay-preview class="wmh-area-mark-preview" d=""></path></svg>'+
-    '<button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token data-x="5" data-y="'+(interior?8:17)+'" style="--token-x:5;--token-y:'+(interior?8:17)+'" aria-label="Player character"><i></i></button>'+
-    (interior ? '<button type="button" class="wmh-character-token wmh-npc-token is-male" data-wmh-npc="teacher" data-x="6" data-y="2" style="--token-x:6;--token-y:2" aria-label="Teacher"><i></i></button><button type="button" class="wmh-character-token wmh-npc-token is-female" data-wmh-npc="student-lin" data-x="3" data-y="4" style="--token-x:3;--token-y:4" aria-label="Student Lin"><i></i></button>' :
-      '<button type="button" class="wmh-character-token wmh-npc-token is-female" data-wmh-npc="student-lin" data-x="7" data-y="4" style="--token-x:7;--token-y:4" aria-label="Student Lin"><i></i></button>'+
-      '<button type="button" class="wmh-character-token wmh-npc-token is-male" data-wmh-npc="student-wei" data-x="10" data-y="9" style="--token-x:10;--token-y:9" aria-label="Student Wei"><i></i></button>'+
-      '<button type="button" class="wmh-character-token wmh-npc-token is-female" data-wmh-npc="teacher-mei" data-x="6" data-y="15" style="--token-x:6;--token-y:15" aria-label="Instructor Mei"><i></i></button>'+
-      '<button type="button" class="wmh-character-token wmh-npc-token is-male" data-wmh-npc="groundskeeper" data-x="22" data-y="5" style="--token-x:22;--token-y:5" aria-label="Groundskeeper"><i></i></button>')+
-    '</div></div></div>';
+  const boardClass='wmh-isometric-board '+(interior?'is-interior':'is-exterior')+(mapImage?' has-map-base':' is-placeholder');
+  const imageMarkup=mapImage
+    ? '<img class="wmh-isometric-map-base" data-wmh-map-art src="'+mapImage+'" alt="Isometric map base" draggable="false" loading="eager" decoding="async"/><canvas class="wmh-isometric-foreground" data-wmh-foreground-canvas aria-hidden="true"></canvas>'
+    : '';
+  const npcTokens=isometricNpcTokensMarkup(mapId,interior);
+  return '<div class="wmh-iso-controls"><button type="button" data-wmh-iso-zoom="out" aria-label="Zoom out">−</button><span data-wmh-iso-level>100%</span><button type="button" data-wmh-iso-zoom="in" aria-label="Zoom in">+</button><button type="button" data-wmh-iso-zoom="reset">FIT</button><button type="button" data-wmh-iso-center aria-label="Center isometric map">CENTER MAP</button><small>DRAG TO PAN · PINCH TO ZOOM</small></div><div class="wmh-isometric-wrap" data-wmh-iso-viewport><div class="wmh-isometric-camera" data-wmh-iso-camera><div class="'+boardClass+'" data-wmh-board style="--tile-cols:'+cols+';--tile-rows:'+rows+';--iso-center-x:'+(rows*tileW/2)+'px;--iso-board-width:'+boardWidth+'px;--iso-board-height:'+boardHeight+'px;--tile-w:'+tileW+'px;--tile-h:'+tileH+'px;--iso-half-w:'+(tileW/2)+'px;--iso-half-h:'+(tileH/2)+'px;--iso-offset-y:0px;--slab-depth:7px" data-cols="'+cols+'" data-rows="'+rows+'" data-map-id="'+escapeMapEditorText(mapId)+'">'+imageMarkup+tiles+'<svg class="wmh-area-overlay-svg" data-wmh-overlay-svg viewBox="0 0 '+boardWidth+' '+boardHeight+'" preserveAspectRatio="none"><g data-wmh-overlay-marks></g><g data-wmh-manual-marks></g><g data-wmh-transition-marks></g><path data-wmh-overlay-preview class="wmh-area-mark-preview" d=""></path></svg><button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token data-x="5" data-y="'+(interior?8:17)+'" style="--token-x:5;--token-y:'+(interior?8:17)+'" aria-label="Player character"><i></i></button>'+npcTokens+'</div></div></div>';
 }
 function isometricMapBaseFor(regionId: RegionId, selectedBuilding: string, interior: boolean): string {
   if (interior) return "";
@@ -591,6 +627,17 @@ function drawIsometricForeground(board:HTMLElement,data=readIsoMapData(board)):v
   const image=board.querySelector<HTMLImageElement>("[data-wmh-map-art]");
   if(!canvas||!image||!image.complete||!image.naturalWidth||!image.naturalHeight)return;
   const dataGrid=data.grid;
+  const sourceUrl=image.currentSrc||image.src;
+  if(sourceUrl){
+    const escaped=sourceUrl.replace(/"/g,"%22");
+    board.style.backgroundImage='url("'+escaped+'")';
+    board.style.backgroundSize=image.naturalWidth+"px "+image.naturalHeight+"px";
+    board.style.backgroundPosition="left top";
+    board.style.backgroundRepeat="no-repeat";
+    image.style.width=image.naturalWidth+"px";
+    image.style.height=image.naturalHeight+"px";
+    image.style.opacity="0";
+  }
   const projectedWidth=(dataGrid.cols+dataGrid.rows-2)*dataGrid.tileW/2+dataGrid.tileW;
   const projectedHeight=(dataGrid.cols+dataGrid.rows-2)*dataGrid.tileH/2+dataGrid.tileH+7;
   const boardWidth=Math.max(projectedWidth,image.naturalWidth);
@@ -1084,7 +1131,7 @@ function bindIsometricCamera(dialog:HTMLElement):void {
   if(!viewport||!camera||!board||viewport.dataset.cameraBound==="true")return;
   viewport.dataset.cameraBound="true";
   syncIsoDepthAndOcclusion(board);
-  let zoom=.85,baseW=0,baseH=0;
+  let zoom=1,baseW=0,baseH=0,initialFitApplied=false;
   const padX=()=>Math.max(1,viewport.clientWidth)*4;
   const padY=()=>Math.max(1,viewport.clientHeight)*4;
   const measure=()=>{
@@ -1096,6 +1143,10 @@ function bindIsometricCamera(dialog:HTMLElement):void {
     const tileH=Number.parseFloat(style.getPropertyValue("--tile-h"))||32;
     baseW=board.offsetWidth||Number.parseFloat(style.width)||(cols+rows-2)*tileW/2+tileW;
     baseH=board.offsetHeight||Number.parseFloat(style.height)||(cols+rows-2)*tileH/2+tileH+7;
+    if(!initialFitApplied){
+      zoom=Math.max(.08,Math.min(1,(viewport.clientWidth-24)/Math.max(1,baseW),(viewport.clientHeight-190)/Math.max(1,baseH)));
+      initialFitApplied=true;
+    }
     const px=padX(),py=padY();
     camera.style.position="relative";camera.style.display="block";
     camera.style.width=(baseW*zoom+px*2)+"px";
@@ -1111,7 +1162,7 @@ function bindIsometricCamera(dialog:HTMLElement):void {
   };
   const apply=(next:number,focusX?:number,focusY?:number)=>{
     if(!baseW||!baseH)measure();
-    const old=zoom;zoom=Math.max(.65,Math.min(2.4,next));
+    const old=zoom;zoom=Math.max(.08,Math.min(2.4,next));
     const rect=viewport.getBoundingClientRect(),px=padX(),py=padY();
     const fx=focusX==null?viewport.clientWidth/2:focusX-rect.left;
     const fy=focusY==null?viewport.clientHeight/2:focusY-rect.top;
@@ -1226,7 +1277,19 @@ const npcData: Record<string,{name:string;gender:string;greeting:string;choices:
   "student-wei":{name:"Shen Wei",gender:"male",greeting:"I was told to practice footwork, but the groundskeeper keeps sending me to carry things. Hah.",choices:["Ask about training","Offer to help","End conversation"],replies:["The sparring court is beyond the southern gate. Keep your stance low.","Really? Thanks. Those planters are heavier than they look.","See you around."]},
   "teacher-mei":{name:"Instructor Mei",gender:"female",greeting:"A student should learn to observe before acting. Even a quiet garden has much to teach.",choices:["Ask about today's lessons","Ask for advice","Take your leave"],replies:["Foundational theory is being taught in the eastern classroom today.","Watch the flow of Spirit Qi, but do not force it. Patience is part of discipline.","Return when you have a question worth asking."]},
   "groundskeeper":{name:"Uncle Qiao",gender:"male",greeting:"Mind the wet stones around the pond, young one. The moss makes them slippery after watering.",choices:["Ask about the garden","Ask about the pond","Thank him"],replies:["The flowering shrubs were planted by the first academy groundskeeper.","The pond is shallow near the bridge, but deep beside the willow.","Take care where you step."]},
-  "teacher":{name:"Instructor",gender:"male",greeting:"Settle down. The lesson will begin shortly.",choices:["Ask about the lesson","Ask for guidance"],replies:["Today we review the foundations.","Observe carefully and ask when you are ready."]}
+  "teacher":{name:"Instructor",gender:"male",greeting:"Settle down. The lesson will begin shortly.",choices:["Ask about the lesson","Ask for guidance"],replies:["Today we review the foundations.","Observe carefully and ask when you are ready."]},
+  "arena-referee":{name:"Referee Gao",gender:"male",greeting:"The public arena is open for supervised bouts. No lethal techniques, no attacks after a match is called, and no exceptions.",choices:["Ask about arena rules","Ask about registration","Thank him"],replies:["A bout ends when one side yields, leaves the ring, or the referee intervenes. Keep the crowd outside the boundary.","Register at the bronze desk. Bring your name and current Spirit Realm record; unverified challenges are not accepted.","Clear rules keep a public arena safe."]},
+  "arena-fighter":{name:"Meng Rui",gender:"female",greeting:"I am waiting for the next sparring call. My last opponent relied on speed, so today I am practicing how to read a feint.",choices:["Ask about training","Ask about the arena","Wish her luck"],replies:["Short steps, steady breathing, and no wasted motion. It is less impressive than a flashy technique, but it works.","The public arena hosts open practice as well as formal bouts. The western stands are usually quieter.","Watch the footwork if you stay for the match."]},
+  "arena-spectator":{name:"Fan Bo",gender:"male",greeting:"I came early to get a seat near the rail. You can learn a surprising amount by watching how experienced fighters control distance.",choices:["Ask who is fighting","Ask about the rules","Enjoy the match"],replies:["The next pairing has not been posted yet. The stewards are still checking registrations.","The outer ring is for spectators. Cross the marked line only when the referee invites you.","Watch carefully and enjoy the bout."]},
+  "gde-warden":{name:"Captain Lu Jian",gender:"male",greeting:"Keep to the marked avenue. The imperial district is busy, but visitors are welcome when they respect the posted rules.",choices:["Ask about the district","Ask about the gate","Thank him"],replies:["The main avenue leads toward the administrative quarter and public grounds.","The eastern gate is open to registered travellers. Keep your papers somewhere dry.","Travel safely."]},
+  "gde-herbalist":{name:"Madam Su",gender:"female",greeting:"Looking for a remedy or simply browsing? Ordinary herbs are on the front shelf; rarer ingredients stay under lock.",choices:["Ask about herbs","Ask about Spirit Beasts","Browse quietly"],replies:["The pale-leaf variety is useful for simple salves. Anything stronger needs proper identification first.","Never harvest from a Spirit Beast habitat without knowing the local restrictions.","Take your time. Good ingredients deserve a careful look."]},
+  "gde-courier":{name:"Zhou An",gender:"male",greeting:"I have three parcels left before the afternoon bell. The city lanes are easy to lose track of when the market gets crowded.",choices:["Ask for directions","Ask about deliveries","Wish him luck"],replies:["Follow the stone lanterns toward the public pavilion, then take the north path.","Most academy parcels are sealed with a blue cord. I never open one; I only check the destination mark.","Thank you. I should get moving."]},
+  "ty-clerk":{name:"Yun Suyi",gender:"female",greeting:"Welcome to the skyport. Boarding notices change with the island's route, so check the brass display before approaching a vessel.",choices:["Ask about routes","Ask about safety","Thank her"],replies:["The western platform serves local districts. Long-distance vessels use the upper berths.","Keep behind the gold floor marks while an airship is docking. Its stabilizers can create strong pressure gusts.","Safe travels across Yunzhou."]},
+  "ty-sailor":{name:"Chen Luo",gender:"male",greeting:"The clouds look calm from here, but the updrafts around the island edge can change without warning.",choices:["Ask about sailing","Ask about the harbor","Ask about the weather"],replies:["A steady hand matters more than speed. We wait for a clear wind window before leaving the platform.","Cargo is checked at the lower quay. Passenger vessels use the suspended pier above it.","The cloud cover is thinning, but I would still wait for the signal lantern."]},
+  "ty-arcanist":{name:"Shu Meilin",gender:"female",greeting:"I maintain the small guide-lamps along this walk. They are simple artificial artifacts, but a loose seal can make them flicker.",choices:["Ask about the guide-lamps","Ask about Arcanistry","Offer to help"],replies:["Each lamp stores a measured portion of energy liquid. It is safer to replace a cartridge than force a damaged core.","Arcanistry begins with careful measurement. A complicated engraving is useless if the base alignment is wrong.","Please keep clear of the marked workbench while the casing is open."]},
+  "bg-guide":{name:"Mo Ren",gender:"male",greeting:"The northern path is clear for now. Stay near the stone markers; snowfall can hide the old trail in less than an hour.",choices:["Ask about the pass","Ask about Spirit Beasts","Thank him"],replies:["The mountain pass bends east after the second marker. Do not take the narrow ravine in poor visibility.","Tracks near the frozen basin are fresh. Observe from a distance before deciding whether to approach.","Keep your hands warm and your route familiar."]},
+  "bg-trainee":{name:"Beiming Xue",gender:"female",greeting:"I am repeating the opening stance until it becomes natural. The cold makes careless movement even more obvious.",choices:["Ask about practice","Ask about the dojo","Wish her well"],replies:["Start slowly, then increase the pace only when your balance stays steady.","The dojo network shares instructors, but each hall keeps its own training schedule.","May your own practice go smoothly."]},
+  "bg-attendant":{name:"Han Yu",gender:"male",greeting:"The grand hall is quiet between audiences. If you need directions, I can point you toward the public records desk.",choices:["Ask about the records","Ask about the hall","Thank him"],replies:["The public records desk keeps route notices and local announcements. Restricted records require an authorized request.","The northern wing is used for formal meetings. Please leave the central passage clear.","The marked corridor is the easiest way back."]}
 };
 function syncIsoDepthAndOcclusion(board:HTMLElement):void {
   const data=readIsoMapData(board);
