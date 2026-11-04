@@ -873,7 +873,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       toggle.style.top=Math.max(0,Math.min(maxY,startTop+dy))+"px";
       toggle.style.right="auto";toggle.style.bottom="auto";
     };
-    const end=(next:PointerEvent)=>{
+    const end=(_next:PointerEvent)=>{
       window.removeEventListener("pointermove",move);window.removeEventListener("pointerup",end);window.removeEventListener("pointercancel",end);
       if(moved){suppressToggleClick=true;saveEditorUi();}
     };
