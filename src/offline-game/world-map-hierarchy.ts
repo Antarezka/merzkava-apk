@@ -658,8 +658,10 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     board.style.setProperty("--iso-center-x",(grid.rows*grid.tileW/2+grid.offsetX)+"px");board.style.setProperty("--iso-offset-y",grid.offsetY+"px");
     board.style.setProperty("--player-scale",String(grid.playerScale));board.style.setProperty("--npc-scale",String(grid.npcScale));
     const image=board.querySelector<HTMLImageElement>("[data-wmh-map-art]");
-    const width=Math.max((grid.cols+grid.rows-2)*grid.tileW/2+grid.tileW,image?.naturalWidth||0,board.classList.contains("is-exterior")?1408:0);
-    const height=Math.max((grid.cols+grid.rows-2)*grid.tileH/2+grid.tileH+7,image?.naturalHeight||0,board.classList.contains("is-exterior")?768:0);
+    const projectedWidth=(grid.cols+grid.rows-2)*grid.tileW/2+grid.tileW;
+    const projectedHeight=(grid.cols+grid.rows-2)*grid.tileH/2+grid.tileH+7;
+    const width=Math.max(projectedWidth,image?.naturalWidth||0);
+    const height=Math.max(projectedHeight,image?.naturalHeight||0);
     board.style.setProperty("--iso-board-width",width+"px");board.style.setProperty("--iso-board-height",height+"px");
     board.style.width=width+"px";board.style.height=height+"px";svg.setAttribute("viewBox","0 0 "+width+" "+height);
     panel.querySelectorAll<HTMLInputElement>("[data-wmh-grid-control]").forEach(input=>{
@@ -769,10 +771,13 @@ function bindIsometricCamera(dialog:HTMLElement):void {
   const padY=()=>Math.max(1,viewport.clientHeight)*4;
   const measure=()=>{
     const style=getComputedStyle(board);
-    // The level may be bound while its parent is hidden; use the declared
-    // Academy dimensions until the browser can report its real layout size.
-    baseW=board.offsetWidth||Number.parseFloat(style.width)||(board.classList.contains("is-exterior")?1408:(Number(board.dataset.cols)||12)*64);
-    baseH=board.offsetHeight||Number.parseFloat(style.height)||(board.classList.contains("is-exterior")?768:(Number(board.dataset.rows)||10)*32);
+    // The level may be bound while its parent is hidden; fall back to this
+    // map's own calibrated grid instead of assuming Academy dimensions.
+    const cols=Number(board.dataset.cols)||12,rows=Number(board.dataset.rows)||10;
+    const tileW=Number.parseFloat(style.getPropertyValue("--tile-w"))||64;
+    const tileH=Number.parseFloat(style.getPropertyValue("--tile-h"))||32;
+    baseW=board.offsetWidth||Number.parseFloat(style.width)||(cols+rows-2)*tileW/2+tileW;
+    baseH=board.offsetHeight||Number.parseFloat(style.height)||(cols+rows-2)*tileH/2+tileH+7;
     const px=padX(),py=padY();
     camera.style.position="relative";camera.style.display="block";
     camera.style.width=(baseW*zoom+px*2)+"px";
