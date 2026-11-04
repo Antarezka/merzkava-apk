@@ -1557,14 +1557,14 @@
 
 
 
-/* Fresh Tianhai Academy shell: deliberately blank until its new layout is designed. */
+/* Tianhai Academy: restore the user's original base artwork only; keep the area otherwise empty. */
 .wmh-academy-empty-screen{
   background:#101512!important;
 }
 .wmh-academy-empty-surface{
   position:absolute!important;
   inset:0!important;
-  background:#101512!important;
+  background:#101512 url("https://raw.githubusercontent.com/Antarezka/merzkava-apk/df799046bd2a4d6c7893973afe0e4bd6ed597307/public/maps/academy/full-map/1_academy.jpg") center center / contain no-repeat!important;
 }
 .wmh-academy-empty-screen>.wmh-map-back{
   z-index:540!important;
