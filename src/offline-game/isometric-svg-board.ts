@@ -121,7 +121,7 @@ function cellMarkup(
     '" data-y="' + y + '" data-z="0" data-tile-id="' + escapeXml("map-" + x + "-" + y) +
     '" data-surface="' + surfaceFor(feature, theme) + '" points="' + points + '" fill="' + fill +
     '" fill-opacity="' + fillOpacity + '" stroke="' + stroke + '" stroke-opacity="' + strokeOpacity +
-    '" stroke-width="1.35" aria-label="Tile ' + x + ', ' + y + ' · ' + feature + '"><title>' +
+    '" stroke-width="' + (baseImage ? "0.85" : "1.35") + '" aria-label="Tile ' + x + ', ' + y + ' · ' + feature + '"><title>' +
     x + ", " + y + " · " + feature + "</title></polygon>";
 }
 
