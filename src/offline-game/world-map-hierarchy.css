@@ -559,7 +559,7 @@
 /* Academy composition: the isometric base remains underneath the full map art.
    The transparent editor grid is the topmost layer, never a colored tile fill. */
 .wmh-isometric-board.is-exterior{position:relative;isolation:isolate;background:#172019}
-.wmh-academy-map-art{position:absolute;z-index:50;inset:0;width:100%;height:100%;object-fit:fill;pointer-events:none;user-select:none}
+.wmh-academy-map-art{position:absolute;z-index:50;left:0;top:0;right:auto;bottom:auto;width:1408px;height:768px;max-width:none;max-height:none;object-fit:contain;pointer-events:none;user-select:none}
 .wmh-area-overlay-svg{z-index:300!important}
 .wmh-isometric-board.wmh-overlay-editing .wmh-tile{
   z-index:70!important;
