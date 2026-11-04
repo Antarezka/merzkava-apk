@@ -557,7 +557,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
  const val=(q:string)=>panel.querySelector<HTMLSelectElement>(q)?.value||"";
  const mode=()=>val("[data-wmh-overlay-mode]")||"area";
  const modeSelect=panel.querySelector<HTMLSelectElement>("[data-wmh-overlay-mode]");
- modeSelect?.addEventListener("change",()=>{const a=panel.querySelector<HTMLElement>("[data-wmh-area-tools]"),m=panel.querySelector<HTMLElement>("[data-wmh-manual-tools]");if(a)a.hidden=mode()==="manual";if(m)m.hidden=mode()!=="manual";});
+ modeSelect?.addEventListener("change",()=>{const a=panel.querySelector<HTMLElement>("[data-wmh-area-tools]"),m=panel.querySelector<HTMLElement>("[data-wmh-manual-tools]"),t=panel.querySelector<HTMLElement>("[data-wmh-transition-tools]");if(a)a.hidden=mode()!=="area";if(m)m.hidden=mode()!=="manual";if(t)t.hidden=mode()!=="transition";});
  const setActive=(v:boolean)=>{active=v;board.classList.toggle("wmh-overlay-editing",v);panel.hidden=!v;toggle.setAttribute("aria-pressed",String(v));if(!v){drawing=false;points=[];preview?.setAttribute("d","");}};
  toggle.addEventListener("click",()=>setActive(!active));
  dialog.querySelector<HTMLElement>("[data-wmh-overlay-close]")?.addEventListener("click",()=>setActive(false));
