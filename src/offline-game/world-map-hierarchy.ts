@@ -1,4 +1,5 @@
 import "./world-map-hierarchy.css";
+import { playFootstep } from "../audio/sound-effects";
 
 type Level = "world" | "regional" | "local" | "interior" | "home" | "map-editor";
 type RegionId = "golden-dragon-empire" | "tianhai-yunzhou" | "beiming-gu";
@@ -84,7 +85,7 @@ function readWorldMarkers(): WorldMarker[] {
     if (Array.isArray(saved)) {
       return defaultWorldMarkers.map(item => {
         const entry = saved.find((value: any) => value?.id === item.id);
-        return entry && Number.isFinite(Number(entry.x)) && Number.isFinite(Number(entry.y))
+        return ["mega-colossal-labyrinth-exit","lantern-passage","changqion-harbour","three-lantern-passage","southwake-port","bitterglass-isle","dicewake-isle","dongxing-port","mingzhu-port","lanfan-port","chaoguan-port","yuhai-port","yuandeng-port","longchao-port"].includes(item.id) ? { ...item } : entry && Number.isFinite(Number(entry.x)) && Number.isFinite(Number(entry.y))
           ? { ...item, x: Math.max(0, Math.min(100, Number(entry.x))), y: Math.max(0, Math.min(100, Number(entry.y))), placementStatus: entry.placementStatus === "owner-set" ? "owner-set" : item.placementStatus }
           : { ...item };
       });
@@ -406,12 +407,13 @@ function tileMapMarkup(interior = false): string {
   const cols = 12, rows = 10;
   const features: Record<string,string> = interior
     ? {"2-1":"blackboard","5-1":"teacher-desk","3-3":"desk","5-3":"desk","7-3":"desk","3-5":"desk","5-5":"desk","7-5":"desk","10-8":"door"}
-    : {"5-1":"pond","6-1":"pond","7-1":"pond","8-1":"pond","1-2":"tree","2-2":"tree","10-2":"tree","1-3":"flower","3-3":"flower","9-3":"flower","11-3":"tree","2-5":"garden","3-5":"garden","8-5":"garden","9-5":"garden","4-7":"gate","5-7":"gate","6-7":"gate","7-7":"gate","2-8":"bench","9-8":"bench"};
+    : {"5-1":"pond","6-1":"pond","7-1":"pond","8-1":"pond","1-2":"tree","2-2":"tree","10-2":"tree","1-3":"flower","3-3":"flower","9-3":"flower","11-3":"tree","2-5":"garden","3-5":"garden","8-5":"garden","9-5":"garden","4-7":"gate","5-7":"gate","6-7":"gate","7-7":"gate","2-8":"bench","9-8":"bench","3-2":"study-hall","9-4":"teachers-house","5-6":"learning-building"};
   const tiles = Array.from({length: rows}, (_,y) => Array.from({length:cols},(_,x) => {
     const key=x+"-"+y, feature=features[key] || "";
     const surface = interior ? (y<2?"wood":"tile") : (feature==="pond"?"wet":feature==="gate"?"stone":feature==="tree"||feature==="flower"||feature==="garden"?"earth":y>7?"stone":"earth");
-    const label = feature==="pond"?"POND":feature==="tree"?"TREE":feature==="flower"?"FLOWER":feature==="garden"?"GARDEN":feature==="gate"?"ACADEMY GATE":feature==="bench"?"BENCH":feature==="blackboard"?"BOARD":feature==="teacher-desk"?"TEACHER":feature==="desk"?"DESK":feature==="door"?"DOOR":"";
-    return '<button type="button" class="wmh-tile wmh-tile-'+surface+' '+(feature?'has-feature feature-'+feature:'')+'" data-wmh-tile data-x="'+x+'" data-y="'+y+'" data-surface="'+surface+'" aria-label="'+(label||surface)+'">'+(label?'<span>'+label+'</span>':'')+'</button>';
+    const label = feature==="pond"?"POND":feature==="tree"?"TREE":feature==="flower"?"FLOWER":feature==="garden"?"GARDEN":feature==="gate"?"ACADEMY GATE":feature==="bench"?"BENCH":feature==="blackboard"?"BOARD":feature==="teacher-desk"?"TEACHER":feature==="desk"?"DESK":feature==="door"?"DOOR":feature==="study-hall"?"STUDY HALL":feature==="teachers-house"?"TEACHERS’ HALL":feature==="learning-building"?"LEARNING HALL":"";
+    const building=feature==="study-hall"?"Study Hall":feature==="teachers-house"?"Teachers’ Hall":feature==="learning-building"?"Learning Hall":"";
+    return '<button type="button" class="wmh-tile wmh-tile-'+surface+' '+(feature?'has-feature feature-'+feature:'')+'" data-wmh-tile data-x="'+x+'" data-y="'+y+'" data-surface="'+surface+'" '+(building?'data-wmh-building="'+building+'"':'')+' aria-label="'+(label||surface)+'">'+(label?'<span>'+label+'</span>':'')+'</button>';
   }).join("")).join("");
   return '<div class="wmh-isometric-wrap"><div class="wmh-isometric-board '+(interior?'is-interior':'is-exterior')+'" data-wmh-board style="--tile-cols:'+cols+';--tile-rows:'+rows+'">'+tiles+
     '<button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token style="grid-column:6;grid-row:9" aria-label="Player character"><i></i></button>'+
@@ -457,6 +459,32 @@ const npcData: Record<string,{name:string;gender:string;greeting:string;choices:
   "groundskeeper":{name:"Uncle Qiao",gender:"male",greeting:"Mind the wet stones around the pond, young one. The moss makes them slippery after watering.",choices:["Ask about the garden","Ask about the pond","Thank him"],replies:["The flowering shrubs were planted by the first academy groundskeeper.","The pond is shallow near the bridge, but deep beside the willow.","Take care where you step."]},
   "teacher":{name:"Instructor",gender:"male",greeting:"Settle down. The lesson will begin shortly.",choices:["Ask about the lesson","Ask for guidance"],replies:["Today we review the foundations.","Observe carefully and ask when you are ready."]}
 };
+function stopNpcWander(dialog:HTMLElement):void {
+  const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
+  const timer=Number(board?.dataset.npcTimer||0);
+  if(timer)window.clearInterval(timer);
+}
+function startNpcWander(dialog:HTMLElement):void {
+  const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
+  if(!board)return;
+  stopNpcWander(dialog);
+  const timer=window.setInterval(()=>{
+    const player=board.querySelector<HTMLElement>("[data-wmh-player-token]");
+    board.querySelectorAll<HTMLElement>("[data-wmh-npc]").forEach(npc=>{
+      if(Math.random()>.48)return;
+      const x=Number(npc.dataset.x||0),y=Number(npc.dataset.y||0);
+      const options=[[x+1,y],[x-1,y],[x,y+1],[x,y-1]].filter(([nx,ny])=>
+        nx>=0&&nx<12&&ny>=0&&ny<10&&
+        !(Number(player?.dataset.x||5)===nx&&Number(player?.dataset.y||8)===ny)
+      );
+      if(!options.length)return;
+      const [nx,ny]=options[Math.floor(Math.random()*options.length)];
+      npc.dataset.x=String(nx);npc.dataset.y=String(ny);
+      npc.style.gridColumn=String(nx+1);npc.style.gridRow=String(ny+1);
+    });
+  },2400);
+  board.dataset.npcTimer=String(timer);
+}
 function renderChat(dialog:HTMLElement,npcId:string):void {
   const npc=npcData[npcId]; if(!npc)return;
   const chat=dialog.querySelector<HTMLElement>("[data-wmh-chat]");
@@ -479,7 +507,7 @@ function walkToTile(dialog:HTMLElement,targetX:number,targetY:number,surface:str
     player.dataset.x=String(x);player.dataset.y=String(y);
     const tile=board.querySelector<HTMLElement>('[data-wmh-tile][data-x="'+x+'"][data-y="'+y+'"]');
     const material=tile?.dataset.surface||surface;
-    window.dispatchEvent(new CustomEvent("merzkava:footstep",{detail:{surface:material}}));
+    playFootstep(material as "earth"|"wet"|"stone"|"wood"|"tile");
     if(x!==targetX||y!==targetY)window.setTimeout(move,135);
   };
   move();
@@ -500,7 +528,7 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
   if(action.dataset.wmhAction==="close"){overlay.hidden=true;return true;}
   if(action.dataset.wmhAction==="back"){
     const next:Level=current==="interior"?"local":current==="local"?"regional":"world";
-    overlay.dataset.level=next;dialog.innerHTML=panelMarkup(next,regionId,building);if(next==="world")bindWorldMapZoom(dialog);return true;
+    stopNpcWander(dialog);overlay.dataset.level=next;dialog.innerHTML=panelMarkup(next,regionId,building);if(next==="world")bindWorldMapZoom(dialog);if(next==="local")startNpcWander(dialog);return true;
   }
   if(action.dataset.wmhInfo){
     const id=action.dataset.wmhInfo as WorldMarkerId;
@@ -515,9 +543,14 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
   if(action.dataset.wmhAction==="dismiss-marker-info"){dialog.querySelector(".wmh-marker-info")?.remove();return true;}
   if(action.dataset.wmhSite){
     overlay.dataset.level="local";overlay.dataset.building=action.dataset.wmhSite;
-    dialog.innerHTML=panelMarkup("local",regionId,action.dataset.wmhSite);return true;
+    dialog.innerHTML=panelMarkup("local",regionId,action.dataset.wmhSite);startNpcWander(dialog);return true;
   }
   if(action.dataset.wmhBuilding){
+    overlay.dataset.level="interior";overlay.dataset.building=action.dataset.wmhBuilding;
+    dialog.innerHTML=panelMarkup("interior",regionId,action.dataset.wmhBuilding);return true;
+  }
+  if(action.dataset.wmhBuilding && current==="local"){
+    stopNpcWander(dialog);
     overlay.dataset.level="interior";overlay.dataset.building=action.dataset.wmhBuilding;
     dialog.innerHTML=panelMarkup("interior",regionId,action.dataset.wmhBuilding);return true;
   }
