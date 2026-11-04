@@ -433,16 +433,16 @@ function tileMapMarkup(interior = false): string {
     const surface = interior ? (y<2?"wood":"tile") : (feature==="pond"?"wet":feature==="gate"?"stone":feature==="tree"||feature==="flower"||feature==="garden"?"earth":y>7?"stone":"earth");
     const label = feature==="pond"?"POND":feature==="tree"?"TREE":feature==="flower"?"FLOWER":feature==="garden"?"GARDEN":feature==="gate"?"ACADEMY GATE":feature==="bench"?"BENCH":feature==="blackboard"?"BOARD":feature==="teacher-desk"?"TEACHER":feature==="desk"?"DESK":feature==="door"?"DOOR":feature==="study-hall"?"STUDY HALL":feature==="teachers-house"?"TEACHERS’ HALL":feature==="learning-building"?"LEARNING HALL":"";
     const building=feature==="study-hall"?"Study Hall":feature==="teachers-house"?"Teachers’ Hall":feature==="learning-building"?"Learning Hall":"";
-    return '<button type="button" class="wmh-tile wmh-tile-'+surface+' '+(feature?'has-feature feature-'+feature:'')+'" data-wmh-tile data-x="'+x+'" data-y="'+y+'" data-surface="'+surface+'" '+(building?'data-wmh-building="'+building+'"':'')+' aria-label="'+(label||surface)+'">'+(label?'<span>'+label+'</span>':'')+'</button>';
+    return '<button type="button" class="wmh-tile wmh-tile-'+surface+' '+(feature?'has-feature feature-'+feature:'')+'" data-wmh-tile data-x="'+x+'" data-y="'+y+'" data-z="0" data-tile-id="tile-'+x+'-'+y+'" data-surface="'+surface+'" style="--tile-x:'+x+';--tile-y:'+y+'" '+(building?'data-wmh-building="'+building+'"':'')+' aria-label="Tile X '+x+', Y '+y+', Z 0 · '+(label||surface)+'"><span class="wmh-tile-coord">('+x+','+y+',0)</span>'+(label?'<b>'+label+'</b>':'')+'</button>';
   }).join("")).join("");
-  return '<div class="wmh-isometric-wrap"><div class="wmh-isometric-board '+(interior?'is-interior':'is-exterior')+'" data-wmh-board style="--tile-cols:'+cols+';--tile-rows:'+rows+'">'+tiles+
-    '<button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token data-x="5" data-y="8" style="grid-column:6;grid-row:9" aria-label="Player character"><i></i></button>'+
-    (interior ? '<button type="button" class="wmh-character-token wmh-npc-token is-male" data-wmh-npc="teacher" data-x="6" data-y="2" style="grid-column:7;grid-row:3" aria-label="Teacher"><i></i></button><button type="button" class="wmh-character-token wmh-npc-token is-female" data-wmh-npc="student-lin" data-x="3" data-y="4" style="grid-column:4;grid-row:5" aria-label="Student Lin"><i></i></button>' :
-      '<button type="button" class="wmh-character-token wmh-npc-token is-female" data-wmh-npc="student-lin" data-x="5" data-y="3" style="grid-column:6;grid-row:4" aria-label="Student Lin"><i></i></button>'+
-      '<button type="button" class="wmh-character-token wmh-npc-token is-male" data-wmh-npc="student-wei" data-x="9" data-y="5" style="grid-column:10;grid-row:6" aria-label="Student Wei"><i></i></button>'+
-      '<button type="button" class="wmh-character-token wmh-npc-token is-female" data-wmh-npc="teacher-mei" data-x="2" data-y="6" style="grid-column:3;grid-row:7" aria-label="Instructor Mei"><i></i></button>'+
-      '<button type="button" class="wmh-character-token wmh-npc-token is-male" data-wmh-npc="groundskeeper" data-x="10" data-y="2" style="grid-column:11;grid-row:3" aria-label="Groundskeeper"><i></i></button>')+
-    '</div></div>';
+  return '<div class="wmh-isometric-wrap" data-wmh-iso-viewport><div class="wmh-isometric-camera" data-wmh-iso-camera><div class="wmh-isometric-board '+(interior?'is-interior':'is-exterior')+'" data-wmh-board style="--tile-cols:'+cols+';--tile-rows:'+rows+';--tile-w:64px;--tile-h:32px;--slab-depth:7px">'+tiles+
+    '<button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token data-x="5" data-y="8" style="--token-x:5;--token-y:8" aria-label="Player character"><i></i></button>'+
+    (interior ? '<button type="button" class="wmh-character-token wmh-npc-token is-male" data-wmh-npc="teacher" data-x="6" data-y="2" style="--token-x:6;--token-y:2" aria-label="Teacher"><i></i></button><button type="button" class="wmh-character-token wmh-npc-token is-female" data-wmh-npc="student-lin" data-x="3" data-y="4" style="--token-x:3;--token-y:4" aria-label="Student Lin"><i></i></button>' :
+      '<button type="button" class="wmh-character-token wmh-npc-token is-female" data-wmh-npc="student-lin" data-x="5" data-y="3" style="--token-x:5;--token-y:3" aria-label="Student Lin"><i></i></button>'+
+      '<button type="button" class="wmh-character-token wmh-npc-token is-male" data-wmh-npc="student-wei" data-x="9" data-y="5" style="--token-x:9;--token-y:5" aria-label="Student Wei"><i></i></button>'+
+      '<button type="button" class="wmh-character-token wmh-npc-token is-female" data-wmh-npc="teacher-mei" data-x="2" data-y="6" style="--token-x:2;--token-y:6" aria-label="Instructor Mei"><i></i></button>'+
+      '<button type="button" class="wmh-character-token wmh-npc-token is-male" data-wmh-npc="groundskeeper" data-x="10" data-y="2" style="--token-x:10;--token-y:2" aria-label="Groundskeeper"><i></i></button>')+
+    '</div></div></div>';
 }
 function panelMarkup(level: Level, regionId: RegionId = "golden-dragon-empire", selectedBuilding = "Tianhai Academy", selectedArea?: WorldMarker): string {
   const region = regionData[regionId];
@@ -514,7 +514,7 @@ function startNpcWander(dialog:HTMLElement):void {
       if(!options.length)return;
       const [nx,ny]=options[Math.floor(Math.random()*options.length)];
       npc.dataset.x=String(nx);npc.dataset.y=String(ny);
-      animateGridMove(npc,()=>{npc.style.gridColumn=String(nx+1);npc.style.gridRow=String(ny+1);});
+      animateGridMove(npc,()=>{npc.style.setProperty("--token-x",String(nx));npc.style.setProperty("--token-y",String(ny));});
     });
   },2400);
   board.dataset.npcTimer=String(timer);
@@ -569,8 +569,8 @@ function walkToTile(dialog:HTMLElement,targetX:number,targetY:number,surface:str
     const [x,y]=path[step++];
     const tile=board.querySelector<HTMLElement>('[data-wmh-tile][data-x="'+x+'"][data-y="'+y+'"]');
     animateGridMove(player,()=>{
-      player.style.gridColumn=String(x+1);
-      player.style.gridRow=String(y+1);
+      player.style.setProperty("--token-x",String(x));
+      player.style.setProperty("--token-y",String(y));
     });
     player.dataset.x=String(x);player.dataset.y=String(y);
     const material=tile?.dataset.surface||surface;
