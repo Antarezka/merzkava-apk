@@ -1,5 +1,6 @@
 import "./world-map-hierarchy.css";
 import { playFootstep } from "../audio/sound-effects";
+import { animateExpeditionPanel } from "./expedition-animations";
 
 type Level = "world" | "regional" | "local" | "interior" | "home" | "map-editor";
 type RegionId = "golden-dragon-empire" | "tianhai-yunzhou" | "beiming-gu";
@@ -103,6 +104,19 @@ function worldMapMarkerMarkup(marker: WorldMarker, editor = false): string {
     '" style="left:' + marker.x + '%;top:' + marker.y + '%" ' +
     (editor ? 'type="button" data-wmh-drag-marker="' + marker.id + '" aria-label="Drag ' + marker.name + '"' : 'data-wmh-info="' + marker.id + '"') +
     provisional + '><b>' + number + '</b><span>' + marker.name + '</span></button>';
+}
+function selectionImage(info: WorldMarker): string {
+  const power=regionData[info.id as RegionId];
+  if(power)return power.image;
+  if(info.id==="lawless-territories"||info.id==="ashen-borderlands"||info.id==="black-tide-expanse")return "/game/scenery/lawless-territories/lt-01-lawless-territory-wilderness.png";
+  if(info.id==="silverpine-wilds"||info.id==="nine-frost-wastes"||info.id==="high-cloud-sea-mountains")return "/game/scenery/beiming-gu/bg-05-northern-mountain-pass.png";
+  if(info.id==="azerion-forest"||info.id==="inner-azerion"||info.id==="dead-zone")return "/game/scenery/special-locations/az-01-azerion-illusion-fog-boundary.png";
+  return "";
+}
+function selectionMarkup(info: WorldMarker): string {
+  const image=selectionImage(info);
+  return '<div class="wmh-selection-backdrop" data-wmh-dismiss-layer><section class="wmh-selection-card" data-wmh-selection-card role="dialog" aria-modal="true" aria-label="'+info.name+'"><div class="wmh-selection-glass"><div class="wmh-selection-art">'+(image?'<img class="wmh-selection-scene-image" src="'+image+'" alt="'+info.name+'"/>':'<div class="wmh-selection-art-placeholder"><span>'+info.category.toUpperCase()+'</span><b>'+info.name+'</b><small>AREA ART · PLACEHOLDER</small></div>')+
+    '<div class="wmh-selection-glass-glow"></div><span class="wmh-selection-window-label">MERZKAVA · AREA WINDOW</span><div class="wmh-selection-title"><small>'+info.subtitle+'</small><h3>'+info.name+'</h3></div></div></div><div class="wmh-selection-question"><p>Would you like to access <b>'+info.name+'</b>?</p><div><button type="button" data-wmh-action="selection-yes" data-marker-id="'+info.id+'">YES · ENTER</button><button type="button" data-wmh-action="selection-no">NO · STAY HERE</button></div></div></section></div>';
 }
 function serializeWorldMapCoordinates(markers: WorldMarker[]): string {
   return JSON.stringify({
