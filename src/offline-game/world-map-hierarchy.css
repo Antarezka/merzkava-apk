@@ -1561,6 +1561,15 @@
 .wmh-academy-empty-screen{
   background:#101512!important;
 }
+/* Academy's full-size JPG is the only main-map ground layer.
+   Its isometric grid is intentionally rendered only inside the minimap. */
+.wmh-isometric-board.wmh-academy-grid-disabled>[data-wmh-scene-svg]{
+  display:none!important;
+}
+.wmh-isometric-board.wmh-academy-grid-disabled>.wmh-isometric-map-base{
+  display:block!important;visibility:visible!important;opacity:1!important;
+}
+
 .wmh-academy-map-viewport{
   position:absolute!important;inset:0!important;overflow:auto!important;display:grid!important;place-items:center!important;
   background:#101512!important;scrollbar-width:none!important;overscroll-behavior:contain!important;
