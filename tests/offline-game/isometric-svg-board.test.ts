@@ -65,6 +65,18 @@ describe("shared SVG isometric map renderer", () => {
     expect(beiming).toContain('fill="#6fabc0"');
   });
 
+
+  it("projects cell diamonds from the calibrated grid and offsets", () => {
+    const html = renderIsometricSvgSceneMarkup({
+      mapId: "offset-grid",
+      grid: { ...regionalGrid, offsetX: 8, offsetY: 12 },
+      theme: "golden-dragon-empire",
+      title: "Offset Grid",
+    });
+    expect(html).toContain('data-x="1" data-y="0" data-z="0"');
+    expect(html).toContain('points="680,28 712,44 680,60 648,44"');
+  });
+
   it("renders a separate wood-toned vector floor for interiors", () => {
     const html = renderIsometricSvgSceneMarkup({
       mapId: "golden-dragon-empire:tianhai-academy:interior",
