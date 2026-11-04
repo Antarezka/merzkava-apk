@@ -390,3 +390,12 @@
  .arcanist-machine-shell.is-printing .arcanist-ticket,.arcanist-ticket.is-returning,.arcanist-ticket.is-torn,.arcanist-travel-card.is-swallowing,.arcanist-travel-card.is-ejecting{animation:none!important}
  .arcanist-quadrant-lever.is-returning .arcanist-lever-shaft,.arcanist-quadrant-lever.is-returning .arcanist-lever-handle{transition:none!important}
 }
+
+/* Map Navigation is the single atlas page; the old illustrative regional selector is retired. */
+.idle-home-dialog>.wmh-overlay{position:relative;inset:auto;z-index:auto;display:block;place-items:stretch;min-height:0;padding:0;background:transparent}
+.idle-home-dialog>.wmh-overlay[hidden]{display:none!important}
+.idle-home-dialog>.wmh-overlay>.wmh-dialog{width:100%;height:auto;max-height:none;overflow:visible;padding:0;background:transparent;color:#f1e5ce}
+.idle-home-dialog .wmh-world-map{height:clamp(300px,52dvh,560px);min-height:300px;max-height:none;flex:none}
+.idle-home-dialog .wmh-bottom-actions{margin-bottom:8px}
+.idle-home-dialog>.idle-region-switch,.idle-home-dialog>.idle-navigation-layout{display:none!important}
+.idle-home-dialog .idle-home-header small{color:#d5bd90}
