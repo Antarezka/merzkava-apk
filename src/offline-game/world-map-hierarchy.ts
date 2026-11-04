@@ -14,7 +14,7 @@ const regionData: Record<RegionId, { name: string; subtitle: string; image: stri
   "golden-dragon-empire": {
     name: "Golden Dragon Empire", subtitle: "EASTERN POWER · IMPERIAL TERRITORIES",
     image: "/game/scenery/golden-dragon-empire/establishing-views/gde-01-imperial-city-panorama.png",
-    sites: ["Imperial Capital", "Tianhai Academy", "Imperial Market", "Eastern Port", "Public Pavilion", "Sparring Arena"]
+    sites: ["Imperial Capital", "Tianhai Academy", "Imperial Market", "Eastern Port", "Public Pavilion", "Public Arena"]
   },
   "tianhai-yunzhou": {
     name: "Tianhai Yunzhou", subtitle: "SOUTHWESTERN FLOATING POWER",
@@ -536,7 +536,11 @@ function isometricNpcTokensMarkup(mapId:string,interior:boolean):string {
     ? [{id:"teacher",x:6,y:2,gender:"male" as const},{id:"student-lin",x:3,y:4,gender:"female" as const}]
     : mapId.startsWith("golden-dragon-empire:tianhai-academy:exterior")
       ? [{id:"student-lin",x:7,y:4,gender:"female" as const},{id:"student-wei",x:10,y:9,gender:"male" as const},{id:"teacher-mei",x:6,y:15,gender:"female" as const},{id:"groundskeeper",x:22,y:5,gender:"male" as const}]
-      : [{id:"gde-warden",x:3,y:4,gender:"male" as const},{id:"gde-herbalist",x:12,y:9,gender:"female" as const}];
+      : mapId.startsWith("tianhai-yunzhou:")
+        ? [{id:"ty-clerk",x:4,y:4,gender:"female" as const},{id:"ty-sailor",x:12,y:9,gender:"male" as const},{id:"ty-arcanist",x:20,y:5,gender:"female" as const}]
+        : mapId.startsWith("beiming-gu:")
+          ? [{id:"bg-guide",x:4,y:4,gender:"male" as const},{id:"bg-trainee",x:12,y:9,gender:"female" as const},{id:"bg-attendant",x:20,y:5,gender:"male" as const}]
+          : [{id:"gde-warden",x:3,y:4,gender:"male" as const},{id:"gde-herbalist",x:12,y:9,gender:"female" as const}];
   return (maps[mapId]||fallback).map(npc =>
     '<button type="button" class="wmh-character-token wmh-npc-token '+(npc.gender==="female"?"is-female":"is-male")+'" data-wmh-npc="'+npc.id+'" data-x="'+npc.x+'" data-y="'+npc.y+'" style="--token-x:'+npc.x+';--token-y:'+npc.y+'" aria-label="Talk to '+npc.id+'"><i></i></button>'
   ).join("");
@@ -603,23 +607,20 @@ function isoOverlayKey(board: HTMLElement): string {
 }
 function readIsoMapData(board: HTMLElement): IsoMapEditorData {
   const mapId=board.dataset.mapId||"unnamed-isometric-map";
-  const fallback:IsoMapGridConfig={...DEFAULT_ISOMETRIC_GRID,cols:Number(board.dataset.cols||24),rows:Number(board.dataset.rows||20)};
-  try { const saved=JSON.parse(localStorage.getItem(isoOverlayKey(board))||"null"); if(saved)return normalizeIsoMapEditorData(saved,mapId,fallback); } catch {}
-  // Preserve old calibration and transition labels, but do not carry the obsolete
-  // quarter-based "behind" behavior into the independent cell-layer model.
+  const fallback:IsoMapGridConfig={
+    ...DEFAULT_ISOMETRIC_GRID,
+    cols:Number(board.dataset.cols||24),
+    rows:Number(board.dataset.rows||20),
+    tileW:Number(board.dataset.tileW||DEFAULT_ISOMETRIC_GRID.tileW),
+    tileH:Number(board.dataset.tileH||DEFAULT_ISOMETRIC_GRID.tileH),
+    offsetX:Number(board.dataset.offsetX||0),
+    offsetY:Number(board.dataset.offsetY||0),
+  };
   try {
-    const overlay=board.closest<HTMLElement>("[data-world-map-hierarchy]");
-    const level=overlay?.dataset.level==="interior"?"interior":"exterior";
-    const building=overlay?.dataset.building||"Tianhai Academy";
-    const legacy=JSON.parse(localStorage.getItem("merzkava.iso-area-overlays.v2:"+level+":"+building)||"null");
-    if(legacy)return normalizeIsoMapEditorData({
-      grid:legacy.grid,transitions:legacy.transitions,
-      blockedCells:Array.isArray(legacy.manual)?legacy.manual.filter((m:any)=>m?.rule==="blocked").reduce((all:string[],m:any)=>{
-        const count=legacy.manual.filter((n:any)=>n?.x===m.x&&n?.y===m.y&&n?.rule==="blocked").length;
-        if(count>=4)all.push(isoCellKey(Number(m.x),Number(m.y)));return all;
-      },[]):[],
-    },mapId,fallback);
+    const saved=JSON.parse(localStorage.getItem(isoOverlayKey(board))||"null");
+    if(saved)return normalizeIsoMapEditorData(saved,mapId,fallback);
   } catch {}
+  // Refreshed map IDs start clean; old maps are not silently imported.
   return createIsoMapEditorData(mapId,fallback);
 }
 function drawIsometricForeground(board:HTMLElement,data=readIsoMapData(board)):void {
@@ -630,6 +631,8 @@ function drawIsometricForeground(board:HTMLElement,data=readIsoMapData(board)):v
   const sourceUrl=image.currentSrc||image.src;
   if(sourceUrl){
     const escaped=sourceUrl.replace(/"/g,"%22");
+    board.style.setProperty("--iso-map-base-image",'url("'+escaped+'")');
+    board.style.setProperty("--iso-map-base-size",image.naturalWidth+"px "+image.naturalHeight+"px");
     board.style.backgroundImage='url("'+escaped+'")';
     board.style.backgroundSize=image.naturalWidth+"px "+image.naturalHeight+"px";
     board.style.backgroundPosition="left top";
@@ -1267,7 +1270,23 @@ function panelMarkup(level: Level, regionId: RegionId = "golden-dragon-empire", 
 export function renderWorldMapHierarchy(): string {
   return '<section class="wmh-overlay" data-world-map-hierarchy aria-label="Map Navigation"><div class="wmh-dialog" data-wmh-dialog>'+panelMarkup("world")+'</div></section>';
 }
+function resetLegacyIsometricMapLayouts(): void {
+  const marker="merzkava.isometric-map-refresh.v2";
+  try {
+    if(localStorage.getItem(marker)==="done")return;
+    const prefixes=["merzkava.isometric-map-editor.v1:","merzkava.iso-area-overlays.v2:","merzkava.iso-editor-ui.v1:"];
+    const remove:string[]=[];
+    for(let i=0;i<localStorage.length;i++){
+      const key=localStorage.key(i)||"";
+      if(prefixes.some(prefix=>key.startsWith(prefix)))remove.push(key);
+    }
+    remove.forEach(key=>localStorage.removeItem(key));
+    localStorage.setItem(marker,"done");
+  } catch { /* the refreshed editor remains usable without local persistence */ }
+}
+
 export function initializeWorldMapHierarchy(root: HTMLElement): void {
+  resetLegacyIsometricMapLayouts();
   const overlay=root.querySelector<HTMLElement>("[data-world-map-hierarchy]");
   const dialog=overlay?.querySelector<HTMLElement>("[data-wmh-dialog]");
   if(overlay&&dialog&&!overlay.hidden)bindWorldMapZoom(dialog);
