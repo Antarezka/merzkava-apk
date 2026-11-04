@@ -288,3 +288,50 @@ export function setSoundEnabled(enabled: boolean): void {
 export function isSoundEnabled(): boolean {
   return soundEnabled;
 }
+
+
+/** Soft, material-specific RPG footsteps for tile exploration. */
+export function playFootstep(surface: "earth" | "wet" | "stone" | "wood" | "tile"): void {
+  if (!soundEnabled) return;
+  try {
+    const context = getSharedAudioContext();
+    if (!context) return;
+    const now = context.currentTime;
+    const settings = {
+      earth: { freq: 92, noise: 420, duration: .105, volume: .055 },
+      wet: { freq: 72, noise: 680, duration: .14, volume: .06 },
+      stone: { freq: 145, noise: 1500, duration: .075, volume: .045 },
+      wood: { freq: 118, noise: 920, duration: .095, volume: .05 },
+      tile: { freq: 175, noise: 1850, duration: .065, volume: .038 }
+    }[surface];
+    const count = Math.floor(context.sampleRate * settings.duration);
+    const buffer = context.createBuffer(1, count, context.sampleRate);
+    const samples = buffer.getChannelData(0);
+    for (let i = 0; i < count; i++) {
+      const t = i / count;
+      samples[i] = (Math.random() * 2 - 1) * Math.pow(1 - t, 2) * (t < .12 ? t / .12 : 1);
+    }
+    const source = context.createBufferSource();
+    const filter = context.createBiquadFilter();
+    const gain = context.createGain();
+    source.buffer = buffer;
+    filter.type = "lowpass";
+    filter.frequency.setValueAtTime(settings.noise, now);
+    gain.gain.setValueAtTime(.0001, now);
+    gain.gain.exponentialRampToValueAtTime(settings.volume, now + .008);
+    gain.gain.exponentialRampToValueAtTime(.0001, now + settings.duration);
+    source.connect(filter); filter.connect(gain); gain.connect(context.destination); source.start(now);
+    const thud = context.createOscillator();
+    const thudGain = context.createGain();
+    thud.type = "sine";
+    thud.frequency.setValueAtTime(settings.freq, now);
+    thud.frequency.exponentialRampToValueAtTime(settings.freq * .62, now + .065);
+    thudGain.gain.setValueAtTime(.0001, now);
+    thudGain.gain.exponentialRampToValueAtTime(settings.volume * .55, now + .006);
+    thudGain.gain.exponentialRampToValueAtTime(.0001, now + .075);
+    thud.connect(thudGain); thudGain.connect(context.destination);
+    thud.start(now); thud.stop(now + .08);
+  } catch (error) {
+    console.warn("Merzkava footstep could not play:", error);
+  }
+}
