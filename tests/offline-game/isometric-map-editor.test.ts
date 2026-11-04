@@ -5,6 +5,7 @@ import {
   isoCellAtPoint,
   isoCellCenter,
   isoCellHasLayer,
+  isoMapStorageKey,
   normalizeIsoMapEditorData,
   toggleIsoCellLayer,
 } from "../../src/offline-game/isometric-map-editor";
@@ -47,6 +48,13 @@ describe("shared isometric map editor data", () => {
     expect(data.blockedCells).toEqual(["1,2"]);
     expect(data.opacityCells).toEqual(["4,5"]);
     expect(data.transitions).toEqual([{ id: "a", x: 7, y: 5, label: "North Gate" }]);
+  });
+
+  it("keeps editor settings isolated for different isometric map IDs", () => {
+    expect(isoMapStorageKey("golden-dragon-empire:academy:exterior"))
+      .not.toBe(isoMapStorageKey("golden-dragon-empire:academy:interior"));
+    expect(isoMapStorageKey("golden-dragon-empire:academy:exterior"))
+      .not.toBe(isoMapStorageKey("tianhai-yunzhou:academy:exterior"));
   });
 
   it("rejects clicks outside the isometric diamond grid", () => {
