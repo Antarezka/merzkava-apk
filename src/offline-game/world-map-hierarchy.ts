@@ -191,9 +191,15 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
     applyZoom(action === "in" ? zoom + .25 : zoom - .25);
   }));
   viewport.addEventListener("pointerdown", event => {
+    // A marker tap is a selection, never a map-pan gesture. Do not register it
+    // in the gesture tracker; otherwise a stale one-finger pan can move the map.
+    if ((event.target as Element).closest(".wmh-power")) {
+      panStart = null;
+      pinchStart = null;
+      return;
+    }
     pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
     if (pointers.size === 1) {
-      if ((event.target as Element).closest(".wmh-power")) return;
       panStart = { x: event.clientX, y: event.clientY, scrollLeft: viewport.scrollLeft, scrollTop: viewport.scrollTop };
       try { viewport.setPointerCapture(event.pointerId); } catch { /* pointer capture may be unavailable */ }
     } else if (pointers.size === 2) {
@@ -524,20 +530,54 @@ function renderChat(dialog:HTMLElement,npcId:string):void {
   replies.innerHTML=npc.choices.map((choice,i)=>'<button type="button" data-wmh-reply="'+i+'" data-npc-id="'+npcId+'">'+choice+'</button>').join("");
 }
 function walkToTile(dialog:HTMLElement,targetX:number,targetY:number,surface:string):void {
-  const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");const player=board?.querySelector<HTMLElement>("[data-wmh-player-token]");
-  if(!board||!player)return;const cols=12,rows=10;if(targetX<0||targetX>=cols||targetY<0||targetY>=rows)return;
-  const oldTimer=Number(player.dataset.moveTimer||0);if(oldTimer)window.clearTimeout(oldTimer);
+  const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
+  const player=board?.querySelector<HTMLElement>("[data-wmh-player-token]");
+  if(!board||!player)return;
+  const cols=12,rows=10;
+  if(!Number.isInteger(targetX)||!Number.isInteger(targetY)||targetX<0||targetX>=cols||targetY<0||targetY>=rows)return;
+  const destination=board.querySelector<HTMLElement>('[data-wmh-tile][data-x="'+targetX+'"][data-y="'+targetY+'"]');
+  if(!destination)return;
+  const oldTimer=Number(player.dataset.moveTimer||0);
+  if(oldTimer)window.clearTimeout(oldTimer);
   const startX=Number(player.dataset.x||5),startY=Number(player.dataset.y||8);
-  const queue:Array<[number,number]>=[[startX,startY]];const previous=new Map<string,string|null>([[startX+","+startY,null]]);
-  for(let cursor=0;cursor<queue.length;cursor++){const [x,y]=queue[cursor];if(x===targetX&&y===targetY)break;
-    for(const [nx,ny] of [[x+1,y],[x-1,y],[x,y+1],[x,y-1]] as Array<[number,number]>){const key=nx+","+ny;if(nx<0||nx>=cols||ny<0||ny>=rows||previous.has(key))continue;previous.set(key,x+","+y);queue.push([nx,ny]);}}
-  const targetKey=targetX+","+targetY;if(!previous.has(targetKey))return;const path:Array<[number,number]>=[];let cursor:string|null=targetKey;
-  while(cursor){const [x,y]=cursor.split(",").map(Number);path.unshift([x,y]);cursor=previous.get(cursor)||null;}path.shift();let step=0;
-  const move=()=>{if(step>=path.length){delete player.dataset.moveTimer;return;}const [x,y]=path[step++];
+  // Fixed-order breadth-first path: every tap resolves to the exact tile's
+  // stored grid coordinates; no random destination or visual-position guess.
+  const queue:Array<[number,number]>=[[startX,startY]];
+  const previous=new Map<string,string|null>([[startX+","+startY,null]]);
+  for(let cursor=0;cursor<queue.length;cursor++){
+    const [x,y]=queue[cursor];
+    if(x===targetX&&y===targetY)break;
+    const neighbors:[[number,number],[number,number],[number,number],[number,number]]=[[x,y-1],[x+1,y],[x,y+1],[x-1,y]];
+    for(const [nx,ny] of neighbors){
+      const key=nx+","+ny;
+      if(nx<0||nx>=cols||ny<0||ny>=rows||previous.has(key))continue;
+      previous.set(key,x+","+y);queue.push([nx,ny]);
+    }
+  }
+  const targetKey=targetX+","+targetY;
+  if(!previous.has(targetKey))return;
+  const path:Array<[number,number]>=[];
+  let cursor:string|null=targetKey;
+  while(cursor){
+    const [x,y]=cursor.split(",").map(Number);
+    path.unshift([x,y]);cursor=previous.get(cursor)||null;
+  }
+  path.shift();
+  let step=0;
+  const move=()=>{
+    if(step>=path.length){delete player.dataset.moveTimer;return;}
+    const [x,y]=path[step++];
     const tile=board.querySelector<HTMLElement>('[data-wmh-tile][data-x="'+x+'"][data-y="'+y+'"]');
-    animateGridMove(player,()=>{player.style.gridColumn=String(x+1);player.style.gridRow=String(y+1);});player.dataset.x=String(x);player.dataset.y=String(y);
-    const material=tile?.dataset.surface||surface;playFootstep(material as "earth"|"wet"|"stone"|"wood"|"tile");
-    player.dataset.moveTimer=String(window.setTimeout(move,145));};move();
+    animateGridMove(player,()=>{
+      player.style.gridColumn=String(x+1);
+      player.style.gridRow=String(y+1);
+    });
+    player.dataset.x=String(x);player.dataset.y=String(y);
+    const material=tile?.dataset.surface||surface;
+    playFootstep(material as "earth"|"wet"|"stone"|"wood"|"tile");
+    player.dataset.moveTimer=String(window.setTimeout(move,145));
+  };
+  move();
 }
 export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement, onAdvanceTime: (minutes: number) => void): boolean {
   const action=target.closest<HTMLElement>("[data-wmh-action],[data-wmh-info],[data-wmh-site],[data-wmh-building],[data-wmh-npc],[data-wmh-plot],[data-wmh-tile],[data-wmh-reply],[data-wmh-dismiss-layer],[data-wmh-selection-card]");
