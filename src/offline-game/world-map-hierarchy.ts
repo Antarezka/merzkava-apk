@@ -870,6 +870,7 @@ function startNpcWander(dialog:HTMLElement):void {
   if(!board)return;
   stopNpcWander(dialog);
   const timer=window.setInterval(()=>{
+    const mapData=readIsoMapData(board);
     const player=board.querySelector<HTMLElement>("[data-wmh-player-token]");
     board.querySelectorAll<HTMLElement>("[data-wmh-npc]").forEach(npc=>{
       if(Math.random()>.48)return;
