@@ -485,3 +485,14 @@
   .wmh-chat-copy p{font-size:13px}
   .wmh-chat-bust{width:48px;height:58px}
 }
+
+
+/* Coordinate inspection mode: readable per-tile labels for owner review. */
+.wmh-tile-coord{
+  top:25px!important;
+  font:700 7px/1 Arial,sans-serif!important;
+  color:#fff4d9!important;
+  opacity:.9!important;
+  text-shadow:0 1px 3px #000,0 0 3px #000!important;
+  z-index:4!important;
+}
