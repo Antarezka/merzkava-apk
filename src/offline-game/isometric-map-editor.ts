@@ -1,3 +1,4 @@
+import "./isometric-render-yard-interceptor";
 import "./world-map-hierarchy-scroll.css";
 export type IsoMapGridConfig = {
   cols: number;
