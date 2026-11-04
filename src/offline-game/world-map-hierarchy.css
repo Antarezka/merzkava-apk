@@ -119,3 +119,34 @@
 .wmh-editor-marker-lifted{pointer-events:none}
 .wmh-coordinate-table th:first-child,.wmh-coordinate-table td:first-child{white-space:nowrap}
 .wmh-coordinate-table td:nth-child(2){min-width:132px}
+
+
+/* World map fills its entire column; minimum zoom is a cropped, pannable cover view. */
+.wmh-world-map{
+  flex:1 1 0;
+  min-height:0;
+  max-height:none;
+  height:0;
+  margin:8px 0 12px;
+  overflow:auto;
+  border:0;
+  background:#18251e;
+  scrollbar-width:none;
+  -ms-overflow-style:none;
+}
+.wmh-world-map::-webkit-scrollbar{display:none}
+.wmh-world-map-image{
+  position:relative;
+  display:block;
+  min-width:0;
+  min-height:0;
+  max-width:none;
+  flex:none;
+}
+.wmh-world-map-image>img{
+  display:block;
+  max-width:none;
+  max-height:none;
+  object-fit:fill;
+  filter:none;
+}
