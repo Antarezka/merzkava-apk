@@ -1446,3 +1446,58 @@
   box-shadow:inset 0 1px 0 #ffffff22,0 1px 2px #0005!important;
   opacity:1!important;
 }
+
+
+/* Isometric render test yard: deliberately independent from Academy artwork. */
+.wmh-isometric-board.is-render-test{
+  background:radial-gradient(ellipse at 50% 45%,#344c3d 0%,#1d3027 68%,#142019 100%)!important;
+  outline:1px solid #c6a66b88!important;
+}
+.wmh-isometric-board.is-render-test>.wmh-tile:after{
+  background:linear-gradient(145deg,#778d68,#3e5b47)!important;
+  border:1px solid #d7e4c288!important;
+  box-shadow:inset 0 1px 0 #ffffff20,0 1px 3px #0005!important;
+  opacity:1!important;
+}
+.wmh-isometric-board.is-render-test>.wmh-tile.feature-test-path:after{
+  background:linear-gradient(145deg,#c9b78f,#8f7958)!important;
+  border:1px solid #f4e4bd!important;
+}
+.wmh-isometric-board.is-render-test>.wmh-tile.feature-test-plaza:after{
+  background:linear-gradient(145deg,#e1d1a7,#a8936b)!important;
+  border:1px solid #fff0c8!important;
+}
+.wmh-isometric-board.is-render-test>.wmh-tile.feature-test-water:after{
+  background:linear-gradient(145deg,#8ac7d1,#397b91)!important;
+  border:1px solid #c2f1fa!important;
+  box-shadow:inset 0 1px 5px #e5fbff88,0 1px 3px #0007!important;
+}
+.wmh-isometric-board.is-render-test>.wmh-tile.feature-test-garden:after{
+  background:linear-gradient(145deg,#9cbd70,#426b42)!important;
+  border:1px solid #d3ed9a!important;
+}
+.wmh-isometric-board.is-render-test>.wmh-tile.feature-test-tree:after{
+  background:radial-gradient(circle at 45% 35%,#c6d77a,#477344 68%,#254a34)!important;
+  border:1px solid #d5e99b!important;
+}
+.wmh-isometric-board.is-render-test>.wmh-tile.feature-test-gate:after{
+  background:linear-gradient(145deg,#f0d08a,#9a7045)!important;
+  border:2px solid #fff0bd!important;
+}
+.wmh-isometric-board.is-render-test .wmh-character-token[data-token-label]::after{
+  content:attr(data-token-label);
+  position:absolute;left:50%;top:calc(100% + 2px);transform:translateX(-50%);
+  padding:2px 4px;border:1px solid #e5d4aa;border-radius:3px;
+  background:#101813eF;color:#fff1c8;font:800 7px/1 Arial,sans-serif;
+  letter-spacing:.08em;white-space:nowrap;pointer-events:none;text-shadow:0 1px 2px #000;
+}
+.wmh-isometric-test-caption{
+  position:absolute!important;z-index:561!important;
+  top:max(12px,env(safe-area-inset-top))!important;left:50%!important;
+  transform:translateX(-50%)!important;display:flex!important;flex-direction:column!important;
+  gap:3px!important;padding:6px 9px!important;border:1px solid #d5b775!important;
+  background:#111a15eF!important;color:#f4e5c3!important;box-shadow:0 3px 12px #0009!important;
+  text-align:center!important;pointer-events:none!important;
+}
+.wmh-isometric-test-caption b{font:900 8px/1 Arial Black,Arial,sans-serif!important;letter-spacing:.12em!important}
+.wmh-isometric-test-caption span{font:700 6px/1 Arial,sans-serif!important;letter-spacing:.1em!important;color:#d5bd90!important}

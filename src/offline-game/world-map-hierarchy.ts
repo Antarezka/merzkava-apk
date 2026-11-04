@@ -8,7 +8,7 @@ import {
   type IsoCellLayer, type IsoMapEditorData, type IsoMapGridConfig,
 } from "./isometric-map-editor";
 
-type Level = "world" | "regional" | "local" | "interior" | "home" | "map-editor";
+type Level = "world" | "regional" | "local" | "interior" | "home" | "map-editor" | "test";
 type RegionId = "golden-dragon-empire" | "tianhai-yunzhou" | "beiming-gu";
 const regionData: Record<RegionId, { name: string; subtitle: string; image: string; sites: string[] }> = {
   "golden-dragon-empire": {
@@ -503,7 +503,9 @@ function isometricNpcTokensMarkup(mapId:string,interior:boolean):string {
   };
   const fallback=interior
     ? [{id:"teacher",x:6,y:2,gender:"male" as const},{id:"student-lin",x:3,y:4,gender:"female" as const}]
-    : mapId.startsWith("golden-dragon-empire:tianhai-academy:exterior")
+    : mapId.startsWith("isometric-render-test:")
+      ? [{id:"test-guide",x:3,y:3,gender:"female" as const},{id:"test-scholar",x:12,y:4,gender:"male" as const},{id:"test-mechanic",x:11,y:9,gender:"female" as const}]
+      : mapId.startsWith("golden-dragon-empire:tianhai-academy:exterior")
       ? [{id:"student-lin",x:7,y:4,gender:"female" as const},{id:"student-wei",x:10,y:9,gender:"male" as const},{id:"teacher-mei",x:6,y:15,gender:"female" as const},{id:"groundskeeper",x:22,y:5,gender:"male" as const}]
       : mapId.startsWith("tianhai-yunzhou:")
         ? [{id:"ty-clerk",x:4,y:4,gender:"female" as const},{id:"ty-sailor",x:12,y:9,gender:"male" as const},{id:"ty-arcanist",x:20,y:5,gender:"female" as const}]
@@ -511,14 +513,15 @@ function isometricNpcTokensMarkup(mapId:string,interior:boolean):string {
           ? [{id:"bg-guide",x:4,y:4,gender:"male" as const},{id:"bg-trainee",x:12,y:9,gender:"female" as const},{id:"bg-attendant",x:20,y:5,gender:"male" as const}]
           : [{id:"gde-warden",x:3,y:4,gender:"male" as const},{id:"gde-herbalist",x:12,y:9,gender:"female" as const}];
   return (maps[mapId]||fallback).map(npc =>
-    '<button type="button" class="wmh-character-token wmh-npc-token '+(npc.gender==="female"?"is-female":"is-male")+'" data-wmh-npc="'+npc.id+'" data-x="'+npc.x+'" data-y="'+npc.y+'" style="--token-x:'+npc.x+';--token-y:'+npc.y+'" aria-label="Talk to '+npc.id+'"><i></i></button>'
+    '<button type="button" class="wmh-character-token wmh-npc-token '+(npc.gender==="female"?"is-female":"is-male")+'" data-wmh-npc="'+npc.id+'" data-token-label="'+(mapId.startsWith("isometric-render-test:")?(npc.id==="test-guide"?"GUIDE":npc.id==="test-scholar"?"SCHOLAR":"ARTIFICER"):"")+'" data-x="'+npc.x+'" data-y="'+npc.y+'" style="--token-x:'+npc.x+';--token-y:'+npc.y+'" aria-label="Talk to '+npc.id+'"><i></i></button>'
   ).join("");
 }
 
 function tileMapMarkup(interior = false, mapId = "academy-exterior", mapImage = ""): string {
   const academyExterior = !interior && mapId.startsWith("golden-dragon-empire:tianhai-academy:exterior");
-  const cols = interior ? 12 : 24, rows = interior ? 10 : 20;
-  const tileW = academyExterior ? 128 : 64, tileH = academyExterior ? 69.5 : 32;
+  const isometricTestArea = !interior && mapId.startsWith("isometric-render-test:");
+  const cols = isometricTestArea ? 16 : interior ? 12 : 24, rows = isometricTestArea ? 12 : interior ? 10 : 20;
+  const tileW = isometricTestArea ? 72 : academyExterior ? 128 : 64, tileH = isometricTestArea ? 36 : academyExterior ? 69.5 : 32;
   const baseWidth = mapImage ? 2816 : 0, baseHeight = mapImage ? 1536 : 0;
   const projectedWidth = (cols + rows - 2) * tileW / 2 + tileW;
   const projectedHeight = (cols + rows - 2) * tileH / 2 + tileH + 7;
@@ -526,9 +529,11 @@ function tileMapMarkup(interior = false, mapId = "academy-exterior", mapImage = 
   const boardHeight = Math.max(projectedHeight, baseHeight);
   const features: Record<string,string> = interior
     ? {"2-1":"blackboard","5-1":"teacher-desk","3-3":"desk","5-3":"desk","7-3":"desk","3-5":"desk","5-5":"desk","7-5":"desk","10-8":"door"}
-    : academyExterior
-      ? {"5-1":"pond","6-1":"pond","7-1":"pond","8-1":"pond","1-2":"tree","2-2":"tree","10-2":"tree","1-3":"flower","3-3":"flower","9-3":"flower","11-3":"tree","2-9":"garden","3-9":"garden","8-9":"garden","9-9":"garden","2-14":"bench","9-14":"bench","3-2":"study-hall","9-2":"teachers-house","3-10":"learning-building","20-2":"simple-house"}
-      : {};
+    : isometricTestArea
+      ? {"7-0":"test-gate","8-0":"test-gate","11-2":"test-water","12-2":"test-water","11-3":"test-water","12-3":"test-water","2-2":"test-garden","3-2":"test-garden","2-3":"test-garden","3-3":"test-garden","12-8":"test-garden","13-8":"test-garden","12-9":"test-garden","13-9":"test-garden","4-5":"test-plaza","5-5":"test-plaza","6-5":"test-plaza","9-5":"test-plaza","10-5":"test-plaza","11-5":"test-plaza","3-9":"test-tree","14-4":"test-tree"}
+      : academyExterior
+        ? {"5-1":"pond","6-1":"pond","7-1":"pond","8-1":"pond","1-2":"tree","2-2":"tree","10-2":"tree","1-3":"flower","3-3":"flower","9-3":"flower","11-3":"tree","2-9":"garden","3-9":"garden","8-9":"garden","9-9":"garden","2-14":"bench","9-14":"bench","3-2":"study-hall","9-2":"teachers-house","3-10":"learning-building","20-2":"simple-house"}
+        : {};
   const buildingSpecs = !academyExterior ? [] : [
     {id:"study-hall",name:"Study Hall",x:3,y:2,w:4,h:4},
     {id:"teachers-house",name:"Teachers’ Hall",x:9,y:2,w:4,h:4},
@@ -538,25 +543,27 @@ function tileMapMarkup(interior = false, mapId = "academy-exterior", mapImage = 
   const sparring={x:14,y:8,w:8,h:8};
   const tiles = Array.from({length: rows}, (_,y) => Array.from({length:cols},(_,x) => {
     const key=x+"-"+y;
-    const road=academyExterior&&(y===6||y===7||x===12||x===13);
+    const road=(academyExterior&&(y===6||y===7||x===12||x===13))||(isometricTestArea&&((x===7||x===8)&&(y>=1&&y<=11)||(y===6||y===7)&&(x>=2&&x<=13)));
     const inSparring=academyExterior&&x>=sparring.x&&x<sparring.x+sparring.w&&y>=sparring.y&&y<sparring.y+sparring.h;
-    const feature=features[key]||(road?"road":inSparring?"sparring-ground":"");
+    const feature=features[key]||(road?(isometricTestArea?"test-path":"road"):inSparring?"sparring-ground":"");
     const structure=buildingSpecs.find(item=>x>=item.x&&x<item.x+item.w&&y>=item.y&&y<item.y+item.h);
     const structureAnchor=!!structure&&x===structure.x&&y===structure.y;
-    const surface = interior ? (y<2?"wood":"tile") : academyExterior
-      ? (feature==="pond"?"wet":feature==="gate"||feature==="road"?"stone":feature==="tree"||feature==="flower"||feature==="garden"?"earth":feature==="sparring-ground"?"tile":y>15?"stone":"earth")
-      : "tile";
-    const label = feature==="pond"?"POND":feature==="tree"?"TREE":feature==="flower"?"FLOWER":feature==="garden"?"GARDEN":feature==="gate"?"ACADEMY GATE":feature==="bench"?"BENCH":feature==="blackboard"?"BOARD":feature==="teacher-desk"?"TEACHER":feature==="desk"?"DESK":feature==="door"?"DOOR":feature==="study-hall"?"STUDY HALL":feature==="teachers-house"?"TEACHERS’ HALL":feature==="learning-building"?"LEARNING HALL":feature==="simple-house"?"HOUSE":feature==="sparring-ground"&&x===sparring.x&&y===sparring.y?"SPARRING GROUND":"";
+    const surface = interior ? (y<2?"wood":"tile") : isometricTestArea
+      ? (feature==="test-water"?"wet":feature==="test-garden"||feature==="test-tree"?"earth":"stone")
+      : academyExterior
+        ? (feature==="pond"?"wet":feature==="gate"||feature==="road"?"stone":feature==="tree"||feature==="flower"||feature==="garden"?"earth":feature==="sparring-ground"?"tile":y>15?"stone":"earth")
+        : "tile";
+    const label = feature==="test-gate"?"TEST GATE":feature==="test-water"?"WATER":feature==="test-garden"?"GARDEN":feature==="test-tree"?"TREE":feature==="test-plaza"?"PLAZA":feature==="test-path"&&x===7&&y===6?"MAIN PATH":feature==="pond"?"POND":feature==="tree"?"TREE":feature==="flower"?"FLOWER":feature==="garden"?"GARDEN":feature==="gate"?"ACADEMY GATE":feature==="bench"?"BENCH":feature==="blackboard"?"BOARD":feature==="teacher-desk"?"TEACHER":feature==="desk"?"DESK":feature==="door"?"DOOR":feature==="study-hall"?"STUDY HALL":feature==="teachers-house"?"TEACHERS’ HALL":feature==="learning-building"?"LEARNING HALL":feature==="simple-house"?"HOUSE":feature==="sparring-ground"&&x===sparring.x&&y===sparring.y?"SPARRING GROUND":"";
     const building=structure?.name||"";
     const classes=(feature?'has-feature feature-'+feature:'')+(structure?' building-footprint building-'+structure.id+' building-occlusion':'');
     return '<button type="button" class="wmh-tile wmh-tile-'+surface+' '+classes+'" data-wmh-tile data-x="'+x+'" data-y="'+y+'" data-z="0" data-tile-id="tile-'+x+'-'+y+'" data-surface="'+surface+'" style="--tile-x:'+x+';--tile-y:'+y+'" '+(structureAnchor?'data-wmh-building="'+building+'"':'')+' aria-label="Tile X '+x+', Y '+y+', Z 0 · '+(label||surface)+'"><span class="wmh-tile-coord">('+x+','+y+',0)</span>'+(label?'<b>'+label+'</b>':'')+'</button>';
   }).join("")).join("");
-  const boardClass='wmh-isometric-board '+(interior?'is-interior':'is-exterior')+(mapImage?' has-map-base':' is-placeholder');
+  const boardClass='wmh-isometric-board '+(interior?'is-interior':'is-exterior')+(isometricTestArea?' is-render-test':'')+(mapImage?' has-map-base':' is-placeholder');
   const imageMarkup=mapImage
     ? '<img class="wmh-isometric-map-base" data-wmh-map-art src="'+mapImage+'" alt="Isometric map base" draggable="false" loading="eager" decoding="async"/><canvas class="wmh-isometric-foreground" data-wmh-foreground-canvas aria-hidden="true"></canvas>'
     : '';
   const npcTokens=isometricNpcTokensMarkup(mapId,interior);
-  return '<div class="wmh-iso-controls"><button type="button" data-wmh-iso-zoom="out" aria-label="Zoom out">−</button><span data-wmh-iso-level>100%</span><button type="button" data-wmh-iso-zoom="in" aria-label="Zoom in">+</button><button type="button" data-wmh-iso-zoom="reset">FIT</button><button type="button" data-wmh-iso-center aria-label="Center isometric map">CENTER MAP</button><small>DRAG TO PAN · PINCH TO ZOOM</small></div><div class="wmh-isometric-wrap" data-wmh-iso-viewport><div class="wmh-isometric-camera" data-wmh-iso-camera><div class="'+boardClass+'" data-wmh-board style="--tile-cols:'+cols+';--tile-rows:'+rows+';--iso-center-x:'+(rows*tileW/2)+'px;--iso-board-width:'+boardWidth+'px;--iso-board-height:'+boardHeight+'px;--tile-w:'+tileW+'px;--tile-h:'+tileH+'px;--iso-half-w:'+(tileW/2)+'px;--iso-half-h:'+(tileH/2)+'px;--iso-offset-y:0px;--slab-depth:7px" data-cols="'+cols+'" data-rows="'+rows+'" data-tile-w="'+tileW+'" data-tile-h="'+tileH+'" data-offset-x="0" data-offset-y="0" data-map-id="'+escapeMapEditorText(mapId)+'">'+imageMarkup+tiles+'<svg class="wmh-area-overlay-svg" data-wmh-overlay-svg viewBox="0 0 '+boardWidth+' '+boardHeight+'" preserveAspectRatio="none"><g data-wmh-overlay-marks></g><g data-wmh-manual-marks></g><g data-wmh-transition-marks></g><path data-wmh-overlay-preview class="wmh-area-mark-preview" d=""></path></svg><button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token data-x="5" data-y="'+(interior?8:17)+'" style="--token-x:5;--token-y:'+(interior?8:17)+'" aria-label="Player character"><i></i></button>'+npcTokens+'</div></div></div>';
+  return '<div class="wmh-iso-controls"><button type="button" data-wmh-iso-zoom="out" aria-label="Zoom out">−</button><span data-wmh-iso-level>100%</span><button type="button" data-wmh-iso-zoom="in" aria-label="Zoom in">+</button><button type="button" data-wmh-iso-zoom="reset">FIT</button><button type="button" data-wmh-iso-center aria-label="Center isometric map">CENTER MAP</button><small>DRAG TO PAN · PINCH TO ZOOM</small></div><div class="wmh-isometric-wrap" data-wmh-iso-viewport><div class="wmh-isometric-camera" data-wmh-iso-camera><div class="'+boardClass+'" data-wmh-board style="--tile-cols:'+cols+';--tile-rows:'+rows+';--iso-center-x:'+(rows*tileW/2)+'px;--iso-board-width:'+boardWidth+'px;--iso-board-height:'+boardHeight+'px;--tile-w:'+tileW+'px;--tile-h:'+tileH+'px;--iso-half-w:'+(tileW/2)+'px;--iso-half-h:'+(tileH/2)+'px;--iso-offset-y:0px;--slab-depth:7px" data-cols="'+cols+'" data-rows="'+rows+'" data-tile-w="'+tileW+'" data-tile-h="'+tileH+'" data-offset-x="0" data-offset-y="0" data-map-id="'+escapeMapEditorText(mapId)+'">'+imageMarkup+tiles+'<svg class="wmh-area-overlay-svg" data-wmh-overlay-svg viewBox="0 0 '+boardWidth+' '+boardHeight+'" preserveAspectRatio="none"><g data-wmh-overlay-marks></g><g data-wmh-manual-marks></g><g data-wmh-transition-marks></g><path data-wmh-overlay-preview class="wmh-area-mark-preview" d=""></path></svg><button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token data-token-label="'+(isometricTestArea?"YOU":"")+'" data-x="5" data-y="'+(isometricTestArea?10:interior?8:17)+'" style="--token-x:5;--token-y:'+(isometricTestArea?10:interior?8:17)+'" aria-label="Player character"><i></i></button>'+npcTokens+'</div></div></div>';
 }
 function isometricMapBaseFor(regionId: RegionId, selectedBuilding: string, interior: boolean): string {
   if (interior) return "";
@@ -1215,6 +1222,15 @@ function isometricPlayMarkup(regionId: RegionId, selectedBuilding: string, inter
     '</div>';
 }
 
+export function renderIsometricMapTestArea(): string {
+  const mapId="isometric-render-test:render-yard:exterior";
+  return '<div class="wmh-isometric-play-screen" data-wmh-isometric-play-screen>'+
+    tileMapMarkup(false,mapId,"")+isometricHudMarkup("ISOMETRIC RENDER TEST","")+isometricEditorMarkup()+
+    '<div class="wmh-isometric-test-caption"><b>ISOMETRIC RENDER TEST</b><span>16 × 12 TILES · PLAYER · 3 NPCs · LIVE CAMERA</span></div>'+
+    '<button type="button" class="wmh-map-back" data-wmh-action="back" aria-label="Leave isometric test area"><span>‹</span><b>EXIT TEST</b></button>'+
+    '<section class="wmh-chat-panel" data-wmh-chat hidden role="dialog" aria-label="Character conversation"><div class="wmh-chat-card"><button type="button" class="wmh-chat-close" data-wmh-action="chat-close" aria-label="Close conversation">×</button><div class="wmh-chat-thread" data-wmh-thread></div><div class="wmh-chat-input-row"><span>YOUR RESPONSE</span><div data-wmh-replies></div></div></div></section></div>';
+}
+
 function panelMarkup(level: Level, regionId: RegionId = "golden-dragon-empire", selectedBuilding = "Tianhai Academy", selectedArea?: WorldMarker): string {
   const region = regionData[regionId];
   const header = (kind: string, title: string, subtitle: string) =>
@@ -1222,8 +1238,9 @@ function panelMarkup(level: Level, regionId: RegionId = "golden-dragon-empire", 
   if (level === "world") return header("WORLD MAP","Merzkava Universe","THREE GREAT POWERS · EXTERNAL TERRITORIES · SEAS")+
     '<div class="wmh-map-zoom"><button type="button" data-wmh-zoom="out">−</button><span data-wmh-zoom-level>100%</span><button type="button" data-wmh-zoom="in">+</button><button type="button" data-wmh-zoom="reset">RESET</button></div>'+
     '<div class="wmh-world-map" data-wmh-map-viewport><div class="wmh-world-map-image" data-wmh-map-surface><img src="/world/Untitled77_20261029054536.png" alt="Merzkava Universe world map"/>'+readWorldMarkers().map(marker=>worldMapMarkerMarkup(marker)).join("")+'</div><div data-wmh-selection-host></div></div>'+
-    '<div class="wmh-bottom-actions"><span>SELECT A POWER TO OPEN ITS REGIONAL MAP</span><button data-wmh-action="editor-open">⊞ MAP EDITOR</button></div>';
+    '<div class="wmh-bottom-actions"><span>SELECT A POWER TO OPEN ITS REGIONAL MAP</span><button type="button" data-wmh-action="test-isometric">▦ ISOMETRIC TEST AREA</button><button data-wmh-action="editor-open">⊞ MAP EDITOR</button></div>';
   if (level === "map-editor") return header("WORLD MAP TOOLS","Map Editor","FLAT WORLD MAP · NORMALIZED COORDINATES")+mapEditorMarkup();
+  if (level === "test") return renderIsometricMapTestArea();
   if (level === "regional") return header("REGIONAL MAP",selectedArea?.name||region.name,selectedArea?.subtitle||region.subtitle)+
     academyMiniMapMarkup()+
     '<div class="wmh-regional-placeholder"><div class="wmh-regional-land"><span class="wmh-regional-river"></span><span class="wmh-regional-road road-one"></span><span class="wmh-regional-road road-two"></span><span class="wmh-regional-road road-three"></span><span class="wmh-regional-label">'+(selectedArea?selectedArea.name.toUpperCase():"REGIONAL MAP ART · PLACEHOLDER")+'</span>'+
@@ -1275,7 +1292,10 @@ const npcData: Record<string,{name:string;gender:string;greeting:string;choices:
   "ty-arcanist":{name:"Shu Meilin",gender:"female",greeting:"I maintain the small guide-lamps along this walk. They are simple artificial artifacts, but a loose seal can make them flicker.",choices:["Ask about the guide-lamps","Ask about Arcanistry","Offer to help"],replies:["Each lamp stores a measured portion of energy liquid. It is safer to replace a cartridge than force a damaged core.","Arcanistry begins with careful measurement. A complicated engraving is useless if the base alignment is wrong.","Please keep clear of the marked workbench while the casing is open."]},
   "bg-guide":{name:"Mo Ren",gender:"male",greeting:"The northern path is clear for now. Stay near the stone markers; snowfall can hide the old trail in less than an hour.",choices:["Ask about the pass","Ask about Spirit Beasts","Thank him"],replies:["The mountain pass bends east after the second marker. Do not take the narrow ravine in poor visibility.","Tracks near the frozen basin are fresh. Observe from a distance before deciding whether to approach.","Keep your hands warm and your route familiar."]},
   "bg-trainee":{name:"Beiming Xue",gender:"female",greeting:"I am repeating the opening stance until it becomes natural. The cold makes careless movement even more obvious.",choices:["Ask about practice","Ask about the dojo","Wish her well"],replies:["Start slowly, then increase the pace only when your balance stays steady.","The dojo network shares instructors, but each hall keeps its own training schedule.","May your own practice go smoothly."]},
-  "bg-attendant":{name:"Han Yu",gender:"male",greeting:"The grand hall is quiet between audiences. If you need directions, I can point you toward the public records desk.",choices:["Ask about the records","Ask about the hall","Thank him"],replies:["The public records desk keeps route notices and local announcements. Restricted records require an authorized request.","The northern wing is used for formal meetings. Please leave the central passage clear.","The marked corridor is the easiest way back."]}
+  "bg-attendant":{name:"Han Yu",gender:"male",greeting:"The grand hall is quiet between audiences. If you need directions, I can point you toward the public records desk.",choices:["Ask about the records","Ask about the hall","Thank him"],replies:["The public records desk keeps route notices and local announcements. Restricted records require an authorized request.","The northern wing is used for formal meetings. Please leave the central passage clear.","The marked corridor is the easiest way back."]},
+  "test-guide":{name:"Guide Ren",gender:"female",greeting:"Welcome to the Isometric Render Yard. Every visible diamond is a walkable test tile unless marked otherwise.",choices:["Ask what this area tests","Ask about the markers","Thank her"],replies:["This room uses the same board, camera, tile, player, NPC, and minimap renderer as the Academy, but it has no Academy artwork dependency.","The gold token is you. The rose and blue tokens are NPCs. Their labels should stay attached while they move.","Good luck with the test."]},
+  "test-scholar":{name:"Scholar Bo",gender:"male",greeting:"I am checking the stone path and the reflection pool. Both should remain visible while the camera moves.",choices:["Ask about the terrain","Ask about movement"],replies:["The blue area is the pool, the pale strip is the main path, and the green cells mark gardens.","Tap any empty tile to move. The camera FIT and CENTER controls should also work."]},
+  "test-mechanic":{name:"Artificer Mei",gender:"female",greeting:"I am watching the player and NPC layers. Their sprites should render above the ground tiles.",choices:["Ask about the map layers","Ask about the editor"],replies:["This test has no image layer. It isolates the isometric grid and character layers from external artwork loading.","Open the floating editor to test the grid and destination markers without leaving this room."]}
 };
 function syncIsoDepthAndOcclusion(board:HTMLElement):void {
   const data=readIsoMapData(board);
@@ -1422,6 +1442,13 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
   if(action.dataset.wmhAction==="editor-close"){overlay.dataset.level="world";dialog.innerHTML=panelMarkup("world");bindWorldMapZoom(dialog);return true;}
   if(action.dataset.wmhAction==="editor-confirm"||action.dataset.wmhAction==="editor-reset")return true;
   if(action.dataset.wmhAction==="close"){const outerClose=root.querySelector<HTMLButtonElement>("[data-idle-rpg-close]");if(outerClose)outerClose.click();else overlay.hidden=true;return true;}
+  if(action.dataset.wmhAction==="test-isometric"){
+    stopNpcWander(dialog);
+    overlay.dataset.level="test";
+    dialog.innerHTML=panelMarkup("test",regionId,"Isometric Render Test");
+    bindIsoAreaEditor(dialog);bindIsometricCamera(dialog);bindIsometricMapArt(dialog);bindIsometricHud(dialog);startNpcWander(dialog);
+    return true;
+  }
   if(action.dataset.wmhAction==="academy-home"){
     if(current==="local"){
       dialog.querySelector<HTMLButtonElement>("[data-wmh-iso-center]")?.click();
