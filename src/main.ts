@@ -8,6 +8,7 @@ import { createCharacter, deleteCharacter, listCharacters, type Character } from
 import { validateCharacterDraft } from "./convo/engine/character-validation";
 import { renderScreen, type ScreenId } from "./app/screens";
 import { initializeIdleTriggerDrag } from "./offline-game/idle-trigger-drag";
+import { initializeArcanistryTransitDrag } from "./offline-game/transit-pull-drag";
 import { animateExpeditionChoiceModal, animateExpeditionPanel, mountExpeditionAnimations } from "./offline-game/expedition-animations";
 import { deleteEternalSave, exportEternalSave, importEternalSave, loadEternalSave, renameEternalSave, resetEternalGame, resolveEternalSituationChoice, advanceEternalWorldTime, setEternalLocation, startEternalGame, unloadEternalGame, type EternalRegion } from "./offline-game/expedition-game";
 import { getCanonIndex, getCanonStatus, loadCanonModule, loadPlayerRegistry, loadRegisteredPlayerProfile, refreshCanon, refreshLatestPlayerRegistry, type CanonDocument } from "./convo/canon/canon-loader";
@@ -541,6 +542,7 @@ function render(): void {
   </div>`;
   if (activeScreen === "offline-game") {
     initializeIdleTriggerDrag();
+    initializeArcanistryTransitDrag(root);
   }
   translateRenderedContent(root, currentLanguage);
   // Preserve the rail's manual roulette offset and each independent mechanical dial angle across rerenders.

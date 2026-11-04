@@ -8,10 +8,16 @@ export function isArcanistryLeverEngaged(distance: number): boolean {
   return Number.isFinite(distance) && distance >= ARCANISTRY_LEVER_PULL_DISTANCE;
 }
 
-export function getArcanistryLeverAngle(horizontalDelta: number): number {
-  if (!Number.isFinite(horizontalDelta)) return 0;
-  const progress = Math.min(1, Math.abs(horizontalDelta) / 56);
-  const direction = horizontalDelta < 0 ? -1 : horizontalDelta > 0 ? 1 : 0;
+export function getArcanistryLeverPullDelta(horizontalDelta: number, verticalDelta: number): number {
+  if (!Number.isFinite(horizontalDelta)) return Number.isFinite(verticalDelta) ? verticalDelta : 0;
+  if (!Number.isFinite(verticalDelta)) return horizontalDelta;
+  return Math.abs(verticalDelta) > Math.abs(horizontalDelta) ? -verticalDelta : horizontalDelta;
+}
+
+export function getArcanistryLeverAngle(pullDelta: number): number {
+  if (!Number.isFinite(pullDelta)) return 0;
+  const progress = Math.min(1, Math.abs(pullDelta) / 56);
+  const direction = pullDelta < 0 ? -1 : pullDelta > 0 ? 1 : 0;
   return direction * Math.pow(progress, .9) * 55;
 }
 
@@ -29,7 +35,7 @@ type TravelHandler = (sceneId: string) => void | Promise<void>;
 export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: TravelHandler): () => void {
   const timers = new Set<number>();
   let activeTicket: { element: HTMLButtonElement; pointerId: number; startY: number; distance: number } | null = null;
-  let activeLever: { element: HTMLButtonElement; machine: HTMLElement; pointerId: number; startX: number; direction: -1 | 1; distance: number } | null = null;
+  let activeLever: { element: HTMLButtonElement; machine: HTMLElement; pointerId: number; startX: number; startY: number; direction: -1 | 1; distance: number } | null = null;
   let disposed = false;
 
   const later = (callback: () => void, delay: number): number => {
@@ -308,7 +314,7 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     const lever = target.closest<HTMLButtonElement>("[data-arcanistry-lever]");
     const leverMachine = lever?.closest<HTMLElement>("[data-arcanistry-machine]");
     if (lever && leverMachine && !lever.disabled && leverMachine.dataset.selectedAvailable === "true") {
-      activeLever = { element: lever, machine: leverMachine, pointerId: event.pointerId, startX: event.clientX, direction: -1, distance: 0 };
+      activeLever = { element: lever, machine: leverMachine, pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, direction: -1, distance: 0 };
       try { lever.setPointerCapture(event.pointerId); } catch { /* WebView fallback */ }
       event.preventDefault();
       return;
@@ -325,10 +331,12 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
   const onPointerMove = (event: PointerEvent): void => {
     if (activeLever && activeLever.pointerId === event.pointerId) {
       const horizontalDelta = event.clientX - activeLever.startX;
-      const distance = Math.min(56, Math.abs(horizontalDelta));
-      const curvedAngle = getArcanistryLeverAngle(horizontalDelta);
+      const verticalDelta = event.clientY - activeLever.startY;
+      const pullDelta = getArcanistryLeverPullDelta(horizontalDelta, verticalDelta);
+      const distance = Math.min(56, Math.abs(pullDelta));
+      const curvedAngle = getArcanistryLeverAngle(pullDelta);
       activeLever.distance = distance;
-      activeLever.direction = horizontalDelta <= 0 ? -1 : 1;
+      activeLever.direction = pullDelta <= 0 ? -1 : 1;
       const leverArm = activeLever.element.querySelector<HTMLElement>(".arcanist-lever-arm");
       if (leverArm) leverArm.style.transform = "rotate(" + curvedAngle.toFixed(1) + "deg)";
       activeLever.element.classList.toggle("is-pulling", distance > 2);

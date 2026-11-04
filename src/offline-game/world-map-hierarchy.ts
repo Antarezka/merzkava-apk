@@ -572,7 +572,7 @@ function tileMapMarkup(
   const npcTokens=isometricNpcTokensMarkup(mapId,interior);
   const boardClass='wmh-isometric-board wmh-svg-ground-map '+(interior?'is-interior':'is-exterior')+
     (mapImage?' has-map-base is-minimap-style':' is-placeholder')+
-    (academyExterior?' wmh-academy-grid-disabled':'');
+    '';
   return '<div class="wmh-iso-controls"><button type="button" data-wmh-iso-zoom="out" aria-label="Zoom out">−</button><span data-wmh-iso-level>100%</span><button type="button" data-wmh-iso-zoom="in" aria-label="Zoom in">+</button><button type="button" data-wmh-iso-zoom="reset">FIT</button><button type="button" data-wmh-iso-center aria-label="Center isometric map">CENTER MAP</button><small>DRAG TO PAN · PINCH TO ZOOM</small></div>'+
     '<div class="wmh-isometric-wrap" data-wmh-iso-viewport><div class="wmh-isometric-camera" data-wmh-iso-camera><div class="'+boardClass+'" data-wmh-board style="--tile-cols:'+cols+';--tile-rows:'+rows+
     ';--iso-center-x:'+(rows*tileW/2)+'px;--iso-board-width:'+boardWidth+'px;--iso-board-height:'+boardHeight+'px;--tile-w:'+tileW+'px;--tile-h:'+tileH+
@@ -587,8 +587,7 @@ function tileMapMarkup(
 function isometricMapBaseFor(regionId: RegionId, selectedBuilding: string, interior: boolean): string {
   if (interior) return "";
   const place = selectedBuilding.trim().toLowerCase().replace(/\s+/g, " ");
-  // Tianhai Academy is intentionally rebuilt as an empty area; do not mount its former JPG base.
-  if (regionId === "golden-dragon-empire" && (place === "tianhai academy" || place === "academy")) return "";
+  if (regionId === "golden-dragon-empire" && (place === "tianhai academy" || place === "academy")) return "/maps/academy/full-map/1_academy.jpg";
   return "";
 }
 function makeIsometricMapId(regionId: RegionId, selectedBuilding: string, interior: boolean): string {
@@ -716,13 +715,9 @@ function renderIsometricMinimap(board:HTMLElement):void {
   const boardHeight=Number.parseFloat(style.getPropertyValue("--iso-board-height"))||board.offsetHeight||1;
   world.style.setProperty("aspect-ratio",boardWidth+" / "+boardHeight,"important");
 
-  // Academy's main JPG stays clean; its compact minimap still uses the shared
-  // isometric grid and live player/NPC marker layer.
   const isTianhaiAcademy=board.dataset.mapId==="golden-dragon-empire:tianhai-academy:exterior";
   const gridSvg=world.querySelector<SVGSVGElement>("[data-wmh-minimap-grid]");
   const mainGridSvg=board.classList.contains("is-minimap-style")?board.querySelector<SVGSVGElement>("[data-wmh-scene-svg]"):null;
-  if(isTianhaiAcademy)board.classList.add("wmh-academy-grid-disabled");
-  else board.classList.remove("wmh-academy-grid-disabled");
   if(gridSvg)gridSvg.style.display="";
   if(mainGridSvg)mainGridSvg.style.display="";
 
@@ -1318,7 +1313,7 @@ function isometricEditorMarkup(): string {
     '<textarea data-wmh-overlay-export hidden readonly></textarea><label>IMPORT MAP DATA<textarea data-wmh-overlay-import-text placeholder="Paste a saved isometric-map JSON backup..."></textarea></label><button type="button" data-wmh-overlay-import>IMPORT MAP DATA</button>'+
     '<small data-wmh-overlay-status>Choose a tool, then tap individual diamond cells. The world pauses while the editor is open.</small></section></div></div>';
 }
-function isometricHudMarkup(title: string, mapImage: string): string {
+function isometricHudMarkup(title: string, mapImage: string, showMinimap = true): string {
   // Keep the compact minimap in the HUD for every area, including Academy.
   // Academy uses the same full Map Base image with its matching grid and actor layer.
   const minimapMarkup=
@@ -1332,7 +1327,7 @@ function isometricHudMarkup(title: string, mapImage: string): string {
     '<div class="wmh-world-status-top"><span class="wmh-status-cycle-icon" data-wmh-cycle-icon>☼</span><div><b data-wmh-cycle-label>PAGI</b><small data-wmh-cycle-caption>WORLD CYCLE</small></div></div>'+
     '<div class="wmh-world-status-bottom"><span class="wmh-status-weather"><i data-wmh-weather-icon>☀</i><b data-wmh-weather-label>CLEAR</b></span><span class="wmh-status-day" data-wmh-day>HARI 01</span><strong data-wmh-time>08:00</strong></div>'+
     '<small class="wmh-status-location">'+escapeMapEditorText(title)+'</small><small class="wmh-status-coordinates" data-wmh-player-grid>GRID X 05 · Y 17</small></section>'+
-    minimapMarkup+'</div>';
+    (showMinimap?minimapMarkup:"")+'</div>';
 }
 function isometricPlayMarkup(regionId: RegionId, selectedBuilding: string, interior: boolean): string {
   const isEmptyAcademy = !interior && regionId === "golden-dragon-empire" &&
@@ -1342,7 +1337,7 @@ function isometricPlayMarkup(regionId: RegionId, selectedBuilding: string, inter
     const academyMapId=makeIsometricMapId(regionId,selectedBuilding,false);
     return '<div class="wmh-isometric-play-screen wmh-academy-empty-screen" data-wmh-isometric-play-screen>'+
       tileMapMarkup(false,academyMapId,academyMapImage,regionId,selectedBuilding)+
-      isometricHudMarkup("Tianhai Academy",academyMapImage)+
+      isometricHudMarkup("Tianhai Academy",academyMapImage,false)+
       '<button type="button" class="wmh-map-back wmh-academy-map-back" data-wmh-action="back" aria-label="Return to Golden Dragon Empire map"><i class="wmh-academy-back-icon" aria-hidden="true"></i><b>GOLDEN DRAGON EMPIRE</b></button>'+
       '<section class="wmh-chat-panel" data-wmh-chat hidden role="dialog" aria-label="Character conversation"><div class="wmh-chat-card"><button type="button" class="wmh-chat-close" data-wmh-action="chat-close" aria-label="Close conversation">×</button><div class="wmh-chat-thread" data-wmh-thread></div><div class="wmh-chat-input-row"><span>YOUR RESPONSE</span><div data-wmh-replies></div></div></div></section>'+
       '</div>';
