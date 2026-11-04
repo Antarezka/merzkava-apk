@@ -1194,11 +1194,13 @@
   width:100%!important;height:100%!important;overflow:hidden!important;opacity:.55!important;
   pointer-events:none!important;
 }
-.wmh-minimap-cell{fill:none;stroke:#f6e9be;stroke-width:12;vector-effect:non-scaling-stroke;opacity:.34}
+/* Shared isometric line language: 12 map-units scales naturally in both the
+   compact minimap and the expanded Academy canvas. */
+.wmh-minimap-cell{fill:none;stroke:#f6e9be;stroke-width:12;opacity:.34}
 .wmh-minimap-cell.is-foreground{fill:#367ec455;stroke:#9bd3ff;opacity:.82}
 .wmh-minimap-cell.is-blocked{fill:#c63d4355;stroke:#ffaaa8;opacity:.9}
 .wmh-minimap-cell.is-opacity{fill:#9467c655;stroke:#d8b8ff;opacity:.85}
-.wmh-minimap-transition{fill:#bd3939;stroke:#ffd0c8;stroke-width:12;vector-effect:non-scaling-stroke}
+.wmh-minimap-transition{fill:#bd3939;stroke:#ffd0c8;stroke-width:12}
 .wmh-minimap-transition.is-named{fill:#287acb;stroke:#c5e4ff}
 .wmh-minimap-actors{position:absolute;inset:0;z-index:3;pointer-events:none}
 .wmh-minimap-dot{
@@ -1577,9 +1579,8 @@
   fill:transparent!important;
   fill-opacity:0!important;
   stroke:#f6e9be!important;
-  stroke-width:.85px!important;
+  stroke-width:12px!important;
   stroke-opacity:.34!important;
-  vector-effect:non-scaling-stroke!important;
   pointer-events:all!important;
 }
 .wmh-isometric-board.is-minimap-style>.wmh-isometric-foreground{
