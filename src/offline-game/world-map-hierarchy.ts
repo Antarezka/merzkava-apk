@@ -723,6 +723,21 @@ function renderIsometricMinimap(board:HTMLElement):void {
   const boardHeight=Number.parseFloat(style.getPropertyValue("--iso-board-height"))||board.offsetHeight||1;
   world.style.setProperty("aspect-ratio",boardWidth+" / "+boardHeight,"important");
 
+  // Temporarily disable the isometric grid on Tianhai Academy only.
+  // Keep the artwork, player/NPC minimap dots and movement coordinates active.
+  const isTianhaiAcademy=board.dataset.mapId==="golden-dragon-empire:tianhai-academy:exterior";
+  const gridSvg=world.querySelector<SVGSVGElement>("[data-wmh-minimap-grid]");
+  const mainGridSvg=board.classList.contains("is-minimap-style")?board.querySelector<SVGSVGElement>("[data-wmh-scene-svg]"):null;
+  if(isTianhaiAcademy){
+    board.classList.add("wmh-academy-grid-disabled");
+    if(gridSvg){gridSvg.innerHTML="";gridSvg.style.display="none";delete gridSvg.dataset.signature;}
+    if(mainGridSvg){mainGridSvg.innerHTML="";mainGridSvg.style.display="none";delete mainGridSvg.dataset.minimapSignature;}
+  }else{
+    board.classList.remove("wmh-academy-grid-disabled");
+    if(gridSvg)gridSvg.style.display="";
+    if(mainGridSvg)mainGridSvg.style.display="";
+  }
+
   // One geometry source for both displays: the minimap's SVG cell layer is also
   // mounted directly over the full-size Map Base. Only its presentation size differs.
   const signature=JSON.stringify({
@@ -755,8 +770,7 @@ function renderIsometricMinimap(board:HTMLElement):void {
     return '<g class="wmh-vector-cells wmh-minimap-grid-cells">'+cells.join("")+'</g><g class="wmh-minimap-overlays">'+overlays.join("")+'</g><g class="wmh-minimap-transitions">'+transitions+'</g>';
   };
 
-  const gridSvg=world.querySelector<SVGSVGElement>("[data-wmh-minimap-grid]");
-  if(gridSvg&&gridSvg.dataset.signature!==signature){
+  if(!isTianhaiAcademy&&gridSvg&&gridSvg.dataset.signature!==signature){
     gridSvg.setAttribute("viewBox","0 0 "+boardWidth+" "+boardHeight);
     gridSvg.innerHTML=renderGrid(false);
     gridSvg.dataset.signature=signature;
@@ -764,8 +778,7 @@ function renderIsometricMinimap(board:HTMLElement):void {
 
   // The full map now receives the exact same SVG cells, overlays and transitions
   // as the minimap instead of maintaining a second, visually separate renderer.
-  const mainGridSvg=board.classList.contains("is-minimap-style")?board.querySelector<SVGSVGElement>("[data-wmh-scene-svg]"):null;
-  if(mainGridSvg){
+  if(!isTianhaiAcademy&&mainGridSvg){
     mainGridSvg.classList.add("wmh-minimap-grid");
     mainGridSvg.setAttribute("viewBox","0 0 "+boardWidth+" "+boardHeight);
     mainGridSvg.setAttribute("preserveAspectRatio","none");
