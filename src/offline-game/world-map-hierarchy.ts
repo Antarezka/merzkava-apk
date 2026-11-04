@@ -713,7 +713,8 @@ function renderIsometricWorldStatus(dialog:HTMLElement):void {
   if(overlay){overlay.dataset.wmhCycle=atmosphere.cycle.toLowerCase();overlay.dataset.wmhWeather=atmosphere.weather.toLowerCase();}
 }
 function renderIsometricMinimap(board:HTMLElement):void {
-  const world=board.closest<HTMLElement>("[data-wmh-isometric-play-screen]")?.querySelector<HTMLElement>("[data-wmh-minimap-world]");
+  const playScreen=board.closest<HTMLElement>("[data-wmh-isometric-play-screen]");
+  const world=playScreen?.querySelector<HTMLElement>("[data-wmh-minimap-world]");
   const actors=world?.querySelector<HTMLElement>("[data-wmh-minimap-actors]");
   if(!world||!actors)return;
   const data=readIsoMapData(board);
@@ -722,39 +723,58 @@ function renderIsometricMinimap(board:HTMLElement):void {
   const boardHeight=Number.parseFloat(style.getPropertyValue("--iso-board-height"))||board.offsetHeight||1;
   world.style.setProperty("aspect-ratio",boardWidth+" / "+boardHeight,"important");
 
-  // The minimap uses the same projected diamonds and cell metadata as the main board.
-  // Rebuild this small SVG only when the grid or its saved overlays actually change.
+  // One geometry source for both displays: the minimap's SVG cell layer is also
+  // mounted directly over the full-size Map Base. Only its presentation size differs.
+  const signature=JSON.stringify({
+    grid:data.grid,
+    foreground:data.foregroundCells,
+    blocked:data.blockedCells,
+    opacity:data.opacityCells,
+    transitions:data.transitions,
+  });
+  const renderGrid=(interactive:boolean):string=>{
+    const grid=data.grid;
+    const polygon=(x:number,y:number,cls:string)=> {
+      const c=isoCellCenter(x,y,grid),hw=grid.tileW/2,hh=grid.tileH/2;
+      const points=[c.x+","+(c.y-hh),(c.x+hw)+","+c.y,c.x+","+(c.y+hh),(c.x-hw)+","+c.y].join(" ");
+      const tile=interactive
+        ? ' data-wmh-tile data-x="'+x+'" data-y="'+y+'" data-z="0" data-tile-id="map-'+x+'-'+y+'" data-surface="earth" aria-label="Map tile '+x+', '+y+'"'
+        : "";
+      return '<polygon class="wmh-minimap-cell '+cls+'" points="'+points+'"'+tile+'/>';
+    };
+    const cells:string[]=[];
+    for(let y=0;y<grid.rows;y++)for(let x=0;x<grid.cols;x++)cells.push(polygon(x,y,""));
+    const overlays:string[]=[];
+    data.foregroundCells.forEach(key=>{const [x,y]=key.split(",").map(Number);overlays.push(polygon(x,y,"is-foreground"));});
+    data.blockedCells.forEach(key=>{const [x,y]=key.split(",").map(Number);overlays.push(polygon(x,y,"is-blocked"));});
+    data.opacityCells.forEach(key=>{const [x,y]=key.split(",").map(Number);overlays.push(polygon(x,y,"is-opacity"));});
+    const transitions=data.transitions.map(marker=>{
+      const c=isoCellCenter(marker.x,marker.y,grid);
+      return '<circle class="wmh-minimap-transition '+(marker.label.trim()?"is-named":"is-unlabelled")+'" cx="'+c.x+'" cy="'+c.y+'" r="22"><title>'+escapeMapEditorText(marker.label||"Unlabelled transition")+'</title></circle>';
+    }).join("");
+    return '<g class="wmh-vector-cells wmh-minimap-grid-cells">'+cells.join("")+'</g><g class="wmh-minimap-overlays">'+overlays.join("")+'</g><g class="wmh-minimap-transitions">'+transitions+'</g>';
+  };
+
   const gridSvg=world.querySelector<SVGSVGElement>("[data-wmh-minimap-grid]");
-  if(gridSvg){
-    const signature=JSON.stringify({
-      grid:data.grid,
-      foreground:data.foregroundCells,
-      blocked:data.blockedCells,
-      opacity:data.opacityCells,
-      transitions:data.transitions,
-    });
-    if(gridSvg.dataset.signature!==signature){
-      const grid=data.grid;
-      gridSvg.setAttribute("viewBox","0 0 "+boardWidth+" "+boardHeight);
-      const polygon=(x:number,y:number,cls:string)=> {
-        const c=isoCellCenter(x,y,grid),hw=grid.tileW/2,hh=grid.tileH/2;
-        const points=[c.x+","+(c.y-hh),(c.x+hw)+","+c.y,c.x+","+(c.y+hh),(c.x-hw)+","+c.y].join(" ");
-        return '<polygon class="wmh-minimap-cell '+cls+'" points="'+points+'"/>';
-      };
-      const cells:string[]=[];
-      for(let y=0;y<grid.rows;y++)for(let x=0;x<grid.cols;x++)cells.push(polygon(x,y,""));
-      const overlays:string[]=[];
-      data.foregroundCells.forEach(key=>{const [x,y]=key.split(",").map(Number);overlays.push(polygon(x,y,"is-foreground"));});
-      data.blockedCells.forEach(key=>{const [x,y]=key.split(",").map(Number);overlays.push(polygon(x,y,"is-blocked"));});
-      data.opacityCells.forEach(key=>{const [x,y]=key.split(",").map(Number);overlays.push(polygon(x,y,"is-opacity"));});
-      const transitions=data.transitions.map(marker=>{
-        const c=isoCellCenter(marker.x,marker.y,grid);
-        return '<circle class="wmh-minimap-transition '+(marker.label.trim()?"is-named":"is-unlabelled")+'" cx="'+c.x+'" cy="'+c.y+'" r="22"><title>'+escapeMapEditorText(marker.label||"Unlabelled transition")+'</title></circle>';
-      }).join("");
-      gridSvg.innerHTML='<g class="wmh-minimap-grid-cells">'+cells.join("")+'</g><g class="wmh-minimap-overlays">'+overlays.join("")+'</g><g class="wmh-minimap-transitions">'+transitions+'</g>';
-      gridSvg.dataset.signature=signature;
+  if(gridSvg&&gridSvg.dataset.signature!==signature){
+    gridSvg.setAttribute("viewBox","0 0 "+boardWidth+" "+boardHeight);
+    gridSvg.innerHTML=renderGrid(false);
+    gridSvg.dataset.signature=signature;
+  }
+
+  // The full map now receives the exact same SVG cells, overlays and transitions
+  // as the minimap instead of maintaining a second, visually separate renderer.
+  const mainGridSvg=board.querySelector<SVGSVGElement>("[data-wmh-scene-svg]");
+  if(mainGridSvg){
+    mainGridSvg.classList.add("wmh-minimap-grid");
+    mainGridSvg.setAttribute("viewBox","0 0 "+boardWidth+" "+boardHeight);
+    mainGridSvg.setAttribute("preserveAspectRatio","none");
+    if(mainGridSvg.dataset.minimapSignature!==signature){
+      mainGridSvg.innerHTML=renderGrid(true);
+      mainGridSvg.dataset.minimapSignature=signature;
     }
   }
+
   const position=(token:HTMLElement)=>{
     const center=isoCellCenter(Number(token.dataset.x||0),Number(token.dataset.y||0),data.grid);
     return {
