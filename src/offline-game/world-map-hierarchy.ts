@@ -782,6 +782,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     redraw();drawIsometricForeground(board,data);syncIsoDepthAndOcclusion(board);
   };
   const applyGrid=()=>{
+    data.grid={...grid};
     board.dataset.cols=String(grid.cols);board.dataset.rows=String(grid.rows);
     const wanted=new Set<string>();for(let y=0;y<grid.rows;y++)for(let x=0;x<grid.cols;x++)wanted.add(isoCellKey(x,y));
     board.querySelectorAll<HTMLElement>("[data-wmh-tile]").forEach(tile=>{if(!wanted.has(isoCellKey(Number(tile.dataset.x),Number(tile.dataset.y))))tile.remove();});
@@ -836,11 +837,11 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       renderIsometricWorldStatus(dialog);
       selectedTransitionId=null;
     }
+    if(!active)saveEditorUi();
     panel.hidden=!active;
     toggle.hidden=active;
     toggle.setAttribute("aria-pressed",String(active));
     toggle.setAttribute("aria-expanded",String(active));
-    if(!active)saveEditorUi();
   };
   let suppressToggleClick=false;
   toggle.addEventListener("click",()=>{if(suppressToggleClick){suppressToggleClick=false;return;}setActive(panel.hidden);});
@@ -849,7 +850,6 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
   // The bubble can be dragged anywhere inside the isometric play area.
   toggle.addEventListener("pointerdown",event=>{
     if(!panel.hidden)return;
-    event.preventDefault();
     const startX=event.clientX,startY=event.clientY;
     const startLeft=toggle.offsetLeft,startTop=toggle.offsetTop;
     let moved=false;
@@ -1349,7 +1349,7 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
   if(action.dataset.wmhBuilding && current==="local"){
     stopNpcWander(dialog);
     overlay.dataset.level="interior";overlay.dataset.building=action.dataset.wmhBuilding;
-    dialog.innerHTML=panelMarkup("interior",regionId,action.dataset.wmhBuilding);bindIsoAreaEditor(dialog);bindIsometricCamera(dialog);bindIsometricMapArt(dialog);return true;
+    dialog.innerHTML=panelMarkup("interior",regionId,action.dataset.wmhBuilding);bindIsoAreaEditor(dialog);bindIsometricCamera(dialog);bindIsometricMapArt(dialog);bindIsometricHud(dialog);return true;
   }
   if(action.hasAttribute("data-wmh-tile")){
     if(dialog.querySelector<HTMLElement>("[data-wmh-board]")?.classList.contains("wmh-overlay-editing"))return true;
