@@ -580,7 +580,7 @@ function tileMapMarkup(
   });
   const npcTokens=isometricNpcTokensMarkup(mapId,interior);
   const boardClass='wmh-isometric-board wmh-svg-ground-map '+(interior?'is-interior':'is-exterior')+
-    (mapImage?' has-map-base':' is-placeholder');
+    (mapImage?' has-map-base is-minimap-style':' is-placeholder');
   return '<div class="wmh-iso-controls"><button type="button" data-wmh-iso-zoom="out" aria-label="Zoom out">−</button><span data-wmh-iso-level>100%</span><button type="button" data-wmh-iso-zoom="in" aria-label="Zoom in">+</button><button type="button" data-wmh-iso-zoom="reset">FIT</button><button type="button" data-wmh-iso-center aria-label="Center isometric map">CENTER MAP</button><small>DRAG TO PAN · PINCH TO ZOOM</small></div>'+
     '<div class="wmh-isometric-wrap" data-wmh-iso-viewport><div class="wmh-isometric-camera" data-wmh-iso-camera><div class="'+boardClass+'" data-wmh-board style="--tile-cols:'+cols+';--tile-rows:'+rows+
     ';--iso-center-x:'+(rows*tileW/2)+'px;--iso-board-width:'+boardWidth+'px;--iso-board-height:'+boardHeight+'px;--tile-w:'+tileW+'px;--tile-h:'+tileH+
@@ -1270,16 +1270,19 @@ function isometricEditorMarkup(): string {
     '<small data-wmh-overlay-status>Choose a tool, then tap individual diamond cells. The world pauses while the editor is open.</small></section></div></div>';
 }
 function isometricHudMarkup(title: string, mapImage: string): string {
-  const image=mapImage?'<img src="'+mapImage+'" alt="" draggable="false"/>':'';
+  // Academy promotes the minimap's image-and-grid presentation to the main
+  // play surface. Other locations keep the compact field minimap in the HUD.
+  const minimapMarkup=mapImage?"":
+    '<button type="button" class="wmh-rpg-minimap" data-wmh-minimap aria-label="Minimap. Tap a location to walk there." title="Tap the map to move">'+
+    '<span class="wmh-minimap-heading">FIELD MAP <i>⌖</i></span><span class="wmh-minimap-world" data-wmh-minimap-world>'+
+    '<svg class="wmh-minimap-grid" data-wmh-minimap-grid viewBox="0 0 2816 1536" preserveAspectRatio="none" aria-hidden="true"></svg><span class="wmh-minimap-actors" data-wmh-minimap-actors></span></span>'+
+    '<span class="wmh-minimap-footer" data-wmh-minimap-footer>YOU · X 05 / Y 17 · TAP TO MOVE</span></button>';
   return '<div class="wmh-isometric-hud" data-wmh-isometric-hud>'+
     '<section class="wmh-world-status" aria-label="World conditions">'+
     '<div class="wmh-world-status-top"><span class="wmh-status-cycle-icon" data-wmh-cycle-icon>☼</span><div><b data-wmh-cycle-label>PAGI</b><small data-wmh-cycle-caption>WORLD CYCLE</small></div></div>'+
     '<div class="wmh-world-status-bottom"><span class="wmh-status-weather"><i data-wmh-weather-icon>☀</i><b data-wmh-weather-label>CLEAR</b></span><span class="wmh-status-day" data-wmh-day>HARI 01</span><strong data-wmh-time>08:00</strong></div>'+
     '<small class="wmh-status-location">'+escapeMapEditorText(title)+'</small><small class="wmh-status-coordinates" data-wmh-player-grid>GRID X 05 · Y 17</small></section>'+
-    '<button type="button" class="wmh-rpg-minimap" data-wmh-minimap aria-label="Minimap. Tap a location to walk there." title="Tap the map to move">'+
-    '<span class="wmh-minimap-heading">FIELD MAP <i>⌖</i></span><span class="wmh-minimap-world" data-wmh-minimap-world>'+image+
-    '<svg class="wmh-minimap-grid" data-wmh-minimap-grid viewBox="0 0 2816 1536" preserveAspectRatio="none" aria-hidden="true"></svg><span class="wmh-minimap-actors" data-wmh-minimap-actors></span></span>'+
-    '<span class="wmh-minimap-footer" data-wmh-minimap-footer>YOU · X 05 / Y 17 · TAP TO MOVE</span></button></div>';
+    minimapMarkup+'</div>';
 }
 function isometricPlayMarkup(regionId: RegionId, selectedBuilding: string, interior: boolean): string {
   const mapId=makeIsometricMapId(regionId,selectedBuilding,interior);
