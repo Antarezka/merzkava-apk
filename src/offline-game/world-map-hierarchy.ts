@@ -1311,6 +1311,7 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
     bindIsoAreaEditor(dialog);
     bindIsometricCamera(dialog);
     bindIsometricMapArt(dialog);
+    bindIsometricHud(dialog);
     startNpcWander(dialog);
     return true;
   }
@@ -1343,7 +1344,7 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
   }
   if(action.dataset.wmhSite){
     overlay.dataset.level="local";overlay.dataset.building=action.dataset.wmhSite;
-    dialog.innerHTML=panelMarkup("local",regionId,action.dataset.wmhSite);bindIsoAreaEditor(dialog);bindIsometricCamera(dialog);bindIsometricMapArt(dialog);startNpcWander(dialog);return true;
+    dialog.innerHTML=panelMarkup("local",regionId,action.dataset.wmhSite);bindIsoAreaEditor(dialog);bindIsometricCamera(dialog);bindIsometricMapArt(dialog);bindIsometricHud(dialog);startNpcWander(dialog);return true;
   }
   if(action.dataset.wmhBuilding && current==="local"){
     stopNpcWander(dialog);
