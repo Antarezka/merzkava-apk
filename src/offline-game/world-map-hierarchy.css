@@ -1306,3 +1306,44 @@
   .wmh-isometric-play-screen .wmh-overlay-modal>.wmh-overlay-tools{width:min(290px,88vw)!important;height:min(48dvh,420px)!important}
   .wmh-map-back{bottom:max(14px,env(safe-area-inset-bottom))!important}
 }
+
+
+/* Academy base restoration: earlier green tile button backgrounds covered the
+   image even though their pseudo-element tops were hidden. Keep the base fully
+   visible beneath transparent interaction cells on the phone-sized play screen. */
+.wmh-isometric-board.has-map-base{
+  background:transparent!important;
+}
+.wmh-isometric-board.has-map-base>.wmh-isometric-map-base{
+  display:block!important;
+  position:absolute!important;
+  z-index:0!important;
+  left:0!important;
+  top:0!important;
+  right:auto!important;
+  bottom:auto!important;
+  width:var(--iso-board-width,1408px)!important;
+  height:var(--iso-board-height,768px)!important;
+  max-width:none!important;
+  max-height:none!important;
+  object-fit:fill!important;
+  visibility:visible!important;
+  opacity:1!important;
+  pointer-events:none!important;
+}
+.wmh-isometric-board.has-map-base>.wmh-tile{
+  background:transparent!important;
+  border-color:transparent!important;
+  box-shadow:none!important;
+}
+.wmh-isometric-board.has-map-base>.wmh-tile:before,
+.wmh-isometric-board.has-map-base>.wmh-tile:after{
+  display:none!important;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+}
+.wmh-isometric-board.has-map-base:not(.wmh-overlay-editing) .wmh-tile-coord,
+.wmh-isometric-board.has-map-base:not(.wmh-overlay-editing) .wmh-tile>b{
+  display:none!important;
+}
