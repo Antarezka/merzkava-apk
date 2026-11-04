@@ -764,7 +764,7 @@ function renderIsometricMinimap(board:HTMLElement):void {
 
   // The full map now receives the exact same SVG cells, overlays and transitions
   // as the minimap instead of maintaining a second, visually separate renderer.
-  const mainGridSvg=board.querySelector<SVGSVGElement>("[data-wmh-scene-svg]");
+  const mainGridSvg=board.classList.contains("is-minimap-style")?board.querySelector<SVGSVGElement>("[data-wmh-scene-svg]"):null;
   if(mainGridSvg){
     mainGridSvg.classList.add("wmh-minimap-grid");
     mainGridSvg.setAttribute("viewBox","0 0 "+boardWidth+" "+boardHeight);
