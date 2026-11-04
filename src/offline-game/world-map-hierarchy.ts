@@ -587,7 +587,7 @@ function tileMapMarkup(interior = false, mapId = "academy-exterior", mapImage = 
     ? '<img class="wmh-isometric-map-base" data-wmh-map-art src="'+mapImage+'" alt="Isometric map base" draggable="false" loading="eager" decoding="async"/><canvas class="wmh-isometric-foreground" data-wmh-foreground-canvas aria-hidden="true"></canvas>'
     : '';
   const npcTokens=isometricNpcTokensMarkup(mapId,interior);
-  return '<div class="wmh-iso-controls"><button type="button" data-wmh-iso-zoom="out" aria-label="Zoom out">−</button><span data-wmh-iso-level>100%</span><button type="button" data-wmh-iso-zoom="in" aria-label="Zoom in">+</button><button type="button" data-wmh-iso-zoom="reset">FIT</button><button type="button" data-wmh-iso-center aria-label="Center isometric map">CENTER MAP</button><small>DRAG TO PAN · PINCH TO ZOOM</small></div><div class="wmh-isometric-wrap" data-wmh-iso-viewport><div class="wmh-isometric-camera" data-wmh-iso-camera><div class="'+boardClass+'" data-wmh-board style="--tile-cols:'+cols+';--tile-rows:'+rows+';--iso-center-x:'+(rows*tileW/2)+'px;--iso-board-width:'+boardWidth+'px;--iso-board-height:'+boardHeight+'px;--tile-w:'+tileW+'px;--tile-h:'+tileH+'px;--iso-half-w:'+(tileW/2)+'px;--iso-half-h:'+(tileH/2)+'px;--iso-offset-y:0px;--slab-depth:7px" data-cols="'+cols+'" data-rows="'+rows+'" data-map-id="'+escapeMapEditorText(mapId)+'">'+imageMarkup+tiles+'<svg class="wmh-area-overlay-svg" data-wmh-overlay-svg viewBox="0 0 '+boardWidth+' '+boardHeight+'" preserveAspectRatio="none"><g data-wmh-overlay-marks></g><g data-wmh-manual-marks></g><g data-wmh-transition-marks></g><path data-wmh-overlay-preview class="wmh-area-mark-preview" d=""></path></svg><button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token data-x="5" data-y="'+(interior?8:17)+'" style="--token-x:5;--token-y:'+(interior?8:17)+'" aria-label="Player character"><i></i></button>'+npcTokens+'</div></div></div>';
+  return '<div class="wmh-iso-controls"><button type="button" data-wmh-iso-zoom="out" aria-label="Zoom out">−</button><span data-wmh-iso-level>100%</span><button type="button" data-wmh-iso-zoom="in" aria-label="Zoom in">+</button><button type="button" data-wmh-iso-zoom="reset">FIT</button><button type="button" data-wmh-iso-center aria-label="Center isometric map">CENTER MAP</button><small>DRAG TO PAN · PINCH TO ZOOM</small></div><div class="wmh-isometric-wrap" data-wmh-iso-viewport><div class="wmh-isometric-camera" data-wmh-iso-camera><div class="'+boardClass+'" data-wmh-board style="--tile-cols:'+cols+';--tile-rows:'+rows+';--iso-center-x:'+(rows*tileW/2)+'px;--iso-board-width:'+boardWidth+'px;--iso-board-height:'+boardHeight+'px;--tile-w:'+tileW+'px;--tile-h:'+tileH+'px;--iso-half-w:'+(tileW/2)+'px;--iso-half-h:'+(tileH/2)+'px;--iso-offset-y:0px;--slab-depth:7px" data-cols="'+cols+'" data-rows="'+rows+'" data-tile-w="'+tileW+'" data-tile-h="'+tileH+'" data-offset-x="0" data-offset-y="0" data-map-id="'+escapeMapEditorText(mapId)+'">'+imageMarkup+tiles+'<svg class="wmh-area-overlay-svg" data-wmh-overlay-svg viewBox="0 0 '+boardWidth+' '+boardHeight+'" preserveAspectRatio="none"><g data-wmh-overlay-marks></g><g data-wmh-manual-marks></g><g data-wmh-transition-marks></g><path data-wmh-overlay-preview class="wmh-area-mark-preview" d=""></path></svg><button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token data-x="5" data-y="'+(interior?8:17)+'" style="--token-x:5;--token-y:'+(interior?8:17)+'" aria-label="Player character"><i></i></button>'+npcTokens+'</div></div></div>';
 }
 function isometricMapBaseFor(regionId: RegionId, selectedBuilding: string, interior: boolean): string {
   if (interior) return "";
@@ -611,8 +611,8 @@ function readIsoMapData(board: HTMLElement): IsoMapEditorData {
     ...DEFAULT_ISOMETRIC_GRID,
     cols:Number(board.dataset.cols||24),
     rows:Number(board.dataset.rows||20),
-    tileW:Number(board.dataset.tileW||DEFAULT_ISOMETRIC_GRID.tileW),
-    tileH:Number(board.dataset.tileH||DEFAULT_ISOMETRIC_GRID.tileH),
+    tileW:Number(board.dataset.tileW||(board.classList.contains("has-map-base")?128:DEFAULT_ISOMETRIC_GRID.tileW)),
+    tileH:Number(board.dataset.tileH||(board.classList.contains("has-map-base")?69.5:DEFAULT_ISOMETRIC_GRID.tileH)),
     offsetX:Number(board.dataset.offsetX||0),
     offsetY:Number(board.dataset.offsetY||0),
   };
@@ -890,6 +890,8 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
   const applyGrid=()=>{
     data.grid={...grid};
     board.dataset.cols=String(grid.cols);board.dataset.rows=String(grid.rows);
+    board.dataset.tileW=String(grid.tileW);board.dataset.tileH=String(grid.tileH);
+    board.dataset.offsetX=String(grid.offsetX);board.dataset.offsetY=String(grid.offsetY);
     const wanted=new Set<string>();for(let y=0;y<grid.rows;y++)for(let x=0;x<grid.cols;x++)wanted.add(isoCellKey(x,y));
     board.querySelectorAll<HTMLElement>("[data-wmh-tile]").forEach(tile=>{if(!wanted.has(isoCellKey(Number(tile.dataset.x),Number(tile.dataset.y))))tile.remove();});
     const present=new Set(Array.from(board.querySelectorAll<HTMLElement>("[data-wmh-tile]")).map(t=>isoCellKey(Number(t.dataset.x),Number(t.dataset.y))));
