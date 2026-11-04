@@ -805,7 +805,9 @@ function bindIsometricHud(dialog:HTMLElement):void {
   const minimap=dialog.querySelector<HTMLButtonElement>("[data-wmh-minimap]");
   const world=minimap?.querySelector<HTMLElement>("[data-wmh-minimap-world]");
   const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
-  if(!hud||!board)return;
+  if(!hud)return;
+  // The rebuilt Academy currently has no actor board; its HUD still shows live world conditions.
+  if(!board){renderIsometricWorldStatus(dialog);return;}
   if(minimap&&world&&minimap.dataset.bound!=="true"){
     minimap.dataset.bound="true";
     minimap.addEventListener("click",event=>{
@@ -1314,8 +1316,10 @@ function isometricPlayMarkup(regionId: RegionId, selectedBuilding: string, inter
     selectedBuilding.trim().toLowerCase() === "tianhai academy";
   if (isEmptyAcademy) {
     // Fresh Academy shell: no old artwork, tiles, grid, actors, NPCs, minimap, or editor.
+    const academyMapImage="/maps/academy/full-map/1_academy.jpg";
     return '<div class="wmh-isometric-play-screen wmh-academy-empty-screen" data-wmh-isometric-play-screen>'+
-      '<div class="wmh-academy-empty-surface" aria-label="Empty Tianhai Academy area"></div>'+
+      '<div class="wmh-academy-empty-surface" aria-label="Tianhai Academy map artwork"></div>'+
+      isometricHudMarkup("Tianhai Academy",academyMapImage)+
       '<button type="button" class="wmh-map-back" data-wmh-action="back" aria-label="Leave Tianhai Academy"><span>‹</span><b>BACK</b></button>'+
       '</div>';
   }
