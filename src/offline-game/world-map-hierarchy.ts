@@ -444,7 +444,7 @@ function panelMarkup(level: Level, regionId: RegionId = "golden-dragon-empire", 
     '<header class="wmh-level-header"><div><span class="wmh-level-tag">'+kind+'</span><h3>'+title+'</h3><p>'+subtitle+'</p></div><button type="button" class="wmh-close" data-wmh-action="close" aria-label="Close map">×</button></header>';
   if (level === "world") return header("WORLD MAP","Merzkava Universe","THREE GREAT POWERS · EXTERNAL TERRITORIES · SEAS")+
     '<div class="wmh-map-zoom"><button type="button" data-wmh-zoom="out">−</button><span data-wmh-zoom-level>100%</span><button type="button" data-wmh-zoom="in">+</button><button type="button" data-wmh-zoom="reset">RESET</button></div>'+
-    '<div class="wmh-world-map" data-wmh-map-viewport><div class="wmh-world-map-image" data-wmh-map-surface><img src="/world/Untitled77_20261029054536.png" alt="Merzkava Universe world map"/>'+readWorldMarkers().map(marker=>worldMapMarkerMarkup(marker)).join("")+'</div></div>'+
+    '<div class="wmh-world-map" data-wmh-map-viewport><div class="wmh-world-map-image" data-wmh-map-surface><img src="/world/Untitled77_20261029054536.png" alt="Merzkava Universe world map"/>'+readWorldMarkers().map(marker=>worldMapMarkerMarkup(marker)).join("")+'</div><div data-wmh-selection-host></div></div>'+
     '<div class="wmh-bottom-actions"><span>SELECT A POWER TO OPEN ITS REGIONAL MAP</span><button data-wmh-action="editor-open">⊞ MAP EDITOR</button></div>';
   if (level === "map-editor") return header("WORLD MAP TOOLS","Map Editor","FLAT WORLD MAP · NORMALIZED COORDINATES")+mapEditorMarkup();
   if (level === "regional") return header("REGIONAL MAP",region.name,region.subtitle)+
@@ -541,7 +541,7 @@ function walkToTile(dialog:HTMLElement,targetX:number,targetY:number,surface:str
   move();
 }
 export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement, onAdvanceTime: (minutes: number) => void): boolean {
-  const action=target.closest<HTMLElement>("[data-wmh-action],[data-wmh-info],[data-wmh-site],[data-wmh-building],[data-wmh-npc],[data-wmh-plot],[data-wmh-tile],[data-wmh-reply]");
+  const action=target.closest<HTMLElement>("[data-wmh-action],[data-wmh-info],[data-wmh-site],[data-wmh-building],[data-wmh-npc],[data-wmh-plot],[data-wmh-tile],[data-wmh-reply],[data-wmh-dismiss-layer]");
   if(!action)return false;
   const overlay=root.querySelector<HTMLElement>("[data-world-map-hierarchy]");
   const dialog=overlay?.querySelector<HTMLElement>("[data-wmh-dialog]");
@@ -559,16 +559,21 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
     stopNpcWander(dialog);overlay.dataset.level=next;dialog.innerHTML=panelMarkup(next,regionId,building);if(next==="world")bindWorldMapZoom(dialog);if(next==="local")startNpcWander(dialog);return true;
   }
   if(action.dataset.wmhInfo){
-    const id=action.dataset.wmhInfo as WorldMarkerId;
-    const info=readWorldMarkers().find(item=>item.id===id);if(!info)return true;
-    if(["golden-dragon-empire","tianhai-yunzhou","beiming-gu"].includes(id)){
-      overlay.dataset.region=id;overlay.dataset.level="regional";dialog.innerHTML=panelMarkup("regional",id as RegionId);return true;
-    }
-    dialog.querySelector(".wmh-marker-info")?.remove();
-    const placement=info.placementStatus==="provisional"?"<em>PROVISIONAL</em>":"<em>OWNER-POSITIONED</em>";
-    dialog.insertAdjacentHTML("beforeend",'<section class="wmh-marker-info"><div><small>'+info.category.toUpperCase()+' · MAP LOCATION</small><b>'+info.name+'</b><span>'+info.subtitle+'</span><p>'+info.description+'</p>'+placement+'</div><button type="button" data-wmh-action="dismiss-marker-info">×</button></section>');return true;
+    const info=readWorldMarkers().find(item=>item.id===action.dataset.wmhInfo);if(!info)return true;
+    const host=dialog.querySelector<HTMLElement>("[data-wmh-selection-host]");if(!host)return true;
+    host.innerHTML=selectionMarkup(info);
+    const card=host.querySelector<HTMLElement>("[data-wmh-selection-card]");if(card)animateExpeditionPanel(card);
+    const art=host.querySelector<HTMLElement>(".wmh-selection-scene-image");
+    if(art&&!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches)art.animate([{transform:"scale(1.045)",filter:"brightness(.78)"},{transform:"scale(1)",filter:"brightness(1)"}],{duration:760,easing:"cubic-bezier(.2,.75,.25,1)"});
+    return true;
   }
-  if(action.dataset.wmhAction==="dismiss-marker-info"){dialog.querySelector(".wmh-marker-info")?.remove();return true;}
+  if(action.hasAttribute("data-wmh-dismiss-layer")||action.dataset.wmhAction==="selection-no"){dialog.querySelector("[data-wmh-selection-host]")?.replaceChildren();return true;}
+  if(action.dataset.wmhAction==="selection-yes"){
+    const id=action.dataset.markerId as WorldMarkerId;const info=readWorldMarkers().find(item=>item.id===id);if(!info)return true;
+    if(["golden-dragon-empire","tianhai-yunzhou","beiming-gu"].includes(id)){overlay.dataset.region=id;overlay.dataset.level="regional";dialog.innerHTML=panelMarkup("regional",id as RegionId);}
+    else {overlay.dataset.region="golden-dragon-empire";overlay.dataset.level="regional";dialog.innerHTML=panelMarkup("regional","golden-dragon-empire",info.name,info);}
+    return true;
+  }
   if(action.dataset.wmhSite){
     overlay.dataset.level="local";overlay.dataset.building=action.dataset.wmhSite;
     dialog.innerHTML=panelMarkup("local",regionId,action.dataset.wmhSite);startNpcWander(dialog);return true;
