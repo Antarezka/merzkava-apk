@@ -203,10 +203,7 @@
  background:radial-gradient(ellipse at 48% 12%,#394239 0%,#171d19 58%,#090d0b 100%);
  border:1px solid #c5a16a;box-shadow:inset 0 0 0 4px #0b100d,inset 0 0 0 5px #94764b,0 12px 32px #000c;
  scrollbar-color:#9b7b4d #111713;overscroll-behavior:contain;
- transform:translateX(-102%);visibility:hidden;pointer-events:none;
- transition:transform .3s cubic-bezier(.2,.75,.25,1),visibility 0s linear .3s;
-}
-.arcanist-device-drawer.is-open{transform:translateX(0);visibility:visible;pointer-events:auto;transition:transform .3s cubic-bezier(.2,.75,.25,1),visibility 0s;}
+ }
 .arcanist-device-drawer[hidden]{display:none!important}
 .arcanist-machine-shell{
  position:relative;isolation:isolate;display:flex;flex:1 0 auto;flex-direction:column;gap:7px;
