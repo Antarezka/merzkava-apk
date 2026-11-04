@@ -449,14 +449,8 @@ function bindWorldMapEditor(dialog: HTMLElement): void {
 const ACADEMY_MAP_ART_PATH = "maps/academy/full-map/1_academy.jpg";
 
 function academyMapArtUrl(): string {
-  // Vite is configured with a relative base for Capacitor. Resolve against the
-  // app document so the packaged APK and browser build use the same asset path.
+  // Resolve against the app document so browser and packaged APK use the same asset path.
   return new URL(ACADEMY_MAP_ART_PATH, document.baseURI).href;
-}
-
-function academyMiniMapMarkup(): string {
-  const src=academyMapArtUrl();
-  return '<div class="wmh-academy-map-jump"><button type="button" class="wmh-academy-mini-map" data-wmh-action="academy-home" aria-label="Return to the Academy exterior map"><span class="wmh-academy-mini-map-thumb"><img class="wmh-academy-mini-map-art" data-wmh-academy-map-art src="'+src+'" alt="" draggable="false"/></span><span class="wmh-academy-mini-map-copy"><b>TIANHAI ACADEMY</b><small>CLICK TO RETURN TO ACADEMY</small></span><span class="wmh-academy-mini-map-arrow" aria-hidden="true">↗</span></button></div>';
 }
 
 function bindIsometricMapArt(dialog: HTMLElement): void {
@@ -1320,7 +1314,6 @@ function panelMarkup(level: Level, regionId: RegionId = "golden-dragon-empire", 
   if (level === "map-editor") return header("WORLD MAP TOOLS","Map Editor","FLAT WORLD MAP · NORMALIZED COORDINATES")+mapEditorMarkup();
   if (level === "test") return renderIsometricMapTestArea();
   if (level === "regional") return header("REGIONAL MAP",selectedArea?.name||region.name,selectedArea?.subtitle||region.subtitle)+
-    academyMiniMapMarkup()+
     '<div class="wmh-regional-placeholder"><div class="wmh-regional-land"><span class="wmh-regional-river"></span><span class="wmh-regional-road road-one"></span><span class="wmh-regional-road road-two"></span><span class="wmh-regional-road road-three"></span><span class="wmh-regional-label">'+(selectedArea?selectedArea.name.toUpperCase():"REGIONAL MAP ART · PLACEHOLDER")+'</span>'+
     (selectedArea?["Central District","Local Settlement","Market Quarter","Public Grounds","Transport Gate","Nearby Landmark"]:region.sites).map((site,i)=>'<button type="button" class="wmh-regional-site site-'+i+'" data-wmh-site="'+site+'" data-wmh-region-id="'+regionId+'"><i>'+["♜","⌘","▤","⚓","⌑","⚔"][i%6]+'</i><b>'+site+'</b></button>').join("")+'</div></div>'+
     '<div class="wmh-bottom-actions"><button data-wmh-action="back">← WORLD MAP</button><span>SELECT A PLACE · LOCAL MAPS OPEN HERE</span></div>';

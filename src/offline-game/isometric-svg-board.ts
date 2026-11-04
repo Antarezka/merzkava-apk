@@ -114,13 +114,14 @@ function cellMarkup(
   const palette = palettes[theme];
   const fill = baseImage ? "transparent" : palette[feature];
   const fillOpacity = baseImage ? "0" : feature === "ground" ? ".88" : ".96";
-  const stroke = baseImage ? "#fff3d7" : "#e5e5c5";
-  const strokeOpacity = baseImage ? ".34" : feature === "ground" ? ".42" : ".82";
+  // Academy artwork remains the visible ground; its isometric grid is only a thin coordinate guide.
+  const stroke = baseImage ? "#fff8e8" : "#e5e5c5";
+  const strokeOpacity = baseImage ? "0.22" : feature === "ground" ? ".42" : ".82";
   return '<polygon class="wmh-vector-cell feature-' + feature + '" data-wmh-tile data-x="' + x +
     '" data-y="' + y + '" data-z="0" data-tile-id="' + escapeXml("map-" + x + "-" + y) +
     '" data-surface="' + surfaceFor(feature, theme) + '" points="' + points + '" fill="' + fill +
     '" fill-opacity="' + fillOpacity + '" stroke="' + stroke + '" stroke-opacity="' + strokeOpacity +
-    '" stroke-width="1.35" aria-label="Tile ' + x + ', ' + y + ' · ' + feature + '"><title>' +
+    '" stroke-width="' + (baseImage ? "0.85" : "1.35") + '" aria-label="Tile ' + x + ', ' + y + ' · ' + feature + '"><title>' +
     x + ", " + y + " · " + feature + "</title></polygon>";
 }
 
