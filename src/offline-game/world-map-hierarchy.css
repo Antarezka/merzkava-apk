@@ -796,8 +796,8 @@
   transform-origin:top left!important;
 }
 .wmh-isometric-board.is-exterior{
-  width:1408px!important;
-  height:768px!important;
+  width:var(--iso-board-width,1408px)!important;
+  height:var(--iso-board-height,768px)!important;
 }
 .wmh-isometric-board.is-exterior .wmh-academy-map-art{
   width:1408px!important;
@@ -1046,9 +1046,19 @@
 
 /* Shared isometric map layers: the complete JPG stays behind actors and only
    foreground-priority cell portions are redrawn above them. */
-.wmh-isometric-board.has-map-base .wmh-academy-map-art,
 .wmh-isometric-board.has-map-base .wmh-isometric-map-base{
+  display:block!important;
+  position:absolute!important;
   z-index:0!important;
+  left:0!important;
+  top:0!important;
+  right:auto!important;
+  bottom:auto!important;
+  width:auto!important;
+  height:auto!important;
+  max-width:none!important;
+  max-height:none!important;
+  object-fit:fill!important;
   pointer-events:none!important;
 }
 .wmh-isometric-board.has-map-base .wmh-tile:before,
