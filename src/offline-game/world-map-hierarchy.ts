@@ -1201,6 +1201,7 @@ function bindIsometricCamera(dialog:HTMLElement):void {
     board.style.setProperty("--wmh-camera-pad-x",px+"px");
     board.style.setProperty("--wmh-camera-pad-y",py+"px");
     board.style.setProperty("--wmh-camera-zoom",String(zoom));
+    board.style.setProperty("--wmh-camera-inverse-zoom",String(1/zoom));
     const scaleLabel=dialog.querySelector<HTMLElement>("[data-wmh-iso-level]");
     if(scaleLabel)scaleLabel.textContent=Math.round(zoom*100)+"%";
   };
@@ -1221,6 +1222,7 @@ function bindIsometricCamera(dialog:HTMLElement):void {
     board.style.setProperty("--wmh-camera-pad-x",px+"px");
     board.style.setProperty("--wmh-camera-pad-y",py+"px");
     board.style.setProperty("--wmh-camera-zoom",String(zoom));
+    board.style.setProperty("--wmh-camera-inverse-zoom",String(1/zoom));
     viewport.scrollLeft=px+ax*zoom/old-fx;
     viewport.scrollTop=py+ay*zoom/old-fy;
     const label=dialog.querySelector<HTMLElement>("[data-wmh-iso-level]");
