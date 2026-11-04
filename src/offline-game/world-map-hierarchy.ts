@@ -188,7 +188,14 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
   // World-map markers are fixed map anchors: their pointer gestures must never
   // enter the viewport pan/pinch tracker. Keep click bubbling for the preview handler.
   viewport.querySelectorAll<HTMLElement>(".wmh-power:not(.wmh-editor-marker)").forEach(marker => {
-    for (const type of ["pointerdown", "pointermove", "pointerup", "pointercancel"]) {
+    marker.addEventListener("pointerdown", event => {
+      event.preventDefault();
+      event.stopPropagation();
+      panStart = null;
+      pinchStart = null;
+      try { marker.focus({ preventScroll: true }); } catch { /* older WebViews */ }
+    });
+    for (const type of ["pointermove", "pointerup", "pointercancel"]) {
       marker.addEventListener(type, event => event.stopPropagation());
     }
     marker.addEventListener("dragstart", event => event.preventDefault());
@@ -458,6 +465,7 @@ function bindIsometricCamera(dialog:HTMLElement):void {
   const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
   if(!viewport||!camera||!board||viewport.dataset.cameraBound==="true")return;
   viewport.dataset.cameraBound="true";
+  syncIsoDepthAndOcclusion(board);
   let zoom=1;
   const baseW=704,baseH=368;
   const apply=(next:number,focusX?:number,focusY?:number)=>{
@@ -522,15 +530,28 @@ const npcData: Record<string,{name:string;gender:string;greeting:string;choices:
   "groundskeeper":{name:"Uncle Qiao",gender:"male",greeting:"Mind the wet stones around the pond, young one. The moss makes them slippery after watering.",choices:["Ask about the garden","Ask about the pond","Thank him"],replies:["The flowering shrubs were planted by the first academy groundskeeper.","The pond is shallow near the bridge, but deep beside the willow.","Take care where you step."]},
   "teacher":{name:"Instructor",gender:"male",greeting:"Settle down. The lesson will begin shortly.",choices:["Ask about the lesson","Ask for guidance"],replies:["Today we review the foundations.","Observe carefully and ask when you are ready."]}
 };
+function syncIsoDepthAndOcclusion(board:HTMLElement):void {
+  const tokens=Array.from(board.querySelectorAll<HTMLElement>("[data-wmh-player-token],[data-wmh-npc]"));
+  const occupied=new Set(tokens.map(token=>Number(token.dataset.x||0)+","+Number(token.dataset.y||0)));
+  board.querySelectorAll<HTMLElement>("[data-wmh-tile]").forEach(tile=>{
+    const x=Number(tile.dataset.x||0),y=Number(tile.dataset.y||0);
+    tile.style.zIndex=String(tile.dataset.wmhOcclusion==="true"?40+x+y:1+x+y);
+    tile.classList.toggle("wmh-occlusion-active",tile.dataset.wmhOcclusion==="true"&&occupied.has(x+","+y));
+  });
+  tokens.forEach(token=>{
+    const x=Number(token.dataset.x||0),y=Number(token.dataset.y||0);
+    token.style.zIndex=String(20+x+y);
+  });
+}
 function animateGridMove(token:HTMLElement,update:()=>void):void {
   const before=token.getBoundingClientRect();
   update();
   const after=token.getBoundingClientRect();
   const dx=before.left-after.left,dy=before.top-after.top;
   token.animate([
-    {transform:"translate("+dx+"px,"+dy+"px) translateY(-6px)"},
-    {transform:"translateY(-6px)"}
-  ],{duration:125,easing:"ease-out"});
+    {transform:"translate("+dx+"px,"+dy+"px) translate(-50%,-100%) translateY(-7px)"},
+    {transform:"translate(-50%,-100%) translateY(-7px)"}
+  ],{duration:225,easing:"cubic-bezier(.2,.72,.25,1)"});
 }
 function stopNpcWander(dialog:HTMLElement):void {
   const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
@@ -548,12 +569,13 @@ function startNpcWander(dialog:HTMLElement):void {
       const x=Number(npc.dataset.x||0),y=Number(npc.dataset.y||0);
       const options=[[x+1,y],[x-1,y],[x,y+1],[x,y-1]].filter(([nx,ny])=>
         nx>=0&&nx<12&&ny>=0&&ny<10&&
+        !board.querySelector<HTMLElement>('[data-wmh-tile][data-x="'+nx+'"][data-y="'+ny+'"][data-wmh-blocked="true"]')&&
         !(Number(player?.dataset.x||5)===nx&&Number(player?.dataset.y||8)===ny)
       );
       if(!options.length)return;
       const [nx,ny]=options[Math.floor(Math.random()*options.length)];
       npc.dataset.x=String(nx);npc.dataset.y=String(ny);
-      animateGridMove(npc,()=>{npc.style.setProperty("--token-x",String(nx));npc.style.setProperty("--token-y",String(ny));});
+      animateGridMove(npc,()=>{npc.style.setProperty("--token-x",String(nx));npc.style.setProperty("--token-y",String(ny));});npc.dataset.x=String(nx);npc.dataset.y=String(ny);syncIsoDepthAndOcclusion(board);
     });
   },2400);
   board.dataset.npcTimer=String(timer);
@@ -575,7 +597,7 @@ function walkToTile(dialog:HTMLElement,targetX:number,targetY:number,surface:str
   const cols=12,rows=10;
   if(!Number.isInteger(targetX)||!Number.isInteger(targetY)||targetX<0||targetX>=cols||targetY<0||targetY>=rows)return;
   const destination=board.querySelector<HTMLElement>('[data-wmh-tile][data-x="'+targetX+'"][data-y="'+targetY+'"]');
-  if(!destination)return;
+  if(!destination||destination.dataset.wmhBlocked==="true")return;
   const oldTimer=Number(player.dataset.moveTimer||0);
   if(oldTimer)window.clearTimeout(oldTimer);
   const startX=Number(player.dataset.x||5),startY=Number(player.dataset.y||8);
@@ -590,6 +612,8 @@ function walkToTile(dialog:HTMLElement,targetX:number,targetY:number,surface:str
     for(const [nx,ny] of neighbors){
       const key=nx+","+ny;
       if(nx<0||nx>=cols||ny<0||ny>=rows||previous.has(key))continue;
+      const nextTile=board.querySelector<HTMLElement>('[data-wmh-tile][data-x="'+nx+'"][data-y="'+ny+'"]');
+      if(nextTile?.dataset.wmhBlocked==="true")continue;
       previous.set(key,x+","+y);queue.push([nx,ny]);
     }
   }
@@ -612,9 +636,10 @@ function walkToTile(dialog:HTMLElement,targetX:number,targetY:number,surface:str
       player.style.setProperty("--token-y",String(y));
     });
     player.dataset.x=String(x);player.dataset.y=String(y);
+    syncIsoDepthAndOcclusion(board);
     const material=tile?.dataset.surface||surface;
     playFootstep(material as "earth"|"wet"|"stone"|"wood"|"tile");
-    player.dataset.moveTimer=String(window.setTimeout(move,145));
+    player.dataset.moveTimer=String(window.setTimeout(move,235));
   };
   move();
 }
