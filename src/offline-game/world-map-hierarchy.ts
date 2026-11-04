@@ -898,7 +898,7 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
   }
   if(action.dataset.wmhAction==="back"){
     const next:Level=current==="interior"?"local":current==="local"?"regional":"world";
-    stopNpcWander(dialog);overlay.dataset.level=next;dialog.innerHTML=panelMarkup(next,regionId,building);if(next==="world")bindWorldMapZoom(dialog);if(next==="regional"||next==="interior")bindAcademyMapArt(dialog);if(next==="local"){bindIsoAreaEditor(dialog);bindIsometricCamera(dialog);bindAcademyMapArt(dialog);startNpcWander(dialog);}return true;
+    stopNpcWander(dialog);overlay.dataset.level=next;dialog.innerHTML=panelMarkup(next,regionId,building);if(next==="world")bindWorldMapZoom(dialog);if(next==="regional")bindAcademyMapArt(dialog);if(next==="local"){bindIsoAreaEditor(dialog);bindIsometricCamera(dialog);bindAcademyMapArt(dialog);startNpcWander(dialog);}return true;
   }
   if(action.dataset.wmhAction==="chat-close"){
     const chat=dialog.querySelector<HTMLElement>("[data-wmh-chat]");
