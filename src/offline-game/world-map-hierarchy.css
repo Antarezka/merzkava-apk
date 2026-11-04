@@ -771,10 +771,13 @@
 }
 .wmh-isometric-camera{
   display:block!important;
-  width:max-content!important;
-  height:max-content!important;
+  /* Width and height are set by bindIsometricCamera to include the blank pan field. */
+  width:auto;
+  height:auto;
   min-width:0!important;
   min-height:0!important;
+  max-width:none!important;
+  max-height:none!important;
   flex:none!important;
 }
 .wmh-isometric-board{
