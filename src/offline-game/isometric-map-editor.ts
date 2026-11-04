@@ -42,12 +42,37 @@ export const DEFAULT_ISOMETRIC_GRID: IsoMapGridConfig = {
   npcScale: 1,
 };
 
+export const ACADEMY_MAP_BASE_DIMENSIONS = { width: 2816, height: 1536 } as const;
+export const ACADEMY_ISOMETRIC_GRID: IsoMapGridConfig = {
+  cols: 24,
+  rows: 20,
+  tileW: 128,
+  tileH: 69.5,
+  offsetX: 0,
+  offsetY: 0,
+  playerScale: 1,
+  npcScale: 1,
+};
+
+export function isoMapBoardSize(
+  grid: IsoMapGridConfig,
+  baseWidth = 0,
+  baseHeight = 0,
+): { width: number; height: number } {
+  const projectedWidth = (grid.cols + grid.rows - 2) * grid.tileW / 2 + grid.tileW;
+  const projectedHeight = (grid.cols + grid.rows - 2) * grid.tileH / 2 + grid.tileH + 7;
+  return {
+    width: Math.max(projectedWidth, baseWidth),
+    height: Math.max(projectedHeight, baseHeight),
+  };
+}
+
 export function isoCellKey(x: number, y: number): string {
   return x + "," + y;
 }
 
 export function isoMapStorageKey(mapId: string): string {
-  return "merzkava.isometric-map-editor.v1:" + encodeURIComponent(mapId);
+  return "merzkava.isometric-map-editor.v2:" + encodeURIComponent(mapId);
 }
 
 function clamp(value: unknown, min: number, max: number, fallback: number): number {

@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
+  ACADEMY_ISOMETRIC_GRID,
+  ACADEMY_MAP_BASE_DIMENSIONS,
   createIsoMapEditorData,
   DEFAULT_ISOMETRIC_GRID,
+  isoMapBoardSize,
   isoCellAtPoint,
   isoCellCenter,
   isoCellHasLayer,
@@ -48,6 +51,26 @@ describe("shared isometric map editor data", () => {
     expect(data.blockedCells).toEqual(["1,2"]);
     expect(data.opacityCells).toEqual(["4,5"]);
     expect(data.transitions).toEqual([{ id: "a", x: 7, y: 5, label: "North Gate" }]);
+  });
+
+  it("calibrates the Academy grid against the complete PNG base dimensions", () => {
+    expect(isoMapBoardSize(
+      ACADEMY_ISOMETRIC_GRID,
+      ACADEMY_MAP_BASE_DIMENSIONS.width,
+      ACADEMY_MAP_BASE_DIMENSIONS.height,
+    )).toEqual({ width: 2816, height: 1536 });
+    expect(ACADEMY_ISOMETRIC_GRID).toMatchObject({
+      cols: 24, rows: 20, tileW: 128, tileH: 69.5,
+    });
+  });
+
+  it("uses a fresh storage namespace for the reinstalled isometric areas", () => {
+    expect(isoMapStorageKey("golden-dragon-empire:tianhai-academy:exterior"))
+      .toMatch(/^merzkava\\.isometric-map-editor\\.v2:/);
+    expect(isoMapStorageKey("golden-dragon-empire:tianhai-academy:exterior"))
+      .not.toBe(isoMapStorageKey("golden-dragon-empire:tianhai-academy:interior"));
+    expect(isoMapStorageKey("golden-dragon-empire:tianhai-academy:exterior"))
+      .not.toBe(isoMapStorageKey("tianhai-yunzhou:academy:exterior"));
   });
 
   it("keeps editor settings isolated for different isometric map IDs", () => {
