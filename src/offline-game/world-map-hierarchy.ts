@@ -457,43 +457,8 @@ function academyMiniMapMarkup(): string {
   return '<div class="wmh-academy-map-jump"><button type="button" class="wmh-academy-mini-map" data-wmh-action="academy-home" aria-label="Return to the Academy exterior map"><span class="wmh-academy-mini-map-thumb"><img class="wmh-academy-mini-map-art" data-wmh-academy-map-art src="'+src+'" alt="" draggable="false"/></span><span class="wmh-academy-mini-map-copy"><b>TIANHAI ACADEMY</b><small>CLICK TO RETURN TO ACADEMY</small></span><span class="wmh-academy-mini-map-arrow" aria-hidden="true">↗</span></button></div>';
 }
 
-let academyMapPngDataUrl: string | null = null;
-
 function bindIsometricMapArt(dialog: HTMLElement): void {
   const images = Array.from(dialog.querySelectorAll<HTMLImageElement>("[data-wmh-academy-map-art],[data-wmh-map-art]"));
-  const convertAllToPng = (source: HTMLImageElement): void => {
-    if (!academyMapPngDataUrl) {
-      try {
-        if (source.currentSrc.startsWith("data:image/png")) {
-          academyMapPngDataUrl = source.currentSrc;
-        } else {
-          const canvas = document.createElement("canvas");
-          canvas.width = source.naturalWidth;
-          canvas.height = source.naturalHeight;
-          const context = canvas.getContext("2d");
-          if (!context || !canvas.width || !canvas.height) return;
-          context.drawImage(source, 0, 0);
-          academyMapPngDataUrl = canvas.toDataURL("image/png");
-        }
-      } catch {
-        // The original same-origin image remains usable if PNG canvas export is unavailable.
-        return;
-      }
-    }
-    if (!academyMapPngDataUrl) return;
-    for (const image of images) {
-      if (image.dataset.mapPngConverted === "true") continue;
-      image.dataset.mapPngConverted = "true";
-      const board = image.closest<HTMLElement>("[data-wmh-board]");
-      const draw = () => { if (board) drawIsometricForeground(board); };
-      if (image.src === academyMapPngDataUrl) {
-        draw();
-      } else {
-        image.addEventListener("load", draw, { once: true });
-        image.src = academyMapPngDataUrl;
-      }
-    }
-  };
   images.forEach(image => {
     if (image.dataset.mapArtBound === "true") return;
     image.dataset.mapArtBound = "true";
@@ -504,9 +469,11 @@ function bindIsometricMapArt(dialog: HTMLElement): void {
     const board = image.closest<HTMLElement>("[data-wmh-board]");
     const ready = () => {
       if (!image.naturalWidth) return;
-      convertAllToPng(image);
-      // Paint the source immediately as a board texture as a fallback; once the
-      // PNG data URL loads, the same callback redraws it in PNG form.
+      image.style.width = image.naturalWidth + "px";
+      image.style.height = image.naturalHeight + "px";
+      image.style.opacity = "1";
+      image.style.visibility = "visible";
+      image.style.display = "block";
       if (board) drawIsometricForeground(board);
     };
     if (image.complete && image.naturalWidth) ready();
@@ -630,18 +597,13 @@ function drawIsometricForeground(board:HTMLElement,data=readIsoMapData(board)):v
   const image=board.querySelector<HTMLImageElement>("[data-wmh-map-art]");
   if(!canvas||!image||!image.complete||!image.naturalWidth||!image.naturalHeight)return;
   const dataGrid=data.grid;
-  const sourceUrl=image.currentSrc||image.src;
-  if(sourceUrl){
-    const escaped=sourceUrl.replace(/"/g,"%22");
-    // Keep the source image as a real DOM image layer. Do not rely on a
-    // CSS background URL: Android WebView may reject very large data-URL
-    // backgrounds even while the same image element works in the minimap.
-    image.style.width=image.naturalWidth+"px";
-    image.style.height=image.naturalHeight+"px";
-    image.style.opacity="1";
-    image.style.visibility="visible";
-    image.style.display="block";
-  }
+  // Display the original checked-in JPG directly. Avoid generating a large
+  // PNG data URL: the same direct image element works in Android WebView.
+  image.style.width=image.naturalWidth+"px";
+  image.style.height=image.naturalHeight+"px";
+  image.style.opacity="1";
+  image.style.visibility="visible";
+  image.style.display="block";
   const projectedWidth=(dataGrid.cols+dataGrid.rows-2)*dataGrid.tileW/2+dataGrid.tileW;
   const projectedHeight=(dataGrid.cols+dataGrid.rows-2)*dataGrid.tileH/2+dataGrid.tileH+7;
   const boardWidth=Math.max(projectedWidth,image.naturalWidth);

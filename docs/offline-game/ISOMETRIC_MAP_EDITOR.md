@@ -38,7 +38,7 @@ Use unique stable map IDs for each exterior, interior, or other isometric scene.
 
 ## Current map rollout
 
-- **Tianhai Academy exterior:** source artwork is `public/maps/academy/full-map/1_academy.jpg`, fetched from the committed Academy map asset. The browser converts it to a real PNG data URL before the main board and minimap display it. The Map Base is painted as the board background; the grid is transparent interaction geometry above it.
+- **Tianhai Academy exterior:** source artwork is `public/maps/academy/full-map/1_academy.jpg`, fetched from the committed Academy map asset. The original JPEG file is loaded directly by the main board and minimap. The main board uses the visible HTML image element as its base layer; the grid is transparent interaction geometry above it. No CSS background or large data-URL conversion is required.
 - The source artwork is **2816×1536 px**. Its current 24×20 grid is calibrated to **128×69.5 px** diamonds, giving a projected board of 2816×1536. The first camera view fits the entire map to the phone viewport.
 - **Golden Dragon Empire, Tianhai Yunzhou, and Beiming Gu:** all local areas use the same isometric board/editor, each with a separate map ID and no Map Base image for now. They show a restrained isometric placeholder grid until artwork is supplied; regional panorama artwork is not substituted for a playable map.
 - The previous cell-layout and editor-window local-storage keys are cleared once during the refresh. New map areas start with clean calibration, transitions, blocked cells, and foreground cells.

@@ -6,7 +6,7 @@ For the current Tianhai Academy exterior, the checked-in source image is:
 
 - `public/maps/academy/full-map/1_academy.jpg`
 
-The app converts the loaded source into a PNG data URL at runtime before using it for the main map and minimap. The checked-in source is still a JPG; do not rename JPG bytes to a .png filename. A verified full-map PNG source is needed to replace the committed JPG asset itself.
+The runtime loads this exact JPG source directly into the main isometric board and minimap. It is not renamed or converted into a data URL. Preserve the original JPEG bytes and extension.
 
 Do not split roofs, canopies, gates, or foreground architecture into separate image fragments. The editor stores cell metadata only; it never modifies or crops the source image file.
 
