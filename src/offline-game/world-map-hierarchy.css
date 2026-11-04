@@ -1296,13 +1296,56 @@
   visibility:hidden!important;opacity:0!important;animation-play-state:paused!important;transition:none!important;
 }
 .wmh-isometric-play-screen .wmh-isometric-board.wmh-editor-paused .wmh-character-token{animation-play-state:paused!important}
+/* NPC dialogue keeps the previous choice-based conversation flow, but opens
+   as a true viewport modal instead of a docked strip at the bottom of the map. */
 .wmh-isometric-play-screen .wmh-chat-panel{
-  position:absolute!important;z-index:610!important;left:50%!important;bottom:62px!important;transform:translateX(-50%)!important;
-  width:min(92vw,480px)!important;max-height:32dvh!important;margin:0!important;overflow:auto!important;pointer-events:auto!important;
+  position:fixed!important;
+  z-index:10000!important;
+  inset:0!important;
+  width:100vw!important;
+  height:100vh!important;
+  height:100dvh!important;
+  max-height:none!important;
+  margin:0!important;
+  padding:max(14px,env(safe-area-inset-top)) 14px max(14px,env(safe-area-inset-bottom))!important;
+  box-sizing:border-box!important;
+  display:grid!important;
+  place-items:center!important;
+  overflow:hidden!important;
+  border:0!important;
+  background:#080d0bd9!important;
+  backdrop-filter:blur(6px)!important;
+  -webkit-backdrop-filter:blur(6px)!important;
+  pointer-events:auto!important;
+  touch-action:none!important;
 }
 .wmh-isometric-play-screen .wmh-chat-panel[hidden]{display:none!important}
+.wmh-isometric-play-screen .wmh-chat-card{
+  width:min(100%,520px)!important;
+  max-height:min(82dvh,680px)!important;
+  overflow-y:auto!important;
+  overscroll-behavior:contain!important;
+  padding:24px 14px 14px!important;
+  box-sizing:border-box!important;
+  touch-action:pan-y!important;
+}
 .wmh-isometric-play-screen .wmh-chat-close{pointer-events:auto!important}
+.wmh-isometric-play-screen .wmh-chat-input-row [data-wmh-replies] button{
+  min-height:40px!important;
+  padding:9px 12px!important;
+  border-radius:7px!important;
+  font-size:11px!important;
+}
 .wmh-isometric-play-screen .wmh-toast{display:none!important}
+@media(max-width:390px){
+  .wmh-isometric-play-screen .wmh-chat-panel{
+    padding:max(10px,env(safe-area-inset-top)) 10px max(10px,env(safe-area-inset-bottom))!important;
+  }
+  .wmh-isometric-play-screen .wmh-chat-card{
+    max-height:min(84dvh,640px)!important;
+    padding:22px 10px 12px!important;
+  }
+}
 @media(max-width:390px){
   .wmh-world-status{width:clamp(148px,49vw,174px)!important;padding:7px 8px 6px!important}
   .wmh-world-status-top b{font-size:14px!important}
