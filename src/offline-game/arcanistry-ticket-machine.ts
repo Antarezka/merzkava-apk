@@ -11,7 +11,7 @@ export function isArcanistryLeverEngaged(distance: number): boolean {
 export function getArcanistryLeverPullDelta(horizontalDelta: number, verticalDelta: number): number {
   if (!Number.isFinite(horizontalDelta)) return Number.isFinite(verticalDelta) ? verticalDelta : 0;
   if (!Number.isFinite(verticalDelta)) return horizontalDelta;
-  return Math.abs(verticalDelta) > Math.abs(horizontalDelta) ? verticalDelta : horizontalDelta;
+  return Math.abs(verticalDelta) > Math.abs(horizontalDelta) ? -verticalDelta : horizontalDelta;
 }
 
 export function getArcanistryLeverAngle(pullDelta: number): number {
