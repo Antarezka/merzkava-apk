@@ -7,6 +7,7 @@ import {
   isoCellKey, isoMapStorageKey, normalizeIsoMapEditorData, toggleIsoCellLayer,
   type IsoCellLayer, type IsoMapEditorData, type IsoMapGridConfig,
 } from "./isometric-map-editor";
+import { renderIsometricSvgSceneMarkup, refreshIsometricSvgScene, type IsometricSvgTheme } from "./isometric-svg-board";
 
 type Level = "world" | "regional" | "local" | "interior" | "home" | "map-editor" | "test";
 type RegionId = "golden-dragon-empire" | "tianhai-yunzhou" | "beiming-gu";
@@ -520,54 +521,81 @@ function isometricNpcTokensMarkup(mapId:string,interior:boolean):string {
   ).join("");
 }
 
-function tileMapMarkup(interior = false, mapId = "academy-exterior", mapImage = ""): string {
-  const academyExterior = !interior && mapId.startsWith("golden-dragon-empire:tianhai-academy:exterior");
+function tileMapMarkup(
+  interior = false,
+  mapId = "academy-exterior",
+  mapImage = "",
+  regionId: RegionId = "golden-dragon-empire",
+  selectedBuilding = "Tianhai Academy",
+): string {
+  // The live Atlas test yard remains mounted by its untouched SVG interceptor.
+  // Retain this dormant fallback only for the legacy test route.
   const isometricTestArea = !interior && mapId.startsWith("isometric-render-test:");
-  const academyImageBoard = academyExterior && !!mapImage;
-  const cols = isometricTestArea ? 16 : interior ? 12 : 24, rows = isometricTestArea ? 12 : interior ? 10 : 20;
-  const tileW = isometricTestArea ? 72 : academyExterior ? 128 : 64, tileH = isometricTestArea ? 36 : academyExterior ? 69.5 : 32;
-  const baseWidth = mapImage ? 2816 : 0, baseHeight = mapImage ? 1536 : 0;
-  const projectedWidth = (cols + rows - 2) * tileW / 2 + tileW;
-  const projectedHeight = (cols + rows - 2) * tileH / 2 + tileH + 7;
-  const boardWidth = Math.max(projectedWidth, baseWidth);
-  const boardHeight = Math.max(projectedHeight, baseHeight);
-  const features: Record<string,string> = interior
-    ? {"2-1":"blackboard","5-1":"teacher-desk","3-3":"desk","5-3":"desk","7-3":"desk","3-5":"desk","5-5":"desk","7-5":"desk","10-8":"door"}
-    : isometricTestArea
-      ? {"7-0":"test-gate","8-0":"test-gate","11-2":"test-water","12-2":"test-water","11-3":"test-water","12-3":"test-water","2-2":"test-garden","3-2":"test-garden","2-3":"test-garden","3-3":"test-garden","12-8":"test-garden","13-8":"test-garden","12-9":"test-garden","13-9":"test-garden","4-5":"test-plaza","5-5":"test-plaza","6-5":"test-plaza","9-5":"test-plaza","10-5":"test-plaza","11-5":"test-plaza","3-9":"test-tree","14-4":"test-tree"}
-      : academyImageBoard ? {} : academyExterior
-        ? {"5-1":"pond","6-1":"pond","7-1":"pond","8-1":"pond","1-2":"tree","2-2":"tree","10-2":"tree","1-3":"flower","3-3":"flower","9-3":"flower","11-3":"tree","2-9":"garden","3-9":"garden","8-9":"garden","9-9":"garden","2-14":"bench","9-14":"bench","3-2":"study-hall","9-2":"teachers-house","3-10":"learning-building","20-2":"simple-house"}
-        : {};
-  const buildingSpecs = !academyExterior || academyImageBoard ? [] : [
-    {id:"study-hall",name:"Study Hall",x:3,y:2,w:4,h:4},
-    {id:"teachers-house",name:"Teachers’ Hall",x:9,y:2,w:4,h:4},
-    {id:"learning-building",name:"Learning Hall",x:3,y:10,w:4,h:4},
-    {id:"simple-house",name:"Simple House",x:20,y:2,w:2,h:2}
-  ];
-  const sparring={x:14,y:8,w:8,h:8};
-  const tiles = Array.from({length: rows}, (_,y) => Array.from({length:cols},(_,x) => {
-    const key=x+"-"+y;
-    const road=(!academyImageBoard&&academyExterior&&(y===6||y===7||x===12||x===13))||(isometricTestArea&&((x===7||x===8)&&(y>=1&&y<=11)||(y===6||y===7)&&(x>=2&&x<=13)));
-    const inSparring=academyExterior&&!academyImageBoard&&x>=sparring.x&&x<sparring.x+sparring.w&&y>=sparring.y&&y<sparring.y+sparring.h;
-    const feature=features[key]||(road?(isometricTestArea?"test-path":"road"):inSparring?"sparring-ground":"");
-    const structure=buildingSpecs.find(item=>x>=item.x&&x<item.x+item.w&&y>=item.y&&y<item.y+item.h);
-    const structureAnchor=!!structure&&x===structure.x&&y===structure.y;
-    const surface = interior ? (y<2?"wood":"tile") : isometricTestArea
-      ? (feature==="test-water"?"wet":feature==="test-garden"||feature==="test-tree"?"earth":"stone")
-      : academyExterior
-        ? (feature==="pond"?"wet":feature==="gate"||feature==="road"?"stone":feature==="tree"||feature==="flower"||feature==="garden"?"earth":feature==="sparring-ground"?"tile":y>15?"stone":"earth")
-        : "tile";
-    const label = feature==="test-gate"?"TEST GATE":feature==="test-water"?"WATER":feature==="test-garden"?"GARDEN":feature==="test-tree"?"TREE":feature==="test-plaza"?"PLAZA":feature==="test-path"&&x===7&&y===6?"MAIN PATH":feature==="pond"?"POND":feature==="tree"?"TREE":feature==="flower"?"FLOWER":feature==="garden"?"GARDEN":feature==="gate"?"ACADEMY GATE":feature==="bench"?"BENCH":feature==="blackboard"?"BOARD":feature==="teacher-desk"?"TEACHER":feature==="desk"?"DESK":feature==="door"?"DOOR":feature==="study-hall"?"STUDY HALL":feature==="teachers-house"?"TEACHERS’ HALL":feature==="learning-building"?"LEARNING HALL":feature==="simple-house"?"HOUSE":feature==="sparring-ground"&&x===sparring.x&&y===sparring.y?"SPARRING GROUND":"";
-    const building=structure?.name||"";
-    const classes=(feature?'has-feature feature-'+feature:'')+(structure?' building-footprint building-'+structure.id+' building-occlusion':'');
-    return '<button type="button" class="wmh-tile wmh-tile-'+surface+' '+classes+'" data-wmh-tile data-x="'+x+'" data-y="'+y+'" data-z="0" data-tile-id="tile-'+x+'-'+y+'" data-surface="'+surface+'" style="--tile-x:'+x+';--tile-y:'+y+'" '+(structureAnchor?'data-wmh-building="'+building+'"':'')+' aria-label="Tile X '+x+', Y '+y+', Z 0 · '+(label||surface)+'"><span class="wmh-tile-coord">('+x+','+y+',0)</span>'+(label?'<b>'+label+'</b>':'')+'</button>';
-  }).join("")).join("");
-  const boardClass='wmh-isometric-board '+(interior?'is-interior':'is-exterior')+(isometricTestArea?' is-render-test':'')+(mapImage?' has-map-base':' is-placeholder');
+  if (isometricTestArea) {
+    const cols=16,rows=12,tileW=72,tileH=36;
+    const projectedWidth=(cols+rows-2)*tileW/2+tileW;
+    const projectedHeight=(cols+rows-2)*tileH/2+tileH+7;
+    const features:Record<string,string>={
+      "7-0":"test-gate","8-0":"test-gate","11-2":"test-water","12-2":"test-water",
+      "11-3":"test-water","12-3":"test-water","2-2":"test-garden","3-2":"test-garden",
+      "2-3":"test-garden","3-3":"test-garden","12-8":"test-garden","13-8":"test-garden",
+      "12-9":"test-garden","13-9":"test-garden","4-5":"test-plaza","5-5":"test-plaza",
+      "6-5":"test-plaza","9-5":"test-plaza","10-5":"test-plaza","11-5":"test-plaza",
+      "3-9":"test-tree","14-4":"test-tree"
+    };
+    const tiles=Array.from({length:rows},(_,y)=>Array.from({length:cols},(_,x)=>{
+      const feature=features[x+"-"+y]||(((x===7||x===8)&&(y>=1&&y<=11))||((y===6||y===7)&&x>=2&&x<=13)?"test-path":"");
+      const surface=feature==="test-water"?"wet":feature==="test-garden"||feature==="test-tree"?"earth":"stone";
+      return '<button type="button" class="wmh-tile wmh-tile-'+surface+(feature?' has-feature feature-'+feature:'')+
+        '" data-wmh-tile data-x="'+x+'" data-y="'+y+'" data-z="0" data-tile-id="tile-'+x+'-'+y+
+        '" data-surface="'+surface+'" style="--tile-x:'+x+';--tile-y:'+y+'" aria-label="Test tile '+x+', '+y+'"></button>';
+    }).join("")).join("");
+    const npcTokens=isometricNpcTokensMarkup(mapId,interior);
+    return '<div class="wmh-iso-controls"><button type="button" data-wmh-iso-zoom="out" aria-label="Zoom out">−</button><span data-wmh-iso-level>100%</span><button type="button" data-wmh-iso-zoom="in" aria-label="Zoom in">+</button><button type="button" data-wmh-iso-zoom="reset">FIT</button><button type="button" data-wmh-iso-center>CENTER MAP</button><small>DRAG TO PAN · PINCH TO ZOOM</small></div>'+
+      '<div class="wmh-isometric-wrap" data-wmh-iso-viewport><div class="wmh-isometric-camera" data-wmh-iso-camera><div class="wmh-isometric-board is-exterior is-render-test is-placeholder" data-wmh-board style="--tile-cols:'+cols+';--tile-rows:'+rows+
+      ';--iso-center-x:'+(rows*tileW/2)+'px;--iso-board-width:'+projectedWidth+'px;--iso-board-height:'+projectedHeight+'px;--tile-w:'+tileW+'px;--tile-h:'+tileH+
+      'px;--iso-half-w:'+(tileW/2)+'px;--iso-half-h:'+(tileH/2)+'px;--iso-offset-y:0px;--slab-depth:7px" data-cols="'+cols+'" data-rows="'+rows+
+      '" data-tile-w="'+tileW+'" data-tile-h="'+tileH+'" data-offset-x="0" data-offset-y="0" data-map-id="'+escapeMapEditorText(mapId)+'">'+tiles+
+      '<svg class="wmh-area-overlay-svg" data-wmh-overlay-svg viewBox="0 0 '+projectedWidth+' '+projectedHeight+'" preserveAspectRatio="none"><g data-wmh-overlay-marks></g><g data-wmh-manual-marks></g><g data-wmh-transition-marks></g><path data-wmh-overlay-preview class="wmh-area-mark-preview" d=""></path></svg>'+
+      '<button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token data-token-label="YOU" data-x="5" data-y="10" style="--token-x:5;--token-y:10" aria-label="Player character"><i></i></button>'+npcTokens+
+      '</div></div></div>';
+  }
+
+  const academyExterior = !interior && mapId.startsWith("golden-dragon-empire:tianhai-academy:exterior");
+  const cols = interior ? 12 : 24;
+  const rows = interior ? 10 : 20;
+  const tileW = academyExterior && mapImage ? 128 : 64;
+  const tileH = academyExterior && mapImage ? 69.5 : 32;
+  const baseWidth = mapImage ? 2816 : 0;
+  const baseHeight = mapImage ? 1536 : 0;
+  const grid:IsoMapGridConfig={
+    cols,rows,tileW,tileH,offsetX:0,offsetY:0,playerScale:1,npcScale:1
+  };
+  const projectedWidth=(cols+rows-2)*tileW/2+tileW;
+  const projectedHeight=(cols+rows-2)*tileH/2+tileH+7;
+  const boardWidth=Math.max(projectedWidth,baseWidth);
+  const boardHeight=Math.max(projectedHeight,baseHeight);
+  const theme:IsometricSvgTheme=interior?"interior":regionId;
+  const title=selectedBuilding+(interior?" · INTERIOR":"");
   const imageMarkup=mapImage
-    ? '<img class="wmh-isometric-map-base" data-wmh-map-art src="'+mapImage+'" alt="Isometric map base" draggable="false" loading="eager" decoding="async"/><canvas class="wmh-isometric-foreground" data-wmh-foreground-canvas aria-hidden="true"></canvas>'
-    : '';
+    ? '<img class="wmh-isometric-map-base" data-wmh-map-art src="'+mapImage+'" alt="Tianhai Academy map base" draggable="false" loading="eager" decoding="async"/><canvas class="wmh-isometric-foreground" data-wmh-foreground-canvas aria-hidden="true"></canvas>'
+    : "";
+  const sceneMarkup=renderIsometricSvgSceneMarkup({
+    mapId,grid,theme,title,baseImage:!!mapImage,width:boardWidth,height:boardHeight
+  });
   const npcTokens=isometricNpcTokensMarkup(mapId,interior);
-  return '<div class="wmh-iso-controls"><button type="button" data-wmh-iso-zoom="out" aria-label="Zoom out">−</button><span data-wmh-iso-level>100%</span><button type="button" data-wmh-iso-zoom="in" aria-label="Zoom in">+</button><button type="button" data-wmh-iso-zoom="reset">FIT</button><button type="button" data-wmh-iso-center aria-label="Center isometric map">CENTER MAP</button><small>DRAG TO PAN · PINCH TO ZOOM</small></div><div class="wmh-isometric-wrap" data-wmh-iso-viewport><div class="wmh-isometric-camera" data-wmh-iso-camera><div class="'+boardClass+'" data-wmh-board style="--tile-cols:'+cols+';--tile-rows:'+rows+';--iso-center-x:'+(rows*tileW/2)+'px;--iso-board-width:'+boardWidth+'px;--iso-board-height:'+boardHeight+'px;--tile-w:'+tileW+'px;--tile-h:'+tileH+'px;--iso-half-w:'+(tileW/2)+'px;--iso-half-h:'+(tileH/2)+'px;--iso-offset-y:0px;--slab-depth:7px" data-cols="'+cols+'" data-rows="'+rows+'" data-tile-w="'+tileW+'" data-tile-h="'+tileH+'" data-offset-x="0" data-offset-y="0" data-map-id="'+escapeMapEditorText(mapId)+'">'+imageMarkup+tiles+'<svg class="wmh-area-overlay-svg" data-wmh-overlay-svg viewBox="0 0 '+boardWidth+' '+boardHeight+'" preserveAspectRatio="none"><g data-wmh-overlay-marks></g><g data-wmh-manual-marks></g><g data-wmh-transition-marks></g><path data-wmh-overlay-preview class="wmh-area-mark-preview" d=""></path></svg><button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token data-token-label="'+(isometricTestArea?"YOU":"")+'" data-x="5" data-y="'+(isometricTestArea?10:interior?8:17)+'" style="--token-x:5;--token-y:'+(isometricTestArea?10:interior?8:17)+'" aria-label="Player character"><i></i></button>'+npcTokens+'</div></div></div>';
+  const boardClass='wmh-isometric-board wmh-svg-ground-map '+(interior?'is-interior':'is-exterior')+
+    (mapImage?' has-map-base':' is-placeholder');
+  return '<div class="wmh-iso-controls"><button type="button" data-wmh-iso-zoom="out" aria-label="Zoom out">−</button><span data-wmh-iso-level>100%</span><button type="button" data-wmh-iso-zoom="in" aria-label="Zoom in">+</button><button type="button" data-wmh-iso-zoom="reset">FIT</button><button type="button" data-wmh-iso-center aria-label="Center isometric map">CENTER MAP</button><small>DRAG TO PAN · PINCH TO ZOOM</small></div>'+
+    '<div class="wmh-isometric-wrap" data-wmh-iso-viewport><div class="wmh-isometric-camera" data-wmh-iso-camera><div class="'+boardClass+'" data-wmh-board style="--tile-cols:'+cols+';--tile-rows:'+rows+
+    ';--iso-center-x:'+(rows*tileW/2)+'px;--iso-board-width:'+boardWidth+'px;--iso-board-height:'+boardHeight+'px;--tile-w:'+tileW+'px;--tile-h:'+tileH+
+    'px;--iso-half-w:'+(tileW/2)+'px;--iso-half-h:'+(tileH/2)+'px;--iso-offset-y:0px;--slab-depth:7px" data-cols="'+cols+'" data-rows="'+rows+
+    '" data-tile-w="'+tileW+'" data-tile-h="'+tileH+'" data-offset-x="0" data-offset-y="0" data-map-id="'+escapeMapEditorText(mapId)+
+    '" data-map-theme="'+theme+'" data-map-title="'+escapeMapEditorText(title)+'" data-map-interior="'+String(interior)+'">'+
+    imageMarkup+sceneMarkup+
+    '<svg class="wmh-area-overlay-svg" data-wmh-overlay-svg viewBox="0 0 '+boardWidth+' '+boardHeight+'" preserveAspectRatio="none"><g data-wmh-overlay-marks></g><g data-wmh-manual-marks></g><g data-wmh-transition-marks></g><path data-wmh-overlay-preview class="wmh-area-mark-preview" d=""></path></svg>'+
+    '<button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token data-token-label="" data-x="5" data-y="'+(interior?8:17)+'" style="--token-x:5;--token-y:'+(interior?8:17)+'" aria-label="Player character"><i></i></button>'+npcTokens+
+    '</div></div></div>';
 }
 function isometricMapBaseFor(regionId: RegionId, selectedBuilding: string, interior: boolean): string {
   if (interior) return "";
@@ -908,13 +936,17 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     board.dataset.offsetX=String(grid.offsetX);board.dataset.offsetY=String(grid.offsetY);
     const wanted=new Set<string>();for(let y=0;y<grid.rows;y++)for(let x=0;x<grid.cols;x++)wanted.add(isoCellKey(x,y));
     board.querySelectorAll<HTMLElement>("[data-wmh-tile]").forEach(tile=>{if(!wanted.has(isoCellKey(Number(tile.dataset.x),Number(tile.dataset.y))))tile.remove();});
-    const present=new Set(Array.from(board.querySelectorAll<HTMLElement>("[data-wmh-tile]")).map(t=>isoCellKey(Number(t.dataset.x),Number(t.dataset.y))));
-    for(let y=0;y<grid.rows;y++)for(let x=0;x<grid.cols;x++){
-      const id=isoCellKey(x,y);if(present.has(id))continue;
-      const tile=document.createElement("button");tile.type="button";tile.className="wmh-tile wmh-tile-earth";
-      tile.dataset.wmhTile="";tile.dataset.x=String(x);tile.dataset.y=String(y);tile.dataset.z="0";tile.dataset.tileId="tile-"+id;tile.dataset.surface="earth";
-      tile.style.setProperty("--tile-x",String(x));tile.style.setProperty("--tile-y",String(y));tile.setAttribute("aria-label","Tile X "+x+", Y "+y);
-      const coord=document.createElement("span");coord.className="wmh-tile-coord";coord.textContent="("+x+","+y+")";tile.append(coord);board.append(tile);
+    // Regenerate SVG cells from the active calibration. Legacy boards keep
+    // their button-cell fallback, while live isometric maps use SVG polygons.
+    if(!board.querySelector("[data-wmh-scene-svg]")){
+      const present=new Set(Array.from(board.querySelectorAll<HTMLElement>("[data-wmh-tile]")).map(t=>isoCellKey(Number(t.dataset.x),Number(t.dataset.y))));
+      for(let y=0;y<grid.rows;y++)for(let x=0;x<grid.cols;x++){
+        const id=isoCellKey(x,y);if(present.has(id))continue;
+        const tile=document.createElement("button");tile.type="button";tile.className="wmh-tile wmh-tile-earth";
+        tile.dataset.wmhTile="";tile.dataset.x=String(x);tile.dataset.y=String(y);tile.dataset.z="0";tile.dataset.tileId="tile-"+id;tile.dataset.surface="earth";
+        tile.style.setProperty("--tile-x",String(x));tile.style.setProperty("--tile-y",String(y));tile.setAttribute("aria-label","Tile X "+x+", Y "+y);
+        const coord=document.createElement("span");coord.className="wmh-tile-coord";coord.textContent="("+x+","+y+")";tile.append(coord);board.append(tile);
+      }
     }
     board.style.setProperty("--tile-w",grid.tileW+"px");board.style.setProperty("--tile-h",grid.tileH+"px");
     board.style.setProperty("--iso-half-w",grid.tileW/2+"px");board.style.setProperty("--iso-half-h",grid.tileH/2+"px");
@@ -927,6 +959,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     const height=Math.max(projectedHeight,image?.naturalHeight||0);
     board.style.setProperty("--iso-board-width",width+"px");board.style.setProperty("--iso-board-height",height+"px");
     board.style.width=width+"px";board.style.height=height+"px";svg.setAttribute("viewBox","0 0 "+width+" "+height);
+    if(board.querySelector("[data-wmh-scene-svg]"))refreshIsometricSvgScene(board,grid);
     panel.querySelectorAll<HTMLInputElement>("[data-wmh-grid-control]").forEach(input=>{
       const property=input.dataset.wmhGridControl as keyof IsoMapGridConfig;input.value=String(grid[property]);
       const output=panel.querySelector<HTMLElement>('[data-wmh-grid-value="'+property+'"]');if(output)output.textContent=String(grid[property]);
@@ -1258,7 +1291,7 @@ function isometricPlayMarkup(regionId: RegionId, selectedBuilding: string, inter
   const mapImage=isometricMapBaseFor(regionId,selectedBuilding,interior);
   const title=selectedBuilding+(interior?" · INTERIOR":"");
   return '<div class="wmh-isometric-play-screen" data-wmh-isometric-play-screen>'+
-    tileMapMarkup(interior,mapId,mapImage)+
+    tileMapMarkup(interior,mapId,mapImage,regionId,selectedBuilding)+
     isometricHudMarkup(title,mapImage)+
     isometricEditorMarkup()+
     '<button type="button" class="wmh-map-back" data-wmh-action="back" aria-label="Leave isometric area"><span>‹</span><b>BACK</b></button>'+
