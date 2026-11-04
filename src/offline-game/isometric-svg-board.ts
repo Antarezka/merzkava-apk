@@ -116,7 +116,7 @@ function cellMarkup(
   const fillOpacity = baseImage ? "0" : feature === "ground" ? ".88" : ".96";
   // Academy artwork remains the visible ground; its isometric grid is only a thin coordinate guide.
   const stroke = baseImage ? "#fff8e8" : "#e5e5c5";
-  const strokeOpacity = baseImage ? ".22" : feature === "ground" ? ".42" : ".82";
+  const strokeOpacity = baseImage ? "0.22" : feature === "ground" ? ".42" : ".82";
   return '<polygon class="wmh-vector-cell feature-' + feature + '" data-wmh-tile data-x="' + x +
     '" data-y="' + y + '" data-z="0" data-tile-id="' + escapeXml("map-" + x + "-" + y) +
     '" data-surface="' + surfaceFor(feature, theme) + '" points="' + points + '" fill="' + fill +
