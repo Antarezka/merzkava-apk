@@ -875,11 +875,19 @@
 }
 
 
-/* These camera variables must win over the fixed board layout rules above. */
+/* Keep the map anchored inside the explicitly sized camera canvas.
+   Absolute positioning avoids margin/transform overflow quirks that can make
+   the artwork render outside the scrollable camera on mobile browsers. */
+.wmh-isometric-camera{
+  position:relative!important;
+  display:block!important;
+  overflow:visible!important;
+}
 .wmh-isometric-board{
+  position:absolute!important;
+  left:var(--wmh-camera-pad-x,0px)!important;
+  top:var(--wmh-camera-pad-y,0px)!important;
   margin:0!important;
-  margin-left:var(--wmh-camera-pad-x,0px)!important;
-  margin-top:var(--wmh-camera-pad-y,0px)!important;
   transform:scale(var(--wmh-camera-zoom,1))!important;
   transform-origin:top left!important;
 }
