@@ -540,13 +540,13 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
   const resizeHandle=panel.querySelector<HTMLElement>("[data-wmh-panel-resize-handle]");
   resizeHandle?.addEventListener("pointerdown",event=>{
    event.preventDefault();event.stopPropagation();
-   const startY=event.clientY,startHeight=panel.getBoundingClientRect().height;
-   try{resizeHandle.setPointerCapture(event.pointerId);}catch{}
-   const move=(e:PointerEvent)=>{if(e.pointerId!==event.pointerId)return;const next=Math.max(138,Math.min(window.innerHeight*.78,startHeight+startY-e.clientY));panel.style.height=next+"px";};
-   const end=(e:PointerEvent)=>{if(e.pointerId!==event.pointerId)return;resizeHandle.removeEventListener("pointermove",move);resizeHandle.removeEventListener("pointerup",end);resizeHandle.removeEventListener("pointercancel",end);};
-   resizeHandle.addEventListener("pointermove",move);resizeHandle.addEventListener("pointerup",end);resizeHandle.addEventListener("pointercancel",end);
+   const pointerId=event.pointerId,startY=event.clientY,startHeight=panel.getBoundingClientRect().height;
+   try{resizeHandle.setPointerCapture(pointerId);}catch{}
+   const move=(e:PointerEvent)=>{if(e.pointerId!==pointerId)return;e.preventDefault();const next=Math.max(88,Math.min(window.innerHeight*.72,startHeight+startY-e.clientY));panel.style.height=next+"px";};
+   const end=(e:PointerEvent)=>{if(e.pointerId!==pointerId)return;window.removeEventListener("pointermove",move);window.removeEventListener("pointerup",end);window.removeEventListener("pointercancel",end);};
+   window.addEventListener("pointermove",move,{passive:false});window.addEventListener("pointerup",end);window.addEventListener("pointercancel",end);
   });
- const areaGroup=svg.querySelector<SVGGElement>("[data-wmh-overlay-marks]"),manualGroup=svg.querySelector<SVGGElement>("[data-wmh-manual-marks]"),preview=svg.querySelector<SVGPathElement>("[data-wmh-overlay-preview]");
+  const areaGroup=svg.querySelector<SVGGElement>("[data-wmh-overlay-marks]"),manualGroup=svg.querySelector<SVGGElement>("[data-wmh-manual-marks]"),preview=svg.querySelector<SVGPathElement>("[data-wmh-overlay-preview]");
  let areas:IsoOverlayMark[]=[],manual:IsoManualMark[]=[],transitions:IsoTransitionMarker[]=[];let selectedTransitionId:string|null=null;
  const grid={cols:Number(board.dataset.cols||24),rows:Number(board.dataset.rows||20),tileW:64,tileH:32,offsetX:0,offsetY:0,playerScale:1,npcScale:1};
  try{const d=JSON.parse(localStorage.getItem(key)||"{}");if(Array.isArray(d.areas))areas=d.areas;if(Array.isArray(d.manual))manual=d.manual;if(Array.isArray(d.transitions))transitions=d.transitions;if(d.grid)Object.assign(grid,d.grid);}catch{}
@@ -626,19 +626,22 @@ function bindIsometricCamera(dialog:HTMLElement):void {
   const baseW=board.offsetWidth,baseH=board.offsetHeight;
   const apply=(next:number,focusX?:number,focusY?:number)=>{
     const old=zoom;zoom=Math.max(.65,Math.min(2.4,next));
-    const rect=viewport.getBoundingClientRect();
+    const rect=viewport.getBoundingClientRect(),padX=viewport.clientWidth,padY=viewport.clientHeight;
     const fx=focusX==null?viewport.clientWidth/2:focusX-rect.left;
     const fy=focusY==null?viewport.clientHeight/2:focusY-rect.top;
-    const ax=viewport.scrollLeft+fx,ay=viewport.scrollTop+fy;
-    camera.style.width=(baseW*zoom)+"px";camera.style.height=(baseH*zoom)+"px";
+    const ax=viewport.scrollLeft+fx-padX,ay=viewport.scrollTop+fy-padY;
+    camera.style.width=(baseW*zoom+padX*2)+"px";camera.style.height=(baseH*zoom+padY*2)+"px";
+    board.style.margin="0";board.style.marginLeft=padX+"px";board.style.marginTop=padY+"px";
     board.style.transform="scale("+zoom+")";board.style.transformOrigin="top left";
-    viewport.scrollLeft=ax*zoom/old-fx;viewport.scrollTop=ay*zoom/old-fy;
+    viewport.scrollLeft=padX+ax*zoom/old-fx;viewport.scrollTop=padY+ay*zoom/old-fy;
     const label=dialog.querySelector<HTMLElement>("[data-wmh-iso-level]");
     if(label)label.textContent=Math.round(zoom*100)+"%";
   };
+  apply(zoom);
+  viewport.scrollLeft=viewport.clientWidth;viewport.scrollTop=viewport.clientHeight;
   dialog.querySelectorAll<HTMLElement>("[data-wmh-iso-zoom]").forEach(button=>button.addEventListener("click",()=>{
     const a=button.dataset.wmhIsoZoom;apply(a==="reset"?1:zoom+(a==="in"?.2:-.2));
-    if(button.dataset.wmhIsoZoom==="reset"){viewport.scrollLeft=0;viewport.scrollTop=0;}
+    if(button.dataset.wmhIsoZoom==="reset"){viewport.scrollLeft=viewport.clientWidth;viewport.scrollTop=viewport.clientHeight;}
   }));
   const pts=new Map<number,{x:number;y:number}>();let pinch:{distance:number;zoom:number}|null=null;
   const dist=(a:{x:number;y:number},b:{x:number;y:number})=>Math.hypot(a.x-b.x,a.y-b.y);
