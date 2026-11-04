@@ -39,11 +39,9 @@ const root = app;
 root.addEventListener("arcanistry:lever-lock", () => playClockworkRatchet());
 mountArcanistryTicketMachine(root, async sceneId => {
   setEternalLocation(sceneId);
-  const dock = root.querySelector<HTMLElement>("[data-arcanist-dock]");
-  dock?.classList.add("is-collapsed");
-  const toggle = root.querySelector<HTMLButtonElement>("[data-arcanist-pull]");
-  toggle?.setAttribute("aria-expanded", "false");
-  toggle?.setAttribute("aria-label", "Show Arcanistry Machine");
+  const drawer = root.querySelector<HTMLElement>("[data-arcanist-device]");
+  if (drawer) drawer.hidden = true;
+  root.querySelector<HTMLButtonElement>("[data-arcanist-pull]")?.setAttribute("aria-expanded", "false");
   notice = sceneId === "gde-academy" ? "Arrived at the Academy." : "Arrived at the Imperial Capital.";
   render();
 });
@@ -992,8 +990,8 @@ root.addEventListener("click", async (event: MouseEvent) => {
   }
   const idlePlaceButton=target.closest<HTMLButtonElement>("[data-idle-place]");
   if(idlePlaceButton){selectArcanistDestination(idlePlaceButton);return;}
-  if(target.closest("[data-arcanist-pull]")){const dock=root.querySelector<HTMLElement>("[data-arcanist-dock]");const trigger=root.querySelector<HTMLButtonElement>("[data-arcanist-pull]");if(dock&&trigger){const opening=dock.classList.contains("is-collapsed");dock.classList.toggle("is-collapsed",!opening);trigger.setAttribute("aria-expanded",String(opening));trigger.setAttribute("aria-label",opening?"Hide Arcanistry Machine":"Show Arcanistry Machine");trigger.setAttribute("title",opening?"Hide Arcanistry Machine":"Show Arcanistry Machine");}return;}
-  if(target.closest("[data-arcanist-close]")){const dock=root.querySelector<HTMLElement>("[data-arcanist-dock]");const trigger=root.querySelector<HTMLButtonElement>("[data-arcanist-pull]");const machine=root.querySelector<HTMLElement>("[data-arcanistry-machine]");if(machine&&machine.dataset.machineState!=="idle")return;if(dock&&trigger){dock.classList.add("is-collapsed");trigger.setAttribute("aria-expanded","false");trigger.setAttribute("aria-label","Show Arcanistry Machine");trigger.setAttribute("title","Show Arcanistry Machine");}return;}
+  if(target.closest("[data-arcanist-pull]")){const drawer=root.querySelector<HTMLElement>("[data-arcanist-device]");const trigger=root.querySelector<HTMLButtonElement>("[data-arcanist-pull]");const machine=root.querySelector<HTMLElement>("[data-arcanistry-machine]");if(drawer&&trigger){if(!drawer.hidden&&machine?.dataset.machineState!=="idle")return;drawer.hidden=!drawer.hidden;trigger.setAttribute("aria-expanded",String(!drawer.hidden));}return;}
+  if(target.closest("[data-arcanist-close]")){const drawer=root.querySelector<HTMLElement>("[data-arcanist-device]");const trigger=root.querySelector<HTMLButtonElement>("[data-arcanist-pull]");const machine=root.querySelector<HTMLElement>("[data-arcanistry-machine]");if(machine&&machine.dataset.machineState!=="idle")return;if(drawer&&trigger){drawer.hidden=true;trigger.setAttribute("aria-expanded","false");}return;}
   if (target.closest("[data-idle-rpg-open]")) {
     const modal=root.querySelector<HTMLElement>("[data-idle-rpg-modal]");
     const trigger=root.querySelector<HTMLButtonElement>("[data-idle-rpg-open]");
