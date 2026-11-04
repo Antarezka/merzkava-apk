@@ -30,7 +30,7 @@ import { animateOpeningSplash, animateSplashCurtain } from "./ui/splash-animatio
 import { animateAppScreen } from "./ui/app-shell-motion";
 import { initializeGravityPullCord } from "./ui/gravity-pull-cord";
 import { mountArcanistryTicketMachine } from "./offline-game/arcanistry-ticket-machine";
-import { handleWorldMapHierarchyClick } from "./offline-game/world-map-hierarchy";
+import { handleWorldMapHierarchyClick, initializeWorldMapHierarchy } from "./offline-game/world-map-hierarchy";
 import { closeLoreEntry, closeLoreSource, closeLorePlaceholder, openLoreEntry, openLoreSource, openLorePlaceholder, setLoreCategory, setLoreSearch, renderLoreResults } from "./world-archive/lore-library";
 
 const app = document.querySelector<HTMLDivElement>("#app");
@@ -1005,6 +1005,7 @@ root.addEventListener("click", async (event: MouseEvent) => {
       modal.hidden=false;
       root.querySelector(".app-shell")?.classList.add("is-idle-world");
       trigger?.setAttribute("aria-expanded","true");
+      initializeWorldMapHierarchy(root);
       history.pushState({idleRpgNotice:true},"");
       modal.querySelector<HTMLButtonElement>("[data-idle-rpg-close]")?.focus();
     }
