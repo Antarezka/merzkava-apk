@@ -301,3 +301,12 @@
 .wmh-character-token{position:absolute;left:calc((var(--token-x) - var(--token-y))*32px + 320px);top:calc((var(--token-x) + var(--token-y))*16px + 8px);transform:translate(-50%,-100%);margin:0;justify-self:auto;align-self:auto}
 .wmh-character-token{transition:left .13s linear,top .13s linear,filter .15s ease}
 @media(max-width:390px){.wmh-isometric-board{width:704px;max-width:none;transform:none}.wmh-isometric-wrap{min-height:300px}}
+
+
+.wmh-iso-controls{display:flex;align-items:center;gap:6px;flex:none;margin:5px 0;color:#e8d4ae;font:8px Arial;letter-spacing:.08em}
+.wmh-iso-controls button{min-width:32px;height:30px;border:1px solid #b89964;background:#202e25;color:#f2dfbb;font:700 15px Georgia,serif}
+.wmh-iso-controls button[data-wmh-iso-zoom="reset"]{font:700 8px Arial}
+.wmh-iso-controls span{min-width:40px;text-align:center;font-variant-numeric:tabular-nums}
+.wmh-iso-controls small{margin-left:auto;color:#bba982;font-size:7px}
+.wmh-isometric-camera{flex:none}
+.wmh-isometric-wrap{touch-action:pan-x pan-y pinch-zoom}
