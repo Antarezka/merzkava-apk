@@ -102,30 +102,59 @@ function serializeWorldMapCoordinates(markers: WorldMarker[]): string {
 function bindWorldMapZoom(dialog: HTMLElement): void {
   const viewport = dialog.querySelector<HTMLElement>("[data-wmh-map-viewport]");
   const surface = dialog.querySelector<HTMLElement>("[data-wmh-map-surface]");
-  if (!viewport || !surface || viewport.dataset.gesturesBound === "true") return;
+  const image = surface?.querySelector<HTMLImageElement>("img");
+  if (!viewport || !surface || !image || viewport.dataset.gesturesBound === "true") return;
   viewport.dataset.gesturesBound = "true";
   let zoom = 1;
+  let baseWidth = 0;
+  let baseHeight = 0;
   const pointers = new Map<number, { x: number; y: number }>();
   let panStart: { x: number; y: number; scrollLeft: number; scrollTop: number } | null = null;
-  let pinchStart: { distance: number; zoom: number; centerX: number; centerY: number } | null = null;
+  let pinchStart: { distance: number; zoom: number } | null = null;
   const distance = (a: {x:number;y:number}, b: {x:number;y:number}) => Math.hypot(a.x-b.x,a.y-b.y);
   const midpoint = (a: {x:number;y:number}, b: {x:number;y:number}) => ({x:(a.x+b.x)/2,y:(a.y+b.y)/2});
+  const sizeBaseMap = () => {
+    const rect = viewport.getBoundingClientRect();
+    const ratio = image.naturalWidth > 0 && image.naturalHeight > 0 ? image.naturalWidth / image.naturalHeight : 1;
+    // Cover the complete viewport at minimum zoom: no map edge or empty canvas
+    // is exposed. The larger dimension remains pannable inside the viewport.
+    baseWidth = Math.max(rect.width, rect.height * ratio);
+    baseHeight = Math.max(rect.height, rect.width / ratio);
+    surface.style.width = baseWidth + "px";
+    surface.style.height = baseHeight + "px";
+    image.style.width = "100%";
+    image.style.height = "100%";
+    image.style.objectFit = "fill";
+  };
   const applyZoom = (next: number, focusX?: number, focusY?: number) => {
+    if (!baseWidth || !baseHeight) sizeBaseMap();
     const previous = zoom;
     zoom = Math.max(1, Math.min(2.5, next));
     const localX = focusX == null ? viewport.clientWidth / 2 : focusX - viewport.getBoundingClientRect().left;
     const localY = focusY == null ? viewport.clientHeight / 2 : focusY - viewport.getBoundingClientRect().top;
     const anchoredX = viewport.scrollLeft + localX;
     const anchoredY = viewport.scrollTop + localY;
-    surface.style.width = (zoom * 100) + "%";
+    surface.style.width = (baseWidth * zoom) + "px";
+    surface.style.height = (baseHeight * zoom) + "px";
     viewport.scrollLeft = anchoredX * zoom / previous - localX;
     viewport.scrollTop = anchoredY * zoom / previous - localY;
     const level = dialog.querySelector<HTMLElement>("[data-wmh-zoom-level]");
     if (level) level.textContent = Math.round(zoom * 100) + "%";
   };
+  const centerMap = () => {
+    sizeBaseMap();
+    zoom = 1;
+    surface.style.width = baseWidth + "px";
+    surface.style.height = baseHeight + "px";
+    viewport.scrollLeft = Math.max(0, (baseWidth - viewport.clientWidth) / 2);
+    viewport.scrollTop = Math.max(0, (baseHeight - viewport.clientHeight) / 2);
+    const level = dialog.querySelector<HTMLElement>("[data-wmh-zoom-level]");
+    if (level) level.textContent = "100%";
+  };
   dialog.querySelectorAll<HTMLElement>("[data-wmh-zoom]").forEach(button => button.addEventListener("click", () => {
     const action = button.dataset.wmhZoom;
-    applyZoom(action === "reset" ? 1 : action === "in" ? zoom + .25 : zoom - .25);
+    if (action === "reset") { centerMap(); return; }
+    applyZoom(action === "in" ? zoom + .25 : zoom - .25);
   }));
   viewport.addEventListener("pointerdown", event => {
     pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
@@ -135,8 +164,7 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
       try { viewport.setPointerCapture(event.pointerId); } catch { /* pointer capture may be unavailable */ }
     } else if (pointers.size === 2) {
       const pair = [...pointers.values()];
-      const center = midpoint(pair[0], pair[1]);
-      pinchStart = { distance: Math.max(1, distance(pair[0], pair[1])), zoom, centerX: center.x, centerY: center.y };
+      pinchStart = { distance: Math.max(1, distance(pair[0], pair[1])), zoom };
       panStart = null;
       for (const id of pointers.keys()) {
         try { viewport.setPointerCapture(id); } catch { /* pointer capture may be unavailable */ }
@@ -167,9 +195,9 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
   };
   viewport.addEventListener("pointerup", endPointer);
   viewport.addEventListener("pointercancel", endPointer);
-  applyZoom(zoom);
+  if (image.complete && image.naturalWidth) centerMap();
+  else image.addEventListener("load", centerMap, { once: true });
 }
-
 function mapEditorMarkup(): string {
   const markers = readWorldMarkers();
   return '<div class="wmh-map-editor"><div class="wmh-editor-intro"><b>WORLD MAP · COORDINATE EDITOR</b><span>DRAG MARKERS OR EDIT X / Y · NEW PLACEMENTS ARE PROVISIONAL · 0–100%</span></div>' +
