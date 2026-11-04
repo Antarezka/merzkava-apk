@@ -783,8 +783,8 @@ function bindIsometricHud(dialog:HTMLElement):void {
   const minimap=dialog.querySelector<HTMLButtonElement>("[data-wmh-minimap]");
   const world=minimap?.querySelector<HTMLElement>("[data-wmh-minimap-world]");
   const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
-  if(!hud||!minimap||!world||!board)return;
-  if(minimap.dataset.bound!=="true"){
+  if(!hud||!board)return;
+  if(minimap&&world&&minimap.dataset.bound!=="true"){
     minimap.dataset.bound="true";
     minimap.addEventListener("click",event=>{
       if(board.classList.contains("wmh-overlay-editing"))return;
@@ -801,7 +801,7 @@ function bindIsometricHud(dialog:HTMLElement):void {
     });
   }
   renderIsometricWorldStatus(dialog);
-  renderIsometricMinimap(board);
+  if(world)renderIsometricMinimap(board);
 }
 function relocateActorsFromBlockedCells(board:HTMLElement,data:IsoMapEditorData):boolean {
   const actors=Array.from(board.querySelectorAll<HTMLElement>("[data-wmh-player-token],[data-wmh-npc]"));
