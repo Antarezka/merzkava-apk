@@ -32,10 +32,16 @@ Each map stores transition markers independently. An unnamed marker is red; afte
 
 ## Persistence and reuse
 
-Editor data is saved in local storage under `merzkava.isometric-map-editor.v1:<encoded map ID>`. Exported JSON uses format `merzkava-isometric-map-editor`, version 1, and contains the map ID, grid, three cell-layer arrays, and transitions.
+Editor data is saved in local storage under `merzkava.isometric-map-editor.v2:<encoded map ID>`. The refreshed rollout uses a clean v2 namespace; the first initialization removes the older v1 cell layouts, legacy overlay data, and editor-window positions once. Exported JSON uses format `merzkava-isometric-map-editor`, version 1, and contains the map ID, grid, three cell-layer arrays, and transitions.
 
 Use unique stable map IDs for each exterior, interior, or other isometric scene. Do not reuse one ID for different map artwork. A map board that has no base image can still use grid, collision, opacity, and transition data; foreground rendering becomes active when a base image is supplied.
 
-## Current Academy integration
+## Current map rollout
 
-The Tianhai Academy exterior currently uses `public/maps/academy/full-map/1_academy.jpg`. Other isometric locations receive their own map ID and should pass their own base image when that artwork is ready. Academy interior currently remains a generated floor-plan scene without a Map Base image.
+- **Tianhai Academy exterior:** source artwork is `public/maps/academy/full-map/1_academy.jpg`, fetched from the committed Academy map asset. The browser converts it to a real PNG data URL before the main board and minimap display it. The Map Base is painted as the board background; the grid is transparent interaction geometry above it.
+- The source artwork is **2816×1536 px**. Its current 24×20 grid is calibrated to **128×69.5 px** diamonds, giving a projected board of 2816×1536. The first camera view fits the entire map to the phone viewport.
+- **Golden Dragon Empire, Tianhai Yunzhou, and Beiming Gu:** all local areas use the same isometric board/editor, each with a separate map ID and no Map Base image for now. They show a restrained isometric placeholder grid until artwork is supplied; regional panorama artwork is not substituted for a playable map.
+- The previous cell-layout and editor-window local-storage keys are cleared once during the refresh. New map areas start with clean calibration, transitions, blocked cells, and foreground cells.
+- Test NPCs are placed across Academy, Public Arena, other Golden Dragon Empire districts, Tianhai Yunzhou, and Beiming Gu. They keep the existing conversation panel style and have distinct area-specific greetings, choices, and replies.
+
+Academy interior and all non-Academy interiors remain empty Map Base placeholders until their own map artwork is supplied.

@@ -12,6 +12,6 @@ Dedicated source folder for the academy isometric map.
 
 ## Tile sizing
 
-Provisional reference sample: `reference/academy-ground-tile-sample.svg`. It currently illustrates a 64×32 diamond top with a 7 px thin slab (64×39 total). This is a visual measuring aid, not a locked final tile specification; the owner will confirm the final size by inspecting the coordinate-labelled in-game grid.
+The sample `reference/academy-ground-tile-sample.svg` illustrates a 64×32 diamond with a 7 px thin slab for generic/placeholder areas. The current full Academy Map Base is 2816×1536 and uses a separately calibrated 24×20 grid of 128×69.5 px diamonds. That larger calibration is specific to the Academy image and does not resize the source artwork.
 
 Keep ground, buildings, props, and character sprites as separate layers in reusable source assets. The complete composition belongs in `full-map/`. The renderer must depth-sort objects using their world-space foot/base position, not their image top edge.
