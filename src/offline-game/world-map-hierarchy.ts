@@ -800,14 +800,34 @@ function renderIsometricMinimap(board:HTMLElement):void {
     footer.textContent="YOU · X "+String(player.dataset.x||0).padStart(2,"0")+" / Y "+String(player.dataset.y||0).padStart(2,"0")+" · TAP TO MOVE";
   }
 }
+function bindAcademyMapControls(dialog:HTMLElement):void {
+  const viewport=dialog.querySelector<HTMLElement>("[data-wmh-academy-map-viewport]");
+  const surface=viewport?.querySelector<HTMLElement>(".wmh-academy-empty-surface");
+  const reset=dialog.querySelector<HTMLButtonElement>("[data-wmh-academy-map-reset]");
+  const center=dialog.querySelector<HTMLButtonElement>("[data-wmh-academy-map-center]");
+  if(!viewport||!surface||viewport.dataset.controlsBound==="true")return;
+  viewport.dataset.controlsBound="true";
+  let zoom=1;
+  const apply=()=>{surface.style.transform="translate(0,0) scale("+zoom+")";};
+  reset?.addEventListener("click",()=>{zoom=1;apply();viewport.scrollTo({left:0,top:0,behavior:"smooth"});});
+  center?.addEventListener("click",()=>{
+    viewport.scrollTo({left:Math.max(0,(viewport.scrollWidth-viewport.clientWidth)/2),top:Math.max(0,(viewport.scrollHeight-viewport.clientHeight)/2),behavior:"smooth"});
+    surface.style.transformOrigin="center center";
+    apply();
+  });
+}
 function bindIsometricHud(dialog:HTMLElement):void {
   const hud=dialog.querySelector<HTMLElement>("[data-wmh-isometric-hud]");
   const minimap=dialog.querySelector<HTMLButtonElement>("[data-wmh-minimap]");
   const world=minimap?.querySelector<HTMLElement>("[data-wmh-minimap-world]");
   const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
   if(!hud)return;
-  // The rebuilt Academy currently has no actor board; its HUD still shows live world conditions.
-  if(!board){renderIsometricWorldStatus(dialog);return;}
+  // Academy is an artwork-only view, so bind its dedicated camera controls without an actor board.
+  if(!board){
+    renderIsometricWorldStatus(dialog);
+    bindAcademyMapControls(dialog);
+    return;
+  }
   if(minimap&&world&&minimap.dataset.bound!=="true"){
     minimap.dataset.bound="true";
     minimap.addEventListener("click",event=>{
@@ -1318,9 +1338,13 @@ function isometricPlayMarkup(regionId: RegionId, selectedBuilding: string, inter
     // Fresh Academy shell: no old artwork, tiles, grid, actors, NPCs, minimap, or editor.
     const academyMapImage="/maps/academy/full-map/1_academy.jpg";
     return '<div class="wmh-isometric-play-screen wmh-academy-empty-screen" data-wmh-isometric-play-screen>'+
-      '<div class="wmh-academy-empty-surface" aria-label="Tianhai Academy map artwork"></div>'+
+      '<div class="wmh-academy-map-viewport" data-wmh-academy-map-viewport><div class="wmh-academy-empty-surface" aria-label="Tianhai Academy map artwork"></div></div>'+
       isometricHudMarkup("Tianhai Academy",academyMapImage)+
-      '<button type="button" class="wmh-map-back" data-wmh-action="back" aria-label="Leave Tianhai Academy"><span>‹</span><b>BACK</b></button>'+
+      '<section class="wmh-academy-map-controls" aria-label="Academy map controls">'+
+      '<button type="button" data-wmh-academy-map-reset aria-label="Reset map view" title="Reset map view"><i class="wmh-css-reset-icon"></i><b>RESET</b></button>'+
+      '<button type="button" data-wmh-academy-map-center aria-label="Center map" title="Center map"><i class="wmh-css-center-icon"></i><b>CENTER MAP</b></button>'+
+      '</section>'+
+      '<button type="button" class="wmh-map-back wmh-academy-map-back" data-wmh-action="back" aria-label="Return to Golden Dragon Empire map"><i class="wmh-academy-back-icon" aria-hidden="true"></i><b>GOLDEN DRAGON EMPIRE</b></button>'+
       '</div>';
   }
   const mapId=makeIsometricMapId(regionId,selectedBuilding,interior);
