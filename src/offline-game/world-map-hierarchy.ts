@@ -466,7 +466,7 @@ function tileMapMarkup(interior = false): string {
     const classes=(feature?'has-feature feature-'+feature:'')+(structure?' building-footprint building-'+structure.id+(blocked?' building-blocked':' building-occlusion'):'');
     return '<button type="button" class="wmh-tile wmh-tile-'+surface+' '+classes+'" data-wmh-tile data-x="'+x+'" data-y="'+y+'" data-z="0" data-tile-id="tile-'+x+'-'+y+'" data-surface="'+surface+'" style="--tile-x:'+x+';--tile-y:'+y+'" '+(blocked?'data-wmh-blocked="true"':'')+' '+(occlusion?'data-wmh-occlusion="true"':'')+' '+(structureAnchor?'data-wmh-building="'+building+'"':'')+' aria-label="Tile X '+x+', Y '+y+', Z 0 · '+(label||surface)+'"><span class="wmh-tile-coord">('+x+','+y+',0)</span>'+(label?'<b>'+label+'</b>':'')+'</button>';
   }).join("")).join("");
-  return '<div class="wmh-iso-controls"><button type="button" data-wmh-iso-zoom="out" aria-label="Zoom out">−</button><span data-wmh-iso-level>100%</span><button type="button" data-wmh-iso-zoom="in" aria-label="Zoom in">+</button><button type="button" data-wmh-iso-zoom="reset">RESET</button><small>DRAG TO PAN · PINCH TO ZOOM</small></div><div class="wmh-isometric-wrap" data-wmh-iso-viewport><div class="wmh-isometric-camera" data-wmh-iso-camera><div class="wmh-isometric-board '+(interior?'is-interior':'is-exterior')+'" data-wmh-board style="--tile-cols:'+cols+';--tile-rows:'+rows+';--iso-center-x:'+(rows*32)+'px;--iso-board-width:'+((cols+rows-1)*32+32)+'px;--iso-board-height:'+((cols+rows-2)*16+39)+'px;--tile-w:64px;--tile-h:32px;--slab-depth:7px" data-cols="'+cols+'" data-rows="'+rows+'">'+tiles+''+(interior?'':'<img class="wmh-academy-map-art" src="/maps/academy/full-map/1_academy.png" alt="Tianhai Academy full map" draggable="false"/>')+'<svg class="wmh-area-overlay-svg" data-wmh-overlay-svg viewBox="0 0 '+((cols+rows-1)*32+32)+' '+((cols+rows-2)*16+39)+'" preserveAspectRatio="none"><g data-wmh-overlay-marks></g><g data-wmh-manual-marks></g><g data-wmh-transition-marks></g><path data-wmh-overlay-preview class="wmh-area-mark-preview" d=""></path></svg>'+
+  return '<div class="wmh-iso-controls"><button type="button" data-wmh-iso-zoom="out" aria-label="Zoom out">−</button><span data-wmh-iso-level>100%</span><button type="button" data-wmh-iso-zoom="in" aria-label="Zoom in">+</button><button type="button" data-wmh-iso-zoom="reset">RESET</button><button type="button" data-wmh-iso-center aria-label="Center Academy map">CENTER MAP</button><small>DRAG TO PAN · PINCH TO ZOOM</small></div><div class="wmh-isometric-wrap" data-wmh-iso-viewport><div class="wmh-isometric-camera" data-wmh-iso-camera><div class="wmh-isometric-board '+(interior?'is-interior':'is-exterior')+'" data-wmh-board style="--tile-cols:'+cols+';--tile-rows:'+rows+';--iso-center-x:'+(rows*32)+'px;--iso-board-width:'+((cols+rows-1)*32+32)+'px;--iso-board-height:'+((cols+rows-2)*16+39)+'px;--tile-w:64px;--tile-h:32px;--slab-depth:7px" data-cols="'+cols+'" data-rows="'+rows+'">'+tiles+''+(interior?'':'<img class="wmh-academy-map-art" src="/maps/academy/full-map/1_academy.png" alt="Tianhai Academy full map" draggable="false"/>')+'<svg class="wmh-area-overlay-svg" data-wmh-overlay-svg viewBox="0 0 '+((cols+rows-1)*32+32)+' '+((cols+rows-2)*16+39)+'" preserveAspectRatio="none"><g data-wmh-overlay-marks></g><g data-wmh-manual-marks></g><g data-wmh-transition-marks></g><path data-wmh-overlay-preview class="wmh-area-mark-preview" d=""></path></svg>'+
     '<button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token data-x="5" data-y="'+(interior?8:17)+'" style="--token-x:5;--token-y:'+(interior?8:17)+'" aria-label="Player character"><i></i></button>'+
     (interior ? '<button type="button" class="wmh-character-token wmh-npc-token is-male" data-wmh-npc="teacher" data-x="6" data-y="2" style="--token-x:6;--token-y:2" aria-label="Teacher"><i></i></button><button type="button" class="wmh-character-token wmh-npc-token is-female" data-wmh-npc="student-lin" data-x="3" data-y="4" style="--token-x:3;--token-y:4" aria-label="Student Lin"><i></i></button>' :
       '<button type="button" class="wmh-character-token wmh-npc-token is-female" data-wmh-npc="student-lin" data-x="7" data-y="4" style="--token-x:7;--token-y:4" aria-label="Student Lin"><i></i></button>'+
@@ -622,17 +622,30 @@ function bindIsometricCamera(dialog:HTMLElement):void {
   if(!viewport||!camera||!board||viewport.dataset.cameraBound==="true")return;
   viewport.dataset.cameraBound="true";
   syncIsoDepthAndOcclusion(board);
-  let zoom=1;
-  const baseW=board.offsetWidth,baseH=board.offsetHeight;
-  // Large empty travel field around the Academy canvas. Keep the map itself
-  // unchanged; the viewport can scroll several screen-widths beyond every edge.
+  let zoom=1,baseW=0,baseH=0;
   const padX=()=>Math.max(1,viewport.clientWidth)*4;
   const padY=()=>Math.max(1,viewport.clientHeight)*4;
+  const measure=()=>{
+    const style=getComputedStyle(board);
+    // The level may be bound while its parent is hidden; use the declared
+    // Academy dimensions until the browser can report its real layout size.
+    baseW=board.offsetWidth||Number.parseFloat(style.width)||(board.classList.contains("is-exterior")?1408:(Number(board.dataset.cols)||12)*64);
+    baseH=board.offsetHeight||Number.parseFloat(style.height)||(board.classList.contains("is-exterior")?768:(Number(board.dataset.rows)||10)*32);
+    const px=padX(),py=padY();
+    camera.style.position="relative";camera.style.display="block";
+    camera.style.width=(baseW*zoom+px*2)+"px";
+    camera.style.height=(baseH*zoom+py*2)+"px";
+    board.style.setProperty("--wmh-camera-pad-x",px+"px");
+    board.style.setProperty("--wmh-camera-pad-y",py+"px");
+    board.style.setProperty("--wmh-camera-zoom",String(zoom));
+  };
   const centerMap=()=>{
+    if(!baseW||!baseH)measure();
     viewport.scrollLeft=padX()+baseW*zoom/2-viewport.clientWidth/2;
     viewport.scrollTop=padY()+baseH*zoom/2-viewport.clientHeight/2;
   };
   const apply=(next:number,focusX?:number,focusY?:number)=>{
+    if(!baseW||!baseH)measure();
     const old=zoom;zoom=Math.max(.65,Math.min(2.4,next));
     const rect=viewport.getBoundingClientRect(),px=padX(),py=padY();
     const fx=focusX==null?viewport.clientWidth/2:focusX-rect.left;
@@ -648,19 +661,25 @@ function bindIsometricCamera(dialog:HTMLElement):void {
     const label=dialog.querySelector<HTMLElement>("[data-wmh-iso-level]");
     if(label)label.textContent=Math.round(zoom*100)+"%";
   };
-  apply(zoom);
-  centerMap();
   dialog.querySelectorAll<HTMLElement>("[data-wmh-iso-zoom]").forEach(button=>button.addEventListener("click",()=>{
-    const a=button.dataset.wmhIsoZoom;
-    apply(a==="reset"?1:zoom+(a==="in"?.2:-.2));
-    if(button.dataset.wmhIsoZoom==="reset")centerMap();
+    const action=button.dataset.wmhIsoZoom;
+    if(action==="reset"){zoom=1;measure();centerMap();const label=dialog.querySelector<HTMLElement>("[data-wmh-iso-level]");if(label)label.textContent="100%";return;}
+    apply(zoom+(action==="in"?.2:-.2));
   }));
+  dialog.querySelector<HTMLElement>("[data-wmh-iso-center]")?.addEventListener("click",()=>{measure();centerMap();});
   const pts=new Map<number,{x:number;y:number}>();let pinch:{distance:number;zoom:number}|null=null;
   const dist=(a:{x:number;y:number},b:{x:number;y:number})=>Math.hypot(a.x-b.x,a.y-b.y);
   viewport.addEventListener("pointerdown",e=>{pts.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pts.size===2){const p=[...pts.values()];pinch={distance:Math.max(1,dist(p[0],p[1])),zoom};}});
   viewport.addEventListener("pointermove",e=>{if(!pts.has(e.pointerId))return;pts.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pts.size===2&&pinch){const p=[...pts.values()];apply(pinch.zoom*dist(p[0],p[1])/pinch.distance,(p[0].x+p[1].x)/2,(p[0].y+p[1].y)/2);e.preventDefault();}});
   const finish=(e:PointerEvent)=>{pts.delete(e.pointerId);if(pts.size<2)pinch=null;};
   viewport.addEventListener("pointerup",finish);viewport.addEventListener("pointercancel",finish);
+  // Wait until the map view is visible; hidden-parent measurements can be zero.
+  const initialize=()=>{measure();centerMap();};
+  requestAnimationFrame(()=>requestAnimationFrame(initialize));
+  if(typeof ResizeObserver!=="undefined"){
+    const observer=new ResizeObserver(()=>{measure();centerMap();});
+    observer.observe(viewport);
+  }
 }
 function panelMarkup(level: Level, regionId: RegionId = "golden-dragon-empire", selectedBuilding = "Tianhai Academy", selectedArea?: WorldMarker): string {
   const region = regionData[regionId];
