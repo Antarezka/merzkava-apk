@@ -628,11 +628,18 @@ function renderIsometricMinimap(board:HTMLElement):void {
   const world=board.closest<HTMLElement>("[data-wmh-isometric-play-screen]")?.querySelector<HTMLElement>("[data-wmh-minimap-world]");
   const actors=world?.querySelector<HTMLElement>("[data-wmh-minimap-actors]");
   if(!world||!actors)return;
-  const cols=Math.max(1,Number(board.dataset.cols)||1),rows=Math.max(1,Number(board.dataset.rows)||1);
-  const position=(token:HTMLElement)=>({
-    x:Math.max(0,Math.min(100,Number(token.dataset.x||0)/Math.max(1,cols-1)*100)),
-    y:Math.max(0,Math.min(100,Number(token.dataset.y||0)/Math.max(1,rows-1)*100)),
-  });
+  const data=readIsoMapData(board);
+  const style=getComputedStyle(board);
+  const boardWidth=Number.parseFloat(style.getPropertyValue("--iso-board-width"))||board.offsetWidth||1;
+  const boardHeight=Number.parseFloat(style.getPropertyValue("--iso-board-height"))||board.offsetHeight||1;
+  world.style.aspectRatio=boardWidth+" / "+boardHeight;
+  const position=(token:HTMLElement)=>{
+    const center=isoCellCenter(Number(token.dataset.x||0),Number(token.dataset.y||0),data.grid);
+    return {
+      x:Math.max(0,Math.min(100,center.x/boardWidth*100)),
+      y:Math.max(0,Math.min(100,center.y/boardHeight*100)),
+    };
+  };
   const player=board.querySelector<HTMLElement>("[data-wmh-player-token]");
   const items:string[]=[];
   if(player){
@@ -656,12 +663,15 @@ function bindIsometricHud(dialog:HTMLElement):void {
     minimap.addEventListener("click",event=>{
       if(board.classList.contains("wmh-overlay-editing"))return;
       const rect=world.getBoundingClientRect();
-      const nx=Math.max(0,Math.min(.999999,(event.clientX-rect.left)/Math.max(1,rect.width)));
-      const ny=Math.max(0,Math.min(.999999,(event.clientY-rect.top)/Math.max(1,rect.height)));
-      const cols=Number(board.dataset.cols)||12,rows=Number(board.dataset.rows)||10;
-      const x=Math.min(cols-1,Math.floor(nx*cols));
-      const y=Math.min(rows-1,Math.floor(ny*rows));
-      walkToTile(dialog,x,y,"earth");
+      const style=getComputedStyle(board);
+      const boardWidth=Number.parseFloat(style.getPropertyValue("--iso-board-width"))||board.offsetWidth||1;
+      const boardHeight=Number.parseFloat(style.getPropertyValue("--iso-board-height"))||board.offsetHeight||1;
+      const point={
+        x:Math.max(0,Math.min(1,(event.clientX-rect.left)/Math.max(1,rect.width)))*boardWidth,
+        y:Math.max(0,Math.min(1,(event.clientY-rect.top)/Math.max(1,rect.height)))*boardHeight,
+      };
+      const cell=isoCellAtPoint(point,readIsoMapData(board).grid);
+      if(cell)walkToTile(dialog,cell.x,cell.y,"earth");
     });
   }
   renderIsometricWorldStatus(dialog);
