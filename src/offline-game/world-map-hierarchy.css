@@ -579,3 +579,25 @@
 .wmh-isometric-board.wmh-overlay-editing .wmh-tile-coord,
 .wmh-isometric-board.wmh-overlay-editing .wmh-tile>b{display:none!important}
 .wmh-isometric-board.wmh-overlay-editing .wmh-area-overlay-svg{z-index:400!important}
+
+
+/* Transition markers: red means no destination label, blue means named destination. */
+.wmh-transition-marker{pointer-events:all;cursor:pointer}
+.wmh-transition-marker circle{fill:#bd3939;stroke:#ffd0c8;stroke-width:2;vector-effect:non-scaling-stroke;filter:drop-shadow(0 2px 3px #000b)}
+.wmh-transition-marker text{font:700 11px Arial;fill:#fff;text-shadow:0 1px 2px #000;pointer-events:none}
+.wmh-transition-marker.is-named circle{fill:#287acb;stroke:#c5e4ff}
+.wmh-transition-marker.is-selected circle{stroke:#ffe59b;stroke-width:4}
+.wmh-grid-calibration{margin:12px 0;padding:10px;border:1px solid #a88b5c;background:#0c1711}
+.wmh-grid-calibration>b{display:block;margin-bottom:8px;color:#f2dfbb;font:700 10px Georgia,serif;letter-spacing:.1em}
+.wmh-grid-calibration [data-wmh-grid-row]{display:grid;grid-template-columns:minmax(85px,1fr) 30px minmax(80px,1.5fr) 30px;align-items:center;gap:5px;margin:7px 0}
+.wmh-grid-calibration label{font:9px Arial;color:#dfc99e}
+.wmh-grid-calibration output{color:#fff;font-weight:700}
+.wmh-grid-calibration button{height:30px;border:1px solid #a88b5c;background:#25372b;color:#fff0cf;font-weight:700}
+.wmh-grid-calibration input{width:100%;min-width:0;accent-color:#d6b578}
+.wmh-transition-marker.is-unlabelled{animation:wmh-transition-pulse 1.8s ease-in-out infinite}
+@keyframes wmh-transition-pulse{50%{opacity:.62}}
+/* Runtime geometry follows the editor's calibration variables. */
+.wmh-isometric-board .wmh-tile{left:calc((var(--tile-x) - var(--tile-y))*var(--iso-half-w,32px) + var(--iso-center-x))!important;top:calc((var(--tile-x) + var(--tile-y))*var(--iso-half-h,16px) + var(--iso-offset-y,0px))!important;width:var(--tile-w,64px)!important;height:calc(var(--tile-h,32px) + var(--slab-depth,7px))!important}
+.wmh-isometric-board .wmh-character-token{left:calc((var(--token-x) - var(--token-y))*var(--iso-half-w,32px) + var(--iso-center-x))!important;top:calc((var(--token-x) + var(--token-y))*var(--iso-half-h,16px) + var(--iso-offset-y,0px) + 8px)!important}
+.wmh-isometric-board .wmh-player-token{scale:var(--player-scale,1)}
+.wmh-isometric-board .wmh-npc-token{scale:var(--npc-scale,1)}
