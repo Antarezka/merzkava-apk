@@ -310,3 +310,21 @@
 .wmh-iso-controls small{margin-left:auto;color:#bba982;font-size:7px}
 .wmh-isometric-camera{flex:none}
 .wmh-isometric-wrap{touch-action:pan-x pan-y pinch-zoom}
+
+
+/* World-map markers are fixed anchors, never draggable during ordinary navigation. */
+.wmh-world-map .wmh-power:not(.wmh-editor-marker){
+  touch-action:manipulation!important;
+  -webkit-user-drag:none;
+  user-select:none;
+  -webkit-user-select:none;
+  cursor:pointer;
+}
+.wmh-world-map .wmh-power:not(.wmh-editor-marker)>b,
+.wmh-world-map .wmh-power:not(.wmh-editor-marker)>span{
+  pointer-events:none;
+}
+.wmh-world-map .wmh-power:not(.wmh-editor-marker):active,
+.wmh-world-map .wmh-power:not(.wmh-editor-marker):focus-visible{
+  transform:translate(-50%,-50%)!important;
+}
