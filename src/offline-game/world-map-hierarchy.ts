@@ -438,7 +438,7 @@ function bindWorldMapEditor(dialog: HTMLElement): void {
   });
 }
 
-const ACADEMY_MAP_ART_PATH = "maps/academy/full-map/1_academy.png";
+const ACADEMY_MAP_ART_PATH = "maps/academy/full-map/1_academy.jpg";
 
 function academyMapArtUrl(): string {
   // Vite is configured with a relative base for Capacitor. Resolve against the
