@@ -1620,6 +1620,4 @@
 .wmh-isometric-board.is-minimap-style .wmh-character-token[data-token-label]::after{
   display:none!important;
 }
-.wmh-isometric-play-screen:has(.wmh-isometric-board.is-minimap-style) .wmh-rpg-minimap{
-  display:none!important;
-}
+/* The Academy Map Base is also shown in its compact HUD minimap. */
