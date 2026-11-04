@@ -873,3 +873,13 @@
   .wmh-isometric-wrap{min-height:min(60dvh,520px)!important}
   .wmh-overlay-modal>.wmh-overlay-tools{width:min(94vw,420px)!important;height:min(54dvh,460px);min-height:88px;padding:9px!important}
 }
+
+
+/* These camera variables must win over the fixed board layout rules above. */
+.wmh-isometric-board{
+  margin:0!important;
+  margin-left:var(--wmh-camera-pad-x,0px)!important;
+  margin-top:var(--wmh-camera-pad-y,0px)!important;
+  transform:scale(var(--wmh-camera-zoom,1))!important;
+  transform-origin:top left!important;
+}
