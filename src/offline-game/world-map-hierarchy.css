@@ -1658,3 +1658,20 @@
   stroke-opacity:.34!important;
   pointer-events:all!important;
 }
+
+
+/* Tianhai Academy image-only presentation: show the artwork cleanly like the
+   World Map image surface, without a dimmed image or isometric grid overlay. */
+.wmh-isometric-board.is-minimap-style>.wmh-isometric-map-base{
+  opacity:1!important;
+  visibility:visible!important;
+  display:block!important;
+  object-fit:fill!important;
+}
+.wmh-isometric-board.is-minimap-style.wmh-academy-grid-disabled>.wmh-area-scene-svg{
+  display:none!important;
+}
+.wmh-rpg-minimap .wmh-minimap-world>img[data-wmh-academy-map-art]{
+  opacity:1!important;
+  visibility:visible!important;
+}
