@@ -554,3 +554,28 @@
 .wmh-overlay-modal .wmh-overlay-tool-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.wmh-overlay-modal .wmh-overlay-tool-actions button{min-height:40px}
 .wmh-overlay-modal textarea{min-height:70px}
 @media(max-width:390px){.wmh-overlay-float{width:52px;height:52px;right:12px;bottom:max(14px,env(safe-area-inset-bottom))}.wmh-overlay-modal>.wmh-overlay-tools{padding:10px}.wmh-overlay-modal .wmh-overlay-tool-actions{gap:5px}}
+
+
+/* Academy composition: the isometric base remains underneath the full map art.
+   The transparent editor grid is the topmost layer, never a colored tile fill. */
+.wmh-isometric-board.is-exterior{position:relative;isolation:isolate;background:#172019}
+.wmh-academy-map-art{position:absolute;z-index:50;inset:0;width:100%;height:100%;object-fit:fill;pointer-events:none;user-select:none}
+.wmh-area-overlay-svg{z-index:300!important}
+.wmh-isometric-board.wmh-overlay-editing .wmh-tile{
+  z-index:70!important;
+  color:transparent!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+.wmh-isometric-board.wmh-overlay-editing .wmh-tile:before{display:none!important}
+.wmh-isometric-board.wmh-overlay-editing .wmh-tile:after{
+  inset:0 0 7px!important;
+  background:transparent!important;
+  border:1px solid rgba(255,255,255,.72)!important;
+  box-shadow:none!important;
+  clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)!important;
+  opacity:.9!important;
+}
+.wmh-isometric-board.wmh-overlay-editing .wmh-tile-coord,
+.wmh-isometric-board.wmh-overlay-editing .wmh-tile>b{display:none!important}
+.wmh-isometric-board.wmh-overlay-editing .wmh-area-overlay-svg{z-index:400!important}
