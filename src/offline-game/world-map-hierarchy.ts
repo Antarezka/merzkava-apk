@@ -505,7 +505,9 @@ function bindIsometricMapArt(dialog: HTMLElement): void {
     const ready = () => {
       if (!image.naturalWidth) return;
       convertAllToPng(image);
-      if (board && image.dataset.mapPngConverted === "true") drawIsometricForeground(board);
+      // Paint the source immediately as a board texture as a fallback; once the
+      // PNG data URL loads, the same callback redraws it in PNG form.
+      if (board) drawIsometricForeground(board);
     };
     if (image.complete && image.naturalWidth) ready();
     else if (image.complete && image.naturalWidth === 0) image.dispatchEvent(new Event("error"));
