@@ -1,6 +1,11 @@
 import "./world-map-hierarchy.css";
 import { playFootstep } from "../audio/sound-effects";
 import { animateExpeditionPanel } from "./expedition-animations";
+import {
+  createIsoMapEditorData, DEFAULT_ISOMETRIC_GRID, isoCellAtPoint, isoCellCenter, isoCellHasLayer,
+  isoCellKey, isoMapStorageKey, normalizeIsoMapEditorData, toggleIsoCellLayer,
+  type IsoCellLayer, type IsoMapEditorData, type IsoMapGridConfig,
+} from "./isometric-map-editor";
 
 type Level = "world" | "regional" | "local" | "interior" | "home" | "map-editor";
 type RegionId = "golden-dragon-empire" | "tianhai-yunzhou" | "beiming-gu";
@@ -463,7 +468,7 @@ function bindAcademyMapArt(dialog: HTMLElement): void {
   });
 }
 
-function tileMapMarkup(interior = false): string {
+function tileMapMarkup(interior = false, mapId = "academy-exterior", mapImage = academyMapArtUrl()): string {
   const cols = interior ? 12 : 24, rows = interior ? 10 : 20;
   const features: Record<string,string> = interior
     ? {"2-1":"blackboard","5-1":"teacher-desk","3-3":"desk","5-3":"desk","7-3":"desk","3-5":"desk","5-5":"desk","7-5":"desk","10-8":"door"}
@@ -483,15 +488,15 @@ function tileMapMarkup(interior = false): string {
     const structure=buildingSpecs.find(item=>x>=item.x&&x<item.x+item.w&&y>=item.y&&y<item.y+item.h);
     const structureAnchor=!!structure&&x===structure.x&&y===structure.y;
     const depthRow=structure?y-structure.y:-1;
-    const blocked=!!structure&&depthRow>=Math.ceil(structure.h/2);
-    const occlusion=!!structure&&!blocked;
+    const blocked=false;
+    const occlusion=false;
     const surface = interior ? (y<2?"wood":"tile") : (feature==="pond"?"wet":feature==="gate"||feature==="road"?"stone":feature==="tree"||feature==="flower"||feature==="garden"?"earth":feature==="sparring-ground"?"tile":y>15?"stone":"earth");
     const label = feature==="pond"?"POND":feature==="tree"?"TREE":feature==="flower"?"FLOWER":feature==="garden"?"GARDEN":feature==="gate"?"ACADEMY GATE":feature==="bench"?"BENCH":feature==="blackboard"?"BOARD":feature==="teacher-desk"?"TEACHER":feature==="desk"?"DESK":feature==="door"?"DOOR":feature==="study-hall"?"STUDY HALL":feature==="teachers-house"?"TEACHERS’ HALL":feature==="learning-building"?"LEARNING HALL":feature==="simple-house"?"HOUSE":feature==="sparring-ground"&&x===sparring.x&&y===sparring.y?"SPARRING GROUND":"";
     const building=structure?.name||"";
     const classes=(feature?'has-feature feature-'+feature:'')+(structure?' building-footprint building-'+structure.id+(blocked?' building-blocked':' building-occlusion'):'');
     return '<button type="button" class="wmh-tile wmh-tile-'+surface+' '+classes+'" data-wmh-tile data-x="'+x+'" data-y="'+y+'" data-z="0" data-tile-id="tile-'+x+'-'+y+'" data-surface="'+surface+'" style="--tile-x:'+x+';--tile-y:'+y+'" '+(blocked?'data-wmh-blocked="true"':'')+' '+(occlusion?'data-wmh-occlusion="true"':'')+' '+(structureAnchor?'data-wmh-building="'+building+'"':'')+' aria-label="Tile X '+x+', Y '+y+', Z 0 · '+(label||surface)+'"><span class="wmh-tile-coord">('+x+','+y+',0)</span>'+(label?'<b>'+label+'</b>':'')+'</button>';
   }).join("")).join("");
-  return '<div class="wmh-iso-controls"><button type="button" data-wmh-iso-zoom="out" aria-label="Zoom out">−</button><span data-wmh-iso-level>100%</span><button type="button" data-wmh-iso-zoom="in" aria-label="Zoom in">+</button><button type="button" data-wmh-iso-zoom="reset">RESET</button><button type="button" data-wmh-iso-center aria-label="Center Academy map">CENTER MAP</button><small>DRAG TO PAN · PINCH TO ZOOM</small></div><div class="wmh-isometric-wrap" data-wmh-iso-viewport><div class="wmh-isometric-camera" data-wmh-iso-camera><div class="wmh-isometric-board '+(interior?'is-interior':'is-exterior')+'" data-wmh-board style="--tile-cols:'+cols+';--tile-rows:'+rows+';--iso-center-x:'+(rows*32)+'px;--iso-board-width:'+((cols+rows-1)*32+32)+'px;--iso-board-height:'+((cols+rows-2)*16+39)+'px;--tile-w:64px;--tile-h:32px;--slab-depth:7px" data-cols="'+cols+'" data-rows="'+rows+'">'+tiles+''+(interior?'':'<img class="wmh-academy-map-art" data-wmh-academy-map-art src="'+academyMapArtUrl()+'" alt="Tianhai Academy full map" draggable="false" loading="eager" decoding="async"/>')+'<svg class="wmh-area-overlay-svg" data-wmh-overlay-svg viewBox="0 0 '+((cols+rows-1)*32+32)+' '+((cols+rows-2)*16+39)+'" preserveAspectRatio="none"><g data-wmh-overlay-marks></g><g data-wmh-manual-marks></g><g data-wmh-transition-marks></g><path data-wmh-overlay-preview class="wmh-area-mark-preview" d=""></path></svg>'+
+  return '<div class="wmh-iso-controls"><button type="button" data-wmh-iso-zoom="out" aria-label="Zoom out">−</button><span data-wmh-iso-level>100%</span><button type="button" data-wmh-iso-zoom="in" aria-label="Zoom in">+</button><button type="button" data-wmh-iso-zoom="reset">RESET</button><button type="button" data-wmh-iso-center aria-label="Center Academy map">CENTER MAP</button><small>DRAG TO PAN · PINCH TO ZOOM</small></div><div class="wmh-isometric-wrap" data-wmh-iso-viewport><div class="wmh-isometric-camera" data-wmh-iso-camera><div class="wmh-isometric-board '+(interior?'is-interior':'is-exterior')+'" data-wmh-board style="--tile-cols:'+cols+';--tile-rows:'+rows+';--iso-center-x:'+(rows*32)+'px;--iso-board-width:'+((cols+rows-1)*32+32)+'px;--iso-board-height:'+((cols+rows-2)*16+39)+'px;--tile-w:64px;--tile-h:32px;--slab-depth:7px" data-cols="'+cols+'" data-rows="'+rows+'" data-map-id="'+escapeMapEditorText(mapId)+'">'+tiles+''+(mapImage?'<img class="wmh-academy-map-art wmh-isometric-map-base" data-wmh-map-art data-wmh-academy-map-art src="'+mapImage+'" alt="Isometric map base" draggable="false" loading="eager" decoding="async"/><canvas class="wmh-isometric-foreground" data-wmh-foreground-canvas aria-hidden="true"></canvas>':'')+'<svg class="wmh-area-overlay-svg" data-wmh-overlay-svg viewBox="0 0 '+((cols+rows-1)*32+32)+' '+((cols+rows-2)*16+39)+'" preserveAspectRatio="none"><g data-wmh-overlay-marks></g><g data-wmh-manual-marks></g><g data-wmh-transition-marks></g><path data-wmh-overlay-preview class="wmh-area-mark-preview" d=""></path></svg>'+
     '<button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token data-x="5" data-y="'+(interior?8:17)+'" style="--token-x:5;--token-y:'+(interior?8:17)+'" aria-label="Player character"><i></i></button>'+
     (interior ? '<button type="button" class="wmh-character-token wmh-npc-token is-male" data-wmh-npc="teacher" data-x="6" data-y="2" style="--token-x:6;--token-y:2" aria-label="Teacher"><i></i></button><button type="button" class="wmh-character-token wmh-npc-token is-female" data-wmh-npc="student-lin" data-x="3" data-y="4" style="--token-x:3;--token-y:4" aria-label="Student Lin"><i></i></button>' :
       '<button type="button" class="wmh-character-token wmh-npc-token is-female" data-wmh-npc="student-lin" data-x="7" data-y="4" style="--token-x:7;--token-y:4" aria-label="Student Lin"><i></i></button>'+
@@ -500,146 +505,220 @@ function tileMapMarkup(interior = false): string {
       '<button type="button" class="wmh-character-token wmh-npc-token is-male" data-wmh-npc="groundskeeper" data-x="22" data-y="5" style="--token-x:22;--token-y:5" aria-label="Groundskeeper"><i></i></button>')+
     '</div></div></div>';
 }
-type IsoAreaCategory = "road"|"object";
-type IsoManualRule = "walkable"|"blocked"|"behind";
-type IsoOverlayMark = {id:string;category:IsoAreaCategory;path:string;points:Array<{x:number;y:number}>;width:number};
-type IsoManualMark = {id:string;x:number;y:number;quarter:0|1|2|3;rule:IsoManualRule};
-type IsoTransitionMarker={id:string;x:number;y:number;label:string};
-function isoOverlayKey(dialog:HTMLElement):string {
- const o=dialog.closest<HTMLElement>("[data-world-map-hierarchy]");
- return "merzkava.iso-area-overlays.v2:"+(o?.dataset.level==="interior"?"interior":"exterior")+":"+(o?.dataset.building||"academy");
+function makeIsometricMapId(regionId: RegionId, selectedBuilding: string, interior: boolean): string {
+  const slug=selectedBuilding.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+  return regionId+":"+(slug||"unnamed-area")+":"+(interior?"interior":"exterior");
 }
-function isoSmoothPath(p:Array<{x:number;y:number}>):string {
- if(p.length<2)return "";
- if(p.length===2)return "M "+p[0].x+" "+p[0].y+" L "+p[1].x+" "+p[1].y;
- let d="M "+p[0].x+" "+p[0].y;
- for(let i=1;i<p.length-1;i++){const m={x:(p[i].x+p[i+1].x)/2,y:(p[i].y+p[i+1].y)/2};d+=" Q "+p[i].x+" "+p[i].y+" "+m.x+" "+m.y;}
- const z=p[p.length-1];return d+" T "+z.x+" "+z.y;
+function escapeMapEditorText(value: unknown): string {
+  return String(value).replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]||char));
 }
-function isoDistanceToPath(p:{x:number;y:number},points:Array<{x:number;y:number}>):number {
- let best=Infinity;
- for(let i=1;i<points.length;i++){const a=points[i-1],b=points[i],dx=b.x-a.x,dy=b.y-a.y,len=dx*dx+dy*dy,t=len?Math.max(0,Math.min(1,((p.x-a.x)*dx+(p.y-a.y)*dy)/len)):0;best=Math.min(best,Math.hypot(p.x-a.x-t*dx,p.y-a.y-t*dy));}
- return best;
+function isoOverlayKey(board: HTMLElement): string {
+  return isoMapStorageKey(board.dataset.mapId||"unnamed-isometric-map");
 }
-function isoManualForTile(board:HTMLElement,x:number,y:number):IsoManualMark[] {
- const key=board.dataset.overlayStorageKey||"";
- if(!key)return [];
- try{const d=JSON.parse(localStorage.getItem(key)||"{}");return Array.isArray(d.manual)?d.manual.filter((m:IsoManualMark)=>m.x===x&&m.y===y):[];}catch{return [];}
+function readIsoMapData(board: HTMLElement): IsoMapEditorData {
+  const mapId=board.dataset.mapId||"unnamed-isometric-map";
+  const fallback:IsoMapGridConfig={...DEFAULT_ISOMETRIC_GRID,cols:Number(board.dataset.cols||24),rows:Number(board.dataset.rows||20)};
+  try { const saved=JSON.parse(localStorage.getItem(isoOverlayKey(board))||"null"); if(saved)return normalizeIsoMapEditorData(saved,mapId,fallback); } catch {}
+  // Preserve old calibration and transition labels, but do not carry the obsolete
+  // quarter-based "behind" behavior into the independent cell-layer model.
+  try {
+    const overlay=board.closest<HTMLElement>("[data-world-map-hierarchy]");
+    const level=overlay?.dataset.level==="interior"?"interior":"exterior";
+    const building=overlay?.dataset.building||"Tianhai Academy";
+    const legacy=JSON.parse(localStorage.getItem("merzkava.iso-area-overlays.v2:"+level+":"+building)||"null");
+    if(legacy)return normalizeIsoMapEditorData({
+      grid:legacy.grid,transitions:legacy.transitions,
+      blockedCells:Array.isArray(legacy.manual)?legacy.manual.filter((m:any)=>m?.rule==="blocked").reduce((all:string[],m:any)=>{
+        const count=legacy.manual.filter((n:any)=>n?.x===m.x&&n?.y===m.y&&n?.rule==="blocked").length;
+        if(count>=4)all.push(isoCellKey(Number(m.x),Number(m.y)));return all;
+      },[]):[],
+    },mapId,fallback);
+  } catch {}
+  return createIsoMapEditorData(mapId,fallback);
 }
-function isoTileRule(board:HTMLElement,x:number,y:number):IsoManualRule|"default" {
- const marks=isoManualForTile(board,x,y);
- if(!marks.length)return "default";
- const rules=marks.map(m=>m.rule);
- if(rules.includes("walkable"))return "walkable";
- if(rules.includes("behind"))return "behind";
- if(rules.filter(rule=>rule==="blocked").length>=4)return "blocked";
- return "default";
-}
-function isoAreaRuleAt(board:HTMLElement,x:number,y:number):"road"|"object"|"default" {
- const key=board.dataset.overlayStorageKey||"";
- try{
-  const data=JSON.parse(localStorage.getItem(key)||"{}");
-  const center={x:(x-y)*32+Number.parseFloat(getComputedStyle(board).getPropertyValue("--iso-center-x")||"640"),y:(x+y)*16+16};
-  let found:IsoOverlayMark|null=null,best=Infinity;
-  for(const mark of (Array.isArray(data.areas)?data.areas:[]) as IsoOverlayMark[]){const dist=isoDistanceToPath(center,mark.points);if(dist<=mark.width/2&&dist<best){best=dist;found=mark;}}
-  return found?.category||"default";
- }catch{return "default";}
+function drawIsometricForeground(board:HTMLElement,data=readIsoMapData(board)):void {
+  const canvas=board.querySelector<HTMLCanvasElement>("[data-wmh-foreground-canvas]");
+  const image=board.querySelector<HTMLImageElement>("[data-wmh-map-art]");
+  if(!canvas||!image||!image.complete||!image.naturalWidth||!image.naturalHeight)return;
+  const width=image.clientWidth||image.naturalWidth,height=image.clientHeight||image.naturalHeight;
+  const dpr=Math.max(1,Math.min(2,window.devicePixelRatio||1));
+  canvas.width=Math.max(1,Math.round(width*dpr));canvas.height=Math.max(1,Math.round(height*dpr));
+  canvas.style.left=image.offsetLeft+"px";canvas.style.top=image.offsetTop+"px";
+  canvas.style.width=width+"px";canvas.style.height=height+"px";
+  const ctx=canvas.getContext("2d");if(!ctx)return;
+  ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,width,height);
+  if(!data.foregroundCells.length)return;
+  const halfW=data.grid.tileW/2,halfH=data.grid.tileH/2,left=image.offsetLeft,top=image.offsetTop;
+  ctx.save();ctx.beginPath();
+  for(const key of data.foregroundCells){
+    const [x,y]=key.split(",").map(Number),center=isoCellCenter(x,y,data.grid),cx=center.x-left,cy=center.y-top;
+    ctx.moveTo(cx,cy-halfH);ctx.lineTo(cx+halfW,cy);ctx.lineTo(cx,cy+halfH);ctx.lineTo(cx-halfW,cy);ctx.closePath();
+  }
+  ctx.clip();ctx.drawImage(image,0,0,width,height);ctx.restore();
 }
 function isoCanWalkTile(board:HTMLElement,tile:HTMLElement|null,x:number,y:number):boolean {
- if(!tile)return false;
- const rule=isoTileRule(board,x,y);
- if(rule==="blocked")return false;
- if(rule==="walkable"||rule==="behind")return true;
- const area=isoAreaRuleAt(board,x,y);
- if(area==="road")return true;
- if(area==="object")return false;
- if(tile.dataset.wmhBlocked==="true")return false;
- return true;
+  if(!tile)return false;
+  return !isoCellHasLayer(readIsoMapData(board),"blockedCells",x,y);
 }
 function bindIsoAreaEditor(dialog:HTMLElement):void {
- const board=dialog.querySelector<HTMLElement>("[data-wmh-board]"),svg=board?.querySelector<SVGSVGElement>("[data-wmh-overlay-svg]");
- const toggle=dialog.querySelector<HTMLButtonElement>("[data-wmh-overlay-toggle]"),panel=dialog.querySelector<HTMLElement>("[data-wmh-overlay-tools]");
- if(!board||!svg||!toggle||!panel||board.dataset.overlayEditorBound==="true")return;
- board.dataset.overlayEditorBound="true";
- const key=isoOverlayKey(dialog);board.dataset.overlayStorageKey=key;
-  const resizeHandle=panel.querySelector<HTMLElement>("[data-wmh-panel-resize-handle]");
-  resizeHandle?.addEventListener("pointerdown",event=>{
-   event.preventDefault();event.stopPropagation();
-   const pointerId=event.pointerId,startY=event.clientY,startHeight=panel.getBoundingClientRect().height;
-   try{resizeHandle.setPointerCapture(pointerId);}catch{}
-   const move=(e:PointerEvent)=>{if(e.pointerId!==pointerId)return;e.preventDefault();const next=Math.max(88,Math.min(window.innerHeight*.72,startHeight+startY-e.clientY));panel.style.height=next+"px";};
-   const end=(e:PointerEvent)=>{if(e.pointerId!==pointerId)return;window.removeEventListener("pointermove",move);window.removeEventListener("pointerup",end);window.removeEventListener("pointercancel",end);};
-   window.addEventListener("pointermove",move,{passive:false});window.addEventListener("pointerup",end);window.addEventListener("pointercancel",end);
+  const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
+  const svg=board?.querySelector<SVGSVGElement>("[data-wmh-overlay-svg]");
+  const toggle=dialog.querySelector<HTMLButtonElement>("[data-wmh-overlay-toggle]");
+  const panel=dialog.querySelector<HTMLElement>("[data-wmh-overlay-tools]");
+  if(!board||!svg||!toggle||!panel||board.dataset.overlayEditorBound==="true")return;
+  board.dataset.overlayEditorBound="true";
+  const key=isoOverlayKey(board);board.dataset.overlayStorageKey=key;
+  let data=readIsoMapData(board),selectedTransitionId:string|null=null;
+  const history:IsoMapEditorData[]=[];
+  const cellGroup=svg.querySelector<SVGGElement>("[data-wmh-manual-marks]");
+  const transitionGroup=svg.querySelector<SVGGElement>("[data-wmh-transition-marks]");
+  const status=()=>panel.querySelector<HTMLElement>("[data-wmh-overlay-status]");
+  const setStatus=(message:string)=>{const node=status();if(node)node.textContent=message;};
+  const modeSelect=panel.querySelector<HTMLSelectElement>("[data-wmh-overlay-mode]");
+  const mode=()=>modeSelect?.value||"foreground";
+  const transitionTools=panel.querySelector<HTMLElement>("[data-wmh-transition-tools]");
+  const transitionField=panel.querySelector<HTMLInputElement>("[data-wmh-transition-label]");
+  const exportField=panel.querySelector<HTMLTextAreaElement>("[data-wmh-overlay-export]");
+  const importField=panel.querySelector<HTMLTextAreaElement>("[data-wmh-overlay-import-text]");
+  const grid:IsoMapGridConfig={...data.grid};
+  const remember=()=>{history.push(JSON.parse(JSON.stringify(data)) as IsoMapEditorData);if(history.length>40)history.shift();};
+  const redraw=()=>{
+    if(cellGroup){
+      const marks:string[]=[];
+      const add=(cells:string[],cls:string,symbol:string)=>{
+        for(const key of cells){
+          const [x,y]=key.split(",").map(Number),c=isoCellCenter(x,y,grid),hw=grid.tileW/2,hh=grid.tileH/2;
+          const points=[c.x+","+(c.y-hh),(c.x+hw)+","+c.y,c.x+","+(c.y+hh),(c.x-hw)+","+c.y].join(" ");
+          marks.push('<g class="wmh-cell-mark '+cls+'"><polygon points="'+points+'"/><text x="'+c.x+'" y="'+c.y+'" text-anchor="middle" dominant-baseline="central">'+symbol+'</text></g>');
+        }
+      };
+      add(data.foregroundCells,"is-foreground","○");add(data.blockedCells,"is-blocked","X");add(data.opacityCells,"is-opacity","◌");
+      cellGroup.innerHTML=marks.join("");
+    }
+    if(transitionGroup)transitionGroup.innerHTML=data.transitions.map(marker=>{
+      const c=isoCellCenter(marker.x,marker.y,grid),label=escapeMapEditorText(marker.label);
+      return '<g class="wmh-transition-marker '+(marker.label.trim()?"is-named":"is-unlabelled")+(selectedTransitionId===marker.id?" is-selected":"")+'" data-transition-id="'+escapeMapEditorText(marker.id)+'" transform="translate('+c.x+" "+c.y+')"><circle r="11"></circle><text text-anchor="middle" dominant-baseline="central">'+(marker.label.trim()?"↗":"?")+'</text><title>'+(label||"UNLABELLED TRANSITION")+'</title></g>';
+    }).join("");
+  };
+  const persist=()=>{
+    data.grid={...grid};
+    try{localStorage.setItem(key,JSON.stringify(data));setStatus("Saved locally. Each isometric map keeps independent cell and grid settings.");}
+    catch{setStatus("Storage unavailable. Use COPY DATA to keep a backup.");}
+    redraw();drawIsometricForeground(board,data);syncIsoDepthAndOcclusion(board);
+  };
+  const applyGrid=()=>{
+    board.dataset.cols=String(grid.cols);board.dataset.rows=String(grid.rows);
+    const wanted=new Set<string>();for(let y=0;y<grid.rows;y++)for(let x=0;x<grid.cols;x++)wanted.add(isoCellKey(x,y));
+    board.querySelectorAll<HTMLElement>("[data-wmh-tile]").forEach(tile=>{if(!wanted.has(isoCellKey(Number(tile.dataset.x),Number(tile.dataset.y))))tile.remove();});
+    const present=new Set(Array.from(board.querySelectorAll<HTMLElement>("[data-wmh-tile]")).map(t=>isoCellKey(Number(t.dataset.x),Number(t.dataset.y))));
+    for(let y=0;y<grid.rows;y++)for(let x=0;x<grid.cols;x++){
+      const id=isoCellKey(x,y);if(present.has(id))continue;
+      const tile=document.createElement("button");tile.type="button";tile.className="wmh-tile wmh-tile-earth";
+      tile.dataset.wmhTile="";tile.dataset.x=String(x);tile.dataset.y=String(y);tile.dataset.z="0";tile.dataset.tileId="tile-"+id;tile.dataset.surface="earth";
+      tile.style.setProperty("--tile-x",String(x));tile.style.setProperty("--tile-y",String(y));tile.setAttribute("aria-label","Tile X "+x+", Y "+y);
+      const coord=document.createElement("span");coord.className="wmh-tile-coord";coord.textContent="("+x+","+y+")";tile.append(coord);board.append(tile);
+    }
+    board.style.setProperty("--tile-w",grid.tileW+"px");board.style.setProperty("--tile-h",grid.tileH+"px");
+    board.style.setProperty("--iso-half-w",grid.tileW/2+"px");board.style.setProperty("--iso-half-h",grid.tileH/2+"px");
+    board.style.setProperty("--iso-center-x",(grid.rows*grid.tileW/2+grid.offsetX)+"px");board.style.setProperty("--iso-offset-y",grid.offsetY+"px");
+    board.style.setProperty("--player-scale",String(grid.playerScale));board.style.setProperty("--npc-scale",String(grid.npcScale));
+    const image=board.querySelector<HTMLImageElement>("[data-wmh-map-art]");
+    const width=Math.max((grid.cols+grid.rows-2)*grid.tileW/2+grid.tileW,image?.naturalWidth||0,board.classList.contains("is-exterior")?1408:0);
+    const height=Math.max((grid.cols+grid.rows-2)*grid.tileH/2+grid.tileH+7,image?.naturalHeight||0,board.classList.contains("is-exterior")?768:0);
+    board.style.setProperty("--iso-board-width",width+"px");board.style.setProperty("--iso-board-height",height+"px");
+    board.style.width=width+"px";board.style.height=height+"px";svg.setAttribute("viewBox","0 0 "+width+" "+height);
+    panel.querySelectorAll<HTMLInputElement>("[data-wmh-grid-control]").forEach(input=>{
+      const property=input.dataset.wmhGridControl as keyof IsoMapGridConfig;input.value=String(grid[property]);
+      const output=panel.querySelector<HTMLElement>('[data-wmh-grid-value="'+property+'"]');if(output)output.textContent=String(grid[property]);
+    });
+    redraw();drawIsometricForeground(board,data);syncIsoDepthAndOcclusion(board);
+  };
+  const setActive=(active:boolean)=>{board.classList.toggle("wmh-overlay-editing",active);panel.hidden=!active;toggle.setAttribute("aria-pressed",String(active));if(!active)selectedTransitionId=null;};
+  toggle.addEventListener("click",()=>setActive(panel.hidden));
+  dialog.querySelector<HTMLElement>("[data-wmh-overlay-close]")?.addEventListener("click",()=>setActive(false));
+  modeSelect?.addEventListener("change",()=>{
+    if(transitionTools)transitionTools.hidden=mode()!=="transition";
+    setStatus(mode()==="foreground"?"Tap cells to toggle ○ foreground priority; the same JPG is clipped and redrawn above characters."
+      :mode()==="blocked"?"Tap cells to toggle X collision. Blocked cells cannot be entered."
+      :mode()==="opacity"?"Tap cells to toggle opacity zones. Characters become translucent while inside them."
+      :"Tap a cell to add/select a transition. Red is unnamed; blue is named.");
   });
-  const areaGroup=svg.querySelector<SVGGElement>("[data-wmh-overlay-marks]"),manualGroup=svg.querySelector<SVGGElement>("[data-wmh-manual-marks]"),preview=svg.querySelector<SVGPathElement>("[data-wmh-overlay-preview]");
- let areas:IsoOverlayMark[]=[],manual:IsoManualMark[]=[],transitions:IsoTransitionMarker[]=[];let selectedTransitionId:string|null=null;
- const grid={cols:Number(board.dataset.cols||24),rows:Number(board.dataset.rows||20),tileW:64,tileH:32,offsetX:0,offsetY:0,playerScale:1,npcScale:1};
- try{const d=JSON.parse(localStorage.getItem(key)||"{}");if(Array.isArray(d.areas))areas=d.areas;if(Array.isArray(d.manual))manual=d.manual;if(Array.isArray(d.transitions))transitions=d.transitions;if(d.grid)Object.assign(grid,d.grid);}catch{}
- const applyGrid=()=>{board.dataset.cols=String(grid.cols);board.dataset.rows=String(grid.rows);const wanted=new Set<string>();for(let y=0;y<grid.rows;y++)for(let x=0;x<grid.cols;x++)wanted.add(x+"-"+y);board.querySelectorAll<HTMLElement>("[data-wmh-tile]").forEach(tile=>{const id=tile.dataset.x+"-"+tile.dataset.y;if(!wanted.has(id))tile.remove();});const present=new Set(Array.from(board.querySelectorAll<HTMLElement>("[data-wmh-tile]")).map(tile=>tile.dataset.x+"-"+tile.dataset.y));for(let y=0;y<grid.rows;y++)for(let x=0;x<grid.cols;x++){const id=x+"-"+y;if(present.has(id))continue;const tile=document.createElement("button");tile.type="button";tile.className="wmh-tile wmh-tile-earth";tile.dataset.wmhTile="";tile.dataset.x=String(x);tile.dataset.y=String(y);tile.dataset.z="0";tile.dataset.tileId="tile-"+id;tile.style.setProperty("--tile-x",String(x));tile.style.setProperty("--tile-y",String(y));tile.setAttribute("aria-label","Tile X "+x+", Y "+y+", Z 0");const coord=document.createElement("span");coord.className="wmh-tile-coord";coord.textContent="("+x+","+y+",0)";tile.append(coord);board.append(tile);}board.style.setProperty("--tile-w",grid.tileW+"px");board.style.setProperty("--tile-h",grid.tileH+"px");board.style.setProperty("--iso-half-w",grid.tileW/2+"px");board.style.setProperty("--iso-half-h",grid.tileH/2+"px");board.style.setProperty("--iso-center-x",(grid.rows*grid.tileW/2+grid.offsetX)+"px");board.style.setProperty("--iso-offset-y",grid.offsetY+"px");board.style.setProperty("--player-scale",String(grid.playerScale));board.style.setProperty("--npc-scale",String(grid.npcScale));const boardWidth=(grid.cols+grid.rows-1)*grid.tileW/2+grid.tileW,boardHeight=Math.max((grid.cols+grid.rows-2)*grid.tileH/2+grid.tileH+7,board.classList.contains("is-exterior")?768:0);board.style.setProperty("--iso-board-width",boardWidth+"px");board.style.setProperty("--iso-board-height",boardHeight+"px");board.style.width=boardWidth+"px";board.style.height=boardHeight+"px";svg.setAttribute("viewBox","0 0 "+board.offsetWidth+" "+board.offsetHeight);dialog.querySelectorAll<HTMLInputElement>("[data-wmh-grid-control]").forEach(input=>{const k=input.dataset.wmhGridControl as keyof typeof grid;if(k in grid){input.value=String(grid[k]);const output=dialog.querySelector<HTMLElement>('[data-wmh-grid-value="'+k+'"]');if(output)output.textContent=String(grid[k]);}});};applyGrid();
- const redraw=()=>{
-  if(areaGroup)areaGroup.innerHTML=areas.map(m=>'<path d="'+m.path+'" class="wmh-area-mark mark-'+m.category+'" style="stroke-width:'+m.width+'px"><title>'+m.category.toUpperCase()+' AREA</title></path>').join("");
-  if(manualGroup)manualGroup.innerHTML=manual.map(m=>{const qx=m.quarter%2?.75:.25,qy=m.quarter>=2?.75:.25;const cx=(m.x-m.y)*grid.tileW/2+grid.rows*grid.tileW/2+(qx-qy)*grid.tileW/2;const cy=(m.x+m.y)*grid.tileH/2+(qx+qy)*grid.tileH/2;const symbol=m.rule==="walkable"?"✓":m.rule==="blocked"?"×":"○";return '<g class="wmh-manual-mark manual-'+m.rule+'" transform="translate('+cx+' '+cy+')"><circle r="8"></circle><text text-anchor="middle" dominant-baseline="central">'+symbol+'</text></g>';}).join("");
-  const tg=svg.querySelector<SVGGElement>("[data-wmh-transition-marks]");if(tg)tg.innerHTML=transitions.map(m=>{const named=!!m.label.trim(),cx=(m.x-m.y)*grid.tileW/2+grid.rows*grid.tileW/2+grid.offsetX,cy=(m.x+m.y)*grid.tileH/2+grid.offsetY;return '<g class="wmh-transition-marker '+(named?"is-named":"is-unlabelled")+(selectedTransitionId===m.id?" is-selected":"")+'" data-transition-id="'+m.id+'" transform="translate('+cx+' '+cy+')"><circle r="11"></circle><text text-anchor="middle" dominant-baseline="central">'+(named?"↗":"?")+'</text><title>'+(named?m.label:"UNLABELLED TRANSITION")+'</title></g>';}).join("");
- };
- const persist=()=>{localStorage.setItem(key,JSON.stringify({format:"merzkava-isometric-area-overlays",version:3,areas,manual,transitions,grid}));redraw();};
- redraw();
- panel.querySelector<HTMLElement>("[data-wmh-transition-apply]")?.addEventListener("click",()=>{const m=transitions.find(x=>x.id===selectedTransitionId),v=panel.querySelector<HTMLInputElement>("[data-wmh-transition-label]");if(m){m.label=(v?.value||"").trim();persist();}});
- panel.querySelector<HTMLElement>("[data-wmh-transition-delete]")?.addEventListener("click",()=>{transitions=transitions.filter(m=>m.id!==selectedTransitionId);selectedTransitionId=null;persist();});
- svg.addEventListener("click",e=>{const g=(e.target as Element).closest<SVGGElement>("[data-transition-id]");if(!g||mode()!=="transition")return;selectedTransitionId=g.dataset.transitionId||null;const m=transitions.find(x=>x.id===selectedTransitionId),v=panel.querySelector<HTMLInputElement>("[data-wmh-transition-label]");if(v)v.value=m?.label||"";redraw();});
- panel.querySelectorAll<HTMLInputElement>("[data-wmh-grid-control]").forEach(input=>{const k=input.dataset.wmhGridControl as keyof typeof grid;const update=()=>{(grid as any)[k]=Number(input.value);applyGrid();persist();};input.addEventListener("input",update);input.closest<HTMLElement>("[data-wmh-grid-row]")?.querySelectorAll<HTMLButtonElement>("[data-wmh-grid-step]").forEach(b=>b.addEventListener("click",()=>{input.value=String(Math.max(Number(input.min),Math.min(Number(input.max),Number(input.value)+Number(b.dataset.wmhGridStep||1)*(b.dataset.wmhGridDir==="minus"?-1:1))));update();}));});
- let active=false,drawing=false,points:Array<{x:number;y:number}>=[];
- const val=(q:string)=>panel.querySelector<HTMLSelectElement>(q)?.value||"";
- const mode=()=>val("[data-wmh-overlay-mode]")||"area";
- const modeSelect=panel.querySelector<HTMLSelectElement>("[data-wmh-overlay-mode]");
- modeSelect?.addEventListener("change",()=>{const a=panel.querySelector<HTMLElement>("[data-wmh-area-tools]"),m=panel.querySelector<HTMLElement>("[data-wmh-manual-tools]"),t=panel.querySelector<HTMLElement>("[data-wmh-transition-tools]");if(a)a.hidden=mode()!=="area";if(m)m.hidden=mode()!=="manual";if(t)t.hidden=mode()!=="transition";});
- const setActive=(v:boolean)=>{active=v;board.classList.toggle("wmh-overlay-editing",v);panel.hidden=!v;toggle.setAttribute("aria-pressed",String(v));if(!v){drawing=false;points=[];preview?.setAttribute("d","");}};
- toggle.addEventListener("click",()=>setActive(!active));
- dialog.querySelector<HTMLElement>("[data-wmh-overlay-close]")?.addEventListener("click",()=>setActive(false));
- panel.addEventListener("click",e=>{if(e.target===panel)setActive(false);});
- const pt=(e:PointerEvent)=>{const r=board.getBoundingClientRect();return{x:(e.clientX-r.left)*board.offsetWidth/r.width,y:(e.clientY-r.top)*board.offsetHeight/r.height};};
- const addManual=(p:{x:number;y:number})=>{
-  const rows=Number(board.dataset.rows||20),center=rows*32,worldX=(p.x-center)/64+p.y/32,worldY=p.y/32-(p.x-center)/64;
-  const x=Math.floor(worldX),y=Math.floor(worldY),fx=worldX-x,fy=worldY-y;
-  const q=(fy>=.5?2:0)+(fx>=.5?1:0);
-  if(x<0||y<0||x>=Number(board.dataset.cols||24)||y>=rows)return;
-  const rule=val("[data-wmh-overlay-manual]") as IsoManualRule;
-  manual=manual.filter(m=>!(m.x===x&&m.y===y&&m.quarter===q));
-  manual.push({id:"manual-"+x+"-"+y+"-"+q,x,y,quarter:q as 0|1|2|3,rule});persist();
- };
- svg.addEventListener("pointerdown",e=>{
-  if(!active)return;e.preventDefault();e.stopPropagation();
-  if(mode()==="manual"){addManual(pt(e));return;}
-  if(mode()==="transition"){const existing=(e.target as Element).closest<SVGGElement>("[data-transition-id]");if(existing){selectedTransitionId=existing.dataset.transitionId||null;const marker=transitions.find(m=>m.id===selectedTransitionId),field=panel.querySelector<HTMLInputElement>("[data-wmh-transition-label]");if(field)field.value=marker?.label||"";redraw();return;}const p=pt(e),hx=grid.tileW/2,hy=grid.tileH/2,cx=grid.rows*hx+grid.offsetX,wx=(p.x-cx)/hx+p.y/hy,wy=p.y/hy-(p.x-cx)/hx,x=Math.floor(wx),y=Math.floor(wy);if(x>=0&&y>=0&&x<grid.cols&&y<grid.rows){const id="transition-"+Date.now();transitions.push({id,x,y,label:""});selectedTransitionId=id;const v=panel.querySelector<HTMLInputElement>("[data-wmh-transition-label]");if(v)v.value="";persist();}return;}
-  drawing=true;points=[pt(e)];try{svg.setPointerCapture(e.pointerId);}catch{}
- });
- svg.addEventListener("pointermove",e=>{if(!active||!drawing)return;e.preventDefault();e.stopPropagation();const p=pt(e),last=points[points.length-1];if(!last||Math.hypot(p.x-last.x,p.y-last.y)>4)points.push(p);preview?.setAttribute("d",isoSmoothPath(points));});
- const finish=()=>{
-  if(!drawing)return;drawing=false;if(points.length<2){points=[];preview?.setAttribute("d","");return;}
-  const review=dialog.querySelector<HTMLElement>("[data-wmh-overlay-review]");
-  if(review){review.hidden=false;review.dataset.path=isoSmoothPath(points);review.dataset.points=JSON.stringify(points);review.dataset.category=val("[data-wmh-overlay-category]")||"road";review.dataset.width=String(Number(panel.querySelector<HTMLInputElement>("[data-wmh-overlay-width]")?.value||26));const t=review.querySelector<HTMLElement>("[data-wmh-review-summary]");if(t)t.textContent=review.dataset.category.toUpperCase()+" AREA · "+points.length+" CONTROL POINTS";}
-  points=[];preview?.setAttribute("d","");
- };
- svg.addEventListener("pointerup",e=>{if(!active)return;e.preventDefault();e.stopPropagation();finish();});svg.addEventListener("pointercancel",finish);
- dialog.querySelector<HTMLElement>("[data-wmh-overlay-cancel]")?.addEventListener("click",()=>{const r=dialog.querySelector<HTMLElement>("[data-wmh-overlay-review]");if(r)r.hidden=true;preview?.setAttribute("d","");});
- dialog.querySelector<HTMLElement>("[data-wmh-overlay-confirm]")?.addEventListener("click",()=>{
-  const r=dialog.querySelector<HTMLElement>("[data-wmh-overlay-review]");if(!r)return;let pts:Array<{x:number;y:number}>=[];try{pts=JSON.parse(r.dataset.points||"[]");}catch{}
-  if(!r.dataset.path||pts.length<2)return;areas.push({id:"area-"+Date.now(),path:r.dataset.path,points:pts,category:(r.dataset.category||"road") as IsoAreaCategory,width:Number(r.dataset.width||26)});persist();r.hidden=true;
- });
- dialog.querySelector<HTMLElement>("[data-wmh-overlay-undo]")?.addEventListener("click",()=>{if(mode()==="manual")manual.pop();else areas.pop();persist();});
- dialog.querySelector<HTMLElement>("[data-wmh-overlay-clear]")?.addEventListener("click",()=>{if(!window.confirm("Clear all area and manual marks for this isometric map?"))return;areas=[];manual=[];persist();});
- const exportBlueprint=()=>JSON.stringify({format:"merzkava-isometric-area-overlays",version:3,mapKey:key,board:{cols:grid.cols,rows:grid.rows,tileWidth:grid.tileW,tileHeight:grid.tileH,offsetX:grid.offsetX,offsetY:grid.offsetY,playerScale:grid.playerScale,npcScale:grid.npcScale},grid,areas,manual,transitions},null,2);
- dialog.querySelector<HTMLElement>("[data-wmh-overlay-save]")?.addEventListener("click",()=>{try{persist();const t=panel.querySelector<HTMLElement>("[data-wmh-overlay-status]");if(t)t.textContent="Markers saved on this device for this map. Use COPY DATA to carry them into another build."; }catch{const t=panel.querySelector<HTMLElement>("[data-wmh-overlay-status]");if(t)t.textContent="Save failed: device storage is unavailable. Copy the data as a backup."; }});
- dialog.querySelector<HTMLElement>("[data-wmh-overlay-copy]")?.addEventListener("click",async()=>{
-  const data=exportBlueprint(),f=dialog.querySelector<HTMLTextAreaElement>("[data-wmh-overlay-export]"),t=panel.querySelector<HTMLElement>("[data-wmh-overlay-status]");
-  if(f){f.hidden=false;f.value=data;}
-  try{if(!navigator.clipboard?.writeText)throw new Error("Clipboard unavailable");await navigator.clipboard.writeText(data);if(t)t.textContent="Complete map marker data copied. Paste this JSON into the next build to restore it.";}catch{if(f){f.focus();f.select();const ok=document.execCommand?.("copy");if(t)t.textContent=ok?"Map marker data copied.":"Clipboard unavailable — JSON selected below; use Copy from your device menu.";}else if(t)t.textContent="Clipboard unavailable. Copy the JSON backup manually.";}
- });
- dialog.querySelector<HTMLElement>("[data-wmh-overlay-import]")?.addEventListener("click",()=>{
-  const f=dialog.querySelector<HTMLTextAreaElement>("[data-wmh-overlay-import-text]");
-  try{const d=JSON.parse(f?.value||"");if(d.format!=="merzkava-isometric-area-overlays"||!Array.isArray(d.areas)||!Array.isArray(d.manual))throw Error();areas=d.areas;manual=d.manual;transitions=Array.isArray(d.transitions)?d.transitions:[];if(d.grid)Object.assign(grid,d.grid);applyGrid();persist();}
-  catch{const t=panel.querySelector<HTMLElement>("[data-wmh-overlay-status]");if(t)t.textContent="Invalid blueprint.";}
- });
+  if(transitionTools)transitionTools.hidden=mode()!=="transition";
+  const point=(e:PointerEvent)=>{const r=board.getBoundingClientRect();return{x:(e.clientX-r.left)*board.offsetWidth/Math.max(1,r.width),y:(e.clientY-r.top)*board.offsetHeight/Math.max(1,r.height)};};
+  svg.addEventListener("pointerdown",e=>{
+    if(!board.classList.contains("wmh-overlay-editing"))return;e.preventDefault();e.stopPropagation();
+    const existing=(e.target as Element).closest<SVGGElement>("[data-transition-id]");
+    if(mode()==="transition"&&existing){
+      selectedTransitionId=existing.dataset.transitionId||null;
+      const marker=data.transitions.find(m=>m.id===selectedTransitionId);if(transitionField)transitionField.value=marker?.label||"";
+      redraw();return;
+    }
+    const cell=isoCellAtPoint(point(e),grid);if(!cell)return;
+    if(mode()==="transition"){
+      remember();
+      let marker=data.transitions.find(m=>m.x===cell.x&&m.y===cell.y);
+      if(!marker){marker={id:"transition-"+Date.now()+"-"+data.transitions.length,x:cell.x,y:cell.y,label:""};data.transitions.push(marker);}
+      selectedTransitionId=marker.id;if(transitionField)transitionField.value=marker.label;
+      persist();setStatus("Transition selected. Enter its destination name to turn it blue.");return;
+    }
+    const layer:IsoCellLayer=mode()==="blocked"?"blockedCells":mode()==="opacity"?"opacityCells":"foregroundCells";
+    remember();const enabled=toggleIsoCellLayer(data,layer,cell.x,cell.y);persist();
+    setStatus((layer==="foregroundCells"?"○ foreground":layer==="blockedCells"?"X blocked":"Opacity")+(enabled?" enabled":" cleared")+" at ("+cell.x+","+cell.y+").");
+  });
+  panel.querySelector<HTMLElement>("[data-wmh-transition-apply]")?.addEventListener("click",()=>{
+    const marker=data.transitions.find(m=>m.id===selectedTransitionId);if(!marker){setStatus("Select a transition marker first.");return;}
+    remember();marker.label=(transitionField?.value||"").trim().slice(0,80);persist();setStatus(marker.label?"Destination named. Marker is now blue.":"Destination name cleared. Marker is red.");
+  });
+  panel.querySelector<HTMLElement>("[data-wmh-transition-delete]")?.addEventListener("click",()=>{
+    if(!selectedTransitionId){setStatus("Select a transition marker first.");return;}
+    remember();data.transitions=data.transitions.filter(m=>m.id!==selectedTransitionId);selectedTransitionId=null;
+    if(transitionField)transitionField.value="";persist();setStatus("Transition marker removed.");
+  });
+  panel.querySelectorAll<HTMLInputElement>("[data-wmh-grid-control]").forEach(input=>{
+    const update=()=>{
+      remember();const property=input.dataset.wmhGridControl as keyof IsoMapGridConfig;grid[property]=Number(input.value);
+      const valid=(key:string)=>{const [x,y]=key.split(",").map(Number);return x<grid.cols&&y<grid.rows;};
+      data.foregroundCells=data.foregroundCells.filter(valid);data.blockedCells=data.blockedCells.filter(valid);data.opacityCells=data.opacityCells.filter(valid);
+      data.transitions=data.transitions.filter(m=>m.x<grid.cols&&m.y<grid.rows);applyGrid();persist();
+    };
+    input.addEventListener("change",update);
+    input.closest<HTMLElement>("[data-wmh-grid-row]")?.querySelectorAll<HTMLButtonElement>("[data-wmh-grid-step]").forEach(button=>button.addEventListener("click",()=>{
+      input.value=String(Math.max(Number(input.min),Math.min(Number(input.max),Number(input.value)+Number(button.dataset.wmhGridStep||1)*(button.dataset.wmhGridDir==="minus"?-1:1))));update();
+    }));
+  });
+  panel.querySelector<HTMLElement>("[data-wmh-overlay-undo]")?.addEventListener("click",()=>{
+    const previous=history.pop();if(!previous){setStatus("There is no editor action to undo.");return;}
+    data=normalizeIsoMapEditorData(previous,data.mapId,grid);Object.assign(grid,data.grid);applyGrid();persist();setStatus("Last editor action undone.");
+  });
+  panel.querySelector<HTMLElement>("[data-wmh-overlay-clear]")?.addEventListener("click",()=>{
+    if(!window.confirm("Clear foreground, blocked, opacity, and transition settings for this map?"))return;
+    remember();data.foregroundCells=[];data.blockedCells=[];data.opacityCells=[];data.transitions=[];selectedTransitionId=null;
+    if(transitionField)transitionField.value="";persist();setStatus("All map cell layers and transitions cleared.");
+  });
+  panel.querySelector<HTMLElement>("[data-wmh-overlay-save]")?.addEventListener("click",()=>{
+    try{data.grid={...grid};localStorage.setItem(key,JSON.stringify(data));setStatus("Map settings saved on this device.");}
+    catch{setStatus("Save failed. Use COPY DATA to create a backup.");}
+  });
+  panel.querySelector<HTMLElement>("[data-wmh-overlay-copy]")?.addEventListener("click",async()=>{
+    const json=JSON.stringify({...data,grid},null,2);if(exportField){exportField.hidden=false;exportField.value=json;}
+    try{await navigator.clipboard.writeText(json);setStatus("Map data copied for "+data.mapId+".");}
+    catch{if(exportField){exportField.focus();exportField.select();}setStatus("Clipboard unavailable. JSON backup is shown below.");}
+  });
+  panel.querySelector<HTMLElement>("[data-wmh-overlay-import]")?.addEventListener("click",()=>{
+    try{const imported=normalizeIsoMapEditorData(JSON.parse(importField?.value||""),data.mapId,grid);remember();data=imported;Object.assign(grid,data.grid);applyGrid();persist();if(exportField)exportField.hidden=true;setStatus("Map data imported for "+data.mapId+".");}
+    catch{setStatus("Import failed. Paste a valid isometric-map editor JSON backup.");}
+  });
+  // Preserve the previous resizable editor window interaction.
+  const grip=panel.querySelector<HTMLElement>("[data-wmh-panel-resize-handle]");
+  grip?.addEventListener("pointerdown",e=>{
+    e.preventDefault();const id=e.pointerId,sy=e.clientY,sh=panel.getBoundingClientRect().height;
+    const move=(v:PointerEvent)=>{if(v.pointerId===id)panel.style.height=Math.max(120,Math.min(window.innerHeight*.78,sh+sy-v.clientY))+"px";};
+    const end=(v:PointerEvent)=>{if(v.pointerId!==id)return;window.removeEventListener("pointermove",move);window.removeEventListener("pointerup",end);window.removeEventListener("pointercancel",end);};
+    window.addEventListener("pointermove",move,{passive:false});window.addEventListener("pointerup",end);window.addEventListener("pointercancel",end);
+  });
+  applyGrid();redraw();drawIsometricForeground(board,data);syncIsoDepthAndOcclusion(board);
 }
+
 function bindIsometricCamera(dialog:HTMLElement):void {
   const viewport=dialog.querySelector<HTMLElement>("[data-wmh-iso-viewport]");
   const camera=dialog.querySelector<HTMLElement>("[data-wmh-iso-camera]");
@@ -723,11 +802,11 @@ function panelMarkup(level: Level, regionId: RegionId = "golden-dragon-empire", 
   if (level === "local") return header("EXTERIOR AREA",selectedBuilding, "ACADEMY EXTERIOR · TAP A TILE TO WALK · NPCs TO CHAT")+
     academyMiniMapMarkup()+
     '<div class="wmh-area-legend"><span>ACADEMY GATE</span><span>GARDEN & POND</span><span>CLASSROOMS</span><span>TEACHERS’ COURT</span></div>'+
-    tileMapMarkup(false)+'<div class="wmh-overlay-editor"><button type="button" class="wmh-overlay-float" data-wmh-overlay-toggle aria-label="Open map marker tools" aria-pressed="false"><i class="wmh-tool-map"></i></button><div class="wmh-overlay-modal" data-wmh-overlay-tools hidden><section class="wmh-overlay-tools" role="dialog" aria-modal="true" aria-label="Isometric map marker tools"><div class="wmh-overlay-resize-grip" data-wmh-panel-resize-handle role="separator" aria-orientation="horizontal" aria-label="Drag to resize map editor"><span></span></div><header class="wmh-overlay-modal-head"><div><b>ACADEMY MAP TOOLS</b><small>ISOMETRIC AREA DATA</small></div><button type="button" data-wmh-overlay-close aria-label="Close tools">×</button></header><label>EDITING MODE<select data-wmh-overlay-mode><option value="area">Broad area highlight</option><option value="manual">Manual quarter markers</option><option value="transition">Area transition markers</option></select></label><div data-wmh-area-tools><div class="wmh-overlay-tool-row"><label>AREA CATEGORY<select data-wmh-overlay-category><option value="road">ROAD AREA · default walkable</option><option value="object">OBJECT AREA · default blocked</option></select></label><label>HIGHLIGHT WIDTH<input type="range" min="12" max="64" step="2" value="28" data-wmh-overlay-width></label></div><p>For a four-way junction, draw one vertical and one horizontal stroke; confirm each stroke with the same category.</p></div><div data-wmh-manual-tools hidden><label>QUARTER RULE<select data-wmh-overlay-manual><option value="walkable">✓ Walkable</option><option value="blocked">× Blocked</option><option value="behind">○ Behind object</option></select></label><p>Tap one of the four sub-areas inside a tile to place or replace its manual marker.</p></div><div data-wmh-transition-tools hidden><label>DESTINATION LABEL<input type="text" maxlength="80" data-wmh-transition-label placeholder="e.g. Tianhai Academy · Main Hall"/></label><button type="button" data-wmh-transition-apply>APPLY LABEL</button><button type="button" data-wmh-transition-delete>DELETE SELECTED</button><p>Red = unlabeled. Blue = labeled. Tap a marker to select it.</p></div><div class="wmh-grid-calibration"><b>GRID CALIBRATION</b><div data-wmh-grid-row><label>Columns <output data-wmh-grid-value="cols">24</output></label><button type="button" data-wmh-grid-dir="minus" data-wmh-grid-step="1">−</button><input type="range" min="12" max="32" step="1" value="24" data-wmh-grid-control="cols"/><button type="button" data-wmh-grid-dir="plus" data-wmh-grid-step="1">+</button></div><div data-wmh-grid-row><label>Rows <output data-wmh-grid-value="rows">20</output></label><button type="button" data-wmh-grid-dir="minus" data-wmh-grid-step="1">−</button><input type="range" min="8" max="28" step="1" value="20" data-wmh-grid-control="rows"/><button type="button" data-wmh-grid-dir="plus" data-wmh-grid-step="1">+</button></div><div data-wmh-grid-row><label>Tile width <output data-wmh-grid-value="tileW">64</output></label><button type="button" data-wmh-grid-dir="minus" data-wmh-grid-step="1">−</button><input type="range" min="32" max="96" step="1" value="64" data-wmh-grid-control="tileW"/><button type="button" data-wmh-grid-dir="plus" data-wmh-grid-step="1">+</button></div><div data-wmh-grid-row><label>Tile height <output data-wmh-grid-value="tileH">32</output></label><button type="button" data-wmh-grid-dir="minus" data-wmh-grid-step="1">−</button><input type="range" min="16" max="64" step="1" value="32" data-wmh-grid-control="tileH"/><button type="button" data-wmh-grid-dir="plus" data-wmh-grid-step="1">+</button></div><div data-wmh-grid-row><label>Offset X <output data-wmh-grid-value="offsetX">0</output></label><button type="button" data-wmh-grid-dir="minus" data-wmh-grid-step="2">−</button><input type="range" min="-400" max="400" step="2" value="0" data-wmh-grid-control="offsetX"/><button type="button" data-wmh-grid-dir="plus" data-wmh-grid-step="2">+</button></div><div data-wmh-grid-row><label>Offset Y <output data-wmh-grid-value="offsetY">0</output></label><button type="button" data-wmh-grid-dir="minus" data-wmh-grid-step="2">−</button><input type="range" min="-400" max="400" step="2" value="0" data-wmh-grid-control="offsetY"/><button type="button" data-wmh-grid-dir="plus" data-wmh-grid-step="2">+</button></div><div data-wmh-grid-row><label>Player scale <output data-wmh-grid-value="playerScale">1</output></label><button type="button" data-wmh-grid-dir="minus" data-wmh-grid-step="0.05">−</button><input type="range" min="0.4" max="2" step="0.05" value="1" data-wmh-grid-control="playerScale"/><button type="button" data-wmh-grid-dir="plus" data-wmh-grid-step="0.05">+</button></div><div data-wmh-grid-row><label>NPC scale <output data-wmh-grid-value="npcScale">1</output></label><button type="button" data-wmh-grid-dir="minus" data-wmh-grid-step="0.05">−</button><input type="range" min="0.4" max="2" step="0.05" value="1" data-wmh-grid-control="npcScale"/><button type="button" data-wmh-grid-dir="plus" data-wmh-grid-step="0.05">+</button></div></div><div class="wmh-overlay-tool-actions"><button type="button" data-wmh-overlay-undo>UNDO LAST</button><button type="button" data-wmh-overlay-clear>CLEAR MAP</button><button type="button" data-wmh-overlay-save>SAVE MARKERS</button><button type="button" data-wmh-overlay-copy>COPY DATA</button></div><div class="wmh-overlay-review" data-wmh-overlay-review hidden><b>REVIEW AREA</b><span data-wmh-review-summary></span><div><button type="button" data-wmh-overlay-cancel>EDIT AGAIN</button><button type="button" data-wmh-overlay-confirm>✓ CONFIRM AREA</button></div></div><textarea data-wmh-overlay-export hidden readonly></textarea><label>IMPORT BLUEPRINT<textarea data-wmh-overlay-import-text placeholder="Paste a previous overlay blueprint..."></textarea></label><button type="button" data-wmh-overlay-import>IMPORT BLUEPRINT</button><small data-wmh-overlay-status>Broad strokes and manual quarter rules are saved separately. Confirm each area before saving.</small></section></div></div>'+'<div class="wmh-local-footer"><span>PLAYER TOKEN · TAP WALKABLE TILES · NPC INTERACTION REQUIRES 1-TILE DISTANCE</span><button data-wmh-action="back">← REGIONAL MAP</button></div>'+
+    tileMapMarkup(false, makeIsometricMapId(regionId, selectedBuilding, false))+'<div class="wmh-overlay-editor"><button type="button" class="wmh-overlay-float" data-wmh-overlay-toggle aria-label="Open map marker tools" aria-pressed="false"><i class="wmh-tool-map"></i></button><div class="wmh-overlay-modal" data-wmh-overlay-tools hidden><section class="wmh-overlay-tools" role="dialog" aria-modal="true" aria-label="Isometric map marker tools"><div class="wmh-overlay-resize-grip" data-wmh-panel-resize-handle role="separator" aria-orientation="horizontal" aria-label="Drag to resize map editor"><span></span></div><header class="wmh-overlay-modal-head"><div><b>ACADEMY MAP TOOLS</b><small>ISOMETRIC AREA DATA</small></div><button type="button" data-wmh-overlay-close aria-label="Close tools">×</button></header><label>EDITING MODE<select data-wmh-overlay-mode><option value="foreground">○ Foreground cells</option><option value="blocked">X Blocked cells</option><option value="opacity">Character opacity zones</option><option value="transition">Area transition markers</option></select></label><p class="wmh-editor-mode-note">Each cell has independent foreground, collision, and opacity settings. The editor changes metadata, never the JPG artwork.</p><div data-wmh-transition-tools hidden><label>DESTINATION LABEL<input type="text" maxlength="80" data-wmh-transition-label placeholder="e.g. Tianhai Academy · Main Hall"/></label><button type="button" data-wmh-transition-apply>APPLY LABEL</button><button type="button" data-wmh-transition-delete>DELETE SELECTED</button><p>Red = unnamed destination. Blue = named destination. Tap a marker to select it.</p></div><div class="wmh-grid-calibration"><b>GRID CALIBRATION</b><div data-wmh-grid-row><label>Columns <output data-wmh-grid-value="cols">24</output></label><button type="button" data-wmh-grid-dir="minus" data-wmh-grid-step="1">−</button><input type="range" min="1" max="64" step="1" value="24" data-wmh-grid-control="cols"/><button type="button" data-wmh-grid-dir="plus" data-wmh-grid-step="1">+</button></div><div data-wmh-grid-row><label>Rows <output data-wmh-grid-value="rows">20</output></label><button type="button" data-wmh-grid-dir="minus" data-wmh-grid-step="1">−</button><input type="range" min="1" max="64" step="1" value="20" data-wmh-grid-control="rows"/><button type="button" data-wmh-grid-dir="plus" data-wmh-grid-step="1">+</button></div><div data-wmh-grid-row><label>Cell width <output data-wmh-grid-value="tileW">64</output></label><button type="button" data-wmh-grid-dir="minus" data-wmh-grid-step="1">−</button><input type="range" min="16" max="128" step="1" value="64" data-wmh-grid-control="tileW"/><button type="button" data-wmh-grid-dir="plus" data-wmh-grid-step="1">+</button></div><div data-wmh-grid-row><label>Cell height <output data-wmh-grid-value="tileH">32</output></label><button type="button" data-wmh-grid-dir="minus" data-wmh-grid-step="1">−</button><input type="range" min="8" max="96" step="1" value="32" data-wmh-grid-control="tileH"/><button type="button" data-wmh-grid-dir="plus" data-wmh-grid-step="1">+</button></div><div data-wmh-grid-row><label>Offset X <output data-wmh-grid-value="offsetX">0</output></label><button type="button" data-wmh-grid-dir="minus" data-wmh-grid-step="2">−</button><input type="range" min="-600" max="600" step="2" value="0" data-wmh-grid-control="offsetX"/><button type="button" data-wmh-grid-dir="plus" data-wmh-grid-step="2">+</button></div><div data-wmh-grid-row><label>Offset Y <output data-wmh-grid-value="offsetY">0</output></label><button type="button" data-wmh-grid-dir="minus" data-wmh-grid-step="2">−</button><input type="range" min="-600" max="600" step="2" value="0" data-wmh-grid-control="offsetY"/><button type="button" data-wmh-grid-dir="plus" data-wmh-grid-step="2">+</button></div><div data-wmh-grid-row><label>Player scale <output data-wmh-grid-value="playerScale">1</output></label><button type="button" data-wmh-grid-dir="minus" data-wmh-grid-step="0.05">−</button><input type="range" min="0.4" max="2" step="0.05" value="1" data-wmh-grid-control="playerScale"/><button type="button" data-wmh-grid-dir="plus" data-wmh-grid-step="0.05">+</button></div><div data-wmh-grid-row><label>NPC scale <output data-wmh-grid-value="npcScale">1</output></label><button type="button" data-wmh-grid-dir="minus" data-wmh-grid-step="0.05">−</button><input type="range" min="0.4" max="2" step="0.05" value="1" data-wmh-grid-control="npcScale"/><button type="button" data-wmh-grid-dir="plus" data-wmh-grid-step="0.05">+</button></div></div><div class="wmh-overlay-tool-actions"><button type="button" data-wmh-overlay-undo>UNDO LAST</button><button type="button" data-wmh-overlay-clear>CLEAR MAP</button><button type="button" data-wmh-overlay-save>SAVE MAP</button><button type="button" data-wmh-overlay-copy>COPY DATA</button></div><textarea data-wmh-overlay-export hidden readonly></textarea><label>IMPORT MAP DATA<textarea data-wmh-overlay-import-text placeholder="Paste a saved isometric-map JSON backup..."></textarea></label><button type="button" data-wmh-overlay-import>IMPORT MAP DATA</button><small data-wmh-overlay-status>Choose a tool, then tap individual diamond cells. Settings are saved separately for each isometric map.</small></section></div></div>'+'<div class="wmh-local-footer"><span>PLAYER TOKEN · TAP WALKABLE TILES · NPC INTERACTION REQUIRES 1-TILE DISTANCE</span><button data-wmh-action="back">← REGIONAL MAP</button></div>'+
     '<section class="wmh-chat-panel" data-wmh-chat hidden role="dialog" aria-label="Character conversation"><div class="wmh-chat-card"><button type="button" class="wmh-chat-close" data-wmh-action="chat-close" aria-label="Close conversation">×</button><div class="wmh-chat-thread" data-wmh-thread></div><div class="wmh-chat-input-row"><span>YOUR RESPONSE</span><div data-wmh-replies></div></div></div></section>';
   if (level === "interior") return header("BUILDING INTERIOR",selectedBuilding,"ISOMETRIC INTERIOR · TAP TO EXPLORE")+
     academyMiniMapMarkup()+
-    tileMapMarkup(true)+'<div class="wmh-overlay-editor"><button type="button" class="wmh-overlay-float" data-wmh-overlay-toggle aria-label="Open map marker tools" aria-pressed="false"><i class="wmh-tool-map"></i></button><div class="wmh-overlay-modal" data-wmh-overlay-tools hidden><section class="wmh-overlay-tools" role="dialog" aria-modal="true" aria-label="Isometric map marker tools"><div class="wmh-overlay-resize-grip" data-wmh-panel-resize-handle role="separator" aria-orientation="horizontal" aria-label="Drag to resize map editor"><span></span></div><header class="wmh-overlay-modal-head"><div><b>ACADEMY MAP TOOLS</b><small>ISOMETRIC AREA DATA</small></div><button type="button" data-wmh-overlay-close aria-label="Close tools">×</button></header><label>EDITING MODE<select data-wmh-overlay-mode><option value="area">Broad area highlight</option><option value="manual">Manual quarter markers</option></select></label><div data-wmh-area-tools><div class="wmh-overlay-tool-row"><label>AREA CATEGORY<select data-wmh-overlay-category><option value="road">ROAD AREA · default walkable</option><option value="object">OBJECT AREA · default blocked</option></select></label><label>HIGHLIGHT WIDTH<input type="range" min="12" max="64" step="2" value="28" data-wmh-overlay-width></label></div><p>Draw flexible strokes for routes or object footprints. Confirm each stroke separately.</p></div><div data-wmh-manual-tools hidden><label>QUARTER RULE<select data-wmh-overlay-manual><option value="walkable">✓ Walkable</option><option value="blocked">× Blocked</option><option value="behind">○ Behind object</option></select></label><p>Tap one of the four sub-areas inside a tile to place or replace its manual marker.</p></div><div class="wmh-overlay-tool-actions"><button type="button" data-wmh-overlay-undo>UNDO LAST</button><button type="button" data-wmh-overlay-clear>CLEAR MAP</button><button type="button" data-wmh-overlay-save>SAVE MARKERS</button><button type="button" data-wmh-overlay-copy>COPY DATA</button></div><div class="wmh-overlay-review" data-wmh-overlay-review hidden><b>REVIEW AREA</b><span data-wmh-review-summary></span><div><button type="button" data-wmh-overlay-cancel>EDIT AGAIN</button><button type="button" data-wmh-overlay-confirm>✓ CONFIRM AREA</button></div></div><textarea data-wmh-overlay-export hidden readonly></textarea><label>IMPORT BLUEPRINT<textarea data-wmh-overlay-import-text placeholder="Paste a previous overlay blueprint..."></textarea></label><button type="button" data-wmh-overlay-import>IMPORT BLUEPRINT</button><small data-wmh-overlay-status>Broad strokes and manual quarter rules are saved separately. Confirm each area before saving.</small></section></div></div>'+'<div class="wmh-local-footer"><span>INTERIOR FLOOR PLAN · PLACEHOLDER</span><button data-wmh-action="back">← EXTERIOR AREA</button></div>'+
+    tileMapMarkup(true, makeIsometricMapId(regionId, selectedBuilding, true))+'<div class="wmh-overlay-editor"><button type="button" class="wmh-overlay-float" data-wmh-overlay-toggle aria-label="Open map marker tools" aria-pressed="false"><i class="wmh-tool-map"></i></button><div class="wmh-overlay-modal" data-wmh-overlay-tools hidden><section class="wmh-overlay-tools" role="dialog" aria-modal="true" aria-label="Isometric map marker tools"><div class="wmh-overlay-resize-grip" data-wmh-panel-resize-handle role="separator" aria-orientation="horizontal" aria-label="Drag to resize map editor"><span></span></div><header class="wmh-overlay-modal-head"><div><b>ACADEMY MAP TOOLS</b><small>ISOMETRIC AREA DATA</small></div><button type="button" data-wmh-overlay-close aria-label="Close tools">×</button></header><label>EDITING MODE<select data-wmh-overlay-mode><option value="area">Broad area highlight</option><option value="manual">Manual quarter markers</option></select></label><div data-wmh-area-tools><div class="wmh-overlay-tool-row"><label>AREA CATEGORY<select data-wmh-overlay-category><option value="road">ROAD AREA · default walkable</option><option value="object">OBJECT AREA · default blocked</option></select></label><label>HIGHLIGHT WIDTH<input type="range" min="12" max="64" step="2" value="28" data-wmh-overlay-width></label></div><p>Draw flexible strokes for routes or object footprints. Confirm each stroke separately.</p></div><div data-wmh-manual-tools hidden><label>QUARTER RULE<select data-wmh-overlay-manual><option value="walkable">✓ Walkable</option><option value="blocked">× Blocked</option><option value="behind">○ Behind object</option></select></label><p>Tap one of the four sub-areas inside a tile to place or replace its manual marker.</p></div><div class="wmh-overlay-tool-actions"><button type="button" data-wmh-overlay-undo>UNDO LAST</button><button type="button" data-wmh-overlay-clear>CLEAR MAP</button><button type="button" data-wmh-overlay-save>SAVE MARKERS</button><button type="button" data-wmh-overlay-copy>COPY DATA</button></div><div class="wmh-overlay-review" data-wmh-overlay-review hidden><b>REVIEW AREA</b><span data-wmh-review-summary></span><div><button type="button" data-wmh-overlay-cancel>EDIT AGAIN</button><button type="button" data-wmh-overlay-confirm>✓ CONFIRM AREA</button></div></div><textarea data-wmh-overlay-export hidden readonly></textarea><label>IMPORT BLUEPRINT<textarea data-wmh-overlay-import-text placeholder="Paste a previous overlay blueprint..."></textarea></label><button type="button" data-wmh-overlay-import>IMPORT BLUEPRINT</button><small data-wmh-overlay-status>Broad strokes and manual quarter rules are saved separately. Confirm each area before saving.</small></section></div></div>'+'<div class="wmh-local-footer"><span>INTERIOR FLOOR PLAN · PLACEHOLDER</span><button data-wmh-action="back">← EXTERIOR AREA</button></div>'+
     '<section class="wmh-chat-panel" data-wmh-chat hidden role="dialog" aria-label="Character conversation"><div class="wmh-chat-card"><button type="button" class="wmh-chat-close" data-wmh-action="chat-close" aria-label="Close conversation">×</button><div class="wmh-chat-thread" data-wmh-thread></div><div class="wmh-chat-input-row"><span>YOUR RESPONSE</span><div data-wmh-replies></div></div></div></section>';
   return header("PERSONAL GROUNDS","Personal Grounds","ISOMETRIC HOME · PLOTS & FACILITIES")+
     '<div class="wmh-home-grid">'+[["Farmland","▧"],["Building Plot","⌂"],["Training Area","⚔"],["Warehouse","▤"],["Fish Pond","◉"],["Lumber Area","♧"]].map(([name,icon])=>'<button data-wmh-plot="'+name+'"><span>'+icon+'</span><b>'+name+'</b><small>VIEW FUNCTION</small></button>').join("")+'</div><div class="wmh-bottom-actions"><button data-wmh-action="back">← WORLD MAP</button><span>PERSONAL DEVELOPMENT AREA</span></div>';
@@ -748,18 +827,19 @@ const npcData: Record<string,{name:string;gender:string;greeting:string;choices:
   "teacher":{name:"Instructor",gender:"male",greeting:"Settle down. The lesson will begin shortly.",choices:["Ask about the lesson","Ask for guidance"],replies:["Today we review the foundations.","Observe carefully and ask when you are ready."]}
 };
 function syncIsoDepthAndOcclusion(board:HTMLElement):void {
+  const data=readIsoMapData(board);
   const tokens=Array.from(board.querySelectorAll<HTMLElement>("[data-wmh-player-token],[data-wmh-npc]"));
-  const occupied=new Set(tokens.map(token=>Number(token.dataset.x||0)+","+Number(token.dataset.y||0)));
   board.querySelectorAll<HTMLElement>("[data-wmh-tile]").forEach(tile=>{
     const x=Number(tile.dataset.x||0),y=Number(tile.dataset.y||0);
-    tile.style.zIndex=String(tile.dataset.wmhOcclusion==="true"?40+x+y:1+x+y);
-    tile.classList.toggle("wmh-occlusion-active",tile.dataset.wmhOcclusion==="true"&&occupied.has(x+","+y));
+    tile.style.zIndex=String(1+x+y);
   });
   tokens.forEach(token=>{
     const x=Number(token.dataset.x||0),y=Number(token.dataset.y||0);
     token.style.zIndex=String(20+x+y);
+    token.style.opacity=isoCellHasLayer(data,"opacityCells",x,y)?"0.42":"1";
   });
 }
+
 function animateGridMove(token:HTMLElement,update:()=>void):void {
   const before=token.getBoundingClientRect();
   update();
