@@ -535,3 +535,22 @@
 .wmh-manual-mark.manual-behind circle{fill:#3976b7;stroke-dasharray:2 1}
 .wmh-overlay-editor [data-wmh-overlay-mode],.wmh-overlay-editor [data-wmh-overlay-category],.wmh-overlay-editor [data-wmh-overlay-manual]{min-height:34px}
 .wmh-overlay-editor input[type=range]{width:100%;accent-color:#d6b578}
+
+/* Compact floating map-tool launcher and centered workbench modal. */
+.wmh-overlay-editor{position:static;margin:0}
+.wmh-overlay-float{position:fixed;z-index:8500;right:max(14px,env(safe-area-inset-right));bottom:max(18px,env(safe-area-inset-bottom));width:58px;height:58px;display:flex;align-items:center;justify-content:center;gap:3px;border:1px solid #d6b77d;border-radius:50%;background:radial-gradient(circle at 35% 25%,#526348,#17251b 72%);box-shadow:0 5px 18px #0009,inset 0 1px #fff5;cursor:pointer}
+.wmh-tool-hammer{position:relative;display:block;width:23px;height:27px;transform:rotate(-35deg)}
+.wmh-tool-hammer:before{content:"";position:absolute;left:8px;top:1px;width:7px;height:20px;border-radius:2px;background:linear-gradient(90deg,#9b7950,#e2c18a,#755536);box-shadow:0 0 0 1px #2b2117}
+.wmh-tool-hammer:after{content:"";position:absolute;left:1px;top:0;width:21px;height:9px;border-radius:3px 3px 2px 2px;background:linear-gradient(#e7d2a7,#9d8258);box-shadow:0 1px 2px #0008}
+.wmh-tool-tree{position:relative;display:block;width:23px;height:31px}
+.wmh-tool-tree:before{content:"";position:absolute;left:8px;bottom:1px;width:7px;height:13px;background:linear-gradient(90deg,#704b2d,#c08a50);border-radius:2px}
+.wmh-tool-tree:after{content:"";position:absolute;left:1px;top:0;width:21px;height:23px;background:linear-gradient(135deg,#a7b47a,#456b42 68%,#28432e);clip-path:polygon(50% 0,100% 62%,72% 62%,92% 100%,8% 100%,28% 62%,0 62%);filter:drop-shadow(0 1px 2px #0008)}
+.wmh-overlay-modal{position:fixed;z-index:11000;inset:0;width:100vw;height:100vh;height:100dvh;box-sizing:border-box;display:grid;place-items:center;padding:max(14px,env(safe-area-inset-top)) 12px max(14px,env(safe-area-inset-bottom));overflow-y:auto;background:#07100bc9;backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}
+.wmh-overlay-modal[hidden]{display:none!important}
+.wmh-overlay-modal>.wmh-overlay-tools{box-sizing:border-box;width:min(100%,520px);max-height:calc(100dvh - 32px);overflow:auto;overscroll-behavior:contain;margin:0;padding:12px;border:1px solid #d2b47b;border-radius:12px;background:linear-gradient(145deg,#293a2e,#101812 78%);box-shadow:0 20px 60px #000d,inset 0 1px #fff3}
+.wmh-overlay-modal-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;padding-bottom:9px;border-bottom:1px solid #b99a6655}
+.wmh-overlay-modal-head b,.wmh-overlay-modal-head small{display:block}.wmh-overlay-modal-head b{font:700 11px Georgia,serif;letter-spacing:.1em;color:#f4e5c6}.wmh-overlay-modal-head small{margin-top:4px;font:7px Arial;letter-spacing:.16em;color:#c9ad7c}
+.wmh-overlay-modal-head button{width:34px;height:34px;border:1px solid #c5a66e;border-radius:50%;background:#17251c;color:#f3dfbb;font:24px Georgia}
+.wmh-overlay-modal .wmh-overlay-tool-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.wmh-overlay-modal .wmh-overlay-tool-actions button{min-height:40px}
+.wmh-overlay-modal textarea{min-height:70px}
+@media(max-width:390px){.wmh-overlay-float{width:52px;height:52px;right:12px;bottom:max(14px,env(safe-area-inset-bottom))}.wmh-overlay-modal>.wmh-overlay-tools{padding:10px}.wmh-overlay-modal .wmh-overlay-tool-actions{gap:5px}}
