@@ -1,0 +1,55 @@
+/* World atlas scrolling and action-button clearance for phone layouts. */
+.wmh-overlay:has(.wmh-bottom-actions){
+  z-index:9000!important;
+  display:block!important;
+  overflow:hidden!important;
+  padding:0!important;
+}
+.wmh-overlay:has(.wmh-bottom-actions)>.wmh-dialog{
+  box-sizing:border-box!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:stretch!important;
+  justify-content:flex-start!important;
+  width:min(100%,560px)!important;
+  height:100dvh!important;
+  max-height:100dvh!important;
+  min-height:0!important;
+  margin:0 auto!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  overscroll-behavior-y:contain!important;
+  -webkit-overflow-scrolling:touch!important;
+  padding:calc(12px + env(safe-area-inset-top)) 12px calc(120px + env(safe-area-inset-bottom))!important;
+}
+.wmh-overlay:has(.wmh-bottom-actions)>.wmh-dialog>.wmh-world-map{
+  flex:0 0 auto!important;
+  height:clamp(420px,56dvh,620px)!important;
+  min-height:420px!important;
+  max-height:none!important;
+  margin:8px 0!important;
+  touch-action:pan-x pan-y!important;
+}
+.wmh-overlay:has(.wmh-bottom-actions)>.wmh-dialog>.wmh-bottom-actions{
+  position:relative!important;
+  z-index:30!important;
+  display:flex!important;
+  flex:0 0 auto!important;
+  flex-wrap:wrap!important;
+  align-items:stretch!important;
+  gap:8px!important;
+  margin:0!important;
+  padding:10px 0 18px!important;
+  background:#111914!important;
+}
+.wmh-overlay:has(.wmh-bottom-actions)>.wmh-dialog>.wmh-bottom-actions>span{
+  flex:1 0 100%!important;
+}
+.wmh-overlay:has(.wmh-bottom-actions)>.wmh-dialog>.wmh-bottom-actions>button{
+  position:relative!important;
+  z-index:31!important;
+  flex:1 1 135px!important;
+  min-height:44px!important;
+  pointer-events:auto!important;
+  touch-action:manipulation!important;
+}
