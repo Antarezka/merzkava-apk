@@ -184,34 +184,11 @@
 .idle-clock-cable{stroke-dasharray:none}
 
 /* World-route drawer trigger retained; rotary and aperture styling removed. */
-/* The route engine docks off-canvas to the left; only its arrow tab remains reachable. */
-.arcanist-machine-dock{
- position:absolute;z-index:45;left:0;top:0;bottom:0;width:min(620px,calc(100% - 30px));max-width:100%;
- transform:translateX(calc(-100% + 30px));transition:transform .32s cubic-bezier(.2,.75,.25,1);
- pointer-events:none;will-change:transform;
-}
-.arcanist-machine-dock.is-collapsed{transform:translateX(calc(-100% + 30px))}
-.arcanist-machine-dock:not(.is-collapsed){transform:translateX(0)}
-.arcanist-device-drawer{
- position:absolute;inset:0;display:flex;flex-direction:column;width:100%;height:100%;min-width:0;max-width:100%;
- box-sizing:border-box;overflow-x:hidden;overflow-y:auto;padding:8px;
- background:radial-gradient(ellipse at 48% 12%,#394239 0%,#171d19 58%,#090d0b 100%);
- border:1px solid #c5a16a;box-shadow:inset 0 0 0 4px #0b100d,inset 0 0 0 5px #94764b,0 12px 32px #000c;
- scrollbar-color:#9b7b4d #111713;overscroll-behavior:contain;pointer-events:auto;
-}
-.arcanist-device-drawer[hidden]{display:none!important}
-.arcanist-dock-toggle{
- position:absolute;z-index:3;right:-29px;top:50%;transform:translateY(-50%);width:30px;height:82px;
- display:grid;place-items:center;padding:0;border:1px solid #c8a56d;border-left:0;border-radius:0 9px 9px 0;
- background:linear-gradient(90deg,#1a211c,#303025);color:#ead7b5;box-shadow:4px 3px 13px #070a08a6;
- pointer-events:auto;touch-action:manipulation;cursor:pointer;
-}
-.arcanist-dock-toggle i{
- width:0;height:0;border-top:8px solid transparent;border-bottom:8px solid transparent;
- border-right:9px solid #e4c18a;transition:transform .25s;
-}
-.arcanist-machine-dock.is-collapsed .arcanist-dock-toggle i{transform:rotate(180deg)}
-.arcanist-dock-toggle:focus-visible{outline:2px solid #f1d79b;outline-offset:2px}
+/* Original World-route pull tab and open/close drawer behavior. */
+.arcanist-pull-tab{position:absolute;z-index:25;left:10px;bottom:10px;display:flex;align-items:center;gap:8px;min-height:42px;padding:0 12px;border:1px solid #c8a56d;border-left:3px solid #e0bd7c;background:linear-gradient(105deg,#1a211c,#303025);color:#ead7b5;box-shadow:0 4px 15px #070a08a6;font:700 8px system-ui,sans-serif;letter-spacing:.14em;touch-action:pan-y}
+.arcanist-pull-glyph{font:22px Georgia,serif;color:#e4c18a;transform:rotate(-18deg)}
+.arcanist-pull-chevron{font-size:12px;color:#c7a46d;transition:transform .25s}
+.arcanist-pull-tab[aria-expanded="true"] .arcanist-pull-chevron{transform:rotate(180deg)}
 .arcanist-route-loading{position:absolute;z-index:120;inset:0;display:grid;align-content:center;justify-items:center;gap:9px;padding:24px;background:radial-gradient(circle at 50% 44%,#273128f7,#090d0bf7 72%);color:#f0dfbd;text-align:center}
 .arcanist-route-loading[hidden]{display:none!important}
 .arcanist-loading-seal{display:grid;place-items:center;width:58px;height:58px;border:1px solid #c8a56d;border-radius:50%;box-shadow:inset 0 0 0 5px #161d17,inset 0 0 0 6px #c8a56d66,0 0 18px #d3ac6b55;color:#e8c98e;font:32px/1 Georgia,serif;animation:arcanist-seal-turn 2.4s linear infinite}
