@@ -524,8 +524,11 @@ function isoCanWalkTile(board:HTMLElement,tile:HTMLElement|null,x:number,y:numbe
  const rule=isoTileRule(board,x,y);
  if(rule==="blocked")return false;
  if(rule==="walkable"||rule==="behind")return true;
+ const area=isoAreaRuleAt(board,x,y);
+ if(area==="road")return true;
+ if(area==="object")return false;
  if(tile.dataset.wmhBlocked==="true")return false;
- return isoAreaRuleAt(board,x,y)!=="object";
+ return true;
 }
 function bindIsoAreaEditor(dialog:HTMLElement):void {
  const board=dialog.querySelector<HTMLElement>("[data-wmh-board]"),svg=board?.querySelector<SVGSVGElement>("[data-wmh-overlay-svg]");
@@ -537,7 +540,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
  let areas:IsoOverlayMark[]=[],manual:IsoManualMark[]=[];
  try{const d=JSON.parse(localStorage.getItem(key)||"{}");if(Array.isArray(d.areas))areas=d.areas;if(Array.isArray(d.manual))manual=d.manual;}catch{}
  const redraw=()=>{
-  if(areaGroup)areaGroup.innerHTML=areas.map(m=>'<path d="'+m.path+'" class="wmh-area-mark mark-'+m.category+'" stroke-width="'+m.width+'"><title>'+m.category.toUpperCase()+' AREA</title></path>').join("");
+  if(areaGroup)areaGroup.innerHTML=areas.map(m=>'<path d="'+m.path+'" class="wmh-area-mark mark-'+m.category+'" style="stroke-width:'+m.width+'px"><title>'+m.category.toUpperCase()+' AREA</title></path>').join("");
   if(manualGroup)manualGroup.innerHTML=manual.map(m=>{const qx=m.quarter%2?.75:.25,qy=m.quarter>=2?.75:.25;const cx=(m.x-m.y)*32+Number(board.dataset.rows||20)*32+(qx-qy)*32;const cy=(m.x+m.y)*16+(qx+qy)*16;const symbol=m.rule==="walkable"?"✓":m.rule==="blocked"?"×":"○";return '<g class="wmh-manual-mark manual-'+m.rule+'" transform="translate('+cx+' '+cy+')"><circle r="8"></circle><text text-anchor="middle" dominant-baseline="central">'+symbol+'</text></g>';}).join("");
  };
  const persist=()=>{localStorage.setItem(key,JSON.stringify({format:"merzkava-isometric-area-overlays",version:2,areas,manual}));redraw();};
