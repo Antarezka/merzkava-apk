@@ -449,8 +449,12 @@ function panelMarkup(level: Level, regionId: RegionId = "golden-dragon-empire", 
     '<div class="wmh-home-grid">'+[["Farmland","▧"],["Building Plot","⌂"],["Training Area","⚔"],["Warehouse","▤"],["Fish Pond","◉"],["Lumber Area","♧"]].map(([name,icon])=>'<button data-wmh-plot="'+name+'"><span>'+icon+'</span><b>'+name+'</b><small>VIEW FUNCTION</small></button>').join("")+'</div><div class="wmh-bottom-actions"><button data-wmh-action="back">← WORLD MAP</button><span>PERSONAL DEVELOPMENT AREA</span></div>';
 }
 export function renderWorldMapHierarchy(): string {
-  return '<button type="button" class="wmh-open" data-wmh-action="open">✧ &nbsp; MAP NAVIGATION</button>'+
-    '<section class="wmh-overlay" data-world-map-hierarchy hidden aria-label="Map Navigation"><div class="wmh-dialog" data-wmh-dialog>'+panelMarkup("world")+'</div></section>';
+  return '<section class="wmh-overlay" data-world-map-hierarchy aria-label="Map Navigation"><div class="wmh-dialog" data-wmh-dialog>'+panelMarkup("world")+'</div></section>';
+}
+export function initializeWorldMapHierarchy(root: HTMLElement): void {
+  const overlay=root.querySelector<HTMLElement>("[data-world-map-hierarchy]");
+  const dialog=overlay?.querySelector<HTMLElement>("[data-wmh-dialog]");
+  if(overlay&&dialog&&!overlay.hidden)bindWorldMapZoom(dialog);
 }
 const npcData: Record<string,{name:string;gender:string;greeting:string;choices:string[];replies:string[]}> = {
   "student-lin":{name:"Lin Yue",gender:"female",greeting:"The academy garden is peaceful this early. I come here whenever the study halls get too noisy.",choices:["Ask about the academy","Ask about the pond","Wish her a good day"],replies:["The instructors rotate lessons between the eastern and western study halls.","The pond is fed by a spring beneath the old cedar. The fish are surprisingly tame.","You too! May your studies go smoothly."]},
