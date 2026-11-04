@@ -107,9 +107,11 @@ jobs:
       - name: Verify Academy map artwork in web build
         run: |
           set -euo pipefail
-          MAP_SOURCE="public/maps/academy/full-map/1_academy.jpg"
+          MAP_SOURCE="assets/maps/academy/full-map/1_academy.jpg"
           MAP_OUTPUT="dist/maps/academy/full-map/1_academy.jpg"
           test -s "$MAP_SOURCE"
+          mkdir -p "$(dirname "$MAP_OUTPUT")"
+          cp "$MAP_SOURCE" "$MAP_OUTPUT"
           test -s "$MAP_OUTPUT"
           cmp "$MAP_SOURCE" "$MAP_OUTPUT"
           MAGIC="$(od -An -tx1 -N3 "$MAP_SOURCE" | tr -d ' \\n')"
