@@ -275,3 +275,29 @@
   .wmh-selection-question p{font-size:13px}
   .wmh-selection-question button{min-height:40px;font-size:9px}
 }
+
+
+/* Merzkava local maps: orthographic isometric thin-slab tile geometry.
+   Tile centers use the stable world projection: sx=(x-y)*32, sy=(x+y)*16. */
+.wmh-isometric-wrap{position:relative;display:block;min-height:320px;overflow:auto;touch-action:pan-x pan-y;overscroll-behavior:contain;padding:18px;background:radial-gradient(ellipse,#354b3b,#142019 72%)}
+.wmh-isometric-camera{position:relative;width:max-content;min-width:100%;min-height:100%;transform-origin:top left}
+.wmh-isometric-board{position:relative;display:block;width:704px;height:368px;margin:0 auto;padding:0;transform:none;filter:drop-shadow(0 16px 12px #0009);isolation:isolate}
+.wmh-tile{position:absolute;left:calc((var(--tile-x) - var(--tile-y))*32px + 320px);top:calc((var(--tile-x) + var(--tile-y))*16px);width:64px;height:39px;min-width:0;min-height:0;padding:0;border:0;border-radius:0;clip-path:none;background:transparent;transform:translate(-50%,0);z-index:calc(1 + var(--tile-x) + var(--tile-y));color:#fff0cf;touch-action:manipulation}
+.wmh-tile:before{content:"";position:absolute;left:0;right:0;top:16px;height:7px;background:linear-gradient(90deg,#263c2b,#40583b);clip-path:polygon(0 0,50% 100%,100% 0,50% 100%);pointer-events:none}
+.wmh-tile:after{content:"";position:absolute;inset:0 0 7px;background:linear-gradient(145deg,#81936b,#526c4d);clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);border:1px solid #d0bd8950;pointer-events:none}
+.wmh-tile-stone:after{background:linear-gradient(145deg,#b6aa91,#756d5d)}
+.wmh-tile-earth:after{background:linear-gradient(145deg,#9b815d,#6c573e)}
+.wmh-tile-wet:after{background:linear-gradient(145deg,#6b9ca0,#315b67)}
+.wmh-tile-wood:after{background:linear-gradient(145deg,#a17a4f,#69472d)}
+.wmh-tile-tile:after{background:linear-gradient(145deg,#b6aa8f,#81765f)}
+.wmh-tile.feature-pond:after{background:linear-gradient(145deg,#8bc2c5,#356c78)}
+.wmh-tile.feature-tree:after{background:linear-gradient(145deg,#5b8d51,#264b32)}
+.wmh-tile.feature-flower:after{background:linear-gradient(145deg,#d5a4a8,#815d78)}
+.wmh-tile.feature-garden:after{background:linear-gradient(145deg,#86a56b,#476a43)}
+.wmh-tile.feature-gate:after{background:linear-gradient(145deg,#c5b18b,#786346)}
+.wmh-tile:active{filter:brightness(1.35)}
+.wmh-tile-coord{position:absolute;z-index:2;left:50%;top:9px;transform:translate(-50%,-50%);font:5px/1 Arial,sans-serif;color:#fff4d9;opacity:.65;white-space:nowrap;pointer-events:none}
+.wmh-tile>b{position:absolute;z-index:3;left:50%;top:9px;transform:translate(-50%,-50%);font:700 5px Arial;text-shadow:0 1px 3px #000;white-space:nowrap;pointer-events:none}
+.wmh-character-token{position:absolute;left:calc((var(--token-x) - var(--token-y))*32px + 320px);top:calc((var(--token-x) + var(--token-y))*16px + 8px);transform:translate(-50%,-100%);margin:0;justify-self:auto;align-self:auto}
+.wmh-character-token{transition:left .13s linear,top .13s linear,filter .15s ease}
+@media(max-width:390px){.wmh-isometric-board{width:704px;max-width:none;transform:none}.wmh-isometric-wrap{min-height:300px}}
