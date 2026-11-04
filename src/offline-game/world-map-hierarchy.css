@@ -328,3 +328,41 @@
 .wmh-world-map .wmh-power:not(.wmh-editor-marker):focus-visible{
   transform:translate(-50%,-50%)!important;
 }
+
+
+/* Fixed marker taps: focus/pressed states must never alter the map anchor. */
+.wmh-world-map .wmh-power,
+.wmh-world-map .wmh-power:active,
+.wmh-world-map .wmh-power:focus,
+.wmh-world-map .wmh-power:focus-visible{
+  transform:translate(-50%,-50%)!important;
+  translate:none!important;
+  scale:none!important;
+  scroll-margin:0;
+  -webkit-tap-highlight-color:transparent;
+}
+.wmh-world-map .wmh-power:focus{outline:none}
+.wmh-world-map .wmh-power:focus-visible{outline:1px solid #f1d39a;outline-offset:2px}
+
+/* 3x2 building footprints: front row blocks movement; rear row occludes actors. */
+.wmh-tile.building-footprint:before{
+  top:12px;
+  height:14px;
+  background:linear-gradient(90deg,#493b2c,#806747 48%,#392f25);
+  clip-path:polygon(0 0,50% 100%,100% 0,50% 100%);
+  opacity:.98;
+}
+.wmh-tile.building-footprint:after{
+  inset:0 0 14px;
+  background:linear-gradient(145deg,#b39b72,#6e5a3e 72%,#4d4030);
+  border:1px solid #e0c28b99;
+  box-shadow:inset 0 0 0 2px #382e2488;
+}
+.wmh-tile.building-blocked{cursor:not-allowed}
+.wmh-tile.building-occlusion{filter:drop-shadow(0 2px 3px #0008)}
+.wmh-tile.wmh-occlusion-active{
+  opacity:.42!important;
+  transition:opacity .18s ease;
+}
+.wmh-tile.building-footprint{transition:opacity .18s ease}
+.wmh-character-token{transition:filter .15s ease;will-change:left,top,transform}
