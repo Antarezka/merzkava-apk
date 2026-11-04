@@ -917,8 +917,8 @@
 }
 .wmh-isometric-board.is-exterior{
   position:absolute!important;
-  width:1408px!important;
-  height:768px!important;
+  width:var(--iso-board-width,1408px)!important;
+  height:var(--iso-board-height,768px)!important;
   max-width:none!important;
   max-height:none!important;
   margin:0!important;
