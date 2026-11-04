@@ -107,17 +107,17 @@ jobs:
       - name: Verify Academy map artwork in web build
         run: |
           set -euo pipefail
-          MAP_SOURCE="public/maps/academy/full-map/1_academy.png"
-          MAP_OUTPUT="dist/maps/academy/full-map/1_academy.png"
+          MAP_SOURCE="public/maps/academy/full-map/1_academy.jpg"
+          MAP_OUTPUT="dist/maps/academy/full-map/1_academy.jpg"
           test -s "$MAP_SOURCE"
           test -s "$MAP_OUTPUT"
           cmp "$MAP_SOURCE" "$MAP_OUTPUT"
-          echo "Verified Academy map artwork is packaged at dist/maps/academy/full-map/1_academy.png"
+          echo "Verified Academy map artwork is packaged at dist/maps/academy/full-map/1_academy.jpg"
           node --input-type=module - <<'NODE'
           import { readFileSync, readdirSync } from "node:fs";
           const bundle = readdirSync("dist/assets").filter(name => name.endsWith(".js"))
             .map(name => readFileSync("dist/assets/" + name, "utf8")).join("\\n");
-          if (!bundle.includes("maps/academy/full-map/1_academy.png")) {
+          if (!bundle.includes("maps/academy/full-map/1_academy.jpg")) {
             throw new Error("Built web bundle is missing the Academy map asset reference.");
           }
           console.log("Verified Academy map reference is present in the built JavaScript.");
