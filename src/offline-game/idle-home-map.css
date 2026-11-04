@@ -185,7 +185,7 @@
 
 /* World-route drawer trigger retained; rotary and aperture styling removed. */
 /* Original World-route pull tab and open/close drawer behavior. */
-.arcanist-pull-tab{position:absolute;z-index:25;left:10px;bottom:10px;display:flex;align-items:center;gap:8px;min-height:42px;padding:0 12px;border:1px solid #c8a56d;border-left:3px solid #e0bd7c;background:linear-gradient(105deg,#1a211c,#303025);color:#ead7b5;box-shadow:0 4px 15px #070a08a6;font:700 8px system-ui,sans-serif;letter-spacing:.14em;touch-action:pan-y}
+.arcanist-pull-tab{position:absolute;z-index:25;right:10px;left:auto;bottom:10px;display:flex;align-items:center;gap:8px;min-height:42px;padding:0 12px;border:1px solid #c8a56d;border-right:3px solid #e0bd7c;background:linear-gradient(105deg,#303025,#1a211c);color:#ead7b5;box-shadow:0 4px 15px #070a08a6;font:700 8px system-ui,sans-serif;letter-spacing:.14em;touch-action:pan-y;will-change:transform}
 .arcanist-pull-glyph{font:22px Georgia,serif;color:#e4c18a;transform:rotate(-18deg)}
 .arcanist-pull-chevron{font-size:12px;color:#c7a46d;transition:transform .25s}
 .arcanist-pull-tab[aria-expanded="true"] .arcanist-pull-chevron{transform:rotate(180deg)}
