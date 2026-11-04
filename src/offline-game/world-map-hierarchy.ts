@@ -466,7 +466,7 @@ function tileMapMarkup(interior = false): string {
     const classes=(feature?'has-feature feature-'+feature:'')+(structure?' building-footprint building-'+structure.id+(blocked?' building-blocked':' building-occlusion'):'');
     return '<button type="button" class="wmh-tile wmh-tile-'+surface+' '+classes+'" data-wmh-tile data-x="'+x+'" data-y="'+y+'" data-z="0" data-tile-id="tile-'+x+'-'+y+'" data-surface="'+surface+'" style="--tile-x:'+x+';--tile-y:'+y+'" '+(blocked?'data-wmh-blocked="true"':'')+' '+(occlusion?'data-wmh-occlusion="true"':'')+' '+(structureAnchor?'data-wmh-building="'+building+'"':'')+' aria-label="Tile X '+x+', Y '+y+', Z 0 · '+(label||surface)+'"><span class="wmh-tile-coord">('+x+','+y+',0)</span>'+(label?'<b>'+label+'</b>':'')+'</button>';
   }).join("")).join("");
-  return '<div class="wmh-iso-controls"><button type="button" data-wmh-iso-zoom="out" aria-label="Zoom out">−</button><span data-wmh-iso-level>100%</span><button type="button" data-wmh-iso-zoom="in" aria-label="Zoom in">+</button><button type="button" data-wmh-iso-zoom="reset">RESET</button><small>DRAG TO PAN · PINCH TO ZOOM</small></div><div class="wmh-isometric-wrap" data-wmh-iso-viewport><div class="wmh-isometric-camera" data-wmh-iso-camera><div class="wmh-isometric-board '+(interior?'is-interior':'is-exterior')+'" data-wmh-board style="--tile-cols:'+cols+';--tile-rows:'+rows+';--iso-center-x:'+(rows*32)+'px;--iso-board-width:'+((cols+rows-1)*32+32)+'px;--iso-board-height:'+((cols+rows-2)*16+39)+'px;--tile-w:64px;--tile-h:32px;--slab-depth:7px" data-cols="'+cols+'" data-rows="'+rows+'">'+tiles+'<svg class="wmh-area-overlay-svg" data-wmh-overlay-svg viewBox="0 0 '+((cols+rows-1)*32+32)+' '+((cols+rows-2)*16+39)+'" preserveAspectRatio="none"><g data-wmh-overlay-marks></g><path data-wmh-overlay-preview class="wmh-area-mark-preview" d=""></path></svg>'+
+  return '<div class="wmh-iso-controls"><button type="button" data-wmh-iso-zoom="out" aria-label="Zoom out">−</button><span data-wmh-iso-level>100%</span><button type="button" data-wmh-iso-zoom="in" aria-label="Zoom in">+</button><button type="button" data-wmh-iso-zoom="reset">RESET</button><small>DRAG TO PAN · PINCH TO ZOOM</small></div><div class="wmh-isometric-wrap" data-wmh-iso-viewport><div class="wmh-isometric-camera" data-wmh-iso-camera><div class="wmh-isometric-board '+(interior?'is-interior':'is-exterior')+'" data-wmh-board style="--tile-cols:'+cols+';--tile-rows:'+rows+';--iso-center-x:'+(rows*32)+'px;--iso-board-width:'+((cols+rows-1)*32+32)+'px;--iso-board-height:'+((cols+rows-2)*16+39)+'px;--tile-w:64px;--tile-h:32px;--slab-depth:7px" data-cols="'+cols+'" data-rows="'+rows+'">'+tiles+'<svg class="wmh-area-overlay-svg" data-wmh-overlay-svg viewBox="0 0 '+((cols+rows-1)*32+32)+' '+((cols+rows-2)*16+39)+'" preserveAspectRatio="none"><g data-wmh-overlay-marks></g><g data-wmh-manual-marks></g><path data-wmh-overlay-preview class="wmh-area-mark-preview" d=""></path></svg>'+
     '<button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token data-x="5" data-y="'+(interior?8:17)+'" style="--token-x:5;--token-y:'+(interior?8:17)+'" aria-label="Player character"><i></i></button>'+
     (interior ? '<button type="button" class="wmh-character-token wmh-npc-token is-male" data-wmh-npc="teacher" data-x="6" data-y="2" style="--token-x:6;--token-y:2" aria-label="Teacher"><i></i></button><button type="button" class="wmh-character-token wmh-npc-token is-female" data-wmh-npc="student-lin" data-x="3" data-y="4" style="--token-x:3;--token-y:4" aria-label="Student Lin"><i></i></button>' :
       '<button type="button" class="wmh-character-token wmh-npc-token is-female" data-wmh-npc="student-lin" data-x="7" data-y="4" style="--token-x:7;--token-y:4" aria-label="Student Lin"><i></i></button>'+
@@ -475,32 +475,110 @@ function tileMapMarkup(interior = false): string {
       '<button type="button" class="wmh-character-token wmh-npc-token is-male" data-wmh-npc="groundskeeper" data-x="22" data-y="5" style="--token-x:22;--token-y:5" aria-label="Groundskeeper"><i></i></button>')+
     '</div></div></div>';
 }
-type IsoOverlayMark = {id:string;navigation:"walkable"|"blocked"|"behind";area:string;path:string;points:Array<{x:number;y:number}>};
-function isoOverlayKey(dialog:HTMLElement):string {const o=dialog.closest<HTMLElement>("[data-world-map-hierarchy]");return "merzkava.iso-area-overlays.v1:"+(o?.dataset.level==="interior"?"interior":"exterior")+":"+(o?.dataset.building||"academy");}
-function isoSmoothPath(p:Array<{x:number;y:number}>):string {if(p.length<2)return "";if(p.length===2)return "M "+p[0].x+" "+p[0].y+" L "+p[1].x+" "+p[1].y;let d="M "+p[0].x+" "+p[0].y;for(let i=1;i<p.length-1;i++){const m={x:(p[i].x+p[i+1].x)/2,y:(p[i].y+p[i+1].y)/2};d+=" Q "+p[i].x+" "+p[i].y+" "+m.x+" "+m.y;}const z=p[p.length-1];return d+" T "+z.x+" "+z.y+" Z";}
+type IsoAreaCategory = "road"|"object";
+type IsoManualRule = "walkable"|"blocked"|"behind";
+type IsoOverlayMark = {id:string;category:IsoAreaCategory;path:string;points:Array<{x:number;y:number}>;width:number};
+type IsoManualMark = {id:string;x:number;y:number;quarter:0|1|2|3;rule:IsoManualRule};
+function isoOverlayKey(dialog:HTMLElement):string {
+ const o=dialog.closest<HTMLElement>("[data-world-map-hierarchy]");
+ return "merzkava.iso-area-overlays.v2:"+(o?.dataset.level==="interior"?"interior":"exterior")+":"+(o?.dataset.building||"academy");
+}
+function isoSmoothPath(p:Array<{x:number;y:number}>):string {
+ if(p.length<2)return "";
+ if(p.length===2)return "M "+p[0].x+" "+p[0].y+" L "+p[1].x+" "+p[1].y;
+ let d="M "+p[0].x+" "+p[0].y;
+ for(let i=1;i<p.length-1;i++){const m={x:(p[i].x+p[i+1].x)/2,y:(p[i].y+p[i+1].y)/2};d+=" Q "+p[i].x+" "+p[i].y+" "+m.x+" "+m.y;}
+ const z=p[p.length-1];return d+" T "+z.x+" "+z.y;
+}
+function isoDistanceToPath(p:{x:number;y:number},points:Array<{x:number;y:number}>):number {
+ let best=Infinity;
+ for(let i=1;i<points.length;i++){const a=points[i-1],b=points[i],dx=b.x-a.x,dy=b.y-a.y,len=dx*dx+dy*dy,t=len?Math.max(0,Math.min(1,((p.x-a.x)*dx+(p.y-a.y)*dy)/len)):0;best=Math.min(best,Math.hypot(p.x-a.x-t*dx,p.y-a.y-t*dy));}
+ return best;
+}
+function isoManualForTile(board:HTMLElement,x:number,y:number):IsoManualMark[] {
+ const key=board.dataset.overlayStorageKey||"";
+ if(!key)return [];
+ try{const d=JSON.parse(localStorage.getItem(key)||"{}");return Array.isArray(d.manual)?d.manual.filter((m:IsoManualMark)=>m.x===x&&m.y===y):[];}catch{return [];}
+}
+function isoTileRule(board:HTMLElement,x:number,y:number):IsoManualRule|"default" {
+ const marks=isoManualForTile(board,x,y);
+ if(!marks.length)return "default";
+ const rules=marks.map(m=>m.rule);
+ if(rules.includes("blocked"))return "blocked";
+ if(rules.includes("behind"))return "behind";
+ if(rules.includes("walkable"))return "walkable";
+ return "default";
+}
+function isoAreaRuleAt(board:HTMLElement,x:number,y:number):"road"|"object"|"default" {
+ const key=board.dataset.overlayStorageKey||"";
+ try{
+  const data=JSON.parse(localStorage.getItem(key)||"{}");
+  const center={x:(x-y)*32+Number.parseFloat(getComputedStyle(board).getPropertyValue("--iso-center-x")||"640"),y:(x+y)*16+19};
+  let found:IsoOverlayMark|null=null,best=Infinity;
+  for(const mark of (Array.isArray(data.areas)?data.areas:[]) as IsoOverlayMark[]){const dist=isoDistanceToPath(center,mark.points);if(dist<=mark.width/2&&dist<best){best=dist;found=mark;}}
+  return found?.category||"default";
+ }catch{return "default";}
+}
 function bindIsoAreaEditor(dialog:HTMLElement):void {
- const board=dialog.querySelector<HTMLElement>("[data-wmh-board]"),svg=board?.querySelector<SVGSVGElement>("[data-wmh-overlay-svg]"),toggle=dialog.querySelector<HTMLButtonElement>("[data-wmh-overlay-toggle]"),panel=dialog.querySelector<HTMLElement>("[data-wmh-overlay-tools]");
- if(!board||!svg||!toggle||!panel||board.dataset.overlayEditorBound==="true")return;board.dataset.overlayEditorBound="true";
- const key=isoOverlayKey(dialog),group=svg.querySelector<SVGGElement>("[data-wmh-overlay-marks]"),preview=svg.querySelector<SVGPathElement>("[data-wmh-overlay-preview]");
- let marks:IsoOverlayMark[]=[];try{const v=JSON.parse(localStorage.getItem(key)||"[]");if(Array.isArray(v))marks=v;}catch{}
- const redraw=()=>{if(group)group.innerHTML=marks.map(m=>'<path d="'+m.path+'" class="wmh-area-mark mark-'+m.navigation+'"><title>'+m.area+' · '+m.navigation+'</title></path>').join("");};redraw();
+ const board=dialog.querySelector<HTMLElement>("[data-wmh-board]"),svg=board?.querySelector<SVGSVGElement>("[data-wmh-overlay-svg]");
+ const toggle=dialog.querySelector<HTMLButtonElement>("[data-wmh-overlay-toggle]"),panel=dialog.querySelector<HTMLElement>("[data-wmh-overlay-tools]");
+ if(!board||!svg||!toggle||!panel||board.dataset.overlayEditorBound==="true")return;
+ board.dataset.overlayEditorBound="true";
+ const key=isoOverlayKey(dialog);board.dataset.overlayStorageKey=key;
+ const areaGroup=svg.querySelector<SVGGElement>("[data-wmh-overlay-marks]"),manualGroup=svg.querySelector<SVGGElement>("[data-wmh-manual-marks]"),preview=svg.querySelector<SVGPathElement>("[data-wmh-overlay-preview]");
+ let areas:IsoOverlayMark[]=[],manual:IsoManualMark[]=[];
+ try{const d=JSON.parse(localStorage.getItem(key)||"{}");if(Array.isArray(d.areas))areas=d.areas;if(Array.isArray(d.manual))manual=d.manual;}catch{}
+ const redraw=()=>{
+  if(areaGroup)areaGroup.innerHTML=areas.map(m=>'<path d="'+m.path+'" class="wmh-area-mark mark-'+m.category+'" stroke-width="'+m.width+'"><title>'+m.category.toUpperCase()+' AREA</title></path>').join("");
+  if(manualGroup)manualGroup.innerHTML=manual.map(m=>{const cx=(m.x-m.y)*32+Number(board.dataset.rows||20)*32+(m.quarter%2?.75:.25)*64-(m.quarter>=2?32:0);const cy=(m.x+m.y)*16+((m.quarter>=2?.75:.25)*32);const symbol=m.rule==="walkable"?"✓":m.rule==="blocked"?"×":"○";return '<g class="wmh-manual-mark manual-'+m.rule+'" transform="translate('+cx+' '+cy+')"><circle r="8"></circle><text text-anchor="middle" dominant-baseline="central">'+symbol+'</text></g>';}).join("");
+ };
+ const persist=()=>{localStorage.setItem(key,JSON.stringify({format:"merzkava-isometric-area-overlays",version:2,areas,manual}));redraw();};
+ redraw();
  let active=false,drawing=false,points:Array<{x:number;y:number}>=[];
  const val=(q:string)=>panel.querySelector<HTMLSelectElement>(q)?.value||"";
+ const mode=()=>val("[data-wmh-overlay-mode]")||"area";
  const setActive=(v:boolean)=>{active=v;board.classList.toggle("wmh-overlay-editing",v);panel.hidden=!v;toggle.setAttribute("aria-pressed",String(v));toggle.textContent=v?"CLOSE AREA EDITOR":"✎ AREA OVERLAY EDITOR";if(!v){drawing=false;points=[];preview?.setAttribute("d","");}};
  toggle.addEventListener("click",()=>setActive(!active));
  const pt=(e:PointerEvent)=>{const r=board.getBoundingClientRect();return{x:(e.clientX-r.left)*board.offsetWidth/r.width,y:(e.clientY-r.top)*board.offsetHeight/r.height};};
- svg.addEventListener("pointerdown",e=>{if(!active)return;e.preventDefault();e.stopPropagation();drawing=true;points=[pt(e)];try{svg.setPointerCapture(e.pointerId);}catch{}});
- svg.addEventListener("pointermove",e=>{if(!active||!drawing)return;e.preventDefault();e.stopPropagation();const p=pt(e),last=points[points.length-1];if(!last||Math.hypot(p.x-last.x,p.y-last.y)>5)points.push(p);preview?.setAttribute("d",isoSmoothPath(points));});
- const finish=()=>{if(!drawing)return;drawing=false;if(points.length<2){points=[];return;}const r=dialog.querySelector<HTMLElement>("[data-wmh-overlay-review]");if(r){r.hidden=false;r.dataset.path=isoSmoothPath(points);r.dataset.points=JSON.stringify(points);r.dataset.navigation=val("[data-wmh-overlay-navigation]");r.dataset.area=val("[data-wmh-overlay-area]");const t=r.querySelector<HTMLElement>("[data-wmh-review-summary]");if(t)t.textContent=r.dataset.area+" · "+r.dataset.navigation+" · "+points.length+" points";}points=[];};
+ const addManual=(p:{x:number;y:number})=>{
+  const rows=Number(board.dataset.rows||20),center=rows*32,worldX=(p.x-center)/64+p.y/32,worldY=p.y/32-(p.x-center)/64;
+  const x=Math.floor(worldX),y=Math.floor(worldY),fx=worldX-x,fy=worldY-y;
+  const q=(fy>=.5?2:0)+(fx>=.5?1:0);
+  if(x<0||y<0||x>=Number(board.dataset.cols||24)||y>=rows)return;
+  const rule=val("[data-wmh-overlay-manual]") as IsoManualRule;
+  manual=manual.filter(m=>!(m.x===x&&m.y===y&&m.quarter===q));
+  manual.push({id:"manual-"+x+"-"+y+"-"+q,x,y,quarter:q as 0|1|2|3,rule});persist();
+ };
+ svg.addEventListener("pointerdown",e=>{
+  if(!active)return;e.preventDefault();e.stopPropagation();
+  if(mode()==="manual"){addManual(pt(e));return;}
+  drawing=true;points=[pt(e)];try{svg.setPointerCapture(e.pointerId);}catch{}
+ });
+ svg.addEventListener("pointermove",e=>{if(!active||!drawing)return;e.preventDefault();e.stopPropagation();const p=pt(e),last=points[points.length-1];if(!last||Math.hypot(p.x-last.x,p.y-last.y)>4)points.push(p);preview?.setAttribute("d",isoSmoothPath(points));});
+ const finish=()=>{
+  if(!drawing)return;drawing=false;if(points.length<2){points=[];preview?.setAttribute("d","");return;}
+  const review=dialog.querySelector<HTMLElement>("[data-wmh-overlay-review]");
+  if(review){review.hidden=false;review.dataset.path=isoSmoothPath(points);review.dataset.points=JSON.stringify(points);review.dataset.category=val("[data-wmh-overlay-category]")||"road";review.dataset.width=String(Number(panel.querySelector<HTMLInputElement>("[data-wmh-overlay-width]")?.value||26));const t=review.querySelector<HTMLElement>("[data-wmh-review-summary]");if(t)t.textContent=review.dataset.category.toUpperCase()+" AREA · "+points.length+" CONTROL POINTS";}
+  points=[];preview?.setAttribute("d","");
+ };
  svg.addEventListener("pointerup",e=>{if(!active)return;e.preventDefault();e.stopPropagation();finish();});svg.addEventListener("pointercancel",finish);
  dialog.querySelector<HTMLElement>("[data-wmh-overlay-cancel]")?.addEventListener("click",()=>{const r=dialog.querySelector<HTMLElement>("[data-wmh-overlay-review]");if(r)r.hidden=true;preview?.setAttribute("d","");});
- dialog.querySelector<HTMLElement>("[data-wmh-overlay-confirm]")?.addEventListener("click",()=>{const r=dialog.querySelector<HTMLElement>("[data-wmh-overlay-review]");if(!r)return;let pts:Array<{x:number;y:number}>=[];try{pts=JSON.parse(r.dataset.points||"[]");}catch{}if(!r.dataset.path||pts.length<2)return;marks.push({id:"area-"+Date.now(),path:r.dataset.path,points:pts,navigation:(r.dataset.navigation||"walkable") as IsoOverlayMark["navigation"],area:r.dataset.area||"path"});localStorage.setItem(key,JSON.stringify(marks));redraw();r.hidden=true;preview?.setAttribute("d","");});
- dialog.querySelector<HTMLElement>("[data-wmh-overlay-undo]")?.addEventListener("click",()=>{marks.pop();localStorage.setItem(key,JSON.stringify(marks));redraw();});
- dialog.querySelector<HTMLElement>("[data-wmh-overlay-clear]")?.addEventListener("click",()=>{if(!window.confirm("Clear all overlays for this map?"))return;marks=[];localStorage.setItem(key,"[]");redraw();});
- dialog.querySelector<HTMLElement>("[data-wmh-overlay-copy]")?.addEventListener("click",()=>{const data=JSON.stringify({format:"merzkava-isometric-area-overlays",version:1,mapKey:key,marks},null,2);const f=dialog.querySelector<HTMLTextAreaElement>("[data-wmh-overlay-export]");if(f){f.hidden=false;f.value=data;f.focus();f.select();}navigator.clipboard?.writeText(data);});
- dialog.querySelector<HTMLElement>("[data-wmh-overlay-import]")?.addEventListener("click",()=>{const f=dialog.querySelector<HTMLTextAreaElement>("[data-wmh-overlay-import-text]");try{const d=JSON.parse(f?.value||"");if(d.format!=="merzkava-isometric-area-overlays"||!Array.isArray(d.marks))throw Error();marks=d.marks;localStorage.setItem(key,JSON.stringify(marks));redraw();}catch{const t=panel.querySelector<HTMLElement>("[data-wmh-overlay-status]");if(t)t.textContent="Invalid blueprint."; }});
+ dialog.querySelector<HTMLElement>("[data-wmh-overlay-confirm]")?.addEventListener("click",()=>{
+  const r=dialog.querySelector<HTMLElement>("[data-wmh-overlay-review]");if(!r)return;let pts:Array<{x:number;y:number}>=[];try{pts=JSON.parse(r.dataset.points||"[]");}catch{}
+  if(!r.dataset.path||pts.length<2)return;areas.push({id:"area-"+Date.now(),path:r.dataset.path,points:pts,category:(r.dataset.category||"road") as IsoAreaCategory,width:Number(r.dataset.width||26)});persist();r.hidden=true;
+ });
+ dialog.querySelector<HTMLElement>("[data-wmh-overlay-undo]")?.addEventListener("click",()=>{if(mode()==="manual")manual.pop();else areas.pop();persist();});
+ dialog.querySelector<HTMLElement>("[data-wmh-overlay-clear]")?.addEventListener("click",()=>{if(!window.confirm("Clear all area and manual marks for this isometric map?"))return;areas=[];manual=[];persist();});
+ dialog.querySelector<HTMLElement>("[data-wmh-overlay-copy]")?.addEventListener("click",()=>{
+  const data=JSON.stringify({format:"merzkava-isometric-area-overlays",version:2,mapKey:key,board:{cols:Number(board.dataset.cols||0),rows:Number(board.dataset.rows||0)},areas,manual},null,2);
+  const f=dialog.querySelector<HTMLTextAreaElement>("[data-wmh-overlay-export]");if(f){f.hidden=false;f.value=data;f.focus();f.select();}if(navigator.clipboard?.writeText)navigator.clipboard.writeText(data);
+ });
+ dialog.querySelector<HTMLElement>("[data-wmh-overlay-import]")?.addEventListener("click",()=>{
+  const f=dialog.querySelector<HTMLTextAreaElement>("[data-wmh-overlay-import-text]");
+  try{const d=JSON.parse(f?.value||"");if(d.format!=="merzkava-isometric-area-overlays"||!Array.isArray(d.areas)||!Array.isArray(d.manual))throw Error();areas=d.areas;manual=d.manual;persist();}
+  catch{const t=panel.querySelector<HTMLElement>("[data-wmh-overlay-status]");if(t)t.textContent="Invalid blueprint.";}
+ });
 }
-
 function bindIsometricCamera(dialog:HTMLElement):void {
   const viewport=dialog.querySelector<HTMLElement>("[data-wmh-iso-viewport]");
   const camera=dialog.querySelector<HTMLElement>("[data-wmh-iso-camera]");
@@ -645,7 +723,7 @@ function walkToTile(dialog:HTMLElement,targetX:number,targetY:number,surface:str
   const cols=Number(board.dataset.cols||12),rows=Number(board.dataset.rows||10);
   if(!Number.isInteger(targetX)||!Number.isInteger(targetY)||targetX<0||targetX>=cols||targetY<0||targetY>=rows)return;
   const destination=board.querySelector<HTMLElement>('[data-wmh-tile][data-x="'+targetX+'"][data-y="'+targetY+'"]');
-  if(!destination||destination.dataset.wmhBlocked==="true")return;
+  if(!destination||destination.dataset.wmhBlocked==="true"||isoManualForTile(board,targetX,targetY).some(m=>m.rule==="blocked")||isoAreaRuleAt(board,targetX,targetY)==="object")return;
   const oldTimer=Number(player.dataset.moveTimer||0);
   if(oldTimer)window.clearTimeout(oldTimer);
   const startX=Number(player.dataset.x||5),startY=Number(player.dataset.y||8);
@@ -661,7 +739,7 @@ function walkToTile(dialog:HTMLElement,targetX:number,targetY:number,surface:str
       const key=nx+","+ny;
       if(nx<0||nx>=cols||ny<0||ny>=rows||previous.has(key))continue;
       const nextTile=board.querySelector<HTMLElement>('[data-wmh-tile][data-x="'+nx+'"][data-y="'+ny+'"]');
-      if(nextTile?.dataset.wmhBlocked==="true")continue;
+      if(nextTile?.dataset.wmhBlocked==="true"||isoManualForTile(board,nx,ny).some(m=>m.rule==="blocked")||isoAreaRuleAt(board,nx,ny)==="object")continue;
       previous.set(key,x+","+y);queue.push([nx,ny]);
     }
   }
