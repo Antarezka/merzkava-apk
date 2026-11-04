@@ -11,6 +11,6 @@ Dedicated source folder for the academy isometric map.
 
 ## Tile sizing
 
-Do not resize or normalize source images on import. The final tile dimensions, diamond proportions, anchor point, and atlas slicing rules will be measured from the supplied sample and confirmed before implementation.
+Provisional reference sample: `reference/academy-ground-tile-sample.svg`. It currently illustrates a 64×32 diamond top with a 7 px thin slab (64×39 total). This is a visual measuring aid, not a locked final tile specification; the owner will confirm the final size by inspecting the coordinate-labelled in-game grid.
 
 Keep ground, buildings, props, and character sprites as separate layers. The renderer must depth-sort objects using their world-space foot/base position, not their image top edge.
