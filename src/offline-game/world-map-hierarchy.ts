@@ -484,6 +484,9 @@ function bindIsometricMapArt(dialog: HTMLElement): void {
 
 function isometricNpcTokensMarkup(mapId:string,interior:boolean):string {
   const maps:Record<string,Array<{id:string;x:number;y:number;gender:"male"|"female"}>>={
+    "golden-dragon-empire:tianhai-academy:exterior":[
+      {id:"student-lin",x:7,y:4,gender:"female"},{id:"student-wei",x:10,y:9,gender:"male"},
+      {id:"teacher-mei",x:6,y:15,gender:"female"},{id:"groundskeeper",x:22,y:5,gender:"male"}],
     "golden-dragon-empire:public-arena:exterior":[
       {id:"arena-referee",x:10,y:3,gender:"male"},{id:"arena-fighter",x:15,y:8,gender:"female"},{id:"arena-spectator",x:19,y:15,gender:"male"}],
     "golden-dragon-empire:sparring-arena:exterior":[
@@ -520,6 +523,7 @@ function isometricNpcTokensMarkup(mapId:string,interior:boolean):string {
 function tileMapMarkup(interior = false, mapId = "academy-exterior", mapImage = ""): string {
   const academyExterior = !interior && mapId.startsWith("golden-dragon-empire:tianhai-academy:exterior");
   const isometricTestArea = !interior && mapId.startsWith("isometric-render-test:");
+  const academyImageBoard = academyExterior && !!mapImage;
   const cols = isometricTestArea ? 16 : interior ? 12 : 24, rows = isometricTestArea ? 12 : interior ? 10 : 20;
   const tileW = isometricTestArea ? 72 : academyExterior ? 128 : 64, tileH = isometricTestArea ? 36 : academyExterior ? 69.5 : 32;
   const baseWidth = mapImage ? 2816 : 0, baseHeight = mapImage ? 1536 : 0;
@@ -531,10 +535,10 @@ function tileMapMarkup(interior = false, mapId = "academy-exterior", mapImage = 
     ? {"2-1":"blackboard","5-1":"teacher-desk","3-3":"desk","5-3":"desk","7-3":"desk","3-5":"desk","5-5":"desk","7-5":"desk","10-8":"door"}
     : isometricTestArea
       ? {"7-0":"test-gate","8-0":"test-gate","11-2":"test-water","12-2":"test-water","11-3":"test-water","12-3":"test-water","2-2":"test-garden","3-2":"test-garden","2-3":"test-garden","3-3":"test-garden","12-8":"test-garden","13-8":"test-garden","12-9":"test-garden","13-9":"test-garden","4-5":"test-plaza","5-5":"test-plaza","6-5":"test-plaza","9-5":"test-plaza","10-5":"test-plaza","11-5":"test-plaza","3-9":"test-tree","14-4":"test-tree"}
-      : academyExterior
+      : academyImageBoard ? {} : academyExterior
         ? {"5-1":"pond","6-1":"pond","7-1":"pond","8-1":"pond","1-2":"tree","2-2":"tree","10-2":"tree","1-3":"flower","3-3":"flower","9-3":"flower","11-3":"tree","2-9":"garden","3-9":"garden","8-9":"garden","9-9":"garden","2-14":"bench","9-14":"bench","3-2":"study-hall","9-2":"teachers-house","3-10":"learning-building","20-2":"simple-house"}
         : {};
-  const buildingSpecs = !academyExterior ? [] : [
+  const buildingSpecs = !academyExterior || academyImageBoard ? [] : [
     {id:"study-hall",name:"Study Hall",x:3,y:2,w:4,h:4},
     {id:"teachers-house",name:"Teachers’ Hall",x:9,y:2,w:4,h:4},
     {id:"learning-building",name:"Learning Hall",x:3,y:10,w:4,h:4},
@@ -543,8 +547,8 @@ function tileMapMarkup(interior = false, mapId = "academy-exterior", mapImage = 
   const sparring={x:14,y:8,w:8,h:8};
   const tiles = Array.from({length: rows}, (_,y) => Array.from({length:cols},(_,x) => {
     const key=x+"-"+y;
-    const road=(academyExterior&&(y===6||y===7||x===12||x===13))||(isometricTestArea&&((x===7||x===8)&&(y>=1&&y<=11)||(y===6||y===7)&&(x>=2&&x<=13)));
-    const inSparring=academyExterior&&x>=sparring.x&&x<sparring.x+sparring.w&&y>=sparring.y&&y<sparring.y+sparring.h;
+    const road=(!academyImageBoard&&academyExterior&&(y===6||y===7||x===12||x===13))||(isometricTestArea&&((x===7||x===8)&&(y>=1&&y<=11)||(y===6||y===7)&&(x>=2&&x<=13)));
+    const inSparring=academyExterior&&!academyImageBoard&&x>=sparring.x&&x<sparring.x+sparring.w&&y>=sparring.y&&y<sparring.y+sparring.h;
     const feature=features[key]||(road?(isometricTestArea?"test-path":"road"):inSparring?"sparring-ground":"");
     const structure=buildingSpecs.find(item=>x>=item.x&&x<item.x+item.w&&y>=item.y&&y<item.y+item.h);
     const structureAnchor=!!structure&&x===structure.x&&y===structure.y;
@@ -680,6 +684,8 @@ function renderIsometricWorldStatus(dialog:HTMLElement):void {
   set("[data-wmh-weather-icon]",w.icon);set("[data-wmh-weather-label]",w.label);
   set("[data-wmh-day]","HARI "+String(save?.day??1).padStart(2,"0"));
   set("[data-wmh-time]",hour+":"+minute);
+  const player=dialog.querySelector<HTMLElement>("[data-wmh-board] [data-wmh-player-token]");
+  set("[data-wmh-player-grid]",player?"GRID X "+String(player.dataset.x||0).padStart(2,"0")+" · Y "+String(player.dataset.y||0).padStart(2,"0"):"GRID X -- · Y --");
   const overlay=dialog.closest<HTMLElement>("[data-world-map-hierarchy]");
   if(overlay){overlay.dataset.wmhCycle=atmosphere.cycle.toLowerCase();overlay.dataset.wmhWeather=atmosphere.weather.toLowerCase();}
 }
@@ -692,6 +698,40 @@ function renderIsometricMinimap(board:HTMLElement):void {
   const boardWidth=Number.parseFloat(style.getPropertyValue("--iso-board-width"))||board.offsetWidth||1;
   const boardHeight=Number.parseFloat(style.getPropertyValue("--iso-board-height"))||board.offsetHeight||1;
   world.style.setProperty("aspect-ratio",boardWidth+" / "+boardHeight,"important");
+
+  // The minimap uses the same projected diamonds and cell metadata as the main board.
+  // Rebuild this small SVG only when the grid or its saved overlays actually change.
+  const gridSvg=world.querySelector<SVGSVGElement>("[data-wmh-minimap-grid]");
+  if(gridSvg){
+    const signature=JSON.stringify({
+      grid:data.grid,
+      foreground:data.foregroundCells,
+      blocked:data.blockedCells,
+      opacity:data.opacityCells,
+      transitions:data.transitions,
+    });
+    if(gridSvg.dataset.signature!==signature){
+      const grid=data.grid;
+      gridSvg.setAttribute("viewBox","0 0 "+boardWidth+" "+boardHeight);
+      const polygon=(x:number,y:number,cls:string)=> {
+        const c=isoCellCenter(x,y,grid),hw=grid.tileW/2,hh=grid.tileH/2;
+        const points=[c.x+","+(c.y-hh),(c.x+hw)+","+c.y,c.x+","+(c.y+hh),(c.x-hw)+","+c.y].join(" ");
+        return '<polygon class="wmh-minimap-cell '+cls+'" points="'+points+'"/>';
+      };
+      const cells:string[]=[];
+      for(let y=0;y<grid.rows;y++)for(let x=0;x<grid.cols;x++)cells.push(polygon(x,y,""));
+      const overlays:string[]=[];
+      data.foregroundCells.forEach(key=>{const [x,y]=key.split(",").map(Number);overlays.push(polygon(x,y,"is-foreground"));});
+      data.blockedCells.forEach(key=>{const [x,y]=key.split(",").map(Number);overlays.push(polygon(x,y,"is-blocked"));});
+      data.opacityCells.forEach(key=>{const [x,y]=key.split(",").map(Number);overlays.push(polygon(x,y,"is-opacity"));});
+      const transitions=data.transitions.map(marker=>{
+        const c=isoCellCenter(marker.x,marker.y,grid);
+        return '<circle class="wmh-minimap-transition '+(marker.label.trim()?"is-named":"is-unlabelled")+'" cx="'+c.x+'" cy="'+c.y+'" r="22"><title>'+escapeMapEditorText(marker.label||"Unlabelled transition")+'</title></circle>';
+      }).join("");
+      gridSvg.innerHTML='<g class="wmh-minimap-grid-cells">'+cells.join("")+'</g><g class="wmh-minimap-overlays">'+overlays.join("")+'</g><g class="wmh-minimap-transitions">'+transitions+'</g>';
+      gridSvg.dataset.signature=signature;
+    }
+  }
   const position=(token:HTMLElement)=>{
     const center=isoCellCenter(Number(token.dataset.x||0),Number(token.dataset.y||0),data.grid);
     return {
@@ -707,9 +747,13 @@ function renderIsometricMinimap(board:HTMLElement):void {
   }
   if(!board.classList.contains("wmh-overlay-editing"))board.querySelectorAll<HTMLElement>("[data-wmh-npc]").forEach((npc,index)=>{
     const p=position(npc);
-    items.push('<span class="wmh-minimap-dot is-npc '+(npc.classList.contains("is-female")?"is-female":"is-male")+'" data-minimap-npc="'+index+'" style="left:'+p.x+'%;top:'+p.y+'%" title="NPC"></span>');
+    items.push('<span class="wmh-minimap-dot is-npc '+(npc.classList.contains("is-female")?"is-female":"is-male")+'" data-minimap-npc="'+index+'" style="left:'+p.x+'%;top:'+p.y+'%" title="'+escapeMapEditorText(npc.dataset.wmhNpc||"NPC")+'"></span>');
   });
   actors.innerHTML=items.join("");
+  const footer=world.closest<HTMLElement>("[data-wmh-minimap]")?.querySelector<HTMLElement>("[data-wmh-minimap-footer]");
+  if(footer&&player){
+    footer.textContent="YOU · X "+String(player.dataset.x||0).padStart(2,"0")+" / Y "+String(player.dataset.y||0).padStart(2,"0")+" · TAP TO MOVE";
+  }
 }
 function bindIsometricHud(dialog:HTMLElement):void {
   const hud=dialog.querySelector<HTMLElement>("[data-wmh-isometric-hud]");
@@ -1203,11 +1247,11 @@ function isometricHudMarkup(title: string, mapImage: string): string {
     '<section class="wmh-world-status" aria-label="World conditions">'+
     '<div class="wmh-world-status-top"><span class="wmh-status-cycle-icon" data-wmh-cycle-icon>☼</span><div><b data-wmh-cycle-label>PAGI</b><small data-wmh-cycle-caption>WORLD CYCLE</small></div></div>'+
     '<div class="wmh-world-status-bottom"><span class="wmh-status-weather"><i data-wmh-weather-icon>☀</i><b data-wmh-weather-label>CLEAR</b></span><span class="wmh-status-day" data-wmh-day>HARI 01</span><strong data-wmh-time>08:00</strong></div>'+
-    '<small class="wmh-status-location">'+escapeMapEditorText(title)+'</small></section>'+
+    '<small class="wmh-status-location">'+escapeMapEditorText(title)+'</small><small class="wmh-status-coordinates" data-wmh-player-grid>GRID X 05 · Y 17</small></section>'+
     '<button type="button" class="wmh-rpg-minimap" data-wmh-minimap aria-label="Minimap. Tap a location to walk there." title="Tap the map to move">'+
     '<span class="wmh-minimap-heading">FIELD MAP <i>⌖</i></span><span class="wmh-minimap-world" data-wmh-minimap-world>'+image+
-    '<span class="wmh-minimap-grid"></span><span class="wmh-minimap-actors" data-wmh-minimap-actors></span></span>'+
-    '<span class="wmh-minimap-footer">YOU ARE HERE · TAP TO MOVE</span></button></div>';
+    '<svg class="wmh-minimap-grid" data-wmh-minimap-grid viewBox="0 0 2816 1536" preserveAspectRatio="none" aria-hidden="true"></svg><span class="wmh-minimap-actors" data-wmh-minimap-actors></span></span>'+
+    '<span class="wmh-minimap-footer" data-wmh-minimap-footer>YOU · X 05 / Y 17 · TAP TO MOVE</span></button></div>';
 }
 function isometricPlayMarkup(regionId: RegionId, selectedBuilding: string, interior: boolean): string {
   const mapId=makeIsometricMapId(regionId,selectedBuilding,interior);
@@ -1255,6 +1299,16 @@ export function renderWorldMapHierarchy(): string {
   return '<section class="wmh-overlay" data-world-map-hierarchy aria-label="Map Navigation"><div class="wmh-dialog" data-wmh-dialog>'+panelMarkup("world")+'</div></section>';
 }
 function resetLegacyIsometricMapLayouts(): void {
+  // Clear only Tianhai Academy exterior once; other regions keep their saved editor data.
+  const academyMarker="merzkava.isometric-map-academy-reset.v1";
+  try {
+    if(localStorage.getItem(academyMarker)!=="done"){
+      const academyId="golden-dragon-empire:tianhai-academy:exterior";
+      localStorage.removeItem(isoMapStorageKey(academyId));
+      localStorage.removeItem("merzkava.iso-editor-ui.v1:"+encodeURIComponent(academyId));
+      localStorage.setItem(academyMarker,"done");
+    }
+  } catch { /* the Academy starts clean when local persistence is available */ }
   const marker="merzkava.isometric-map-refresh.v2";
   try {
     if(localStorage.getItem(marker)==="done")return;
@@ -1306,8 +1360,8 @@ function syncIsoDepthAndOcclusion(board:HTMLElement):void {
   });
   tokens.forEach(token=>{
     const x=Number(token.dataset.x||0),y=Number(token.dataset.y||0);
-    token.style.zIndex=String(20+x+y);
-    token.style.opacity=isoCellHasLayer(data,"opacityCells",x,y)?"0.42":"1";
+    token.style.setProperty("--character-z",String(20+x+y));
+    token.style.setProperty("--character-opacity",isoCellHasLayer(data,"opacityCells",x,y)?"0.42":"1");
   });
   renderIsometricMinimap(board);
   const dialog=board.closest<HTMLElement>("[data-wmh-dialog]");
