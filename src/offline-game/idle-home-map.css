@@ -552,3 +552,9 @@
 @keyframes atlas-caret-blink{0%,45%{opacity:1}46%,100%{opacity:.12}}
 @media(max-width:390px){.atlas-access-buffer{padding:19px 16px 16px;gap:13px}.atlas-buffer-status strong{font-size:16px}.atlas-buffer-visual{width:92px;height:92px}}
 @media(prefers-reduced-motion:reduce){.atlas-buffer-lamp,.atlas-buffer-caret{animation:none}.atlas-buffer-lamp{opacity:1}}
+
+
+/* A compact, localized safety reminder shown only while creating a new Atlas password. */
+.world-atlas-password-safety{display:block;margin:-5px 0 5px;padding:7px 9px;border-left:2px solid #b99a61;background:linear-gradient(90deg,#d7c49a2b,transparent);color:#8b7550;font:500 9px/1.5 system-ui,sans-serif;letter-spacing:.005em}
+.world-atlas-password-safety:before{content:"✧";display:inline-block;margin-right:6px;color:#a58752;font-size:10px}
+:root[data-theme="dark"] .world-atlas-password-safety{border-left-color:#b69d68;background:linear-gradient(90deg,#c7ad7020,transparent);color:#d4c39e}
