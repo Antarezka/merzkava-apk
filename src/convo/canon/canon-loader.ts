@@ -78,13 +78,16 @@ export async function loadPlayerRegistry(activeSha: string): Promise<CanonDocume
 }
 
 /** Performs a fresh, uncached request to the exact official Universe snapshot. */
-export async function verifyCanonSourceConnection(activeSha: string): Promise<void> {
+export async function verifyCanonSourceConnection(activeSha: string, signal?: AbortSignal): Promise<void> {
   const expected = activeSha.toLowerCase();
   if (!/^[a-f0-9]{40}$/.test(expected) || currentStatus.commitSha !== expected) {
     throw new Error("ACTIVE_SHA penuh tidak cocok dengan canon yang sedang diverifikasi.");
   }
   const url = `https://raw.githubusercontent.com/${CANON_REPOSITORY}/${expected}/players.md?connection_check=${Date.now()}`;
   const controller = new AbortController();
+  const abortFromCaller = () => controller.abort();
+  if (signal?.aborted) controller.abort();
+  else signal?.addEventListener("abort", abortFromCaller, { once: true });
   const timeout = window.setTimeout(() => controller.abort(), 7000);
   try {
     const response = await fetch(url, {
@@ -97,6 +100,7 @@ export async function verifyCanonSourceConnection(activeSha: string): Promise<vo
     if (!text.trim()) throw new Error("Universe player registry is empty.");
   } finally {
     window.clearTimeout(timeout);
+    signal?.removeEventListener("abort", abortFromCaller);
   }
 }
 
