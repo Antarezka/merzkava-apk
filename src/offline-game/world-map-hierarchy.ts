@@ -1336,6 +1336,20 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     setStatus(data.walkableAreaEnabled?"Movement is limited to blue walkable cells. Characters outside the area were placed on their nearest selected cells.":"Movement limit disabled; all non-X cells may be used.");
   });
   const point=(e:PointerEvent)=>{const r=svg.getBoundingClientRect(),box=svg.viewBox.baseVal;return{x:(e.clientX-r.left)*box.width/Math.max(1,r.width),y:(e.clientY-r.top)*box.height/Math.max(1,r.height)};};
+  const isCellInsideMapArtwork=(x:number,y:number):boolean=>{
+    const image=board.querySelector<HTMLImageElement>("[data-wmh-map-art]");
+    const svgRect=svg.getBoundingClientRect(),view=svg.viewBox.baseVal;
+    const imageRect=image?.getBoundingClientRect();
+    const scaleX=view.width/Math.max(1,svgRect.width),scaleY=view.height/Math.max(1,svgRect.height);
+    const left=imageRect?(imageRect.left-svgRect.left)*scaleX:0;
+    const top=imageRect?(imageRect.top-svgRect.top)*scaleY:0;
+    const right=imageRect?left+imageRect.width*scaleX:view.width;
+    const bottom=imageRect?top+imageRect.height*scaleY:view.height;
+    const center=isoCellCenter(x,y,grid),halfW=grid.tileW/2,halfH=grid.tileH/2;
+    // New cells must fit entirely inside the Map Base artwork bounds. Canvas
+    // expansion margins and the surrounding scroll surface are never eligible.
+    return center.x-halfW>=left-0.5&&center.y-halfH>=top-0.5&&center.x+halfW<=right+0.5&&center.y+halfH<=bottom+0.5;
+  };
   if(board.dataset.academyArtworkBoard==="true"&&board.dataset.imageTapBound!=="true"){
     board.dataset.imageTapBound="true";
     board.addEventListener("click",event=>{
@@ -1365,7 +1379,23 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     }
   };
   const applyCellTap=(event:PointerEvent,transitionId:string|null)=>{
-    const mapPoint=point(event),cell=isoCellAtPoint(mapPoint,grid);if(!cell)return;
+    const mapPoint=point(event),cell=isoCellAtPoint(mapPoint,grid,mode()==="cell-add");if(!cell)return;
+    if(mode()==="cell-add"){
+      const key=isoCellKey(cell.x,cell.y);
+      if(cell.x>=0&&cell.y>=0&&cell.x<grid.cols&&cell.y<grid.rows){
+        setStatus("A base grid cell already exists here. Tap an ungridded part of the Map Base image to add an extra cell.");return;
+      }
+      if(data.customGridCells.includes(key)){setStatus("This extra image cell already exists. Choose another ungridded image position.");return;}
+      if(!isCellInsideMapArtwork(cell.x,cell.y)){
+        setStatus("Cell not added: the full diamond must fit inside the Map Base image. The canvas and outside margins are excluded.");return;
+      }
+      remember();
+      data.customGridCells=[...data.customGridCells,key];
+      data.walkableCells=[...new Set([...data.walkableCells,key])];
+      persist();
+      setStatus("Added a new image grid cell at ("+cell.x+","+cell.y+"). It is stored as a custom Map Base cell; canvas size and margins were not changed.");
+      return;
+    }
     if(mode()==="transition"){
       const existing=transitionId?data.transitions.find(marker=>marker.id===transitionId):data.transitions.find(marker=>marker.x===cell.x&&marker.y===cell.y);
       if(existing){
