@@ -2851,3 +2851,13 @@ html.soft-keyboard-open .conversation-feed { min-height:180px !important; }
 html.soft-keyboard-open .world-time-panel { min-height:145px !important; padding:13px 15px 11px !important; }
 html.soft-keyboard-open .world-time-main { padding:7px 0 5px !important; }
 html.soft-keyboard-open .conversation-composer { padding-top:10px !important; }
+
+
+/* Developer-only World Atlas recovery controls; authorization is checked independently by the gateway. */
+.developer-atlas-reset{display:grid;gap:10px;margin-top:18px;padding:15px;border:1px solid var(--line);border-radius:12px;background:rgba(24,21,18,.72)}
+.developer-atlas-reset label{display:block;color:var(--muted);font-size:12px}
+.developer-atlas-reset input{width:100%;min-height:42px;margin-top:6px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:#171513;color:#f3eee5}
+.developer-atlas-reset-proof{font-size:11px;line-height:1.55}
+.developer-atlas-reset [data-developer-atlas-reset-message]{min-height:18px;margin:0}
+.world-atlas-password-recovery{display:block;margin:10px 0 14px;color:var(--muted);font-size:11px;line-height:1.55}
+.world-atlas-password-safety{display:block;line-height:1.5}

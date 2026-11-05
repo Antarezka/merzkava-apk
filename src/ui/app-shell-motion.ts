@@ -25,6 +25,15 @@ export function animateAppScreen(shell: HTMLElement | null, options: { menuToggl
     return;
   }
 
+  // Fade the new shell as a single surface. Child panels retain their own staggered Anime.js entrances.
+  animate(shell, {
+    opacity: [0, 1],
+    translateY: [7, 0],
+    scale: [0.996, 1],
+    duration: 360,
+    ease: "outCubic"
+  });
+
   if (options.menuToggle) {
     const collapsed = shell.classList.contains("is-nav-collapsed");
     if (nav) {
@@ -273,11 +282,13 @@ export function animateAppScreenExit(shell: HTMLElement | null, onComplete: () =
     onComplete();
     return;
   }
+  // Fade the outgoing screen before render() replaces its DOM.
   animate(shell, {
     opacity: [1, 0],
-    translateY: [0, -5],
-    duration: 190,
-    ease: "inCubic",
+    translateY: [0, -7],
+    scale: [1, 0.994],
+    duration: 300,
+    ease: "inOutQuad",
     onComplete
   });
 }

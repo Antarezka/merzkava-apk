@@ -17,6 +17,7 @@ on:
       - feature/global-isometric-canvas-margins-2026-11-05
       - fix/player-name-access-gate-2026-11-06
       - fix/account-settings-atlas-remember-2026-11-06
+      - feat/secure-atlas-reset-transitions-2026-11-06
     paths:
       - "src/**"
       - "public/**"
