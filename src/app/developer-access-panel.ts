@@ -19,10 +19,11 @@ export function developerHeaderControls(language:AppLanguage,authenticated:boole
     ? '<button type="button" class="developer-tools-open" data-dev-open-control>'+t.control+'</button><button type="button" class="developer-tools-lock" data-dev-logout>'+t.lock+'</button>'
     : '<button type="button" class="developer-access-key" data-dev-login-open aria-label="'+t.open+'" title="'+t.open+'">⌑</button>';
 }
-export function developerLoginPanel(language:AppLanguage,message:string,busy:boolean):string {
+export function developerLoginPanel(language:AppLanguage,message:string,busy:boolean,required:boolean=false):string {
   const t=labels[language]||labels.en;
-  return '<div class="developer-login-backdrop" data-dev-login-panel hidden><section class="developer-login-card" role="dialog" aria-modal="true" aria-labelledby="developer-login-title">'+
-    '<button type="button" class="developer-login-close" data-dev-login-close aria-label="'+t.close+'">×</button><small>MERZKAVA · RESTRICTED ACCESS</small><h2 id="developer-login-title">'+t.title+'</h2>'+
+  const closeButton=required?"":'<button type="button" class="developer-login-close" data-dev-login-close aria-label="'+t.close+'">×</button>';
+  return '<div class="developer-login-backdrop" data-dev-login-panel '+(required?"":"hidden")+'><section class="developer-login-card" role="dialog" aria-modal="true" aria-labelledby="developer-login-title">'+
+    closeButton+'<small>MERZKAVA · RESTRICTED ACCESS</small><h2 id="developer-login-title">'+t.title+'</h2>'+
     '<form id="developer-login-form"><label for="developer-login-id">'+t.id+'</label><input id="developer-login-id" name="identifier" type="text" maxlength="80" autocomplete="username" required/>'+
     '<label for="developer-login-password">'+t.password+'</label><input id="developer-login-password" name="password" type="password" maxlength="128" autocomplete="current-password" required/>'+
     '<label class="developer-remember"><input type="checkbox" name="remember" value="yes"/><span>'+t.remember+'</span></label>'+
