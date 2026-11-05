@@ -8,6 +8,7 @@ import {
   isoMapBoardSize,
   isoCellAtPoint,
   isoCellCenter,
+  isoClientToImagePoint,
   isoCellHasLayer,
   isoQuadrantAtPoint,
   isoQuadrantHasLayer,
@@ -104,6 +105,20 @@ describe("shared isometric map editor data", () => {
     expect(removeIsoWalkableCell(data, 2, 1)).toBe(true);
     expect(data.walkableCells).toEqual(["1,1", "2,2", "5,5"]);
     expect(data.walkableCellGroups).toEqual([]);
+  });
+
+  it("maps taps to the same Map Base coordinates at every camera zoom", () => {
+    const normal = isoClientToImagePoint(310, 210, {
+      left: 100, top: 50, width: 1408, height: 768, naturalWidth: 2816, naturalHeight: 1536,
+    });
+    const zoomed = isoClientToImagePoint(520, 370, {
+      left: 100, top: 50, width: 2816, height: 1536, naturalWidth: 2816, naturalHeight: 1536,
+    });
+    expect(normal).toEqual({ x: 420, y: 320 });
+    expect(zoomed).toEqual({ x: 420, y: 320 });
+    expect(isoClientToImagePoint(1, 1, {
+      left: 0, top: 0, width: 0, height: 10, naturalWidth: 2816, naturalHeight: 1536,
+    })).toBeNull();
   });
 
   it("resolves extra grid cells outside the base grid only when explicitly allowed", () => {
