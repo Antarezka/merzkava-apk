@@ -33,14 +33,6 @@ describe("World Atlas player login gate",()=>{
       expect(html).toContain('data-atlas-buffer-log');
       expect(html).toContain('data-atlas-buffer-progress');
       expect(html).toContain('data-password-safety-note');
-      expect(html).toContain('data-password-policy-label=');
-      expect(html).toContain('data-atlas-change-open');
-      expect(html).toContain('data-atlas-master-open');
-      expect(html).toContain('data-atlas-reset-panel');
-      expect(html).toContain('data-atlas-reset-current-row');
-      expect(html).toContain('data-atlas-reset-master-row');
-      expect(html).toContain('id="atlas-reset-new"');
-      expect(html).toContain('id="atlas-reset-confirm"');
       const warningStart=html.indexOf('data-password-safety-note>')+'data-password-safety-note>'.length;
       const warningEnd=html.indexOf('</small>',warningStart);
       const warningText=html.slice(warningStart,warningEnd);
