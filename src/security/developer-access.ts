@@ -3,11 +3,17 @@ import { SecureStorage } from "@aparajita/capacitor-secure-storage";
 
 const ITERATIONS = 600_000;
 const REMEMBER_KEY = "merzkava.developer-session.v1";
+const CREDENTIALS_KEY = "merzkava.developer-credentials.v1";
 const ID_SALT = "zki1bXl9Kc9FkzTBCvsoSQ==";
 const ID_VERIFIER = "rWliJ21UojOkc2FX4QQXudntYW7NuuKB9kizB4Ih0sA=";
 const PASSWORD_SALT = "0Wnvcfd3cGISdPZSyJfQZQ==";
 const PASSWORD_VERIFIER = "rYGmwsLKK3El0UXvA3vyj+pe7d7uj0xJchixuRgr/IU=";
 let authenticated = false;
+
+export interface RememberedDeveloperCredentials {
+  identifier: string;
+  password: string;
+}
 
 function decodeBase64(value: string): Uint8Array {
   return Uint8Array.from(atob(value), character => character.charCodeAt(0));
@@ -17,14 +23,12 @@ function toArrayBuffer(value: Uint8Array): ArrayBuffer {
   copy.set(value);
   return copy.buffer;
 }
-
 function constantTimeEqual(left: Uint8Array, right: Uint8Array): boolean {
   if (left.length !== right.length) return false;
   let difference = 0;
   for (let index = 0; index < left.length; index++) difference |= left[index] ^ right[index];
   return difference === 0;
 }
-
 async function verifier(value: string, salt: string): Promise<Uint8Array> {
   if (!globalThis.crypto?.subtle) throw new Error("Secure credential verification is unavailable on this device.");
   const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(value), "PBKDF2", false, ["deriveBits"]);
@@ -38,6 +42,21 @@ async function verifier(value: string, salt: string): Promise<Uint8Array> {
 
 export function isDeveloperAuthenticated(): boolean {
   return authenticated;
+}
+
+/** Returns saved form credentials only on native Android, where SecureStorage protects the record. */
+export async function restoreRememberedDeveloperCredentials(): Promise<RememberedDeveloperCredentials | null> {
+  if (!Capacitor.isNativePlatform()) return null;
+  try {
+    const raw = await SecureStorage.getItem(CREDENTIALS_KEY);
+    if (!raw) return null;
+    const stored = JSON.parse(raw) as { version?: number; identifier?: string; password?: string };
+    if (stored.version !== 1 || typeof stored.identifier !== "string" || !stored.identifier ||
+        typeof stored.password !== "string" || !stored.password) return null;
+    return { identifier: stored.identifier, password: stored.password };
+  } catch {
+    return null;
+  }
 }
 
 export async function restoreDeveloperSession(): Promise<boolean> {
@@ -69,14 +88,33 @@ export async function authenticateDeveloper(
     try { if (Capacitor.isNativePlatform()) await SecureStorage.removeItem(REMEMBER_KEY); } catch { /* fail closed */ }
     return false;
   }
-  authenticated = true;
+
+  // A Lock action revokes the active session marker but deliberately keeps
+  // this separately stored credential record for the next login panel.
   if (Capacitor.isNativePlatform()) {
-    if (rememberMe) await SecureStorage.setItem(REMEMBER_KEY, "authorized");
-    else await SecureStorage.removeItem(REMEMBER_KEY);
+    try {
+      if (rememberMe) {
+        await SecureStorage.setItem(CREDENTIALS_KEY, JSON.stringify({
+          version: 1,
+          identifier: cleanIdentifier,
+          password
+        }));
+        await SecureStorage.setItem(REMEMBER_KEY, "authorized");
+      } else {
+        await SecureStorage.removeItem(CREDENTIALS_KEY);
+        await SecureStorage.removeItem(REMEMBER_KEY);
+      }
+    } catch (error) {
+      authenticated = false;
+      try { await SecureStorage.removeItem(REMEMBER_KEY); } catch { /* remain locked */ }
+      throw new Error("Could not save the Remember Me credential securely on this device.");
+    }
   }
+  authenticated = true;
   return true;
 }
 
+/** Lock the current Developer session without deleting an explicitly remembered credential. */
 export async function signOutDeveloper(): Promise<void> {
   authenticated = false;
   try {
