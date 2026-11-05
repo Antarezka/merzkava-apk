@@ -5,7 +5,7 @@ import { animateExpeditionPanel } from "./expedition-animations";
 import { getEternalSave, getExpeditionAtmosphere } from "./expedition-game";
 import {
   createIsoMapEditorData, DEFAULT_ISOMETRIC_GRID, DEFAULT_ISO_CANVAS_EXPANSION, normalizeIsoCanvasExpansion, isoCellAtPoint, isoCellCenter, isoCellHasLayer,
-  isoCellKey, isoMapStorageKey, isoPointerGesture, isoQuadrantAtPoint, isoQuadrantHasLayer, mergeIsoWalkableCells, normalizeIsoMapEditorData, removeIsoWalkableCell, toggleIsoQuadrantLayer, unmergeIsoWalkableCell,
+  isoCellKey, isoClientToImagePoint, isoMapStorageKey, isoPointerGesture, isoQuadrantAtPoint, isoQuadrantHasLayer, mergeIsoWalkableCells, normalizeIsoMapEditorData, removeIsoWalkableCell, toggleIsoQuadrantLayer, unmergeIsoWalkableCell,
   type IsoMapEditorData, type IsoMapGridConfig, type IsoMapPoint, type IsoQuadrant, type IsoQuadrantLayer,
 } from "./isometric-map-editor";
 import { renderIsometricSvgSceneMarkup, refreshIsometricSvgScene, type IsometricSvgTheme } from "./isometric-svg-board";
@@ -1354,23 +1354,23 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     persist();
     setStatus(data.walkableAreaEnabled?"Movement is limited to blue walkable cells. Characters outside the area were placed on their nearest selected cells.":"Movement limit disabled; all non-X cells may be used.");
   });
-  const point=(e:PointerEvent)=>{const r=svg.getBoundingClientRect(),box=svg.viewBox.baseVal;return{x:(e.clientX-r.left)*box.width/Math.max(1,r.width),y:(e.clientY-r.top)*box.height/Math.max(1,r.height)};};
+  const point=(e:PointerEvent)=>{
+    const image=board.querySelector<HTMLImageElement>("[data-wmh-map-art]");
+    if(board.dataset.academyArtworkBoard==="true"&&image){
+      const rect=image.getBoundingClientRect();
+      return isoClientToImagePoint(e.clientX,e.clientY,{left:rect.left,top:rect.top,width:rect.width,height:rect.height,naturalWidth:image.naturalWidth,naturalHeight:image.naturalHeight});
+    }
+    const r=svg.getBoundingClientRect(),box=svg.viewBox.baseVal;
+    return {x:(e.clientX-r.left)*box.width/Math.max(1,r.width),y:(e.clientY-r.top)*box.height/Math.max(1,r.height)};
+  };
   const isCellInsideMapArtwork=(x:number,y:number,tapPoint:IsoMapPoint):boolean=>{
     const image=board.querySelector<HTMLImageElement>("[data-wmh-map-art]");
-    const svgRect=svg.getBoundingClientRect(),view=svg.viewBox.baseVal;
-    const imageRect=image?.getBoundingClientRect();
-    const scaleX=view.width/Math.max(1,svgRect.width),scaleY=view.height/Math.max(1,svgRect.height);
-    const left=imageRect?(imageRect.left-svgRect.left)*scaleX:0;
-    const top=imageRect?(imageRect.top-svgRect.top)*scaleY:0;
-    const right=imageRect?left+imageRect.width*scaleX:view.width;
-    const bottom=imageRect?top+imageRect.height*scaleY:view.height;
-    // The tap itself must land on the artwork, not an expanded canvas margin.
-    if(tapPoint.x<left||tapPoint.y<top||tapPoint.x>right||tapPoint.y>bottom)return false;
-    // Allow diamonds whose edges extend past the outer image edge. Requiring
-    // the full axis-aligned diamond bounds to fit rejected legitimate gate
-    // cells near the front/outer border of the artwork.
+    const width=image?.naturalWidth||2816,height=image?.naturalHeight||1536;
+    // point() is already expressed in original image pixels. This keeps the
+    // hit test stable at every camera zoom and excludes expanded canvas gaps.
+    if(tapPoint.x<0||tapPoint.y<0||tapPoint.x>width||tapPoint.y>height)return false;
     const center=isoCellCenter(x,y,grid);
-    return center.x>=left&&center.y>=top&&center.x<=right&&center.y<=bottom;
+    return center.x>=0&&center.y>=0&&center.x<=width&&center.y<=height;
   };
   if(board.dataset.academyArtworkBoard==="true"&&board.dataset.imageTapBound!=="true"){
     board.dataset.imageTapBound="true";
