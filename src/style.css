@@ -56,7 +56,8 @@ button{font:inherit;color:inherit;cursor:pointer} button:focus-visible{outline:2
 .splash-content h1{margin:0;color:#f1e5d5;font:400 clamp(43px,12vw,62px)/1.05 Georgia,serif;letter-spacing:.015em}
 .splash-rule{width:52px;height:1px;margin:23px 0 15px;background:linear-gradient(90deg,transparent,#b77b45,transparent)}
 .splash-tagline{color:#88796b;font-size:8px;letter-spacing:.3em}
-.splash-spark{position:absolute;z-index:0;left:var(--spark-x);top:var(--spark-y);width:3px;height:3px;border-radius:50%;background:#e8bd83;box-shadow:0 0 10px 2px #d79a5a66;opacity:0;pointer-events:none;will-change:transform,opacity}\n
+.splash-spark{position:absolute;z-index:0;left:var(--spark-x);top:var(--spark-y);width:3px;height:3px;border-radius:50%;background:#e8bd83;box-shadow:0 0 10px 2px #d79a5a66;opacity:0;pointer-events:none;will-change:transform,opacity}
+
 
 /* Canon source panel */
 .canon-panel{margin-top:24px}
@@ -114,7 +115,7 @@ button {color:inherit;} button:focus-visible {outline-color:#a68d5e;}
 /* Main-menu noticeboard modal */
 body:has(.noticeboard-backdrop){overflow:hidden;overscroll-behavior:none;}
 .noticeboard-backdrop{position:fixed;inset:68px 0 0;z-index:30;display:grid;grid-template-rows:minmax(0,1fr);align-items:start;justify-items:center;box-sizing:border-box;padding:12px 13px 14px;background:#17221dd9;backdrop-filter:blur(7px);overscroll-behavior:none;touch-action:none;animation:noticeboard-fade .28s ease-out}
-.noticeboard-panel{position:relative;display:flex;flex-direction:column;width:min(100%,460px);height:min(82dvh,680px);max-height:calc(100dvh - 94px);min-height:0;overflow:hidden;padding:18px 20px 14px;border:1px solid #9f895e;background:radial-gradient(ellipse at 50% 0%,#fff9e9,#eee4cf 56%,#e4d8bf);color:#2b342d;box-shadow:0 24px 75px #080e0bbd,inset 0 0 0 5px #a68d5e17;touch-action:pan-y}
+.noticeboard-panel{position:relative;display:flex;flex-direction:column;width:min(100%,460px);height:min(82svh,680px);max-height:calc(100svh - 94px);min-height:0;overflow:hidden;padding:18px 20px 14px;border:1px solid #9f895e;background:radial-gradient(ellipse at 50% 0%,#fff9e9,#eee4cf 56%,#e4d8bf);color:#2b342d;box-shadow:0 24px 75px #080e0bbd,inset 0 0 0 5px #a68d5e17;touch-action:pan-y}
 .noticeboard-panel:before{content:'';position:absolute;inset:8px;border:1px solid #a58d6266;pointer-events:none}
 .noticeboard-topline{display:flex;justify-content:space-between;gap:12px;padding:5px 25px 12px 0;border-bottom:1px solid #b7a781;color:#766344;font:600 8px Cinzel,serif;letter-spacing:.14em}
 .noticeboard-close{position:absolute;top:16px;right:16px;z-index:2;width:29px;height:29px;border:1px solid #aa956c;background:#f1e8d5;color:#485347;font:22px/1 'Cormorant Garamond',serif}
