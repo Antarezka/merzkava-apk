@@ -187,6 +187,10 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
   if(academyCanvas){try{academyExpansion=normalizeIsoCanvasExpansion(JSON.parse(localStorage.getItem(academyExpansionKey)||"{}"));}catch{}}
   const pointers = new Map<number, { x: number; y: number }>();
   let panStart: { x: number; y: number; scrollLeft: number; scrollTop: number } | null = null;
+  // In the grid editor, a pointerdown is only a possible tap. The camera may
+  // start panning after the same 8px threshold used by the editor's tap/drag
+  // classifier, so a normal tap never nudges the saved camera position.
+  let pendingCameraPan: { x: number; y: number; scrollLeft: number; scrollTop: number } | null = null;
   let pinchStart: { distance: number; zoom: number } | null = null;
   const distance = (a: {x:number;y:number}, b: {x:number;y:number}) => Math.hypot(a.x-b.x,a.y-b.y);
   const midpoint = (a: {x:number;y:number}, b: {x:number;y:number}) => ({x:(a.x+b.x)/2,y:(a.y+b.y)/2});
@@ -300,9 +304,13 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
     if(academyCanvas)event.preventDefault();
     pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
     if (pointers.size === 1) {
-      panStart = { x: event.clientX, y: event.clientY, scrollLeft: viewport.scrollLeft, scrollTop: viewport.scrollTop };
+      const start={x:event.clientX,y:event.clientY,scrollLeft:viewport.scrollLeft,scrollTop:viewport.scrollTop};
+      const editorTapMode=academyCanvas&&surface.classList.contains("wmh-overlay-editing");
+      panStart=editorTapMode?null:start;
+      pendingCameraPan=editorTapMode?start:null;
       try { viewport.setPointerCapture(event.pointerId); } catch { /* pointer capture may be unavailable */ }
     } else if (pointers.size === 2) {
+      pendingCameraPan=null;
       const pair = [...pointers.values()];
       pinchStart = { distance: Math.max(1, distance(pair[0], pair[1])), zoom };
       panStart = null;
@@ -315,14 +323,23 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
     if (!pointers.has(event.pointerId)) return;
     pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
     if (pointers.size >= 2 && pinchStart) {
+      pendingCameraPan=null;
       const pair = [...pointers.values()].slice(0,2);
       const center = midpoint(pair[0], pair[1]);
       applyZoom(pinchStart.zoom * distance(pair[0], pair[1]) / pinchStart.distance, center.x, center.y);
       event.preventDefault();
-    } else if (pointers.size === 1 && panStart) {
-      viewport.scrollLeft = panStart.scrollLeft - (event.clientX - panStart.x);
-      viewport.scrollTop = panStart.scrollTop - (event.clientY - panStart.y);
-      event.preventDefault();
+    } else if (pointers.size === 1) {
+      if(!panStart&&pendingCameraPan&&isoPointerGesture(
+        {x:pendingCameraPan.x,y:pendingCameraPan.y},{x:event.clientX,y:event.clientY}
+      )==="drag"){
+        panStart=pendingCameraPan;
+        pendingCameraPan=null;
+      }
+      if(panStart){
+        viewport.scrollLeft = panStart.scrollLeft - (event.clientX - panStart.x);
+        viewport.scrollTop = panStart.scrollTop - (event.clientY - panStart.y);
+        event.preventDefault();
+      }
     }
   });
   const endPointer = (event: PointerEvent) => {
@@ -330,8 +347,14 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
     if (pointers.size < 2) pinchStart = null;
     if (pointers.size === 1) {
       const remaining = [...pointers.values()][0];
-      panStart = { x: remaining.x, y: remaining.y, scrollLeft: viewport.scrollLeft, scrollTop: viewport.scrollTop };
-    } else panStart = null;
+      const editorTapMode=academyCanvas&&surface.classList.contains("wmh-overlay-editing");
+      const start={x:remaining.x,y:remaining.y,scrollLeft:viewport.scrollLeft,scrollTop:viewport.scrollTop};
+      panStart=editorTapMode?null:start;
+      pendingCameraPan=editorTapMode?start:null;
+    } else {
+      panStart = null;
+      pendingCameraPan = null;
+    }
   };
   viewport.addEventListener("pointerup", endPointer);
   viewport.addEventListener("pointercancel", endPointer);
