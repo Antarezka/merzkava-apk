@@ -1194,6 +1194,8 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     if(walkableToggle)walkableToggle.checked=data.walkableAreaEnabled;
   };
   const persist=()=>{
+    const cameraViewport=board.closest<HTMLElement>("[data-wmh-map-viewport],[data-wmh-iso-viewport]");
+    const cameraAnchor=cameraViewport?{left:cameraViewport.scrollLeft,top:cameraViewport.scrollTop}:null;
     data.grid={...grid};
     // Any subsequent edit invalidates the last explicit confirmation.
     data.confirmed=false;data.confirmedAt="";
@@ -1201,6 +1203,11 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     try{localStorage.setItem(key,JSON.stringify(data));setStatus("Draft auto-saved on this device. Confirm & Save when the image grid is final.");}
     catch{setStatus("Local storage is unavailable. Use COPY DATA FOR AI to create a portable backup.");}
     redraw();drawIsometricForeground(board,data);syncIsoDepthAndOcclusion(board);
+    // DOM/canvas redraws must not let browser scroll anchoring move the camera.
+    if(cameraViewport&&cameraAnchor)requestAnimationFrame(()=>{
+      cameraViewport.scrollLeft=cameraAnchor.left;
+      cameraViewport.scrollTop=cameraAnchor.top;
+    });
   };
   const applyGrid=()=>{
     data.grid={...grid};
@@ -1428,9 +1435,14 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
   const pointerMove=(event:PointerEvent)=>{
     if(!pendingTap||pendingTap.pointerId!==event.pointerId)return;
     if(isoPointerGesture({x:pendingTap.startX,y:pendingTap.startY},{x:event.clientX,y:event.clientY},12)==="drag"){
-      // Only classify the gesture here. The Academy camera controller handles
-      // the actual pan; never write scrollLeft/scrollTop from the editor.
       pendingTap.dragged=true;
+      // Academy uses its existing camera controller. Other isometric areas
+      // keep their editor-owned one-finger pan because their camera is separate.
+      if(!academyArtwork&&activePointers.size===1&&viewport){
+        viewport.scrollLeft=pendingTap.scrollLeft-(event.clientX-pendingTap.startX);
+        viewport.scrollTop=pendingTap.scrollTop-(event.clientY-pendingTap.startY);
+        event.preventDefault();
+      }
     }
   };
   const applyCellTap=(event:PointerEvent,transitionId:string|null)=>{
