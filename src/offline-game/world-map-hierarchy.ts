@@ -2270,11 +2270,21 @@ function animateGridMove(token:HTMLElement,update:()=>void):void {
   update();
   const board=token.closest<HTMLElement>("[data-wmh-board]");
   if(board)syncIsoDepthAndOcclusion(board);
+  const reduceMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches===true;
+  const suspendNpcIdle=!reduceMotion&&token.matches(".wmh-character-token:not(.wmh-player-token)");
+  // The CSS idle bob and this Anime.js step both use transform. Suspend the
+  // bob only for the 225ms walk so the two animation engines never fight.
+  if(suspendNpcIdle)token.classList.add("wmh-npc-moving");
   const after=token.getBoundingClientRect();
   const dx=before.left-after.left,dy=before.top-after.top;
-  const reduceMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches===true;
   if(reduceMotion)token.style.transform="";
-  else animate(token,{translateX:[dx,0],translateY:[dy,0],duration:225,ease:"outCubic"});
+  else animate(token,{
+    translateX:[dx,0],
+    translateY:[dy,0],
+    duration:225,
+    ease:"outCubic",
+    onComplete:()=>{if(suspendNpcIdle)token.classList.remove("wmh-npc-moving");}
+  });
   if(board){emitTileTrailWave(board,token);updateScannerContacts(board);}
 }
 function stopNpcWander(dialog:HTMLElement):void {
