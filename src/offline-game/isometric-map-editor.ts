@@ -190,7 +190,7 @@ export function normalizeIsoMapEditorData(
     }
     return [...result];
   };
-  const walkableCells = cleanCells(source.walkableCells, grid);
+  const baseWalkableCells = cleanCells(source.walkableCells, grid);
   const customGridCells = Array.isArray(source.customGridCells)
     ? [...new Set(source.customGridCells.flatMap(item=>{
         const match=/^(-?\d+),(-?\d+)$/.exec(String(item));if(!match)return [];
@@ -202,7 +202,7 @@ export function normalizeIsoMapEditorData(
     : [];
   const rawWalkableCells=Array.isArray(source.walkableCells)?source.walkableCells.map(String):[];
   const allowedWalkableExtras=customGridCells.filter(key=>rawWalkableCells.includes(key));
-  const walkableCells=[...new Set([...walkableCells,...allowedWalkableExtras])];
+  const walkableCells=[...new Set([...baseWalkableCells,...allowedWalkableExtras])];
   const walkableSet = new Set(walkableCells);
   const cleanGroupCells=(value:unknown)=>[...new Set([...cleanCells(value,grid),...(Array.isArray(value)?customGridCells.filter(key=>(value as unknown[]).map(String).includes(key)):[])])];
   const usedGroupCells = new Set<string>();
