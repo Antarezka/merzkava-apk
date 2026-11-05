@@ -289,10 +289,6 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
     applyZoom(action === "in" ? zoom + .25 : zoom - .25);
   }));
   viewport.addEventListener("pointerdown", event => {
-    // The active image-grid editor owns pointer gestures over its SVG. Do not
-    // register these pointers in the camera a second time.
-    if(academyCanvas&&surface.classList.contains("wmh-overlay-editing")&&
-      (event.target as Element).closest("[data-wmh-overlay-svg]"))return;
     // A marker tap is a selection, never a map-pan gesture. Do not register it
     // in the gesture tracker; otherwise a stale one-finger pan can move the map.
     if ((event.target as Element).closest(".wmh-power")) {
@@ -1397,6 +1393,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     });
   }
   const viewport=board.closest<HTMLElement>("[data-wmh-map-viewport],[data-wmh-iso-viewport]");
+  const academyArtwork=board.dataset.academyArtworkBoard==="true";
   let activePointers=new Set<number>();
   let pendingTap:{pointerId:number;startX:number;startY:number;scrollLeft:number;scrollTop:number;dragged:boolean;cancelled:boolean;transitionId:string|null}|null=null;
   const pointerMove=(event:PointerEvent)=>{
@@ -1405,9 +1402,9 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       pendingTap.dragged=true;
       // Academy's camera already pans through bindWorldMapZoom. Other map
       // viewports need this one-finger pan while the editor overlay is active.
-      if(activePointers.size===1&&viewport){
-        // Pan the existing scroll viewport only. Never create an editor-local
-        // zoom/transform; the Academy zoom controls retain their original state.
+      if(!academyArtwork&&activePointers.size===1&&viewport){
+        // Other isometric layouts use editor-owned one-finger panning. Tianhai
+        // delegates pan and pinch to its already-bound Academy camera.
         viewport.scrollLeft=pendingTap.scrollLeft-(event.clientX-pendingTap.startX);
         viewport.scrollTop=pendingTap.scrollTop-(event.clientY-pendingTap.startY);
         event.preventDefault();
@@ -1501,9 +1498,9 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
   },true);
   svg.addEventListener("pointerdown",event=>{
     if(!board.classList.contains("wmh-overlay-editing"))return;
-    // Own this gesture here. The parent camera must not process the same
-    // pointer as a second pan/pinch source.
-    event.stopPropagation();
+    // Academy keeps the existing viewport camera as the single pan/pinch
+    // owner. Other maps use editor-owned panning while this workbench is open.
+    if(!academyArtwork)event.stopPropagation();
     const target=event.target as Element;
     activePointers.add(event.pointerId);
     if(activePointers.size>1){
@@ -1517,7 +1514,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       transitionId:target.closest<SVGGElement>("[data-transition-id]")?.dataset.transitionId||null
     };
     event.preventDefault();
-    try{svg.setPointerCapture(event.pointerId);}catch{/* dialog-level pointer listeners remain the fallback */}
+    if(!academyArtwork)try{svg.setPointerCapture(event.pointerId);}catch{/* dialog-level pointer listeners remain the fallback */}
   });
   panel.querySelector<HTMLElement>("[data-wmh-merge-apply]")?.addEventListener("click",()=>{
     if(selectedMergeCells.size<2){setStatus("Select at least two adjacent blue cells first.");return;}
