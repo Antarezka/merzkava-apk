@@ -15,7 +15,7 @@ function esc(value:string):string {
 }
 export function worldAtlasLoginPanelMarkup(language:AppLanguage):string {
   const t=copy[language]||copy.en;
-  return '<div class="world-atlas-login-layer" data-world-atlas-gate hidden>'+
+  return '<div class="world-atlas-login-layer" data-world-atlas-gate hidden data-empty-label="'+esc(t.empty)+'" data-select-label="'+esc(t.player)+'" data-loading-label="'+esc(t.intro)+'" data-login-prompt="Enter the local password for this character." data-signup-prompt="This registered character has no local password yet. Create one to continue." data-success-label="Access granted.">'+
     '<section class="world-atlas-login-card" role="dialog" aria-modal="true" aria-labelledby="world-atlas-login-title">'+
     '<button type="button" class="world-atlas-login-close" data-world-atlas-gate-back aria-label="'+esc(t.back)+'">×</button>'+
     '<small class="world-atlas-login-eyebrow">'+esc(t.eyebrow)+'</small><h2 id="world-atlas-login-title">'+esc(t.title)+'</h2><p class="world-atlas-login-intro">'+esc(t.intro)+'</p>'+

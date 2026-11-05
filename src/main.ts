@@ -752,7 +752,10 @@ async function openWorldAtlasFromTv():Promise<void> {
     if(select){
       select.innerHTML='<option value="">— Select a character —</option>'+options.map(player=>'<option value="'+escapeHtml(player.name)+'">'+escapeHtml(player.name)+'</option>').join("");
       if(options.some(player=>player.name===remembered))select.value=remembered;
-      select.addEventListener("change",()=>{void refreshAtlasPasswordMode(gate);});
+      if(select.dataset.atlasLoginBound!=="true"){
+        select.dataset.atlasLoginBound="true";
+        select.addEventListener("change",()=>{void refreshAtlasPasswordMode(gate);});
+      }
     }
     if(!options.length){
       if(message)message.textContent="No eligible account found. A player must exist in the verified players.md registry and have a matching local Eternal Path save.";

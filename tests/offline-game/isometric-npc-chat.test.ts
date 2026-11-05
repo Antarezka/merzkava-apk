@@ -52,11 +52,27 @@ describe("isometric NPC conversations", () => {
     expect(worldMapSource).toContain('!occupied.has(nx+","+ny)');
   });
 
+  it("does not render editor controls when Developer Mode is disabled", () => {
+    setWorldMapDeveloperMode(false);
+    const html=renderIsometricMapTestArea();
+    expect(html).not.toContain("data-wmh-editor-dock");
+    expect(html).not.toContain("data-wmh-academy-editor");
+  });
+
   it("keeps the hidden state intact until a player taps an NPC", () => {
     const html = renderIsometricMapTestArea();
     expect(html).toContain('data-wmh-chat hidden');
     expect(chatStyles).toContain(".wmh-isometric-play-screen .wmh-chat-panel[hidden]{display:none!important}");
     expect(chatStyles).toContain(".wmh-transition-notice{align-items:center!important;justify-content:center!important;background:#030806d9!important}");
     expect(chatStyles).toContain(".wmh-isometric-play-screen .wmh-overlay-float span{writing-mode:vertical-rl");
+    expect(chatStyles).toContain(".wmh-sonar-ring{");
+    expect(chatStyles).toContain(".wmh-tile-trail-wave{");
+    expect(worldMapSource).toContain("merzkava:field-scanner-overlap");
+    expect(worldMapSource).toContain("function emitTileTrailWave");
+    expect(worldMapSource).toContain("function startActorScanners");
+    expect(worldMapSource).toContain("animate(token,{translateX:[dx,0],translateY:[dy,0]");
+    expect(worldMapSource).toContain("scanTone:\"friendly\"");
+    expect(worldMapSource).toContain("const minimizeWorkbench=()=>");
+    expect(worldMapSource).toContain("const restoreWorkbench=()=>");
   });
 });
