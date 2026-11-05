@@ -37,7 +37,7 @@ export type IsoCanvasExpansion = { top: number; bottom: number; left: number; ri
 export const DEFAULT_ISO_CANVAS_EXPANSION: IsoCanvasExpansion = { top: 0, bottom: 0, left: 800, right: 0 };
 export function normalizeIsoCanvasExpansion(value: unknown): IsoCanvasExpansion {
   const source = value && typeof value === "object" ? value as Record<string, unknown> : {};
-  const read = (side: keyof IsoCanvasExpansion) => Math.round(clamp(source[side], 0, 12000, 0));
+  const read = (side: keyof IsoCanvasExpansion) => Math.round(clamp(source[side], 0, 12000, DEFAULT_ISO_CANVAS_EXPANSION[side]));
   return { top: read("top"), bottom: read("bottom"), left: read("left"), right: read("right") };
 }
 
