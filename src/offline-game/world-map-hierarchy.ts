@@ -5,7 +5,7 @@ import { animateExpeditionPanel } from "./expedition-animations";
 import { getEternalSave, getExpeditionAtmosphere } from "./expedition-game";
 import {
   createIsoMapEditorData, DEFAULT_ISOMETRIC_GRID, DEFAULT_ISO_CANVAS_EXPANSION, normalizeIsoCanvasExpansion, isoCellAtPoint, isoCellCenter, isoCellHasLayer,
-  isoCellKey, isoMapStorageKey, isoPointerGesture, isoQuadrantAtPoint, isoQuadrantHasLayer, normalizeIsoMapEditorData, toggleIsoQuadrantLayer,
+  isoCellKey, isoMapStorageKey, isoPointerGesture, isoQuadrantAtPoint, isoQuadrantHasLayer, mergeIsoWalkableCells, normalizeIsoMapEditorData, removeIsoWalkableCell, toggleIsoQuadrantLayer, unmergeIsoWalkableCell,
   type IsoMapEditorData, type IsoMapGridConfig, type IsoQuadrant, type IsoQuadrantLayer,
 } from "./isometric-map-editor";
 import { renderIsometricSvgSceneMarkup, refreshIsometricSvgScene, type IsometricSvgTheme } from "./isometric-svg-board";
@@ -1018,11 +1018,14 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
   const cellGroup=svg.querySelector<SVGGElement>("[data-wmh-manual-marks]");
   const interactionGroup=svg.querySelector<SVGGElement>("[data-wmh-interaction-grid]");
   const transitionGroup=svg.querySelector<SVGGElement>("[data-wmh-transition-marks]");
+  const cellTools=panel.querySelector<HTMLElement>("[data-wmh-cell-tools]");
+  const selectionCount=panel.querySelector<HTMLElement>("[data-wmh-cell-selection-count]");
+  const selectedMergeCells=new Set<string>();
   const status=()=>panel.querySelector<HTMLElement>("[data-wmh-overlay-status]");
   const setStatus=(message:string)=>{const node=status();if(node)node.textContent=message;};
   const modeSelect=panel.querySelector<HTMLSelectElement>("[data-wmh-overlay-mode]");
   const walkableToggle=panel.querySelector<HTMLInputElement>("[data-wmh-walkable-enabled]");
-  const mode=()=>modeSelect?.value||"walkable";
+  const mode=()=>modeSelect?.value||"cell-add";
   const transitionTools=panel.querySelector<HTMLElement>("[data-wmh-transition-tools]");
   const transitionField=panel.querySelector<HTMLInputElement>("[data-wmh-transition-label]");
   const exportField=panel.querySelector<HTMLTextAreaElement>("[data-wmh-overlay-export]");
@@ -1592,7 +1595,7 @@ function isometricEditorMarkup(): string {
     '<div class="wmh-overlay-modal" data-wmh-overlay-tools hidden><section class="wmh-overlay-tools" role="dialog" aria-modal="false" aria-label="Isometric map editor">'+
     '<div class="wmh-overlay-resize-grip" data-wmh-panel-resize-handle role="separator" aria-orientation="diagonal" aria-label="Resize editor from its upper-left corner"><span></span></div>'+
     '<header class="wmh-overlay-modal-head" data-wmh-overlay-drag-handle><div><b>ISOMETRIC EDITOR</b><small>MAP CELL WORKBENCH</small></div><button type="button" data-wmh-overlay-close aria-label="Return to editor bubble">×</button></header>'+
-    '<label>EDITING MODE<select data-wmh-overlay-mode><option value="walkable">▧ Walkable area brush</option><option value="foreground">○ Foreground (above characters)</option><option value="blocked">X Blocked quadrants</option><option value="opacity">◌ Character opacity quadrants</option><option value="transition">Area transition markers</option></select></label><label class="wmh-walkable-switch"><input type="checkbox" data-wmh-walkable-enabled/> LIMIT MOVEMENT TO BLUE CELLS</label>'+
+    '<label>EDITING MODE<select data-wmh-overlay-mode><option value="cell-add">＋ ADD CELL</option><option value="cell-delete">－ DELETE CELL</option><option value="cell-merge">⇧ SELECT CELLS TO MERGE</option><option value="cell-unmerge">↔ UNMERGE CELL GROUP</option><option value="foreground">○ Foreground quadrants</option><option value="blocked">X Blocked quadrants</option><option value="opacity">◌ Character opacity quadrants</option><option value="transition">Area transition markers</option></select></label><div class="wmh-cell-layout-tools" data-wmh-cell-tools hidden><b>CELL LAYOUT</b><span data-wmh-cell-selection-count>0 CELLS SELECTED</span><button type="button" data-wmh-merge-apply>MERGE SELECTED CELLS</button><button type="button" data-wmh-merge-clear>CLEAR SELECTION</button><small>Tap adjacent cells to select them. Tap-drag only pans the map.</small></div><label class="wmh-walkable-switch"><input type="checkbox" data-wmh-walkable-enabled/> LIMIT MOVEMENT TO BLUE CELLS</label>'+
     '<p class="wmh-editor-mode-note">Paint only the image area that should be used. Each main diamond has 4 sectors: top-left, top-right, bottom-left and bottom-right. X blocks a sector edge, ○ redraws that image sector above characters, and ◌ makes characters translucent. The source image and canvas gaps are never resized by grid calibration.</p>'+
     '<div data-wmh-transition-tools hidden><label>DESTINATION LABEL<input type="text" maxlength="80" data-wmh-transition-label placeholder="e.g. Academy · Main Hall"/></label><button type="button" data-wmh-transition-apply>APPLY LABEL</button><button type="button" data-wmh-transition-delete>DELETE SELECTED</button><p>Red = unnamed. Blue = named. Tap a marker to select it.</p></div>'+
     '<div class="wmh-grid-calibration"><b>GRID CALIBRATION</b>'+
