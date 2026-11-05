@@ -535,6 +535,7 @@
 .wmh-manual-mark.manual-behind circle{fill:#3976b7;stroke-dasharray:2 1}
 .wmh-overlay-editor [data-wmh-overlay-mode],.wmh-overlay-editor [data-wmh-overlay-category],.wmh-overlay-editor [data-wmh-overlay-manual]{min-height:34px}
 .wmh-overlay-editor input[type=range]{width:100%;accent-color:#d6b578}
+.wmh-overlay-tools .wmh-walkable-switch{display:flex;flex-direction:row;align-items:center;gap:8px;margin:8px 0;padding:8px;border:1px solid #4f789c;background:#142536;color:#c8e6ff}.wmh-overlay-tools .wmh-walkable-switch input{width:16px;height:16px;accent-color:#3e9ee5}
 
 /* Compact floating map-tool launcher and centered workbench modal. */
 .wmh-overlay-editor{position:static;margin:0}
@@ -1202,7 +1203,7 @@
 .wmh-minimap-cell{fill:none;stroke:#f6e9be;stroke-width:12;opacity:.34}
 .wmh-minimap-cell.is-foreground{fill:#367ec455;stroke:#9bd3ff;opacity:.82}
 .wmh-minimap-cell.is-blocked{fill:#c63d4355;stroke:#ffaaa8;opacity:.9}
-.wmh-minimap-cell.is-opacity{fill:#9467c655;stroke:#d8b8ff;opacity:.85}
+.wmh-minimap-cell.is-opacity{fill:#9467c655;stroke:#d8b8ff;opacity:.85}.wmh-minimap-cell.is-walkable{fill:#287acb55;stroke:#8bc8ff;opacity:.9}.wmh-minimap-cell.is-quadrant{stroke-width:8}
 .wmh-minimap-transition{fill:#bd3939;stroke:#ffd0c8;stroke-width:12}
 .wmh-minimap-transition.is-named{fill:#287acb;stroke:#c5e4ff}
 .wmh-minimap-actors{position:absolute;inset:0;z-index:3;pointer-events:none}
@@ -1653,6 +1654,7 @@
 .wmh-academy-map-surface.wmh-overlay-editing .wmh-academy-grid-overlay .wmh-academy-hit-cell{pointer-events:all;stroke:rgba(235,238,226,.54);stroke-width:1.1}
 .wmh-academy-map-surface .wmh-academy-grid-overlay [data-wmh-transition-marks]{pointer-events:none;visibility:visible!important}
 .wmh-academy-map-surface.wmh-overlay-editing .wmh-character-token{pointer-events:none!important}
+.wmh-academy-map-surface:not(.wmh-overlay-editing) [data-wmh-manual-marks]{visibility:hidden!important}
 .wmh-academy-actor-layer{position:absolute;z-index:350;pointer-events:none;overflow:visible}.wmh-academy-map-surface>.wmh-isometric-foreground{z-index:400!important;pointer-events:none!important}
 .wmh-academy-actor-layer .wmh-character-token{position:absolute!important;left:0;top:0;right:auto;bottom:auto;display:block!important;justify-self:auto;align-self:auto;transform:translate(-50%,-100%) translateY(-7px)!important;pointer-events:auto}
 .wmh-academy-actor-layer .wmh-npc-token{z-index:2}
