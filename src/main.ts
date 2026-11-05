@@ -519,7 +519,7 @@ function bugPanelMarkup(): string {
 }
 function render(): void {
   if(!hasAppAccess()&&activeScreen!=="control")activeScreen="control";
-  if(!hasAppAccess()&&activeScreen==="gameplay")activeScreen="control";
+  if(!developerAuthenticated&&activeScreen==="gameplay")activeScreen="home";
   const visibleNavigation=developerAuthenticated?navigation:navigation.filter(item=>item.id!=="gameplay");
   // Each render replaces the screen DOM. Stop all Anime.js loops/listeners
   // attached to the previous Eternal Path tree before those nodes are detached.
@@ -1749,7 +1749,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       loadCharacterWorldTime(selected.id);
       loadCharacterChat(selected.id);
       playerLoginBusy=false;playerLoginMessage="";playerLoginName="";
-      accessLoginMode="player";activeScreen="control";notice="";
+      accessLoginMode="player";activeScreen="home";notice="";
       render();
     }catch(error){
       playerLoginBusy=false;
