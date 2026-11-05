@@ -2853,11 +2853,35 @@ html.soft-keyboard-open .world-time-main { padding:7px 0 5px !important; }
 html.soft-keyboard-open .conversation-composer { padding-top:10px !important; }
 
 
-/* Developer-only World Atlas recovery controls; authorization is checked independently by the gateway. */
-.developer-atlas-reset{display:grid;gap:10px;margin-top:18px;padding:15px;border:1px solid var(--line);border-radius:12px;background:rgba(24,21,18,.72)}
-.developer-atlas-reset label{display:block;color:var(--muted);font-size:12px}
-.developer-atlas-reset input{width:100%;min-height:42px;margin-top:6px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:#171513;color:#f3eee5}
+/* Developer recovery tool — parchment/brass in Light, verdigris/enamel in Dark. */
+.developer-atlas-reset{
+  display:grid;gap:10px;margin-top:18px;padding:15px;
+  border:1px solid var(--ui-rule);border-radius:6px;
+  background:linear-gradient(145deg,#f4eddd,#e7ddc8);
+  box-shadow:inset 0 1px #fff8,0 5px 16px #4a412b0d;
+}
+.developer-atlas-reset label{display:block;color:var(--ui-ink-soft);font-size:11px;line-height:1.4}
+.developer-atlas-reset input:not([type=checkbox]){
+  box-sizing:border-box;width:100%;min-height:42px;margin-top:6px;padding:10px 12px;
+  border:1px solid var(--ui-rule);border-radius:4px;background:var(--ui-paper);color:var(--ui-ink);
+}
 .developer-atlas-reset-proof{font-size:11px;line-height:1.55}
+.developer-atlas-reset-confirm{display:flex!important;align-items:flex-start;gap:9px;padding:9px 10px;border:1px solid var(--ui-rule);background:#fff9eb80}
+.developer-atlas-reset-confirm input[type=checkbox]{flex:0 0 17px;width:17px;height:17px;min-height:17px;margin:1px 0 0;accent-color:var(--ui-brass)}
+.developer-atlas-reset-confirm span{font-size:10px;line-height:1.5}
 .developer-atlas-reset [data-developer-atlas-reset-message]{min-height:18px;margin:0}
+.developer-atlas-reset .action-button{min-height:42px;border-radius:4px;font:700 9px/1.2 Cinzel,Georgia,serif;letter-spacing:.08em}
 .world-atlas-password-recovery{display:block;margin:10px 0 14px;color:var(--muted);font-size:11px;line-height:1.55}
 .world-atlas-password-safety{display:block;line-height:1.5}
+:root[data-theme="dark"] .developer-atlas-reset{
+  border-color:#766d50;background:linear-gradient(145deg,#2c4034,#1b2b22);
+  box-shadow:inset 0 1px #fff1,0 7px 18px #0003;color:#ece2c7;
+}
+:root[data-theme="dark"] .developer-atlas-reset label{color:#d2c69f}
+:root[data-theme="dark"] .developer-atlas-reset input:not([type=checkbox]){
+  border-color:#7b7254;background:#111d16;color:#f1e6c9;
+}
+:root[data-theme="dark"] .developer-atlas-reset-confirm{border-color:#796e4d;background:#16261d;color:#ded3b7}
+:root[data-theme="dark"] .developer-atlas-reset-confirm input[type=checkbox]{accent-color:#c4a56a}
+:root[data-theme="dark"] .developer-atlas-reset-proof,
+:root[data-theme="dark"] .developer-atlas-reset [data-developer-atlas-reset-message]{color:#c6c1a8}

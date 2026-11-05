@@ -12,6 +12,8 @@ describe("Account controls in Settings",()=>{
       expect(html).toContain("account-access-icon icon-lock");
       expect(html).toContain("data-atlas-developer-reset-submit");
       expect(html).toContain("developer-atlas-reset-player");
+      expect(html).toContain("data-atlas-developer-reset-proof");
+      expect(html).toContain("developer-atlas-reset-confirm");
     }
   });
 

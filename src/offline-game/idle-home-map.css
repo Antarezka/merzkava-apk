@@ -575,3 +575,119 @@ html.soft-keyboard-open .idle-destination-option { min-height:29px !important; p
 html.soft-keyboard-open .idle-global-menu > .idle-destination-option { min-height:25px !important; }
 html.soft-keyboard-open .idle-coming-panel { padding:7px 9px !important; margin-top:6px !important; }
 html.soft-keyboard-open .idle-home-footer { padding-top:6px !important; }
+
+
+/* World Atlas account controls — Light theme, parchment / sage / aged brass. */
+:root[data-theme="light"] .world-atlas-login-layer {
+  background:rgba(31,43,36,.55)!important;
+  backdrop-filter:blur(9px) saturate(.86)!important;
+  -webkit-backdrop-filter:blur(9px) saturate(.86)!important;
+}
+:root[data-theme="light"] .world-atlas-login-card {
+  border-color:#a88d5d!important;
+  background:linear-gradient(145deg,#f6efdf 0%,#eee4d1 60%,#e4d8c1 100%)!important;
+  color:#34483d!important;
+  box-shadow:0 20px 54px #101a1244,inset 0 1px #fff9,0 0 0 4px #b99b6020!important;
+}
+:root[data-theme="light"] .world-atlas-login-close {
+  border-color:#aa9366!important;background:#e9dfcc!important;color:#415448!important;
+}
+:root[data-theme="light"] .world-atlas-login-eyebrow {color:#92784c!important}
+:root[data-theme="light"] .world-atlas-login-card h2 {color:#2c4339!important}
+:root[data-theme="light"] .world-atlas-login-intro {color:#687465!important}
+:root[data-theme="light"] .world-atlas-login-card form>label:not(.world-atlas-remember) {color:#786543!important}
+:root[data-theme="light"] .world-atlas-login-card select,
+:root[data-theme="light"] .world-atlas-login-card input:not([type=checkbox]) {
+  border-color:#c0b18d!important;background:#faf6eb!important;color:#35483d!important;
+  box-shadow:inset 0 1px 2px #6855370a!important;
+}
+:root[data-theme="light"] .world-atlas-remember {color:#59675a!important}
+:root[data-theme="light"] .world-atlas-login-message {color:#806a43!important}
+:root[data-theme="light"] .world-atlas-login-submit {
+  border-color:#9b8356!important;background:linear-gradient(145deg,#536b58,#344c40)!important;color:#fff5dc!important;
+}
+:root[data-theme="light"] .world-atlas-login-foot {color:#87795e!important}
+:root[data-theme="light"] .world-atlas-password-recovery {color:#6e7568!important}
+:root[data-theme="light"] .atlas-password-actions button {
+  border:1px solid #b5a27a;background:#e9dfca;color:#4a5c4e;
+}
+:root[data-theme="light"] .atlas-password-reset-panel {
+  border:1px solid #b6a176;border-radius:8px;background:linear-gradient(145deg,#f2ead9,#e6dcc7);
+  box-shadow:inset 0 1px #fff8,0 5px 16px #4a412b12;color:#394c40;
+}
+:root[data-theme="light"] .atlas-password-reset-panel label {color:#746343}
+:root[data-theme="light"] .atlas-password-reset-panel input {
+  border:1px solid #c0b28f;background:#faf6eb;color:#34483d;
+}
+:root[data-theme="light"] .atlas-password-policy {color:#81704f}
+:root[data-theme="light"] [data-atlas-reset-message] {color:#6e684f}
+:root[data-theme="light"] .atlas-password-reset-actions [data-atlas-reset-cancel] {
+  border:1px solid #c0b28f;background:#eee5d3;color:#596456;
+}
+:root[data-theme="light"] .atlas-password-reset-actions [data-atlas-reset-apply] {
+  border:1px solid #927a4e;background:linear-gradient(145deg,#4e6753,#344b40);color:#fff3d5;
+}
+
+/* World Atlas account controls — Dark theme, verdigris enamel / parchment / gold. */
+:root[data-theme="dark"] .world-atlas-login-layer {
+  background:rgba(3,8,6,.82)!important;
+  backdrop-filter:blur(11px) saturate(.72)!important;
+  -webkit-backdrop-filter:blur(11px) saturate(.72)!important;
+}
+:root[data-theme="dark"] .world-atlas-login-card {
+  border-color:#d0b477!important;
+  background:linear-gradient(145deg,#293f34f8 0%,#18281f 58%,#101b15 100%)!important;
+  color:#eee4cb!important;
+  box-shadow:0 22px 58px #000e,inset 0 1px #fff2,0 0 0 4px #c8a7651b!important;
+}
+:root[data-theme="dark"] .world-atlas-login-close {
+  border-color:#b99c69!important;background:#17291f!important;color:#f2e4c4!important;
+}
+:root[data-theme="dark"] .world-atlas-login-eyebrow {color:#cfb77f!important}
+:root[data-theme="dark"] .world-atlas-login-card h2 {color:#f1e7cd!important}
+:root[data-theme="dark"] .world-atlas-login-intro {color:#c7c6ad!important}
+:root[data-theme="dark"] .world-atlas-login-card form>label:not(.world-atlas-remember) {color:#d8c28e!important}
+:root[data-theme="dark"] .world-atlas-login-card select,
+:root[data-theme="dark"] .world-atlas-login-card input:not([type=checkbox]) {
+  border-color:#8b815f!important;background:#111c16!important;color:#f2e7cc!important;
+  box-shadow:inset 0 1px 3px #0005!important;
+}
+:root[data-theme="dark"] .world-atlas-remember {color:#d6d0b7!important}
+:root[data-theme="dark"] .world-atlas-login-message {color:#ddc790!important}
+:root[data-theme="dark"] .world-atlas-login-submit {
+  border-color:#d3b777!important;background:linear-gradient(145deg,#526d55,#243b2c)!important;color:#fff0cd!important;
+}
+:root[data-theme="dark"] .world-atlas-login-foot {color:#a99b78!important}
+:root[data-theme="dark"] .world-atlas-password-recovery {color:#b8b39a!important}
+:root[data-theme="dark"] .atlas-password-actions button {
+  border:1px solid #806f4a;background:#293b30;color:#e9dfc4;
+}
+:root[data-theme="dark"] .atlas-password-reset-panel {
+  border:1px solid #8c7950;border-radius:8px;background:linear-gradient(145deg,#283b30,#17251d);
+  box-shadow:inset 0 1px #fff1,0 8px 18px #0003;color:#eadfc2;
+}
+:root[data-theme="dark"] .atlas-password-reset-panel label {color:#d8c18d}
+:root[data-theme="dark"] .atlas-password-reset-panel input {
+  border:1px solid #827654;background:#101b15;color:#f2e7cc;
+}
+:root[data-theme="dark"] .atlas-password-policy {color:#c1b38e}
+:root[data-theme="dark"] [data-atlas-reset-message] {color:#d7c797}
+:root[data-theme="dark"] .atlas-password-reset-actions [data-atlas-reset-cancel] {
+  border:1px solid #736a52;background:#26362c;color:#dcd1b7;
+}
+:root[data-theme="dark"] .atlas-password-reset-actions [data-atlas-reset-apply] {
+  border:1px solid #c2a566;background:linear-gradient(145deg,#536b4d,#293e2e);color:#fff1cc;
+}
+
+.atlas-password-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:5px}
+.atlas-password-actions button{flex:1;min-width:130px;min-height:38px;padding:8px 11px;border-radius:5px;font:700 9px/1.2 Cinzel,Georgia,serif;letter-spacing:.08em}
+.atlas-password-reset-panel{display:grid;gap:10px;margin-top:8px;padding:13px;overflow:hidden}
+.atlas-password-reset-panel[hidden],[data-atlas-reset-new-row][hidden],[data-atlas-reset-policy][hidden],[data-atlas-reset-confirm-row][hidden]{display:none!important}
+.atlas-password-reset-panel label{display:grid;gap:6px;font:700 9px/1.3 Cinzel,Georgia,serif;letter-spacing:.08em;text-transform:uppercase}
+.atlas-password-reset-panel input{box-sizing:border-box;width:100%;min-height:42px;padding:9px 11px;border-radius:5px;font:14px/1.3 system-ui,sans-serif;letter-spacing:normal;text-transform:none}
+.atlas-password-policy{display:block;font:10px/1.5 system-ui,sans-serif}
+.atlas-password-reset-panel [data-atlas-reset-message]{min-height:18px;margin:0;font:11px/1.45 system-ui,sans-serif}
+.atlas-password-reset-actions{display:flex;gap:8px;margin-top:2px}
+.atlas-password-reset-actions button{flex:1;min-height:40px;padding:9px 12px;border-radius:5px;font:700 9px/1.15 Cinzel,Georgia,serif;letter-spacing:.06em}
+@media(max-width:390px){.atlas-password-reset-panel{padding:11px}.atlas-password-reset-actions button{font-size:8px}}
+@media(prefers-reduced-motion:reduce){.atlas-password-actions button,.atlas-password-reset-actions button{transition:none!important}}
