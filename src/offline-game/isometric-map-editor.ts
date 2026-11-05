@@ -268,11 +268,24 @@ export function mergeIsoWalkableCells(
   selectedCells: string[],
   id = "merged-cell",
 ): IsoWalkableCellGroup | null {
-  const cells=[...new Set(selectedCells)].filter(key=>data.walkableCells.includes(key));
+  const selected=new Set([...new Set(selectedCells)].filter(key=>data.walkableCells.includes(key)));
+  if(selected.size<2)return null;
+  // Selecting any member of an existing group absorbs that whole group, so
+  // existing merged zones can be joined without rigid unmerge/rebuild steps.
+  let expanded=true;
+  while(expanded){
+    expanded=false;
+    for(const group of data.walkableCellGroups){
+      if(group.cells.some(key=>selected.has(key))){
+        for(const key of group.cells)if(!selected.has(key)){selected.add(key);expanded=true;}
+      }
+    }
+  }
+  const cells=[...selected];
   if(cells.length<2||!isoWalkableCellsConnected(cells))return null;
-  if(data.walkableCellGroups.some(group=>group.cells.some(key=>cells.includes(key))))return null;
+  const absorbed=new Set(cells);
   const group={id:id.replace(/[^a-zA-Z0-9_-]/g,"").slice(0,64)||"merged-cell",cells};
-  data.walkableCellGroups=[...data.walkableCellGroups,group];
+  data.walkableCellGroups=[...data.walkableCellGroups.filter(item=>!item.cells.some(key=>absorbed.has(key))),group];
   return group;
 }
 
