@@ -20,6 +20,15 @@ describe("World Atlas player login gate",()=>{
       expect(html).toContain('data-atlas-buffer-status');
       expect(html).toContain('data-atlas-buffer-log');
       expect(html).toContain('data-atlas-buffer-progress');
+      expect(html).toContain('data-password-safety-note');
+      const warningMatch=html.match(/<small class="world-atlas-password-safety" data-password-safety-note>(.*?)<\\/small>/);
+      expect(warningMatch?.[1]).toBeTruthy();
+      const expectedWarning:Record<string,string>={
+        id:"Gunakan kata sandi khusus",en:"Use a password made specifically",pt:"Use uma senha exclusiva",
+        fr:"Utilisez un mot de passe réservé",ru:"Используйте отдельный пароль",ja:"World Atlas専用",
+        "zh-CN":"请为 World Atlas 单独设置密码",ko:"World Atlas 전용 비밀번호"
+      };
+      expect(warningMatch?.[1]).toContain(expectedWarning[language.code]);
     }
   });
 });
