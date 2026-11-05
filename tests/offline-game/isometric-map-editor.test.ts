@@ -80,10 +80,12 @@ describe("shared isometric map editor data", () => {
     expect(group).toEqual({ id: "pathway-west", cells: ["2,2", "3,2", "3,3"] });
     expect(data.walkableCellGroups).toHaveLength(1);
     expect(mergeIsoWalkableCells(data, ["2,2", "4,3"], "separate")).toBeNull();
-    expect(mergeIsoWalkableCells(data, ["3,2", "3,3"], "overlap")).toBeNull();
+    const expanded = mergeIsoWalkableCells(data, ["3,2", "3,3", "4,3"], "pathway-expanded");
+    expect(expanded).toEqual({ id: "pathway-expanded", cells: ["3,2", "3,3", "4,3", "2,2"] });
+    expect(data.walkableCellGroups).toHaveLength(1);
 
     const split = unmergeIsoWalkableCell(data, 3, 2);
-    expect(split).toEqual(group);
+    expect(split).toEqual(expanded);
     expect(data.walkableCellGroups).toEqual([]);
     expect(data.walkableCells).toEqual(["2,2", "3,2", "3,3", "4,3"]);
   });
