@@ -200,13 +200,17 @@ export function normalizeIsoMapEditorData(
         return [isoCellKey(x,y)];
       }))]
     : [];
+  const rawWalkableCells=Array.isArray(source.walkableCells)?source.walkableCells.map(String):[];
+  const allowedWalkableExtras=customGridCells.filter(key=>rawWalkableCells.includes(key));
+  const walkableCells=[...new Set([...walkableCells,...allowedWalkableExtras])];
   const walkableSet = new Set(walkableCells);
+  const cleanGroupCells=(value:unknown)=>[...new Set([...cleanCells(value,grid),...(Array.isArray(value)?customGridCells.filter(key=>(value as unknown[]).map(String).includes(key)):[])])];
   const usedGroupCells = new Set<string>();
   const walkableCellGroups: IsoWalkableCellGroup[] = Array.isArray(source.walkableCellGroups)
     ? source.walkableCellGroups.flatMap((item,index)=>{
       if(!item||typeof item!=="object")return [];
       const group=item as Record<string,unknown>;
-      const cells=cleanCells(group.cells,grid).filter(cell=>walkableSet.has(cell)&&!usedGroupCells.has(cell));
+      const cells=cleanGroupCells(group.cells).filter(cell=>walkableSet.has(cell)&&!usedGroupCells.has(cell));
       if(cells.length<2||!isoWalkableCellsConnected(cells))return [];
       cells.forEach(cell=>usedGroupCells.add(cell));
       return [{id:String(group.id||"merged-cell-"+index).replace(/[^a-zA-Z0-9_-]/g,"").slice(0,64)||"merged-cell-"+index,cells}];
