@@ -7,6 +7,7 @@ const labels:Record<AppLanguage,{
   open:string;title:string;id:string;password:string;remember:string;submit:string;close:string;control:string;lock:string;
   playerMode:string;developerMode:string;playerName:string;playerContinue:string;playerHint:string;playerLogout:string;
   showPassword:string;hidePassword:string;accountHeading:string;developerSession:string;playerSession:string;accountDescription:string;
+  resetPlayer:string;resetPlayerHint:string;resetPlayerPlaceholder:string;resetPlayerAction:string;resetPlayerProof:string;
 }> = {
   id:{
     open:"Akses pengembang",title:"Akses Akun",id:"ID pengembang",password:"Kata sandi",remember:"Ingat akun dan kata sandi di perangkat ini",submit:"Masuk",close:"Tutup",control:"Floating Control",lock:"Kunci",playerMode:"Pemain",developerMode:"Developer",playerName:"Nama karakter",playerContinue:"Lanjutkan",playerHint:"Gunakan nama yang sama persis seperti di registry resmi players.md.",playerLogout:"Keluar",

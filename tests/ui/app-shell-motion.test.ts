@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
 }));
 vi.mock("animejs",()=>({animate:mocks.animate,stagger:mocks.stagger}));
 
+let animateAppScreen: typeof import("../../src/ui/app-shell-motion")["animateAppScreen"];
 let animateAppScreenExit: typeof import("../../src/ui/app-shell-motion")["animateAppScreenExit"];
 let animateNoticeboardExit: typeof import("../../src/ui/app-shell-motion")["animateNoticeboardExit"];
 
@@ -13,11 +14,20 @@ describe("screen and noticeboard transitions",()=>{
   beforeEach(async()=>{
     vi.resetModules();
     const motion=await import("../../src/ui/app-shell-motion");
+    animateAppScreen=motion.animateAppScreen;
     animateAppScreenExit=motion.animateAppScreenExit;
     animateNoticeboardExit=motion.animateNoticeboardExit;
     vi.clearAllMocks();
     Object.defineProperty(globalThis,"window",{configurable:true,value:{matchMedia:vi.fn(()=>({matches:false}))}});
     mocks.animate.mockReturnValue({pause:vi.fn()});
+  });
+
+  it("fades the incoming shell in while preserving the child panel entrances",()=>{
+    const shell:any={querySelector:vi.fn(()=>null)};
+    animateAppScreen(shell);
+    expect(mocks.animate).toHaveBeenCalledWith(shell,expect.objectContaining({
+      opacity:[0,1],translateY:[7,0],scale:[0.996,1],duration:360
+    }));
   });
 
   it("fades the outgoing screen and disables input until completion",()=>{
