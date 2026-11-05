@@ -12,7 +12,7 @@ The isometric map editor is a reusable editor/runtime contract. It is not Academ
 
 ## Independent cell metadata
 
-Each cell may independently carry any combination of these flags. The editor can add and delete walkable cells one tap at a time. Several adjacent cells may be selected and merged into one flexible logical cell group, including bent or uneven shapes; existing groups can be extended by merging again or split with UNMERGE. A drag pans the map and is never treated as a tap. When walkableAreaEnabled is turned on, Player and NPC movement is restricted to the selected blue base cells. Keep the limit off while painting, then enable it after the route is complete.
+Each cell may independently carry any combination of these flags. The editor can add and delete walkable cells one tap at a time. ADD CELL is not limited to the original cols×rows rectangle: tap an ungridded point on the Map Base artwork to place one additional diamond at the nearest isometric coordinate. The full diamond must fit within the image bounds; canvas expansion margins and blank canvas are never eligible. These sparse extra coordinates are stored in customGridCells and do not resize the image or canvas. Several adjacent cells may be selected and merged into one flexible logical cell group, including bent or uneven shapes; existing groups can be extended by merging again or split with UNMERGE. A drag pans the map and is never treated as a tap. When walkableAreaEnabled is turned on, Player and NPC movement is restricted to the selected blue base cells. Keep the limit off while painting, then enable it after the route is complete.
 
 | Flag | Editor mode | Runtime behavior |
 |---|---|---|
@@ -33,7 +33,7 @@ Each map stores transition markers independently. An unnamed marker is red; afte
 
 ## Persistence and reuse
 
-Editor data is saved in local storage under `merzkava.isometric-map-editor.v2:<encoded map ID>`. Exported JSON uses format `merzkava-isometric-map-editor`, version 1, and contains the map ID, grid, walkable cells and activation flag, merged walkable cell groups (each with its own ID and component coordinates), three whole-cell arrays, three quadrant arrays, and transitions. An AI can preserve or extend a merged group by using its group ID and component cell coordinates. Grid calibration affects only the transparent image overlay; it does not resize the source artwork or the separately configured canvas expansion margins.
+Editor data is saved in local storage under `merzkava.isometric-map-editor.v2:<encoded map ID>`. Exported JSON uses format `merzkava-isometric-map-editor`, version 1, and contains the map ID, grid, walkable cells and activation flag, merged walkable cell groups (each with its own ID and component coordinates), customGridCells for individually placed diamonds outside the original grid rectangle, three whole-cell arrays, three quadrant arrays, and transitions. Custom cells remain valid movement nodes and can also carry quadrant flags and transition markers. An AI can preserve or extend a merged group by using its group ID and component cell coordinates. Grid calibration affects only the transparent image overlay; it does not resize the source artwork or the separately configured canvas expansion margins.
 
 Use unique stable map IDs for each exterior, interior, or other isometric scene. Do not reuse one ID for different map artwork. A map board that has no base image can still use grid, collision, opacity, and transition data; foreground rendering becomes active when a base image is supplied.
 
