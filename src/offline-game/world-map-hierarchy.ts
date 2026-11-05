@@ -591,7 +591,7 @@ function bindIsometricMapArt(dialog: HTMLElement): void {
 }
 
 function isometricNpcTokensMarkup(mapId:string,interior:boolean):string {
-  const maps:Record<string,Array<{id:string;x:number;y:number;gender:"male"|"female"}>>={
+  const maps:Record<string,Array<{id:string;x:number;y:number;gender:"male"|"female";scanTone?:"friendly"|"hostile"|"spirit-expert"|"unknown"}>>={
     "golden-dragon-empire:tianhai-academy:exterior":[
       {id:"student-lin",x:7,y:4,gender:"female"},{id:"student-wei",x:10,y:9,gender:"male"},
       {id:"teacher-mei",x:6,y:15,gender:"female"},{id:"groundskeeper",x:22,y:10,gender:"male"}],
