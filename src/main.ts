@@ -1179,12 +1179,14 @@ root.addEventListener("click", async (event: MouseEvent) => {
   }
   if(target.closest("[data-player-logout]")){
     await signOutDeveloper();
+    if(getAuthSession())await signOut();
     developerAuthenticated=false;playerAuthenticated=false;playerLoginName="";activeCharacterId="";activeProfileMarkdown="";activeChat={messages:[],started:false,showOptions:activeChat.showOptions};
     authMessage="";setWorldMapDeveloperMode(false);activeScreen="control";accessLoginMode="player";notice="";
     history.pushState({merzkavaScreen:"control",merzkavaHome:false},"");render();return;
   }
   if(target.closest("[data-dev-logout]")){
     await signOutDeveloper();
+    if(getAuthSession())await signOut();
     developerAuthenticated=false;playerAuthenticated=false;playerLoginName="";activeCharacterId="";activeProfileMarkdown="";activeChat={messages:[],started:false,showOptions:activeChat.showOptions};
     authMessage="";setWorldMapDeveloperMode(false);activeScreen="control";accessLoginMode="player";notice="";render();return;
   }
@@ -1740,6 +1742,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     try{
       const selected=await findOfficialPlayer(name);
       await signOutDeveloper();
+      if(getAuthSession())await signOut();
       developerAuthenticated=false;
       setWorldMapDeveloperMode(false);
       playerAuthenticated=true;
