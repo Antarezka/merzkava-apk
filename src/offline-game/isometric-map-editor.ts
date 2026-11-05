@@ -238,6 +238,19 @@ export function normalizeIsoMapEditorData(
       return [{id:String(group.id||"merged-cell-"+index).replace(/[^a-zA-Z0-9_-]/g,"").slice(0,64)||"merged-cell-"+index,cells}];
     })
     : [];
+  const notes: NonNullable<IsoMapEditorData["notes"]> = {};
+  const rawNotes = source.notes && typeof source.notes === "object"
+    ? source.notes as Record<string, unknown>
+    : null;
+  if (rawNotes) {
+    if (Array.isArray(rawNotes.cellSectorOrder)) notes.cellSectorOrder = rawNotes.cellSectorOrder.filter(item => typeof item === "string").slice(0, 8) as string[];
+    if (typeof rawNotes.quadrantKeys === "string") notes.quadrantKeys = rawNotes.quadrantKeys.slice(0, 800);
+    if (typeof rawNotes.transitionColors === "string") notes.transitionColors = rawNotes.transitionColors.slice(0, 800);
+    if (typeof rawNotes.walkableCellGroups === "string") notes.walkableCellGroups = rawNotes.walkableCellGroups.slice(0, 800);
+    if (typeof rawNotes.customGridCells === "string") notes.customGridCells = rawNotes.customGridCells.slice(0, 800);
+    if (typeof rawNotes.cellPlacement === "string") notes.cellPlacement = rawNotes.cellPlacement.slice(0, 800);
+    if (typeof rawNotes.canvasExpansion === "string") notes.canvasExpansion = rawNotes.canvasExpansion.slice(0, 800);
+  }
   return {
     format: "merzkava-isometric-map-editor",
     version: 1,
@@ -265,13 +278,7 @@ export function normalizeIsoMapEditorData(
         height: Math.round(clamp((source.mapBase as Record<string, unknown>).height, 1, 20000, 1)),
       }
     } : {}),
-    ...(source.notes && typeof source.notes === "object" ? {
-      notes: Object.fromEntries(Object.entries(source.notes as Record<string, unknown>).flatMap(([key,value]) => {
-        if (key === "cellSectorOrder" && Array.isArray(value)) return [[key, value.filter(item => typeof item === "string").slice(0, 8) as string[]]];
-        if (["quadrantKeys","transitionColors","walkableCellGroups","customGridCells","cellPlacement","canvasExpansion"].includes(key) && typeof value === "string") return [[key, value.slice(0, 800)]];
-        return [];
-      })) as NonNullable<IsoMapEditorData["notes"]>
-    } : {}),
+    ...(Object.keys(notes).length ? { notes } : {}),
   };
 }
 

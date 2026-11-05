@@ -15,19 +15,33 @@ describe("isometric NPC conversations", () => {
     expect(html).toContain('data-wmh-npc="test-mechanic"');
   });
 
-  it("centers the conversation as a full-screen modal instead of docking it below the map", () => {
+  it("docks the choice conversation at the bottom of the isometric map", () => {
     const rules = [...chatStyles.matchAll(/\.wmh-isometric-play-screen \.wmh-chat-panel\{([^}]*)\}/g)];
-    const finalRule = rules.find(rule => rule[1].includes("position:fixed"))?.[1] ?? "";
+    const finalRule = rules.filter(rule => rule[1].includes("position:fixed")).at(-1)?.[1] ?? "";
     expect(finalRule).toContain("position:fixed");
     expect(finalRule).toContain("inset:0");
-    expect(finalRule).toContain("display:grid");
-    expect(finalRule).toContain("place-items:center");
-    expect(finalRule).not.toContain("bottom:62px");
+    expect(finalRule).toContain("bottom:0");
+    expect(finalRule).toContain("align-items:flex-end");
+    expect(finalRule).not.toContain("place-items:center");
+  });
+
+  it("renders the shared world HUD and map-tool drawer on the isometric play screen", () => {
+    const html = renderIsometricMapTestArea();
+    expect(html).toContain('data-wmh-isometric-hud');
+    expect(html).toContain('data-wmh-cycle-icon');
+    expect(html).toContain('data-wmh-weather-icon');
+    expect(html).toContain('data-wmh-day');
+    expect(html).toContain('data-wmh-time');
+    expect(html).toContain('data-wmh-overlay-toggle');
+    expect(html).toContain('data-wmh-overlay-tools');
+    expect(html).not.toContain('wmh-iso-controls');
   });
 
   it("keeps the hidden state intact until a player taps an NPC", () => {
     const html = renderIsometricMapTestArea();
     expect(html).toContain('data-wmh-chat hidden');
     expect(chatStyles).toContain(".wmh-isometric-play-screen .wmh-chat-panel[hidden]{display:none!important}");
+    expect(chatStyles).toContain(".wmh-transition-notice{align-items:center!important;justify-content:center!important;background:#030806d9!important}");
+    expect(chatStyles).toContain(".wmh-isometric-play-screen .wmh-overlay-float span{writing-mode:vertical-rl");
   });
 });

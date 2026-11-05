@@ -31,6 +31,11 @@ describe("Tianhai Academy owner-supplied map reference", () => {
     ]);
   });
 
+  it("keeps the reference explicitly unconfirmed until the owner confirms it", () => {
+    expect(map.confirmed).toBe(false);
+    expect(map.confirmedAt).toBe("");
+  });
+
   it("retains the eight-sector layer flags and owner notes", () => {
     expect(normalized.foregroundQuadrants.length).toBeGreaterThan(20);
     expect(normalized.blockedQuadrants.length).toBeGreaterThan(100);
