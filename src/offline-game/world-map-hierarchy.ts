@@ -1299,15 +1299,22 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     };
     window.addEventListener("pointermove",move,{passive:false});window.addEventListener("pointerup",end);window.addEventListener("pointercancel",end);
   });
-  modeSelect?.addEventListener("change",()=>{
+  const updateModeHelp=()=>{
     if(transitionTools)transitionTools.hidden=mode()!=="transition";
-    setStatus(mode()==="walkable"?"Brush the image tiles that should be used. Selected tiles turn blue; only these tiles are walkable while AREA LIMIT is ON."
+    if(cellTools)cellTools.hidden=!["cell-add","cell-delete","cell-merge","cell-unmerge"].includes(mode());
+    if(mode()!=="cell-merge")selectedMergeCells.clear();
+    redraw();
+    setStatus(mode()==="cell-add"?"ADD CELL: tap any empty grid diamond on the Map Base to add it to your walkable area. Each tap adds exactly one cell; drag pans."
+      :mode()==="cell-delete"?"DELETE CELL: tap a blue cell to remove it. If it belongs to a merged group, that cell is removed from the group too."
+      :mode()==="cell-merge"?"SELECT & MERGE: tap two or more adjacent blue cells, including bends, then press MERGE SELECTED CELLS to make one flexible logical area."
+      :mode()==="cell-unmerge"?"UNMERGE: tap any cell inside a merged region to split that group back into its individual cells."
       :mode()==="foreground"?"Tap one of the 4 small sectors: ○ redraws that part of the same Map Base above characters."
       :mode()==="blocked"?"Tap one of the 4 small sectors: X blocks movement across that sector's edge."
       :mode()==="opacity"?"Tap one of the 4 small sectors: ◌ makes characters translucent in that image area."
       :"Tap a cell to add/select a transition. Red is unnamed; blue is named.");
-  });
-  if(transitionTools)transitionTools.hidden=mode()!=="transition";
+  };
+  modeSelect?.addEventListener("change",updateModeHelp);
+  updateModeHelp();
   if(walkableToggle)walkableToggle.checked=data.walkableAreaEnabled;
   walkableToggle?.addEventListener("change",()=>{
     if(walkableToggle.checked&&!data.walkableCells.length){walkableToggle.checked=false;setStatus("Paint the walkable area first, then turn this limit on.");return;}
@@ -1361,15 +1368,34 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       if(transitionField)transitionField.value="";
       persist();setStatus("Transition cell selected. Enter its destination label; it stays red until named.");return;
     }
-    if(mode()==="walkable"){
-      const key=isoCellKey(cell.x,cell.y),wasSelected=data.walkableCells.includes(key);
-      if(wasSelected&&data.walkableAreaEnabled&&data.walkableCells.length===1){setStatus("Disable AREA LIMIT before removing the final walkable cell.");return;}
-      remember();data.walkableCells=wasSelected?data.walkableCells.filter(item=>item!==key):[...data.walkableCells,key];
+    const key=isoCellKey(cell.x,cell.y),isWalkable=data.walkableCells.includes(key);
+    if(mode()==="cell-add"){
+      if(isWalkable){setStatus("Cell ("+cell.x+","+cell.y+") is already added. Select another diamond or use DELETE CELL.");return;}
+      remember();data.walkableCells.push(key);
+      persist();setStatus("Added cell ("+cell.x+","+cell.y+"). Add any other cells you need; adjacent cells can later be merged into one flexible area.");return;
+    }
+    if(mode()==="cell-delete"){
+      if(!isWalkable){setStatus("There is no added cell at ("+cell.x+","+cell.y+").");return;}
+      if(data.walkableAreaEnabled&&data.walkableCells.length===1){setStatus("Disable AREA LIMIT before deleting the final walkable cell.");return;}
+      const previousCells=[...data.walkableCells],previousGroups=JSON.parse(JSON.stringify(data.walkableCellGroups)) as IsoMapEditorData["walkableCellGroups"];
+      remember();removeIsoWalkableCell(data,cell.x,cell.y);
       if(data.walkableAreaEnabled&&!relocateActorsFromBlockedCells(board,data)){
-        data.walkableCells=wasSelected?[...data.walkableCells,key]:data.walkableCells.filter(item=>item!==key);
-        history.pop();redraw();setStatus("That change leaves too few free cells for every character. Add more blue cells first.");return;
+        data.walkableCells=previousCells;data.walkableCellGroups=previousGroups;history.pop();redraw();setStatus("Cell deletion cancelled because it would leave a character without a valid destination.");return;
       }
-      persist();setStatus((wasSelected?"Removed":"Added")+" walkable cell ("+cell.x+","+cell.y+"). Tap more cells to shape your own walkable region. A drag only pans the map.");return;
+      persist();setStatus("Deleted cell ("+cell.x+","+cell.y+"). Its merged group was updated automatically.");return;
+    }
+    if(mode()==="cell-merge"){
+      if(!isWalkable){setStatus("Only added blue cells can be merged. Use ADD CELL first.");return;}
+      if(data.walkableCellGroups.some(group=>group.cells.includes(key))){
+        setStatus("This cell already belongs to a merged group. UNMERGE it first before changing that group.");return;
+      }
+      if(selectedMergeCells.has(key))selectedMergeCells.delete(key);else selectedMergeCells.add(key);
+      redraw();setStatus(selectedMergeCells.size+" cells selected. Choose adjacent cells in any connected shape, then press MERGE SELECTED CELLS.");return;
+    }
+    if(mode()==="cell-unmerge"){
+      const group=unmergeIsoWalkableCell(data,cell.x,cell.y);
+      if(!group){setStatus("This cell is not part of a merged group.");return;}
+      remember();persist();setStatus("Unmerged "+group.id+". Its "+group.cells.length+" component cells can now be edited or merged again.");return;
     }
     const quadrant=isoQuadrantAtPoint(mapPoint,cell.x,cell.y,grid);
     const layer:IsoQuadrantLayer=mode()==="blocked"?"blockedQuadrants":mode()==="opacity"?"opacityQuadrants":"foregroundQuadrants";
@@ -1410,6 +1436,17 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     };
     event.preventDefault();
     try{svg.setPointerCapture(event.pointerId);}catch{/* dialog-level pointer listeners remain the fallback */}
+  });
+  panel.querySelector<HTMLElement>("[data-wmh-merge-apply]")?.addEventListener("click",()=>{
+    if(selectedMergeCells.size<2){setStatus("Select at least two adjacent blue cells first.");return;}
+    const cells=[...selectedMergeCells];
+    remember();
+    const group=mergeIsoWalkableCells(data,cells,"merged-"+Date.now());
+    if(!group){history.pop();setStatus("Merge not created. Cells must touch edge-to-edge and cannot already belong to another merged group.");return;}
+    selectedMergeCells.clear();persist();setStatus("Merged "+group.cells.length+" cells into "+group.id+". The group shape follows the selected cells, including turns and uneven edges.");
+  });
+  panel.querySelector<HTMLElement>("[data-wmh-merge-clear]")?.addEventListener("click",()=>{
+    selectedMergeCells.clear();redraw();setStatus("Cell merge selection cleared. No map data was changed.");
   });
   panel.querySelector<HTMLElement>("[data-wmh-transition-apply]")?.addEventListener("click",()=>{
     const marker=data.transitions.find(m=>m.id===selectedTransitionId);if(!marker){setStatus("Select a transition marker first.");return;}
