@@ -1034,3 +1034,20 @@ This policy is a hard acceptance gate for all Eternal Path narrative-node work:
 5. Before accepting an update, verify the node count delta, distinctness, Archive dossier anchors, non-canonical framing, provenance labels, and that no game-only text has been promoted into World Archive or Universe canon.
 
 The nine-node starter slice spans Golden Dragon Empire, Tianhai Yunzhou, and Beiming Gu (three each). Future updates retain the planned labels/categories and should continue to use the Archive as the organizing spine rather than treating the three powers as disconnected lore sources.
+
+
+## 15. Isometric field, actor interaction and access-gate handoff — 2026-11-05
+
+This section records the current implementation boundary and points to the focused continuation documents. It does not mark the full feature set complete.
+
+- [x] Record the shared map-editor schema, Academy reference, walkability/quadrant contract, NPC movement/chat implementation, independent combat formula module, Anime.js ownership and next implementation sequence in [ISOMETRIC_FIELD_SYSTEM.md](./offline-game/ISOMETRIC_FIELD_SYSTEM.md).
+- [x] Record Developer Mode, local World Atlas password primitives, players.md/local-save identity requirements, external-TV versus internal map entry, and Android Back requirements in [APP_ACCESS_AND_NAVIGATION.md](./APP_ACCESS_AND_NAVIGATION.md).
+- [x] Add the AI continuation read order, source map, regression guards and current verification boundary in [AI_HANDOFF_2026-11-05.md](./AI_HANDOFF_2026-11-05.md).
+- [~] Developer-only app/editor gating is present in code; local verifier is client-side and is not a server-grade security boundary. Atlas login UI is not yet wired.
+- [~] Isometric editor workbench can open/drag/resize and uses Anime.js motion. Minimize markup has no handler, and not every X/lever close control is bound independently.
+- [~] NPC pathfinding, bounded wandering and scripted choice chat exist. Interaction max range needs source confirmation. Combat formulas are implemented/tested separately but are not linked to map encounters.
+- [ ] Add status-colored tile trail and short-range sonar scanner with Anime.js; keep scan results presentation-only until the owner approves chase/battle rules.
+- [ ] Complete field-tool minimize/restore/X behavior, Atlas external login flow, internal bypass, Android screen history and Home exit confirmation.
+- [ ] Complete Android emulator and target-device touch QA for the updated APK.
+
+**Verification snapshot:** Web App Validation #2255 passed on code commit fae1ec3f1ef13eca0d20bf1453935b2b47a2c031. Web App Validation #2256 passed on the documentation-only follow-up commit. Android Build #1213 had completed APK build/package/signature/upload steps but was still running its Android emulator stage when this section was updated. Recheck the workflow before marking Android verification complete.

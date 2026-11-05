@@ -34,7 +34,8 @@ See [PROJECT_DIRECTIVES.md](./PROJECT_DIRECTIVES.md) for the working contract, [
 
 - **Convo / AI GM:** `src/convo/` — connected canon, character, auth, and GM runtime.
 - **World Archive:** [content manifest](./docs/world-archive/CONTENT_MANIFEST.md) and [coverage matrix](./docs/world-archive/COVERAGE_MATRIX.md).
-- **Merzkava: Eternal Path:** [content provenance contract](./docs/offline-game/CONTENT_PROVENANCE.md) and [canonical formula snapshot](./docs/offline-game/CANON_FORMULA_SNAPSHOT.md); implementation lives in `src/offline-game/`.
+- **Merzkava: Eternal Path:** [content provenance contract](./docs/offline-game/CONTENT_PROVENANCE.md), [canonical formula snapshot](./docs/offline-game/CANON_FORMULA_SNAPSHOT.md), and [isometric field-system handoff](./docs/offline-game/ISOMETRIC_FIELD_SYSTEM.md); implementation lives in `src/offline-game/`.
+- **AI continuation:** [2026-11-05 handoff](./docs/AI_HANDOFF_2026-11-05.md) and [developer access / World Atlas / Back navigation](./docs/APP_ACCESS_AND_NAVIGATION.md).
 - **Shared infrastructure:** `src/shared/`; app composition: `src/app/`.
 - **Tests:** grouped by system under `tests/`.
 

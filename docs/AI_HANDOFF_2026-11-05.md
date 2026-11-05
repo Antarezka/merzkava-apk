@@ -141,13 +141,14 @@ Do not begin a broad rewrite. Continue in this order:
 
 ## 6. Verification checkpoint
 
-At code baseline fae1ec3f1ef13eca0d20bf1453935b2b47a2c031, Web App Validation #2255 (run 42018543970) and Android APK Build #1213 (run 42018543188) were triggered. The previous code commit 50fa56572c1064503fbd46bff177890a6b8b854c failed:
-- Web tests: 26 files / 208 tests passed; 2 test files / 7 tests failed because the new test setup called setWorldMapDeveloperMode(false) in Node where document is undefined.
-- Android build: npm build stopped on TypeScript noUnusedLocals because listEternalSaves and World Atlas account imports were present but login UI was not yet wired.
+At code baseline fae1ec3f1ef13eca0d20bf1453935b2b47a2c031:
+- **Web App Validation #2255** (run 42018543970) passed, including gameplay tests, TypeScript and production Vite build.
+- **Android APK Build #1213** (run 42018543188) had completed the web build, Capacitor sync, native floating-mode integration, APK build, package/version/alignment/signature verification and artifact upload; its Android 14 emulator install/smoke stage was still running at last check.
+- The follow-up documentation-only commit also triggered Web App Validation #2256 (run 42019165676), which passed.
 
-Commit fae1ec3 adds an SSR-safe guard to setWorldMapDeveloperMode and removes the unused imports until Atlas UI integration. The newer #2255/#1213 runs must be checked before claiming green. If they fail, inspect exact logs and update this document after the repair.
+The earlier code commit 50fa56572c1064503fbd46bff177890a6b8b854c failed because web tests called setWorldMapDeveloperMode(false) in Node where document was undefined, and the APK build stopped on unused listEternalSaves / World Atlas imports. Commit fae1ec3 added an SSR-safe guard and removed the unused imports until Atlas UI integration.
 
-No APK install or physical-device QA is certified by this handoff. Do not infer device success from a passing web suite.
+**Next AI must recheck live workflow status before claiming Android verification green.** No APK installation on the owner's physical target device is certified by this handoff. Do not infer device success from a passing web suite or emulator smoke test.
 
 ## 7. Non-negotiable regression guards
 

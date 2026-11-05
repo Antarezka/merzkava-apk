@@ -1,6 +1,6 @@
 # Shared Isometric Map Editor
 
-The isometric map editor is a reusable editor/runtime contract. It is not Academy-specific. Any isometric map board can use the same editor by supplying a stable `data-map-id`, its base artwork (when it has a complete JPG/PNG Map Base), grid dimensions, and the standard editor controls.
+The isometric map editor is a reusable editor/runtime contract. It is not Academy-specific. Any isometric map board can use the same editor by supplying a stable data-map-id, its base artwork (when it has a complete JPG/PNG Map Base), grid dimensions, and the standard editor controls. For the full runtime handoff covering NPC movement, interactions/chat, combat integration, sonar design and current unfinished controls, see [ISOMETRIC_FIELD_SYSTEM.md](./ISOMETRIC_FIELD_SYSTEM.md).
 
 ## Artwork and render order
 
@@ -44,6 +44,6 @@ Use unique stable map IDs for each exterior, interior, or other isometric scene.
 - The shared glass HUD reports day, 12-hour time, cycle, weather, and current grid X/Y on every isometric area. The compact minimap is reserved for outdoor wilderness and transit/field-route maps; Academy and other campus, town, city, market, harbor, arena, and interior screens keep the HUD without a minimap. Where shown, the minimap mirrors the corresponding map geometry, walkable areas, marker layers, transition colors, and live actor positions. Character opacity and depth order remain controlled through CSS variables so editor flags are not overridden by the global token style.
 - **Golden Dragon Empire, Tianhai Yunzhou, and Beiming Gu:** all local areas use the same isometric board/editor, each with a separate map ID and no Map Base image for now. They show a restrained isometric placeholder grid until artwork is supplied; regional panorama artwork is not substituted for a playable map.
 - Legacy cell-layout and editor-window local-storage keys are cleared once during the refresh. Academy then receives its owner-supplied one-time map seed; other map IDs retain independent persistence and begin with their own default grid/editor data until a map reference is supplied.
-- Academy NPCs are positioned at the owner-marked cells `(7,4)`, `(10,9)`, `(6,15)`, and `(22,10)`. Wandering remains inside the selected walkable whitelist and respects blocked-sector edges; NPCs do not walk into the Player or another NPC. The existing one-cell interaction-distance rule and area-specific greetings, choices, and replies remain authoritative.
+- Academy NPCs are positioned at the owner-marked cells (7,4), (10,9), (6,15), and (22,10). Wandering remains inside the selected walkable whitelist and respects blocked-sector edges; NPCs do not walk into the Player or another NPC. Area-specific greetings, choices and replies remain in world-map-hierarchy.ts. The current code blocks interaction only when Player and NPC occupy the same cell; a maximum interaction radius still needs confirmation against the approved NPC/chat rules. See ISOMETRIC_FIELD_SYSTEM.md.
 
 Academy interior and all non-Academy interiors remain empty Map Base placeholders until their own map artwork is supplied.
