@@ -49,6 +49,18 @@ export type IsoMapEditorData = {
   confirmed: boolean;
   confirmedAt: string;
   transitions: IsoTransitionMarker[];
+  purpose?: "AI_UPDATE_REFERENCE";
+  mapTitle?: string;
+  mapBase?: { src: string; width: number; height: number };
+  notes?: {
+    cellSectorOrder?: string[];
+    quadrantKeys?: string;
+    transitionColors?: string;
+    walkableCellGroups?: string;
+    customGridCells?: string;
+    cellPlacement?: string;
+    canvasExpansion?: string;
+  };
 };
 
 export type IsoMapPoint = { x: number; y: number };
@@ -244,6 +256,22 @@ export function normalizeIsoMapEditorData(
     confirmed: source.confirmed === true,
     confirmedAt: source.confirmed === true ? String(source.confirmedAt || "").slice(0, 48) : "",
     transitions,
+    ...(source.purpose === "AI_UPDATE_REFERENCE" ? { purpose: "AI_UPDATE_REFERENCE" as const } : {}),
+    ...(typeof source.mapTitle === "string" ? { mapTitle: source.mapTitle.slice(0, 120) } : {}),
+    ...(source.mapBase && typeof source.mapBase === "object" ? {
+      mapBase: {
+        src: String((source.mapBase as Record<string, unknown>).src || "").slice(0, 240),
+        width: Math.round(clamp((source.mapBase as Record<string, unknown>).width, 1, 20000, 1)),
+        height: Math.round(clamp((source.mapBase as Record<string, unknown>).height, 1, 20000, 1)),
+      }
+    } : {}),
+    ...(source.notes && typeof source.notes === "object" ? {
+      notes: Object.fromEntries(Object.entries(source.notes as Record<string, unknown>).flatMap(([key,value]) => {
+        if (key === "cellSectorOrder" && Array.isArray(value)) return [[key, value.filter(item => typeof item === "string").slice(0, 8) as string[]]];
+        if (["quadrantKeys","transitionColors","walkableCellGroups","customGridCells","cellPlacement","canvasExpansion"].includes(key) && typeof value === "string") return [[key, value.slice(0, 800)]];
+        return [];
+      })) as NonNullable<IsoMapEditorData["notes"]>
+    } : {}),
   };
 }
 

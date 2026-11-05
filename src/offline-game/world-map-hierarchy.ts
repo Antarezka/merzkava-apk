@@ -3,6 +3,7 @@ import "./world-map-hierarchy-scroll.css";
 import { playFootstep } from "../audio/sound-effects";
 import { animateExpeditionPanel } from "./expedition-animations";
 import { getEternalSave, getExpeditionAtmosphere } from "./expedition-game";
+import { TIANHAI_ACADEMY_MAP_REFERENCE } from "./tianhai-academy-map-reference";
 import {
   createIsoMapEditorData, DEFAULT_ISOMETRIC_GRID, DEFAULT_ISO_CANVAS_EXPANSION, normalizeIsoCanvasExpansion, isoCellAtPoint, isoCellCenter, isoCellHasLayer,
   isoCellKey, isoClientToImagePoint, isoMapStorageKey, isoPointerGesture, isoQuadrantAtPoint, isoQuadrantHasParentLayer, mergeIsoWalkableCells, normalizeIsoMapEditorData, removeIsoWalkableCell, toggleIsoQuadrantLayer, unmergeIsoWalkableCell,
@@ -770,11 +771,24 @@ function readIsoMapData(board: HTMLElement): IsoMapEditorData {
     offsetX:Number(board.dataset.offsetX||0),
     offsetY:Number(board.dataset.offsetY||0),
   };
+  if(mapId===TIANHAI_ACADEMY_MAP_REFERENCE.mapId){
+    const appliedKey="merzkava.tianhai-academy-map-reference.v1.applied";
+    try{
+      if(localStorage.getItem(appliedKey)!=="done"){
+        const reference=normalizeIsoMapEditorData(TIANHAI_ACADEMY_MAP_REFERENCE,mapId,fallback);
+        localStorage.setItem(isoOverlayKey(board),JSON.stringify(reference));
+        localStorage.setItem(appliedKey,"done");
+      }
+      const saved=JSON.parse(localStorage.getItem(isoOverlayKey(board))||"null");
+      if(saved)return normalizeIsoMapEditorData(saved,mapId,fallback);
+    }catch{/* use the bundled owner reference when storage is unavailable */}
+    return normalizeIsoMapEditorData(TIANHAI_ACADEMY_MAP_REFERENCE,mapId,fallback);
+  }
   try {
     const saved=JSON.parse(localStorage.getItem(isoOverlayKey(board))||"null");
     if(saved)return normalizeIsoMapEditorData(saved,mapId,fallback);
   } catch {}
-  // Refreshed map IDs start clean; old maps are not silently imported.
+  // Other map IDs start clean; old maps are not silently imported.
   return createIsoMapEditorData(mapId,fallback);
 }
 function drawIsometricForeground(board:HTMLElement,data=readIsoMapData(board)):void {
