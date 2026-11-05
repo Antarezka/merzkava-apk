@@ -714,11 +714,13 @@ function drawIsometricForeground(board:HTMLElement,data=readIsoMapData(board)):v
     const camera=board.closest<HTMLElement>("[data-wmh-iso-camera]");
     const viewport=board.closest<HTMLElement>("[data-wmh-iso-viewport]");
     if(camera&&viewport){
-      const padX=Number.parseFloat(board.style.getPropertyValue("--wmh-camera-pad-x"))||Math.max(1,viewport.clientWidth)*4;
-      const padY=Number.parseFloat(board.style.getPropertyValue("--wmh-camera-pad-y"))||Math.max(1,viewport.clientHeight)*4;
+      const padX=Number.parseFloat(board.style.getPropertyValue("--wmh-camera-pad-x"))||Math.max(1,viewport.clientWidth)*2;
+      const padY=Number.parseFloat(board.style.getPropertyValue("--wmh-camera-pad-y"))||Math.max(1,viewport.clientHeight)/2;
+      const padRight=Number.parseFloat(board.style.getPropertyValue("--wmh-camera-pad-right"))||padX/2;
+      const padBottom=Number.parseFloat(board.style.getPropertyValue("--wmh-camera-pad-bottom"))||padY;
       const zoom=Number.parseFloat(board.style.getPropertyValue("--wmh-camera-zoom"))||1;
-      camera.style.width=(boardWidth*zoom+padX*2)+"px";
-      camera.style.height=(boardHeight*zoom+padY*2)+"px";
+      camera.style.width=(boardWidth*zoom+padX+padRight)+"px";
+      camera.style.height=(boardHeight*zoom+padY+padBottom)+"px";
       board.style.setProperty("--wmh-camera-pad-x",padX+"px");
       board.style.setProperty("--wmh-camera-pad-y",padY+"px");
       viewport.scrollLeft=padX+boardWidth*zoom/2-viewport.clientWidth/2;
