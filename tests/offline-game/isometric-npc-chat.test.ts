@@ -70,6 +70,10 @@ describe("isometric NPC conversations", () => {
     expect(worldMapSource).toContain("merzkava:field-scanner-overlap");
     expect(worldMapSource).toContain("function emitTileTrailWave");
     expect(worldMapSource).toContain("function startActorScanners");
+    expect(worldMapSource).toContain("updateNpcInteractionProximity(board)");
+    expect(worldMapSource).toContain("isNpcInteractionCellReachable(");
+    expect(worldMapSource).toContain("data-interaction-ready");
+    expect(chatStyles).toContain(".wmh-npc-proximity-glow");
     expect(worldMapSource).toContain("animate(token,{translateX:[dx,0],translateY:[dy,0]");
     expect(worldMapSource).toContain("scanTone:\"friendly\"");
     expect(worldMapSource).toContain("const minimizeWorkbench=()=>");
