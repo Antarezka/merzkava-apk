@@ -1761,7 +1761,10 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     const eligible=atlasEligiblePlayers().some(player=>player.name===playerName);
     const message=gate?.querySelector<HTMLElement>("[data-world-atlas-message]");
     const button=form.querySelector<HTMLButtonElement>("[data-world-atlas-submit]");
-    if(!gate||!eligible){if(message)message.textContent="This character is not registered in the verified players.md and local Eternal Path account list.";return;}
+    if(!gate)return;
+    if(!playerName){if(message)message.textContent=gate.dataset.selectLabel||"Select a registered character to continue.";return;}
+    if(!eligible){if(message)message.textContent="This character is not registered in the verified players.md and local Eternal Path account list.";return;}
+    if(!password){if(message)message.textContent=gate.dataset.passwordRequiredLabel||"Enter a password to continue.";return;}
     if(password.length<8||password.length>128){if(message)message.textContent="Use a password between 8 and 128 characters.";return;}
     const offlineMessage=gate.dataset.offlineLabel||"No internet connection or the official Universe source is unavailable. Check your connection and try again.";
     if(!navigator.onLine){
