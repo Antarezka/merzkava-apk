@@ -1387,11 +1387,8 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     }
     if(mode()==="cell-merge"){
       if(!isWalkable){setStatus("Only added blue cells can be merged. Use ADD CELL first.");return;}
-      if(data.walkableCellGroups.some(group=>group.cells.includes(key))){
-        setStatus("This cell already belongs to a merged group. UNMERGE it first before changing that group.");return;
-      }
       if(selectedMergeCells.has(key))selectedMergeCells.delete(key);else selectedMergeCells.add(key);
-      redraw();setStatus(selectedMergeCells.size+" cells selected. Choose adjacent cells in any connected shape, then press MERGE SELECTED CELLS.");return;
+      redraw();setStatus(selectedMergeCells.size+" cells selected. Existing merged groups are absorbed automatically when you merge again. The final selection must connect edge-to-edge.");return;
     }
     if(mode()==="cell-unmerge"){
       const existingGroup=data.walkableCellGroups.find(item=>item.cells.includes(key));
