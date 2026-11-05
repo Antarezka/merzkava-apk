@@ -1,10 +1,19 @@
 # Merzkava: Eternal Path — Offline Game documentation
 
-This folder contains the Life Simulation Text RPG's canon-derived formula references and game-content contracts. The current working title is **Merzkava: Eternal Path**. Read [Content Provenance & Game Data Contract](./CONTENT_PROVENANCE.md) before adding player-visible content. The single product roadmap remains at [../PRODUCT_ROADMAP.md](../PRODUCT_ROADMAP.md). The game release package pins approved World Archive references plus a separate reviewed Offline Game content pack; runtime never loads the Universe repository directly.
+This folder contains Eternal Path's local simulation/formula references and game-content contracts. The current working title is **Merzkava: Eternal Path**. Read [Content Provenance & Game Data Contract](./CONTENT_PROVENANCE.md) before adding player-visible content. The product roadmap remains at [../PRODUCT_ROADMAP.md](../PRODUCT_ROADMAP.md).
 
-For isometric map movement, NPC interactions, chat, combat handoff, Anime.js motion and remaining field-tool tasks, read [Isometric Field System](./ISOMETRIC_FIELD_SYSTEM.md). The app-level developer/Atlas login and Android Back handoff is in [Developer Access, World Atlas Accounts and Back Navigation](../APP_ACCESS_AND_NAVIGATION.md).
+## Continue work on the isometric world
 
+Recommended AI/developer read order:
+
+1. [AI Handoff — Isometric Field, Combat and Access](../AI_HANDOFF_2026-11-05.md)
+2. [Isometric Field System — runtime and next steps](./ISOMETRIC_FIELD_SYSTEM.md)
+3. [Shared Isometric Map Editor — JSON/grid contract](./ISOMETRIC_MAP_EDITOR.md)
+4. [Developer Access, World Atlas Accounts and Android Back](../APP_ACCESS_AND_NAVIGATION.md)
+5. [Anime.js Animation System](./ANIMATION_SYSTEM.md)
+
+The field system guide records current Player pathfinding, NPC wander/chat behavior, actual interaction-range limitation, field-tool window, colored tile trails, sonar sensor events, combat formula boundary and Android QA requirements. Scanner overlap is not a battle trigger; chase/ambush/stealth rules remain owner-design pending.
 
 ## Eternal Path implementation note
 
-The current development slice has a separately persisted offline character, an action-driven local clock, deterministic atmosphere state, and a versioned `0.1.0` dialogue pack with 240 branching nodes. Story content is `IN_GAME_ORIGINAL` and must not be treated as Universe canon. See the [master roadmap](../PRODUCT_ROADMAP.md) for remaining release gates.
+Eternal Path has separately persisted local journeys, an action-driven local clock and deterministic atmosphere. Story content is IN_GAME_ORIGINAL and must not be treated as Universe canon. The Atlas account gate uses a verified players.md character plus a matching local save; it does not create a new Universe character.

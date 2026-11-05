@@ -1,189 +1,206 @@
-# Isometric Field System — Runtime Contract and Next Steps
+# Isometric Field System — Runtime Contract and Continuation Guide
 
-**Last audited:** 2026-11-05  
-**Code baseline audited:** fae1ec3f1ef13eca0d20bf1453935b2b47a2c031
+**Last source audit:** 2026-11-05  
+**Audited source commit:** ed5ef007cead9ecf8e6e70662c29ec5cce9527b0  
+**Working branch:** feature/global-isometric-canvas-margins-2026-11-05
 
-This document records what is actually implemented and what remains a design task. Do not infer that a visual control or a planned interaction is functional merely because its markup or data field exists.
+This is the implementation contract for isometric maps, the field-tool editor, actor movement, NPC interactions/chat, animation, scanner events, and the combat boundary. It separates working runtime behavior from planned mechanics. A UI element or event name is not proof that a gameplay rule has been implemented.
 
-## 1. Main source files
+## 1. Source map and ownership
 
-- **src/offline-game/world-map-hierarchy.ts** — map hierarchy, board markup, grid rendering, map persistence, transitions, actors, movement, NPC wandering, chat, editor binding and Developer Mode gate.
-- **src/offline-game/world-map-hierarchy.css** — board, actor positioning, HUD, field-tool window, chat panel, transition overlays and grid appearance.
-- **src/offline-game/isometric-map-editor.ts** — map data schema, coordinate conversion, cell/quadrant operations, walkability and normalization.
-- **src/offline-game/tianhai-academy-map-reference.ts** — owner-supplied Tianhai Academy exterior reference.
-- **src/offline-game/isometric-svg-board.ts** — SVG isometric test/render board.
-- **tests/offline-game/isometric-map-editor.test.ts** — editor data, grid math, quadrants, canvas margins, walkability and pointer gestures.
-- **tests/offline-game/isometric-npc-chat.test.ts** — NPC chat markup, bottom dialogue, shared HUD/editor markup and Academy actor placement.
-- **tests/offline-game/isometric-render-test.test.ts** and **tests/offline-game/isometric-svg-board.test.ts** — SVG test-yard contracts.
+| Concern | Source of truth |
+|---|---|
+| Map hierarchy, board markup, transitions, actors, NPC chat, Player movement, wandering, field effects, editor wiring | **src/offline-game/world-map-hierarchy.ts** |
+| Board, normal/editor grid contrast, camera/editor window, HUD, chat, tile trail and scanner styles | **src/offline-game/world-map-hierarchy.css** |
+| Map data schema, grid coordinates, 8-sector flags, normalization, walkability and blocked-edge rules | **src/offline-game/isometric-map-editor.ts** |
+| Owner-supplied Tianhai Academy exterior JSON reference | **src/offline-game/tianhai-academy-map-reference.ts** |
+| Academy base artwork | **public/maps/academy/full-map/1_academy.jpg** |
+| Isometric SVG test-yard renderer | **src/offline-game/isometric-svg-board.ts** |
+| NPC greetings, choices and replies | npcData in **world-map-hierarchy.ts** |
+| Player registry and canonical profiles | **src/convo/canon/canon-loader.ts**, consumed by **src/main.ts** |
+| Eternal Path local saves, clock and world state | **src/offline-game/expedition-game.ts** |
+| Standalone combat formulas | **src/offline-game/mechanics/combat.ts** |
+| Anime.js for Eternal Path scenes | **src/offline-game/expedition-animations.ts** and **docs/offline-game/ANIMATION_SYSTEM.md** |
 
-Read this file together with ISOMETRIC_MAP_EDITOR.md. The editor data contract is shared across maps; do not create an Academy-only grid implementation.
+Do not make an Academy-only grid implementation. The editor/runtime contract is shared by each isometric board and every exterior/interior map must retain its own stable map ID.
 
-## 2. Existing map/editor contract
+## 2. Tianhai Academy reference and spawn
 
-Each map has a stable map ID. Exterior and interior maps must not share IDs. The Academy exterior is golden-dragon-empire:tianhai-academy:exterior and uses public/maps/academy/full-map/1_academy.jpg as its sole visual Map Base.
+The owner-supplied reference is **golden-dragon-empire:tianhai-academy:exterior** with:
 
-Academy calibration remains 2816 × 1536 px with a 24 × 20 base grid and 128 × 69.5 px tiles. The AI_UPDATE_REFERENCE in tianhai-academy-map-reference.ts includes selected walkable base/custom cells, sparse custom diamonds, eight-sector foreground/blocked/opacity flags, transition markers and image/calibration metadata.
+- Map Base: /maps/academy/full-map/1_academy.jpg, 2816 × 1536 px.
+- Base grid: 24 × 20; tile size 128 × 69.5; offsets 0/0; Player/NPC scale 1.
+- Walkability whitelist enabled. Unmarked cells are not valid movement destinations.
+- Separate customGridCells preserve individually placed diamonds outside the base 24 × 20 rectangle. Never fill the gaps between custom cells automatically.
+- Foreground, blocked and opacity flags use 8-sector keys, e.g. 14,-2:tr-a. Legacy parent keys expand to both child sectors.
+- The Player spawn is (12,31). Golden Dragon Empire gateway markers are (11,31) and (12,31); the dialogue marker is (9,3); the introductory event marker is (14,-5).
+- The reference has confirmed:false. Do not change this automatically.
 
-The app seeds that reference once. It must not reapply it every launch because that would overwrite later local editor changes. It remains confirmed:false until the owner explicitly confirms it.
+The app seeds the owner reference once into local editor storage. Subsequent launches must preserve a user's local editor changes rather than replacing them with the bundled JSON. The Academy NPC seed cells are (7,4), (10,9), (6,15), and (22,10).
 
-The Academy Player spawn is (12,31). The two Golden Dragon Empire gateway markers are (11,31) and (12,31); the dialogue marker is (9,3), and the introductory event marker is (14,-5). Academy NPCs are initially placed at (7,4), (10,9), (6,15), and (22,10).
+## 3. Developer-only field editor and window
 
-## 3. Editor visibility and field-tool window
+The runtime authorization flag is worldMapDeveloperMode, initially false. setWorldMapDeveloperMode(enabled) controls the map editor independently of the main app-shell gate.
 
-Developer mode is held by worldMapDeveloperMode in world-map-hierarchy.ts. Production starts with it disabled. setWorldMapDeveloperMode(false) removes mounted editor dock/canvas controls and clears editor pause classes. The following markup/binders are guarded: mapEditorMarkup / bindWorldMapEditor, academyCanvasEditorMarkup / bindAcademyCanvasEditor, isometricEditorMarkup / bindIsoAreaEditor, and the world-map editor-open/test-isometric actions.
+Protected code paths include mapEditorMarkup/bindWorldMapEditor, academyCanvasEditorMarkup/bindAcademyCanvasEditor, isometricEditorMarkup/bindIsoAreaEditor, editor-open and test-isometric actions, and direct click targets for editor canvas/markers/controls.
 
-The main app also hides developer-only menus and rejects sensitive actions when its developer session is not authenticated. Keep both the main-shell gate and the world-map gate. Never rely only on CSS or hidden attributes for authorization.
+When Developer Mode is false, editor markup is not rendered, binders do not activate, and direct editor actions are rejected. On sign-out, mounted editor controls are removed and editor pause classes are cleared. Do not weaken this to CSS-only hiding.
 
-### Current field-tool window behavior
+### Field-tool window behavior
 
-Implemented:
-- floating field-tool launcher can be dragged within the map area;
-- workbench can be dragged by its header;
-- upper-left grip resizes the workbench;
-- panel and launcher positions/sizes are saved per map in local editor UI preferences;
-- Anime.js is used for workbench open/close translate/opacity motion;
-- entering editor mode pauses NPC wandering and Player movement, hides chat, applies wmh-overlay-editing / wmh-editor-paused, and preserves the camera scroll anchor;
-- leaving editor mode clears pause classes, restores actor animations/chat visibility, restarts NPC wandering when appropriate, and resumes a pending Player destination if one was interrupted.
+The workbench is a small floating window anchored near the right edge of the map, not a full-height sheet. It is independently scrollable and has a drag handle and a resize grip. Camera zoom/center controls are in the workbench. The smaller floating launcher can itself be moved within the map area.
 
-Not complete / needs a focused repair:
-1. data-wmh-overlay-minimize exists in the field-tool markup but bindIsoAreaEditor has no minimize click handler. It is currently only a visual button.
-2. The markup has multiple data-wmh-overlay-close elements (drawer lever and X). The current binder uses querySelector for one close element rather than binding every close control. Audit both targets and ensure the lever and X work independently.
-3. Minimize must hide only the workbench window. It must NOT call setActive(false), remove wmh-overlay-editing, resume NPC wandering, or resume Player movement. Editor mode remains active while minimized. The floating launcher should restore the workbench.
-4. X is the explicit editor-mode exit. It should close the window, clear editing mode, resume live play, and preserve map camera position, grid data and local editor changes.
-5. Verify independent vertical scrolling inside the compact floating window, drag header, resize grip, safe-area boundaries and touch scrolling on a narrow Android screen.
-6. Do not claim X or minimize is verified until their listeners are bound and tested.
+- **Open:** tap the launcher; Anime.js slides the workbench into view.
+- **Drag:** use the workbench header. Buttons and resize grip are excluded from the drag start.
+- **Resize:** use the upper-left resize grip; panel size/position are retained in per-map editor UI preferences.
+- **Minimize (—):** hides only the workbench. editorModeActive, wmh-overlay-editing and wmh-editor-paused remain active; Player/NPC movement remains paused. The small launcher remains visible.
+- **Restore:** tap the launcher again. The workbench is shown without leaving edit mode.
+- **X / pull lever:** both are bound to exit editor mode. Actor animation/chat visibility/wandering and any pending Player destination are restored as appropriate.
+- **Camera:** editor open/minimize/restore/close preserve the camera scroll anchor; do not reset zoom or position as a side effect.
 
-When a control changes camera or editor state, preserve the existing camera anchor. Never reset zoom or scroll merely because the panel opened, minimized, restored or closed.
+The normal-play grid is deliberately much thinner/lighter than the editor calibration grid. Do not make editor cell borders and 8-sector guides visually dominant during ordinary movement.
 
-## 4. Runtime grid, movement and pathfinding
+### Editing tools retained
 
-The editor grid is the precise editing/calibration grid. Normal play should use the lighter, thinner visual treatment already defined in the normal-board CSS rules; do not make the full editor sector grid visually dominant outside editor mode.
+ADD CELL, DELETE CELL, SELECT & MERGE, UNMERGE, walkable whitelist, foreground, blocked sector, opacity sector, area transition markers, grid calibration, undo, clear, save draft, confirm/save, JSON export/copy and JSON import. The map image and canvas expansion are not modified by grid calibration.
 
-The active movement contract is data-driven:
-- walkableAreaEnabled and walkableCells/customGridCells define allowed movement cells when the walkable whitelist is enabled;
-- blockedCells and blockedQuadrants prevent movement through blocked cells/edge sectors;
-- isoGridCellExists, isoCanWalkTile and isoCanStep are shared checks;
-- walkToTile builds a deterministic breadth-first path in cardinal order: north, east, south, west;
-- occupied NPC cells are excluded from the Player path;
-- each path step updates token coordinates, depth/occlusion, footstep surface sound and the next movement timer;
-- NPC wandering checks the same grid existence and blocked-edge rules and avoids the Player and other NPCs.
+## 4. Walkability, Player pathfinding and NPC wandering
 
-NPC wandering currently runs on a 2,400 ms interval. Each NPC skips a tick when Math.random() is greater than 0.48, then chooses among valid cardinal neighbors. Keep this presentation behavior inside the board lifecycle and stop the timer when leaving the map, opening a chat that pauses wandering, or entering editor mode.
+When walkableAreaEnabled is true, walkableCells and valid customGridCells define the allowed movement graph. A missing/unmarked cell is not walkable. blockedCells and blockedQuadrants block cells/sector edges. Use shared checks instead of bypassing the map data:
 
-Do not weaken the walkability whitelist to make a path appear to work. An unmarked area is not a valid movement destination when walkableAreaEnabled is true. Do not interpolate across blocked-sector edges or allow NPCs to share an occupied cell.
+- isoGridCellExists(...)
+- isoCanWalkTile(...)
+- isoCanStep(...)
 
-## 5. NPC data, interaction and chat
+Player movement is resolved by walkToTile(dialog, targetX, targetY, surface):
 
-NPC definitions currently live in npcData in world-map-hierarchy.ts. Each record contains name, gender, greeting, choices and replies. isometricNpcTokensMarkup places NPC tokens by map ID; Academy positions are explicit owner-supplied cells.
+1. Validate integer target coordinates and that the destination exists on the map.
+2. Reject a destination that fails walkability checks.
+3. Resolve a deterministic breadth-first path in the fixed cardinal order north, east, south, west.
+4. Exclude occupied NPC cells.
+5. Update the Player one tile at a time, update depth/occlusion, emit the movement animation/trail and schedule the next step.
+6. Preserve the pending destination if movement is paused by entering editor mode; resume it only when editor mode exits and chat is not open.
 
-Current interaction flow:
-1. handleWorldMapHierarchyClick receives a tap on data-wmh-npc.
-2. It finds Player and NPC cell coordinates and calculates Manhattan distance.
-3. renderChat opens the lower dialogue panel, stops NPC wandering, clears a pending Player movement timeout, inserts the NPC greeting and renders choice buttons.
-4. A data-wmh-reply click appends the selected Player line and static NPC reply, then refreshes the choice buttons.
-5. data-wmh-action chat-close hides the panel and restarts NPC wandering on a local map.
+NPC wandering is deliberately simple presentation behavior, not an AI combatant brain:
 
-Important accuracy note: current code checks distance < 1 and blocks only when Player and NPC occupy the same cell. It does not enforce a maximum one-cell/adjacent interaction range. The older editor document's phrase “one-cell interaction-distance rule” must not be treated as proof that a maximum range is implemented. Confirm intended range from owner/Universe rules before changing it.
+- Timer interval: 2,400 ms.
+- Each NPC skips a tick when Math.random() > 0.48.
+- Candidate steps are cardinal neighbors only.
+- Candidate cells must exist, satisfy the same blocked-edge/walkability checks, and must not be occupied by the Player or another NPC.
+- stopNpcWander() clears the timer and stops actor scanners. Call it when leaving the area, opening NPC chat, or entering editor mode.
 
-The current board conversation is a local scripted choice panel. It is not connected to the Convo / AI GM pipeline and should not silently send game-world NPC dialogue to Supabase or Convo. Preserve the existing chat panel and lower-screen presentation.
+Do not loosen the whitelist or blocked-sector rules to make an actor move. Unmarked space is intentionally inert.
 
-When extending NPC dialogue:
-- preserve NPC-specific names, greetings, choice labels and replies;
-- keep actor movement/wandering paused while conversation is open;
-- prevent outside-map taps from submitting chat choices;
-- keep focus and close behavior usable on touch devices;
-- read current player-facing NPC conversation/style rules from the official Universe source at the verified active canon SHA before changing style or range;
-- do not infer private NPC agendas, hostility, Spirit Realm status or hidden identity from an NPC name.
+## 5. NPC interaction and dialogue/chat contract
 
-## 6. Movement effects, scan waves and future combat detection
+NPC runtime data is split between map placement/appearance records used by isometricNpcTokensMarkup() (id, x, y, gender and optional explicit scan tone) and npcData entries in world-map-hierarchy.ts (display name, gender, greeting, choices, reply strings).
 
-### Implemented today
+The current NPC chat is scripted, choice-based local UI. It is not yet a free-text AI conversation and is not persisted as a transcript.
 
-- Player movement uses walkToTile and per-cell state updates.
-- NPC movement uses startNpcWander and the same grid-step checks.
-- animateGridMove currently uses the browser Web Animations API through token.animate(...). It does NOT yet use Anime.js.
-- Anime.js is imported in world-map-hierarchy.ts and is already used for field-tool panel motion and other UI transitions.
-- There is no implemented colored tile-trail wave, no actor sonar/scanner ring, no overlap/chase resolver and no map-triggered battle entry.
+Interaction sequence:
 
-### Owner's requested visual language
+1. Player taps an NPC token.
+2. The map handler obtains the Player and NPC coordinates and calculates Manhattan distance: abs(playerX - npcX) + abs(playerY - npcY).
+3. The current code rejects only distance < 1 (the Player and NPC occupy the same cell). There is no maximum adjacency/range check in the current handler. Do not describe this as “one cell away” or assume a maximum reach. Confirm the intended rule from owner/official rules before adding a maximum range.
+4. renderChat(dialog, npcId) stops NPC wandering/scanner intervals, cancels a pending Player movement timeout, shows the lower dialogue panel, renders the NPC greeting and authored choices.
+5. Tapping a choice appends the Player's selected line and the corresponding authored NPC reply, then leaves the choice buttons available.
+6. Closing the panel hides it and resumes NPC wandering for the local map.
 
-The intended status colors are:
-- blue: verified non-hostile;
-- red: verified hostile — examples supplied by the owner: bandit, monster, aggressive Spirit Beast, quest-specific hostile NPC and assassin;
-- black: verified Spirit Realm expert;
-- white: Mortal or status not known.
+Chat presentation is a lower-screen dialogue box, not a full-screen centered modal. Keep the NPC bust/name, readable text, choices, close action, and bottom anchoring. The chat panel pauses movement/wandering while open. Do not invent new NPC knowledge, motives, hostility, or a conversation history that has not been recorded.
 
-Classification must come from explicit verified actor/profile metadata or an approved map/NPC record. If actor status is missing or ambiguous, use white. Do not decide an NPC is hostile merely because its ID/name contains a keyword. Spirit Realm expert must be a known status, not an assumption based on appearance.
+The map currently uses local scripted greetings/choices/replies. A future AI dialogue integration must use the appropriate NPC profile/knowledge boundaries and owner-approved prompt/data contract. It must not silently turn ordinary NPC taps into Convo login or expose developer-only Convo panels.
 
-After each completed tile movement, the owner wants a soft, short-lived light-wave impression on the tile just crossed. The wave should inherit the mover's status color and must not alter position, collision or game state.
+## 6. Actor status colors, tile trail and submarine scanner
 
-Each Player/NPC should eventually have a submarine-sonar-style expanding scan pulse with approximately a 2–3 tile reach. Keep it subtle and respect prefers-reduced-motion. The scanner is a future gameplay sensor, not just decoration: intended later rule is scan-wave contact initiates a chase and a one-tile approach/contact can lead to battle.
+Actor tone is explicit metadata: data-scan-tone. actorScanTone() returns unknown if the value is absent or invalid. Never infer threat/cultivation status from NPC name, gender, clothing, role, or visual appearance.
 
-### Do not implement chase or battle triggers yet
+| Explicit tone | Color | Meaning |
+|---|---|---|
+| friendly | Blue | Known non-hostile |
+| hostile | Red | Explicit hostile status, e.g. a confirmed bandit/assassin/aggressive Spirit Beast/quest enemy |
+| spirit-expert | Black | Explicitly established Spirit Realm expert |
+| unknown | White | Mortal/default/unknown status |
 
-The owner explicitly said combatant/chase integration rules are still being designed. Until those rules are supplied and approved:
-- do not start an NPC chase when two visual rings touch;
-- do not auto-enter combat at one tile;
-- do not add line-of-sight, stealth, detection probability, suspicion decay, attack priority, aggro reset, escape radius, facing cone or faction rules by inference;
-- do not apply damage, HP loss, injury, time cost, rewards or quest effects from a scan;
-- do not make cosmetic scan overlap mutate saved game state.
+The four Academy students/staff have explicit friendly metadata. Other NPCs/Player tokens default to unknown (white) until a valid source assigns a tone. Do not classify an NPC as hostile merely because the owner listed bandits/assassins/monsters as examples; an actual actor must be explicitly typed.
 
-When the owner provides the detection/chase design, integrate it with the authoritative combatant system and exact actor position/status records. Keep the detector separate from the renderer so animation frames never decide combat.
+### Current Anime.js effects
 
-## 7. Combat engine boundary
+- animateGridMove() uses Anime.js to ease actor translation after a tile coordinate changes (225 ms, outCubic).
+- emitTileTrailWave() places one short-lived colored wave on the tile reached after movement (760 ms, outQuad). It is presentation only.
+- Each Player/NPC token receives two expanding sonar rings. Pulse interval: 2,450 ms; each ring duration: 1,800 ms with staggered delay.
+- CSS scanner bounds are approximately five tile widths/heights across (about 2.5 tiles radius from the actor).
+- Reduced-motion users get a static scanner treatment and no animated tile trail.
+- Scanners start with the local actor/NPC field and stop when the field is hidden/paused, NPC wander lifecycle stops, chat opens, or editor mode begins.
 
-Combat formulas already exist separately from the isometric map:
-- src/offline-game/mechanics/combat.ts;
-- tests/offline-game/combat.test.ts (10 formula/validation tests);
-- official rule source: Antarezka/merzkava-universe/gameplay/COMBAT_SYSTEM.md.
+### Scanner event contract
 
-The utility exports calculateCombatRating, calculateCombatRatio, calculateHitChance, resolveD100Hit, calculateCombatDamage, getComboFollowupBaseDamagePercent and canResolveDefaultComboFollowup. It covers combat rating, ratio, hit chance, deterministic d100 result resolution, damage, defense reduction and default combo-follow-up validation.
+updateScannerContacts(board) compares actor cell centers using Euclidean grid distance:
 
-The formula implementation is not a complete fight loop and is not connected to map encounters or battle UI. The map has no encounter state, combat turn UI, chase state, battle state, initiative scheduler, actor resource transaction or battle outcome persistence.
+distance = hypot(actorX - targetX, actorY - targetY)
 
-Before connecting a future battle:
-1. Read active official COMBAT_SYSTEM.md plus core/SPIRIT_RING_RULES.md, core/HP_SYSTEM.md, core/INJURY_SYSTEM.md, gameplay/TIME_AND_ACTION_RULES.md and core/HUNGER_AND_METABOLISM.md at the same verified canon revision.
-2. Use only values supported by Player/NPC state. Missing PowerScale, HP, Qi, defense, artifact or injury data must stay unknown; never fill it with plausible-looking numbers.
-3. Apply the official initiative/action/readiness/hit/damage/defense/combo/consequence sequence. One action is not automatically one hit; the default combo follow-up only occurs under documented conditions.
-4. Keep scan/chase/ambush/escape rules as a separate approved layer. Do not add them to the combat formula utility until the owner provides the corresponding rules.
-5. Record position, HP/Qi/stamina, injury, equipment, inventory, time and other consequences only when the approved action resolver actually changes them.
-6. Add deterministic tests for the resolver and its integration with map actor IDs and cells.
+When distance <= 5 cells (two approximately 2.5-cell scanner fields overlap), the first transition into overlap dispatches:
 
-## 8. Anime.js implementation direction
+merzkava:field-scanner-overlap
 
-Anime.js 4.x is already installed as animejs ^4.5.0. Eternal Path owns a scoped animation module in src/offline-game/expedition-animations.ts:
-- imports animate, createScope and stagger;
-- uses createScope rooted at the current expedition screen;
-- disposes listeners and pauses active animations when the screen is replaced;
-- respects prefers-reduced-motion;
-- keeps animation presentation-only.
+Detail contains actor ID, target ID, both explicit tones, distance and both cell coordinates. When an existing pair leaves the overlap radius, it dispatches:
 
-Use the same Anime.js 4.x API for future isometric move easing, tile-wave and sonar visuals. Keep CSS responsible for color, blend mode, clipping and static fallback. Do not use PixiJS. Do not make game state depend on animation callbacks or frame counts.
+merzkava:field-scanner-clear
 
-For the map system, add a board-scoped lifecycle:
-- start effects only while the corresponding board is live;
-- keep one timer/scope per board, not one global scanner for every map;
-- stop/pause effects when the map is hidden, editor mode starts or app screen changes;
-- restore without duplicating intervals or event listeners;
-- skip/simplify motion for prefers-reduced-motion;
-- clean up detached DOM references and Anime.js instances when the map closes.
+The event is a sensor observation only. It does not change saved state, NPC intent, Player state, HP, Qi, injury, time, inventory or quest outcomes.
 
-## 9. Required tests before marking the field system complete
+## 7. Combat, chase, ambush, stealth and escape boundary
 
-Add/maintain tests for:
-- editor absent and direct editor actions rejected when Developer Mode is false;
-- editor launcher opens, minimize hides workbench but keeps editor pause active, restore opens it again, and X exits/resumes play;
-- every close control is wired independently;
-- editor changes do not reset camera zoom/scroll;
-- normal-play grid is visibly lighter than editor grid by CSS contract;
-- Player BFS remains in walkable whitelist and respects blocked sectors and occupied NPCs;
-- NPC wandering remains in allowed cells and cannot overlap Player/other NPCs;
-- Player/NPC movement emits presentation-only tile trail with correct explicit tone;
-- scan radius limited to owner-approved 2–3 cells, unknown status defaults to white and reduced-motion mode has a static fallback;
-- scanner overlap is only a sensor result until owner approves chase/battle logic;
-- scripted NPC dialogue opens, pauses wandering, responds to each choice and closes cleanly;
-- approved interaction range is enforced after it is sourced;
-- no Anime.js loop/listener remains after leaving the map;
-- Academy spawn, owner-marked NPC positions, seeded map JSON and transition labels remain unchanged.
+A deterministic combat formula helper exists separately:
 
-A passing unit test or web build does not prove touch behavior on Android. Device QA must verify floating panel, scroll, drag/resize, minimize/restore, X, tile tap-versus-pan, camera stability and chat interaction.
+- src/offline-game/mechanics/combat.ts
+- tests/offline-game/combat.test.ts (10 tests)
+- Official source: Antarezka/merzkava-universe/gameplay/COMBAT_SYSTEM.md
+- Related official modules to consult: core/SPIRIT_RING_RULES.md, core/HP_SYSTEM.md, core/INJURY_SYSTEM.md, gameplay/TIME_AND_ACTION_RULES.md, core/HUNGER_AND_METABOLISM.md, gameplay/TRAVEL_ENCOUNTER_AMBUSH_RESCUE.md.
+
+The helper covers Combat Rating, combat ratio, hit chance, d100 hit resolution, damage/defense, HP-loss cap and default combo-follow-up validation. It is not a complete combat turn loop. No map encounter/battle UI or state transaction is connected.
+
+Official combat baseline details already encoded in the helper:
+
+- Combat Rating = PowerScale × Readiness Factor × relevant Artifact Factor.
+- Readiness Factor allowed values: 0.8, 0.9, 1.0, 1.1, 1.2.
+- Hit chance = clamp(10%, 90%, 50% + 25% × (combat ratio − 1)); resolve using d100.
+- Base damage classes: 5%, 8%, 12%, 18%; high-output 18% requires explicit confirmation.
+- Power adjustment uses clamp(0.5, 1.5, sqrt(combat ratio)); apply supported defense reduction, round damage upward, and cap actual HP loss to current HP.
+- Default combo follow-up uses half the original base percentage, only after a successful opening hit and when combo/technique/opening are supported.
+
+Do not implement chase, automatic battle, ambush, stealth detection, hiding, escape or attack triggers yet. The owner explicitly said the chase/combatant integration rules are still being designed. Intended future direction is scanner overlap → chase, one-tile approach/contact → battle, but these are not current rules. Do not make animation frame count, ring overlap or a UI event determine combat. Do not invent line of sight, hearing, suspicion, aggro/decay, target choice, facing cone, escape radius, chase speed, surprise bonuses, turn rules, HP/Qi costs or battle consequences.
+
+When the owner supplies the approved system, integrate the scanner as a detector feeding a separate deterministic encounter resolver. Read the verified official combat/HP/injury/time/Satiety/travel-ambush sources at one consistent Universe commit. Preserve unknown stats as unknown and add deterministic tests before persisting combat results.
+
+## 8. Anime.js ownership and cleanup
+
+Anime.js ^4.5.0 is already installed. Isometric code imports animate (and shared helpers where required) directly in world-map-hierarchy.ts. Eternal Path scene FX and transitions are owned by src/offline-game/expedition-animations.ts, which mounts a scoped Anime.js lifecycle and reverts it before Eternal Path DOM replacement.
+
+Rules:
+
+- Animation is presentation, never the authority for game state.
+- Do not use animation frames/duration to decide cell movement, hit resolution, contact, damage or time.
+- Keep isometric timers per board, not global across hidden maps.
+- Clean up intervals, animations and listeners when board is hidden/detached or editor/chat pauses live play.
+- Respect prefers-reduced-motion; keep a static visual fallback.
+- Prefer opacity/transform and avoid heavy layout animation on low-end Android.
+- Do not use PixiJS for this project.
+
+Read docs/offline-game/ANIMATION_SYSTEM.md for the existing Eternal Path scene animation and lifecycle contract.
+
+## 9. Required follow-up / device QA
+
+Automated tests must continue covering: editor hidden/blocked without Developer Mode; minimize → restore → X; camera preservation; normal-vs-editor grid contrast; walkability whitelist and blocked sectors; occupied NPC cells; movement trail tone; unknown-white default; scanner overlap/clear as sensor-only events; NPC chat pause/reply/close; map-seed and Academy spawn preservation.
+
+Web/CI tests do not certify touch UX. Verify on Android, preferably the owner's low-end TECNO target:
+
+- scroll inside the compact field panel, drag, resize, minimize, restore, X and pull lever;
+- editor does not steal/pan/zoom when tapping a cell and does not reset camera;
+- grid contrast in normal play vs editor mode;
+- movement waves and sonar colors/radius/performance;
+- NPC interaction reach, dialogue, reply, close and wandering pause/resume;
+- external TV login, local signup/login, remember toggle, X/back;
+- internal Atlas route bypasses login;
+- Android back/gesture across modals, screens, repeated Home prompt, reduced motion and memory cleanup.
+
+Do not mark an item device-verified based only on a passing web build or emulator launch.

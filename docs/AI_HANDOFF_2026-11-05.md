@@ -1,166 +1,185 @@
-# AI Handoff — Isometric Field System, Combat/Detection and Access Gates
+# AI Handoff — Merzkava APK Field, Combat and Access Work
 
-**Handoff date:** 2026-11-05  
-**Repository:** Antarezka/merzkava-apk  
-**Working branch:** feature/global-isometric-canvas-margins-2026-11-05  
-**Last audited code commit before this documentation pass:** fae1ec3f1ef13eca0d20bf1453935b2b47a2c031
+**Handoff audit date:** 2026-11-05  
+**Source baseline audited:** ed5ef007cead9ecf8e6e70662c29ec5cce9527b0  
+**Branch:** feature/global-isometric-canvas-margins-2026-11-05  
+**Repository:** Antarezka/merzkava-apk
 
-This is the durable continuation point for the next AI/developer. It is intentionally explicit about incomplete work. Read it before modifying the field system, NPC interaction, combat, Developer Mode, World Atlas authentication or Android Back behavior.
+This is the continuation point for the next AI/developer. It records current implementation, actual tests and remaining proof. Read it before touching map movement, NPC/chat, scanner/combat, Developer Mode, World Atlas login or Android Back.
 
 ## 1. Mandatory read order
 
-1. Check the live branch head and working tree; do not assume this handoff commit remains HEAD.
-2. Check the latest Web App Validation and Build Merzkava Android APK workflow on the exact branch head.
-3. Read docs/PRODUCT_ROADMAP.md and docs/ARCHITECTURE.md.
-4. Read docs/offline-game/README.md and docs/offline-game/ISOMETRIC_MAP_EDITOR.md.
-5. Read docs/offline-game/ISOMETRIC_FIELD_SYSTEM.md.
-6. Read docs/APP_ACCESS_AND_NAVIGATION.md.
-7. Read docs/offline-game/ANIMATION_SYSTEM.md and the authoritative combat/movement/NPC modules from the official Universe repository at the app's verified active canon SHA.
-8. Inspect the actual source and tests listed below before editing.
+1. README.md and docs/PRODUCT_ROADMAP.md — repository architecture, status rules and product boundaries.
+2. This file — current state, immediate tasks and verification checkpoint.
+3. docs/offline-game/ISOMETRIC_FIELD_SYSTEM.md — field runtime/editor, movement, NPC dialogue, scanner events and combat boundary.
+4. docs/APP_ACCESS_AND_NAVIGATION.md — Developer Mode, Atlas account identity, password handling and Back stack.
+5. docs/offline-game/ISOMETRIC_MAP_EDITOR.md — shared map JSON schema, eight-sector markings, calibration and Academy reference.
+6. docs/offline-game/ANIMATION_SYSTEM.md — Anime.js 4.x ownership and cleanup lifecycle.
+7. Source and tests named in those docs.
+8. Before combat or chase work, refresh the active official Universe modules at one verified ACTIVE_SHA; never use mixed revisions.
 
-The official Antarezka/merzkava-universe repository remains the authority for world rules. Use the currently verified active commit SHA; do not substitute main/latest or claim a file was read if the fetch fails. players.md is a character registry, not a password/login store.
+Always fetch the live branch HEAD first. Do not assume this handoff source SHA is still the latest commit after documentation-only updates or future owner changes.
 
-## 2. Owner requirements that must remain in scope
+## 2. Owner requirements that remain in scope
 
-### Isometric field/editor experience
-- Keep the current cell editor data contract and eight child sectors per diamond. Do not simplify the eight-sector quadrant system or overwrite the Academy AI_UPDATE_REFERENCE.
-- The field tool is a compact floating window with internal scroll. Its launcher and workbench are draggable/resizable and use Anime.js for panel motion.
-- Minimize must hide the workbench without leaving editor mode or resuming the world. Restore must reopen the workbench. X must exit editor mode and resume live play. The current implementation is incomplete here; see §4.
-- Outside editor mode, the normal gameplay grid should remain much thinner and quieter than the calibration/editor grid.
-- The live isometric HUD remains shared across maps. Minimap use is limited to outdoor field/wilderness/transit contexts as already specified in ISOMETRIC_MAP_EDITOR.md.
-- Do not change camera zoom/scroll when opening, minimizing, restoring or closing field tools.
+### Isometric field/editor
+- A small floating scrollable field-tool panel, not a full-screen sheet.
+- Existing launcher remains draggable; window remains draggable/resizable.
+- Minimize hides only the panel; edit mode remains active and world/actors stay paused. The launcher restores it.
+- X (and pull lever) exits editor mode and resumes the world.
+- Preserve camera zoom/scroll when open/minimize/restore/close.
+- Normal map grid must remain much thinner/lighter than editor calibration lines.
+- All isometric areas use the shared editor/runtime, not separate Academy-only behavior.
 
-### Actor status, movement effects and sonar
-Requested status palette:
-- blue — verified non-hostile;
-- red — verified hostile, including bandits, monsters, aggressive Spirit Beasts, quest-specific hostiles and assassins;
-- black — verified Spirit Realm expert;
-- white — Mortal or unknown status.
+### Actors, light waves and sonar
+- Per-tile movement uses Anime.js easing and a soft colored wave on the tile reached.
+- Status colors are explicit metadata: blue friendly/non-hostile, red hostile, black Spirit Realm expert, white mortal/unknown.
+- Each Player/NPC shows a two-ring sonar pulse about 2–3 tiles from the actor.
+- Sensor overlap is an event contract only today. Intended later direction is overlap → chase and one-tile contact → battle, but actual rules are not approved.
 
-Each completed tile traversal should eventually emit a subtle status-colored tile wave. Player and NPC actors should eventually emit a subtle expanding sonar-style pulse with approximately 2–3 tile range. These are not implemented at the audited baseline.
+### NPC, dialogue and chat
+- Keep the scripted NPC greeting/choice/reply data and lower-screen dialogue presentation.
+- Chat pauses NPC wandering and actor scanners while open; closing resumes local wandering.
+- Do not invent a maximum interaction radius: current runtime blocks same-cell interaction only; no maximum range is enforced.
+- Future AI NPC behavior must use official NPC profile knowledge/agenda boundaries and must not leak developer-only Convo UI.
 
-The intended later gameplay behavior is scanner contact → chase; one-tile approach/contact → battle. The owner explicitly said combatant/chase integration rules are still being designed. Do not implement chase, battle, stealth, ambush or escape consequences until those rules are supplied/approved. A visual ring overlap must not mutate authoritative game state.
+### Combat, ambush and stealth
+- Combat formula helpers exist and are tested, but are not connected to map encounters or a complete battle loop.
+- Read official gameplay/COMBAT_SYSTEM.md, gameplay/TRAVEL_ENCOUNTER_AMBUSH_RESCUE.md, core/SPIRIT_RING_RULES.md, core/HP_SYSTEM.md, core/INJURY_SYSTEM.md, gameplay/TIME_AND_ACTION_RULES.md, and core/HUNGER_AND_METABOLISM.md from one consistent verified commit.
+- Do not activate chase, battle, stealth, hiding, ambush, escape, damage, HP/Qi loss, injury, time cost or quest consequences from scanner overlap until the owner supplies the specific combatant/chase rules.
 
-### NPC interaction and chat
-- Keep current NPC actor IDs/coordinates and per-area scripted dialogue data unless the owner gives new placements.
-- Keep the existing lower chat panel and choice-based interaction behavior.
-- NPC wandering must remain inside the same walkable and blocked-edge map contract and must not overlap the Player or other NPCs.
-- Confirm actual approved NPC interaction distance from the Universe source/owner rules before changing it. The current same-cell guard is not proof of a maximum adjacency radius.
-- Do not route these static map NPC conversations into Convo/Supabase without an explicit design decision.
-
-### Combat system
-A standalone deterministic combat formula module already exists and is tested, but it is not wired into map encounters or a battle UI. The map must not invent its own combat formulas. Use the official combat and supporting mechanic modules listed in ISOMETRIC_FIELD_SYSTEM.md.
-
-### Account/auth/navigation
-- Developer-only controls, Convo, Supabase/canon controls, Floating Control and all editor entry points must remain hidden/disabled and handler-blocked for non-developers.
-- The external Eternal Path TV opens the World Atlas and must show its local player login panel every time. Candidate accounts must be the intersection of verified players.md registry and local Eternal Path character save data.
-- An account with no local password must be offered a localized create-password flow. Store only a salted password verifier locally; never store or log the raw password.
-- An internal Atlas/map entry originating inside the live game world must bypass the external TV login modal.
-- Android Back/gesture must unwind app screens until Home; Home Back shows an exit confirmation on every press; only explicit Yes may exit. This is not implemented at the audited baseline.
+### Accounts and navigation
+- Ordinary players must not see/use Developer Floating Control, editor, Convo, Supabase auth, canon/registry modules or other sensitive controls. Keep the app-shell gate and independent map editor gate.
+- Developer local verifier is client-side, not server-grade security.
+- External TV World Atlas entry always shows the player login gate, matching verified players.md identity plus local Eternal Path save. Internal in-world Atlas entry bypasses that gate.
+- Atlas password is local, salted and hashed; never use players.md as a password store.
+- Android Back/gesture unwinds overlays and screen history. Home Back shows a localized confirmation on every press; only Yes exits.
 
 ## 3. Source map
 
-### World map, grid and editor
+### Isometric board and editor
 - src/offline-game/world-map-hierarchy.ts
 - src/offline-game/world-map-hierarchy.css
 - src/offline-game/isometric-map-editor.ts
-- src/offline-game/isometric-svg-board.ts
 - src/offline-game/tianhai-academy-map-reference.ts
+- src/offline-game/isometric-svg-board.ts
+- tests/offline-game/isometric-npc-chat.test.ts
 - tests/offline-game/isometric-map-editor.test.ts
 - tests/offline-game/isometric-render-test.test.ts
-- tests/offline-game/isometric-svg-board.test.ts
 
-### NPC/movement/chat
-- npcData and isometricNpcTokensMarkup are in world-map-hierarchy.ts.
-- startNpcWander controls the 2.4-second NPC wandering interval.
-- walkToTile uses cardinal breadth-first search, walkability checks, blocked-sector checks and occupied-NPC exclusion.
-- animateGridMove currently uses Element.animate (Web Animations API), not Anime.js.
-- renderChat opens the lower choice dialogue, stops wandering and displays static greetings/choices/replies.
-- handleWorldMapHierarchyClick handles map taps, NPC interaction, replies, area transitions and editor entry.
-- tests/offline-game/isometric-npc-chat.test.ts covers markup and visible chat contracts.
-
-### Combat
-- src/offline-game/mechanics/combat.ts
-- tests/offline-game/combat.test.ts
-- official source: gameplay/COMBAT_SYSTEM.md
-- related source modules: core/SPIRIT_RING_RULES.md, core/HP_SYSTEM.md, core/INJURY_SYSTEM.md, gameplay/TIME_AND_ACTION_RULES.md and core/HUNGER_AND_METABOLISM.md.
-
-### Anime.js
-- package.json dependency is animejs ^4.5.0.
-- src/offline-game/expedition-animations.ts uses Anime.js 4.x with createScope, animate and stagger; motion is presentation-only, scoped to the mounted Eternal Path view and cleaned up during screen replacement.
-- world-map-hierarchy.ts imports Anime.js animate/stagger, used for field-tool motion, but animateGridMove still uses browser-native Element.animate.
-- docs/offline-game/ANIMATION_SYSTEM.md documents the existing Eternal Path animation contract. Do not reintroduce PixiJS.
-
-### Access and account
+### Player registry, local account and Developer Mode
+- src/main.ts
+- src/convo/canon/canon-loader.ts
+- src/offline-game/expedition-game.ts
 - src/security/developer-access.ts
 - src/app/developer-access-panel.ts
-- src/main.ts
-- src/app/floating-control.ts
-- src/native/floating-window.ts
 - src/offline-game/world-atlas-account.ts
-- src/convo/canon/canon-loader.ts
-- src/convo/characters/character-repository.ts
-- src/offline-game/expedition-game.ts
-- src/offline-game/expedition-interface.ts
+- src/offline-game/world-atlas-login.ts
+- src/app/exit-confirm-panel.ts
+- tests/offline-game/world-atlas-account.test.ts
+- tests/offline-game/world-atlas-login.test.ts
+- tests/app/exit-confirm-panel.test.ts
 
-## 4. Current implementation state at audited code baseline
+### Native Android
+- src/native/floating-window.ts
+- native/android/FloatingWindowPlugin.java
+- scripts/patch-android.mjs
+- Generated MainActivity is patched during build. The patch script is the source of truth.
 
-| Area | State | What is actually present |
+### Combat and animation
+- src/offline-game/mechanics/combat.ts
+- tests/offline-game/combat.test.ts
+- src/offline-game/expedition-animations.ts
+- docs/offline-game/ANIMATION_SYSTEM.md
+
+## 4. Current implementation state at audited source baseline
+
+| Feature | Status | Actual boundary |
 |---|---|---|
-| Shared isometric editor schema | Implemented | Per-map persistence, sparse custom cells, walkable groups, three eight-sector marker layers, transitions and calibration |
-| Tianhai Academy map reference | Implemented | One-time owner reference seed; 2816×1536 artwork; 24×20 grid; Player entrance (12,31); owner-supplied NPC positions and marker data |
-| Developer editor gate | Implemented; tests/build being rechecked | worldMapDeveloperMode default false; markup/binder/action gates; main-shell sensitive-action guards |
-| Floating editor workbench | Partial | Drag/resize/Anime.js open-close exist; minimize markup exists but no handler; multiple X/lever close controls are not all bound |
-| Normal-play grid | Styled | Separate subdued normal-play treatment exists; regression test and device verification still required |
-| Player pathfinding | Implemented | Cardinal BFS, allowed-cell and blocked-edge checks, occupied NPC cell exclusion, footsteps |
-| NPC wandering | Implemented | 2.4-second interval, random cardinal step, map constraints and occupied-cell avoidance |
-| NPC chat | Basic implementation | Static greeting, fixed choices and scripted replies in the lower chat panel; no Convo/AI routing |
-| NPC maximum interaction range | Unverified/incomplete | Current code blocks same-cell interaction (distance < 1) but does not enforce a maximum adjacent range |
-| Combat formula helpers | Implemented/tested standalone | Combat rating, ratio, hit chance, d100 result, damage/defense, default combo follow-up; no map encounter loop |
-| Tile trail waves | Not implemented | Current movement animation has no colored post-step wave |
-| Actor sonar scanner | Not implemented | No 2–3 tile actor scan pulse or contact resolver |
-| Chase/ambush/escape | Design pending | Do not implement until owner supplies combatant specification |
-| Map-triggered battle UI/state | Not integrated | Combat utility is not connected to Player/NPC tokens or map transitions |
-| World Atlas password utility | Implemented as a local module only | Salted PBKDF2 verifier and local remember helpers; no complete TV login UI flow |
-| External TV login gate | Not implemented | TV button currently opens the Atlas modal directly |
-| Internal Atlas bypass distinction | Existing route is distinct | Keep internal in-world route separate from external TV gate |
-| Android Back app navigation stack | Not implemented | Existing popstate closes certain modals; no full app route stack |
-| Home exit confirmation / native exit | Not implemented | Must be added with Android hardware/gesture Back integration |
+| Tianhai Academy map seed | Implemented | One-time seed; owner reference stays confirmed:false; local edits not overwritten |
+| Shared eight-sector grid | Implemented | Legacy quadrant keys expand to child sectors; editor/runtime shared |
+| Walkable whitelist/BFS | Implemented | Cardinal BFS; unmarked cells blocked when whitelist enabled; blocked-sector edges respected |
+| NPC wandering | Implemented | 2,400 ms timer; 0.48 move probability per tick; valid cardinal cells only; no actor overlap |
+| NPC chat | Implemented | Static greeting/choices/replies in npcData; bottom box; pauses wander/scanners |
+| NPC interaction maximum range | Incomplete | Runtime blocks same-cell interaction; no maximum reach is enforced |
+| Developer UI/editor gate | Implemented as local gate | Main app and map editor independently default locked; server-grade security is not claimed |
+| Floating field-tool window | Implemented in source | Compact scroll panel, drag/resize, Anime.js slide, minimize keeps editor active, launcher restores, X/lever closes |
+| Normal/editor grid contrast | Implemented in CSS | Normal play lines lighter/thinner; editing grid stronger |
+| Colored tile trail | Implemented in source | Anime.js 760 ms wave after actor movement; explicit status tone only |
+| Actor sonar pulse | Implemented in source | Two staggered rings, ~2.5-cell visual radius, 2,450 ms pulse interval |
+| Scanner overlap event | Implemented as sensor | field-scanner-overlap and field-scanner-clear; no state mutation |
+| Chase/ambush/escape | Not implemented | Owner rules pending; do not infer from scan |
+| Combat formulas | Implemented/tested standalone | No complete combat loop, encounter state, turn UI or map integration |
+| World Atlas external login | Implemented in source | Verified player registry ∩ local save; local password signup/login; modal gate every external TV open |
+| Internal Atlas route bypass | Implemented in source | In-world map open action does not invoke external login gate |
+| Developer Remember Me | Implemented in source | Native SecureStorage stores authorization marker; typed password not persisted |
+| World Atlas Remember Me | Implemented in source | Stores player selection; it does not skip the login gate |
+| Android Back route stack | Implemented in source | Native patch dispatches WebView Back to JS history; Home shows confirmation repeatedly |
+| Android package/emulator | Pending at source audit | Check current workflow; do not treat source code as target-device QA |
 
-## 5. Immediate continuation order
+## 5. Critical implementation details to preserve
 
-Do not begin a broad rewrite. Continue in this order:
+### Map/editor
+- Academy Map Base: 2816×1536, grid 24×20, tile 128×69.5.
+- Player start (12,31). Gateways (11,31) and (12,31). Dialogue (9,3). Intro event (14,-5).
+- NPC start cells (7,4), (10,9), (6,15), (22,10).
+- Only the four Academy student/staff tokens have explicit friendly scan metadata; all other tokens default unknown/white.
+- Field tool minimize must not remove editor pause; do not simplify it to editor close.
+- Both X and lever are bound via querySelectorAll for data-wmh-overlay-close.
 
-1. **Get CI green on the exact current branch head.** Review Web App Validation and Android APK logs first. Do not call a build successful if only web bundling or packaging passed.
-2. **Repair field-tool controls.** Add a real minimize handler that preserves editor pause/state; bind lever and X independently; add tests for minimize → restore → X, camera preservation and actor/chat pause-resume.
-3. **Wire Atlas login.** Use registeredCharacters from the verified players.md snapshot intersected with listEternalSaves() character names. Use world-atlas-account.ts. Show the modal for external TV every time; preserve the internal game-world route without the login prompt. Add all eight language labels.
-4. **Implement app-level Back stack and Home exit confirmation.** Review current native Android integration and Capacitor version; add explicit hardware/gesture Back handling rather than relying solely on popstate. Keep modal Back priority.
-5. **Implement presentation-only movement trail + sonar using Anime.js.** Use explicit actor status metadata; unknown = white. Respect reduced motion and clean up timers/scopes on map hide/editor pause/screen switch. Keep all overlap events non-authoritative until the owner approves chase/battle rules.
-6. **Wait for the owner's combatant/chase specification.** Then connect sensor contact and one-tile proximity to a proper deterministic encounter resolver using official combat/HP/injury/time/Satiety rules.
-7. **Device QA on Android 14 / target low-end TECNO device.** Test field-tool scroll/drag/resize/minimize/X, map tap-versus-pan, camera stability, NPC chat, external/internal Atlas entry, all Back paths, reduced motion and memory cleanup.
+### Movement/chat
+- Player path walkToTile() is BFS in cardinal order; preserve deterministic order and whitelist/sector checks.
+- NPC wandering avoids occupied actor cells and uses the same map path constraints.
+- NPC tap currently rejects only same cell; do not claim adjacent-only.
+- Chat is local, scripted and not persisted as a full dialogue transcript. It pauses NPC wandering/scanners.
 
-## 6. Verification checkpoint
+### Scanner / future combat
+- Tone map: friendly blue, hostile red, spirit-expert black, unknown white. Never infer tone from name.
+- Visual scanner pair overlap uses Euclidean grid distance <= 5 (two ~2.5-cell scanner reaches overlap).
+- Event names: merzkava:field-scanner-overlap and merzkava:field-scanner-clear.
+- These are sensor presentation events only. A future chase/battle resolver must consume explicit actor/status records and official encounter/combat procedures; it must not use Anime.js completion callbacks.
 
-At code baseline fae1ec3f1ef13eca0d20bf1453935b2b47a2c031:
-- **Web App Validation #2255** (run 42018543970) passed, including gameplay tests, TypeScript and production Vite build.
-- **Android APK Build #1213** (run 42018543188) had completed the web build, Capacitor sync, native floating-mode integration, APK build, package/version/alignment/signature verification and artifact upload; its Android 14 emulator install/smoke stage was still running at last check.
-- The follow-up documentation-only commit also triggered Web App Validation #2256 (run 42019165676), which passed.
+### Login/navigation
+- players.md is identity registry only; no passwords.
+- External TV gate shown every time, even if Remember Me preselects the character.
+- Signup only creates a local password for an existing verified character with a matching Eternal Path local save; it does not create a new Universe account.
+- Developer verifier is static client-side PBKDF2. Do not embed raw credentials or claim offline extraction is impossible.
+- Native Android patch must include both android.webkit.WebView and androidx.activity.OnBackPressedCallback imports. Recheck generated MainActivity.java compile after changes to scripts/patch-android.mjs.
 
-The earlier code commit 50fa56572c1064503fbd46bff177890a6b8b854c failed because web tests called setWorldMapDeveloperMode(false) in Node where document was undefined, and the APK build stopped on unused listEternalSaves / World Atlas imports. Commit fae1ec3 added an SSR-safe guard and removed the unused imports until Atlas UI integration.
+## 6. Immediate continuation order
 
-**Next AI must recheck live workflow status before claiming Android verification green.** No APK installation on the owner's physical target device is certified by this handoff. Do not infer device success from a passing web suite or emulator smoke test.
+1. **Check the actual Android workflow first.** Source baseline ed5ef007... has a successful Web App Validation run. Android Build #1224 was at Android 14 emulator-install when last checked. Confirm package/signing/artifact/emulator results. If failed, fix the exact log failure and rerun.
+2. **Perform on-device UI QA** on Android/TECNO: floating panel scroll, drag, resize, minimize/restore/X, camera stability, tap-vs-pan, trail/scanner color/performance, NPC chat, Atlas external/internal entry, Remember Me, Back button and edge gesture.
+3. **Confirm NPC interaction range with owner/Universe rules.** Current same-cell-only guard is not adequate proof of an adjacency rule; don't guess.
+4. **Wait for owner-approved combatant/chase specification** before wiring overlap→chase or one-cell→battle. Use official Universe modules and deterministic tests.
+5. **Expand explicit tone metadata** only where the NPC/player profile or owner-approved status says friendly/hostile/Spirit Realm expert. Unknown remains white.
+6. **Keep documentation synchronized** after each meaningful system change: field runtime, access/navigation, handoff, roadmap.
 
-## 7. Non-negotiable regression guards
+## 7. Verification checkpoint
 
-- Preserve the eight child-sector quadrant model and old-key normalization.
-- Preserve the Academy source image and owner-supplied one-time AI_UPDATE_REFERENCE. Do not reset/reseed local editor changes on every app launch.
-- Keep movement restricted to the selected walkable whitelist when enabled.
-- Keep blocked-sector edge checks and occupied-cell protections.
-- Keep Player start (12,31) and Academy NPC start positions unless the owner provides a new map reference.
-- Do not change existing NPC choice-chat style without checking official source/owner instructions.
-- Do not route static World NPC chat through Convo without authorization.
-- Do not infer hostility, Spirit Realm expertise, visibility, stealth, detection or combat values from actor names.
-- Do not let Anime.js timing decide state changes.
-- Respect prefers-reduced-motion and dispose every map/app animation/timer listener.
-- Do not reintroduce PixiJS.
-- Never store or publish raw developer/player passwords or provider secrets.
+At the audited source SHA ed5ef007cead9ecf8e6e70662c29ec5cce9527b0:
+
+- Web App Validation #2269: **passed**.
+- Gameplay suite: **31 test files / 222 tests passed**.
+- TypeScript checks, gateway type-check and Vite production build: **passed**.
+- Android Build #1224: **not yet certified at this source audit**; last observed state was Android 14 emulator-install. Recheck live workflow status and artifacts before saying Android verification is complete.
+- Physical installation/interaction on the owner's TECNO target is not certified by CI.
+
+Workflow links:
+- [Web App Validation #2269](https://github.com/Antarezka/merzkava-apk/actions/runs/42023817319)
+- [Android Build #1224](https://github.com/Antarezka/merzkava-apk/actions/runs/42023817359)
+
+## 8. Non-negotiable regression guards
+
+- Do not alter camera behavior, expansion margins or Academy artwork unless specifically requested.
+- Do not overwrite the one-time Academy map seed or change its unconfirmed state.
+- Do not allow movement into unmarked cells when whitelist is on.
+- Do not make Player/NPC tokens overlap.
+- Do not infer actor hostility/Spirit Realm status.
+- Do not trigger chase/battle/damage/quest/time consequences from visual sensor overlap.
+- Do not expose developer/editor/Convo/Supabase/canon controls to non-developers.
+- Do not treat players.md as password authority.
+- Do not make Remember Me skip the external TV login screen.
+- Do not let Android Back exit from a non-Home app screen; only explicit Yes on Home may exit.
+- Preserve the existing lower NPC dialogue panel and chat choice behavior.
+- Keep Anime.js scoped to its owning board/screen and clean up timers/listeners when it is hidden or replaced.

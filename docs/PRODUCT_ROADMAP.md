@@ -1038,16 +1038,23 @@ The nine-node starter slice spans Golden Dragon Empire, Tianhai Yunzhou, and Bei
 
 ## 15. Isometric field, actor interaction and access-gate handoff — 2026-11-05
 
-This section records the current implementation boundary and points to the focused continuation documents. It does not mark the full feature set complete.
+Current source baseline for this workstream: ed5ef007cead9ecf8e6e70662c29ec5cce9527b0. This is a shared system used by all isometric maps, not an Academy-only implementation. Detailed contracts are in [ISOMETRIC_FIELD_SYSTEM.md](./offline-game/ISOMETRIC_FIELD_SYSTEM.md), [APP_ACCESS_AND_NAVIGATION.md](./APP_ACCESS_AND_NAVIGATION.md), and [AI_HANDOFF_2026-11-05.md](./AI_HANDOFF_2026-11-05.md).
 
-- [x] Record the shared map-editor schema, Academy reference, walkability/quadrant contract, NPC movement/chat implementation, independent combat formula module, Anime.js ownership and next implementation sequence in [ISOMETRIC_FIELD_SYSTEM.md](./offline-game/ISOMETRIC_FIELD_SYSTEM.md).
-- [x] Record Developer Mode, local World Atlas password primitives, players.md/local-save identity requirements, external-TV versus internal map entry, and Android Back requirements in [APP_ACCESS_AND_NAVIGATION.md](./APP_ACCESS_AND_NAVIGATION.md).
-- [x] Add the AI continuation read order, source map, regression guards and current verification boundary in [AI_HANDOFF_2026-11-05.md](./AI_HANDOFF_2026-11-05.md).
-- [~] Developer-only app/editor gating is present in code; local verifier is client-side and is not a server-grade security boundary. Atlas login UI is not yet wired.
-- [~] Isometric editor workbench can open/drag/resize and uses Anime.js motion. Minimize markup has no handler, and not every X/lever close control is bound independently.
-- [~] NPC pathfinding, bounded wandering and scripted choice chat exist. Interaction max range needs source confirmation. Combat formulas are implemented/tested separately but are not linked to map encounters.
-- [ ] Add status-colored tile trail and short-range sonar scanner with Anime.js; keep scan results presentation-only until the owner approves chase/battle rules.
-- [ ] Complete field-tool minimize/restore/X behavior, Atlas external login flow, internal bypass, Android screen history and Home exit confirmation.
-- [ ] Complete Android emulator and target-device touch QA for the updated APK.
+- [x] Record shared map JSON, eight-sector markings, Academy reference/seed, walkability whitelist and movement rules.
+- [x] Gate developer-only Floating Control, Convo/Supabase/canon surfaces and map editors behind explicit local Developer Mode; document client-side verifier limitation.
+- [x] Add compact scrollable floating field-tool window with drag/resize, Anime.js open/close, minimize-with-editor-active, restore and X/lever exit wiring. Device touch QA remains required.
+- [x] Add a lighter normal-play grid distinct from the stronger editor grid.
+- [x] Add Anime.js post-step tile waves and two-ring actor sonar. Status tone is explicit metadata: friendly blue, hostile red, Spirit Realm expert black, unknown white. Current Academy student/staff seeds are friendly; other actors remain unknown until classified.
+- [x] Add board sensor events merzkava:field-scanner-overlap and merzkava:field-scanner-clear. They do not start chase/battle or mutate game state.
+- [x] Preserve Player BFS, walkable whitelist, blocked-sector edges, NPC wandering/occupancy checks, and the bottom scripted NPC chat panel.
+- [x] Add external TV World Atlas login gate: verified player registry ∩ local save; local salted password signup/login, Remember Me, eight-language copy and inert/blurred modal. Internal in-world Atlas open bypass remains separate.
+- [x] Add localized Home exit confirmation, JS screen history, Android Back event bridge and native exit action. Android/physical gesture proof remains a build/device gate.
+- [x] Add current runtime and AI continuation docs, including the exact NPC range limitation and standalone combat formula boundary.
+- [~] Complete Android 14 emulator/build verification for this exact baseline and perform owner-device touch QA.
+- [ ] Confirm intended maximum NPC interaction range against owner/Universe rules; current handler blocks same-cell interaction only.
+- [ ] Wait for owner-approved combatant/chase/ambush/stealth/escape rules before connecting sensor events to real encounters.
 
-**Verification snapshot:** Web App Validation #2255 passed on code commit fae1ec3f1ef13eca0d20bf1453935b2b47a2c031. Web App Validation #2256 passed on the documentation-only follow-up commit. Android Build #1213 had completed APK build/package/signature/upload steps but was still running its Android emulator stage when this section was updated. Recheck the workflow before marking Android verification complete.
+**Verification snapshot at the source audit:** Web App Validation #2269 passed for ed5ef007cead9ecf8e6e70662c29ec5cce9527b0: 31 test files and 222 tests passed; TypeScript/gateway checks and Vite production build passed. Android Build #1224 was at the Android 14 emulator-install stage when this section was prepared; check the workflow/artifact before calling Android verified. No physical installation on the target TECNO device is certified by this record.
+
+- [Web App Validation #2269](https://github.com/Antarezka/merzkava-apk/actions/runs/42023817319)
+- [Android Build #1224](https://github.com/Antarezka/merzkava-apk/actions/runs/42023817359)

@@ -1,45 +1,62 @@
-# Developer Access, World Atlas Accounts and Back Navigation
+# Developer Access, World Atlas Accounts and Android Back
 
-**Last audited:** 2026-11-05  
-**Code baseline audited:** fae1ec3f1ef13eca0d20bf1453935b2b47a2c031
+**Last source audit:** 2026-11-05  
+**Audited source commit:** ed5ef007cead9ecf8e6e70662c29ec5cce9527b0  
+**Branch:** feature/global-isometric-canvas-margins-2026-11-05
 
-This document distinguishes active gates from unfinished login/navigation work. The app is client-side Android/WebView software; hiding a control is not a server-side security boundary.
+This document is the security and navigation contract. It records which gates exist, what their data means, and where the boundary remains client-side rather than server-side.
 
-## 1. Developer access source files
+## 1. Source files
 
-- src/security/developer-access.ts — developer ID/password verifier, session state and Remember Me persistence.
-- src/app/developer-access-panel.ts — localized developer login panel and header controls.
-- src/main.ts — developer state, app-shell visibility, submit/click guards and session restore.
-- src/offline-game/world-map-hierarchy.ts — second gate around map editor markup, binders and direct editor actions.
-- src/native/floating-window.ts — Android FloatingWindow plugin wrapper.
-- src/app/floating-control.ts — sensitive floating-control surface.
+| Concern | File |
+|---|---|
+| Developer verifier and local session | src/security/developer-access.ts |
+| Developer login/Remember Me panel | src/app/developer-access-panel.ts |
+| Local World Atlas password and remembered-player storage | src/offline-game/world-atlas-account.ts |
+| Localized World Atlas login gate markup | src/offline-game/world-atlas-login.ts |
+| World Atlas modal placement and gate CSS | src/offline-game/idle-home-map.ts, src/offline-game/idle-home-map.css |
+| App-level Developer Mode, screen routes, external Atlas login and Back handler | src/main.ts |
+| Independent map editor gate | src/offline-game/world-map-hierarchy.ts |
+| Android native plugin wrapper and Java implementation | src/native/floating-window.ts, native/android/FloatingWindowPlugin.java |
+| Generated MainActivity patch | scripts/patch-android.mjs |
+| Localized Home exit confirmation | src/app/exit-confirm-panel.ts, src/style.css |
 
-The developer login panel has a Remember Me checkbox. On native Android, the remembered session uses Capacitor SecureStorage (Android Keystore-backed storage). The app stores a session authorization marker, not the entered password. A non-remembered session remains in memory.
+## 2. Developer Mode and sensitive UI
 
-The verifier in developer-access.ts is a client-side PBKDF2 verifier. It is not equivalent to remote authentication: an extracted APK contains verifier material and an attacker can attempt offline guesses. Encoding a password as binary, base64 or a hash does not make a static client verifier unbreakable. Do not add a plaintext credential to source, documentation, build notes or UI. For stronger release security, move developer authentication to a server challenge/credential service and keep privileged operations protected server-side. Until then, describe the client gate accurately as a local UI/feature gate, not a robust security boundary.
+The application starts with developerAuthenticated=false unless a remembered native developer session is restored. The app-shell gate and the map editor have independent flags; both must remain enforced.
 
-## 2. What is gated today
+When Developer Mode is false:
 
-The main shell starts with developerAuthenticated=false unless a remembered native developer session is restored. It hides developer Floating Control header/actions and the Convo navigation entry from ordinary users, and limits sensitive Convo/Supabase/canon controls to authenticated developer views.
+- Developer-only Floating Control is not shown.
+- The Convo/gameplay navigation entry is removed from normal navigation.
+- Supabase auth, canon/player-registry controls and other sensitive Settings panels are not rendered for ordinary players.
+- Sensitive click/submit handlers reject direct calls rather than trusting hidden buttons.
+- Map editor controls/canvas/test-yard entry are not rendered, and direct editor actions are rejected by the separate worldMapDeveloperMode gate.
+- Debug/diagnostic controls remain developer-only.
 
-Click/submit handlers reject sensitive actions when Developer Mode is false. World-map editor code also has an independent worldMapDeveloperMode flag, initially false. Map editor markup, editor binders, Academy canvas editor markup and developer test-map entry points are guarded. setWorldMapDeveloperMode(false) removes mounted editor dock/canvas controls and clears editor pause classes. Keep both gates; never replace them with CSS-only hiding.
+On developer sign-out, revoke the in-memory state, remove the remembered marker, call setWorldMapDeveloperMode(false), return to Home and rerender. Never make developer access depend only on CSS, a hidden attribute or an obscured URL.
 
-The ordinary user must still be able to browse player-facing screens and start/use the intended Eternal Path experience. Do not blanket-lock all navigation merely because an item is a button; gate the specifically sensitive surfaces.
+### Credential handling and security limit
 
-## 3. World Atlas player identity and local password module
+The user-supplied Developer ID/password are not stored as plaintext in source, UI, docs, build notes or storage. developer-access.ts holds salted PBKDF2-SHA-256 verifier material and derives the submitted identifier/password using 600,000 iterations. The raw typed password is used for verification only. Remember Me stores only a small authorization marker through native Capacitor SecureStorage; a non-remembered session is held in memory.
 
-Official registry source is the verified Universe player registry loaded through src/convo/canon/canon-loader.ts:
-- refreshLatestPlayerRegistry(activeSha) requires the exact verified active 40-character commit SHA;
-- it parses players.md and fetches listed players/<name>.md profiles from the same commit;
-- main.ts maps those registry records into registeredCharacters, retaining registry path and commit metadata.
+Important security truth: a static client-side verifier is extractable from an APK. A sufficiently motivated attacker can attempt offline guesses against it. Base64, binary encoding or hashing does not make a credential hidden from reverse engineering. This Developer Mode is a local UI/feature gate, not server-grade authorization. Any operation that protects important remote data or privileged server actions must also be authorized server-side. Do not claim this local verifier is unbreakable.
 
-Eternal Path local save records are separate. listEternalSaves() in src/offline-game/expedition-game.ts returns local journey summaries, including characterName. A World Atlas account must be resolved against both:
-1. a valid registered character from players.md at the current verified canon snapshot; and
-2. a matching local Eternal Path journey/save on the device.
+## 3. World Atlas player account identity
 
-players.md is an identity/character registry, not a password database. Do not pretend it contains passwords or provides email/password authentication.
+The external Atlas account identity is the intersection of two data sources:
 
-src/offline-game/world-atlas-account.ts already provides local password primitives:
+1. **Verified Universe character registry:** src/convo/canon/canon-loader.ts loads players.md only from the verified active 40-character ACTIVE_SHA, parses the official character table and fetches listed players/<character>.md profiles from that same snapshot.
+2. **Local Eternal Path save:** listEternalSaves() in src/offline-game/expedition-game.ts returns local journeys; the selected character name must match a local save's character name.
+
+Only a character present in both sources is offered as an Atlas account. A stale/unverified canon snapshot must not be silently replaced with guessed registry data.
+
+players.md is a character identity/registry list. It is not a password database and does not contain account passwords. Atlas password creation does not create a new official Universe character. Adding a new official character remains an owner/repository workflow.
+
+### Local password storage
+
+src/offline-game/world-atlas-account.ts provides:
+
 - hasAtlasPassword(playerName)
 - setAtlasPassword(playerName, password)
 - verifyAtlasPassword(playerName, password)
@@ -48,73 +65,77 @@ src/offline-game/world-atlas-account.ts already provides local password primitiv
 - getActiveAtlasPlayer()
 - clearAtlasPlayer()
 
-The module uses a per-account key derived from player name, a random salt, PBKDF2-SHA-256 with 310,000 iterations, and a stored salt/hash record. Native builds use SecureStorage; browser preview uses localStorage fallback. It does not store the typed password in plaintext.
+The local password rules:
 
-Important: this module exists, but as of the audited baseline it is NOT wired into the World Atlas UI in main.ts. The module must be integrated in a later pass.
+- 8–128 characters.
+- Random 16-byte salt per player account.
+- PBKDF2-SHA-256 with 310,000 iterations.
+- Persisted record contains version, iteration count, salt and verifier hash; no plaintext password.
+- Native Android uses Capacitor SecureStorage. Browser preview falls back to localStorage, which is less protected and must not be treated as a production security boundary.
+- Remember Me remembers the player name/session selection. It does not persist the raw password.
 
-## 4. Required World Atlas login flow
+## 4. World Atlas entry policy
 
-The external World Atlas entry is the Eternal Path television/floating icon:
-- TV button: data-idle-rpg-open
-- containing modal: data-idle-rpg-modal
-- existing close controls: data-idle-rpg-close
-- inner world map component: data-world-map-hierarchy / data-wmh-dialog
+### External TV entry — login required every time
 
-When the external TV icon opens the Atlas:
-1. Always show the centered account/login panel before exposing the Atlas interaction surface.
-2. Blur/dim the rest of the Atlas behind the panel and make the outside region inert/non-clickable. Use an actual modal/backdrop and focus management; visual blur alone is not an interaction lock.
-3. Offer only registered characters that also have a matching local Eternal Path save.
-4. If the selected character has no local Atlas password, show a localized create-password/sign-up flow.
-5. If a password already exists, require verification before unlocking the Atlas.
-6. Provide a Remember Me checkbox; use rememberAtlasPlayer / restoreAtlasPlayer for local player selection. Showing the panel on every external TV entry is still required even when the player was remembered.
-7. Provide X/back-to-Eternal-Path. Closing must remove the Atlas gate and return to the existing Eternal Path view without deleting the local journey.
-8. On success, unlock the Atlas for the current app session and record the selected active player.
-9. On failure or cancel, keep the map inert and do not expose a partially logged-in state.
+The Eternal Path TV trigger is data-idle-rpg-open. On every external open:
 
-The languages currently declared by src/i18n.ts are id (Bahasa Indonesia), en (English), pt (Português), fr (Français), ru (Русский), ja (日本語), zh-CN (简体中文) and ko (한국어).
+1. Open the World Atlas modal and initialize the map.
+2. Show the centered World Atlas gate before exposing interaction.
+3. Dim/blur the rest of the Atlas and set sibling UI inert/aria-hidden so it cannot be clicked or reached while the gate is active.
+4. Load the verified registry and local save intersection.
+5. Preselect a remembered player name if it remains eligible, but still show the login panel. Remember Me is not automatic login.
+6. If the selected player has no local password, switch the panel to first-password/sign-up mode and require password confirmation.
+7. If a password exists, require verification.
+8. On success, store only the remembered player preference when selected, then unlock the Atlas for the current session.
+9. X/back closes the Atlas gate and returns to Eternal Path without deleting the journey.
 
-“Sign up” here means creating a local password for an already registered character with a local save. It must not create or claim a new official Universe player record. Adding a player to players.md remains an owner/repository workflow.
+Failed password, no matching local save, missing/invalid registry snapshot or a cancelled login must not expose a partially unlocked Atlas.
 
-### Internal game-world Atlas entry
+### Internal game-world Atlas entry — bypass login
 
-The internal World Atlas map action is handled inside handleWorldMapHierarchyClick (the data-wmh-action="open" route). That route is different from the external TV button. Preserve the owner's requested distinction:
-- external TV from Eternal Path → require the World Atlas login panel every time;
-- internal map/Atlas navigation originating inside the live game world → do not show the external account login panel.
+The map hierarchy's in-world Atlas open action (data-wmh-action="open") is a distinct internal route. Preserve the owner requirement that a player already inside the game world may open the in-world Atlas without the external TV login gate. Do not add the login gate to every map hierarchy open action.
 
-Do not add a universal gate inside renderWorldMapHierarchy() that would lock internal map transitions as well.
+### Supported languages
 
-## 5. Android Back / gesture navigation — not implemented
+src/i18n.ts currently defines: id (Bahasa Indonesia), en (English), pt (Português), fr (Français), ru (Русский), ja (日本語), zh-CN (简体中文), ko (한국어). Atlas panel labels and dynamic status prompts are supplied for all eight. Any new login/error/exit wording must use the current selected language.
 
-As of the audited baseline, main.ts has a popstate listener for existing overlays: idle-rpg-modal, Eternal Path save manager and Eternal Path choice modal.
+## 5. Android Back, gesture Back and Home exit
 
-It closes those overlays and restores some focus. It does not maintain a complete application screen history and does not show the requested localized exit confirmation on the main menu. There is no demonstrated Capacitor native BackButton/App.exitApp integration in the current package. Do not claim hardware Back, Android gesture Back or exit confirmation is finished.
+The intended route is one stack, shared by hardware Back and Android predictive/gesture Back.
 
-Required behavior:
-1. Back from an in-app screen returns to the previously visited app screen, not directly to launcher/OS.
-2. Continue unwinding navigation history until Home/main menu.
-3. Back while Home is visible opens a localized exit-confirmation panel.
-4. Every new Back press on Home must be able to reopen the confirmation after the previous panel is dismissed.
-5. Only explicit Yes may request app exit. No, X, outside dismissal or repeated Back must not exit.
-6. Preserve existing modal stack behavior. An open modal should close before navigating to another app screen.
-7. Integrate Android hardware Back/gesture using the supported Capacitor/native lifecycle route after reviewing the existing Android native integration. Do not assume browser popstate alone reliably handles every Android Back pathway.
+### Native bridge
 
-Exit title/body/buttons must be localized across all eight app languages.
+- scripts/patch-android.mjs patches the generated Android MainActivity.
+- It imports android.webkit.WebView and AndroidX OnBackPressedCallback.
+- The callback dispatches merzkava:android-back into the WebView JavaScript context.
+- src/main.ts handles that event by moving one step back through browser history.
+- exitMerzkavaApplication() calls the native FloatingWindow plugin's exitApp(); the Java plugin finishes/removes the app task. This method is called only from the affirmative Home exit action.
 
-## 6. Sensitive action inventory and tests
+### JavaScript screen history
 
-Audit at least:
-- Developer login/logout and Remember Me;
-- Floating Control page, floating bubble, native overlay permissions and service start/stop;
-- Convo screen and gameplay submission;
-- Supabase login/logout;
-- canon refresh, module loader and canon router;
-- map editor, Academy canvas editor, test yard, map data import/export/confirm;
-- future local Atlas account settings/password actions.
+- Screen navigation adds a history state with the destination screen ID.
+- A base sentinel plus Home state is created on startup.
+- Back first closes the topmost eligible modal/overlay (World Atlas, Developer login, Eternal Path manager/choice modal), then returns to the previous in-app screen.
+- When the current screen is not Home and no overlay is open, Back returns to Home rather than closing the app.
+- At Home, Back shows the localized exit confirmation. No/Stay closes the prompt and keeps the app open. The Home history state is rearmed so another Back shows the prompt again.
+- Only Yes/Exit calls the native app-exit method.
+- Escape also closes the Atlas and developer-login panels in the WebView.
 
-For each surface verify both:
-- unauthenticated markup does not expose the sensitive control; and
-- direct/delegated click, submit or programmatic route is denied while authentication is false.
+A browser preview may refuse window.close(); native Android is the supported actual app-exit target.
 
-Add tests for default locked state, failed/successful developer login, logout revocation, native Remember Me, Atlas registry+local-save intersection, no-password sign-up, password verification, remembered player, cancel, external TV login versus internal map-open bypass, focus trap/inert backdrop/X, screen-history unwinding, repeated Home exit confirmation and native Android Back.
+### Remaining proof
 
-Do not store raw credentials in screenshots, tests, build artifacts, generated build notes or documentation. Do not log user-entered passwords.
+The JS history behavior and native patch are implemented in source. Do not mark predictive Back/gesture behavior physically verified until the current Android build passes packaging/emulator and the owner tests hardware Back plus edge gesture on the target device. Verify that the same press closes a modal first, then returns screens, then shows Home confirmation, and only Yes exits.
+
+## 6. Tests and regression guards
+
+Current dedicated tests:
+
+- tests/offline-game/world-atlas-account.test.ts: salted hash/no plaintext, password verification, remember preference separation, password length and sign-out behavior.
+- tests/offline-game/world-atlas-login.test.ts: modal markup, signup/login, remember, back action across eight languages.
+- tests/app/exit-confirm-panel.test.ts: localized Home exit confirmation, No/Yes controls.
+- tests/offline-game/isometric-npc-chat.test.ts: map editor gate, chat markup, scan effects and field-window markup.
+- The main CI pipeline also runs gameplay formula/map/editor tests and TypeScript/Vite build.
+
+Keep security gates duplicated in main app routing and map editor handlers. Never store or document raw Developer credentials. Never treat players.md as password authority.
