@@ -14,6 +14,7 @@ export type IsoMapGridConfig = {
 export type IsoCellLayer = "foregroundCells" | "blockedCells" | "opacityCells";
 export type IsoQuadrant = "tl" | "tr" | "bl" | "br";
 export type IsoQuadrantLayer = "foregroundQuadrants" | "blockedQuadrants" | "opacityQuadrants";
+export type IsoWalkableCellGroup = { id: string; cells: string[] };
 
 export type IsoTransitionMarker = {
   id: string;
@@ -32,6 +33,8 @@ export type IsoMapEditorData = {
   opacityCells: string[];
   /** Optional movement whitelist; when enabled, only these image cells are traversable. */
   walkableCells: string[];
+  /** Connected sets of walkable diamonds merged into one logical area/cell. */
+  walkableCellGroups: IsoWalkableCellGroup[];
   walkableAreaEnabled: boolean;
   /** Per-quadrant flags use keys such as "4,7:tl" (top-left). */
   foregroundQuadrants: string[];
@@ -127,6 +130,7 @@ export function createIsoMapEditorData(
     blockedCells: [],
     opacityCells: [],
     walkableCells: [],
+    walkableCellGroups: [],
     walkableAreaEnabled: false,
     foregroundQuadrants: [],
     blockedQuadrants: [],
@@ -183,6 +187,19 @@ export function normalizeIsoMapEditorData(
     }
     return [...result];
   };
+  const walkableCells = cleanCells(source.walkableCells, grid);
+  const walkableSet = new Set(walkableCells);
+  const usedGroupCells = new Set<string>();
+  const walkableCellGroups: IsoWalkableCellGroup[] = Array.isArray(source.walkableCellGroups)
+    ? source.walkableCellGroups.flatMap((item,index)=>{
+      if(!item||typeof item!=="object")return [];
+      const group=item as Record<string,unknown>;
+      const cells=cleanCells(group.cells,grid).filter(cell=>walkableSet.has(cell)&&!usedGroupCells.has(cell));
+      if(cells.length<2||!isoWalkableCellsConnected(cells))return [];
+      cells.forEach(cell=>usedGroupCells.add(cell));
+      return [{id:String(group.id||"merged-cell-"+index).replace(/[^a-zA-Z0-9_-]/g,"").slice(0,64)||"merged-cell-"+index,cells}];
+    })
+    : [];
   return {
     format: "merzkava-isometric-map-editor",
     version: 1,
@@ -191,7 +208,8 @@ export function normalizeIsoMapEditorData(
     foregroundCells: cleanCells(source.foregroundCells, grid),
     blockedCells: cleanCells(source.blockedCells, grid),
     opacityCells: cleanCells(source.opacityCells, grid),
-    walkableCells: cleanCells(source.walkableCells, grid),
+    walkableCells,
+    walkableCellGroups,
     walkableAreaEnabled: source.walkableAreaEnabled === true,
     foregroundQuadrants: cleanQuadrants(source.foregroundQuadrants),
     blockedQuadrants: cleanQuadrants(source.blockedQuadrants),
@@ -227,6 +245,60 @@ export function isoCellHasLayer(
   y: number,
 ): boolean {
   return data[layer].includes(isoCellKey(x, y));
+}
+
+function isoWalkableCellsConnected(cells: string[]): boolean {
+  if(cells.length<2)return false;
+  const remaining=new Set(cells);
+  const first=remaining.values().next().value as string|undefined;
+  if(!first)return false;
+  const queue=[first];remaining.delete(first);
+  for(let index=0;index<queue.length;index++){
+    const [x,y]=queue[index].split(",").map(Number);
+    for(const neighbor of [isoCellKey(x+1,y),isoCellKey(x-1,y),isoCellKey(x,y+1),isoCellKey(x,y-1)]){
+      if(remaining.has(neighbor)){remaining.delete(neighbor);queue.push(neighbor);}
+    }
+  }
+  return remaining.size===0;
+}
+
+/** Add selected adjacent walkable diamonds as one flexible merged logical cell. */
+export function mergeIsoWalkableCells(
+  data: IsoMapEditorData,
+  selectedCells: string[],
+  id = "merged-cell",
+): IsoWalkableCellGroup | null {
+  const cells=[...new Set(selectedCells)].filter(key=>data.walkableCells.includes(key));
+  if(cells.length<2||!isoWalkableCellsConnected(cells))return null;
+  if(data.walkableCellGroups.some(group=>group.cells.some(key=>cells.includes(key))))return null;
+  const group={id:id.replace(/[^a-zA-Z0-9_-]/g,"").slice(0,64)||"merged-cell",cells};
+  data.walkableCellGroups=[...data.walkableCellGroups,group];
+  return group;
+}
+
+/** Split the merged logical cell containing the specified map cell. */
+export function unmergeIsoWalkableCell(
+  data: IsoMapEditorData,
+  x: number,
+  y: number,
+): IsoWalkableCellGroup | null {
+  const key=isoCellKey(x,y);
+  const group=data.walkableCellGroups.find(item=>item.cells.includes(key));
+  if(!group)return null;
+  data.walkableCellGroups=data.walkableCellGroups.filter(item=>item.id!==group.id);
+  return group;
+}
+
+/** Remove a walkable cell from its whitelist and any merged group. */
+export function removeIsoWalkableCell(data: IsoMapEditorData,x:number,y:number):boolean {
+  const key=isoCellKey(x,y);
+  if(!data.walkableCells.includes(key))return false;
+  data.walkableCells=data.walkableCells.filter(item=>item!==key);
+  data.walkableCellGroups=data.walkableCellGroups.flatMap(group=>{
+    const cells=group.cells.filter(item=>item!==key);
+    return cells.length>=2?[{...group,cells}]:[];
+  });
+  return true;
 }
 
 export function isoQuadrantKey(x: number, y: number, quadrant: IsoQuadrant): string {
