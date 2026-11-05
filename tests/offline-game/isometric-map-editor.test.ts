@@ -10,10 +10,17 @@ import {
   isoCellHasLayer,
   isoMapStorageKey,
   normalizeIsoMapEditorData,
+  normalizeIsoCanvasExpansion,
   toggleIsoCellLayer,
 } from "../../src/offline-game/isometric-map-editor";
 
 describe("shared isometric map editor data", () => {
+  it("normalizes four independent canvas expansion values", () => {
+    expect(normalizeIsoCanvasExpansion({ top: 250, bottom: 500, left: 900, right: -2 }))
+      .toEqual({ top: 250, bottom: 500, left: 900, right: 0 });
+    expect(normalizeIsoCanvasExpansion({ left: 99999 }).left).toBe(12000);
+  });
+
   it("keeps foreground, blocking, and opacity cell flags independent", () => {
     const data = createIsoMapEditorData("academy-exterior");
     expect(toggleIsoCellLayer(data, "foregroundCells", 4, 6)).toBe(true);
