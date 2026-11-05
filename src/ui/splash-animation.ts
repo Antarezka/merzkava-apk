@@ -89,11 +89,11 @@ export function animateOpeningSplash(splash: HTMLElement): () => void {
     opacity: [0.1, 0.48, 0.16],
     scale: [0.975, 1.045, 0.99],
     translateX: [7, -6, 2],
-    duration: 3400, ease: "inOutSine", alternate: true, loop: true, delay: 380
+    duration: 3400, ease: "inOutSine", alternate: true, loop: true, delay: 2200
   });
   const wordmarkGlow = animate(title, {
     opacity: [0.9, 1, 0.94],
-    duration: 3400, ease: "inOutSine", alternate: true, loop: true, delay: 380
+    duration: 3400, ease: "inOutSine", alternate: true, loop: true, delay: 1450
   });
 
   const sparkAnimations = particles.map((particle, index) => animate(particle, {
@@ -124,10 +124,11 @@ export function animateOpeningSplash(splash: HTMLElement): () => void {
 /** Anime.js curtain replaces the former CSS keyframe close sequence. */
 export function animateSplashCurtain(splash:HTMLElement,onComplete:()=>void):void {
   if(window.matchMedia?.("(prefers-reduced-motion: reduce)").matches){
-    animate(splash,{opacity:[1,0],duration:140,ease:"outQuad",onComplete});
+    splash.style.opacity = "0";
+    onComplete();
     return;
   }
   const content=splash.querySelector<HTMLElement>(".splash-content");
-  if(content) animate(content,{opacity:[1,0],translateY:[0,-7],scale:[1,.985],filter:["blur(0px)","blur(3px)"],duration:460,ease:"inOutCubic"});
+  if(content) animate(content,{opacity:[1,0],translateY:[0,-7],scale:[1,.985],duration:460,ease:"inOutCubic"});
   animate(splash,{opacity:[1,0],duration:520,ease:"inOutCubic",onComplete});
 }
