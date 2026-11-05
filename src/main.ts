@@ -1740,7 +1740,6 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     root.querySelectorAll<HTMLButtonElement>("[data-access-mode]").forEach(tab=>tab.disabled=true);
     try{
       const selected=await findOfficialPlayer(name);
-      if(getAuthSession())await signOut();
       await signOutDeveloper();
       developerAuthenticated=false;
       setWorldMapDeveloperMode(false);
@@ -1847,7 +1846,9 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     const character = availableCharacters().find(item => item.id === characterId);
     if (!character) { notice = "Karakter tidak ditemukan."; render(); return; }
     if (!isGMGatewayConfigured() || !getAuthSession()) {
-      notice = "AI Game Master belum siap. Login dan lengkapi konfigurasi Gateway di Settings sebelum memulai atau melanjutkan sesi.";
+      notice = playerAuthenticated
+        ? "AI Game Master belum dikonfigurasi pada perangkat ini. Developer perlu menyiapkan sesi Supabase dan Gateway di Settings terlebih dahulu."
+        : "AI Game Master belum siap. Login dan lengkapi konfigurasi Gateway di Settings sebelum memulai atau melanjutkan sesi.";
       render();
       return;
     }
