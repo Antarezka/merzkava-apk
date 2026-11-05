@@ -1112,6 +1112,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     data.grid={...grid};
     // Any subsequent edit invalidates the last explicit confirmation.
     data.confirmed=false;data.confirmedAt="";
+    if(exportWrap)exportWrap.hidden=true;
     try{localStorage.setItem(key,JSON.stringify(data));setStatus("Draft auto-saved on this device. Confirm & Save when the image grid is final.");}
     catch{setStatus("Local storage is unavailable. Use COPY DATA FOR AI to create a portable backup.");}
     redraw();drawIsometricForeground(board,data);syncIsoDepthAndOcclusion(board);
@@ -1413,6 +1414,9 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     data.grid={...grid};
     const summary=data.mapId+"\n"+grid.cols+" columns × "+grid.rows+" rows"+
       "\nWalkable cells: "+data.walkableCells.length+
+      "\nBlocked sectors: "+data.blockedQuadrants.length+
+      "\nForeground sectors: "+data.foregroundQuadrants.length+
+      "\nOpacity sectors: "+data.opacityQuadrants.length+
       "\nTransitions: "+data.transitions.length+
       "\nConfirm this exact grid configuration and save it on this device?";
     if(!window.confirm(summary)){setStatus("Confirmation cancelled. Your draft remains available.");return;}
