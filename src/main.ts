@@ -1180,7 +1180,7 @@ root.addEventListener("click", async (event: MouseEvent) => {
   }
   if(target.closest("[data-player-logout]")){
     await signOutDeveloper();
-    if(getAuthSession())await signOut();
+    try{if(getAuthSession())await signOut();}catch{authMessage="Supabase session cleanup was incomplete; developer-only controls remain locked."}
     developerAuthenticated=false;playerAuthenticated=false;activePlayerName="";playerLoginName="";activeCharacterId="";activeProfileMarkdown="";activeChat={messages:[],started:false,showOptions:activeChat.showOptions};
     authMessage="";setWorldMapDeveloperMode(false);activeScreen="control";accessLoginMode="player";notice="";
     history.pushState({merzkavaScreen:"control",merzkavaHome:false},"");render();return;
@@ -1785,7 +1785,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
         const nextButton=root.querySelector<HTMLButtonElement>("#developer-login-form [type=submit]");if(nextButton)nextButton.disabled=false;
         return;
       }
-      developerAuthenticated=true;playerAuthenticated=false;activePlayerName="";activePlayerName="";activeCharacterId="";activeProfileMarkdown="";
+      developerAuthenticated=true;playerAuthenticated=false;activePlayerName="";activeCharacterId="";activeProfileMarkdown="";
       setWorldMapDeveloperMode(true);
       developerLoginBusy=false;developerLoginMessage="";playerLoginMessage="";playerLoginName="";
       activeScreen="control";notice="";render();
