@@ -1047,6 +1047,18 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
   const history:IsoMapEditorData[]=[];
   const cellGroup=svg.querySelector<SVGGElement>("[data-wmh-manual-marks]");
   let interactionGroup=svg.querySelector<SVGGElement>("[data-wmh-interaction-grid]");
+  // Make the entire Map Base-sized SVG viewport tappable while editing.
+  // Existing grid diamonds are only visual guides; ungridded image regions must
+  // receive pointer events too so ADD CELL can create a new diamond there.
+  let hitPlane=svg.querySelector<SVGRectElement>("[data-wmh-overlay-hit-plane]");
+  if(!hitPlane){
+    hitPlane=document.createElementNS("http://www.w3.org/2000/svg","rect");
+    hitPlane.dataset.wmhOverlayHitPlane="";
+    hitPlane.setAttribute("x","0");hitPlane.setAttribute("y","0");
+    hitPlane.setAttribute("width","100%");hitPlane.setAttribute("height","100%");
+    hitPlane.setAttribute("fill","transparent");hitPlane.setAttribute("pointer-events","all");
+    svg.insertBefore(hitPlane,svg.firstChild);
+  }
   if(!interactionGroup){interactionGroup=document.createElementNS("http://www.w3.org/2000/svg","g");interactionGroup.dataset.wmhInteractionGrid="";svg.insertBefore(interactionGroup,cellGroup||svg.firstChild);}
   const transitionGroup=svg.querySelector<SVGGElement>("[data-wmh-transition-marks]");
   const cellTools=panel.querySelector<HTMLElement>("[data-wmh-cell-tools]");
@@ -1343,7 +1355,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     setStatus(data.walkableAreaEnabled?"Movement is limited to blue walkable cells. Characters outside the area were placed on their nearest selected cells.":"Movement limit disabled; all non-X cells may be used.");
   });
   const point=(e:PointerEvent)=>{const r=svg.getBoundingClientRect(),box=svg.viewBox.baseVal;return{x:(e.clientX-r.left)*box.width/Math.max(1,r.width),y:(e.clientY-r.top)*box.height/Math.max(1,r.height)};};
-  const isCellInsideMapArtwork=(x:number,y:number):boolean=>{
+  const isCellInsideMapArtwork=(x:number,y:number,tapPoint:IsoMapPoint):boolean=>{
     const image=board.querySelector<HTMLImageElement>("[data-wmh-map-art]");
     const svgRect=svg.getBoundingClientRect(),view=svg.viewBox.baseVal;
     const imageRect=image?.getBoundingClientRect();
@@ -1352,10 +1364,13 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     const top=imageRect?(imageRect.top-svgRect.top)*scaleY:0;
     const right=imageRect?left+imageRect.width*scaleX:view.width;
     const bottom=imageRect?top+imageRect.height*scaleY:view.height;
-    const center=isoCellCenter(x,y,grid),halfW=grid.tileW/2,halfH=grid.tileH/2;
-    // New cells must fit entirely inside the Map Base artwork bounds. Canvas
-    // expansion margins and the surrounding scroll surface are never eligible.
-    return center.x-halfW>=left-0.5&&center.y-halfH>=top-0.5&&center.x+halfW<=right+0.5&&center.y+halfH<=bottom+0.5;
+    // The tap itself must land on the artwork, not an expanded canvas margin.
+    if(tapPoint.x<left||tapPoint.y<top||tapPoint.x>right||tapPoint.y>bottom)return false;
+    // Allow diamonds whose edges extend past the outer image edge. Requiring
+    // the full axis-aligned diamond bounds to fit rejected legitimate gate
+    // cells near the front/outer border of the artwork.
+    const center=isoCellCenter(x,y,grid);
+    return center.x>=left&&center.y>=top&&center.x<=right&&center.y<=bottom;
   };
   if(board.dataset.academyArtworkBoard==="true"&&board.dataset.imageTapBound!=="true"){
     board.dataset.imageTapBound="true";
@@ -1401,7 +1416,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
         remember();data.walkableCells=[...data.walkableCells,key];persist();
         setStatus("Selected existing extra image cell ("+cell.x+","+cell.y+").");return;
       }
-      if(!isCellInsideMapArtwork(cell.x,cell.y)){
+      if(!isCellInsideMapArtwork(cell.x,cell.y,mapPoint)){
         setStatus("Cell not added: the full diamond must fit inside the Map Base image. Canvas expansion margins and blank canvas are excluded.");return;
       }
       remember();
