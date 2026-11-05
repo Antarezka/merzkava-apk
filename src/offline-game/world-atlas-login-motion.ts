@@ -1,11 +1,35 @@
 import { animate, createScope } from "animejs";
 
-function wait(milliseconds:number):Promise<void> {
-  return new Promise(resolve=>window.setTimeout(resolve,milliseconds));
+function abortError(): Error {
+  const error = new Error("World Atlas login was cancelled.");
+  error.name = "AbortError";
+  return error;
 }
 
-/** Four-second presentation sequence. The app performs the real registry/password checks separately. */
-export async function playWorldAtlasAccessSequence(gate:HTMLElement,duration=4000,holdUntil?:Promise<unknown>):Promise<void> {
+function wait(milliseconds:number,signal?:AbortSignal):Promise<void> {
+  if(signal?.aborted)return Promise.reject(abortError());
+  return new Promise((resolve,reject)=>{
+    const finish=()=>{
+      signal?.removeEventListener("abort",cancel);
+      resolve();
+    };
+    const cancel=()=>{
+      window.clearTimeout(timer);
+      signal?.removeEventListener("abort",cancel);
+      reject(abortError());
+    };
+    const timer=window.setTimeout(finish,milliseconds);
+    signal?.addEventListener("abort",cancel,{once:true});
+  });
+}
+
+/** Four-second presentation sequence. Real source/password checks run separately. */
+export async function playWorldAtlasAccessSequence(
+  gate:HTMLElement,
+  duration=4000,
+  holdUntil?:Promise<unknown>,
+  signal?:AbortSignal
+):Promise<void> {
   const buffer=gate.querySelector<HTMLElement>("[data-world-atlas-buffer]");
   const status=gate.querySelector<HTMLElement>("[data-atlas-buffer-status]");
   const log=gate.querySelector<HTMLElement>("[data-atlas-buffer-log]");
@@ -16,6 +40,7 @@ export async function playWorldAtlasAccessSequence(gate:HTMLElement,duration=400
   const logs=(gate.dataset.bufferLogs||"IDENTITY ROUTE ...|SOURCE SNAPSHOT ...|LOCAL VERIFIER ...|SESSION HANDOFF ...").split("|");
   const started=performance.now();
   const reduced=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches??false;
+  if(signal?.aborted)throw abortError();
   buffer.hidden=false;
   buffer.setAttribute("aria-hidden","false");
   gate.dataset.atlasBuffering="true";
@@ -36,12 +61,14 @@ export async function playWorldAtlasAccessSequence(gate:HTMLElement,duration=400
     for(let index=0;index<stages.length;index++){
       status.textContent=stages[index]||"Preparing access...";
       log.textContent=logs[index]||"VERIFYING ...";
-      await wait(stageDuration);
+      await wait(stageDuration,signal);
     }
     const elapsed=performance.now()-started;
-    if(elapsed<duration)await wait(duration-elapsed);
+    if(elapsed<duration)await wait(duration-elapsed,signal);
+    if(signal?.aborted)throw abortError();
     // Keep the visual buffer present until the live source check has actually settled.
     if(holdUntil)await holdUntil;
+    if(signal?.aborted)throw abortError();
   }finally{
     scope.revert();
     delete gate.dataset.atlasBuffering;
