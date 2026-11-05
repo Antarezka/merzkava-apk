@@ -46,7 +46,7 @@ describe("Initial Developer login panel",()=>{
       identifier:'dev"&id',
       password:"pass<word>"
     });
-    expect(html).toContain('value="dev&amp;&quot;id"');
+    expect(html).toContain('value="dev&quot;&amp;id"');
     expect(html).toContain('value="pass&lt;word&gt;"');
   });
 });
