@@ -686,11 +686,14 @@ function isoMergedGroupBoundaryPath(cells:string[],grid:IsoMapGridConfig):string
   }
   return [...edges.values()].filter(edge=>edge.count===1).map(edge=>"M"+edge.a.x+" "+edge.a.y+" L"+edge.b.x+" "+edge.b.y).join(" ");
 }
+function isoGridCellExists(data:IsoMapEditorData,x:number,y:number):boolean {
+  return (x>=0&&y>=0&&x<data.grid.cols&&y<data.grid.rows)||data.customGridCells.includes(isoCellKey(x,y));
+}
 function isoCellIsWalkable(data:IsoMapEditorData,x:number,y:number):boolean {
-  return (!data.walkableAreaEnabled||data.walkableCells.includes(isoCellKey(x,y)))&&!isoCellHasLayer(data,"blockedCells",x,y);
+  return isoGridCellExists(data,x,y)&&(!data.walkableAreaEnabled||data.walkableCells.includes(isoCellKey(x,y)))&&!isoCellHasLayer(data,"blockedCells",x,y);
 }
 function isoCanStep(data:IsoMapEditorData,fromX:number,fromY:number,toX:number,toY:number):boolean {
-  if(!isoCellIsWalkable(data,toX,toY))return false;
+  if(!isoGridCellExists(data,fromX,fromY)||!isoCellIsWalkable(data,toX,toY))return false;
   const edges:Record<string,[IsoQuadrant,IsoQuadrant]>={"1,0":["br","tl"],"-1,0":["tl","br"],"0,1":["bl","tr"],"0,-1":["tr","bl"]};
   const edge=edges[(toX-fromX)+","+(toY-fromY)];
   return !!edge&&!isoQuadrantHasLayer(data,"blockedQuadrants",fromX,fromY,edge[0])&&!isoQuadrantHasLayer(data,"blockedQuadrants",toX,toY,edge[1]);
@@ -702,13 +705,15 @@ function isoQuadrantTrianglePoints(x:number,y:number,quadrant:IsoQuadrant,grid:I
 }
 function academyInteractionGridMarkup(grid:IsoMapGridConfig,data:IsoMapEditorData):string {
   const cells:string[]=[];
-  for(let y=0;y<grid.rows;y++)for(let x=0;x<grid.cols;x++){
+  const addCell=(x:number,y:number,custom:boolean)=>{
     const c=isoCellCenter(x,y,grid),hw=grid.tileW/2,hh=grid.tileH/2;
     const points=[c.x+","+(c.y-hh),(c.x+hw)+","+c.y,c.x+","+(c.y+hh),(c.x-hw)+","+c.y].join(" ");
     const selected=data.walkableCells.includes(isoCellKey(x,y));
-    cells.push('<polygon class="wmh-academy-hit-cell'+(selected?' is-walkable':'')+'" data-wmh-tile data-x="'+x+'" data-y="'+y+'" data-z="0" data-tile-id="academy-'+x+'-'+y+'" data-surface="earth" points="'+points+'" aria-label="Grid tile '+x+', '+y+'"/>');
+    cells.push('<polygon class="wmh-academy-hit-cell'+(selected?' is-walkable':'')+(custom?' is-custom-grid-cell':'')+'" data-wmh-tile data-x="'+x+'" data-y="'+y+'" data-z="0" data-tile-id="academy-'+x+'-'+y+'" data-surface="earth" points="'+points+'" aria-label="Grid tile '+x+', '+y+'"/>');
     cells.push('<path class="wmh-quadrant-divider" d="M'+c.x+' '+(c.y-hh)+' L'+c.x+' '+(c.y+hh)+' M'+(c.x-hw)+' '+c.y+' L'+(c.x+hw)+' '+c.y+'"/>');
-  }
+  };
+  for(let y=0;y<grid.rows;y++)for(let x=0;x<grid.cols;x++)addCell(x,y,false);
+  data.customGridCells.forEach(key=>{const [x,y]=key.split(",").map(Number);addCell(x,y,true);});
   return cells.join("");
 }
 function escapeMapEditorText(value: unknown): string {
