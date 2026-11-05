@@ -20,13 +20,26 @@ const statusCopy:Record<AppLanguage,{checking:string;select:string;loginPrompt:s
   "zh-CN":{checking:"正在验证已登记角色和本地存档…",select:"请选择一个已登记角色。",loginPrompt:"请输入该角色的本地密码。",signupPrompt:"该角色尚未设置本地密码，请先创建。",success:"访问已授权。"},
   ko:{checking:"등록 캐릭터와 로컬 저장 데이터를 확인하는 중…",select:"계속하려면 등록된 캐릭터를 선택하세요.",loginPrompt:"이 캐릭터의 로컬 비밀번호를 입력하세요.",signupPrompt:"이 캐릭터에는 로컬 비밀번호가 없습니다. 새로 만드세요.",success:"접근이 허용되었습니다."}
 };
-function esc(value:string):string {
+
+type BufferCopy = { stages:string[]; logs:string[] };
+const bufferCopy:Record<AppLanguage,BufferCopy> = {
+  id:{stages:["Mengenali identitas pemain...","Memeriksa snapshot data dunia...","Memverifikasi kata sandi lokal...","Menyiapkan akses World Atlas..."],logs:["RUTE IDENTITAS ...","SNAPSHOT SUMBER ...","VERIFIKASI LOKAL ...","PENGALIHAN SESI ..."]},
+  en:{stages:["Resolving player identity...","Checking world data snapshot...","Verifying local credential...","Preparing World Atlas access..."],logs:["IDENTITY ROUTE ...","SOURCE SNAPSHOT ...","LOCAL VERIFIER ...","SESSION HANDOFF ..."]},
+  pt:{stages:["Identificando o jogador...","Verificando o snapshot do mundo...","Verificando a senha local...","Preparando o acesso ao World Atlas..."],logs:["ROTA DE IDENTIDADE ...","SNAPSHOT DE ORIGEM ...","VERIFICADOR LOCAL ...","TRANSFERÊNCIA DE SESSÃO ..."]},
+  fr:{stages:["Identification du joueur...","Vérification de l’instantané du monde...","Vérification du mot de passe local...","Préparation de l’accès à World Atlas..."],logs:["ROUTE D’IDENTITÉ ...","INSTANTANÉ SOURCE ...","VÉRIFICATEUR LOCAL ...","TRANSFERT DE SESSION ..."]},
+  ru:{stages:["Определение игрока...","Проверка снимка данных мира...","Проверка локального пароля...","Подготовка доступа к World Atlas..."],logs:["МАРШРУТ ИДЕНТИФИКАЦИИ ...","СНИМОК ИСТОЧНИКА ...","ЛОКАЛЬНЫЙ ПРОВЕРЯЮЩИЙ ...","ПЕРЕДАЧА СЕССИИ ..."]},
+  ja:{stages:["プレイヤー情報を確認中...","ワールドデータのスナップショットを確認中...","ローカルパスワードを検証中...","World Atlas へのアクセスを準備中..."],logs:["IDENTITY ROUTE ...","SOURCE SNAPSHOT ...","LOCAL VERIFIER ...","SESSION HANDOFF ..."]},
+  "zh-CN":{stages:["正在识别玩家身份...","正在检查世界数据快照...","正在验证本地密码...","正在准备 World Atlas 访问..."],logs:["身份路由 ...","数据快照 ...","本地验证器 ...","会话交接 ..."]},
+  ko:{stages:["플레이어 신원 확인 중...","월드 데이터 스냅샷 확인 중...","로컬 비밀번호 검증 중...","World Atlas 접근 준비 중..."],logs:["신원 경로 ...","소스 스냅샷 ...","로컬 검증기 ...","세션 전환 ..."]}
+};
+\nfunction esc(value:string):string {
   return value.replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]||char));
 }
 export function worldAtlasLoginPanelMarkup(language:AppLanguage):string {
   const t=copy[language]||copy.en;
   const s=statusCopy[language]||statusCopy.en;
-  return '<div class="world-atlas-login-layer" data-world-atlas-gate hidden data-empty-label="'+esc(t.empty)+'" data-select-label="'+esc(s.select)+'" data-loading-label="'+esc(s.checking)+'" data-login-prompt="'+esc(s.loginPrompt)+'" data-signup-prompt="'+esc(s.signupPrompt)+'" data-success-label="'+esc(s.success)+'" data-login-prompt="Enter the local password for this character." data-signup-prompt="This registered character has no local password yet. Create one to continue." data-success-label="Access granted.">'+
+  const loading=bufferCopy[language]||bufferCopy.en;
+  return '<div class="world-atlas-login-layer" data-world-atlas-gate hidden data-empty-label="'+esc(t.empty)+'" data-select-label="'+esc(s.select)+'" data-loading-label="'+esc(s.checking)+'" data-login-prompt="'+esc(s.loginPrompt)+'" data-signup-prompt="'+esc(s.signupPrompt)+'" data-success-label="'+esc(s.success)+'" data-buffer-stages="'+esc(loading.stages.join("|"))+'" data-buffer-logs="'+esc(loading.logs.join("|"))+'">'+
     '<section class="world-atlas-login-card" role="dialog" aria-modal="true" aria-labelledby="world-atlas-login-title">'+
     '<button type="button" class="world-atlas-login-close" data-world-atlas-gate-back aria-label="'+esc(t.back)+'">×</button>'+
     '<small class="world-atlas-login-eyebrow">'+esc(t.eyebrow)+'</small><h2 id="world-atlas-login-title">'+esc(t.title)+'</h2><p class="world-atlas-login-intro">'+esc(t.intro)+'</p>'+
@@ -37,6 +50,7 @@ export function worldAtlasLoginPanelMarkup(language:AppLanguage):string {
     '<label class="world-atlas-remember"><input type="checkbox" name="remember" value="yes"/><span>'+esc(t.remember)+'</span></label>'+
     '<p class="world-atlas-login-message" data-world-atlas-message role="status">'+esc(t.empty)+'</p>'+
     '<button type="submit" class="world-atlas-login-submit" data-world-atlas-submit data-login-label="'+esc(t.signIn)+'" data-signup-label="'+esc(t.signUp)+'" disabled>'+esc(t.signIn)+'</button></form>'+
+    '<div class="atlas-access-buffer" data-world-atlas-buffer hidden aria-hidden="true"><div class="atlas-buffer-head"><span>MERZKAVA ACCESS ROUTINE</span><i class="atlas-buffer-lamp"></i></div><div class="atlas-buffer-visual"><span class="atlas-buffer-orbit"></span><span class="atlas-buffer-core"></span><span class="atlas-buffer-scan"></span></div><div class="atlas-buffer-status"><small>AUTHENTICATION SEQUENCE</small><strong data-atlas-buffer-status>Resolving player identity...</strong></div><div class="atlas-buffer-console"><span class="atlas-buffer-prompt">›</span><span data-atlas-buffer-log>IDENTITY ROUTE ...</span><i class="atlas-buffer-caret"></i></div><div class="atlas-buffer-track"><span data-atlas-buffer-progress></span></div><small class="atlas-buffer-foot">WORLD ATLAS · LOCAL ACCOUNT HANDSHAKE</small></div>'+
     '<small class="world-atlas-login-foot">'+esc(t.foot)+'</small>'+
     '</section></div>';
 }
