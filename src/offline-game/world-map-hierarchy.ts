@@ -1267,6 +1267,18 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     else setStatus(data.walkableAreaEnabled?"Movement is limited to blue walkable cells.":"Movement limit disabled; all non-X cells may be used.");
   });
   const point=(e:PointerEvent)=>{const r=svg.getBoundingClientRect(),box=svg.viewBox.baseVal;return{x:(e.clientX-r.left)*box.width/Math.max(1,r.width),y:(e.clientY-r.top)*box.height/Math.max(1,r.height)};};
+  if(board.dataset.academyArtworkBoard==="true"&&board.dataset.imageTapBound!=="true"){
+    board.dataset.imageTapBound="true";
+    board.addEventListener("click",event=>{
+      if(board.classList.contains("wmh-overlay-editing"))return;
+      const target=event.target as Element;
+      if(target.closest("[data-wmh-player-token],[data-wmh-npc],[data-wmh-action]"))return;
+      const image=board.querySelector<HTMLImageElement>("[data-wmh-map-art]");if(!image)return;
+      const rect=image.getBoundingClientRect();
+      const mapPoint={x:(event.clientX-rect.left)*image.naturalWidth/Math.max(1,rect.width),y:(event.clientY-rect.top)*image.naturalHeight/Math.max(1,rect.height)};
+      const cell=isoCellAtPoint(mapPoint,grid);if(cell)walkToTile(dialog,cell.x,cell.y,"earth");
+    });
+  }
   svg.addEventListener("pointerdown",e=>{
     if(!board.classList.contains("wmh-overlay-editing"))return;e.preventDefault();e.stopPropagation();
     const existing=(e.target as Element).closest<SVGGElement>("[data-transition-id]");
