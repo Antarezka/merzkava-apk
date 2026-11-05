@@ -546,6 +546,7 @@ function render(): void {
   if(!hasAppAccess()&&activeScreen!=="control")activeScreen="control";
   if(!developerAuthenticated&&activeScreen==="gameplay")activeScreen="home";
 
+  // Route snapshot cross-fades are deliberately separate from the live screen's pointer/focus lifecycle.
   // Keep a non-interactive visual snapshot of the previous screen above the
   // new shell. Both surfaces animate at the same time, so navigation never
   // flashes through an empty frame between render() calls.
