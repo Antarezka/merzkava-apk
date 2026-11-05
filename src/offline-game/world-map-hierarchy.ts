@@ -194,10 +194,17 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
     surface.style.width=(baseWidth*scale)+"px";
     surface.style.height=(baseHeight*scale)+"px";
     if(academyCanvas){
-      image.style.setProperty("left",(academyMarginLeft*scale)+"px","important");
-      image.style.setProperty("top",(academyMarginTop*scale)+"px","important");
-      image.style.setProperty("width",(academyImageWidth*scale)+"px","important");
-      image.style.setProperty("height",(academyImageHeight*scale)+"px","important");
+      const artLeft=academyMarginLeft*scale,artTop=academyMarginTop*scale,artWidth=academyImageWidth*scale,artHeight=academyImageHeight*scale;
+      image.style.setProperty("left",artLeft+"px","important");
+      image.style.setProperty("top",artTop+"px","important");
+      image.style.setProperty("width",artWidth+"px","important");
+      image.style.setProperty("height",artHeight+"px","important");
+      const overlay=surface.querySelector<SVGSVGElement>("[data-wmh-overlay-svg]");
+      if(overlay){overlay.style.left=artLeft+"px";overlay.style.top=artTop+"px";overlay.style.right="auto";overlay.style.bottom="auto";overlay.style.width=artWidth+"px";overlay.style.height=artHeight+"px";overlay.setAttribute("viewBox","0 0 "+(image.naturalWidth||2816)+" "+(image.naturalHeight||1536));}
+      const foreground=surface.querySelector<HTMLCanvasElement>("[data-wmh-foreground-canvas]");
+      if(foreground){foreground.style.left=artLeft+"px";foreground.style.top=artTop+"px";foreground.style.right="auto";foreground.style.bottom="auto";foreground.style.width=artWidth+"px";foreground.style.height=artHeight+"px";}
+      const actors=surface.querySelector<HTMLElement>("[data-wmh-actor-layer]");
+      if(actors){actors.style.left=artLeft+"px";actors.style.top=artTop+"px";actors.style.right="auto";actors.style.bottom="auto";actors.style.width=artWidth+"px";actors.style.height=artHeight+"px";}
     }else{
       image.style.width="100%";
       image.style.height="100%";
@@ -1543,15 +1550,18 @@ function isometricPlayMarkup(regionId: RegionId, selectedBuilding: string, inter
     selectedBuilding.trim().toLowerCase() === "tianhai academy";
   if (isEmptyAcademy) {
     const academyMapImage="/maps/academy/full-map/1_academy.jpg";
-    // Academy is temporarily artwork-only: no isometric board, grid, minimap,
-    // player/NPC tokens, editor, or overlay data is mounted in this view.
+    const academyMapId="golden-dragon-empire:tianhai-academy:exterior";
     return '<div class="wmh-isometric-play-screen wmh-academy-map-screen" data-wmh-isometric-play-screen>'+
       '<div class="wmh-map-zoom wmh-academy-map-zoom" aria-label="Academy map zoom controls"><button type="button" data-wmh-zoom="out" aria-label="Zoom out">−</button><span data-wmh-zoom-level>100%</span><button type="button" data-wmh-zoom="in" aria-label="Zoom in">+</button><button type="button" data-wmh-zoom="reset">RESET</button></div>'+
-      '<div class="wmh-academy-map-viewport" data-wmh-map-viewport><div class="wmh-academy-map-surface" data-wmh-map-surface data-wmh-academy-canvas>'+
+      '<div class="wmh-academy-map-viewport" data-wmh-map-viewport><div class="wmh-academy-map-surface" data-wmh-map-surface data-wmh-academy-canvas data-wmh-board data-academy-artwork-board="true" data-map-id="'+academyMapId+'" data-cols="24" data-rows="20" data-tile-w="128" data-tile-h="69.5" data-offset-x="0" data-offset-y="0" data-map-theme="golden-dragon-empire" data-map-title="Tianhai Academy" data-map-interior="false">'+
       '<svg class="wmh-academy-margin-grid" data-wmh-academy-margin-grid preserveAspectRatio="none" aria-hidden="true"></svg>'+
-      '<img src="'+academyMapImage+'" alt="Tianhai Academy full map" draggable="false" loading="eager" decoding="async"/>'+
-      '</div></div>'+academyCanvasEditorMarkup()+
+      '<img class="wmh-academy-map-art" data-wmh-academy-map-art data-wmh-map-art src="'+academyMapImage+'" alt="Tianhai Academy full map" draggable="false" loading="eager" decoding="async"/>'+
+      '<canvas class="wmh-isometric-foreground" data-wmh-foreground-canvas aria-hidden="true"></canvas>'+
+      '<svg class="wmh-area-overlay-svg wmh-academy-grid-overlay" data-wmh-overlay-svg viewBox="0 0 2816 1536" preserveAspectRatio="none" aria-label="Editable isometric interaction grid"><g data-wmh-interaction-grid></g><g data-wmh-overlay-marks></g><g data-wmh-manual-marks></g><g data-wmh-transition-marks></g><path data-wmh-overlay-preview class="wmh-area-mark-preview" d=""></path></svg>'+
+      '<div class="wmh-academy-actor-layer" data-wmh-actor-layer><button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token data-token-label="" data-x="5" data-y="17" aria-label="Player character"><i></i></button>'+isometricNpcTokensMarkup(academyMapId,false)+'</div>'+
+      '</div></div>'+academyCanvasEditorMarkup()+isometricEditorMarkup()+
       '<button type="button" class="wmh-map-back wmh-academy-map-back" data-wmh-action="back" aria-label="Return to Golden Dragon Empire map"><i class="wmh-academy-back-icon" aria-hidden="true"></i><b>GOLDEN DRAGON EMPIRE</b></button>'+
+      '<section class="wmh-chat-panel" data-wmh-chat hidden role="dialog" aria-label="Character conversation"><div class="wmh-chat-card"><button type="button" class="wmh-chat-close" data-wmh-action="chat-close" aria-label="Close conversation">×</button><div class="wmh-chat-thread" data-wmh-thread></div><div class="wmh-chat-input-row"><span>YOUR RESPONSE</span><div data-wmh-replies></div></div></div></section>'+
       '</div>';
   }
   const mapId=makeIsometricMapId(regionId,selectedBuilding,interior);
