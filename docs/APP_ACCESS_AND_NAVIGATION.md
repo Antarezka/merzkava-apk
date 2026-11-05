@@ -1,8 +1,8 @@
 # Developer Access, World Atlas Accounts and Android Back
 
-**Last source audit:** 2026-11-05  
-**Audited source commit:** ed5ef007cead9ecf8e6e70662c29ec5cce9527b0  
-**Branch:** feature/global-isometric-canvas-margins-2026-11-05
+**Last source audit:** 2026-11-06  
+**Baseline build:** Android Build #1234 · `2676daffff0610013793cc5b17312fe8b320abf9`  
+**Working branch:** `fix/account-settings-atlas-remember-2026-11-06`
 
 This document is the security and navigation contract. It records which gates exist, what their data means, and where the boundary remains client-side rather than server-side.
 
@@ -13,7 +13,7 @@ This document is the security and navigation contract. It records which gates ex
 | Developer verifier and local session | src/security/developer-access.ts |
 | Developer login/Remember Me panel | src/app/developer-access-panel.ts |
 | Local World Atlas password and remembered-player storage | src/offline-game/world-atlas-account.ts |
-| Localized World Atlas login gate markup | src/offline-game/world-atlas-login.ts |
+| Localized World Atlas login gate markup and access-buffer motion | src/offline-game/world-atlas-login.ts, src/offline-game/world-atlas-login-motion.ts |
 | World Atlas modal placement and gate CSS | src/offline-game/idle-home-map.ts, src/offline-game/idle-home-map.css |
 | App-level Developer Mode, screen routes, external Atlas login and Back handler | src/main.ts |
 | Independent map editor gate | src/offline-game/world-map-hierarchy.ts |
@@ -28,7 +28,7 @@ The app's first screen remains **Floating Control**. Before any role is authenti
 The gate has two separate modes:
 
 - **Player:** accepts only a character name, with no password field and no Remember Me option. The submitted name must match a character name exactly (case-sensitive, no trimming-based correction, aliases, fuzzy matching or Unicode normalization) in `players.md` loaded from the currently verified Universe `ACTIVE_SHA`. The app fails closed if the official registry cannot be verified. A local World Atlas password or unrelated local character is not a substitute for official registry membership. Successful player access stays on the same Floating Control screen as Developer and can use the same permission-setup steps. Developer-only tools remain hidden. The player explicitly selects Open game / continue playing to enter the normal Home screen.
-- **Developer:** requires the embedded local Developer ID and password verifier. The raw credentials are not persisted. Remember Me is available only in this mode and stores the existing authorization marker in Android SecureStorage. Successful developer access also stays on Floating Control and enables the developer-only screens and tools in their normal locations.
+- **Developer:** requires the embedded local Developer ID and password verifier. The raw credentials are not persisted. Remember Me is available only in this mode and stores the account identifier and entered password inside native Android SecureStorage, alongside the authorization marker. Lock revokes the active authorization marker but intentionally retains remembered credentials so the initial login panel can prefill both fields; leaving Remember Me unchecked on a subsequent successful login deletes the saved credential record. Browser preview does not persist the credential pair. Successful developer access also stays on Floating Control and enables the developer-only screens and tools in their normal locations. The Developer Floating Control and Lock actions are presented together in Settings → Account & Access; the top header keeps the Kitty Bubble Mode action and the Settings icon only.
 
 On either role's sign-out, clear both in-memory role flags, revoke Developer Mode, return to the initial Floating Control screen, and show the account gate again. Signing in as a player after a developer session must not inherit developer access; signing in as a developer after a player session must restore all developer features. The two roles must never be inferred from one another.
 
@@ -41,7 +41,7 @@ When Developer Mode is false:
 - Map editor controls/canvas/test-yard entry are not rendered, and direct editor actions are rejected by the separate `worldMapDeveloperMode` gate.
 - Debug/diagnostic controls remain developer-only.
 
-The header Bubble Mode action retains its original layered Kitty artwork and its existing action. The initial Floating Control readiness sequence and native Android permission/service flow remain independent of account role.
+The header Bubble Mode action retains its original layered Kitty artwork and its existing action. The adjacent Settings icon keeps its established header position; Developer Floating Control / Lock and Player Sign out are moved to the Account & Access section inside Settings. The initial Floating Control readiness sequence and native Android permission/service flow remain independent of account role. The initial Developer login password field has a CSS-styled eye control to show or hide the typed password.
 
 **World Atlas is a different authentication system.** Its external login gate still requires the existing local password creation/verification flow (including confirmation when setting a first password). The new passwordless player-name gate must not bypass or modify World Atlas authentication.
 
@@ -55,12 +55,13 @@ Important security truth: a static client-side verifier is extractable from an A
 
 ## 3. World Atlas player account identity
 
-The external Atlas account identity is the intersection of two data sources:
+World Atlas now offers a merged, de-duplicated player list from three labelled sources:
 
-1. **Verified Universe character registry:** src/convo/canon/canon-loader.ts loads players.md only from the verified active 40-character ACTIVE_SHA, parses the official character table and fetches listed players/<character>.md profiles from that same snapshot.
-2. **Local Eternal Path save:** listEternalSaves() in src/offline-game/expedition-game.ts returns local journeys; the selected character name must match a local save's character name.
+1. **Universe registry:** `players.md` is loaded from the currently verified `ACTIVE_SHA`; these names and linked profiles remain official Universe identities.
+2. **Local app profiles:** locally stored characters from the app database are available as local Atlas identities.
+3. **Local Eternal Path journeys:** characters already present in local journey saves are also available.
 
-Only a character present in both sources is offered as an Atlas account. A stale/unverified canon snapshot must not be silently replaced with guessed registry data.
+Universe registry entries take precedence when the same name appears in more than one source. Local-only entries are explicitly labelled `Local Profile` or `Local Journey`; creating an Atlas password for one does not register it in `players.md`, grant official canon status, or create an official Universe profile. A stale/unverified canon snapshot must not be silently replaced with guessed registry data.
 
 players.md is a character identity/registry list. It is not a password database and does not contain account passwords. Atlas password creation does not create a new official Universe character. Adding a new official character remains an owner/repository workflow.
 
@@ -96,10 +97,11 @@ The Eternal Path TV trigger is data-idle-rpg-open. On every external open:
 3. Dim/blur the rest of the Atlas and set sibling UI inert/aria-hidden so it cannot be clicked or reached while the gate is active.
 4. Load the verified registry and local save intersection.
 5. Preselect a remembered player name if it remains eligible, but still show the login panel. Remember Me is not automatic login.
-6. If the selected player has no local password, switch the panel to first-password/sign-up mode and require password confirmation.
-7. If a password exists, require verification.
-8. On success, store only the remembered player preference when selected, then unlock the Atlas for the current session.
-9. X/back closes the Atlas gate and returns to Eternal Path without deleting the journey.
+6. If the selected player has no local password, switch the panel to first-password/sign-up mode and require password confirmation. This creates only a local Atlas password for the selected Universe or local identity.
+7. If a password exists, verify it against the locally stored salted verifier.
+8. After a valid attempt, show the four-second World Atlas access sequence while the actual local credential operation completes; its status phases reflect player-record resolution, source-snapshot checking, local credential verification and Atlas session preparation. This is a presentation sequence, not a remote server-security check.
+9. On success, store only the remembered player name when selected, then unlock the Atlas for the current session. The raw Atlas password is never stored.
+10. X/back closes the Atlas gate and returns to Eternal Path without deleting the journey.
 
 Failed password, no matching local save, missing/invalid registry snapshot or a cancelled login must not expose a partially unlocked Atlas.
 
@@ -144,7 +146,9 @@ The JS history behavior and native patch are implemented in source. Do not mark 
 Current dedicated tests:
 
 - tests/offline-game/world-atlas-account.test.ts: salted hash/no plaintext, password verification, remember preference separation, password length and sign-out behavior.
-- tests/offline-game/world-atlas-login.test.ts: modal markup, signup/login, remember, back action across eight languages.
+- tests/offline-game/world-atlas-login.test.ts: modal markup, first-password/sign-in mode, localized access-buffer stages, remember, and back action across eight languages.
+- The World Atlas access-buffer motion is isolated to `src/offline-game/world-atlas-login-motion.ts`; it is finite, four seconds, and respects reduced-motion preferences.
+- Developer Remember Me uses native SecureStorage for its opt-in credential record; Lock clears the active authorization marker but retains the saved record for prefill. The initial login eye control is presentation-only.
 - tests/app/exit-confirm-panel.test.ts: localized Home exit confirmation, No/Yes controls.
 - tests/offline-game/isometric-npc-chat.test.ts: map editor gate, chat markup, scan effects and field-window markup.
 - The main CI pipeline also runs gameplay formula/map/editor tests and TypeScript/Vite build.
