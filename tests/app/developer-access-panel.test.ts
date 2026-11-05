@@ -14,6 +14,8 @@ describe("Account controls in Settings",()=>{
       expect(html).toContain("developer-atlas-reset-player");
       expect(html).toContain("data-atlas-developer-reset-proof");
       expect(html).toContain("developer-atlas-reset-confirm");
+      expect(html).toContain("data-atlas-developer-reset-proof");
+      expect(html).toContain("developer-atlas-reset-confirm");
     }
   });
 
