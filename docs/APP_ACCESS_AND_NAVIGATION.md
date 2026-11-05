@@ -21,20 +21,31 @@ This document is the security and navigation contract. It records which gates ex
 | Generated MainActivity patch | scripts/patch-android.mjs |
 | Localized Home exit confirmation | src/app/exit-confirm-panel.ts, src/style.css |
 
-## 2. Developer Mode and sensitive UI
+## 2. App entry gate, player access and Developer Mode
 
-The application starts with developerAuthenticated=false unless a remembered native developer session is restored. The app-shell gate and the map editor have independent flags; both must remain enforced.
+The app's first screen remains **Floating Control**. Before any role is authenticated, the account-access overlay is rendered above the original Floating Control menu; it does not replace or restructure that menu.
+
+The gate has two separate modes:
+
+- **Player:** accepts only a character name, with no password field and no Remember Me option. The submitted name must match a character name exactly (case-sensitive, no trimming-based correction, aliases, fuzzy matching or Unicode normalization) in `players.md` loaded from the currently verified Universe `ACTIVE_SHA`. The app fails closed if the official registry cannot be verified. A local World Atlas password or unrelated local character is not a substitute for official registry membership. Successful player access enters the normal Home screen; the developer-only Floating Control screen is hidden.
+- **Developer:** requires the embedded local Developer ID and password verifier. The raw credentials are not persisted. Remember Me is available only in this mode and stores the existing authorization marker in Android SecureStorage. Successful developer access keeps the app on Floating Control and enables the developer-only screens and tools in their normal locations.
+
+On either role's sign-out, clear both in-memory role flags, revoke Developer Mode, return to the initial Floating Control screen, and show the account gate again. Signing in as a player after a developer session must not inherit developer access; signing in as a developer after a player session must restore all developer features. The two roles must never be inferred from one another.
 
 When Developer Mode is false:
 
-- Developer-only Floating Control is not shown.
+- The full Floating Control screen is shown only as the initial pre-authentication gate background; after a player signs in, it is hidden.
 - The Convo/gameplay navigation entry is removed from normal navigation.
 - Supabase auth, canon/player-registry controls and other sensitive Settings panels are not rendered for ordinary players.
 - Sensitive click/submit handlers reject direct calls rather than trusting hidden buttons.
-- Map editor controls/canvas/test-yard entry are not rendered, and direct editor actions are rejected by the separate worldMapDeveloperMode gate.
+- Map editor controls/canvas/test-yard entry are not rendered, and direct editor actions are rejected by the separate `worldMapDeveloperMode` gate.
 - Debug/diagnostic controls remain developer-only.
 
-On developer sign-out, revoke the in-memory state, remove the remembered marker, call setWorldMapDeveloperMode(false), return to Home and rerender. Never make developer access depend only on CSS, a hidden attribute or an obscured URL.
+The header Bubble Mode action retains its original layered Kitty artwork and its existing action. The initial Floating Control readiness sequence and native Android permission/service flow remain independent of account role.
+
+**World Atlas is a different authentication system.** Its external login gate still requires the existing local password creation/verification flow (including confirmation when setting a first password). The new passwordless player-name gate must not bypass or modify World Atlas authentication.
+
+On developer sign-out, revoke the in-memory state, remove the remembered marker, call `setWorldMapDeveloperMode(false)`, return to Floating Control and rerender. Never make developer access depend only on CSS, a hidden attribute or an obscured URL.
 
 ### Credential handling and security limit
 
