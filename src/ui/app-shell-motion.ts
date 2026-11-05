@@ -262,3 +262,49 @@ export function animateNavLeverPull(button: HTMLElement, onComplete: () => void)
     },
   });
 }
+
+
+/** Fade the outgoing screen before the app replaces its DOM. */
+export function animateAppScreenExit(shell: HTMLElement | null, onComplete: () => void): void {
+  if (!shell) { onComplete(); return; }
+  const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
+  shell.style.pointerEvents = "none";
+  if (reducedMotion) {
+    onComplete();
+    return;
+  }
+  animate(shell, {
+    opacity: [1, 0],
+    translateY: [0, -5],
+    duration: 190,
+    ease: "inCubic",
+    onComplete
+  });
+}
+
+/** Close the noticeboard with a coordinated panel/backdrop fade. */
+export function animateNoticeboardExit(backdrop: HTMLElement | null, onComplete: () => void): void {
+  if (!backdrop) { onComplete(); return; }
+  const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
+  backdrop.style.pointerEvents = "none";
+  if (reducedMotion) {
+    onComplete();
+    return;
+  }
+  // Finish the CSS entrance keyframe first so it cannot compete with Anime.js opacity.
+  backdrop.getAnimations?.().forEach(animation => animation.finish());
+  const panel = backdrop.querySelector<HTMLElement>(".noticeboard-panel");
+  if (panel) animate(panel, {
+    opacity: [1, 0],
+    translateY: [0, 9],
+    scale: [1, .99],
+    duration: 230,
+    ease: "inCubic"
+  });
+  animate(backdrop, {
+    opacity: [1, 0],
+    duration: 270,
+    ease: "inCubic",
+    onComplete
+  });
+}
