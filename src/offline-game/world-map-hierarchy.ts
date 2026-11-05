@@ -211,12 +211,13 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
     if(academyCanvas){
       // Preserve the existing top, right and bottom canvas margins. Give only
       // the left side a longer runway so the camera can travel much farther.
-      const artworkScale=image.naturalWidth>0?academyImageWidth/image.naturalWidth:1;
-      const cellW=128*artworkScale,cellH=69.5*artworkScale;
-      academyMarginLeft=Math.max(cellW*2,rect.width*2)+academyExpansion.left;
-      academyMarginRight=Math.max(cellW*2,rect.width/2)+academyExpansion.right;
-      academyMarginTop=Math.max(cellH*2,rect.height/2)+academyExpansion.top;
-      academyMarginBottom=Math.max(cellH*2,rect.height/2)+academyExpansion.bottom;
+      const margins=calculateIsoCanvasMargins({
+        viewportWidth:Math.max(1,rect.width),viewportHeight:Math.max(1,rect.height),
+        artworkWidth:image.naturalWidth||academyImageWidth,artworkHeight:image.naturalHeight||academyImageHeight,
+        displayedArtworkWidth:academyImageWidth,cellWidth:128,cellHeight:69.5,expansion:academyExpansion,
+      });
+      academyMarginLeft=margins.left;academyMarginRight=margins.right;
+      academyMarginTop=margins.top;academyMarginBottom=margins.bottom;
       baseWidth=academyImageWidth+academyMarginLeft+academyMarginRight;
       baseHeight=academyImageHeight+academyMarginTop+academyMarginBottom;
       if(academyGrid){
