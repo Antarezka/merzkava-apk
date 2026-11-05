@@ -1930,6 +1930,20 @@
 /* Subtle after-step trails and two-ring submarine-style actor scanners. */
 .wmh-isometric-board{position:relative}
 .wmh-character-token{overflow:visible!important}
+.wmh-character-token>.wmh-npc-proximity-glow{
+  position:absolute!important;
+  z-index:0!important;
+  left:-7px!important;top:-7px!important;right:-7px!important;bottom:-7px!important;
+  width:auto!important;height:auto!important;
+  border:1.5px solid var(--npc-proximity-color,#e5d9b9)!important;
+  border-radius:50%!important;
+  background:radial-gradient(circle,transparent 52%,color-mix(in srgb,var(--npc-proximity-color,#e5d9b9) 17%,transparent) 100%)!important;
+  box-shadow:0 0 7px color-mix(in srgb,var(--npc-proximity-color,#e5d9b9) 52%,transparent),
+    0 0 14px color-mix(in srgb,var(--npc-proximity-color,#e5d9b9) 23%,transparent)!important;
+  opacity:0;transform:scale(.82);pointer-events:none!important;will-change:transform,opacity;
+}
+.wmh-character-token>i{z-index:1}
+@media(prefers-reduced-motion:reduce){.wmh-character-token>.wmh-npc-proximity-glow{will-change:auto}}
 .wmh-sonar-ring{
   position:absolute!important;z-index:-1!important;left:50%!important;top:42%!important;
   width:calc(var(--tile-w,64px)*5)!important;height:calc(var(--tile-h,32px)*5)!important;
