@@ -1483,7 +1483,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
   });
   panel.querySelector<HTMLElement>("[data-wmh-overlay-clear]")?.addEventListener("click",()=>{
     if(!window.confirm("Clear foreground, blocked, opacity, and transition settings for this map?"))return;
-    remember();data.foregroundCells=[];data.blockedCells=[];data.opacityCells=[];data.walkableCells=[];data.walkableAreaEnabled=false;data.foregroundQuadrants=[];data.blockedQuadrants=[];data.opacityQuadrants=[];data.transitions=[];selectedTransitionId=null;if(walkableToggle)walkableToggle.checked=false;
+    remember();data.foregroundCells=[];data.blockedCells=[];data.opacityCells=[];data.walkableCells=[];data.walkableCellGroups=[];data.walkableAreaEnabled=false;data.foregroundQuadrants=[];data.blockedQuadrants=[];data.opacityQuadrants=[];data.transitions=[];selectedTransitionId=null;selectedMergeCells.clear();if(walkableToggle)walkableToggle.checked=false;
     if(transitionField)transitionField.value="";persist();setStatus("All map cell layers and transitions cleared.");
   });
   const exportPackage=()=>{
@@ -1513,6 +1513,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
         cellSectorOrder:["top-left","top-right","bottom-left","bottom-right"],
         quadrantKeys:"x,y:tl|tr|bl|br",
         transitionColors:"red=unnamed, blue=named",
+        walkableCellGroups:"Connected base cells may be merged into flexible logical cells; every group has an ID and retains its underlying grid coordinates.",
         canvasExpansion:"Not included or changed by this grid editor."
       }
     };
