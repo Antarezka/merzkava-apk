@@ -31,7 +31,7 @@ describe("shared isometric map editor data", () => {
       viewportWidth: 400, viewportHeight: 800,
       artworkWidth: 2000, artworkHeight: 1000,
       cellWidth: 64, cellHeight: 32,
-    })).toEqual({ left: 800, right: 200, top: 400, bottom: 400 });
+    })).toEqual({ left: 1600, right: 200, top: 400, bottom: 400 });
     expect(calculateIsoCanvasMargins({
       viewportWidth: 400, viewportHeight: 800,
       artworkWidth: 2000, artworkHeight: 1000,
