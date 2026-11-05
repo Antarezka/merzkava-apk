@@ -80,7 +80,7 @@ function playSceneBeat(root: HTMLElement, particles: HTMLElement[], onAnimation:
 }
 
  /** Anime.js owns Eternal Path presentation motion; game state never depends on animation callbacks. */
-export function mountExpeditionAnimations(root: HTMLElement): () => void {
+export function mountExpeditionAnimations(root: HTMLElement, playEntrance = true): () => void {
   const listeners: Array<() => void> = [];
   const activeSceneAnimations: Array<{ pause?: () => void }> = [];
   const scene = root.querySelector<HTMLElement>(".expedition-environment");
@@ -112,14 +112,19 @@ export function mountExpeditionAnimations(root: HTMLElement): () => void {
     if (!self) return;
     motionAllowed = !self.matches.reduceMotion && !reducedMotion();
     if (self.matches.reduceMotion) return;
-    const entranceTargets = root.querySelectorAll<HTMLElement>(".expedition-heading, .expedition-character-panel, .expedition-disposition-line, .expedition-dialogue, .expedition-footer");
-    if (entranceTargets.length) animate(entranceTargets, { opacity: [0, 1], translateY: [13, 0], duration: 560, delay: stagger(72), ease: "outCubic" });
-    const profileFields = root.querySelectorAll<HTMLElement>(".expedition-profile-meta span");
-    if (profileFields.length) animate(profileFields, { opacity: [0, 1], translateY: [5, 0], duration: 340, delay: stagger(38), ease: "outQuad" });
-    const disposition = root.querySelector<HTMLElement>(".expedition-disposition");
-    if (disposition) animate(disposition, { opacity: [.65, 1], scale: [.97, 1], duration: 900, ease: "outCubic" });
-    const narrative = root.querySelectorAll<HTMLElement>(".expedition-narrative-layer");
-    if (narrative.length) animate(narrative, { opacity: [0, 1], translateY: [9, 0], duration: 520, delay: stagger(115), ease: "outCubic" });
+    // root.innerHTML is rebuilt for ordinary game-state updates. Replaying entrance
+    // fades on each rebuild made every dialogue/action blink. Only a real screen
+    // entry should run these entrance animations; scene beats remain independent.
+    if (playEntrance) {
+      const entranceTargets = root.querySelectorAll<HTMLElement>(".expedition-heading, .expedition-character-panel, .expedition-disposition-line, .expedition-dialogue, .expedition-footer");
+      if (entranceTargets.length) animate(entranceTargets, { opacity: [0, 1], translateY: [13, 0], duration: 560, delay: stagger(72), ease: "outCubic" });
+      const profileFields = root.querySelectorAll<HTMLElement>(".expedition-profile-meta span");
+      if (profileFields.length) animate(profileFields, { opacity: [0, 1], translateY: [5, 0], duration: 340, delay: stagger(38), ease: "outQuad" });
+      const disposition = root.querySelector<HTMLElement>(".expedition-disposition");
+      if (disposition) animate(disposition, { opacity: [.65, 1], scale: [.97, 1], duration: 900, ease: "outCubic" });
+      const narrative = root.querySelectorAll<HTMLElement>(".expedition-narrative-layer");
+      if (narrative.length) animate(narrative, { opacity: [0, 1], translateY: [9, 0], duration: 520, delay: stagger(115), ease: "outCubic" });
+    }
     root.querySelectorAll<HTMLElement>("button").forEach(button => {
       const enter = () => animate(button, { scale: [1, 1.018], duration: 170, ease: "outQuad" });
       const leave = () => animate(button, { scale: [1.018, 1], duration: 210, ease: "outQuad" });
