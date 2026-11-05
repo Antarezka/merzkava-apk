@@ -77,6 +77,29 @@ export async function loadPlayerRegistry(activeSha: string): Promise<CanonDocume
   return fetchPinnedDocument("players.md", expected);
 }
 
+/** Performs a fresh, uncached request to the exact official Universe snapshot. */
+export async function verifyCanonSourceConnection(activeSha: string): Promise<void> {
+  const expected = activeSha.toLowerCase();
+  if (!/^[a-f0-9]{40}$/.test(expected) || currentStatus.commitSha !== expected) {
+    throw new Error("ACTIVE_SHA penuh tidak cocok dengan canon yang sedang diverifikasi.");
+  }
+  const url = `https://raw.githubusercontent.com/${CANON_REPOSITORY}/${expected}/players.md?connection_check=${Date.now()}`;
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), 7000);
+  try {
+    const response = await fetch(url, {
+      cache: "no-store",
+      signal: controller.signal,
+      headers: { Accept: "text/plain" }
+    });
+    if (!response.ok) throw new Error(`Universe source returned HTTP ${response.status}.`);
+    const text = await response.text();
+    if (!text.trim()) throw new Error("Universe player registry is empty.");
+  } finally {
+    window.clearTimeout(timeout);
+  }
+}
+
 export async function loadCanonModule(path: string): Promise<CanonDocument> {
   if (!currentStatus.commitSha) throw new Error("Muat atau perbarui INDEX canon terlebih dahulu.");
   const safePath = validateCanonPath(path);
