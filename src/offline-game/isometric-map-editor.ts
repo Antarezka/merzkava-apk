@@ -33,6 +33,8 @@ export type IsoMapEditorData = {
   opacityCells: string[];
   /** Optional movement whitelist; when enabled, only these image cells are traversable. */
   walkableCells: string[];
+  /** Additional image cells beyond the original rectangular grid bounds. */
+  customGridCells: string[];
   /** Connected sets of walkable diamonds merged into one logical area/cell. */
   walkableCellGroups: IsoWalkableCellGroup[];
   walkableAreaEnabled: boolean;
@@ -130,6 +132,7 @@ export function createIsoMapEditorData(
     blockedCells: [],
     opacityCells: [],
     walkableCells: [],
+    customGridCells: [],
     walkableCellGroups: [],
     walkableAreaEnabled: false,
     foregroundQuadrants: [],
@@ -188,6 +191,15 @@ export function normalizeIsoMapEditorData(
     return [...result];
   };
   const walkableCells = cleanCells(source.walkableCells, grid);
+  const customGridCells = Array.isArray(source.customGridCells)
+    ? [...new Set(source.customGridCells.flatMap(item=>{
+        const match=/^(-?\\d+),(-?\\d+)$/.exec(String(item));if(!match)return [];
+        const x=Number(match[1]),y=Number(match[2]);
+        if(!Number.isSafeInteger(x)||!Number.isSafeInteger(y)||Math.abs(x)>512||Math.abs(y)>512)return [];
+        if(x>=0&&x<grid.cols&&y>=0&&y<grid.rows)return [];
+        return [isoCellKey(x,y)];
+      }))]
+    : [];
   const walkableSet = new Set(walkableCells);
   const usedGroupCells = new Set<string>();
   const walkableCellGroups: IsoWalkableCellGroup[] = Array.isArray(source.walkableCellGroups)
@@ -209,6 +221,7 @@ export function normalizeIsoMapEditorData(
     blockedCells: cleanCells(source.blockedCells, grid),
     opacityCells: cleanCells(source.opacityCells, grid),
     walkableCells,
+    customGridCells,
     walkableCellGroups,
     walkableAreaEnabled: source.walkableAreaEnabled === true,
     foregroundQuadrants: cleanQuadrants(source.foregroundQuadrants),
@@ -385,6 +398,7 @@ export function isoCellCenter(
 export function isoCellAtPoint(
   point: IsoMapPoint,
   grid: IsoMapGridConfig,
+  allowOutsideGrid = false,
 ): { x: number; y: number } | null {
   const halfW = grid.tileW / 2;
   const halfH = grid.tileH / 2;
@@ -398,6 +412,6 @@ export function isoCellAtPoint(
   const y = Math.round(worldY);
   const distance = Math.abs(worldX - x) + Math.abs(worldY - y);
 
-  if (distance > 1.000001 || x < 0 || y < 0 || x >= grid.cols || y >= grid.rows) return null;
+  if (distance > 1.000001 || (!allowOutsideGrid && (x < 0 || y < 0 || x >= grid.cols || y >= grid.rows))) return null;
   return { x, y };
 }
