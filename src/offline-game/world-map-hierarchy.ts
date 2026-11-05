@@ -5,7 +5,7 @@ import { animateExpeditionPanel } from "./expedition-animations";
 import { getEternalSave, getExpeditionAtmosphere } from "./expedition-game";
 import {
   createIsoMapEditorData, DEFAULT_ISOMETRIC_GRID, DEFAULT_ISO_CANVAS_EXPANSION, normalizeIsoCanvasExpansion, isoCellAtPoint, isoCellCenter, isoCellHasLayer,
-  isoCellKey, isoMapStorageKey, isoQuadrantAtPoint, isoQuadrantHasLayer, normalizeIsoMapEditorData, toggleIsoQuadrantLayer,
+  isoCellKey, isoMapStorageKey, isoPointerGesture, isoQuadrantAtPoint, isoQuadrantHasLayer, normalizeIsoMapEditorData, toggleIsoQuadrantLayer,
   type IsoMapEditorData, type IsoMapGridConfig, type IsoQuadrant, type IsoQuadrantLayer,
 } from "./isometric-map-editor";
 import { renderIsometricSvgSceneMarkup, refreshIsometricSvgScene, type IsometricSvgTheme } from "./isometric-svg-board";
@@ -1302,21 +1302,35 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       const cell=isoCellAtPoint(mapPoint,grid);if(cell)walkToTile(dialog,cell.x,cell.y,"earth");
     });
   }
-  svg.addEventListener("pointerdown",e=>{
-    if(!board.classList.contains("wmh-overlay-editing"))return;e.preventDefault();e.stopPropagation();
-    const existing=(e.target as Element).closest<SVGGElement>("[data-transition-id]");
-    if(mode()==="transition"&&existing){
-      selectedTransitionId=existing.dataset.transitionId||null;
-      const marker=data.transitions.find(m=>m.id===selectedTransitionId);if(transitionField)transitionField.value=marker?.label||"";
-      redraw();return;
+  const viewport=board.closest<HTMLElement>("[data-wmh-map-viewport],[data-wmh-iso-viewport]");
+  const academyArtwork=board.dataset.academyArtworkBoard==="true";
+  let activePointers=new Set<number>();
+  let pendingTap:{pointerId:number;startX:number;startY:number;scrollLeft:number;scrollTop:number;dragged:boolean;cancelled:boolean;transitionId:string|null}|null=null;
+  const pointerMove=(event:PointerEvent)=>{
+    if(!pendingTap||pendingTap.pointerId!==event.pointerId)return;
+    if(isoPointerGesture({x:pendingTap.startX,y:pendingTap.startY},{x:event.clientX,y:event.clientY})==="drag"){
+      pendingTap.dragged=true;
+      // Academy's camera already pans through bindWorldMapZoom. Other map
+      // viewports need this one-finger pan while the editor overlay is active.
+      if(!academyArtwork&&activePointers.size===1&&viewport){
+        viewport.scrollLeft=pendingTap.scrollLeft-(event.clientX-pendingTap.startX);
+        viewport.scrollTop=pendingTap.scrollTop-(event.clientY-pendingTap.startY);
+      }
     }
-    const mapPoint=point(e),cell=isoCellAtPoint(mapPoint,grid);if(!cell)return;
+  };
+  const applyCellTap=(event:PointerEvent,transitionId:string|null)=>{
+    const mapPoint=point(event),cell=isoCellAtPoint(mapPoint,grid);if(!cell)return;
     if(mode()==="transition"){
+      const existing=transitionId?data.transitions.find(marker=>marker.id===transitionId):data.transitions.find(marker=>marker.x===cell.x&&marker.y===cell.y);
+      if(existing){
+        selectedTransitionId=existing.id;if(transitionField)transitionField.value=existing.label;
+        redraw();setStatus(existing.label?"Selected named transition: "+existing.label:"Selected unnamed transition. Enter a destination label.");return;
+      }
       remember();
-      let marker=data.transitions.find(m=>m.x===cell.x&&m.y===cell.y);
-      if(!marker){marker={id:"transition-"+Date.now()+"-"+data.transitions.length,x:cell.x,y:cell.y,label:""};data.transitions.push(marker);}
-      selectedTransitionId=marker.id;if(transitionField)transitionField.value=marker.label;
-      persist();setStatus("Transition selected. Enter its destination name to turn it blue.");return;
+      const marker={id:"transition-"+Date.now()+"-"+data.transitions.length,x:cell.x,y:cell.y,label:""};
+      data.transitions.push(marker);selectedTransitionId=marker.id;
+      if(transitionField)transitionField.value="";
+      persist();setStatus("Transition cell selected. Enter its destination label; it stays red until named.");return;
     }
     if(mode()==="walkable"){
       const key=isoCellKey(cell.x,cell.y),wasSelected=data.walkableCells.includes(key);
@@ -1326,13 +1340,47 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
         data.walkableCells=wasSelected?[...data.walkableCells,key]:data.walkableCells.filter(item=>item!==key);
         history.pop();redraw();setStatus("That change leaves too few free cells for every character. Add more blue cells first.");return;
       }
-      persist();setStatus((wasSelected?"Removed":"Added")+" walkable cell ("+cell.x+","+cell.y+"). Blue cells define the optional movement area; enable AREA LIMIT when the region is complete.");return;
+      persist();setStatus((wasSelected?"Removed":"Added")+" walkable cell ("+cell.x+","+cell.y+"). Tap more cells to shape your own walkable region. A drag only pans the map.");return;
     }
     const quadrant=isoQuadrantAtPoint(mapPoint,cell.x,cell.y,grid);
     const layer:IsoQuadrantLayer=mode()==="blocked"?"blockedQuadrants":mode()==="opacity"?"opacityQuadrants":"foregroundQuadrants";
     remember();const enabled=toggleIsoQuadrantLayer(data,layer,cell.x,cell.y,quadrant);
     persist();
-    setStatus((layer==="foregroundQuadrants"?"○ Foreground":layer==="blockedQuadrants"?"X Blocked":"◌ Opacity")+(enabled?" enabled":" cleared")+" in "+quadrant.toUpperCase()+" sector of ("+cell.x+","+cell.y+").");
+    setStatus((layer==="foregroundQuadrants"?"○ Foreground":layer==="blockedQuadrants"?"X Blocked":"◌ Opacity")+(enabled?" enabled":" cleared")+" in "+quadrant.toUpperCase()+" sector of ("+cell.x+","+cell.y+"). Tap edits one sector; drag only pans.");
+  };
+  // Capture movement at the dialog boundary so a finger may leave the grid
+  // during a drag. The camera handles Academy pan/pinch; other isometric maps
+  // receive the same one-finger scroll behavior here.
+  dialog.addEventListener("pointermove",pointerMove,true);
+  dialog.addEventListener("pointerup",event=>{
+    const pointerEvent=event as PointerEvent;
+    activePointers.delete(pointerEvent.pointerId);
+    if(!pendingTap||pendingTap.pointerId!==pointerEvent.pointerId)return;
+    const completed=pendingTap;pendingTap=null;
+    if(!completed.cancelled&&!completed.dragged&&isoPointerGesture(
+      {x:completed.startX,y:completed.startY},{x:pointerEvent.clientX,y:pointerEvent.clientY}
+    )==="tap")applyCellTap(pointerEvent,completed.transitionId);
+  },true);
+  dialog.addEventListener("pointercancel",event=>{
+    const pointerId=(event as PointerEvent).pointerId;activePointers.delete(pointerId);
+    if(pendingTap?.pointerId===pointerId)pendingTap=null;
+  },true);
+  svg.addEventListener("pointerdown",event=>{
+    if(!board.classList.contains("wmh-overlay-editing"))return;
+    const target=event.target as Element;
+    activePointers.add(event.pointerId);
+    if(activePointers.size>1){
+      if(pendingTap)pendingTap.cancelled=true;
+      return; // two fingers are reserved for the existing pinch-zoom camera
+    }
+    pendingTap={
+      pointerId:event.pointerId,startX:event.clientX,startY:event.clientY,
+      scrollLeft:viewport?.scrollLeft||0,scrollTop:viewport?.scrollTop||0,
+      dragged:false,cancelled:false,
+      transitionId:target.closest<SVGGElement>("[data-transition-id]")?.dataset.transitionId||null
+    };
+    event.preventDefault();
+    try{svg.setPointerCapture(event.pointerId);}catch{/* dialog-level pointer listeners remain the fallback */}
   });
   panel.querySelector<HTMLElement>("[data-wmh-transition-apply]")?.addEventListener("click",()=>{
     const marker=data.transitions.find(m=>m.id===selectedTransitionId);if(!marker){setStatus("Select a transition marker first.");return;}
