@@ -26,7 +26,7 @@ describe("screen and noticeboard transitions",()=>{
     const shell:any={querySelector:vi.fn(()=>null)};
     animateAppScreen(shell);
     expect(mocks.animate).toHaveBeenCalledWith(shell,expect.objectContaining({
-      opacity:[0,1],translateY:[7,0],scale:[0.996,1],duration:360
+      opacity:[0,1],duration:480
     }));
   });
 
@@ -36,7 +36,7 @@ describe("screen and noticeboard transitions",()=>{
     animateAppScreenExit(shell,complete);
     expect(shell.style.pointerEvents).toBe("none");
     expect(mocks.animate).toHaveBeenCalledWith(shell,expect.objectContaining({
-      opacity:[1,0],translateY:[0,-7],scale:[1,0.994],duration:300
+      opacity:[1,0],duration:430
     }));
     mocks.animate.mock.calls[0][1].onComplete();
     expect(complete).toHaveBeenCalledOnce();
@@ -55,7 +55,7 @@ describe("screen and noticeboard transitions",()=>{
     expect(backdrop.getAnimations).toHaveBeenCalledOnce();
     expect(mocks.animate).toHaveBeenCalledTimes(2);
     expect(mocks.animate).toHaveBeenCalledWith(panel,expect.objectContaining({
-      opacity:[1,0],translateY:[0,9]
+      opacity:[1,0],translateY:[0,5]
     }));
     const backdropCall=mocks.animate.mock.calls.find(call=>call[0]===backdrop);
     expect(backdropCall).toBeTruthy();

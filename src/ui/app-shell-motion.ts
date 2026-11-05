@@ -25,14 +25,16 @@ export function animateAppScreen(shell: HTMLElement | null, options: { menuToggl
     return;
   }
 
-  // Fade the new shell as a single surface. Child panels retain their own staggered Anime.js entrances.
-  animate(shell, {
-    opacity: [0, 1],
-    translateY: [7, 0],
-    scale: [0.996, 1],
-    duration: 360,
-    ease: "outCubic"
-  });
+  // The shell owns opacity; child wrappers contribute subtle movement only.
+  if (!options.menuToggle) {
+    shell.style.willChange = "opacity";
+    animate(shell, {
+      opacity: [0, 1],
+      duration: 480,
+      ease: "outCubic",
+      onComplete: () => { shell.style.willChange = ""; }
+    });
+  }
 
   if (options.menuToggle) {
     const collapsed = shell.classList.contains("is-nav-collapsed");
@@ -108,15 +110,14 @@ export function animateAppScreen(shell: HTMLElement | null, options: { menuToggl
     return;
   }
 
-  if (header) animate(header, { opacity: [0, 1], translateY: [-8, 0], duration: 390, ease: "outCubic" });
+  if (header) animate(header, { translateY: [-5, 0], duration: 440, delay: 35, ease: "outCubic" });
   if (content) {
     const panels = Array.from(content.querySelectorAll<HTMLElement>(":scope > *"))
       .filter(panel => !panel.matches(".dusty-letter, .language-preference, .developer-credit"));
     panels.forEach((panel, index) => animate(panel, {
-      opacity: [0, 1],
-      ...(panel.classList.contains("expedition-page") ? {} : { translateY: [13, 0] }),
-      duration: 470,
-      delay: 58 * index,
+      ...(panel.classList.contains("expedition-page") ? {} : { translateY: [7, 0] }),
+      duration: 500,
+      delay: 44 * index,
       ease: "outCubic"
     }));
 
@@ -127,18 +128,16 @@ export function animateAppScreen(shell: HTMLElement | null, options: { menuToggl
       const ink = letter.querySelector<HTMLElement>(".dusty-letter-ink");
       const seal = letter.querySelector<HTMLElement>(".kitty-wax-seal");
       const sealLayers = seal?.querySelectorAll<HTMLElement>("img");
-      animate(letter, { opacity: [0, 1], translateY: [18, 0], duration: 760, delay: 110, ease: "outCubic" });
+      animate(letter, { translateY: [10, 0], duration: 620, delay: 75, ease: "outCubic" });
       if (dust) animate(dust, { opacity: [0.18, 0.48, 0.28], translateX: [-4, 5, 0], duration: 2400, delay: 520, ease: "inOutSine" });
       if (ink) animate(ink, { opacity: [0.14, 0.28, 0.18], translateX: [2, -3, 0], duration: 3100, delay: 640, ease: "inOutSine" });
       if (paragraphs.length) animate(paragraphs, {
-        opacity: [0, 1],
-        translateY: [8, 0],
+        translateY: [6, 0],
         delay: stagger(72, { start: 260 }),
         duration: 520,
         ease: "outCubic"
       });
       if (seal) animate(seal, {
-        opacity: [0, 1],
         scale: [0.72, 1.08, 1],
         rotate: [-16, 4, 0],
         duration: 820,
@@ -146,7 +145,6 @@ export function animateAppScreen(shell: HTMLElement | null, options: { menuToggl
         ease: "outBack"
       });
       if (sealLayers?.length) animate(sealLayers, {
-        opacity: [0, 1],
         scale: [0.86, 1],
         delay: stagger(65, { start: 480 }),
         duration: 460,
@@ -157,23 +155,23 @@ export function animateAppScreen(shell: HTMLElement | null, options: { menuToggl
     const languagePanel = content.querySelector<HTMLElement>(".language-preference");
     const credit = content.querySelector<HTMLElement>(".developer-credit");
     if (languagePanel) animate(languagePanel, {
-      opacity: [0, 1], translateY: [12, 0], duration: 520, delay: 90, ease: "outCubic"
+      translateY: [7, 0], duration: 500, delay: 70, ease: "outCubic"
     });
     if (credit) {
       const creditLines = credit.querySelectorAll<HTMLElement>("span, strong, em");
-      animate(credit, { opacity: [0, 1], translateY: [10, 0], duration: 500, delay: 180, ease: "outCubic" });
+      animate(credit, { translateY: [7, 0], duration: 500, delay: 105, ease: "outCubic" });
       if (creditLines.length) animate(creditLines, {
-        opacity: [0, 1], translateY: [5, 0],
+        translateY: [5, 0],
         delay: stagger(75, { start: 260 }), duration: 430, ease: "outCubic"
       });
     }
   }
 
   if (nav) {
-    animate(nav, { opacity: [0, 1], duration: 520, delay: 90, ease: "outCubic" });
+    // Navigation opacity is inherited from the shell; avoid a second fade owner.
     const items = nav.querySelectorAll<HTMLElement>(".nav-item-motion");
     if (items.length) {
-      animate(items, { opacity: [0, 1], duration: 380, delay: stagger(38, { start: 150 }), ease: "outCubic" });
+      animate(items, { translateY: [2, 0], duration: 340, delay: stagger(30, { start: 110 }), ease: "outCubic" });
       items.forEach(item => {
         const enter = () => animate(item, { scale: [1, 1.055], duration: 160, ease: "outQuad" });
         const leave = () => animate(item, { scale: [1.055, 1], duration: 190, ease: "outQuad" });
@@ -273,49 +271,63 @@ export function animateNavLeverPull(button: HTMLElement, onComplete: () => void)
 }
 
 
-/** Fade the outgoing screen before the app replaces its DOM. */
+function currentOpacity(element: HTMLElement): number {
+  const raw = window.getComputedStyle?.(element).opacity ?? "";
+  const value = Number.parseFloat(raw);
+  return Number.isFinite(value) ? Math.max(0, Math.min(1, value)) : 1;
+}
+
+/** Fade an outgoing screen snapshot while its replacement enters underneath. */
 export function animateAppScreenExit(shell: HTMLElement | null, onComplete: () => void): void {
   if (!shell) { onComplete(); return; }
   const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
   shell.style.pointerEvents = "none";
   if (reducedMotion) {
+    shell.style.willChange = "";
     onComplete();
     return;
   }
-  // Fade the outgoing screen before render() replaces its DOM.
+  const fromOpacity = currentOpacity(shell);
+  shell.style.willChange = "opacity";
+  let completed = false;
+  const finish = () => {
+    if (completed) return;
+    completed = true;
+    shell.style.willChange = "";
+    onComplete();
+  };
   animate(shell, {
-    opacity: [1, 0],
-    translateY: [0, -7],
-    scale: [1, 0.994],
-    duration: 300,
-    ease: "inOutQuad",
-    onComplete
+    opacity: [fromOpacity, 0],
+    duration: 430,
+    ease: "inOutSine",
+    onComplete: finish
   });
 }
 
-/** Close the noticeboard with a coordinated panel/backdrop fade. */
+/** Close the noticeboard without a CSS-keyframe/Anime.js opacity handoff. */
 export function animateNoticeboardExit(backdrop: HTMLElement | null, onComplete: () => void): void {
   if (!backdrop) { onComplete(); return; }
   const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
   backdrop.style.pointerEvents = "none";
-  if (reducedMotion) {
-    onComplete();
-    return;
-  }
-  // Finish the CSS entrance keyframe first so it cannot compete with Anime.js opacity.
-  backdrop.getAnimations?.().forEach(animation => animation.finish());
+  if (reducedMotion) { onComplete(); return; }
+  const backdropOpacity = currentOpacity(backdrop);
   const panel = backdrop.querySelector<HTMLElement>(".noticeboard-panel");
-  if (panel) animate(panel, {
-    opacity: [1, 0],
-    translateY: [0, 9],
-    scale: [1, .99],
-    duration: 230,
-    ease: "inCubic"
-  });
+  const panelOpacity = panel ? currentOpacity(panel) : 1;
+  backdrop.getAnimations?.().forEach(animation => animation.cancel());
+  backdrop.style.opacity = String(backdropOpacity);
+  if (panel) {
+    panel.style.opacity = String(panelOpacity);
+    animate(panel, {
+      opacity: [panelOpacity, 0],
+      translateY: [0, 5],
+      duration: 340,
+      ease: "inOutSine"
+    });
+  }
   animate(backdrop, {
-    opacity: [1, 0],
-    duration: 270,
-    ease: "inCubic",
+    opacity: [backdropOpacity, 0],
+    duration: 380,
+    ease: "inOutSine",
     onComplete
   });
 }
