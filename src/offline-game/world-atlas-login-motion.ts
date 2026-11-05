@@ -5,7 +5,7 @@ function wait(milliseconds:number):Promise<void> {
 }
 
 /** Four-second presentation sequence. The app performs the real registry/password checks separately. */
-export async function playWorldAtlasAccessSequence(gate:HTMLElement,duration=4000):Promise<void> {
+export async function playWorldAtlasAccessSequence(gate:HTMLElement,duration=4000,holdUntil?:Promise<unknown>):Promise<void> {
   const buffer=gate.querySelector<HTMLElement>("[data-world-atlas-buffer]");
   const status=gate.querySelector<HTMLElement>("[data-atlas-buffer-status]");
   const log=gate.querySelector<HTMLElement>("[data-atlas-buffer-log]");
@@ -40,6 +40,8 @@ export async function playWorldAtlasAccessSequence(gate:HTMLElement,duration=400
     }
     const elapsed=performance.now()-started;
     if(elapsed<duration)await wait(duration-elapsed);
+    // Keep the visual buffer present until the live source check has actually settled.
+    if(holdUntil)await holdUntil;
   }finally{
     scope.revert();
     delete gate.dataset.atlasBuffering;
