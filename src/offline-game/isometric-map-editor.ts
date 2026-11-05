@@ -33,6 +33,14 @@ export type IsoMapEditorData = {
 
 export type IsoMapPoint = { x: number; y: number };
 
+export type IsoCanvasExpansion = { top: number; bottom: number; left: number; right: number };
+export const DEFAULT_ISO_CANVAS_EXPANSION: IsoCanvasExpansion = { top: 0, bottom: 0, left: 0, right: 0 };
+export function normalizeIsoCanvasExpansion(value: unknown): IsoCanvasExpansion {
+  const source = value && typeof value === "object" ? value as Record<string, unknown> : {};
+  const read = (side: keyof IsoCanvasExpansion) => Math.round(clamp(source[side], 0, 12000, 0));
+  return { top: read("top"), bottom: read("bottom"), left: read("left"), right: read("right") };
+}
+
 export const DEFAULT_ISOMETRIC_GRID: IsoMapGridConfig = {
   cols: 24,
   rows: 20,
