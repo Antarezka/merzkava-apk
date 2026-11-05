@@ -1084,9 +1084,10 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     board.dataset.offsetX=String(grid.offsetX);board.dataset.offsetY=String(grid.offsetY);
     const wanted=new Set<string>();for(let y=0;y<grid.rows;y++)for(let x=0;x<grid.cols;x++)wanted.add(isoCellKey(x,y));
     board.querySelectorAll<HTMLElement>("[data-wmh-tile]").forEach(tile=>{if(!wanted.has(isoCellKey(Number(tile.dataset.x),Number(tile.dataset.y))))tile.remove();});
-    // Regenerate SVG cells from the active calibration. Legacy boards keep
-    // their button-cell fallback, while live isometric maps use SVG polygons.
-    if(!board.querySelector("[data-wmh-scene-svg]")){
+    const academyArtwork=board.dataset.academyArtworkBoard==="true";
+    // Regenerate SVG cells from the active calibration. Academy geometry is
+    // strictly an image overlay; it must never resize the map surface/canvas.
+    if(!academyArtwork&&!board.querySelector("[data-wmh-scene-svg]")){
       const present=new Set(Array.from(board.querySelectorAll<HTMLElement>("[data-wmh-tile]")).map(t=>isoCellKey(Number(t.dataset.x),Number(t.dataset.y))));
       for(let y=0;y<grid.rows;y++)for(let x=0;x<grid.cols;x++){
         const id=isoCellKey(x,y);if(present.has(id))continue;
@@ -1103,11 +1104,17 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     const image=board.querySelector<HTMLImageElement>("[data-wmh-map-art]");
     const projectedWidth=(grid.cols+grid.rows-2)*grid.tileW/2+grid.tileW;
     const projectedHeight=(grid.cols+grid.rows-2)*grid.tileH/2+grid.tileH+7;
-    const width=Math.max(projectedWidth,image?.naturalWidth||0);
-    const height=Math.max(projectedHeight,image?.naturalHeight||0);
-    board.style.setProperty("--iso-board-width",width+"px");board.style.setProperty("--iso-board-height",height+"px");
-    board.style.width=width+"px";board.style.height=height+"px";svg.setAttribute("viewBox","0 0 "+width+" "+height);
-    if(board.querySelector("[data-wmh-scene-svg]"))refreshIsometricSvgScene(board,grid);
+    const width=academyArtwork?(image?.naturalWidth||2816):Math.max(projectedWidth,image?.naturalWidth||0);
+    const height=academyArtwork?(image?.naturalHeight||1536):Math.max(projectedHeight,image?.naturalHeight||0);
+    if(academyArtwork){
+      svg.setAttribute("viewBox","0 0 "+width+" "+height);
+      const interaction=svg.querySelector<SVGGElement>("[data-wmh-interaction-grid]");
+      if(interaction)interaction.innerHTML=academyInteractionGridMarkup(grid,data);
+    }else{
+      board.style.setProperty("--iso-board-width",width+"px");board.style.setProperty("--iso-board-height",height+"px");
+      board.style.width=width+"px";board.style.height=height+"px";svg.setAttribute("viewBox","0 0 "+width+" "+height);
+      if(board.querySelector("[data-wmh-scene-svg]"))refreshIsometricSvgScene(board,grid);
+    }
     panel.querySelectorAll<HTMLInputElement>("[data-wmh-grid-control]").forEach(input=>{
       const property=input.dataset.wmhGridControl as keyof IsoMapGridConfig;input.value=String(grid[property]);
       const output=panel.querySelector<HTMLElement>('[data-wmh-grid-value="'+property+'"]');if(output)output.textContent=String(grid[property]);
@@ -1234,7 +1241,13 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       :"Tap a cell to add/select a transition. Red is unnamed; blue is named.");
   });
   if(transitionTools)transitionTools.hidden=mode()!=="transition";
-  const point=(e:PointerEvent)=>{const r=board.getBoundingClientRect();return{x:(e.clientX-r.left)*board.offsetWidth/Math.max(1,r.width),y:(e.clientY-r.top)*board.offsetHeight/Math.max(1,r.height)};};
+  if(walkableToggle)walkableToggle.checked=data.walkableAreaEnabled;
+  walkableToggle?.addEventListener("change",()=>{
+    remember();data.walkableAreaEnabled=walkableToggle.checked;persist();
+    if(!relocateActorsFromBlockedCells(board,data))setStatus("No safe cells are selected. Paint the walkable area before enabling this limit.");
+    else setStatus(data.walkableAreaEnabled?"Movement is limited to blue walkable cells.":"Movement limit disabled; all non-X cells may be used.");
+  });
+  const point=(e:PointerEvent)=>{const r=svg.getBoundingClientRect(),box=svg.viewBox.baseVal;return{x:(e.clientX-r.left)*box.width/Math.max(1,r.width),y:(e.clientY-r.top)*box.height/Math.max(1,r.height)};};
   svg.addEventListener("pointerdown",e=>{
     if(!board.classList.contains("wmh-overlay-editing"))return;e.preventDefault();e.stopPropagation();
     const existing=(e.target as Element).closest<SVGGElement>("[data-transition-id]");
