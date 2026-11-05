@@ -1037,6 +1037,8 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
   const transitionGroup=svg.querySelector<SVGGElement>("[data-wmh-transition-marks]");
   const cellTools=panel.querySelector<HTMLElement>("[data-wmh-cell-tools]");
   const selectionCount=panel.querySelector<HTMLElement>("[data-wmh-cell-selection-count]");
+  const mergeApplyButton=panel.querySelector<HTMLButtonElement>("[data-wmh-merge-apply]");
+  const mergeClearButton=panel.querySelector<HTMLButtonElement>("[data-wmh-merge-clear]");
   const selectedMergeCells=new Set<string>();
   const status=()=>panel.querySelector<HTMLElement>("[data-wmh-overlay-status]");
   const setStatus=(message:string)=>{const node=status();if(node)node.textContent=message;};
@@ -1303,6 +1305,8 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
   const updateModeHelp=()=>{
     if(transitionTools)transitionTools.hidden=mode()!=="transition";
     if(cellTools)cellTools.hidden=!["cell-add","cell-delete","cell-merge","cell-unmerge"].includes(mode());
+    if(mergeApplyButton)mergeApplyButton.hidden=mode()!=="cell-merge";
+    if(mergeClearButton)mergeClearButton.hidden=mode()!=="cell-merge";
     if(mode()!=="cell-merge")selectedMergeCells.clear();
     redraw();
     setStatus(mode()==="cell-add"?"ADD CELL: tap any empty grid diamond on the Map Base to add it to your walkable area. Each tap adds exactly one cell; drag pans."
