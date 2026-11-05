@@ -520,8 +520,8 @@ function bugPanelMarkup(): string {
 }
 function render(): void {
   if(!hasAppAccess()&&activeScreen!=="control")activeScreen="control";
-  if(!developerAuthenticated&&activeScreen==="gameplay")activeScreen="home";
-  const visibleNavigation=developerAuthenticated?navigation:navigation.filter(item=>item.id!=="gameplay");
+  if(!hasAppAccess()&&activeScreen==="gameplay")activeScreen="control";
+  const visibleNavigation=hasAppAccess()?navigation:navigation.filter(item=>item.id!=="gameplay");
   // Each render replaces the screen DOM. Stop all Anime.js loops/listeners
   // attached to the previous Eternal Path tree before those nodes are detached.
   // Without this, route switches and repeated game actions accumulate infinite
@@ -1180,19 +1180,17 @@ root.addEventListener("click", async (event: MouseEvent) => {
   }
   if(target.closest("[data-player-logout]")){
     await signOutDeveloper();
-    try{if(getAuthSession())await signOut();}catch{authMessage="Supabase session cleanup was incomplete; developer-only controls remain locked."}
     developerAuthenticated=false;playerAuthenticated=false;activePlayerName="";playerLoginName="";activeCharacterId="";activeProfileMarkdown="";activeChat={messages:[],started:false,showOptions:activeChat.showOptions};
     authMessage="";setWorldMapDeveloperMode(false);activeScreen="control";accessLoginMode="player";notice="";
     history.pushState({merzkavaScreen:"control",merzkavaHome:false},"");render();return;
   }
   if(target.closest("[data-dev-logout]")){
     await signOutDeveloper();
-    if(getAuthSession())await signOut();
     developerAuthenticated=false;playerAuthenticated=false;activePlayerName="";playerLoginName="";activeCharacterId="";activeProfileMarkdown="";activeChat={messages:[],started:false,showOptions:activeChat.showOptions};
     authMessage="";setWorldMapDeveloperMode(false);activeScreen="control";accessLoginMode="player";notice="";render();return;
   }
   if(!hasAppAccess()&&target.closest("[data-floating-action]"))return;
-  if(!developerAuthenticated&&target.closest("[data-auth-logout],[data-refresh-canon],[data-refresh-players],[data-bug-copy],[data-bug-minimize],[data-bug-dismiss]"))return;
+  if(!developerAuthenticated&&target.closest("[data-auth-logout],[data-refresh-canon],[data-bug-copy],[data-bug-minimize],[data-bug-dismiss]"))return;
   const activeEternalModal=root.querySelector<HTMLElement>(".expedition-choice-modal:not([hidden])");
   if(activeEternalModal && !target.closest(".expedition-choice-modal")) return;
   if (event.detail !== 0 && suppressNextPointerClick) {
@@ -1623,7 +1621,7 @@ root.addEventListener("click", async (event: MouseEvent) => {
   const button = target.closest<HTMLButtonElement>("[data-screen]");
   const nextScreen = button?.dataset.screen as ScreenId | undefined;
   if (!nextScreen || !navigation.some(item => item.id === nextScreen)) return;
-  if(nextScreen==="gameplay"&&!developerAuthenticated)return;
+  if(nextScreen==="gameplay"&&!hasAppAccess())return;
   if(nextScreen!==activeScreen)history.pushState({merzkavaScreen:nextScreen},"");
   if (nextScreen === "gameplay" && activeScreen !== "gameplay") {
     const selected = root.querySelector<HTMLSelectElement>("#gameplay-character")?.value ?? activeCharacterId;
@@ -1796,7 +1794,8 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     }
     return;
   }
-  if(!developerAuthenticated&&(form.id==="auth-form"||form.id==="canon-route-form"||form.id==="canon-module-form"||form.id==="gameplay-route-form")){event.preventDefault();return;}
+  if(!developerAuthenticated&&(form.id==="auth-form"||form.id==="canon-route-form"||form.id==="canon-module-form")){event.preventDefault();return;}
+  if(!hasAppAccess()&&form.id==="gameplay-route-form"){event.preventDefault();return;}
   if (form.matches("[data-eternal-rename-form]")) {
     event.preventDefault();
     const id=form.getAttribute("data-eternal-rename-form")??"";
