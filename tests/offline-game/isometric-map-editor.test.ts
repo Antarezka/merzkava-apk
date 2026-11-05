@@ -16,6 +16,10 @@ import {
 } from "../../src/offline-game/isometric-map-editor";
 
 describe("shared isometric map editor data", () => {
+  it("uses the shared 800px left expansion when no override is stored", () => {
+    expect(normalizeIsoCanvasExpansion({})).toEqual({ top: 0, bottom: 0, left: 800, right: 0 });
+  });
+
   it("normalizes four independent canvas expansion values", () => {
     expect(normalizeIsoCanvasExpansion({ top: 250, bottom: 500, left: 900, right: -2 }))
       .toEqual({ top: 250, bottom: 500, left: 900, right: 0 });
