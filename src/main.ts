@@ -182,7 +182,7 @@ let playerLoginMessage = "";
 let playerLoginBusy = false;
 let playerLoginName = "";
 let accessLoginMode: "player" | "developer" = "player";
-let developerSessionRestored = false;
+let accessSessionRestored = false;
 let worldAtlasLoginBusy = false;
 function hasAppAccess(): boolean { return developerAuthenticated || playerAuthenticated; }
 let floatingReadiness: FloatingReadiness = { displayOverApps: false, notifications: false, batteryExemption: false, serviceRunning: false };
@@ -1726,7 +1726,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
   }
   if(form.id==="player-login-form"){
     event.preventDefault();if(playerLoginBusy)return;
-    if(!developerSessionRestored){
+    if(!accessSessionRestored){
       playerLoginMessage="Local access check is still starting. Please try again.";
       const message=root.querySelector<HTMLElement>("[data-player-login-message]");if(message)message.textContent=playerLoginMessage;
       return;
@@ -1766,7 +1766,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
   }
   if(form.id==="developer-login-form"){
     event.preventDefault();if(developerLoginBusy)return;
-    if(!developerSessionRestored){
+    if(!accessSessionRestored){
       developerLoginMessage="Local access check is still starting. Please try again.";
       const message=root.querySelector<HTMLElement>("[data-dev-login-message]");if(message)message.textContent=developerLoginMessage;
       return;
@@ -2059,7 +2059,6 @@ void initializeDatabase().then(async status => {
   databaseMessage = status.message;
   await refreshCharacters();
   try{developerAuthenticated=await restoreDeveloperSession();setWorldMapDeveloperMode(developerAuthenticated);}catch{developerAuthenticated=false;setWorldMapDeveloperMode(false);}
-  developerSessionRestored=true;
   try {
     await restoreAuthSession();
     authMessage = getAuthSession() ? "Saved secure session restored." : "";
@@ -2067,6 +2066,7 @@ void initializeDatabase().then(async status => {
     recordBug(error, "Restore authentication session", "Authentication");
     authMessage = error instanceof Error ? error.message : "Could not restore secure session.";
   }
+  accessSessionRestored=true;
   render();
   const canonStatus = await refreshCanon();
   canonMessage = canonStatus.message;
