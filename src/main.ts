@@ -595,7 +595,7 @@ function render(): void {
   }
   if (activeScreen === "offline-game") {
     const expeditionPage = root.querySelector<HTMLElement>(".expedition-page");
-    if (expeditionPage) cleanupExpeditionAnimations = mountExpeditionAnimations(expeditionPage);
+    if (expeditionPage) cleanupExpeditionAnimations = mountExpeditionAnimations(expeditionPage, shouldAnimateScreen);
   }
   if (!isControl) lastAnimatedScreen = activeScreen;
   updateSessionCalendar();
