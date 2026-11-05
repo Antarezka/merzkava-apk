@@ -106,6 +106,28 @@ describe("shared isometric map editor data", () => {
     expect(data.walkableCellGroups).toEqual([]);
   });
 
+  it("resolves extra grid cells outside the base grid only when explicitly allowed", () => {
+    const grid = { ...DEFAULT_ISOMETRIC_GRID, cols: 8, rows: 6, tileW: 80, tileH: 40 };
+    const extraCenter = isoCellCenter(8, 2, grid);
+    expect(isoCellAtPoint(extraCenter, grid)).toBeNull();
+    expect(isoCellAtPoint(extraCenter, grid, true)).toEqual({ x: 8, y: 2 });
+    expect(isoCellAtPoint(isoCellCenter(4, 3, grid), grid, true)).toEqual({ x: 4, y: 3 });
+  });
+
+  it("preserves sparse custom grid cells, walkable flags and merged groups outside base bounds", () => {
+    const data = normalizeIsoMapEditorData({
+      grid: { cols: 8, rows: 6 },
+      customGridCells: ["8,2", "9,2", "-1,3", "1,1", "600,1", "bad"],
+      walkableCells: ["8,2", "9,2", "-1,3", "1,2"],
+      walkableCellGroups: [
+        { id: "outer-path", cells: ["8,2", "9,2"] },
+      ],
+    }, "custom-grid");
+    expect(data.customGridCells).toEqual(["8,2", "9,2", "-1,3"]);
+    expect(data.walkableCells).toEqual(["1,2", "8,2", "9,2", "-1,3"]);
+    expect(data.walkableCellGroups).toEqual([{ id: "outer-path", cells: ["8,2", "9,2"] }]);
+  });
+
   it("resolves the four sub-sectors inside one diamond", () => {
     const grid = { ...DEFAULT_ISOMETRIC_GRID, tileW: 120, tileH: 60 };
     const center = isoCellCenter(3, 5, grid);
