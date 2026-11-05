@@ -102,3 +102,40 @@ if (!manifest.includes("FloatingKeepAliveService")) {
 }
 await writeFile(manifestPath, manifest);
 console.log("Patched generated Android project with Merzkava Floating Mode plugin and foreground service.");
+
+
+let backCallbackActivity = await readFile(mainActivityPath, "utf8");
+if (!backCallbackActivity.includes("MerzkavaAndroidBackCallback")) {
+  if (!backCallbackActivity.includes("import androidx.activity.OnBackPressedCallback;")) {
+    backCallbackActivity = backCallbackActivity.replace(
+      /^package\\s+[\\w.]+;/m,
+      match => match + "\\n\\nimport androidx.activity.OnBackPressedCallback;"
+    );
+  }
+  const callback = `
+        // MerzkavaAndroidBackCallback: keep navigation inside the WebView until Home confirms exit.
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                WebView currentWebView = getBridge() == null ? null : getBridge().getWebView();
+                if (currentWebView == null) {
+                    setEnabled(false);
+                    MainActivity.this.finishAndRemoveTask();
+                    return;
+                }
+                currentWebView.evaluateJavascript(
+                    "window.dispatchEvent(new Event('merzkava:android-back'))",
+                    null
+                );
+            }
+        });
+`;
+  if (!backCallbackActivity.includes("super.onCreate(savedInstanceState);")) {
+    throw new Error("Cannot attach Back callback: generated MainActivity onCreate shape changed.");
+  }
+  backCallbackActivity = backCallbackActivity.replace(
+    "super.onCreate(savedInstanceState);",
+    "super.onCreate(savedInstanceState);\\n" + callback
+  );
+  await writeFile(mainActivityPath, backCallbackActivity);
+}

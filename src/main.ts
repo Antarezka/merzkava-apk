@@ -177,7 +177,6 @@ let developerAuthenticated = false;
 let developerLoginMessage = "";
 let developerLoginBusy = false;
 let worldAtlasLoginBusy = false;
-let worldAtlasAuthenticated = false;
 let floatingReadiness: FloatingReadiness = { displayOverApps: false, notifications: false, batteryExemption: false, serviceRunning: false };
 let floatingBusy = false;
 async function refreshFloatingReadiness(): Promise<void> {
@@ -714,7 +713,6 @@ function closeWorldAtlas(syncHistory=true):void {
   if(modal&&!modal.hidden)modal.hidden=true;
   root.querySelector(".app-shell")?.classList.remove("is-idle-world");
   trigger?.setAttribute("aria-expanded","false");
-  worldAtlasAuthenticated=false;
   worldAtlasLoginBusy=false;
   trigger?.focus();
   if(syncHistory&&history.state?.idleRpgNotice)history.back();
@@ -732,7 +730,6 @@ async function openWorldAtlasFromTv():Promise<void> {
   history.pushState({idleRpgNotice:true,worldAtlasFromTv:true},"");
   gate.hidden=false;
   lockAtlasBackground(gate,true);
-  worldAtlasAuthenticated=false;
   worldAtlasLoginBusy=false;
   const select=gate.querySelector<HTMLSelectElement>("[data-world-atlas-player]");
   const message=gate.querySelector<HTMLElement>("[data-world-atlas-message]");
@@ -915,30 +912,60 @@ root.addEventListener("scroll", event => {
   navigationIntentTimer = window.setTimeout(() => { navigationScrollIntent = false; }, 650);
 }, true);
 
-window.addEventListener("popstate", () => {
+function showAppExitConfirmation(repeat=false):void {
+  const panel=root.querySelector<HTMLElement>("[data-app-exit-panel]");
+  if(!panel)return;
+  panel.hidden=false;
+  if(repeat){panel.classList.remove("is-back-repeat");void panel.offsetWidth;panel.classList.add("is-back-repeat");}
+}
+function closeIdleAtlasFromBack():void {
+  closeWorldAtlas(false);
+}
+window.addEventListener("merzkava:android-back",()=>{history.back();});
+window.addEventListener("popstate",(event:PopStateEvent)=>{
   const idleNotice=root.querySelector<HTMLElement>("[data-idle-rpg-modal]");
-  if(idleNotice&&!idleNotice.hidden){
-    idleNotice.hidden=true;
-    root.querySelector(".app-shell")?.classList.remove("is-idle-world");
-    root.querySelector<HTMLButtonElement>("[data-idle-rpg-open]")?.setAttribute("aria-expanded","false");
-    root.querySelector<HTMLButtonElement>("[data-idle-rpg-open]")?.focus();
+  if(idleNotice&&!idleNotice.hidden){closeIdleAtlasFromBack();return;}
+  const devPanel=root.querySelector<HTMLElement>("[data-dev-login-panel]");
+  if(devPanel&&!devPanel.hidden){
+    devPanel.hidden=true;
+    history.pushState({merzkavaScreen:activeScreen,merzkavaHome:activeScreen==="home"},"");
     return;
   }
   const manager=root.querySelector<HTMLElement>("[data-eternal-manager-content]");
   if(manager&&!manager.hidden){
     manager.hidden=true;
     const backdrop=root.querySelector<HTMLButtonElement>("[data-eternal-manager-backdrop]");
-    if(backdrop) backdrop.hidden=true;
+    if(backdrop)backdrop.hidden=true;
     root.querySelector<HTMLButtonElement>(".expedition-manager-trigger")?.setAttribute("aria-expanded","false");
     root.querySelector<HTMLButtonElement>(".expedition-manager-trigger")?.focus();
     return;
   }
-  const modal=root.querySelector<HTMLElement>(".expedition-choice-modal:not([hidden])");
-  if(!modal) return;
-  animateExpeditionChoiceModal(modal,false,()=>root.querySelector<HTMLButtonElement>("[data-eternal-open-choices]")?.focus());
-  document.body.classList.remove("eternal-choice-open");
+  const choice=root.querySelector<HTMLElement>(".expedition-choice-modal:not([hidden])");
+  if(choice){
+    animateExpeditionChoiceModal(choice,false,()=>root.querySelector<HTMLButtonElement>("[data-eternal-open-choices]")?.focus());
+    document.body.classList.remove("eternal-choice-open");
+    return;
+  }
+  const state=event.state as {merzkavaScreen?:string;merzkavaHome?:boolean}|null;
+  if(state?.merzkavaScreen&&navigation.some(item=>item.id===state.merzkavaScreen)){
+    const next=state.merzkavaScreen as ScreenId;
+    if(next!==activeScreen){activeScreen=next;notice="";render();}
+    return;
+  }
+  if(activeScreen!=="home"){
+    activeScreen="home";notice="";render();
+    history.replaceState({merzkavaScreen:"home",merzkavaHome:true},"");
+    return;
+  }
+  showAppExitConfirmation(!root.querySelector<HTMLElement>("[data-app-exit-panel]")?.hidden);
+  // Re-arm Home so every subsequent Android Back/gesture repeats this confirmation.
+  history.pushState({merzkavaScreen:"home",merzkavaHome:true},"");
 });
 root.addEventListener("keydown", event => {
+  const atlasGate=root.querySelector<HTMLElement>("[data-world-atlas-gate]");
+  if(event.key==="Escape"&&atlasGate&&!atlasGate.hidden){closeWorldAtlas();return;}
+  const devAccess=root.querySelector<HTMLElement>("[data-dev-login-panel]");
+  if(event.key==="Escape"&&devAccess&&!devAccess.hidden){devAccess.hidden=true;return;}
   const idleNotice=root.querySelector<HTMLElement>("[data-idle-rpg-modal]");
   if(event.key==="Escape"&&idleNotice&&!idleNotice.hidden){
     idleNotice.hidden=true;
@@ -1541,6 +1568,7 @@ root.addEventListener("click", async (event: MouseEvent) => {
   const nextScreen = button?.dataset.screen as ScreenId | undefined;
   if (!nextScreen || !navigation.some(item => item.id === nextScreen)) return;
   if(nextScreen==="gameplay"&&!developerAuthenticated)return;
+  if(nextScreen!==activeScreen)history.pushState({merzkavaScreen:nextScreen},"");
   if (nextScreen === "gameplay" && activeScreen !== "gameplay") {
     const selected = root.querySelector<HTMLSelectElement>("#gameplay-character")?.value ?? activeCharacterId;
     loadCharacterWorldTime(selected);
@@ -1623,7 +1651,6 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
         await setAtlasPassword(playerName,password);
       }
       await rememberAtlasPlayer(playerName,remember);
-      worldAtlasAuthenticated=true;
       worldAtlasLoginBusy=false;
       if(message)message.textContent="Access granted.";
       form.querySelector<HTMLInputElement>("#world-atlas-password")!.value="";
@@ -1913,6 +1940,8 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
   }
 });
 
+history.replaceState({merzkavaAppBase:true},"");
+history.pushState({merzkavaScreen:"home",merzkavaHome:true},"");
 window.addEventListener("error", event => { recordBug(event.error ?? event.message, "Uncaught JavaScript error", "Global handler"); render(); });
 window.addEventListener("unhandledrejection", event => { recordBug(event.reason, "Unhandled promise rejection", "Global handler"); render(); });
 render();

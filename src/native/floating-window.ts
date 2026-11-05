@@ -18,6 +18,7 @@ export interface FloatingWindowPlugin {
   requestPermission(): Promise<void>;
   show(): Promise<void>;
   restore(): Promise<void>;
+  exitApp(): Promise<void>;
 }
 
 const FloatingWindow = registerPlugin<FloatingWindowPlugin>("FloatingWindow");
@@ -75,4 +76,12 @@ export async function stopFloatingService(): Promise<void> {
 export async function restoreFullMode(): Promise<void> {
   if (!Capacitor.isNativePlatform()) return;
   await FloatingWindow.restore();
+}
+
+export async function exitMerzkavaApplication(): Promise<void> {
+  if (Capacitor.isNativePlatform()) {
+    await FloatingWindow.exitApp();
+    return;
+  }
+  try { window.close(); } catch { /* Web browsers may deny script-initiated close. */ }
 }

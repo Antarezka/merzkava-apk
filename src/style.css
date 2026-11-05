@@ -2792,3 +2792,26 @@ body { color:var(--ui-ink); }
 @media(prefers-reduced-motion:reduce){
   .narrative-wallpaper-settings .wallpaper-dropdown-arrow{transition:none}
 }
+
+
+/* Reusable app-level confirmation dialog for Android/WebView Back at Home. */
+.app-exit-confirm{
+  position:fixed!important;inset:0!important;z-index:2147483601!important;display:flex!important;align-items:center!important;justify-content:center!important;
+  box-sizing:border-box!important;padding:20px!important;background:rgba(5,10,8,.78)!important;
+  backdrop-filter:blur(9px)!important;-webkit-backdrop-filter:blur(9px)!important;
+}
+.app-exit-confirm[hidden]{display:none!important}
+.app-exit-confirm-card{
+  width:min(100%,380px)!important;padding:25px 21px 19px!important;border:1px solid #cfb174!important;border-radius:13px!important;
+  background:linear-gradient(145deg,#293c31,#111a14)!important;color:#f4e6c5!important;
+  box-shadow:0 20px 55px #000b,inset 0 1px #fff2!important;
+}
+.app-exit-confirm-card>small{color:#cdb47d!important;font:800 8px Arial,sans-serif!important;letter-spacing:.2em!important}
+.app-exit-confirm-card h2{margin:12px 0 8px!important;color:#f5e8cb!important;font:600 23px/1.2 Georgia,serif!important}
+.app-exit-confirm-card p{margin:0 0 20px!important;color:#d8c8a7!important;font:14px/1.5 Georgia,serif!important}
+.app-exit-confirm-actions{display:grid!important;grid-template-columns:1fr 1fr!important;gap:9px!important}
+.app-exit-confirm-actions button{min-height:42px!important;border:1px solid #bba06d!important;border-radius:6px!important;background:#1a2a20!important;color:#f1e2c0!important;font:800 9px Arial,sans-serif!important;letter-spacing:.08em!important}
+.app-exit-confirm-actions button[data-app-exit-yes]{background:linear-gradient(145deg,#64413a,#34221e)!important;border-color:#c88770!important}
+
+.app-exit-confirm.is-back-repeat .app-exit-confirm-card{animation:merzkava-exit-repeat .42s ease}
+@keyframes merzkava-exit-repeat{0%{transform:scale(.97);opacity:.7}60%{transform:scale(1.015);opacity:1}100%{transform:scale(1);opacity:1}}

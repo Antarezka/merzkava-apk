@@ -527,6 +527,19 @@ public class FloatingWindowPlugin extends Plugin {
     }
 
 
+    @PluginMethod
+    public void exitApp(PluginCall call) {
+        Activity activity = getActivity();
+        if (activity == null) {
+            call.reject("The application activity is unavailable.");
+            return;
+        }
+        MAIN.post(() -> {
+            call.resolve();
+            activity.finishAndRemoveTask();
+        });
+    }
+
     private static class KittyBubbleView extends View {
         private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         private final Path head = new Path();
