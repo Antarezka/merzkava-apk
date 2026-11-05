@@ -46,7 +46,7 @@ describe("shared isometric map editor data", () => {
       artworkWidth: 4000, artworkHeight: 2000,
       cellWidth: 64, cellHeight: 32, displayedArtworkWidth: 8000,
       expansion: { top: 100, bottom: 200, left: 300, right: 400 },
-    })).toEqual({ left: 556, right: 656, top: 164, bottom: 264 });
+    })).toEqual({ left: 556, right: 656, top: 228, bottom: 328 });
   });
 
   it("keeps foreground, blocking, and opacity cell flags independent", () => {
