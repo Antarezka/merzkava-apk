@@ -32,7 +32,7 @@ import { dustyLetterMarkup } from "./app/dusty-letter";
 import { APP_NAME, APP_VERSION } from "./app/app-meta";
 import { getLanguage, languagePanelMarkup, translateLabel, translateRenderedContent, setLanguage, type AppLanguage } from "./i18n";
 import { animateOpeningSplash, animateSplashCurtain } from "./ui/splash-animation";
-import { animateAppScreen } from "./ui/app-shell-motion";
+import { animateAppScreen, animateAppScreenExit, animateNoticeboardExit } from "./ui/app-shell-motion";
 import { initializeGravityPullCord } from "./ui/gravity-pull-cord";
 import { installSoftKeyboardStability } from "./ui/soft-keyboard-stability";
 import { mountArcanistryTicketMachine } from "./offline-game/arcanistry-ticket-machine";
@@ -111,6 +111,8 @@ let menuToggleAnimationPending = false;
 let languageAnimationPending = false;
 let cleanupExpeditionAnimations: (() => void) | undefined;
 let lastAnimatedScreen: AppScreen | null = null;
+let screenTransitionInFlight = false;
+let screenTransitionSettled = false;
 const splashAnimationCleanup=new WeakMap<HTMLDivElement,()=>void>();
 initializeLedgerNotifications();
 
@@ -414,7 +416,23 @@ function parseNoticeboardUpdates(readme: string): NoticeboardUpdate[] {
 async function refreshNoticeboardUpdates(): Promise<void> {
   try { const response = await fetch("https://raw.githubusercontent.com/Antarezka/merzkava-universe/main/README.md?noticeboard=" + Date.now(), { cache: "no-store" }); if (!response.ok) throw new Error("README request failed: " + response.status); noticeboardUpdates = parseNoticeboardUpdates(await response.text()); noticeboardSourceStatus = "LIVE · WORLD ARCHIVE"; }
   catch (error) { noticeboardSourceStatus = "ARCHIVE CONNECTION UNAVAILABLE"; console.warn("Noticeboard sync failed:", error); }
-  if (noticeboardVisible) render();
+  if (noticeboardVisible && activeScreen === "home") {
+    const current = root.querySelector<HTMLElement>("[data-noticeboard-backdrop]");
+    if (current) {
+      const template = document.createElement("template");
+      template.innerHTML = noticeboardMarkup();
+      const updated = template.content.querySelector<HTMLElement>("[data-noticeboard-backdrop]");
+      const currentFeed = current.querySelector<HTMLElement>(".noticeboard-feed");
+      const updatedFeed = updated?.querySelector<HTMLElement>(".noticeboard-feed");
+      if (currentFeed && updatedFeed) currentFeed.innerHTML = updatedFeed.innerHTML;
+      const currentFootnote = current.querySelector<HTMLElement>(".noticeboard-footnote");
+      const updatedFootnote = updated?.querySelector<HTMLElement>(".noticeboard-footnote");
+      if (currentFootnote && updatedFootnote) currentFootnote.textContent = updatedFootnote.textContent;
+      const currentHeading = current.querySelector<HTMLElement>(".noticeboard-topline span:last-child");
+      const updatedHeading = updated?.querySelector<HTMLElement>(".noticeboard-topline span:last-child");
+      if (currentHeading && updatedHeading) currentHeading.textContent = updatedHeading.textContent;
+    }
+  }
 }
 function noticeboardMarkup(): string {
   const entries = noticeboardUpdates.map((item, index) => '<article class="noticeboard-entry"><span class="noticeboard-entry-index">' + String(index + 1).padStart(2, "0") + '</span><div class="noticeboard-entry-content"><h3>' + highlightNoticeKeywords(item.title) + '</h3><p>' + highlightNoticeKeywords(item.description) + '</p><div class="noticeboard-entry-meta"><span>HASH · ' + escapeNoticeText(item.hash) + '</span><span>' + escapeNoticeText(item.version) + '</span></div></div></article>').join("");
@@ -525,6 +543,21 @@ function bugPanelMarkup(): string {
   </div>`;
 }
 function render(): void {
+  if (screenTransitionInFlight) return;
+  if (!screenTransitionSettled && lastAnimatedScreen !== null &&
+      lastAnimatedScreen !== "control" && activeScreen !== "control" &&
+      activeScreen !== lastAnimatedScreen) {
+    const outgoingShell = root.querySelector<HTMLElement>(".app-shell");
+    if (outgoingShell) {
+      screenTransitionInFlight = true;
+      animateAppScreenExit(outgoingShell, () => {
+        screenTransitionInFlight = false;
+        screenTransitionSettled = true;
+        render();
+      });
+      return;
+    }
+  }
   if(!hasAppAccess()&&activeScreen!=="control")activeScreen="control";
   if(!developerAuthenticated&&activeScreen==="gameplay")activeScreen="home";
   const visibleNavigation=developerAuthenticated?navigation:navigation.filter(item=>item.id!=="gameplay");
@@ -597,7 +630,8 @@ function render(): void {
     const expeditionPage = root.querySelector<HTMLElement>(".expedition-page");
     if (expeditionPage) cleanupExpeditionAnimations = mountExpeditionAnimations(expeditionPage, shouldAnimateScreen);
   }
-  if (!isControl) lastAnimatedScreen = activeScreen;
+  lastAnimatedScreen = activeScreen;
+  screenTransitionSettled = false;
   updateSessionCalendar();
   renderChat();
   translateRenderedContent(root, currentLanguage);
@@ -1113,19 +1147,25 @@ initializeGravityPullCord(root, {
 // A backdrop tap closes it, while a swipe outside the panel is ignored.
 let noticeboardBackdropPointer: { id: number; x: number; y: number } | null = null;
 
+let noticeboardClosing = false;
 function dismissNoticeboard(mode: "once" | "today" = "once"): void {
-  if (!noticeboardVisible) return;
+  if (!noticeboardVisible || noticeboardClosing) return;
+  noticeboardClosing = true;
   if (mode === "today") {
     try { localStorage.setItem(noticeboardStorageKey, "1"); } catch { /* Session-only dismissal still works. */ }
   }
-  noticeboardVisible = false;
-  document.body.classList.remove("noticeboard-open");
   noticeboardBackdropPointer = null;
-  render();
+  const backdrop = root.querySelector<HTMLElement>("[data-noticeboard-backdrop]");
+  animateNoticeboardExit(backdrop, () => {
+    noticeboardVisible = false;
+    noticeboardClosing = false;
+    document.body.classList.remove("noticeboard-open");
+    render();
+  });
 }
 
 root.addEventListener("pointerdown", (event: PointerEvent) => {
-  if (!event.isPrimary || !noticeboardVisible) return;
+  if (!event.isPrimary || !noticeboardVisible || noticeboardClosing) return;
   const target = event.target;
   if (!(target instanceof Element) || !target.matches(".noticeboard-backdrop")) {
     noticeboardBackdropPointer = null;
@@ -1137,7 +1177,7 @@ root.addEventListener("pointerdown", (event: PointerEvent) => {
 root.addEventListener("pointerup", (event: PointerEvent) => {
   const start = noticeboardBackdropPointer;
   noticeboardBackdropPointer = null;
-  if (!start || start.id !== event.pointerId || !noticeboardVisible) return;
+  if (!start || start.id !== event.pointerId || !noticeboardVisible || noticeboardClosing) return;
   const target = event.target;
   if (!(target instanceof Element) || !target.matches(".noticeboard-backdrop")) return;
   const moved = Math.hypot(event.clientX - start.x, event.clientY - start.y);
@@ -1152,7 +1192,7 @@ root.addEventListener("pointercancel", () => {
 }, true);
 
 root.addEventListener("click", (event: MouseEvent) => {
-  if (!noticeboardVisible) return;
+  if (!noticeboardVisible || noticeboardClosing) return;
   const target = event.target;
   if (!(target instanceof Element)) return;
   const dismiss = target.closest<HTMLElement>("[data-notice-dismiss]");
@@ -1163,7 +1203,7 @@ root.addEventListener("click", (event: MouseEvent) => {
 }, true);
 
 window.addEventListener("keydown", (event: KeyboardEvent) => {
-  if (event.key !== "Escape" || !noticeboardVisible) return;
+  if (event.key !== "Escape" || !noticeboardVisible || noticeboardClosing) return;
   event.preventDefault();
   dismissNoticeboard("once");
 });
