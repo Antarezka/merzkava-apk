@@ -408,6 +408,20 @@ This is a transparent checklist-completion index, **not** a prediction of remain
 - Detailed Zone roster, map scale/grid/footprints, construction catalog and durations, worker capacity/upkeep, exact NPC behavior matrix, battle formulas, party limits, and reserve rules remain open design work.
 - Do not begin full Idle World implementation or mark this design complete until the shared-state contracts, official progression references, behavior matrix, map/object schema, offline-time rules, and activity/battle acceptance criteria have been reviewed.
 
+**Isometric local-area presentation checkpoint (2026-11-05)**
+
+This is a narrowly scoped presentation/navigation layer for the existing isometric area maps. It does **not** authorize the full Idle World simulation, define new canon, or replace the structured-world/object model above.
+
+- [~] Every isometric area uses one shared upper-left archival glass HUD: 12-hour world time, day count, cycle symbol/label, and weather symbol/label. The save/world clock is authoritative; Anime.js only animates presentation.
+- [~] On local-area entry, the destination view is mounted first, the existing world clock advances by three hours, and Anime.js animates the clock/cycle/weather transition. Opening the tool drawer or returning to a previous map does not advance time.
+- [~] The compact minimap is restricted to outdoor wilderness and transit/field-route map IDs. Campus, town, city, market, harbor, arena, and interior maps retain the shared HUD without the minimap.
+- [~] Tianhai Academy exterior consumes the owner-provided `AI_UPDATE_REFERENCE` as a one-time local seed: exact Map Base dimensions, 24×20 base grid, sparse custom cells, walkable whitelist, eight-sector flags, and four transition markers. The seed is not reapplied over subsequent local editor changes; `confirmed:false` remains unchanged until explicitly confirmed.
+- [~] Academy entry places the Player at the named Golden Dragon Empire gateway (`12,31`). The four Academy NPCs begin on owner-marked walkable cells; Player pathfinding and NPC wandering use the same walkable whitelist and blocked-sector rules, and actors cannot occupy another actor's cell.
+- [~] NPC conversations and `Dialog box:` map markers use a clickable lower-screen dialogue surface. `Event scene:` markers use a separate dimmed, clickable event notice.
+- [~] Map zoom, centering, and editor tools share one right-edge field drawer. The drawer and arrival motions use Anime.js; editor controls remain separate from the future Player Profile, Inventory, Quest Board, and other player-facing world panels.
+- [ ] Add reviewed map references and deliberate minimap classifications for the remaining isometric areas as their walkable routes and actor placements are supplied.
+- [ ] Complete visual/gesture and time-transition verification on the target Android device. CI checks do not replace device QA.
+
 
 ### 5C-2. Illustrated item tiles, category frames, and permanent character emblems
 
