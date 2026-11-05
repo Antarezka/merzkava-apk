@@ -1,5 +1,8 @@
-import { describe, expect, it } from "vitest";
-import { renderIsometricMapTestArea } from "../../src/offline-game/world-map-hierarchy";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { renderIsometricMapTestArea, setWorldMapDeveloperMode } from "../../src/offline-game/world-map-hierarchy";
+
+beforeEach(() => setWorldMapDeveloperMode(true));
+afterEach(() => setWorldMapDeveloperMode(false));
 import { readFileSync } from "node:fs";
 
 const worldMapSource = readFileSync(new URL("../../src/offline-game/world-map-hierarchy.ts", import.meta.url), "utf8");

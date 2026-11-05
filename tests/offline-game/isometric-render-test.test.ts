@@ -1,5 +1,8 @@
-import { describe, expect, it } from "vitest";
-import { renderWorldMapHierarchy } from "../../src/offline-game/world-map-hierarchy";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { renderWorldMapHierarchy, setWorldMapDeveloperMode } from "../../src/offline-game/world-map-hierarchy";
+
+beforeEach(() => setWorldMapDeveloperMode(true));
+afterEach(() => setWorldMapDeveloperMode(false));
 import { renderIsometricVectorYard } from "../../src/offline-game/isometric-render-yard-interceptor";
 
 describe("standalone SVG isometric render yard", () => {

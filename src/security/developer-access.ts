@@ -12,6 +12,11 @@ let authenticated = false;
 function decodeBase64(value: string): Uint8Array {
   return Uint8Array.from(atob(value), character => character.charCodeAt(0));
 }
+function toArrayBuffer(value: Uint8Array): ArrayBuffer {
+  const copy = new Uint8Array(value.byteLength);
+  copy.set(value);
+  return copy.buffer;
+}
 
 function constantTimeEqual(left: Uint8Array, right: Uint8Array): boolean {
   if (left.length !== right.length) return false;
@@ -24,7 +29,7 @@ async function verifier(value: string, salt: string): Promise<Uint8Array> {
   if (!globalThis.crypto?.subtle) throw new Error("Secure credential verification is unavailable on this device.");
   const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(value), "PBKDF2", false, ["deriveBits"]);
   const bits = await crypto.subtle.deriveBits(
-    { name: "PBKDF2", salt: decodeBase64(salt), iterations: ITERATIONS, hash: "SHA-256" },
+    { name: "PBKDF2", salt: toArrayBuffer(decodeBase64(salt)), iterations: ITERATIONS, hash: "SHA-256" },
     key,
     256
   );

@@ -173,6 +173,8 @@ const navigation: { id: ScreenId; label: string; icon: string }[] = [
 type AppScreen = ScreenId | "control";
 let activeScreen: AppScreen = "home";
 let developerAuthenticated = false;
+let developerLoginMessage = "";
+let developerLoginBusy = false;
 let floatingReadiness: FloatingReadiness = { displayOverApps: false, notifications: false, batteryExemption: false, serviceRunning: false };
 let floatingBusy = false;
 async function refreshFloatingReadiness(): Promise<void> {
