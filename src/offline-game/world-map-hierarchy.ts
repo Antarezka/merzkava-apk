@@ -1409,6 +1409,7 @@ function academyCanvasEditorMarkup(): string {
   return '<div class="wmh-academy-canvas-editor" data-wmh-academy-editor>'+
     '<button type="button" data-wmh-academy-editor-toggle aria-expanded="false">▦ CANVAS EDITOR</button>'+
     '<section data-wmh-academy-editor-panel hidden><b>ACADEMY CANVAS EXPANSION</b><small>Adjust each side independently. Preview updates live; confirm to save.</small>'+
+    '<div class="wmh-canvas-default-gap" aria-label="Read-only automatic default gap"><b>DEFAULT GAP · AUTO (READ ONLY)</b><div><span>TOP</span><output data-wmh-default-gap="top">— px</output><span>BOTTOM</span><output data-wmh-default-gap="bottom">— px</output><span>LEFT</span><output data-wmh-default-gap="left">— px</output><span>RIGHT</span><output data-wmh-default-gap="right">— px</output></div><small>Initial automatic gap before your extra values below.</small></div>'+
     sides.map(side=>'<label>'+side.toUpperCase()+' <output data-wmh-canvas-value="'+side+'">'+DEFAULT_ISO_CANVAS_EXPANSION[side]+' px</output><input type="range" min="0" max="12000" step="100" value="'+DEFAULT_ISO_CANVAS_EXPANSION[side]+'" data-wmh-canvas-side="'+side+'"/></label>').join("")+
     '<div class="wmh-academy-canvas-actions"><button type="button" data-wmh-canvas-refresh>↻ REFRESH PREVIEW</button><button type="button" data-wmh-canvas-confirm>✓ CONFIRM & SAVE</button><button type="button" data-wmh-canvas-copy>COPY CONFIG</button></div>'+
     '<textarea data-wmh-canvas-export readonly aria-label="Copyable Academy canvas configuration" placeholder="Confirmed canvas configuration appears here..."></textarea><small data-wmh-canvas-status>Unconfirmed changes are preview-only.</small></section></div>';
@@ -1425,21 +1426,35 @@ function bindAcademyCanvasEditor(dialog:HTMLElement):void {
   const status=panel.querySelector<HTMLElement>("[data-wmh-canvas-status]");
   const output=panel.querySelector<HTMLTextAreaElement>("[data-wmh-canvas-export]");
   const read=()=>normalizeIsoCanvasExpansion(Object.fromEntries(controls.map(input=>[input.dataset.wmhCanvasSide||"",Number(input.value)])));
+  const gapInfo=()=>{
+    const rect=mapViewport?.getBoundingClientRect();
+    const image=dialog.querySelector<HTMLImageElement>("[data-wmh-map-surface] img");
+    const naturalWidth=image?.naturalWidth||2816,naturalHeight=image?.naturalHeight||1536;
+    const viewportWidth=Math.max(1,rect?.width||window.innerWidth),viewportHeight=Math.max(1,rect?.height||window.innerHeight);
+    const ratio=naturalWidth/naturalHeight;
+    const imageWidth=Math.max(viewportWidth,viewportHeight*ratio);
+    const scale=imageWidth/naturalWidth,cellW=128*scale,cellH=69.5*scale;
+    const defaults={top:Math.round(Math.max(cellH*2,viewportHeight/2)),bottom:Math.round(Math.max(cellH*2,viewportHeight/2)),left:Math.round(Math.max(cellW*2,viewportWidth*2)),right:Math.round(Math.max(cellW*2,viewportWidth/2))};
+    const extra=read();
+    return {defaults,extra,final:Object.fromEntries((Object.keys(defaults) as Array<keyof typeof defaults>).map(side=>[side,Math.round(defaults[side]+extra[side])]))};
+  };
   const showValues=()=>controls.forEach(input=>{const side=input.dataset.wmhCanvasSide||"",value=panel.querySelector<HTMLOutputElement>('[data-wmh-canvas-value="'+side+'"]');if(value)value.value=Number(input.value).toLocaleString()+" px";});
-  const preview=()=>{showValues();mapViewport?.dispatchEvent(new CustomEvent("merzkava-academy-canvas-expansion-preview",{detail:read()}));if(status)status.textContent="Live preview updated. Confirm to save these values.";};
+  const showDefaultGap=()=>{const info=gapInfo();(Object.keys(info.defaults) as Array<keyof typeof info.defaults>).forEach(side=>{const value=panel.querySelector<HTMLOutputElement>('[data-wmh-default-gap="'+side+'"]');if(value)value.value=info.defaults[side].toLocaleString()+" px";});return info;};
+  const exportConfig=()=>{const info=showDefaultGap();return {format:"merzkava-academy-canvas-expansion",version:1,mapId:"golden-dragon-empire:tianhai-academy:exterior",defaultGapPx:info.defaults,canvasExpansion:info.extra,finalGapPx:info.final};};
+  const preview=()=>{showValues();showDefaultGap();mapViewport?.dispatchEvent(new CustomEvent("merzkava-academy-canvas-expansion-preview",{detail:read()}));if(status)status.textContent="Live preview updated. Confirm to save these values.";};
   try{
     const saved=normalizeIsoCanvasExpansion(JSON.parse(localStorage.getItem(key)||"{}"));
     controls.forEach(input=>{input.value=String(saved[(input.dataset.wmhCanvasSide||"left") as keyof typeof saved]);});showValues();
   }catch{}
-  toggle.addEventListener("click",()=>{panel.hidden=!panel.hidden;toggle.setAttribute("aria-expanded",String(!panel.hidden));});
+  toggle.addEventListener("click",()=>{panel.hidden=!panel.hidden;toggle.setAttribute("aria-expanded",String(!panel.hidden));if(!panel.hidden)showDefaultGap();});
   controls.forEach(input=>input.addEventListener("input",preview));
   panel.querySelector<HTMLElement>("[data-wmh-canvas-refresh]")?.addEventListener("click",preview);
   panel.querySelector<HTMLElement>("[data-wmh-canvas-confirm]")?.addEventListener("click",()=>{
-    const value=read();try{localStorage.setItem(key,JSON.stringify(value));if(status)status.textContent="Canvas expansion confirmed and saved on this device.";if(output)output.value=JSON.stringify({format:"merzkava-academy-canvas-expansion",version:1,mapId:"golden-dragon-empire:tianhai-academy:exterior",canvasExpansion:value},null,2);}
+    const value=read();try{localStorage.setItem(key,JSON.stringify(value));if(status)status.textContent="Canvas expansion confirmed and saved on this device.";if(output)output.value=JSON.stringify(exportConfig(),null,2);}
     catch{if(status)status.textContent="Could not save. Use COPY CONFIG to keep the current settings.";}
   });
   panel.querySelector<HTMLElement>("[data-wmh-canvas-copy]")?.addEventListener("click",async()=>{
-    const value=JSON.stringify({format:"merzkava-academy-canvas-expansion",version:1,mapId:"golden-dragon-empire:tianhai-academy:exterior",canvasExpansion:read()},null,2);
+    const value=JSON.stringify(exportConfig(),null,2);
     if(output)output.value=value;
     try{await navigator.clipboard.writeText(value);if(status)status.textContent="Configuration copied. Send that JSON here.";}
     catch{output?.focus();output?.select();if(status)status.textContent="Clipboard unavailable. Select and copy the JSON shown above.";}
