@@ -13,7 +13,7 @@ import { animateExpeditionChoiceModal, animateExpeditionPanel, mountExpeditionAn
 import { deleteEternalSave, exportEternalSave, importEternalSave, listEternalSaves, loadEternalSave, renameEternalSave, resetEternalGame, resolveEternalSituationChoice, advanceEternalWorldTime, setEternalLocation, startEternalGame, unloadEternalGame, type EternalRegion } from "./offline-game/expedition-game";
 import { hasAtlasPassword, setAtlasPassword, verifyAtlasPassword, rememberAtlasPlayer, restoreAtlasPlayer } from "./offline-game/world-atlas-account";
 import { authenticateDeveloper, restoreDeveloperSession, restoreRememberedDeveloperCredentials, signOutDeveloper, type RememberedDeveloperCredentials } from "./security/developer-access";
-import { getCanonIndex, getCanonStatus, loadCanonModule, loadPlayerRegistry, loadRegisteredPlayerProfile, refreshCanon, refreshLatestPlayerRegistry, type CanonDocument } from "./convo/canon/canon-loader";
+import { getCanonIndex, getCanonStatus, loadCanonModule, loadPlayerRegistry, loadRegisteredPlayerProfile, refreshCanon, refreshLatestPlayerRegistry, verifyCanonSourceConnection, type CanonDocument } from "./convo/canon/canon-loader";
 import { routeCanonActivity } from "./convo/canon/canon-router";
 import { assembleGameplayContext } from "./convo/canon/context-assembler";
 import { requestGMProposal, validateGMResponse, type GMProposal } from "./convo/engine/gm-engine";
@@ -1741,6 +1741,16 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     const button=form.querySelector<HTMLButtonElement>("[data-world-atlas-submit]");
     if(!gate||!eligible){if(message)message.textContent="This character is not registered in the verified players.md and local Eternal Path account list.";return;}
     if(password.length<8||password.length>128){if(message)message.textContent="Use a password between 8 and 128 characters.";return;}
+    const offlineMessage=gate.dataset.offlineLabel||"No internet connection or the official Universe source is unavailable. Check your connection and try again.";
+    if(!navigator.onLine){
+      if(message)message.textContent=offlineMessage;
+      return;
+    }
+    const activeCanon=getCanonStatus();
+    if(!activeCanon.commitSha){
+      if(message)message.textContent=offlineMessage;
+      return;
+    }
     let passwordExists=false;
     try{passwordExists=await hasAtlasPassword(playerName);}
     catch(error){if(message)message.textContent=error instanceof Error?error.message:"Secure local account storage is unavailable.";return;}
@@ -1753,17 +1763,22 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     if(loginForm)loginForm.inert=true;
     if(message)message.textContent="Preparing World Atlas access…";
     try{
+      const connectionWork=verifyCanonSourceConnection(activeCanon.commitSha);
       const credentialWork=(async()=>{
         if(passwordExists){
           const valid=await verifyAtlasPassword(playerName,password);
           if(!valid)throw new Error("Incorrect local password.");
-        }else{
-          await setAtlasPassword(playerName,password);
         }
       })();
-      const results=await Promise.allSettled([credentialWork,playWorldAtlasAccessSequence(gate,4000)]);
-      const failed=results.find(result=>result.status==="rejected");
-      if(failed&&failed.status==="rejected")throw failed.reason;
+      const results=await Promise.allSettled([
+        connectionWork,
+        credentialWork,
+        playWorldAtlasAccessSequence(gate,4000)
+      ]);
+      if(results[0].status==="rejected")throw new Error(offlineMessage);
+      if(results[1].status==="rejected")throw results[1].reason;
+      // A first-time password is persisted only after the live official-source check succeeds.
+      if(!passwordExists)await setAtlasPassword(playerName,password);
       await rememberAtlasPlayer(playerName,remember);
       if(message)message.textContent=gate.dataset.successLabel||"Access granted.";
       form.querySelector<HTMLInputElement>("#world-atlas-password")!.value="";
