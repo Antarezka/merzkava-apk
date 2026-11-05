@@ -293,16 +293,10 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
     applyZoom(action === "in" ? zoom + .25 : zoom - .25);
   }));
   viewport.addEventListener("pointerdown", event => {
-    // While the grid editor is open, it exclusively owns image gestures.
-    // Its tap/drag classifier decides whether to edit a cell or pan; allowing
-    // this camera tracker to register the same pointer can create a phantom
-    // pinch or a second pan and jump the saved Academy camera.
-    if(academyCanvas&&surface.classList.contains("wmh-overlay-editing")){
-      pointers.clear();panStart=null;pendingCameraPan=null;pinchStart=null;
-      return;
-    }
-    // A marker tap is a selection, never a map-pan gesture. Do not register it
-    // in the gesture tracker; otherwise a stale one-finger pan can move the map.
+    // The Academy viewport remains the only camera controller in editor mode.
+    // A single pointer starts as a pending tap; it becomes a pan only after
+    // the same threshold used by the cell editor. Two pointers may pinch.
+    // A marker tap is a selection, never a map-pan gesture.
     if ((event.target as Element).closest(".wmh-power")) {
       panStart = null;
       pinchStart = null;
@@ -328,10 +322,6 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
     }
   });
   viewport.addEventListener("pointermove", event => {
-    if(academyCanvas&&surface.classList.contains("wmh-overlay-editing")){
-      pointers.clear();panStart=null;pendingCameraPan=null;pinchStart=null;
-      return;
-    }
     if (!pointers.has(event.pointerId)) return;
     pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
     if (pointers.size >= 2 && pinchStart) {
@@ -342,7 +332,7 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
       event.preventDefault();
     } else if (pointers.size === 1) {
       if(!panStart&&pendingCameraPan&&isoPointerGesture(
-        {x:pendingCameraPan.x,y:pendingCameraPan.y},{x:event.clientX,y:event.clientY}
+        {x:pendingCameraPan.x,y:pendingCameraPan.y},{x:event.clientX,y:event.clientY},12
       )==="drag"){
         panStart=pendingCameraPan;
         pendingCameraPan=null;
@@ -355,10 +345,6 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
     }
   });
   const endPointer = (event: PointerEvent) => {
-    if(academyCanvas&&surface.classList.contains("wmh-overlay-editing")){
-      pointers.clear();panStart=null;pendingCameraPan=null;pinchStart=null;
-      return;
-    }
     pointers.delete(event.pointerId);
     if (pointers.size < 2) pinchStart = null;
     if (pointers.size === 1) {
@@ -784,14 +770,18 @@ function drawIsometricForeground(board:HTMLElement,data=readIsoMapData(board)):v
   const image=board.querySelector<HTMLImageElement>("[data-wmh-map-art]");
   if(!canvas||!image||!image.complete||!image.naturalWidth||!image.naturalHeight)return;
   const dataGrid=data.grid;
-  // Display the original checked-in JPG directly. Avoid generating a large
-  // PNG data URL: the same direct image element works in Android WebView.
-  image.style.width=image.naturalWidth+"px";
-  image.style.height=image.naturalHeight+"px";
+  const academyArtwork=board.dataset.academyArtworkBoard==="true";
+  // The Academy camera owns the artwork's CSS width/height and offset.
+  // Reassigning natural pixel dimensions here after every cell tap changes the
+  // scroll surface, shifts the image beneath the overlay and appears as a zoom.
+  // Other isometric maps keep their existing natural-size image behavior.
+  if(!academyArtwork){
+    image.style.width=image.naturalWidth+"px";
+    image.style.height=image.naturalHeight+"px";
+  }
   image.style.opacity="1";
   image.style.visibility="visible";
   image.style.display="block";
-  const academyArtwork=board.dataset.academyArtworkBoard==="true";
   const projectedWidth=(dataGrid.cols+dataGrid.rows-2)*dataGrid.tileW/2+dataGrid.tileW;
   const projectedHeight=(dataGrid.cols+dataGrid.rows-2)*dataGrid.tileH/2+dataGrid.tileH+7;
   const boardWidth=academyArtwork?image.naturalWidth:Math.max(projectedWidth,image.naturalWidth);
@@ -1438,15 +1428,9 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
   const pointerMove=(event:PointerEvent)=>{
     if(!pendingTap||pendingTap.pointerId!==event.pointerId)return;
     if(isoPointerGesture({x:pendingTap.startX,y:pendingTap.startY},{x:event.clientX,y:event.clientY},12)==="drag"){
+      // Only classify the gesture here. The Academy camera controller handles
+      // the actual pan; never write scrollLeft/scrollTop from the editor.
       pendingTap.dragged=true;
-      // The editor owns exactly one gesture stream while open. A tap edits
-      // the cell; only movement beyond the threshold pans the existing camera.
-      // This prevents the Academy camera and SVG editor from moving it twice.
-      if(activePointers.size===1&&viewport){
-        viewport.scrollLeft=pendingTap.scrollLeft-(event.clientX-pendingTap.startX);
-        viewport.scrollTop=pendingTap.scrollTop-(event.clientY-pendingTap.startY);
-        event.preventDefault();
-      }
     }
   };
   const applyCellTap=(event:PointerEvent,transitionId:string|null)=>{
