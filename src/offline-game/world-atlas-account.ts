@@ -4,6 +4,8 @@ import { SecureStorage } from "@aparajita/capacitor-secure-storage";
 const ITERATIONS = 310_000;
 const KEY_PREFIX = "merzkava.world-atlas.account.";
 const REMEMBER_KEY = "merzkava.world-atlas.remembered-player.v1";
+const MASTER_RESET_SALT = new TextEncoder().encode("Merzkava.WorldAtlas.MasterReset.v1");
+const MASTER_RESET_HASH = "aHqvTavnyWOM/bTAJMNRxRbV3qfGdwQYgCfoTo/BgrI=";
 let activePlayer = "";
 
 function bytesToBase64(bytes: Uint8Array): string {
@@ -54,11 +56,26 @@ async function accountKey(playerName: string): Promise<string> {
   return KEY_PREFIX + await digest(playerName);
 }
 
+export function atlasPasswordPolicyError(password: string): string | null {
+  if (password.length < 8) return "Use at least 8 characters.";
+  if (password.length > 128) return "Use no more than 128 characters.";
+  if (!/[A-Z]/.test(password)) return "Include at least one uppercase letter.";
+  if (!/[a-z]/.test(password)) return "Include at least one lowercase letter.";
+  if (!/[0-9]/.test(password)) return "Include at least one number.";
+  if (!/[^A-Za-z0-9]/.test(password)) return "Include at least one symbol.";
+  return null;
+}
+export async function verifyAtlasMasterResetPassword(password: string): Promise<boolean> {
+  if (!password) return false;
+  const actual = await derive(password, MASTER_RESET_SALT);
+  return constantTimeEqual(actual, base64ToBytes(MASTER_RESET_HASH));
+}
 export async function hasAtlasPassword(playerName: string): Promise<boolean> {
   return Boolean(await readStored(await accountKey(playerName)));
 }
 export async function setAtlasPassword(playerName: string, password: string): Promise<void> {
-  if (password.length < 8 || password.length > 128) throw new Error("Password must contain 8–128 characters.");
+  const policyError = atlasPasswordPolicyError(password);
+  if (policyError) throw new Error(policyError);
   const salt = crypto.getRandomValues(new Uint8Array(16));
   const hash = await derive(password, salt);
   await writeStored(await accountKey(playerName), JSON.stringify({
