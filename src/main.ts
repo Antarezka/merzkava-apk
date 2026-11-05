@@ -176,7 +176,15 @@ let activeScreen: AppScreen = "control";
 let developerAuthenticated = false;
 let developerLoginMessage = "";
 let developerLoginBusy = false;
+let playerAuthenticated = false;
+let activePlayerName = "";
+let playerLoginMessage = "";
+let playerLoginBusy = false;
+let playerLoginName = "";
+let accessLoginMode: "player" | "developer" = "player";
+let developerSessionRestored = false;
 let worldAtlasLoginBusy = false;
+function hasAppAccess(): boolean { return developerAuthenticated || playerAuthenticated; }
 let floatingReadiness: FloatingReadiness = { displayOverApps: false, notifications: false, batteryExemption: false, serviceRunning: false };
 let floatingBusy = false;
 async function refreshFloatingReadiness(): Promise<void> {
@@ -511,6 +519,7 @@ function bugPanelMarkup(): string {
   </div>`;
 }
 function render(): void {
+  if(!hasAppAccess()&&activeScreen!=="control")activeScreen="control";
   if(!developerAuthenticated&&activeScreen==="gameplay")activeScreen="home";
   const visibleNavigation=developerAuthenticated?navigation:navigation.filter(item=>item.id!=="gameplay");
   // Each render replaces the screen DOM. Stop all Anime.js loops/listeners
@@ -541,7 +550,7 @@ function render(): void {
   const previousNavigation = root.querySelector<HTMLElement>(".nav-roulette-track");
   if (previousNavigation) savedNavigationScrollLeft = previousNavigation.scrollLeft;
   root.innerHTML = `<div class="app-shell ${isControl ? "control-shell" : ""} ${menuRevealPending ? "is-entering" : ""} ${navigationCollapsed ? "is-nav-collapsed" : ""}">
-    ${isControl ? "" : `<header class="app-header"><button class="brand" data-screen="home" aria-label="Merzkava home"><span class="brand-mark">M</span><span class="brand-wordmark"><small>MERZKAVA UNIVERSE</small><strong>Merzkava</strong></span></button><div class="header-context"><small>TACTICAL ACADEMY</small><strong>${translateLabel(navigation.find(item => item.id === activeScreen)?.label ?? "Command Hall", currentLanguage)}</strong></div><div class="header-tools">${developerAuthenticated ? `<button class="header-settings header-kitty-trigger" data-floating-action="start-bubble" aria-label="Start Bubble Mode" title="Start Bubble Mode"><span class="header-kitty-mascot" aria-hidden="true"><img class="header-kitty-layer header-kitty-shadow" src="/kitty/shadow/kitty-shadow.png" alt="" /><img class="header-kitty-layer header-kitty-tail" src="/kitty/ekor/kitty-tail.png" alt="" /><img class="header-kitty-layer header-kitty-body" src="/kitty/body/kitty-body.png" alt="" /><img class="header-kitty-layer header-kitty-head" src="/kitty/kepala/kitty-head.png" alt="" /></span></button>` : ""}${developerHeaderControls(currentLanguage,developerAuthenticated)}<button class="header-settings" data-screen="settings" aria-label="Settings">⚙</button></div></header>
+    ${isControl ? "" : `<header class="app-header"><button class="brand" data-screen="home" aria-label="Merzkava home"><span class="brand-mark">M</span><span class="brand-wordmark"><small>MERZKAVA UNIVERSE</small><strong>Merzkava</strong></span></button><div class="header-context"><small>TACTICAL ACADEMY</small><strong>${translateLabel(navigation.find(item => item.id === activeScreen)?.label ?? "Command Hall", currentLanguage)}</strong></div><div class="header-tools">${developerAuthenticated ? `<button class="header-settings header-kitty-trigger" data-floating-action="start-bubble" aria-label="Start Bubble Mode" title="Start Bubble Mode"><span class="header-kitty-mascot" aria-hidden="true"><img class="header-kitty-layer header-kitty-shadow" src="/kitty/shadow/kitty-shadow.png" alt="" /><img class="header-kitty-layer header-kitty-tail" src="/kitty/ekor/kitty-tail.png" alt="" /><img class="header-kitty-layer header-kitty-body" src="/kitty/body/kitty-body.png" alt="" /><img class="header-kitty-layer header-kitty-head" src="/kitty/kepala/kitty-head.png" alt="" /></span></button>` : ""}${developerHeaderControls(currentLanguage,developerAuthenticated,playerAuthenticated)}<button class="header-settings" data-screen="settings" aria-label="Settings">⚙</button></div></header>
     `}${notice ? `<p class="notice" role="status">${escapeHtml(notice)}</p>` : ""}
     ${isControl ? content : `<main class="main-content">${activeScreen === "settings" ? `<details class="settings-category app-settings-category" open><summary><span>APP SETTINGS</span><small>Appearance · Wallpapers · Language · Sound · Storage</small></summary><div class="settings-category-content">${languagePanelMarkup(currentLanguage)}${content}</div></details>${developerAuthenticated ? `<details class="settings-category world-settings-category"><summary><span>WORLD & ACCOUNT</span><small>Supabase · AI Gateway · Canon Source</small></summary><div class="settings-category-content">${authPanel()}${canonPanel()}</div></details>` : ""}` : `${content}${activeScreen === "home" ? dustyLetterMarkup(currentLanguage, APP_VERSION) : ""}`}</main>`}
     ${isControl ? "" : `<nav class="bottom-nav" aria-label="Academy navigation"><span class="nav-cable nav-cable-left" aria-hidden="true"></span><span class="nav-cable nav-cable-right" aria-hidden="true"></span><div class="nav-roulette-track">${visibleNavigation.map((item, index) => `<button class="nav-item ${activeScreen === item.id ? "active" : ""}" data-screen="${item.id}" ${activeScreen === item.id ? 'aria-current="page"' : ""}><span class="nav-item-motion"><span class="nav-index">${String(index + 1).padStart(2, "0")}</span><span class="nav-rotor" aria-hidden="true"><span class="nav-rotor-mark"></span><span class="nav-rotor-grip" data-nav-rotor="${item.id}"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="21" fill="none" stroke="transparent" stroke-width="7" pointer-events="stroke"/></svg></span><span class="nav-icon-frame nav-icon-frame-${item.id}"><span class="nav-icon"><span class="nav-icon-art">${item.icon}</span></span></span></span><small>${translateLabel(item.label, currentLanguage)}</small></span></button>`).join("")}</div></nav>`}
@@ -550,7 +559,7 @@ function render(): void {
     ${isControl ? "" : `<div class="storage-status"><span class="status-dot"></span>${databaseMessage}</div>`}
     ${activeScreen === "gameplay" ? snapshotBlindMarkup() : ""}
     ${activeScreen === "home" && noticeboardVisible ? noticeboardMarkup() : ""}
-    ${developerLoginPanel(currentLanguage,developerLoginMessage,developerLoginBusy,!developerAuthenticated&&activeScreen==="control")}
+    ${developerLoginPanel(currentLanguage,developerLoginMessage,developerLoginBusy,!hasAppAccess()&&activeScreen==="control",playerLoginMessage,playerLoginBusy,accessLoginMode,playerLoginName)}
     ${exitConfirmationPanelMarkup(currentLanguage)}
     ${developerAuthenticated ? bugPanelMarkup() : ""}
   </div>`;
@@ -616,6 +625,40 @@ function availableCharacters(): Character[] {
   return [...registeredCharacters, ...characters.filter(local => !registeredCharacters.some(registered => registered.name === local.name))];
 }
 
+type PlayerRegistrySnapshot = Awaited<ReturnType<typeof refreshLatestPlayerRegistry>>;
+function mapRegistryCharacters(result: PlayerRegistrySnapshot): Character[] {
+  return result.players.map(player => ({
+    id: "registry:" + player.path,
+    name: player.name,
+    age: player.age ?? 0,
+    origin: "Registry",
+    background: player.background,
+    realm: player.realm,
+    cultivationLevel: 0,
+    awakened: false,
+    createdAt: "",
+    registryPath: player.path,
+    registryCommitSha: result.commitSha,
+    profileMarkdown: player.profileMarkdown
+  }));
+}
+
+async function findOfficialPlayer(name: string): Promise<Character> {
+  if (!name.trim()) throw new Error("Masukkan nama karakter yang terdaftar.");
+  let status = getCanonStatus();
+  if (!status.commitSha || status.status === "error") status = await refreshCanon();
+  if (!status.commitSha || status.status === "error") throw new Error("Registry pemain tidak dapat diverifikasi dari sumber canon resmi. Coba lagi saat koneksi tersedia.");
+  const result = await refreshLatestPlayerRegistry(status.commitSha);
+  if (result.commitSha !== status.commitSha) throw new Error("Snapshot players.md tidak cocok dengan ACTIVE_SHA yang diverifikasi.");
+  registeredCharacters = mapRegistryCharacters(result);
+  playerRegistryMessage = `${registeredCharacters.length} karakter dari players.md · snapshot ${result.commitSha}`;
+  const exact = result.players.find(player => player.name === name);
+  if (!exact) throw new Error("Nama tidak ditemukan persis di players.md. Periksa ejaan dan huruf besar-kecilnya.");
+  const selected = registeredCharacters.find(player => player.name === exact.name && player.registryPath === exact.path && player.registryCommitSha === result.commitSha);
+  if (!selected) throw new Error("Profil pemain tidak dapat dipastikan dari registry resmi.");
+  return selected;
+}
+
 async function refreshPlayerRegistry(): Promise<void> {
   if (playerRegistryBusy) return;
   playerRegistryBusy = true;
@@ -624,20 +667,7 @@ async function refreshPlayerRegistry(): Promise<void> {
     const status = getCanonStatus();
     if (!status.commitSha || status.status === "error") throw new Error("Canon ACTIVE_SHA belum terverifikasi; registry tidak boleh memakai sumber lain.");
     const result = await refreshLatestPlayerRegistry(status.commitSha);
-    registeredCharacters = result.players.map(player => ({
-      id: "registry:" + player.path,
-      name: player.name,
-      age: player.age ?? 0,
-      origin: "Registry",
-      background: player.background,
-      realm: player.realm,
-      cultivationLevel: 0,
-      awakened: false,
-      createdAt: "",
-      registryPath: player.path,
-      registryCommitSha: result.commitSha,
-      profileMarkdown: player.profileMarkdown
-    }));
+    registeredCharacters = mapRegistryCharacters(result);
     playerRegistryMessage = `${registeredCharacters.length} karakter dari players.md · snapshot ${result.commitSha}`;
     if (activeScreen === "character" || activeScreen === "gameplay") render();
   } catch (error) {
@@ -931,7 +961,7 @@ window.addEventListener("popstate",(event:PopStateEvent)=>{
   if(idleNotice&&!idleNotice.hidden){closeIdleAtlasFromBack();return;}
   const devPanel=root.querySelector<HTMLElement>("[data-dev-login-panel]");
   if(devPanel&&!devPanel.hidden){
-    if(!developerAuthenticated&&activeScreen==="control"){
+    if(!hasAppAccess()&&activeScreen==="control"){
       history.pushState({merzkavaScreen:"control",merzkavaHome:false},"");
       return;
     }
@@ -973,7 +1003,7 @@ root.addEventListener("keydown", event => {
   const atlasGate=root.querySelector<HTMLElement>("[data-world-atlas-gate]");
   if(event.key==="Escape"&&atlasGate&&!atlasGate.hidden){closeWorldAtlas();return;}
   const devAccess=root.querySelector<HTMLElement>("[data-dev-login-panel]");
-  if(event.key==="Escape"&&devAccess&&!devAccess.hidden){if(!developerAuthenticated&&activeScreen==="control")return;devAccess.hidden=true;return;}
+  if(event.key==="Escape"&&devAccess&&!devAccess.hidden){if(!hasAppAccess()&&activeScreen==="control")return;devAccess.hidden=true;return;}
   const idleNotice=root.querySelector<HTMLElement>("[data-idle-rpg-modal]");
   if(event.key==="Escape"&&idleNotice&&!idleNotice.hidden){
     idleNotice.hidden=true;
@@ -1130,21 +1160,39 @@ root.addEventListener("click", async (event: MouseEvent) => {
     const button=target.closest<HTMLButtonElement>("[data-app-exit-yes]");if(button)button.disabled=true;
     await exitMerzkavaApplication();return;
   }
+  const accessModeButton=target.closest<HTMLButtonElement>("[data-access-mode]");
+  if(accessModeButton){
+    accessLoginMode=accessModeButton.dataset.accessMode==="developer"?"developer":"player";
+    developerLoginMessage="";playerLoginMessage="";render();return;
+  }
   if(target.closest("[data-dev-login-open]")){
+    accessLoginMode="developer";render();
     const panel=root.querySelector<HTMLElement>("[data-dev-login-panel]");
     if(panel){panel.hidden=false;panel.querySelector<HTMLInputElement>("#developer-login-id")?.focus();}
     return;
   }
   if(target.closest("[data-dev-login-close]")){
+    if(!hasAppAccess()&&activeScreen==="control")return;
     const panel=root.querySelector<HTMLElement>("[data-dev-login-panel]");if(panel)panel.hidden=true;return;
   }
   if(target.closest("[data-dev-open-control]")){
     if(!developerAuthenticated)return;activeScreen="control";notice="";render();return;
   }
-  if(target.closest("[data-dev-logout]")){
-    await signOutDeveloper();developerAuthenticated=false;setWorldMapDeveloperMode(false);activeScreen="control";notice="";render();return;
+  if(target.closest("[data-player-logout]")){
+    await signOutDeveloper();
+    if(getAuthSession())await signOut();
+    developerAuthenticated=false;playerAuthenticated=false;activePlayerName="";playerLoginName="";activeCharacterId="";activeProfileMarkdown="";activeChat={messages:[],started:false,showOptions:activeChat.showOptions};
+    authMessage="";setWorldMapDeveloperMode(false);activeScreen="control";accessLoginMode="player";notice="";
+    history.pushState({merzkavaScreen:"control",merzkavaHome:false},"");render();return;
   }
-  if(!developerAuthenticated&&target.closest("[data-floating-action],[data-auth-logout],[data-refresh-canon],[data-refresh-players],[data-bug-copy],[data-bug-minimize],[data-bug-dismiss]"))return;
+  if(target.closest("[data-dev-logout]")){
+    await signOutDeveloper();
+    if(getAuthSession())await signOut();
+    developerAuthenticated=false;playerAuthenticated=false;activePlayerName="";playerLoginName="";activeCharacterId="";activeProfileMarkdown="";activeChat={messages:[],started:false,showOptions:activeChat.showOptions};
+    authMessage="";setWorldMapDeveloperMode(false);activeScreen="control";accessLoginMode="player";notice="";render();return;
+  }
+  if(!hasAppAccess()&&target.closest("[data-floating-action]"))return;
+  if(!developerAuthenticated&&target.closest("[data-auth-logout],[data-refresh-canon],[data-refresh-players],[data-bug-copy],[data-bug-minimize],[data-bug-dismiss]"))return;
   const activeEternalModal=root.querySelector<HTMLElement>(".expedition-choice-modal:not([hidden])");
   if(activeEternalModal && !target.closest(".expedition-choice-modal")) return;
   if (event.detail !== 0 && suppressNextPointerClick) {
@@ -1590,6 +1638,10 @@ root.addEventListener("click", async (event: MouseEvent) => {
 
 root.addEventListener("input", event => {
   const target = event.target;
+  if (target instanceof HTMLInputElement && target.id === "player-login-name") {
+    playerLoginName = target.value;
+    return;
+  }
   if (target instanceof HTMLInputElement && target.id === "lore-search") {
     setLoreSearch(target.value);
     const results = root.querySelector<HTMLElement>("#lore-results");
@@ -1672,8 +1724,53 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     }
     return;
   }
+  if(form.id==="player-login-form"){
+    event.preventDefault();if(playerLoginBusy)return;
+    if(!developerSessionRestored){
+      playerLoginMessage="Local access check is still starting. Please try again.";
+      const message=root.querySelector<HTMLElement>("[data-player-login-message]");if(message)message.textContent=playerLoginMessage;
+      return;
+    }
+    const name=String(new FormData(form).get("playerName")??"");
+    if(!name.trim()){
+      playerLoginMessage="Masukkan nama karakter yang terdaftar.";
+      const message=root.querySelector<HTMLElement>("[data-player-login-message]");if(message)message.textContent=playerLoginMessage;
+      return;
+    }
+    playerLoginBusy=true;
+    const button=form.querySelector<HTMLButtonElement>("[type=submit]");if(button)button.disabled=true;
+    root.querySelectorAll<HTMLButtonElement>("[data-access-mode]").forEach(tab=>tab.disabled=true);
+    try{
+      const selected=await findOfficialPlayer(name);
+      if(getAuthSession())await signOut();
+      await signOutDeveloper();
+      developerAuthenticated=false;
+      setWorldMapDeveloperMode(false);
+      playerAuthenticated=true;
+      activePlayerName=selected.name;
+      activeCharacterId=selected.id;
+      activeProfileMarkdown=selected.profileMarkdown??"";
+      loadCharacterWorldTime(selected.id);
+      loadCharacterChat(selected.id);
+      playerLoginBusy=false;playerLoginMessage="";playerLoginName="";
+      accessLoginMode="player";activeScreen="control";notice="";
+      render();
+    }catch(error){
+      playerLoginBusy=false;
+      playerLoginMessage=error instanceof Error?error.message:"Player access verification failed.";
+      const message=root.querySelector<HTMLElement>("[data-player-login-message]");if(message)message.textContent=playerLoginMessage;
+      const nextButton=root.querySelector<HTMLButtonElement>("#player-login-form [type=submit]");if(nextButton)nextButton.disabled=false;
+      root.querySelectorAll<HTMLButtonElement>("[data-access-mode]").forEach(tab=>tab.disabled=false);
+    }
+    return;
+  }
   if(form.id==="developer-login-form"){
     event.preventDefault();if(developerLoginBusy)return;
+    if(!developerSessionRestored){
+      developerLoginMessage="Local access check is still starting. Please try again.";
+      const message=root.querySelector<HTMLElement>("[data-dev-login-message]");if(message)message.textContent=developerLoginMessage;
+      return;
+    }
     const data=new FormData(form);
     const identifier=String(data.get("identifier")??"");
     const password=String(data.get("password")??"");
@@ -1688,8 +1785,9 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
         const nextButton=root.querySelector<HTMLButtonElement>("#developer-login-form [type=submit]");if(nextButton)nextButton.disabled=false;
         return;
       }
-      developerAuthenticated=true;setWorldMapDeveloperMode(true);
-      developerLoginBusy=false;developerLoginMessage="";
+      developerAuthenticated=true;playerAuthenticated=false;activePlayerName="";activePlayerName="";activeCharacterId="";activeProfileMarkdown="";
+      setWorldMapDeveloperMode(true);
+      developerLoginBusy=false;developerLoginMessage="";playerLoginMessage="";playerLoginName="";
       activeScreen="control";notice="";render();
     }catch(error){
       developerLoginBusy=false;developerLoginMessage=error instanceof Error?error.message:"Developer authentication failed.";
@@ -1949,7 +2047,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
 });
 
 history.replaceState({merzkavaAppBase:true},"");
-history.pushState({merzkavaScreen:"home",merzkavaHome:true},"");
+history.pushState({merzkavaScreen:"control",merzkavaHome:false},"");
 window.addEventListener("error", event => { recordBug(event.error ?? event.message, "Uncaught JavaScript error", "Global handler"); render(); });
 window.addEventListener("unhandledrejection", event => { recordBug(event.reason, "Unhandled promise rejection", "Global handler"); render(); });
 render();
@@ -1961,6 +2059,7 @@ void initializeDatabase().then(async status => {
   databaseMessage = status.message;
   await refreshCharacters();
   try{developerAuthenticated=await restoreDeveloperSession();setWorldMapDeveloperMode(developerAuthenticated);}catch{developerAuthenticated=false;setWorldMapDeveloperMode(false);}
+  developerSessionRestored=true;
   try {
     await restoreAuthSession();
     authMessage = getAuthSession() ? "Saved secure session restored." : "";
