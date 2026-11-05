@@ -1,4 +1,3 @@
-import { animate, stagger } from "animejs";
 import "./world-map-hierarchy.css";
 import "./world-map-hierarchy-scroll.css";
 import { playFootstep } from "../audio/sound-effects";
@@ -293,7 +292,6 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
     if (action === "reset") { centerMap(); return; }
     applyZoom(action === "in" ? zoom + .25 : zoom - .25);
   }));
-  dialog.querySelector<HTMLElement>("[data-wmh-map-center]")?.addEventListener("click",centerMap);
   viewport.addEventListener("pointerdown", event => {
     // The Academy viewport remains the only camera controller in editor mode.
     // A single pointer starts as a pending tap; it becomes a pan only after
@@ -579,7 +577,7 @@ function isometricNpcTokensMarkup(mapId:string,interior:boolean):string {
   const maps:Record<string,Array<{id:string;x:number;y:number;gender:"male"|"female"}>>={
     "golden-dragon-empire:tianhai-academy:exterior":[
       {id:"student-lin",x:7,y:4,gender:"female"},{id:"student-wei",x:10,y:9,gender:"male"},
-      {id:"teacher-mei",x:6,y:15,gender:"female"},{id:"groundskeeper",x:22,y:10,gender:"male"}],
+      {id:"teacher-mei",x:6,y:15,gender:"female"},{id:"groundskeeper",x:22,y:5,gender:"male"}],
     "golden-dragon-empire:public-arena:exterior":[
       {id:"arena-referee",x:10,y:3,gender:"male"},{id:"arena-fighter",x:15,y:8,gender:"female"},{id:"arena-spectator",x:19,y:15,gender:"male"}],
     "golden-dragon-empire:sparring-arena:exterior":[
@@ -641,7 +639,8 @@ function tileMapMarkup(
         '" data-surface="'+surface+'" style="--tile-x:'+x+';--tile-y:'+y+'" aria-label="Test tile '+x+', '+y+'"></button>';
     }).join("")).join("");
     const npcTokens=isometricNpcTokensMarkup(mapId,interior);
-    return '<div class="wmh-isometric-wrap" data-wmh-iso-viewport><div class="wmh-isometric-camera" data-wmh-iso-camera><div class="wmh-isometric-board is-exterior is-render-test is-placeholder" data-wmh-board style="--tile-cols:'+cols+';--tile-rows:'+rows+
+    return '<div class="wmh-iso-controls"><button type="button" data-wmh-iso-zoom="out" aria-label="Zoom out">−</button><span data-wmh-iso-level>100%</span><button type="button" data-wmh-iso-zoom="in" aria-label="Zoom in">+</button><button type="button" data-wmh-iso-zoom="reset">FIT</button><button type="button" data-wmh-iso-center>CENTER MAP</button><small>DRAG TO PAN · PINCH TO ZOOM</small></div>'+
+      '<div class="wmh-isometric-wrap" data-wmh-iso-viewport><div class="wmh-isometric-camera" data-wmh-iso-camera><div class="wmh-isometric-board is-exterior is-render-test is-placeholder" data-wmh-board style="--tile-cols:'+cols+';--tile-rows:'+rows+
       ';--iso-center-x:'+(rows*tileW/2)+'px;--iso-board-width:'+projectedWidth+'px;--iso-board-height:'+projectedHeight+'px;--tile-w:'+tileW+'px;--tile-h:'+tileH+
       'px;--iso-half-w:'+(tileW/2)+'px;--iso-half-h:'+(tileH/2)+'px;--iso-offset-y:0px;--slab-depth:7px" data-cols="'+cols+'" data-rows="'+rows+
       '" data-tile-w="'+tileW+'" data-tile-h="'+tileH+'" data-offset-x="0" data-offset-y="0" data-map-id="'+escapeMapEditorText(mapId)+'">'+tiles+
@@ -676,7 +675,8 @@ function tileMapMarkup(
   const boardClass='wmh-isometric-board wmh-svg-ground-map '+(interior?'is-interior':'is-exterior')+
     (mapImage?' has-map-base is-minimap-style':' is-placeholder')+
     '';
-  return '<div class="wmh-isometric-wrap" data-wmh-iso-viewport><div class="wmh-isometric-camera" data-wmh-iso-camera><div class="'+boardClass+'" data-wmh-board style="--tile-cols:'+cols+';--tile-rows:'+rows+
+  return '<div class="wmh-iso-controls"><button type="button" data-wmh-iso-zoom="out" aria-label="Zoom out">−</button><span data-wmh-iso-level>100%</span><button type="button" data-wmh-iso-zoom="in" aria-label="Zoom in">+</button><button type="button" data-wmh-iso-zoom="reset">FIT</button><button type="button" data-wmh-iso-center aria-label="Center isometric map">CENTER MAP</button><small>DRAG TO PAN · PINCH TO ZOOM</small></div>'+
+    '<div class="wmh-isometric-wrap" data-wmh-iso-viewport><div class="wmh-isometric-camera" data-wmh-iso-camera><div class="'+boardClass+'" data-wmh-board style="--tile-cols:'+cols+';--tile-rows:'+rows+
     ';--iso-center-x:'+(rows*tileW/2)+'px;--iso-board-width:'+boardWidth+'px;--iso-board-height:'+boardHeight+'px;--tile-w:'+tileW+'px;--tile-h:'+tileH+
     'px;--iso-half-w:'+(tileW/2)+'px;--iso-half-h:'+(tileH/2)+'px;--iso-offset-y:0px;--slab-depth:7px" data-cols="'+cols+'" data-rows="'+rows+
     '" data-tile-w="'+tileW+'" data-tile-h="'+tileH+'" data-offset-x="0" data-offset-y="0" data-map-id="'+escapeMapEditorText(mapId)+
@@ -864,79 +864,17 @@ function renderIsometricWorldStatus(dialog:HTMLElement):void {
   };
   const c=cycle[atmosphere.cycle]||cycle.Morning;
   const w=weather[atmosphere.weather]||weather.Clear;
-  const rawHour=Math.max(0,Math.min(23,Number(save?.hour??8)));
-  const hour=String(rawHour%12||12);
+  const hour=String(save?.hour??8).padStart(2,"0");
   const minute=String(save?.minute??0).padStart(2,"0");
-  const meridiem=rawHour<12?"AM":"PM";
   const set=(selector:string,value:string)=>{const node=hud.querySelector<HTMLElement>(selector);if(node)node.textContent=value;};
   set("[data-wmh-cycle-icon]",c.icon);set("[data-wmh-cycle-label]",c.label);set("[data-wmh-cycle-caption]",c.caption);
   set("[data-wmh-weather-icon]",w.icon);set("[data-wmh-weather-label]",w.label);
   set("[data-wmh-day]","HARI "+String(save?.day??1).padStart(2,"0"));
-  set("[data-wmh-time]",hour+":"+minute+" "+meridiem);
+  set("[data-wmh-time]",hour+":"+minute);
   const player=dialog.querySelector<HTMLElement>("[data-wmh-board] [data-wmh-player-token]");
   set("[data-wmh-player-grid]",player?"GRID X "+String(player.dataset.x||0).padStart(2,"0")+" · Y "+String(player.dataset.y||0).padStart(2,"0"):"GRID X -- · Y --");
   const overlay=dialog.closest<HTMLElement>("[data-world-map-hierarchy]");
   if(overlay){overlay.dataset.wmhCycle=atmosphere.cycle.toLowerCase();overlay.dataset.wmhWeather=atmosphere.weather.toLowerCase();}
-}
-function shouldShowIsometricMinimap(mapId:string,title:string):boolean {
-  const key=(mapId+" "+title).toLowerCase();
-  if(/academy|capital|market|harbor|harbour|city|village|settlement|district|arena|terrace|port|hall|interior|school/.test(key))return false;
-  return /forest|wilds|wilderness|transit|traveller|travel-road|roadway|mountain-pass|trail|frontier|expedition|outer-route|field-route/.test(key);
-}
-function captureIsometricClockState():{day:number;minutes:number;cycle:string;weather:string}|null {
-  const save=getEternalSave();if(!save)return null;
-  const atmosphere=getExpeditionAtmosphere();
-  return {day:save.day,minutes:save.hour*60+save.minute,cycle:atmosphere.cycle,weather:atmosphere.weather};
-}
-function formatIsometricClock(totalMinutes:number):string {
-  const minute=((Math.round(totalMinutes)%1440)+1440)%1440;
-  const rawHour=Math.floor(minute/60),hour=rawHour%12||12;
-  return hour+":"+String(minute%60).padStart(2,"0")+" "+(rawHour<12?"AM":"PM");
-}
-function animateIsometricArrival(dialog:HTMLElement,from:{day:number;minutes:number;cycle:string;weather:string}|null):void {
-  const hud=dialog.querySelector<HTMLElement>("[data-wmh-isometric-hud]");
-  const to=captureIsometricClockState();
-  if(!hud||!from||!to)return;
-  const reduceMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches===true;
-  const time=hud.querySelector<HTMLElement>("[data-wmh-time]");
-  const cycleIcon=hud.querySelector<HTMLElement>("[data-wmh-cycle-icon]");
-  const cycleLabel=hud.querySelector<HTMLElement>("[data-wmh-cycle-label]");
-  const weatherIcon=hud.querySelector<HTMLElement>("[data-wmh-weather-icon]");
-  const weatherLabel=hud.querySelector<HTMLElement>("[data-wmh-weather-label]");
-  const dayLabel=hud.querySelector<HTMLElement>("[data-wmh-day]");
-  if(!reduceMotion){
-    animate(hud,{opacity:[0,1],translateY:[-14,0],duration:460,ease:"outCubic"});
-    const parts=[cycleIcon,cycleLabel,weatherIcon,weatherLabel,dayLabel].filter((node):node is HTMLElement=>!!node);
-    if(parts.length)animate(parts,{opacity:[.18,1],scale:[.78,1],duration:520,delay:stagger(90),ease:"outBack"});
-    const elapsedDays=Math.max(0,to.day-from.day);
-    const clock={minutes:from.minutes};
-    if(time){
-      time.textContent=formatIsometricClock(from.minutes);
-      animate(clock,{minutes:to.minutes+elapsedDays*1440,duration:1450,ease:"inOutCubic",onUpdate:()=>{time.textContent=formatIsometricClock(clock.minutes);}});
-    }
-    if(to.cycle!==from.cycle&&cycleIcon)animate(cycleIcon,{rotate:[-28,0],scale:[.55,1.12,1],duration:680,ease:"outBack"});
-    if(to.weather!==from.weather&&weatherIcon)animate(weatherIcon,{rotate:[-18,18,0],opacity:[.2,1],duration:760,ease:"inOutSine"});
-    hud.dataset.arrivalMotion="animejs";
-  }else{
-    if(time)time.textContent=formatIsometricClock(to.minutes);
-    hud.dataset.arrivalMotion="reduced";
-  }
-  if(cycleLabel)cycleLabel.dataset.arrived=to.cycle;
-  if(weatherLabel)weatherLabel.dataset.arrived=to.weather;
-}
-function renderIsometricTransitions(board:HTMLElement):void {
-  const data=readIsoMapData(board);
-  const host=board.querySelector<HTMLElement>("[data-wmh-actor-layer]")||board;
-  let layer=host.querySelector<HTMLElement>("[data-wmh-transition-layer]");
-  if(!layer){layer=document.createElement("div");layer.dataset.wmhTransitionLayer="";host.append(layer);}
-  layer.innerHTML=data.transitions.map(marker=>{
-    const label=marker.label.trim();
-    const kind=/^akses ke map golden dragon empire$/i.test(label)?"gate":
-      /^dialog box:/i.test(label)?"dialogue":/^event scene:/i.test(label)?"event":"generic";
-    const glyph=kind==="gate"?"↗":kind==="dialogue"?"…":kind==="event"?"✦":"◇";
-    const center=isoCellCenter(marker.x,marker.y,data.grid);
-    return '<button type="button" class="wmh-transition-token is-'+kind+'" data-wmh-transition="'+escapeMapEditorText(marker.id)+'" data-x="'+marker.x+'" data-y="'+marker.y+'" style="--transition-x:'+center.x+'px;--transition-y:'+center.y+'px" aria-label="'+escapeMapEditorText(label||"Area transition")+'" title="'+escapeMapEditorText(label||"Area transition")+'"><i>'+glyph+'</i></button>';
-  }).join("");
 }
 function renderIsometricMinimap(board:HTMLElement):void {
   const playScreen=board.closest<HTMLElement>("[data-wmh-isometric-play-screen]");
@@ -1094,7 +1032,6 @@ function bindIsometricHud(dialog:HTMLElement):void {
     });
   }
   renderIsometricWorldStatus(dialog);
-  renderIsometricTransitions(board);
   if(world)renderIsometricMinimap(board);
 }
 function relocateActorsFromBlockedCells(board:HTMLElement,data:IsoMapEditorData):boolean {
@@ -1287,7 +1224,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     if(exportWrap)exportWrap.hidden=true;
     try{localStorage.setItem(key,JSON.stringify(data));setStatus("Draft auto-saved on this device. Confirm & Save when the image grid is final.");}
     catch{setStatus("Local storage is unavailable. Use COPY DATA FOR AI to create a portable backup.");}
-    redraw();drawIsometricForeground(board,data);syncIsoDepthAndOcclusion(board);renderIsometricTransitions(board);
+    redraw();drawIsometricForeground(board,data);syncIsoDepthAndOcclusion(board);
     // DOM/canvas redraws must not let browser scroll anchoring move the camera.
     if(cameraViewport&&cameraAnchor)requestAnimationFrame(()=>{
       cameraViewport.scrollLeft=cameraAnchor.left;
@@ -1820,7 +1757,7 @@ function bindIsometricCamera(dialog:HTMLElement):void {
     board.style.setProperty("--wmh-camera-pad-y",py+"px");
     board.style.setProperty("--wmh-camera-zoom",String(zoom));
     board.style.setProperty("--wmh-camera-inverse-zoom",String(1/zoom));
-    const scaleLabel=dialog.querySelector<HTMLElement>("[data-wmh-iso-level],[data-wmh-zoom-level]");
+    const scaleLabel=dialog.querySelector<HTMLElement>("[data-wmh-iso-level]");
     if(scaleLabel)scaleLabel.textContent=Math.round(zoom*100)+"%";
   };
   const centerMap=()=>{
@@ -1846,12 +1783,12 @@ function bindIsometricCamera(dialog:HTMLElement):void {
     const label=dialog.querySelector<HTMLElement>("[data-wmh-iso-level]");
     if(label)label.textContent=Math.round(zoom*100)+"%";
   };
-  dialog.querySelectorAll<HTMLElement>("[data-wmh-zoom],[data-wmh-iso-zoom]").forEach(button=>button.addEventListener("click",()=>{
-    const action=button.dataset.wmhZoom||button.dataset.wmhIsoZoom;
+  dialog.querySelectorAll<HTMLElement>("[data-wmh-iso-zoom]").forEach(button=>button.addEventListener("click",()=>{
+    const action=button.dataset.wmhIsoZoom;
     if(action==="reset"){initialFitApplied=false;measure();centerMap();return;}
     apply(zoom+(action==="in"?.2:-.2));
   }));
-  dialog.querySelector<HTMLElement>("[data-wmh-iso-center],[data-wmh-map-center]")?.addEventListener("click",()=>{measure();centerMap();});
+  dialog.querySelector<HTMLElement>("[data-wmh-iso-center]")?.addEventListener("click",()=>{measure();centerMap();});
   const pts=new Map<number,{x:number;y:number}>();let pinch:{distance:number;zoom:number}|null=null;
   const dist=(a:{x:number;y:number},b:{x:number;y:number})=>Math.hypot(a.x-b.x,a.y-b.y);
   viewport.addEventListener("pointerdown",e=>{pts.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pts.size===2){const p=[...pts.values()];pinch={distance:Math.max(1,dist(p[0],p[1])),zoom};}});
@@ -1869,10 +1806,10 @@ function bindIsometricCamera(dialog:HTMLElement):void {
 
 function isometricEditorMarkup(): string {
   return '<div class="wmh-overlay-editor" data-wmh-editor-dock>'+
-    '<button type="button" class="wmh-overlay-float" data-wmh-overlay-toggle aria-label="Open map tools drawer" aria-pressed="false" aria-expanded="false"><i class="wmh-tool-map">☷</i><span>MAP TOOLS</span></button>'+
-    '<div class="wmh-overlay-modal" data-wmh-overlay-tools hidden><button type="button" class="wmh-overlay-drawer-lever" data-wmh-overlay-close aria-label="Close map tools drawer">‹</button><section class="wmh-overlay-tools" role="dialog" aria-modal="false" aria-label="Map and isometric editor tools">'+
+    '<button type="button" class="wmh-overlay-float" data-wmh-overlay-toggle aria-label="Open isometric map editor" aria-pressed="false" aria-expanded="false"><i class="wmh-tool-map">⌖</i></button>'+
+    '<div class="wmh-overlay-modal" data-wmh-overlay-tools hidden><section class="wmh-overlay-tools" role="dialog" aria-modal="false" aria-label="Isometric map editor">'+
     '<div class="wmh-overlay-resize-grip" data-wmh-panel-resize-handle role="separator" aria-orientation="diagonal" aria-label="Resize editor from its upper-left corner"><span></span></div>'+
-    '<header class="wmh-overlay-modal-head" data-wmh-overlay-drag-handle><div><b>WORLD ARCHIVE · FIELD TOOLS</b><small>MAP GLASS · CAMERA · CELL WORKBENCH</small></div><button type="button" data-wmh-overlay-close aria-label="Close map tools drawer">×</button></header><div class="wmh-drawer-map-controls" aria-label="Map camera controls"><span>CAMERA</span><button type="button" data-wmh-zoom="out" aria-label="Zoom out">−</button><output data-wmh-zoom-level>100%</output><button type="button" data-wmh-zoom="in" aria-label="Zoom in">+</button><button type="button" data-wmh-zoom="reset">FIT</button><button type="button" data-wmh-map-center>⌖ CENTER MAP</button></div>'+
+    '<header class="wmh-overlay-modal-head" data-wmh-overlay-drag-handle><div><b>ISOMETRIC EDITOR</b><small>MAP CELL WORKBENCH</small></div><button type="button" data-wmh-overlay-close aria-label="Return to editor bubble">×</button></header>'+
     '<label>EDITING MODE<select data-wmh-overlay-mode><option value="cell-add">＋ ADD CELL</option><option value="cell-delete">－ DELETE CELL</option><option value="cell-merge">⇧ SELECT CELLS TO MERGE</option><option value="cell-unmerge">↔ UNMERGE CELL GROUP</option><option value="foreground">○ Foreground sectors</option><option value="blocked">X Blocked sectors</option><option value="opacity">◌ Character opacity sectors</option><option value="transition">Area transition markers</option></select></label><div class="wmh-cell-layout-tools" data-wmh-cell-tools hidden><b>CELL LAYOUT</b><span data-wmh-cell-selection-count>0 CELLS SELECTED</span><button type="button" data-wmh-merge-apply>MERGE SELECTED CELLS</button><button type="button" data-wmh-merge-clear>CLEAR SELECTION</button><small>Tap adjacent cells to select them. Tap-drag only pans the map.</small></div><label class="wmh-walkable-switch"><input type="checkbox" data-wmh-walkable-enabled/> LIMIT MOVEMENT TO BLUE CELLS</label>'+
     '<p class="wmh-editor-mode-note">Paint only the image area that should be used. Each main diamond has 8 smaller sectors: two inside each of the four former quadrants. X blocks a sector edge, ○ redraws that image sector above characters, and ◌ makes characters translucent. The source image and canvas gaps are never resized by grid calibration.</p>'+
     '<div data-wmh-transition-tools hidden><label>DESTINATION LABEL<input type="text" maxlength="80" data-wmh-transition-label placeholder="e.g. Academy · Main Hall"/></label><button type="button" data-wmh-transition-apply>APPLY LABEL</button><button type="button" data-wmh-transition-delete>DELETE SELECTED</button><p>Red = unnamed. Blue = named. Tap a marker to select it.</p></div>'+
@@ -1890,7 +1827,8 @@ function isometricEditorMarkup(): string {
     '<small data-wmh-overlay-status>Choose a tool, then tap individual diamond cells. The world pauses while the editor is open.</small></section></div></div>';
 }
 function isometricHudMarkup(title: string, mapImage: string, showMinimap = true): string {
-  // The shared HUD is universal; the field map is reserved for wilderness and transit areas.
+  // Keep the compact minimap in the HUD for every area, including Academy.
+  // Academy uses the same full Map Base image with its matching grid and actor layer.
   const minimapMarkup=
     '<button type="button" class="wmh-rpg-minimap" data-wmh-minimap aria-label="Minimap. Tap a location to walk there." title="Tap the map to move">'+
     '<span class="wmh-minimap-heading">FIELD MAP <i>⌖</i></span><span class="wmh-minimap-world" data-wmh-minimap-world>'+
@@ -1967,16 +1905,16 @@ function isometricPlayMarkup(regionId: RegionId, selectedBuilding: string, inter
     const academyMapImage="/maps/academy/full-map/1_academy.jpg";
     const academyMapId="golden-dragon-empire:tianhai-academy:exterior";
     return '<div class="wmh-isometric-play-screen wmh-academy-map-screen" data-wmh-isometric-play-screen>'+
-      ''+
+      '<div class="wmh-map-zoom wmh-academy-map-zoom" aria-label="Academy map zoom controls"><button type="button" data-wmh-zoom="out" aria-label="Zoom out">−</button><span data-wmh-zoom-level>100%</span><button type="button" data-wmh-zoom="in" aria-label="Zoom in">+</button><button type="button" data-wmh-zoom="reset">RESET</button></div>'+
       '<div class="wmh-academy-map-viewport" data-wmh-map-viewport><div class="wmh-academy-map-surface" data-wmh-map-surface data-wmh-academy-canvas data-wmh-board data-academy-artwork-board="true" data-map-id="'+academyMapId+'" data-cols="24" data-rows="20" data-tile-w="128" data-tile-h="69.5" data-offset-x="0" data-offset-y="0" data-map-theme="golden-dragon-empire" data-map-title="Tianhai Academy" data-map-interior="false">'+
       '<svg class="wmh-academy-margin-grid" data-wmh-academy-margin-grid preserveAspectRatio="none" aria-hidden="true"></svg>'+
       '<img class="wmh-academy-map-art" data-wmh-academy-map-art data-wmh-map-art src="'+academyMapImage+'" alt="Tianhai Academy full map" draggable="false" loading="eager" decoding="async"/>'+
       '<canvas class="wmh-isometric-foreground" data-wmh-foreground-canvas aria-hidden="true"></canvas>'+
       '<svg class="wmh-area-overlay-svg wmh-academy-grid-overlay" data-wmh-overlay-svg viewBox="0 0 2816 1536" preserveAspectRatio="none" aria-label="Editable isometric interaction grid"><g data-wmh-interaction-grid></g><g data-wmh-overlay-marks></g><g data-wmh-manual-marks></g><g data-wmh-transition-marks></g><path data-wmh-overlay-preview class="wmh-area-mark-preview" d=""></path></svg>'+
-      '<div class="wmh-academy-actor-layer" data-wmh-actor-layer><button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token data-token-label="" data-x="12" data-y="31" aria-label="Player character"><i></i></button>'+isometricNpcTokensMarkup(academyMapId,false)+'<div data-wmh-transition-layer></div></div>'+
-      '</div></div>'+isometricHudMarkup("Tianhai Academy",academyMapImage,false)+academyCanvasEditorMarkup()+isometricEditorMarkup()+
+      '<div class="wmh-academy-actor-layer" data-wmh-actor-layer><button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token data-token-label="" data-x="5" data-y="17" aria-label="Player character"><i></i></button>'+isometricNpcTokensMarkup(academyMapId,false)+'</div>'+
+      '</div></div>'+academyCanvasEditorMarkup()+isometricEditorMarkup()+
       '<button type="button" class="wmh-map-back wmh-academy-map-back" data-wmh-action="back" aria-label="Return to Golden Dragon Empire map"><i class="wmh-academy-back-icon" aria-hidden="true"></i><b>GOLDEN DRAGON EMPIRE</b></button>'+
-      '<section class="wmh-chat-panel" data-wmh-chat hidden role="dialog" aria-label="Character conversation"><div class="wmh-chat-card"><button type="button" class="wmh-chat-close" data-wmh-action="chat-close" aria-label="Close conversation">×</button><div class="wmh-chat-thread" data-wmh-thread></div><div class="wmh-chat-input-row"><span>YOUR RESPONSE</span><div data-wmh-replies></div></div></div></section><section class="wmh-transition-dialog" data-wmh-transition-dialog hidden role="dialog" aria-label="World dialogue"><div class="wmh-transition-dialog-card"><small data-wmh-transition-speaker>WORLD ARCHIVE</small><p data-wmh-transition-dialog-text></p><button type="button" data-wmh-transition-close>CONTINUE</button></div></section><section class="wmh-transition-notice" data-wmh-transition-notice hidden role="dialog" aria-label="World event notification"><div class="wmh-transition-notice-card"><small>WORLD EVENT · ARCHIVE NOTICE</small><h3 data-wmh-transition-notice-title></h3><p data-wmh-transition-notice-text></p><button type="button" data-wmh-transition-close>CONTINUE</button></div></section>'+
+      '<section class="wmh-chat-panel" data-wmh-chat hidden role="dialog" aria-label="Character conversation"><div class="wmh-chat-card"><button type="button" class="wmh-chat-close" data-wmh-action="chat-close" aria-label="Close conversation">×</button><div class="wmh-chat-thread" data-wmh-thread></div><div class="wmh-chat-input-row"><span>YOUR RESPONSE</span><div data-wmh-replies></div></div></div></section>'+
       '</div>';
   }
   const mapId=makeIsometricMapId(regionId,selectedBuilding,interior);
@@ -1984,10 +1922,10 @@ function isometricPlayMarkup(regionId: RegionId, selectedBuilding: string, inter
   const title=selectedBuilding+(interior?" · INTERIOR":"");
   return '<div class="wmh-isometric-play-screen" data-wmh-isometric-play-screen>'+
     tileMapMarkup(interior,mapId,mapImage,regionId,selectedBuilding)+
-    isometricHudMarkup(title,mapImage,shouldShowIsometricMinimap(makeIsometricMapId(regionId,selectedBuilding,interior),title))+
+    isometricHudMarkup(title,mapImage)+
     isometricEditorMarkup()+
     '<button type="button" class="wmh-map-back" data-wmh-action="back" aria-label="Leave isometric area"><span>‹</span><b>BACK</b></button>'+
-    '<section class="wmh-chat-panel" data-wmh-chat hidden role="dialog" aria-label="Character conversation"><div class="wmh-chat-card"><button type="button" class="wmh-chat-close" data-wmh-action="chat-close" aria-label="Close conversation">×</button><div class="wmh-chat-thread" data-wmh-thread></div><div class="wmh-chat-input-row"><span>YOUR RESPONSE</span><div data-wmh-replies></div></div></div></section><section class="wmh-transition-dialog" data-wmh-transition-dialog hidden role="dialog" aria-label="World dialogue"><div class="wmh-transition-dialog-card"><small data-wmh-transition-speaker>WORLD ARCHIVE</small><p data-wmh-transition-dialog-text></p><button type="button" data-wmh-transition-close>CONTINUE</button></div></section><section class="wmh-transition-notice" data-wmh-transition-notice hidden role="dialog" aria-label="World event notification"><div class="wmh-transition-notice-card"><small>WORLD EVENT · ARCHIVE NOTICE</small><h3 data-wmh-transition-notice-title></h3><p data-wmh-transition-notice-text></p><button type="button" data-wmh-transition-close>CONTINUE</button></div></section>'+
+    '<section class="wmh-chat-panel" data-wmh-chat hidden role="dialog" aria-label="Character conversation"><div class="wmh-chat-card"><button type="button" class="wmh-chat-close" data-wmh-action="chat-close" aria-label="Close conversation">×</button><div class="wmh-chat-thread" data-wmh-thread></div><div class="wmh-chat-input-row"><span>YOUR RESPONSE</span><div data-wmh-replies></div></div></div></section>'+
     '</div>';
 }
 
@@ -1997,7 +1935,7 @@ export function renderIsometricMapTestArea(): string {
     tileMapMarkup(false,mapId,"")+isometricHudMarkup("ISOMETRIC RENDER TEST","")+isometricEditorMarkup()+
     '<div class="wmh-isometric-test-caption"><b>ISOMETRIC RENDER TEST</b><span>16 × 12 TILES · PLAYER · 3 NPCs · LIVE CAMERA</span></div>'+
     '<button type="button" class="wmh-map-back" data-wmh-action="back" aria-label="Leave isometric test area"><span>‹</span><b>EXIT TEST</b></button>'+
-    '<section class="wmh-chat-panel" data-wmh-chat hidden role="dialog" aria-label="Character conversation"><div class="wmh-chat-card"><button type="button" class="wmh-chat-close" data-wmh-action="chat-close" aria-label="Close conversation">×</button><div class="wmh-chat-thread" data-wmh-thread></div><div class="wmh-chat-input-row"><span>YOUR RESPONSE</span><div data-wmh-replies></div></div></div></section><section class="wmh-transition-dialog" data-wmh-transition-dialog hidden role="dialog" aria-label="World dialogue"><div class="wmh-transition-dialog-card"><small data-wmh-transition-speaker>WORLD ARCHIVE</small><p data-wmh-transition-dialog-text></p><button type="button" data-wmh-transition-close>CONTINUE</button></div></section><section class="wmh-transition-notice" data-wmh-transition-notice hidden role="dialog" aria-label="World event notification"><div class="wmh-transition-notice-card"><small>WORLD EVENT · ARCHIVE NOTICE</small><h3 data-wmh-transition-notice-title></h3><p data-wmh-transition-notice-text></p><button type="button" data-wmh-transition-close>CONTINUE</button></div></section></div>';
+    '<section class="wmh-chat-panel" data-wmh-chat hidden role="dialog" aria-label="Character conversation"><div class="wmh-chat-card"><button type="button" class="wmh-chat-close" data-wmh-action="chat-close" aria-label="Close conversation">×</button><div class="wmh-chat-thread" data-wmh-thread></div><div class="wmh-chat-input-row"><span>YOUR RESPONSE</span><div data-wmh-replies></div></div></div></section></div>';
 }
 
 function panelMarkup(level: Level, regionId: RegionId = "golden-dragon-empire", selectedBuilding = "Tianhai Academy", selectedArea?: WorldMarker): string {
@@ -2214,36 +2152,8 @@ function walkToTile(dialog:HTMLElement,targetX:number,targetY:number,surface:str
   };
   move();
 }
-function closeTransitionOverlays(dialog:HTMLElement):void {
-  dialog.querySelectorAll<HTMLElement>("[data-wmh-transition-dialog],[data-wmh-transition-notice]").forEach(node=>node.hidden=true);
-}
-function showTransitionDialogue(dialog:HTMLElement,speaker:string,message:string):void {
-  closeTransitionOverlays(dialog);
-  const panel=dialog.querySelector<HTMLElement>("[data-wmh-transition-dialog]");
-  const text=dialog.querySelector<HTMLElement>("[data-wmh-transition-dialog-text]");
-  const title=dialog.querySelector<HTMLElement>("[data-wmh-transition-speaker]");
-  if(!panel||!text)return;
-  if(title)title.textContent=speaker;text.textContent=message;panel.hidden=false;
-  const card=panel.querySelector<HTMLElement>(".wmh-transition-dialog-card");
-  if(card&&!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches)animate(card,{opacity:[0,1],translateY:[28,0],duration:360,ease:"outCubic"});
-}
-function showTransitionNotice(dialog:HTMLElement,titleText:string,message:string):void {
-  closeTransitionOverlays(dialog);
-  const panel=dialog.querySelector<HTMLElement>("[data-wmh-transition-notice]");
-  const title=dialog.querySelector<HTMLElement>("[data-wmh-transition-notice-title]");
-  const text=dialog.querySelector<HTMLElement>("[data-wmh-transition-notice-text]");
-  if(!panel||!title||!text)return;
-  title.textContent=titleText;text.textContent=message;panel.hidden=false;
-  const card=panel.querySelector<HTMLElement>(".wmh-transition-notice-card");
-  if(card&&!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches)animate(card,{opacity:[0,1],scale:[.94,1],translateY:[12,0],duration:420,ease:"outCubic"});
-}
-function captureArrivalState():{day:number;minutes:number;cycle:string;weather:string}|null {
-  const save=getEternalSave();if(!save)return null;
-  const atmosphere=getExpeditionAtmosphere();
-  return {day:save.day,minutes:save.hour*60+save.minute,cycle:atmosphere.cycle,weather:atmosphere.weather};
-}
 export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement, onAdvanceTime: (minutes: number) => void): boolean {
-  const action=target.closest<HTMLElement>("[data-wmh-action],[data-wmh-info],[data-wmh-site],[data-wmh-building],[data-wmh-npc],[data-wmh-plot],[data-wmh-tile],[data-wmh-reply],[data-wmh-transition],[data-wmh-transition-close],[data-wmh-dismiss-layer],[data-wmh-selection-card]");
+  const action=target.closest<HTMLElement>("[data-wmh-action],[data-wmh-info],[data-wmh-site],[data-wmh-building],[data-wmh-npc],[data-wmh-plot],[data-wmh-tile],[data-wmh-reply],[data-wmh-dismiss-layer],[data-wmh-selection-card]");
   if(!action)return false;
   const overlay=root.querySelector<HTMLElement>("[data-world-map-hierarchy]");
   const dialog=overlay?.querySelector<HTMLElement>("[data-wmh-dialog]");
@@ -2284,25 +2194,6 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
     const next:Level=current==="interior"?"local":current==="local"?"regional":"world";
     stopNpcWander(dialog);overlay.dataset.level=next;dialog.innerHTML=panelMarkup(next,regionId,building);if(next==="world")bindWorldMapZoom(dialog);if(next==="regional")bindIsometricMapArt(dialog);if(next==="local"){bindIsoAreaEditor(dialog);bindIsometricCamera(dialog);bindIsometricMapArt(dialog);bindIsometricHud(dialog);startNpcWander(dialog);}return true;
   }
-  if(action.hasAttribute("data-wmh-transition-close")){
-    closeTransitionOverlays(dialog);
-    return true;
-  }
-  if(action.dataset.wmhTransition){
-    const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
-    const marker=board?readIsoMapData(board).transitions.find(item=>item.id===action.dataset.wmhTransition):null;
-    const label=marker?.label.trim()||"";
-    if(/^akses ke map golden dragon empire$/i.test(label)){
-      closeTransitionOverlays(dialog);stopNpcWander(dialog);
-      overlay.dataset.level="regional";overlay.dataset.region="golden-dragon-empire";
-      dialog.innerHTML=panelMarkup("regional","golden-dragon-empire");bindIsometricMapArt(dialog);
-      return true;
-    }
-    if(/^dialog box:/i.test(label)){showTransitionDialogue(dialog,"TIANHAI ACADEMY",label.replace(/^dialog box:\\s*/i,""));return true;}
-    if(/^event scene:/i.test(label)){showTransitionNotice(dialog,"An Introduction to Merzkava",label.replace(/^event scene:\\s*/i,""));return true;}
-    showTransitionDialogue(dialog,"WORLD ARCHIVE",label||"The route is not yet identified.");
-    return true;
-  }
   if(action.dataset.wmhAction==="chat-close"){
     const chat=dialog.querySelector<HTMLElement>("[data-wmh-chat]");
     if(chat){chat.hidden=true;chat.removeAttribute("aria-modal");}
@@ -2327,13 +2218,8 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
     return true;
   }
   if(action.dataset.wmhSite){
-    const arrival=captureArrivalState();
-    onAdvanceTime(180);
     overlay.dataset.level="local";overlay.dataset.building=action.dataset.wmhSite;
-    dialog.innerHTML=panelMarkup("local",regionId,action.dataset.wmhSite);
-    bindIsoAreaEditor(dialog);bindIsometricCamera(dialog);bindIsometricMapArt(dialog);bindIsometricHud(dialog);startNpcWander(dialog);
-    requestAnimationFrame(()=>animateIsometricArrival(dialog,arrival));
-    return true;
+    dialog.innerHTML=panelMarkup("local",regionId,action.dataset.wmhSite);bindIsoAreaEditor(dialog);bindIsometricCamera(dialog);bindIsometricMapArt(dialog);bindIsometricHud(dialog);startNpcWander(dialog);return true;
   }
   if(action.dataset.wmhBuilding && current==="local"){
     stopNpcWander(dialog);
