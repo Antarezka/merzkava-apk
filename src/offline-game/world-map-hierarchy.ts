@@ -1395,7 +1395,7 @@ function isometricPlayMarkup(regionId: RegionId, selectedBuilding: string, inter
     return '<div class="wmh-isometric-play-screen wmh-academy-map-screen" data-wmh-isometric-play-screen>'+
       '<div class="wmh-map-zoom wmh-academy-map-zoom" aria-label="Academy map zoom controls"><button type="button" data-wmh-zoom="out" aria-label="Zoom out">−</button><span data-wmh-zoom-level>100%</span><button type="button" data-wmh-zoom="in" aria-label="Zoom in">+</button><button type="button" data-wmh-zoom="reset">RESET</button></div>'+
       '<div class="wmh-academy-map-viewport" data-wmh-map-viewport><div class="wmh-academy-map-surface" data-wmh-map-surface data-wmh-academy-canvas>'+
-      '<svg class="wmh-academy-margin-grid" data-wmh-academy-margin-grid aria-hidden="true"></svg>'+
+      '<svg class="wmh-academy-margin-grid" data-wmh-academy-margin-grid preserveAspectRatio="none" aria-hidden="true"></svg>'+
       '<img src="'+academyMapImage+'" alt="Tianhai Academy full map" draggable="false" loading="eager" decoding="async"/>'+
       '</div></div>'+
       '<button type="button" class="wmh-map-back wmh-academy-map-back" data-wmh-action="back" aria-label="Return to Golden Dragon Empire map"><i class="wmh-academy-back-icon" aria-hidden="true"></i><b>GOLDEN DRAGON EMPIRE</b></button>'+
