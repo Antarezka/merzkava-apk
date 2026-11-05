@@ -152,9 +152,9 @@ body:has(.noticeboard-backdrop){overflow:hidden;overscroll-behavior:none;}
 
 
 /* Conversation-first workspace: the chat owns the screen; metadata stays secondary. */
-.app-shell:has(.conversation-window){width:100%;max-width:900px;min-height:100dvh;padding:54px 10px calc(82px + env(safe-area-inset-bottom));}
+.app-shell:has(.conversation-window){width:100%;max-width:900px;min-height:100svh;padding:54px 10px calc(82px + env(safe-area-inset-bottom));}
 .app-shell:has(.conversation-window) .app-header{padding:4px 2px 9px;}
-.app-shell:has(.conversation-window) .main-content{display:flex;flex-direction:column;min-height:calc(100dvh - 140px);padding:10px 0 0;}
+.app-shell:has(.conversation-window) .main-content{display:flex;flex-direction:column;min-height:calc(100svh - 140px);padding:10px 0 0;}
 .app-shell:has(.conversation-window) .bottom-nav{width:100%;max-width:900px;}
 .world-time-panel{flex:0 0 auto;margin:0 0 9px;padding:10px 13px;border:1px solid #9c927a;background:linear-gradient(120deg,#e9e1cf,#f2ecde);color:#30463e;box-shadow:0 3px 12px #33483d0c;}
 .world-time-heading,.world-time-main,.world-time-details{display:flex;align-items:center;justify-content:space-between;gap:8px;}
@@ -211,7 +211,7 @@ body:has(.noticeboard-backdrop){overflow:hidden;overscroll-behavior:none;}
 .snapshot-blind.is-open .blind-content{max-height:112px;gap:12px;padding:10px 15px 13px;opacity:1;border-bottom-width:1px;}
 .snapshot-blind.is-open .blind-content>div{min-height:32px;}
 .snapshot-blind.is-open .blind-content{pointer-events:auto;}
-@media(min-width:600px){.app-shell:has(.conversation-window){padding-top:60px;padding-bottom:95px}.app-shell:has(.conversation-window) .main-content{min-height:calc(100dvh - 165px)}}
+@media(min-width:600px){.app-shell:has(.conversation-window){padding-top:60px;padding-bottom:95px}.app-shell:has(.conversation-window) .main-content{min-height:calc(100svh - 165px)}}
 @media(max-height:650px){.app-shell:has(.conversation-window){padding-bottom:76px}.conversation-feed{min-height:120px}.world-time-panel{padding:7px 11px}.world-time-main{padding:4px 0}.conversation-composer{padding-top:7px}}
 @media(prefers-reduced-motion:reduce){.blind-content{transition:none}.conversation-feed{scroll-behavior:auto}}
 
@@ -1233,7 +1233,7 @@ body:has(.noticeboard-backdrop){overflow:hidden;overscroll-behavior:none;}
   grid-template-rows: repeat(2, minmax(36px, auto));
 }
 .app-shell:has(.conversation-window) .main-content {
-  min-height: calc(100dvh - 190px);
+  min-height: calc(100svh - 190px);
 }
 .world-time-panel {
   position: sticky;
@@ -2843,3 +2843,12 @@ body { color:var(--ui-ink); }
 :root[data-theme="dark"] .account-access-icon{border-color:#8c7950;background:radial-gradient(circle at 35% 28%,#465447,#29342d)}
 @media(max-width:430px){.account-access-actions{grid-template-columns:1fr}.account-access-action{min-height:54px}}
 @media(prefers-reduced-motion:reduce){.account-access-action,.developer-password-toggle{transition:none}}
+
+
+/* Android IME stability: do not switch short-device layouts while a text field has focus. */
+html.soft-keyboard-open .app-shell:has(.conversation-window) { padding-bottom:112px !important; }
+html.soft-keyboard-open .app-shell:has(.conversation-window) .main-content { min-height:calc(100svh - 190px) !important; }
+html.soft-keyboard-open .conversation-feed { min-height:180px !important; }
+html.soft-keyboard-open .world-time-panel { min-height:145px !important; padding:13px 15px 11px !important; }
+html.soft-keyboard-open .world-time-main { padding:7px 0 5px !important; }
+html.soft-keyboard-open .conversation-composer { padding-top:10px !important; }
