@@ -1774,8 +1774,10 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     const loginAttempt=++worldAtlasLoginAttempt;
     const abortController=new AbortController();
     worldAtlasLoginAbort=abortController;
+    const closeButton=gate.querySelector<HTMLButtonElement>("[data-world-atlas-gate-back]");
+    const loginForm=form;
     if(button)button.disabled=true;
-    closeButton.disabled=true;
+    if(closeButton)closeButton.disabled=true;
     if(loginForm)loginForm.inert=true;
     if(message)message.textContent="Preparing World Atlas access…";
     try{
