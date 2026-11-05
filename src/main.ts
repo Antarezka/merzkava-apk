@@ -172,7 +172,7 @@ const navigation: { id: ScreenId; label: string; icon: string }[] = [
 ];
 
 type AppScreen = ScreenId | "control";
-let activeScreen: AppScreen = "home";
+let activeScreen: AppScreen = "control";
 let developerAuthenticated = false;
 let developerLoginMessage = "";
 let developerLoginBusy = false;
@@ -511,7 +511,7 @@ function bugPanelMarkup(): string {
   </div>`;
 }
 function render(): void {
-  if(!developerAuthenticated&&(activeScreen==="control"||activeScreen==="gameplay"))activeScreen="home";
+  if(!developerAuthenticated&&activeScreen==="gameplay")activeScreen="home";
   const visibleNavigation=developerAuthenticated?navigation:navigation.filter(item=>item.id!=="gameplay");
   // Each render replaces the screen DOM. Stop all Anime.js loops/listeners
   // attached to the previous Eternal Path tree before those nodes are detached.
@@ -527,7 +527,7 @@ function render(): void {
   } else if (!notice || activeScreen !== "gameplay") {
     lastPlayWarningNotice = "";
   }
-  const isControl = developerAuthenticated && activeScreen === "control";
+  const isControl = activeScreen === "control";
   const shouldAnimateScreen = !isControl && (lastAnimatedScreen !== activeScreen || menuRevealPending);
   const selectedCharacter = availableCharacters().find(item => item.id === activeCharacterId);
   const sourceProfile = selectedCharacter?.profileMarkdown ? parseCharacterProfile(selectedCharacter.profileMarkdown) : null;
@@ -550,7 +550,7 @@ function render(): void {
     ${isControl ? "" : `<div class="storage-status"><span class="status-dot"></span>${databaseMessage}</div>`}
     ${activeScreen === "gameplay" ? snapshotBlindMarkup() : ""}
     ${activeScreen === "home" && noticeboardVisible ? noticeboardMarkup() : ""}
-    ${developerLoginPanel(currentLanguage,developerLoginMessage,developerLoginBusy)}
+    ${developerLoginPanel(currentLanguage,developerLoginMessage,developerLoginBusy,!developerAuthenticated&&activeScreen==="control")}
     ${exitConfirmationPanelMarkup(currentLanguage)}
     ${developerAuthenticated ? bugPanelMarkup() : ""}
   </div>`;
@@ -931,6 +931,10 @@ window.addEventListener("popstate",(event:PopStateEvent)=>{
   if(idleNotice&&!idleNotice.hidden){closeIdleAtlasFromBack();return;}
   const devPanel=root.querySelector<HTMLElement>("[data-dev-login-panel]");
   if(devPanel&&!devPanel.hidden){
+    if(!developerAuthenticated&&activeScreen==="control"){
+      history.pushState({merzkavaScreen:"control",merzkavaHome:false},"");
+      return;
+    }
     devPanel.hidden=true;
     history.pushState({merzkavaScreen:activeScreen,merzkavaHome:activeScreen==="home"},"");
     return;
@@ -963,13 +967,13 @@ window.addEventListener("popstate",(event:PopStateEvent)=>{
   }
   showAppExitConfirmation(!root.querySelector<HTMLElement>("[data-app-exit-panel]")?.hidden);
   // Re-arm Home so every subsequent Android Back/gesture repeats this confirmation.
-  history.pushState({merzkavaScreen:"home",merzkavaHome:true},"");
+  history.pushState({merzkavaScreen:"control",merzkavaHome:false},"");
 });
 root.addEventListener("keydown", event => {
   const atlasGate=root.querySelector<HTMLElement>("[data-world-atlas-gate]");
   if(event.key==="Escape"&&atlasGate&&!atlasGate.hidden){closeWorldAtlas();return;}
   const devAccess=root.querySelector<HTMLElement>("[data-dev-login-panel]");
-  if(event.key==="Escape"&&devAccess&&!devAccess.hidden){devAccess.hidden=true;return;}
+  if(event.key==="Escape"&&devAccess&&!devAccess.hidden){if(!developerAuthenticated&&activeScreen==="control")return;devAccess.hidden=true;return;}
   const idleNotice=root.querySelector<HTMLElement>("[data-idle-rpg-modal]");
   if(event.key==="Escape"&&idleNotice&&!idleNotice.hidden){
     idleNotice.hidden=true;
@@ -1138,7 +1142,7 @@ root.addEventListener("click", async (event: MouseEvent) => {
     if(!developerAuthenticated)return;activeScreen="control";notice="";render();return;
   }
   if(target.closest("[data-dev-logout]")){
-    await signOutDeveloper();developerAuthenticated=false;setWorldMapDeveloperMode(false);activeScreen="home";notice="";render();return;
+    await signOutDeveloper();developerAuthenticated=false;setWorldMapDeveloperMode(false);activeScreen="control";notice="";render();return;
   }
   if(!developerAuthenticated&&target.closest("[data-floating-action],[data-auth-logout],[data-refresh-canon],[data-refresh-players],[data-bug-copy],[data-bug-minimize],[data-bug-dismiss]"))return;
   const activeEternalModal=root.querySelector<HTMLElement>(".expedition-choice-modal:not([hidden])");
@@ -1686,7 +1690,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       }
       developerAuthenticated=true;setWorldMapDeveloperMode(true);
       developerLoginBusy=false;developerLoginMessage="";
-      activeScreen="home";notice="";render();
+      activeScreen="control";notice="";render();
     }catch(error){
       developerLoginBusy=false;developerLoginMessage=error instanceof Error?error.message:"Developer authentication failed.";
       const message=root.querySelector<HTMLElement>("[data-dev-login-message]");if(message)message.textContent=developerLoginMessage;
