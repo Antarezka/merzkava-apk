@@ -10,7 +10,8 @@ import { renderScreen, type ScreenId } from "./app/screens";
 import { initializeIdleTriggerDrag } from "./offline-game/idle-trigger-drag";
 import { initializeArcanistryTransitDrag } from "./offline-game/transit-pull-drag";
 import { animateExpeditionChoiceModal, animateExpeditionPanel, mountExpeditionAnimations } from "./offline-game/expedition-animations";
-import { deleteEternalSave, exportEternalSave, importEternalSave, loadEternalSave, renameEternalSave, resetEternalGame, resolveEternalSituationChoice, advanceEternalWorldTime, setEternalLocation, startEternalGame, unloadEternalGame, type EternalRegion } from "./offline-game/expedition-game";
+import { deleteEternalSave, exportEternalSave, importEternalSave, listEternalSaves, loadEternalSave, renameEternalSave, resetEternalGame, resolveEternalSituationChoice, advanceEternalWorldTime, setEternalLocation, startEternalGame, unloadEternalGame, type EternalRegion } from "./offline-game/expedition-game";
+import { hasAtlasPassword, setAtlasPassword, verifyAtlasPassword, rememberAtlasPlayer, restoreAtlasPlayer } from "./offline-game/world-atlas-account";
 import { authenticateDeveloper, restoreDeveloperSession, signOutDeveloper } from "./security/developer-access";
 import { getCanonIndex, getCanonStatus, loadCanonModule, loadPlayerRegistry, loadRegisteredPlayerProfile, refreshCanon, refreshLatestPlayerRegistry, type CanonDocument } from "./convo/canon/canon-loader";
 import { routeCanonActivity } from "./convo/canon/canon-router";
@@ -23,8 +24,9 @@ import { buildSaveCheckpointPrompt } from "./convo/engine/save-checkpoint";
 import { getAuthSession, isSupabaseConfigured, restoreAuthSession, signInWithPassword, signOut } from "./convo/auth/supabase-auth";
 import { GatewayGMProvider, isGMGatewayConfigured } from "./convo/engine/gateway-gm-provider";
 import { getLedgerLog, initializeLedgerNotifications, showLedgerProposalBubble } from "./ui/ledger-log";
-import { startFloatingMode, requestFloatingOverlayPermission, getFloatingReadiness, requestFloatingNotifications, requestFloatingBatteryExemption, showFloatingBubble, stopFloatingService, type FloatingReadiness } from "./native/floating-window";
+import { startFloatingMode, requestFloatingOverlayPermission, getFloatingReadiness, requestFloatingNotifications, requestFloatingBatteryExemption, showFloatingBubble, stopFloatingService, exitMerzkavaApplication, type FloatingReadiness } from "./native/floating-window";
 import { floatingControlMarkup } from "./app/floating-control";
+import { exitConfirmationPanelMarkup } from "./app/exit-confirm-panel";
 import { developerHeaderControls, developerLoginPanel } from "./app/developer-access-panel";
 import { dustyLetterMarkup } from "./app/dusty-letter";
 import { APP_NAME, APP_VERSION } from "./app/app-meta";
@@ -174,6 +176,8 @@ let activeScreen: AppScreen = "home";
 let developerAuthenticated = false;
 let developerLoginMessage = "";
 let developerLoginBusy = false;
+let worldAtlasLoginBusy = false;
+let worldAtlasAuthenticated = false;
 let floatingReadiness: FloatingReadiness = { displayOverApps: false, notifications: false, batteryExemption: false, serviceRunning: false };
 let floatingBusy = false;
 async function refreshFloatingReadiness(): Promise<void> {
@@ -548,6 +552,7 @@ function render(): void {
     ${activeScreen === "gameplay" ? snapshotBlindMarkup() : ""}
     ${activeScreen === "home" && noticeboardVisible ? noticeboardMarkup() : ""}
     ${developerLoginPanel(currentLanguage,developerLoginMessage,developerLoginBusy)}
+    ${exitConfirmationPanelMarkup(currentLanguage)}
     ${developerAuthenticated ? bugPanelMarkup() : ""}
   </div>`;
   if (activeScreen === "offline-game") {
@@ -643,6 +648,125 @@ async function refreshPlayerRegistry(): Promise<void> {
     if (activeScreen === "character" || activeScreen === "gameplay") render();
   } finally {
     playerRegistryBusy = false;
+  }
+}
+
+type AtlasEligiblePlayer = { id:string; name:string; registryPath:string };
+function atlasEligiblePlayers():AtlasEligiblePlayer[] {
+  const localNames=new Set(listEternalSaves().map(save=>save.characterName.trim().toLocaleLowerCase()));
+  const seen=new Set<string>();
+  return registeredCharacters.flatMap(player=>{
+    const key=player.name.trim().toLocaleLowerCase();
+    if(!key||!localNames.has(key)||seen.has(key))return [];
+    seen.add(key);
+    return [{id:player.id,name:player.name,registryPath:player.registryPath||""}];
+  });
+}
+function lockAtlasBackground(gate:HTMLElement,locked:boolean):void {
+  const dialog=gate.parentElement;
+  if(!dialog)return;
+  Array.from(dialog.children).forEach(child=>{
+    if(child===gate||!(child instanceof HTMLElement))return;
+    child.inert=locked;
+    if(locked)child.setAttribute("aria-hidden","true");
+    else child.removeAttribute("aria-hidden");
+  });
+}
+async function refreshAtlasPasswordMode(gate:HTMLElement):Promise<void> {
+  const select=gate.querySelector<HTMLSelectElement>("[data-world-atlas-player]");
+  const confirmRow=gate.querySelector<HTMLElement>("[data-world-atlas-confirm-row]");
+  const confirmInput=gate.querySelector<HTMLInputElement>("#world-atlas-password-confirm");
+  const button=gate.querySelector<HTMLButtonElement>("[data-world-atlas-submit]");
+  const message=gate.querySelector<HTMLElement>("[data-world-atlas-message]");
+  const password=gate.querySelector<HTMLInputElement>("#world-atlas-password");
+  const selected=select?.value||"";
+  const eligible=atlasEligiblePlayers().some(player=>player.name===selected);
+  if(!button||!confirmRow||!password)return;
+  if(!eligible){
+    confirmRow.hidden=true;
+    button.disabled=true;
+    if(message)message.textContent=atlasEligiblePlayers().length?"Select a registered character to continue.":"";
+    return;
+  }
+  try{
+    const exists=await hasAtlasPassword(selected);
+    confirmRow.hidden=exists;
+    if(confirmInput)confirmInput.required=!exists;
+    password.autocomplete=exists?"current-password":"new-password";
+    button.dataset.atlasMode=exists?"login":"signup";
+    button.textContent=exists?(button.dataset.loginLabel||"Sign in"):(button.dataset.signupLabel||"Sign up");
+    button.disabled=false;
+    if(message)message.textContent=exists?"Enter the local password for this character.":"This registered character has no local password yet. Create one to continue.";
+  }catch(error){
+    button.disabled=true;
+    if(message)message.textContent=error instanceof Error?error.message:"Secure local account storage is unavailable.";
+  }
+}
+function unlockAtlasBackground(gate:HTMLElement):void {
+  lockAtlasBackground(gate,false);
+  gate.hidden=true;
+}
+function closeWorldAtlas(syncHistory=true):void {
+  const modal=root.querySelector<HTMLElement>("[data-idle-rpg-modal]");
+  const trigger=root.querySelector<HTMLButtonElement>("[data-idle-rpg-open]");
+  const gate=modal?.querySelector<HTMLElement>("[data-world-atlas-gate]");
+  if(gate)unlockAtlasBackground(gate);
+  if(modal&&!modal.hidden)modal.hidden=true;
+  root.querySelector(".app-shell")?.classList.remove("is-idle-world");
+  trigger?.setAttribute("aria-expanded","false");
+  worldAtlasAuthenticated=false;
+  worldAtlasLoginBusy=false;
+  trigger?.focus();
+  if(syncHistory&&history.state?.idleRpgNotice)history.back();
+}
+async function openWorldAtlasFromTv():Promise<void> {
+  const modal=root.querySelector<HTMLElement>("[data-idle-rpg-modal]");
+  const trigger=root.querySelector<HTMLButtonElement>("[data-idle-rpg-open]");
+  const gate=modal?.querySelector<HTMLElement>("[data-world-atlas-gate]");
+  if(!modal||!gate)return;
+  if(!modal.hidden){closeWorldAtlas();return;}
+  modal.hidden=false;
+  root.querySelector(".app-shell")?.classList.add("is-idle-world");
+  trigger?.setAttribute("aria-expanded","true");
+  initializeWorldMapHierarchy(root);
+  history.pushState({idleRpgNotice:true,worldAtlasFromTv:true},"");
+  gate.hidden=false;
+  lockAtlasBackground(gate,true);
+  worldAtlasAuthenticated=false;
+  worldAtlasLoginBusy=false;
+  const select=gate.querySelector<HTMLSelectElement>("[data-world-atlas-player]");
+  const message=gate.querySelector<HTMLElement>("[data-world-atlas-message]");
+  const submit=gate.querySelector<HTMLButtonElement>("[data-world-atlas-submit]");
+  if(message)message.textContent="Verifying the registered player list and local journey saves…";
+  if(select)select.innerHTML='<option value="">Loading registered players…</option>';
+  if(submit)submit.disabled=true;
+  try{
+    let canon=getCanonStatus();
+    if(!canon.commitSha||canon.status==="error"){
+      const status=await refreshCanon();
+      canonMessage=status.message;
+      canon=getCanonStatus();
+    }
+    if(!canon.commitSha||canon.status==="error")throw new Error("The verified players.md snapshot is unavailable. Refresh the World Archive source and try again.");
+    while(playerRegistryBusy)await new Promise<void>(resolve=>window.setTimeout(resolve,60));
+    if(!registeredCharacters.length)await refreshPlayerRegistry();
+    const options=atlasEligiblePlayers();
+    const remembered=await restoreAtlasPlayer().catch(()=> "");
+    if(select){
+      select.innerHTML='<option value="">— Select a character —</option>'+options.map(player=>'<option value="'+escapeHtml(player.name)+'">'+escapeHtml(player.name)+'</option>').join("");
+      if(options.some(player=>player.name===remembered))select.value=remembered;
+      select.addEventListener("change",()=>{void refreshAtlasPasswordMode(gate);});
+    }
+    if(!options.length){
+      if(message)message.textContent="No eligible account found. A player must exist in the verified players.md registry and have a matching local Eternal Path save.";
+      if(submit)submit.disabled=true;
+    }else{
+      await refreshAtlasPasswordMode(gate);
+    }
+    requestAnimationFrame(()=>gate.querySelector<HTMLInputElement>("#world-atlas-player")?.focus());
+  }catch(error){
+    if(message)message.textContent=error instanceof Error?error.message:"Could not load registered player accounts.";
+    if(submit)submit.disabled=true;
   }
 }
 
@@ -964,6 +1088,13 @@ function selectArcanistDestination(place:HTMLElement):void{
 root.addEventListener("click", async (event: MouseEvent) => {
   const target = event.target;
   if (!(target instanceof Element)) return;
+  if(target.closest("[data-app-exit-no]")){
+    const panel=root.querySelector<HTMLElement>("[data-app-exit-panel]");if(panel)panel.hidden=true;return;
+  }
+  if(target.closest("[data-app-exit-yes]")){
+    const button=target.closest<HTMLButtonElement>("[data-app-exit-yes]");if(button)button.disabled=true;
+    await exitMerzkavaApplication();return;
+  }
   if(target.closest("[data-dev-login-open]")){
     const panel=root.querySelector<HTMLElement>("[data-dev-login-panel]");
     if(panel){panel.hidden=false;panel.querySelector<HTMLInputElement>("#developer-login-id")?.focus();}
@@ -1019,37 +1150,11 @@ root.addEventListener("click", async (event: MouseEvent) => {
   if(idlePlaceButton){selectArcanistDestination(idlePlaceButton);return;}
   if(target.closest("[data-arcanist-pull]")){const drawer=root.querySelector<HTMLElement>("[data-arcanist-device]");const trigger=root.querySelector<HTMLButtonElement>("[data-arcanist-pull]");const machine=root.querySelector<HTMLElement>("[data-arcanistry-machine]");if(drawer&&trigger){if(!drawer.hidden&&machine?.dataset.machineState!=="idle")return;drawer.hidden = !drawer.hidden;trigger.setAttribute("aria-expanded",String(!drawer.hidden));}return;}
   if(target.closest("[data-arcanist-close]")){const drawer=root.querySelector<HTMLElement>("[data-arcanist-device]");const trigger=root.querySelector<HTMLButtonElement>("[data-arcanist-pull]");const machine=root.querySelector<HTMLElement>("[data-arcanistry-machine]");if(machine&&machine.dataset.machineState!=="idle")return;if(drawer&&trigger){drawer.hidden=true;trigger.setAttribute("aria-expanded","false");}return;}
-  if (target.closest("[data-idle-rpg-open]")) {
-    const modal=root.querySelector<HTMLElement>("[data-idle-rpg-modal]");
-    const trigger=root.querySelector<HTMLButtonElement>("[data-idle-rpg-open]");
-    if(modal&&!modal.hidden){
-      modal.hidden=true;
-      root.querySelector(".app-shell")?.classList.remove("is-idle-world");
-      trigger?.setAttribute("aria-expanded","false");
-      trigger?.focus();
-      if(history.state?.idleRpgNotice) history.back();
-    } else if(modal){
-      modal.hidden=false;
-      root.querySelector(".app-shell")?.classList.add("is-idle-world");
-      trigger?.setAttribute("aria-expanded","true");
-      initializeWorldMapHierarchy(root);
-      history.pushState({idleRpgNotice:true},"");
-      modal.querySelector<HTMLButtonElement>("[data-idle-rpg-close]")?.focus();
-    }
-    return;
+  if(target.closest("[data-world-atlas-gate-back]")){
+    closeWorldAtlas();return;
   }
-  if (target.closest("[data-idle-rpg-close]")) {
-    const modal=root.querySelector<HTMLElement>("[data-idle-rpg-modal]");
-    const trigger=root.querySelector<HTMLButtonElement>("[data-idle-rpg-open]");
-    if(modal&&!modal.hidden){
-      modal.hidden=true;
-      root.querySelector(".app-shell")?.classList.remove("is-idle-world");
-      trigger?.setAttribute("aria-expanded","false");
-      trigger?.focus();
-      if(history.state?.idleRpgNotice) history.back();
-    }
-    return;
-  }
+  if (target.closest("[data-idle-rpg-open]")) { await openWorldAtlasFromTv(); return; }
+  if (target.closest("[data-idle-rpg-close]")) { closeWorldAtlas(); return; }
   if (target.closest("[data-eternal-manager-toggle]")) {
     const panel=root.querySelector<HTMLElement>("[data-eternal-manager-content]");
     const trigger=root.querySelector<HTMLButtonElement>(".expedition-manager-trigger");
@@ -1492,6 +1597,46 @@ root.addEventListener("change", async event => {
 root.addEventListener("submit", async (event: SubmitEvent) => {
   const form = event.target;
   if (!(form instanceof HTMLFormElement)) return;
+  if(form.id==="world-atlas-login-form"){
+    event.preventDefault();
+    if(worldAtlasLoginBusy)return;
+    const gate=form.closest<HTMLElement>("[data-world-atlas-gate]");
+    const data=new FormData(form);
+    const playerName=String(data.get("player")??"").trim();
+    const password=String(data.get("password")??"");
+    const confirmation=String(data.get("confirm")??"");
+    const remember=data.get("remember")==="yes";
+    const eligible=atlasEligiblePlayers().some(player=>player.name===playerName);
+    const message=gate?.querySelector<HTMLElement>("[data-world-atlas-message]");
+    const button=form.querySelector<HTMLButtonElement>("[data-world-atlas-submit]");
+    if(!gate||!eligible){if(message)message.textContent="This character is not registered in the verified players.md and local Eternal Path account list.";return;}
+    if(password.length<8||password.length>128){if(message)message.textContent="Use a password between 8 and 128 characters.";return;}
+    worldAtlasLoginBusy=true;if(button)button.disabled=true;
+    if(message)message.textContent="Checking local account credentials…";
+    try{
+      const exists=await hasAtlasPassword(playerName);
+      if(exists){
+        const valid=await verifyAtlasPassword(playerName,password);
+        if(!valid)throw new Error("Incorrect local password.");
+      }else{
+        if(password!==confirmation)throw new Error("The two passwords do not match.");
+        await setAtlasPassword(playerName,password);
+      }
+      await rememberAtlasPlayer(playerName,remember);
+      worldAtlasAuthenticated=true;
+      worldAtlasLoginBusy=false;
+      if(message)message.textContent="Access granted.";
+      form.querySelector<HTMLInputElement>("#world-atlas-password")!.value="";
+      const confirm=form.querySelector<HTMLInputElement>("#world-atlas-password-confirm");if(confirm)confirm.value="";
+      unlockAtlasBackground(gate);
+      gate.setAttribute("aria-hidden","true");
+    }catch(error){
+      worldAtlasLoginBusy=false;
+      if(message)message.textContent=error instanceof Error?error.message:"Local account verification failed.";
+      if(button)button.disabled=false;
+    }
+    return;
+  }
   if(form.id==="developer-login-form"){
     event.preventDefault();if(developerLoginBusy)return;
     const data=new FormData(form);
