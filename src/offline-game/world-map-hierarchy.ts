@@ -990,11 +990,13 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
   let data=readIsoMapData(board),selectedTransitionId:string|null=null;
   const history:IsoMapEditorData[]=[];
   const cellGroup=svg.querySelector<SVGGElement>("[data-wmh-manual-marks]");
+  const interactionGroup=svg.querySelector<SVGGElement>("[data-wmh-interaction-grid]");
   const transitionGroup=svg.querySelector<SVGGElement>("[data-wmh-transition-marks]");
   const status=()=>panel.querySelector<HTMLElement>("[data-wmh-overlay-status]");
   const setStatus=(message:string)=>{const node=status();if(node)node.textContent=message;};
   const modeSelect=panel.querySelector<HTMLSelectElement>("[data-wmh-overlay-mode]");
-  const mode=()=>modeSelect?.value||"foreground";
+  const walkableToggle=panel.querySelector<HTMLInputElement>("[data-wmh-walkable-enabled]");
+  const mode=()=>modeSelect?.value||"walkable";
   const transitionTools=panel.querySelector<HTMLElement>("[data-wmh-transition-tools]");
   const transitionField=panel.querySelector<HTMLInputElement>("[data-wmh-transition-label]");
   const exportField=panel.querySelector<HTMLTextAreaElement>("[data-wmh-overlay-export]");
@@ -1033,6 +1035,13 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
   }catch{}
   const remember=()=>{history.push(JSON.parse(JSON.stringify(data)) as IsoMapEditorData);if(history.length>40)history.shift();};
   const redraw=()=>{
+    if(interactionGroup){
+      interactionGroup.innerHTML=data.walkableCells.map(key=>{
+        const [x,y]=key.split(",").map(Number),c=isoCellCenter(x,y,grid),hw=grid.tileW/2,hh=grid.tileH/2;
+        const points=[c.x+","+(c.y-hh),(c.x+hw)+","+c.y,c.x+","+(c.y+hh),(c.x-hw)+","+c.y].join(" ");
+        return '<polygon class="wmh-walkable-cell" points="'+points+'" aria-label="Walkable image cell '+x+', '+y+'"/>';
+      }).join("");
+    }
     if(cellGroup){
       const marks:string[]=[];
       const add=(cells:string[],cls:string,symbol:string)=>{
@@ -1042,13 +1051,25 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
           marks.push('<g class="wmh-cell-mark '+cls+'"><polygon points="'+points+'"/><text x="'+c.x+'" y="'+c.y+'" text-anchor="middle" dominant-baseline="central">'+symbol+'</text></g>');
         }
       };
+      const addQuadrants=(cells:string[],cls:string,symbol:string)=>{
+        for(const key of cells){
+          const match=/^([0-9]+),([0-9]+):(tl|tr|bl|br)$/.exec(key);if(!match)continue;
+          const x=Number(match[1]),y=Number(match[2]),q=match[3] as IsoQuadrant;
+          const points=isoQuadrantTrianglePoints(x,y,q,grid);
+          const vertices=points.split(" ").map(point=>point.split(",").map(Number));
+          const cx=vertices.reduce((sum,p)=>sum+p[0],0)/vertices.length,cy=vertices.reduce((sum,p)=>sum+p[1],0)/vertices.length;
+          marks.push('<g class="wmh-cell-mark '+cls+' is-quadrant"><polygon points="'+points+'"/><text x="'+cx+'" y="'+cy+'" text-anchor="middle" dominant-baseline="central">'+symbol+'</text></g>');
+        }
+      };
       add(data.foregroundCells,"is-foreground","○");add(data.blockedCells,"is-blocked","X");add(data.opacityCells,"is-opacity","◌");
+      addQuadrants(data.foregroundQuadrants,"is-foreground","○");addQuadrants(data.blockedQuadrants,"is-blocked","X");addQuadrants(data.opacityQuadrants,"is-opacity","◌");
       cellGroup.innerHTML=marks.join("");
     }
     if(transitionGroup)transitionGroup.innerHTML=data.transitions.map(marker=>{
       const c=isoCellCenter(marker.x,marker.y,grid),label=escapeMapEditorText(marker.label);
       return '<g class="wmh-transition-marker '+(marker.label.trim()?"is-named":"is-unlabelled")+(selectedTransitionId===marker.id?" is-selected":"")+'" data-transition-id="'+escapeMapEditorText(marker.id)+'" transform="translate('+c.x+" "+c.y+')"><circle r="11"></circle><text text-anchor="middle" dominant-baseline="central">'+(marker.label.trim()?"↗":"?")+'</text><title>'+(label||"UNLABELLED TRANSITION")+'</title></g>';
     }).join("");
+    if(walkableToggle)walkableToggle.checked=data.walkableAreaEnabled;
   };
   const persist=()=>{
     data.grid={...grid};
