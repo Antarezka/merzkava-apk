@@ -722,11 +722,13 @@ async function refreshAtlasPasswordMode(gate:HTMLElement):Promise<void> {
   const button=gate.querySelector<HTMLButtonElement>("[data-world-atlas-submit]");
   const message=gate.querySelector<HTMLElement>("[data-world-atlas-message]");
   const password=gate.querySelector<HTMLInputElement>("#world-atlas-password");
+  const safetyNote=gate.querySelector<HTMLElement>("[data-password-safety-note]");
   const selected=select?.value||"";
   const eligible=atlasEligiblePlayers().some(player=>player.name===selected);
   if(!button||!confirmRow||!password)return;
   if(!eligible){
     confirmRow.hidden=true;
+    if(safetyNote)safetyNote.hidden=true;
     button.disabled=true;
     if(message)message.textContent=atlasEligiblePlayers().length?(gate.dataset.selectLabel||"Select a registered character to continue."):(gate.dataset.emptyLabel||"");
     return;
@@ -734,6 +736,7 @@ async function refreshAtlasPasswordMode(gate:HTMLElement):Promise<void> {
   try{
     const exists=await hasAtlasPassword(selected);
     confirmRow.hidden=exists;
+    if(safetyNote)safetyNote.hidden=exists;
     if(confirmInput)confirmInput.required=!exists;
     password.autocomplete=exists?"current-password":"new-password";
     button.dataset.atlasMode=exists?"login":"signup";
