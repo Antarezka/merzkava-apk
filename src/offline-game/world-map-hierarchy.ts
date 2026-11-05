@@ -5,8 +5,8 @@ import { animateExpeditionPanel } from "./expedition-animations";
 import { getEternalSave, getExpeditionAtmosphere } from "./expedition-game";
 import {
   createIsoMapEditorData, DEFAULT_ISOMETRIC_GRID, DEFAULT_ISO_CANVAS_EXPANSION, normalizeIsoCanvasExpansion, isoCellAtPoint, isoCellCenter, isoCellHasLayer,
-  isoCellKey, isoMapStorageKey, normalizeIsoMapEditorData, toggleIsoCellLayer,
-  type IsoCellLayer, type IsoMapEditorData, type IsoMapGridConfig,
+  isoCellKey, isoMapStorageKey, isoQuadrantAtPoint, isoQuadrantHasLayer, isoQuadrantKey, normalizeIsoMapEditorData, toggleIsoCellLayer, toggleIsoQuadrantLayer,
+  type IsoCellLayer, type IsoMapEditorData, type IsoMapGridConfig, type IsoQuadrant, type IsoQuadrantLayer,
 } from "./isometric-map-editor";
 import { renderIsometricSvgSceneMarkup, refreshIsometricSvgScene, type IsometricSvgTheme } from "./isometric-svg-board";
 
@@ -664,6 +664,30 @@ function makeIsometricMapId(regionId: RegionId, selectedBuilding: string, interi
   const slug=selectedBuilding.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
   return regionId+":"+(slug||"unnamed-area")+":"+(interior?"interior":"exterior");
 }
+function isoCellIsWalkable(data:IsoMapEditorData,x:number,y:number):boolean {
+  return (!data.walkableAreaEnabled||data.walkableCells.includes(isoCellKey(x,y)))&&!isoCellHasLayer(data,"blockedCells",x,y);
+}
+function isoCanStep(data:IsoMapEditorData,fromX:number,fromY:number,toX:number,toY:number):boolean {
+  if(!isoCellIsWalkable(data,toX,toY))return false;
+  const edges:Record<string,[IsoQuadrant,IsoQuadrant]>={"1,0":["br","tl"],"-1,0":["tl","br"],"0,1":["bl","tr"],"0,-1":["tr","bl"]};
+  const edge=edges[(toX-fromX)+","+(toY-fromY)];
+  return !!edge&&!isoQuadrantHasLayer(data,"blockedQuadrants",fromX,fromY,edge[0])&&!isoQuadrantHasLayer(data,"blockedQuadrants",toX,toY,edge[1]);
+}
+function isoQuadrantTrianglePoints(x:number,y:number,quadrant:IsoQuadrant,grid:IsoMapGridConfig):string {
+  const c=isoCellCenter(x,y,grid),top={x:c.x,y:c.y-grid.tileH/2},right={x:c.x+grid.tileW/2,y:c.y},bottom={x:c.x,y:c.y+grid.tileH/2},left={x:c.x-grid.tileW/2,y:c.y},center={x:c.x,y:c.y};
+  const triangles:Record<IsoQuadrant,Array<{x:number;y:number}>>={tl:[top,center,left],tr:[top,right,center],bl:[left,center,bottom],br:[center,right,bottom]};
+  return triangles[quadrant].map(point=>point.x+","+point.y).join(" ");
+}
+function academyInteractionGridMarkup(grid:IsoMapGridConfig,data:IsoMapEditorData):string {
+  const cells:string[]=[];
+  for(let y=0;y<grid.rows;y++)for(let x=0;x<grid.cols;x++){
+    const c=isoCellCenter(x,y,grid),hw=grid.tileW/2,hh=grid.tileH/2;
+    const points=[c.x+","+(c.y-hh),(c.x+hw)+","+c.y,c.x+","+(c.y+hh),(c.x-hw)+","+c.y].join(" ");
+    const selected=data.walkableCells.includes(isoCellKey(x,y));
+    cells.push('<polygon class="wmh-academy-hit-cell'+(selected?' is-walkable':'')+'" data-wmh-tile data-x="'+x+'" data-y="'+y+'" data-z="0" data-tile-id="academy-'+x+'-'+y+'" data-surface="earth" points="'+points+'" aria-label="Grid tile '+x+', '+y+'"/>');
+  }
+  return cells.join("");
+}
 function escapeMapEditorText(value: unknown): string {
   return String(value).replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]||char));
 }
@@ -742,7 +766,7 @@ function drawIsometricForeground(board:HTMLElement,data=readIsoMapData(board)):v
 }
 function isoCanWalkTile(board:HTMLElement,tile:HTMLElement|null,x:number,y:number,data=readIsoMapData(board)):boolean {
   if(!tile)return false;
-  return !isoCellHasLayer(data,"blockedCells",x,y);
+  return isoCellIsWalkable(data,x,y);
 }
 function renderIsometricWorldStatus(dialog:HTMLElement):void {
   const hud=dialog.querySelector<HTMLElement>("[data-wmh-isometric-hud]");
