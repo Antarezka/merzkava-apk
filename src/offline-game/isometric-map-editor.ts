@@ -274,6 +274,15 @@ export function isoQuadrantAtPoint(
   return "br";
 }
 
+/** Distinguish a deliberate cell tap from a map-pan gesture. */
+export function isoPointerGesture(
+  start: IsoMapPoint,
+  end: IsoMapPoint,
+  threshold = 8,
+): "tap" | "drag" {
+  return Math.hypot(end.x - start.x, end.y - start.y) < threshold ? "tap" : "drag";
+}
+
 export function isoCellCenter(
   x: number,
   y: number,
