@@ -217,7 +217,7 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
       if(academyGrid){
         academyGrid.setAttribute("viewBox","0 0 "+baseWidth+" "+baseHeight);
         academyGrid.innerHTML=academyMarginGridMarkup(
-          baseWidth,baseHeight,academyMarginX,academyMarginY,academyImageWidth,academyImageHeight,cellW,cellH
+          baseWidth,baseHeight,academyMarginLeft,academyMarginY,academyImageWidth,academyImageHeight,cellW,cellH
         );
       }
     }else{
