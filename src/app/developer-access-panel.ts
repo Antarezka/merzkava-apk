@@ -4,27 +4,27 @@ type AccessMode = "player" | "developer";
 
 const labels:Record<AppLanguage,{
   open:string;title:string;id:string;password:string;remember:string;submit:string;close:string;control:string;lock:string;
-  playerMode:string;developerMode:string;playerName:string;playerContinue:string;playerHint:string;
+  playerMode:string;developerMode:string;playerName:string;playerContinue:string;playerHint:string;playerLogout:string;
 }> = {
-  id:{open:"Akses pengembang",title:"Akses Akun",id:"ID pengembang",password:"Kata sandi",remember:"Ingat saya di perangkat ini",submit:"Masuk",close:"Tutup",control:"Floating Control",lock:"Kunci",playerMode:"Pemain",developerMode:"Developer",playerName:"Nama karakter",playerContinue:"Lanjutkan",playerHint:"Gunakan nama yang sama persis seperti di registry resmi players.md."},
-  en:{open:"Developer access",title:"Account Access",id:"Developer ID",password:"Password",remember:"Remember me on this device",submit:"Sign in",close:"Close",control:"Floating Control",lock:"Lock",playerMode:"Player",developerMode:"Developer",playerName:"Registered character name",playerContinue:"Continue",playerHint:"Enter the exact name shown in the official players.md registry."},
-  pt:{open:"Acesso do desenvolvedor",title:"Acesso à conta",id:"ID do desenvolvedor",password:"Senha",remember:"Lembrar neste dispositivo",submit:"Entrar",close:"Fechar",control:"Floating Control",lock:"Bloquear",playerMode:"Jogador",developerMode:"Developer",playerName:"Nome do personagem registrado",playerContinue:"Continuar",playerHint:"Digite o nome exatamente como aparece no registro oficial players.md."},
-  fr:{open:"Accès développeur",title:"Accès au compte",id:"Identifiant développeur",password:"Mot de passe",remember:"Se souvenir sur cet appareil",submit:"Connexion",close:"Fermer",control:"Floating Control",lock:"Verrouiller",playerMode:"Joueur",developerMode:"Developer",playerName:"Nom du personnage enregistré",playerContinue:"Continuer",playerHint:"Saisissez le nom exactement comme dans le registre officiel players.md."},
-  ru:{open:"Доступ разработчика",title:"Доступ к аккаунту",id:"ID разработчика",password:"Пароль",remember:"Запомнить на этом устройстве",submit:"Войти",close:"Закрыть",control:"Floating Control",lock:"Заблокировать",playerMode:"Игрок",developerMode:"Developer",playerName:"Имя зарегистрированного персонажа",playerContinue:"Продолжить",playerHint:"Введите имя в точном соответствии с официальным реестром players.md."},
-  ja:{open:"開発者アクセス",title:"アカウントアクセス",id:"開発者ID",password:"パスワード",remember:"この端末でログイン状態を保持",submit:"ログイン",close:"閉じる",control:"Floating Control",lock:"ロック",playerMode:"プレイヤー",developerMode:"Developer",playerName:"登録キャラクター名",playerContinue:"続行",playerHint:"公式 players.md レジストリと完全に一致する名前を入力してください。"},
-  "zh-CN":{open:"开发者入口",title:"账户入口",id:"开发者 ID",password:"密码",remember:"在此设备上记住我",submit:"登录",close:"关闭",control:"Floating Control",lock:"锁定",playerMode:"玩家",developerMode:"Developer",playerName:"已登记角色名称",playerContinue:"继续",playerHint:"请输入与官方 players.md 注册表完全一致的名称。"},
-  ko:{open:"개발자 접근",title:"계정 접근",id:"개발자 ID",password:"비밀번호",remember:"이 기기에서 기억하기",submit:"로그인",close:"닫기",control:"Floating Control",lock:"잠금",playerMode:"플레이어",developerMode:"Developer",playerName:"등록된 캐릭터 이름",playerContinue:"계속",playerHint:"공식 players.md 레지스트리에 있는 이름과 정확히 일치하게 입력하세요."}
+  id:{open:"Akses pengembang",title:"Akses Akun",id:"ID pengembang",password:"Kata sandi",remember:"Ingat saya di perangkat ini",submit:"Masuk",close:"Tutup",control:"Floating Control",lock:"Kunci",playerMode:"Pemain",developerMode:"Developer",playerName:"Nama karakter",playerContinue:"Lanjutkan",playerHint:"Gunakan nama yang sama persis seperti di registry resmi players.md.",playerLogout:"Keluar"},
+  en:{open:"Developer access",title:"Account Access",id:"Developer ID",password:"Password",remember:"Remember me on this device",submit:"Sign in",close:"Close",control:"Floating Control",lock:"Lock",playerMode:"Player",developerMode:"Developer",playerName:"Registered character name",playerContinue:"Continue",playerHint:"Enter the exact name shown in the official players.md registry.",playerLogout:"Sign out"},
+  pt:{open:"Acesso do desenvolvedor",title:"Acesso à conta",id:"ID do desenvolvedor",password:"Senha",remember:"Lembrar neste dispositivo",submit:"Entrar",close:"Fechar",control:"Floating Control",lock:"Bloquear",playerMode:"Jogador",developerMode:"Developer",playerName:"Nome do personagem registrado",playerContinue:"Continuar",playerHint:"Digite o nome exatamente como aparece no registro oficial players.md.",playerLogout:"Sair"},
+  fr:{open:"Accès développeur",title:"Accès au compte",id:"Identifiant développeur",password:"Mot de passe",remember:"Se souvenir sur cet appareil",submit:"Connexion",close:"Fermer",control:"Floating Control",lock:"Verrouiller",playerMode:"Joueur",developerMode:"Developer",playerName:"Nom du personnage enregistré",playerContinue:"Continuer",playerHint:"Saisissez le nom exactement comme dans le registre officiel players.md.",playerLogout:"Déconnexion"},
+  ru:{open:"Доступ разработчика",title:"Доступ к аккаунту",id:"ID разработчика",password:"Пароль",remember:"Запомнить на этом устройстве",submit:"Войти",close:"Закрыть",control:"Floating Control",lock:"Заблокировать",playerMode:"Игрок",developerMode:"Developer",playerName:"Имя зарегистрированного персонажа",playerContinue:"Продолжить",playerHint:"Введите имя в точном соответствии с официальным реестром players.md.",playerLogout:"Выйти"},
+  ja:{open:"開発者アクセス",title:"アカウントアクセス",id:"開発者ID",password:"パスワード",remember:"この端末でログイン状態を保持",submit:"ログイン",close:"閉じる",control:"Floating Control",lock:"ロック",playerMode:"プレイヤー",developerMode:"Developer",playerName:"登録キャラクター名",playerContinue:"続行",playerHint:"公式 players.md レジストリと完全に一致する名前を入力してください。",playerLogout:"ログアウト"},
+  "zh-CN":{open:"开发者入口",title:"账户入口",id:"开发者 ID",password:"密码",remember:"在此设备上记住我",submit:"登录",close:"关闭",control:"Floating Control",lock:"锁定",playerMode:"玩家",developerMode:"Developer",playerName:"已登记角色名称",playerContinue:"继续",playerHint:"请输入与官方 players.md 注册表完全一致的名称。",playerLogout:"退出"},
+  ko:{open:"개발자 접근",title:"계정 접근",id:"개발자 ID",password:"비밀번호",remember:"이 기기에서 기억하기",submit:"로그인",close:"닫기",control:"Floating Control",lock:"잠금",playerMode:"플레이어",developerMode:"Developer",playerName:"등록된 캐릭터 이름",playerContinue:"계속",playerHint:"공식 players.md 레지스트리에 있는 이름과 정확히 일치하게 입력하세요.",playerLogout:"로그아웃"}
 };
 
 function escape(value:string):string {
   return value.replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]||char));
 }
 
-export function developerHeaderControls(language:AppLanguage,authenticated:boolean):string {
+export function developerHeaderControls(language:AppLanguage,authenticated:boolean,playerAuthenticated:boolean=false):string {
   const t=labels[language]||labels.en;
-  return authenticated
-    ? '<button type="button" class="developer-tools-open" data-dev-open-control>'+t.control+'</button><button type="button" class="developer-tools-lock" data-dev-logout>'+t.lock+'</button>'
-    : '<button type="button" class="developer-access-key" data-dev-login-open aria-label="'+t.open+'" title="'+t.open+'">⌑</button>';
+  if(authenticated) return '<button type="button" class="developer-tools-open" data-dev-open-control>'+t.control+'</button><button type="button" class="developer-tools-lock" data-dev-logout>'+t.lock+'</button>';
+  if(playerAuthenticated) return '<button type="button" class="developer-player-logout" data-player-logout>'+t.playerLogout+'</button>';
+  return '<button type="button" class="developer-access-key" data-dev-login-open aria-label="'+t.open+'" title="'+t.open+'">⌑</button>';
 }
 
 export function developerLoginPanel(
