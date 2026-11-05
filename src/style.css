@@ -399,7 +399,6 @@ body:has(.noticeboard-backdrop){overflow:hidden;overscroll-behavior:none;}
 .ledger-bubble.tone-positive { border-color:#8b9a78; }
 .ledger-bubble.tone-negative { border-color:#b58c83; }
 .ledger-bubble.tone-neutral { border-color:#b9a779; }
-.ledger-bubble.is-popping { animation: ledger-bubble-pop .22s ease-out forwards; }
 @keyframes ledger-soap-float {
   0% { opacity:0; transform:translate3d(0,0,0) scale(.72); }
   8% { opacity:1; transform:translate3d(-8px,-8vh,0) scale(1); }
@@ -410,7 +409,6 @@ body:has(.noticeboard-backdrop){overflow:hidden;overscroll-behavior:none;}
   88% { opacity:.92; transform:translate3d(7px,-98vh,0) scale(.96); }
   100% { opacity:0; transform:translate3d(-5px,-116vh,0) scale(.9); }
 }
-@keyframes ledger-bubble-pop { to { opacity:0; transform:scale(1.14); } }
 :root[data-theme="dark"] .ledger-bubble {
   border-color:#b8a06c; color:#e8e0cf;
   background:radial-gradient(ellipse at 28% 12%,#657064f0 0%,#344139f0 55%,#26332bf0 100%);
