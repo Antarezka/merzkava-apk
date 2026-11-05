@@ -400,3 +400,32 @@
 .idle-home-dialog .wmh-bottom-actions{margin-bottom:8px}
 .idle-home-dialog>.idle-region-switch,.idle-home-dialog>.idle-navigation-layout{display:none!important}
 .idle-home-dialog .idle-home-header small{color:#d5bd90}
+
+
+/* Opaque left-side transit panel: keep the world map visible beside it. */
+.arcanist-device-drawer{
+  width:min(460px,86vw);
+  max-width:86vw;
+  background:#111713;
+  opacity:1;
+  backdrop-filter:none;
+}
+.arcanist-machine-shell{
+  background:#1b211b;
+  opacity:1;
+}
+.arcanist-destination-panel{
+  background:#171d18;
+}
+.arcanist-lever-panel{
+  background:#1b211b;
+}
+.arcanist-transmission-bay{
+  background:#171d18;
+}
+.arcanist-machine-status{
+  background:#171d18;
+}
+@media(max-width:360px){
+  .arcanist-device-drawer{width:84vw;max-width:84vw}
+}
