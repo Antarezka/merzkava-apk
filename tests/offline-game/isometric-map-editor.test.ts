@@ -4,6 +4,7 @@ import {
   ACADEMY_MAP_BASE_DIMENSIONS,
   createIsoMapEditorData,
   DEFAULT_ISOMETRIC_GRID,
+  DEFAULT_ISO_CANVAS_EXPANSION,
   isoMapBoardSize,
   isoCellAtPoint,
   isoCellCenter,
@@ -15,6 +16,12 @@ import {
 } from "../../src/offline-game/isometric-map-editor";
 
 describe("shared isometric map editor data", () => {
+  it("provides default gaps for all four canvas sides", () => {
+    expect(DEFAULT_ISO_CANVAS_EXPANSION).toEqual({ top: 0, bottom: 0, left: 800, right: 0 });
+    expect(normalizeIsoCanvasExpansion({})).toEqual(DEFAULT_ISO_CANVAS_EXPANSION);
+    expect(normalizeIsoCanvasExpansion({ left: 1200 })).toEqual({ top: 0, bottom: 0, left: 1200, right: 0 });
+  });
+
   it("normalizes four independent canvas expansion values", () => {
     expect(normalizeIsoCanvasExpansion({ top: 250, bottom: 500, left: 900, right: -2 }))
       .toEqual({ top: 250, bottom: 500, left: 900, right: 0 });
