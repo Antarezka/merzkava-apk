@@ -622,7 +622,7 @@ function isometricNpcTokensMarkup(mapId:string,interior:boolean):string {
           ? [{id:"bg-guide",x:4,y:4,gender:"male" as const},{id:"bg-trainee",x:12,y:9,gender:"female" as const},{id:"bg-attendant",x:20,y:5,gender:"male" as const}]
           : [{id:"gde-warden",x:3,y:4,gender:"male" as const},{id:"gde-herbalist",x:12,y:9,gender:"female" as const}];
   return (maps[mapId]||fallback).map(npc =>
-    '<button type="button" class="wmh-character-token wmh-npc-token '+(npc.gender==="female"?"is-female":"is-male")+'" data-wmh-npc="'+npc.id+'" data-token-label="'+(mapId.startsWith("isometric-render-test:")?(npc.id==="test-guide"?"GUIDE":npc.id==="test-scholar"?"SCHOLAR":"ARTIFICER"):"")+'" data-x="'+npc.x+'" data-y="'+npc.y+'" style="--token-x:'+npc.x+';--token-y:'+npc.y+'" aria-label="Talk to '+npc.id+'"><i></i></button>'
+    '<button type="button" class="wmh-character-token wmh-npc-token '+(npc.gender==="female"?"is-female":"is-male")+'" data-wmh-npc="'+npc.id+'" data-scan-tone="'+(npc.scanTone||"unknown")+'" data-token-label="'+(mapId.startsWith("isometric-render-test:")?(npc.id==="test-guide"?"GUIDE":npc.id==="test-scholar"?"SCHOLAR":"ARTIFICER"):"")+'" data-x="'+npc.x+'" data-y="'+npc.y+'" style="--token-x:'+npc.x+';--token-y:'+npc.y+'" aria-label="Talk to '+npc.id+'"><i></i></button>'
   ).join("");
 }
 
@@ -661,7 +661,7 @@ function tileMapMarkup(
       'px;--iso-half-w:'+(tileW/2)+'px;--iso-half-h:'+(tileH/2)+'px;--iso-offset-y:0px;--slab-depth:7px" data-cols="'+cols+'" data-rows="'+rows+
       '" data-tile-w="'+tileW+'" data-tile-h="'+tileH+'" data-offset-x="0" data-offset-y="0" data-map-id="'+escapeMapEditorText(mapId)+'">'+tiles+
       '<svg class="wmh-area-overlay-svg" data-wmh-overlay-svg viewBox="0 0 '+projectedWidth+' '+projectedHeight+'" preserveAspectRatio="none"><g data-wmh-interaction-grid></g><g data-wmh-overlay-marks></g><g data-wmh-manual-marks></g><g data-wmh-transition-marks></g><path data-wmh-overlay-preview class="wmh-area-mark-preview" d=""></path></svg>'+
-      '<button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token data-token-label="YOU" data-x="5" data-y="10" style="--token-x:5;--token-y:10" aria-label="Player character"><i></i></button>'+npcTokens+
+      '<button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token data-scan-tone="unknown" data-token-label="YOU" data-x="5" data-y="10" style="--token-x:5;--token-y:10" aria-label="Player character"><i></i></button>'+npcTokens+
       '</div></div></div>';
   }
 
@@ -698,7 +698,7 @@ function tileMapMarkup(
     '" data-map-theme="'+theme+'" data-map-title="'+escapeMapEditorText(title)+'" data-map-interior="'+String(interior)+'">'+
     imageMarkup+sceneMarkup+
     '<svg class="wmh-area-overlay-svg" data-wmh-overlay-svg viewBox="0 0 '+boardWidth+' '+boardHeight+'" preserveAspectRatio="none"><g data-wmh-overlay-marks></g><g data-wmh-manual-marks></g><g data-wmh-transition-marks></g><path data-wmh-overlay-preview class="wmh-area-mark-preview" d=""></path></svg>'+
-    '<button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token data-token-label="" data-x="5" data-y="'+(interior?8:17)+'" style="--token-x:5;--token-y:'+(interior?8:17)+'" aria-label="Player character"><i></i></button>'+npcTokens+
+    '<button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token data-scan-tone="unknown" data-token-label="" data-x="5" data-y="'+(interior?8:17)+'" style="--token-x:5;--token-y:'+(interior?8:17)+'" aria-label="Player character"><i></i></button>'+npcTokens+
     '</div></div></div>';
 }
 function isometricMapBaseFor(regionId: RegionId, selectedBuilding: string, interior: boolean): string {
@@ -1367,9 +1367,39 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     });
     redraw();drawIsometricForeground(board,data);syncIsoDepthAndOcclusion(board);
   };
+  let editorModeActive=false;
+  const restoreWorkbench=()=>{
+    if(!editorModeActive)return;
+    panel.hidden=false;toggle.hidden=true;
+    toggle.setAttribute("aria-pressed","true");
+    toggle.setAttribute("aria-expanded","true");
+    toggle.setAttribute("aria-label","Editor panel open");
+    const reduceMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches===true;
+    if(workbench){
+      if(reduceMotion){workbench.style.transform="translateX(0%)";workbench.style.opacity="1";}
+      else animate(workbench,{translateX:["105%","0%"],opacity:[0,1],duration:360,ease:"outCubic"});
+    }
+  };
+  const minimizeWorkbench=()=>{
+    if(!editorModeActive||panel.hidden)return;
+    toggle.hidden=false;
+    toggle.setAttribute("aria-pressed","true");
+    toggle.setAttribute("aria-expanded","false");
+    toggle.setAttribute("aria-label","Restore minimized editor panel; editor mode remains active");
+    const reduceMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches===true;
+    if(workbench&&!reduceMotion){
+      animate(workbench,{translateX:["0%","105%"],opacity:[1,0],duration:260,ease:"inCubic",onComplete:()=>{panel.hidden=true;}});
+    }else{
+      panel.hidden=true;
+      if(workbench){workbench.style.transform="translateX(105%)";workbench.style.opacity="0";}
+    }
+  };
   const setActive=(active:boolean)=>{
+    if(active&&editorModeActive){restoreWorkbench();return;}
+    if(!active&&!editorModeActive){panel.hidden=true;toggle.hidden=false;return;}
     const cameraViewport=board.closest<HTMLElement>("[data-wmh-map-viewport],[data-wmh-iso-viewport]");
     const cameraScrollBefore=cameraViewport?{left:cameraViewport.scrollLeft,top:cameraViewport.scrollTop}:null;
+    editorModeActive=active;
     if(active){
       stopNpcWander(dialog);
       const chat=dialog.querySelector<HTMLElement>("[data-wmh-chat]");
@@ -1386,6 +1416,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       board.classList.add("wmh-overlay-editing","wmh-editor-paused");
       board.querySelectorAll<HTMLElement>("[data-wmh-player-token],[data-wmh-npc]").forEach(token=>token.getAnimations().forEach(animation=>animation.pause()));
       if(!relocateActorsFromBlockedCells(board,data))setStatus("Warning: this map has no free cell for one or more characters. Clear some X cells before resuming play.");
+      panel.hidden=false;toggle.hidden=true;
     }else{
       board.dataset.editorPaused="false";
       board.classList.remove("wmh-overlay-editing","wmh-editor-paused");
@@ -1404,33 +1435,35 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       renderIsometricMinimap(board);
       renderIsometricWorldStatus(dialog);
       selectedTransitionId=null;
+      toggle.hidden=false;
     }
     const reduceMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches===true;
-    if(active){
-      panel.hidden=false;
-      if(workbench){
-        if(reduceMotion){workbench.style.transform="translateX(0%)";workbench.style.opacity="1";}
-        else animate(workbench,{translateX:["105%","0%"],opacity:[0,1],duration:390,ease:"outCubic"});
-      }
-    }else if(workbench&&!panel.hidden&&!reduceMotion){
+    if(!active&&workbench&&!panel.hidden&&!reduceMotion){
       animate(workbench,{translateX:["0%","105%"],opacity:[1,0],duration:330,ease:"inCubic",onComplete:()=>{panel.hidden=true;}});
-    }else{
+    }else if(!active){
       panel.hidden=true;
       if(workbench){workbench.style.transform="translateX(105%)";workbench.style.opacity="0";}
+    }else if(workbench){
+      if(reduceMotion){workbench.style.transform="translateX(0%)";workbench.style.opacity="1";}
+      else animate(workbench,{translateX:["105%","0%"],opacity:[0,1],duration:390,ease:"outCubic"});
     }
-    toggle.hidden=active;
-    toggle.setAttribute("aria-pressed",String(active));
-    toggle.setAttribute("aria-expanded",String(active));
-    // Editor visibility may trigger layout recalculation, but it must never
-    // reset the live camera anchor or active zoom.
+    toggle.setAttribute("aria-pressed",String(editorModeActive));
+    toggle.setAttribute("aria-expanded",String(editorModeActive&&!panel.hidden));
+    toggle.setAttribute("aria-label",editorModeActive?"Restore map editor":"Open map editor");
+    // Opening, minimizing, restoring and leaving the editor must never reset the map camera.
     if(cameraViewport&&cameraScrollBefore)requestAnimationFrame(()=>{
       cameraViewport.scrollLeft=cameraScrollBefore.left;
       cameraViewport.scrollTop=cameraScrollBefore.top;
     });
   };
   let suppressToggleClick=false;
-  toggle.addEventListener("click",()=>{if(suppressToggleClick){suppressToggleClick=false;return;}setActive(panel.hidden);});
-  dialog.querySelector<HTMLElement>("[data-wmh-overlay-close]")?.addEventListener("click",()=>setActive(false));
+  toggle.addEventListener("click",()=>{
+    if(suppressToggleClick){suppressToggleClick=false;return;}
+    if(editorModeActive){restoreWorkbench();return;}
+    setActive(true);
+  });
+  panel.querySelector<HTMLElement>("[data-wmh-overlay-minimize]")?.addEventListener("click",minimizeWorkbench);
+  panel.querySelectorAll<HTMLElement>("[data-wmh-overlay-close]").forEach(button=>button.addEventListener("click",()=>setActive(false)));
 
   // The bubble can be dragged anywhere inside the isometric play area.
   toggle.addEventListener("pointerdown",event=>{
@@ -1458,7 +1491,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
   // Drag the workbench by its top header; controls and the close button remain clickable.
   const dragHandle=workbench?.querySelector<HTMLElement>("[data-wmh-overlay-drag-handle]");
   dragHandle?.addEventListener("pointerdown",event=>{
-    if((event.target as Element).closest("[data-wmh-overlay-close],[data-wmh-panel-resize-handle]"))return;
+    if((event.target as Element).closest("[data-wmh-overlay-close],[data-wmh-overlay-minimize],[data-wmh-panel-resize-handle]"))return;
     event.preventDefault();
     const container=panel.getBoundingClientRect(),rect=workbench!.getBoundingClientRect();
     const startX=event.clientX,startY=event.clientY,left=rect.left-container.left,top=rect.top-container.top;
@@ -2017,7 +2050,7 @@ function isometricPlayMarkup(regionId: RegionId, selectedBuilding: string, inter
       '<img class="wmh-academy-map-art" data-wmh-academy-map-art data-wmh-map-art src="'+academyMapImage+'" alt="Tianhai Academy full map" draggable="false" loading="eager" decoding="async"/>'+
       '<canvas class="wmh-isometric-foreground" data-wmh-foreground-canvas aria-hidden="true"></canvas>'+
       '<svg class="wmh-area-overlay-svg wmh-academy-grid-overlay" data-wmh-overlay-svg viewBox="0 0 2816 1536" preserveAspectRatio="none" aria-label="Editable isometric interaction grid"><g data-wmh-interaction-grid></g><g data-wmh-overlay-marks></g><g data-wmh-manual-marks></g><g data-wmh-transition-marks></g><path data-wmh-overlay-preview class="wmh-area-mark-preview" d=""></path></svg>'+
-      '<div class="wmh-academy-actor-layer" data-wmh-actor-layer><button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token data-token-label="" data-x="12" data-y="31" aria-label="Player character"><i></i></button>'+isometricNpcTokensMarkup(academyMapId,false)+'<div data-wmh-transition-layer></div></div>'+
+      '<div class="wmh-academy-actor-layer" data-wmh-actor-layer><button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token data-scan-tone="unknown" data-token-label="" data-x="12" data-y="31" aria-label="Player character"><i></i></button>'+isometricNpcTokensMarkup(academyMapId,false)+'<div data-wmh-transition-layer></div></div>'+
       '</div></div>'+isometricHudMarkup("Tianhai Academy",academyMapImage,false)+academyCanvasEditorMarkup()+isometricEditorMarkup()+
       '<button type="button" class="wmh-map-back wmh-academy-map-back" data-wmh-action="back" aria-label="Return to Golden Dragon Empire map"><i class="wmh-academy-back-icon" aria-hidden="true"></i><b>GOLDEN DRAGON EMPIRE</b></button>'+
       '<section class="wmh-chat-panel" data-wmh-chat hidden role="dialog" aria-label="Character conversation"><div class="wmh-chat-card"><button type="button" class="wmh-chat-close" data-wmh-action="chat-close" aria-label="Close conversation">×</button><div class="wmh-chat-thread" data-wmh-thread></div><div class="wmh-chat-input-row"><span>YOUR RESPONSE</span><div data-wmh-replies></div></div></div></section><section class="wmh-transition-dialog" data-wmh-transition-dialog hidden role="dialog" aria-label="World dialogue"><div class="wmh-transition-dialog-card"><small data-wmh-transition-speaker>WORLD ARCHIVE</small><p data-wmh-transition-dialog-text></p><button type="button" data-wmh-transition-close>CONTINUE</button></div></section><section class="wmh-transition-notice" data-wmh-transition-notice hidden role="dialog" aria-label="World event notification"><div class="wmh-transition-notice-card"><small>WORLD EVENT · ARCHIVE NOTICE</small><h3 data-wmh-transition-notice-title></h3><p data-wmh-transition-notice-text></p><button type="button" data-wmh-transition-close>CONTINUE</button></div></section>'+
@@ -2098,7 +2131,7 @@ export function initializeWorldMapHierarchy(root: HTMLElement): void {
   const dialog=overlay?.querySelector<HTMLElement>("[data-wmh-dialog]");
   if(overlay&&dialog&&!overlay.hidden)bindWorldMapZoom(dialog);
 }
-const npcData: Record<string,{name:string;gender:string;greeting:string;choices:string[];replies:string[]}> = {
+const npcData: Record<string,{name:string;gender:string;greeting:string;choices:string[];replies:string[];scanTone?:"friendly"|"hostile"|"spirit-expert"|"unknown"}> = {
   "student-lin":{name:"Lin Yue",gender:"female",greeting:"The academy garden is peaceful this early. I come here whenever the study halls get too noisy.",choices:["Ask about the academy","Ask about the pond","Wish her a good day"],replies:["The instructors rotate lessons between the eastern and western study halls.","The pond is fed by a spring beneath the old cedar. The fish are surprisingly tame.","You too! May your studies go smoothly."]},
   "student-wei":{name:"Shen Wei",gender:"male",greeting:"I was told to practice footwork, but the groundskeeper keeps sending me to carry things. Hah.",choices:["Ask about training","Offer to help","End conversation"],replies:["The sparring court is beyond the southern gate. Keep your stance low.","Really? Thanks. Those planters are heavier than they look.","See you around."]},
   "teacher-mei":{name:"Instructor Mei",gender:"female",greeting:"A student should learn to observe before acting. Even a quiet garden has much to teach.",choices:["Ask about today's lessons","Ask for advice","Take your leave"],replies:["Foundational theory is being taught in the eastern classroom today.","Watch the flow of Spirit Qi, but do not force it. Patience is part of discipline.","Return when you have a question worth asking."]},
@@ -2142,6 +2175,96 @@ function syncIsoDepthAndOcclusion(board:HTMLElement):void {
   if(dialog)renderIsometricWorldStatus(dialog);
 }
 
+type ActorScanTone="friendly"|"hostile"|"spirit-expert"|"unknown";
+const scannerContacts=new WeakMap<HTMLElement,Set<string>>();
+function actorScanTone(actor:HTMLElement):ActorScanTone {
+  const value=(actor.dataset.scanTone||"unknown") as ActorScanTone;
+  return value==="friendly"||value==="hostile"||value==="spirit-expert"||value==="unknown"?value:"unknown";
+}
+function actorScanColor(tone:ActorScanTone):string {
+  return tone==="friendly"?"#55baff":tone==="hostile"?"#ed5353":tone==="spirit-expert"?"#090b0d":"#f5f6f7";
+}
+function emitTileTrailWave(board:HTMLElement,actor:HTMLElement):void {
+  const x=Number(actor.dataset.x||0),y=Number(actor.dataset.y||0);
+  const tile=board.querySelector<HTMLElement>('[data-wmh-tile][data-x="'+x+'"][data-y="'+y+'"]');
+  if(!tile)return;
+  const boardRect=board.getBoundingClientRect(),tileRect=tile.getBoundingClientRect();
+  const wave=document.createElement("span"),tone=actorScanTone(actor);
+  wave.className="wmh-tile-trail-wave tone-"+tone;
+  wave.style.left=(tileRect.left+tileRect.width/2-boardRect.left)+"px";
+  wave.style.top=(tileRect.top+tileRect.height/2-boardRect.top)+"px";
+  wave.style.setProperty("--scan-color",actorScanColor(tone));
+  board.append(wave);
+  const reduceMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches===true;
+  if(reduceMotion){wave.remove();return;}
+  animate(wave,{scale:[.2,1.65],opacity:[.42,0],duration:760,ease:"outQuad",onComplete:()=>wave.remove()});
+}
+function updateScannerContacts(board:HTMLElement):void {
+  const actors=Array.from(board.querySelectorAll<HTMLElement>("[data-wmh-player-token],[data-wmh-npc]"));
+  const previous=scannerContacts.get(board)||new Set<string>(),next=new Set<string>();
+  for(let i=0;i<actors.length;i++)for(let j=i+1;j<actors.length;j++){
+    const first=actors[i],second=actors[j];
+    const dx=Number(first.dataset.x||0)-Number(second.dataset.x||0);
+    const dy=Number(first.dataset.y||0)-Number(second.dataset.y||0);
+    // Two sonar fields each reach about 2.5 cells; their overlap is a sensor event only.
+    const distance=Math.hypot(dx,dy);
+    if(distance>5)continue;
+    const pair=[first.dataset.wmhNpc||"player",second.dataset.wmhNpc||"player"].sort().join("|");
+    next.add(pair);
+    if(previous.has(pair))continue;
+    board.dispatchEvent(new CustomEvent("merzkava:field-scanner-overlap",{
+      bubbles:true,detail:{
+        actor:first.dataset.wmhNpc||"player",target:second.dataset.wmhNpc||"player",
+        actorTone:actorScanTone(first),targetTone:actorScanTone(second),
+        distance,actorCell:{x:Number(first.dataset.x||0),y:Number(first.dataset.y||0)},
+        targetCell:{x:Number(second.dataset.x||0),y:Number(second.dataset.y||0)}
+      }
+    }));
+  }
+  for(const pair of previous)if(!next.has(pair)){
+    const [actor,target]=pair.split("|");
+    board.dispatchEvent(new CustomEvent("merzkava:field-scanner-clear",{bubbles:true,detail:{actor,target}}));
+  }
+  scannerContacts.set(board,next);
+}
+function pulseActorScanner(actor:HTMLElement,index:number):void {
+  const tone=actorScanTone(actor),color=actorScanColor(tone);
+  actor.style.setProperty("--scan-color",color);
+  let rings=Array.from(actor.querySelectorAll<HTMLElement>(".wmh-sonar-ring"));
+  if(rings.length!==2){
+    actor.querySelectorAll(".wmh-sonar-ring").forEach(node=>node.remove());
+    rings=[0,1].map(n=>{
+      const ring=document.createElement("span");
+      ring.className="wmh-sonar-ring ring-"+n;ring.setAttribute("aria-hidden","true");
+      actor.prepend(ring);return ring;
+    });
+  }
+  rings.forEach((ring,n)=>{
+    ring.style.borderColor=color;
+    ring.style.background="radial-gradient(ellipse,transparent 58%,"+color+"12 100%)";
+    if(window.matchMedia?.("(prefers-reduced-motion: reduce)").matches){
+      ring.style.opacity=".1";ring.style.transform="translate(-50%,-50%) scale(1)";
+    }else{
+      animate(ring,{scale:[.08,1],opacity:[.44,0],duration:1800,ease:"outQuad",delay:index*65+n*820});
+    }
+  });
+}
+function stopActorScanners(board:HTMLElement):void {
+  const timer=Number(board.dataset.scannerTimer||0);
+  if(timer)window.clearInterval(timer);
+  delete board.dataset.scannerTimer;
+  board.querySelectorAll<HTMLElement>(".wmh-sonar-ring").forEach(ring=>ring.remove());
+}
+function startActorScanners(board:HTMLElement):void {
+  stopActorScanners(board);
+  const pulse=()=>{
+    if(!board.isConnected||board.dataset.editorPaused==="true"||board.hidden){stopActorScanners(board);return;}
+    board.querySelectorAll<HTMLElement>("[data-wmh-player-token],[data-wmh-npc]").forEach((actor,index)=>pulseActorScanner(actor,index));
+    updateScannerContacts(board);
+  };
+  pulse();
+  board.dataset.scannerTimer=String(window.setInterval(pulse,2450));
+}
 function animateGridMove(token:HTMLElement,update:()=>void):void {
   const before=token.getBoundingClientRect();
   update();
@@ -2149,22 +2272,23 @@ function animateGridMove(token:HTMLElement,update:()=>void):void {
   if(board)syncIsoDepthAndOcclusion(board);
   const after=token.getBoundingClientRect();
   const dx=before.left-after.left,dy=before.top-after.top;
-  token.animate([
-    {transform:"translate("+dx+"px,"+dy+"px) translate(-50%,-100%) translateY(-7px)"},
-    {transform:"translate(-50%,-100%) translateY(-7px)"}
-  ],{duration:225,easing:"cubic-bezier(.2,.72,.25,1)"});
+  const reduceMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches===true;
+  if(reduceMotion)token.style.transform="";
+  else animate(token,{translateX:[dx,0],translateY:[dy,0],duration:225,ease:"outCubic"});
+  if(board){emitTileTrailWave(board,token);updateScannerContacts(board);}
 }
 function stopNpcWander(dialog:HTMLElement):void {
   const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
   const timer=Number(board?.dataset.npcTimer||0);
   if(timer)window.clearInterval(timer);
-  if(board)delete board.dataset.npcTimer;
+  if(board){delete board.dataset.npcTimer;stopActorScanners(board);}
 }
 function startNpcWander(dialog:HTMLElement):void {
   const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
   if(!board||board.dataset.editorPaused==="true"||board.classList.contains("wmh-overlay-editing"))return;
   if(dialog.querySelector<HTMLElement>("[data-wmh-chat]")?.hidden===false)return;
   stopNpcWander(dialog);
+  startActorScanners(board);
   const timer=window.setInterval(()=>{
     const mapData=readIsoMapData(board);
     board.querySelectorAll<HTMLElement>("[data-wmh-npc]").forEach(npc=>{

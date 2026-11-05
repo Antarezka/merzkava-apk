@@ -1925,3 +1925,34 @@
   .wmh-isometric-play-screen .wmh-chat-card{max-height:48dvh!important;padding:14px 9px 9px!important}
   .wmh-isometric-play-screen .wmh-transition-token{width:30px!important;height:30px!important}
 }
+
+
+/* Subtle after-step trails and two-ring submarine-style actor scanners. */
+.wmh-isometric-board{position:relative}
+.wmh-character-token{overflow:visible!important}
+.wmh-sonar-ring{
+  position:absolute!important;z-index:-1!important;left:50%!important;top:42%!important;
+  width:calc(var(--tile-w,64px)*5)!important;height:calc(var(--tile-h,32px)*5)!important;
+  border:1.3px solid var(--scan-color,#f5f6f7)!important;border-radius:50%!important;
+  box-shadow:0 0 10px color-mix(in srgb,var(--scan-color,#f5f6f7) 24%,transparent)!important;
+  transform:translate(-50%,-50%) scale(.08);opacity:0;pointer-events:none!important;
+}
+.wmh-sonar-ring.ring-1{border-style:dashed!important;border-width:1px!important}
+.wmh-tile-trail-wave{
+  position:absolute!important;z-index:260!important;width:calc(var(--tile-w,64px)*.9)!important;height:calc(var(--tile-h,32px)*.9)!important;
+  border:1.3px solid var(--scan-color,#f5f6f7)!important;border-radius:50%!important;
+  background:transparent;box-shadow:0 0 10px color-mix(in srgb,var(--scan-color,#f5f6f7) 35%,transparent)!important;
+  transform:translate(-50%,-50%) scale(.2);opacity:0;pointer-events:none!important;
+}
+.wmh-tile-trail-wave.tone-friendly{background:rgba(85,186,255,.12)!important}
+.wmh-tile-trail-wave.tone-hostile{background:rgba(237,83,83,.12)!important}
+.wmh-tile-trail-wave.tone-spirit-expert{background:rgba(5,7,9,.22)!important;border-width:2px!important;box-shadow:0 0 12px #000b!important}
+.wmh-tile-trail-wave.tone-unknown{background:rgba(245,246,247,.13)!important}
+.wmh-character-token[data-scan-tone="friendly"]{--scan-color:#55baff}
+.wmh-character-token[data-scan-tone="hostile"]{--scan-color:#ed5353}
+.wmh-character-token[data-scan-tone="spirit-expert"]{--scan-color:#090b0d}
+.wmh-character-token[data-scan-tone="unknown"]{--scan-color:#f5f6f7}
+@media(prefers-reduced-motion:reduce){
+  .wmh-tile-trail-wave{display:none!important}
+  .wmh-sonar-ring{transition:none!important;animation:none!important}
+}
