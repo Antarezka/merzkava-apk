@@ -122,10 +122,18 @@ describe("shared isometric map editor data", () => {
       walkableCellGroups: [
         { id: "outer-path", cells: ["8,2", "9,2"] },
       ],
+      foregroundQuadrants: ["8,2:tl", "-1,3:br", "1,2:tr"],
+      blockedQuadrants: ["9,2:bl"],
+      opacityQuadrants: ["-1,3:tr"],
+      transitions: [{ id: "outer-gate", x: 8, y: 2, label: "Academy Outer Gate" }],
     }, "custom-grid");
     expect(data.customGridCells).toEqual(["8,2", "9,2", "-1,3"]);
     expect(data.walkableCells).toEqual(["1,2", "8,2", "9,2", "-1,3"]);
     expect(data.walkableCellGroups).toEqual([{ id: "outer-path", cells: ["8,2", "9,2"] }]);
+    expect(data.foregroundQuadrants).toEqual(["8,2:tl", "-1,3:br", "1,2:tr"]);
+    expect(data.blockedQuadrants).toEqual(["9,2:bl"]);
+    expect(data.opacityQuadrants).toEqual(["-1,3:tr"]);
+    expect(data.transitions).toEqual([{ id: "outer-gate", x: 8, y: 2, label: "Academy Outer Gate" }]);
   });
 
   it("resolves the four sub-sectors inside one diamond", () => {
