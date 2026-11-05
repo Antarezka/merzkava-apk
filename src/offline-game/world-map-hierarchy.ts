@@ -176,6 +176,7 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
   let baseWidth = 0;
   let baseHeight = 0;
   const academyCanvas=surface.hasAttribute("data-wmh-academy-canvas");
+  if(academyCanvas)bindAcademyCanvasEditor(dialog);
   const academyGrid=academyCanvas?surface.querySelector<SVGSVGElement>("[data-wmh-academy-margin-grid]"):null;
   // Academy pan and pinch are handled by this pointer controller. Do not let
   // Android WebView begin a competing native scroll gesture on the viewport.
