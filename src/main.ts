@@ -786,6 +786,7 @@ async function openWorldAtlasFromTv():Promise<void> {
   if(select)select.innerHTML='<option value="">Loading registered players…</option>';
   if(submit)submit.disabled=true;
   try{
+    await refreshCharacters();
     let canon=getCanonStatus();
     if(!canon.commitSha||canon.status==="error"){
       const status=await refreshCanon();
