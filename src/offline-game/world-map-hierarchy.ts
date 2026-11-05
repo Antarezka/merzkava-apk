@@ -862,6 +862,7 @@ function renderIsometricMinimap(board:HTMLElement):void {
     walkable:data.walkableCells,
     walkableGroups:data.walkableCellGroups,
     walkableAreaEnabled:data.walkableAreaEnabled,
+    customGridCells:data.customGridCells,
     foregroundQuadrants:data.foregroundQuadrants,
     blockedQuadrants:data.blockedQuadrants,
     opacityQuadrants:data.opacityQuadrants,
@@ -1038,7 +1039,8 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
   let data=readIsoMapData(board),selectedTransitionId:string|null=null;
   const history:IsoMapEditorData[]=[];
   const cellGroup=svg.querySelector<SVGGElement>("[data-wmh-manual-marks]");
-  const interactionGroup=svg.querySelector<SVGGElement>("[data-wmh-interaction-grid]");
+  let interactionGroup=svg.querySelector<SVGGElement>("[data-wmh-interaction-grid]");
+  if(!interactionGroup){interactionGroup=document.createElementNS("http://www.w3.org/2000/svg","g");interactionGroup.dataset.wmhInteractionGrid="";svg.insertBefore(interactionGroup,cellGroup||svg.firstChild);}
   const transitionGroup=svg.querySelector<SVGGElement>("[data-wmh-transition-marks]");
   const cellTools=panel.querySelector<HTMLElement>("[data-wmh-cell-tools]");
   const selectionCount=panel.querySelector<HTMLElement>("[data-wmh-cell-selection-count]");
@@ -1094,13 +1096,11 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
         interactionGroup.innerHTML=academyInteractionGridMarkup(grid,data);
       }else{
         const marks:string[]=[];
-        for(const key of data.walkableCells){
+        for(const key of data.customGridCells){
           const [x,y]=key.split(",").map(Number),c=isoCellCenter(x,y,grid),hw=grid.tileW/2,hh=grid.tileH/2;
           const points=[c.x+","+(c.y-hh),(c.x+hw)+","+c.y,c.x+","+(c.y+hh),(c.x-hw)+","+c.y].join(" ");
-          marks.push('<polygon class="wmh-walkable-cell" points="'+points+'" aria-label="Walkable image cell '+x+', '+y+'"/>');
-        }
-        for(let y=0;y<grid.rows;y++)for(let x=0;x<grid.cols;x++){
-          const c=isoCellCenter(x,y,grid),hw=grid.tileW/2,hh=grid.tileH/2;
+          const selected=data.walkableCells.includes(key);
+          marks.push('<polygon class="wmh-academy-hit-cell is-custom-grid-cell'+(selected?' is-walkable':'')+'" data-wmh-tile data-x="'+x+'" data-y="'+y+'" data-z="0" data-tile-id="custom-'+x+'-'+y+'" data-surface="earth" points="'+points+'" aria-label="Custom image grid cell '+x+', '+y+'"/>');
           marks.push('<path class="wmh-quadrant-divider" d="M'+c.x+' '+(c.y-hh)+' L'+c.x+' '+(c.y+hh)+' M'+(c.x-hw)+' '+c.y+' L'+(c.x+hw)+' '+c.y+'"/>');
         }
         interactionGroup.innerHTML=marks.join("");
@@ -1159,7 +1159,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     board.dataset.cols=String(grid.cols);board.dataset.rows=String(grid.rows);
     board.dataset.tileW=String(grid.tileW);board.dataset.tileH=String(grid.tileH);
     board.dataset.offsetX=String(grid.offsetX);board.dataset.offsetY=String(grid.offsetY);
-    const wanted=new Set<string>();for(let y=0;y<grid.rows;y++)for(let x=0;x<grid.cols;x++)wanted.add(isoCellKey(x,y));
+    const wanted=new Set<string>();for(let y=0;y<grid.rows;y++)for(let x=0;x<grid.cols;x++)wanted.add(isoCellKey(x,y));data.customGridCells.forEach(key=>wanted.add(key));
     board.querySelectorAll<HTMLElement>("[data-wmh-tile]").forEach(tile=>{if(!wanted.has(isoCellKey(Number(tile.dataset.x),Number(tile.dataset.y))))tile.remove();});
     const academyArtwork=board.dataset.academyArtworkBoard==="true";
     // Regenerate SVG cells from the active calibration. Academy geometry is
@@ -1510,6 +1510,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       grid:{...grid},
       walkableAreaEnabled:data.walkableAreaEnabled,
       walkableCells:[...data.walkableCells],
+      customGridCells:[...data.customGridCells],
       walkableCellGroups:data.walkableCellGroups.map(group=>({id:group.id,cells:[...group.cells]})),
       foregroundCells:[...data.foregroundCells],
       blockedCells:[...data.blockedCells],
