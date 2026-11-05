@@ -34,40 +34,11 @@ export type IsoMapEditorData = {
 export type IsoMapPoint = { x: number; y: number };
 
 export type IsoCanvasExpansion = { top: number; bottom: number; left: number; right: number };
-export const DEFAULT_ISO_CANVAS_EXPANSION: IsoCanvasExpansion = { top: 0, bottom: 0, left: 800, right: 0 };
+export const DEFAULT_ISO_CANVAS_EXPANSION: IsoCanvasExpansion = { top: 0, bottom: 0, left: 0, right: 0 };
 export function normalizeIsoCanvasExpansion(value: unknown): IsoCanvasExpansion {
   const source = value && typeof value === "object" ? value as Record<string, unknown> : {};
-  const read = (side: keyof IsoCanvasExpansion) => Math.round(clamp(source[side], 0, 12000, DEFAULT_ISO_CANVAS_EXPANSION[side]));
+  const read = (side: keyof IsoCanvasExpansion) => Math.round(clamp(source[side], 0, 12000, 0));
   return { top: read("top"), bottom: read("bottom"), left: read("left"), right: read("right") };
-}
-
-/** Calculate image-relative outer canvas margins using the Academy camera's adaptive rules. */
-export function calculateIsoCanvasMargins(input: {
-  viewportWidth: number;
-  viewportHeight: number;
-  artworkWidth: number;
-  artworkHeight: number;
-  cellWidth: number;
-  cellHeight: number;
-  displayedArtworkWidth?: number;
-  expansion?: Partial<IsoCanvasExpansion>;
-}): IsoCanvasExpansion {
-  const finitePositive = (value: number, fallback = 1) =>
-    Number.isFinite(value) && value > 0 ? value : fallback;
-  const viewportWidth = finitePositive(input.viewportWidth);
-  const viewportHeight = finitePositive(input.viewportHeight);
-  const artworkWidth = finitePositive(input.artworkWidth);
-  finitePositive(input.artworkHeight);
-  const scale = finitePositive(input.displayedArtworkWidth ?? artworkWidth) / artworkWidth;
-  const cellWidth = finitePositive(input.cellWidth) * scale;
-  const cellHeight = finitePositive(input.cellHeight) * scale;
-  const extra = normalizeIsoCanvasExpansion(input.expansion ?? DEFAULT_ISO_CANVAS_EXPANSION);
-  return {
-    left: Math.max(cellWidth * 2, viewportWidth * 2) + extra.left,
-    right: Math.max(cellWidth * 2, viewportWidth / 2) + extra.right,
-    top: Math.max(cellHeight * 2, viewportHeight / 2) + extra.top,
-    bottom: Math.max(cellHeight * 2, viewportHeight / 2) + extra.bottom,
-  };
 }
 
 export const DEFAULT_ISOMETRIC_GRID: IsoMapGridConfig = {
