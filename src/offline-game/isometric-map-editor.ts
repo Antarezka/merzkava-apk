@@ -163,13 +163,25 @@ export function normalizeIsoMapEditorData(
     playerScale: clamp(rawGrid.playerScale, 0.25, 3, fallbackGrid.playerScale),
     npcScale: clamp(rawGrid.npcScale, 0.25, 3, fallbackGrid.npcScale),
   };
+  const customGridCells = Array.isArray(source.customGridCells)
+    ? [...new Set(source.customGridCells.flatMap(item=>{
+        const match=/^(-?\d+),(-?\d+)$/.exec(String(item));if(!match)return [];
+        const x=Number(match[1]),y=Number(match[2]);
+        if(!Number.isSafeInteger(x)||!Number.isSafeInteger(y)||Math.abs(x)>512||Math.abs(y)>512)return [];
+        if(x>=0&&x<grid.cols&&y>=0&&y<grid.rows)return [];
+        return [isoCellKey(x,y)];
+      }))]
+    : [];
+  const isConfiguredCell=(x:number,y:number)=>(
+    (x>=0&&y>=0&&x<grid.cols&&y<grid.rows)||customGridCells.includes(isoCellKey(x,y))
+  );
   const transitions = Array.isArray(source.transitions)
     ? source.transitions.flatMap((item, index) => {
       if (!item || typeof item !== "object") return [];
       const marker = item as Record<string, unknown>;
       const x = Math.floor(Number(marker.x));
       const y = Math.floor(Number(marker.y));
-      if (!Number.isFinite(x) || !Number.isFinite(y) || x < 0 || x >= grid.cols || y < 0 || y >= grid.rows) return [];
+      if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isInteger(x) || !Number.isInteger(y) || !isConfiguredCell(x,y)) return [];
       return [{
         id: String(marker.id || "transition-import-" + index).slice(0, 96),
         x,
@@ -183,23 +195,14 @@ export function normalizeIsoMapEditorData(
     if (!Array.isArray(value)) return [];
     const result = new Set<string>();
     for (const item of value) {
-      const match = /^([0-9]+),([0-9]+):(tl|tr|bl|br)$/.exec(String(item));
+      const match = /^(-?[0-9]+),(-?[0-9]+):(tl|tr|bl|br)$/.exec(String(item));
       if (!match) continue;
       const x = Number(match[1]), y = Number(match[2]);
-      if (x >= 0 && x < grid.cols && y >= 0 && y < grid.rows) result.add(String(item));
+      if (isConfiguredCell(x,y)) result.add(String(item));
     }
     return [...result];
   };
   const baseWalkableCells = cleanCells(source.walkableCells, grid);
-  const customGridCells = Array.isArray(source.customGridCells)
-    ? [...new Set(source.customGridCells.flatMap(item=>{
-        const match=/^(-?\d+),(-?\d+)$/.exec(String(item));if(!match)return [];
-        const x=Number(match[1]),y=Number(match[2]);
-        if(!Number.isSafeInteger(x)||!Number.isSafeInteger(y)||Math.abs(x)>512||Math.abs(y)>512)return [];
-        if(x>=0&&x<grid.cols&&y>=0&&y<grid.rows)return [];
-        return [isoCellKey(x,y)];
-      }))]
-    : [];
   const rawWalkableCells=Array.isArray(source.walkableCells)?source.walkableCells.map(String):[];
   const allowedWalkableExtras=customGridCells.filter(key=>rawWalkableCells.includes(key));
   const walkableCells=[...new Set([...baseWalkableCells,...allowedWalkableExtras])];
@@ -342,7 +345,7 @@ export function toggleIsoQuadrantLayer(
   y: number,
   quadrant: IsoQuadrant,
 ): boolean {
-  if (!Number.isInteger(x) || !Number.isInteger(y) || x < 0 || y < 0 || x >= data.grid.cols || y >= data.grid.rows) return false;
+  if (!Number.isInteger(x) || !Number.isInteger(y) || !((x>=0&&y>=0&&x<data.grid.cols&&y<data.grid.rows)||data.customGridCells.includes(isoCellKey(x,y)))) return false;
   const key = isoQuadrantKey(x, y, quadrant);
   const cells = new Set(data[layer]);
   const enabled = !cells.has(key);
