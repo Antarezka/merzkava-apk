@@ -1397,7 +1397,6 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     });
   }
   const viewport=board.closest<HTMLElement>("[data-wmh-map-viewport],[data-wmh-iso-viewport]");
-  const academyArtwork=board.dataset.academyArtworkBoard==="true";
   let activePointers=new Set<number>();
   let pendingTap:{pointerId:number;startX:number;startY:number;scrollLeft:number;scrollTop:number;dragged:boolean;cancelled:boolean;transitionId:string|null}|null=null;
   const pointerMove=(event:PointerEvent)=>{
@@ -1485,8 +1484,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     setStatus((layer==="foregroundQuadrants"?"○ Foreground":layer==="blockedQuadrants"?"X Blocked":"◌ Opacity")+(enabled?" enabled":" cleared")+" in "+quadrant.toUpperCase()+" sector of ("+cell.x+","+cell.y+"). Tap edits one sector; drag only pans.");
   };
   // Capture movement at the dialog boundary so a finger may leave the grid
-  // during a drag. The camera handles Academy pan/pinch; other isometric maps
-  // receive the same one-finger scroll behavior here.
+  // during a drag. The existing viewport is panned without changing its zoom.
   dialog.addEventListener("pointermove",pointerMove,true);
   dialog.addEventListener("pointerup",event=>{
     const pointerEvent=event as PointerEvent;
