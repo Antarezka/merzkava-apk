@@ -1680,7 +1680,8 @@
   max-width:none!important;
   max-height:none!important;
 }
-.wmh-academy-map-surface .wmh-area-overlay-svg{z-index:500!important;pointer-events:none!important;touch-action:none!important}.wmh-academy-map-surface.wmh-overlay-editing .wmh-area-overlay-svg{pointer-events:auto!important;cursor:crosshair}
+.wmh-academy-map-surface .wmh-area-overlay-svg{z-index:500!important;pointer-events:none!important;touch-action:none!important}
+.wmh-academy-map-surface .wmh-area-overlay-svg [data-wmh-overlay-hit-plane]{fill:transparent;pointer-events:all}.wmh-academy-map-surface.wmh-overlay-editing .wmh-area-overlay-svg{pointer-events:all!important;cursor:crosshair}
 .wmh-academy-map-surface.wmh-overlay-editing .wmh-academy-hit-cell{stroke:rgba(255,255,255,.72);stroke-width:1.5;fill:rgba(255,255,255,.015)}
 .wmh-academy-map-surface .wmh-academy-grid-overlay .wmh-academy-hit-cell{pointer-events:none;fill:transparent;stroke:transparent;stroke-width:1;vector-effect:non-scaling-stroke}
 .wmh-academy-map-surface .wmh-academy-grid-overlay .wmh-academy-hit-cell.is-walkable{fill:rgba(45,133,219,.27);stroke:#82c5ff;stroke-width:2}
