@@ -246,7 +246,7 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
     if (level) level.textContent = Math.round(zoom * 100) + "%";
   };
   if(academyCanvas){
-    window.addEventListener("merzkava-academy-canvas-expansion-preview",((event:Event)=>{
+    viewport.addEventListener("merzkava-academy-canvas-expansion-preview",((event:Event)=>{
       academyExpansion=normalizeIsoCanvasExpansion((event as CustomEvent<unknown>).detail);
       const left=viewport.scrollLeft,top=viewport.scrollTop;
       sizeBaseMap();applySurfaceSize(zoom);
@@ -1422,11 +1422,12 @@ function bindAcademyCanvasEditor(dialog:HTMLElement):void {
   editor.dataset.bound="true";
   const key="merzkava.academy-canvas-expansion.v1";
   const controls=[...panel.querySelectorAll<HTMLInputElement>("[data-wmh-canvas-side]")];
+  const mapViewport=dialog.querySelector<HTMLElement>("[data-wmh-map-viewport]");
   const status=panel.querySelector<HTMLElement>("[data-wmh-canvas-status]");
   const output=panel.querySelector<HTMLTextAreaElement>("[data-wmh-canvas-export]");
   const read=()=>normalizeIsoCanvasExpansion(Object.fromEntries(controls.map(input=>[input.dataset.wmhCanvasSide||"",Number(input.value)])));
   const showValues=()=>controls.forEach(input=>{const side=input.dataset.wmhCanvasSide||"",value=panel.querySelector<HTMLOutputElement>('[data-wmh-canvas-value="'+side+'"]');if(value)value.value=Number(input.value).toLocaleString()+" px";});
-  const preview=()=>{showValues();window.dispatchEvent(new CustomEvent("merzkava-academy-canvas-expansion-preview",{detail:read()}));if(status)status.textContent="Live preview updated. Confirm to save these values.";};
+  const preview=()=>{showValues();mapViewport?.dispatchEvent(new CustomEvent("merzkava-academy-canvas-expansion-preview",{detail:read()}));if(status)status.textContent="Live preview updated. Confirm to save these values.";};
   try{
     const saved=normalizeIsoCanvasExpansion(JSON.parse(localStorage.getItem(key)||"{}"));
     controls.forEach(input=>{input.value=String(saved[(input.dataset.wmhCanvasSide||"left") as keyof typeof saved]);});showValues();
