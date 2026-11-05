@@ -14,6 +14,16 @@ describe("World Atlas player login gate",()=>{
       expect(html).toContain('data-login-label=');
       expect(html).toContain('data-signup-label=');
       expect(html).toContain('data-world-atlas-gate-back');
+      expect(html).toContain('data-offline-label=');
+      const offlineLabelStart=html.indexOf('data-offline-label="')+'data-offline-label="'.length;
+      const offlineLabelEnd=html.indexOf('"',offlineLabelStart);
+      const offlineLabel=html.slice(offlineLabelStart,offlineLabelEnd);
+      const expectedOffline:Record<string,string>={
+        id:"Internet tidak terhubung",en:"No internet connection",pt:"Sem conexão com a internet",
+        fr:"Aucune connexion Internet",ru:"Нет подключения к интернету",ja:"インターネットに接続",
+        "zh-CN":"未连接互联网",ko:"인터넷에 연결"
+      };
+      expect(offlineLabel).toContain(expectedOffline[language.code]);
       expect(html).toContain('data-world-atlas-buffer');
       expect(html).toContain('data-buffer-stages=');
       expect(html).toContain('AUTHENTICATION SEQUENCE');
