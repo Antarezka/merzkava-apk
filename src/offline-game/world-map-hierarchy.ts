@@ -1321,7 +1321,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     if(mergeClearButton)mergeClearButton.hidden=mode()!=="cell-merge";
     if(mode()!=="cell-merge")selectedMergeCells.clear();
     redraw();
-    setStatus(mode()==="cell-add"?"ADD CELL: tap any empty grid diamond on the Map Base to add it to your walkable area. Each tap adds exactly one cell; drag pans."
+    setStatus(mode()==="cell-add"?"ADD CELL: tap an ungridded part of the Map Base image. The editor calculates the next isometric coordinate and adds one new diamond there. The full cell must fit inside the image; canvas margins are excluded. Drag only pans."
       :mode()==="cell-delete"?"DELETE CELL: tap a blue cell to remove it. If it belongs to a merged group, that cell is removed from the group too."
       :mode()==="cell-merge"?"SELECT & MERGE: tap two or more adjacent blue cells, including bends, then press MERGE SELECTED CELLS to make one flexible logical area."
       :mode()==="cell-unmerge"?"UNMERGE: tap any cell inside a merged region to split that group back into its individual cells."
@@ -1395,7 +1395,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       }
       if(data.customGridCells.includes(key)){setStatus("This extra image cell already exists. Choose another ungridded image position.");return;}
       if(!isCellInsideMapArtwork(cell.x,cell.y)){
-        setStatus("Cell not added: the full diamond must fit inside the Map Base image. The canvas and outside margins are excluded.");return;
+        setStatus("Cell not added: the full diamond must fit inside the Map Base image. Canvas expansion margins and blank canvas are excluded.");return;
       }
       remember();
       data.customGridCells=[...data.customGridCells,key];
@@ -1576,6 +1576,8 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
         quadrantKeys:"x,y:tl|tr|bl|br",
         transitionColors:"red=unnamed, blue=named",
         walkableCellGroups:"Connected base cells may be merged into flexible logical cells; every group has an ID and retains its underlying grid coordinates.",
+        customGridCells:"Extra isometric diamonds added on Map Base image areas outside the base cols×rows grid. Each coordinate is an individually placed cell; do not fill intervening image or canvas space automatically.",
+        cellPlacement:"Tap in an ungridded image area to add one diamond. Drag pans only. Each custom cell is valid only inside the Map Base image bounds.",
         canvasExpansion:"Not included or changed by this grid editor."
       }
     };
