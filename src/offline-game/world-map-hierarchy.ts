@@ -724,11 +724,12 @@ function drawIsometricForeground(board:HTMLElement,data=readIsoMapData(board)):v
   image.style.opacity="1";
   image.style.visibility="visible";
   image.style.display="block";
+  const academyArtwork=board.dataset.academyArtworkBoard==="true";
   const projectedWidth=(dataGrid.cols+dataGrid.rows-2)*dataGrid.tileW/2+dataGrid.tileW;
   const projectedHeight=(dataGrid.cols+dataGrid.rows-2)*dataGrid.tileH/2+dataGrid.tileH+7;
-  const boardWidth=Math.max(projectedWidth,image.naturalWidth);
-  const boardHeight=Math.max(projectedHeight,image.naturalHeight);
-  const dimensionsChanged=board.offsetWidth!==boardWidth||board.offsetHeight!==boardHeight;
+  const boardWidth=academyArtwork?image.naturalWidth:Math.max(projectedWidth,image.naturalWidth);
+  const boardHeight=academyArtwork?image.naturalHeight:Math.max(projectedHeight,image.naturalHeight);
+  const dimensionsChanged=!academyArtwork&&(board.offsetWidth!==boardWidth||board.offsetHeight!==boardHeight);
   if(dimensionsChanged){
     board.style.setProperty("--iso-board-width",boardWidth+"px");
     board.style.setProperty("--iso-board-height",boardHeight+"px");
@@ -755,12 +756,19 @@ function drawIsometricForeground(board:HTMLElement,data=readIsoMapData(board)):v
   canvas.style.width=width+"px";canvas.style.height=height+"px";
   const ctx=canvas.getContext("2d");if(!ctx)return;
   ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,width,height);
-  if(!data.foregroundCells.length)return;
+  if(!data.foregroundCells.length&&!data.foregroundQuadrants.length)return;
   const halfW=data.grid.tileW/2,halfH=data.grid.tileH/2,left=image.offsetLeft,top=image.offsetTop;
   ctx.save();ctx.beginPath();
   for(const key of data.foregroundCells){
     const [x,y]=key.split(",").map(Number),center=isoCellCenter(x,y,data.grid),cx=center.x-left,cy=center.y-top;
     ctx.moveTo(cx,cy-halfH);ctx.lineTo(cx+halfW,cy);ctx.lineTo(cx,cy+halfH);ctx.lineTo(cx-halfW,cy);ctx.closePath();
+  }
+  for(const key of data.foregroundQuadrants){
+    const match=/^([0-9]+),([0-9]+):(tl|tr|bl|br)$/.exec(key);if(!match)continue;
+    const points=isoQuadrantTrianglePoints(Number(match[1]),Number(match[2]),match[3] as IsoQuadrant,data.grid).split(" ").map(point=>point.split(",").map(Number));
+    ctx.moveTo(points[0][0]-left,points[0][1]-top);
+    for(let i=1;i<points.length;i++)ctx.lineTo(points[i][0]-left,points[i][1]-top);
+    ctx.closePath();
   }
   ctx.clip();ctx.drawImage(image,0,0,width,height);ctx.restore();
 }
@@ -1653,7 +1661,12 @@ function syncIsoDepthAndOcclusion(board:HTMLElement):void {
   tokens.forEach(token=>{
     const x=Number(token.dataset.x||0),y=Number(token.dataset.y||0);
     token.style.setProperty("--character-z",String(20+x+y));
-    token.style.setProperty("--character-opacity",isoCellHasLayer(data,"opacityCells",x,y)?"0.42":"1");
+    const opacity=isoCellHasLayer(data,"opacityCells",x,y)||data.opacityQuadrants.some(key=>key.startsWith(x+","+y+":"))?"0.42":"1";
+    token.style.setProperty("--character-opacity",opacity);
+    if(board.dataset.academyArtworkBoard==="true"){
+      const image=board.querySelector<HTMLImageElement>("[data-wmh-map-art]"),width=image?.naturalWidth||2816,height=image?.naturalHeight||1536,center=isoCellCenter(x,y,data.grid);
+      token.style.left=(center.x/width*100)+"%";token.style.top=(center.y/height*100)+"%";token.style.zIndex=String(20+x+y);token.style.opacity=opacity;
+    }
   });
   renderIsometricMinimap(board);
   const dialog=board.closest<HTMLElement>("[data-wmh-dialog]");
