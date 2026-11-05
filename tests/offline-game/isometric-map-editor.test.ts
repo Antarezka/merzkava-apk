@@ -13,6 +13,7 @@ import {
   isoQuadrantHasLayer,
   isoQuadrantKey,
   isoMapStorageKey,
+  isoPointerGesture,
   normalizeIsoMapEditorData,
   normalizeIsoCanvasExpansion,
   toggleIsoCellLayer,
@@ -115,6 +116,13 @@ describe("shared isometric map editor data", () => {
     }, "map-draft");
     expect(draft.confirmed).toBe(false);
     expect(draft.confirmedAt).toBe("");
+  });
+
+  it("separates a cell tap from a map drag using a movement threshold", () => {
+    expect(isoPointerGesture({ x: 40, y: 80 }, { x: 44, y: 83 })).toBe("tap");
+    expect(isoPointerGesture({ x: 40, y: 80 }, { x: 49, y: 80 })).toBe("drag");
+    expect(isoPointerGesture({ x: 40, y: 80 }, { x: 40, y: 90 })).toBe("drag");
+    expect(isoPointerGesture({ x: 40, y: 80 }, { x: 48, y: 80 })).toBe("drag");
   });
 
   it("maps isometric diamond centers back to their exact cells with grid offsets", () => {
