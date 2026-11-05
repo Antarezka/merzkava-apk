@@ -193,7 +193,7 @@ export function normalizeIsoMapEditorData(
   const walkableCells = cleanCells(source.walkableCells, grid);
   const customGridCells = Array.isArray(source.customGridCells)
     ? [...new Set(source.customGridCells.flatMap(item=>{
-        const match=/^(-?\\d+),(-?\\d+)$/.exec(String(item));if(!match)return [];
+        const match=/^(-?\d+),(-?\d+)$/.exec(String(item));if(!match)return [];
         const x=Number(match[1]),y=Number(match[2]);
         if(!Number.isSafeInteger(x)||!Number.isSafeInteger(y)||Math.abs(x)>512||Math.abs(y)>512)return [];
         if(x>=0&&x<grid.cols&&y>=0&&y<grid.rows)return [];
