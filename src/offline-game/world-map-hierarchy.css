@@ -1602,6 +1602,7 @@
 .wmh-academy-map-viewport{
   position:absolute!important;inset:0!important;overflow:auto!important;display:grid!important;place-items:center!important;
   background:#101512!important;scrollbar-width:none!important;overscroll-behavior:contain!important;
+  overflow-anchor:none!important;scroll-behavior:auto!important;
 }
 .wmh-academy-map-viewport::-webkit-scrollbar{display:none!important}
 .wmh-academy-empty-surface{
