@@ -1270,7 +1270,8 @@ root.addEventListener("click", async (event: MouseEvent) => {
   if(idlePlaceButton){selectArcanistDestination(idlePlaceButton);return;}
   if(target.closest("[data-arcanist-pull]")){const drawer=root.querySelector<HTMLElement>("[data-arcanist-device]");const trigger=root.querySelector<HTMLButtonElement>("[data-arcanist-pull]");const machine=root.querySelector<HTMLElement>("[data-arcanistry-machine]");if(drawer&&trigger){if(!drawer.hidden&&machine?.dataset.machineState!=="idle")return;drawer.hidden = !drawer.hidden;trigger.setAttribute("aria-expanded",String(!drawer.hidden));}return;}
   if(target.closest("[data-arcanist-close]")){const drawer=root.querySelector<HTMLElement>("[data-arcanist-device]");const trigger=root.querySelector<HTMLButtonElement>("[data-arcanist-pull]");const machine=root.querySelector<HTMLElement>("[data-arcanistry-machine]");if(machine&&machine.dataset.machineState!=="idle")return;if(drawer&&trigger){drawer.hidden=true;trigger.setAttribute("aria-expanded","false");}return;}
-  if(target.closest("[data-world-atlas-gate-back]")){\n    if(worldAtlasLoginBusy)return;
+  if(target.closest("[data-world-atlas-gate-back]")){
+    if(worldAtlasLoginBusy)return;
     closeWorldAtlas();return;
   }
   if (target.closest("[data-idle-rpg-open]")) { await openWorldAtlasFromTv(); return; }
@@ -1836,7 +1837,8 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
         const nextButton=root.querySelector<HTMLButtonElement>("#developer-login-form [type=submit]");if(nextButton)nextButton.disabled=false;
         return;
       }
-      rememberedDeveloperCredentials=remember?{identifier:identifier.trim().toLowerCase(),password}:null;\n      developerAuthenticated=true;playerAuthenticated=false;activeCharacterId="";activeProfileMarkdown="";
+      rememberedDeveloperCredentials=remember?{identifier:identifier.trim().toLowerCase(),password}:null;
+      developerAuthenticated=true;playerAuthenticated=false;activeCharacterId="";activeProfileMarkdown="";
       setWorldMapDeveloperMode(true);
       developerLoginBusy=false;developerLoginMessage="";playerLoginMessage="";playerLoginName="";
       activeScreen="control";notice="";render();
