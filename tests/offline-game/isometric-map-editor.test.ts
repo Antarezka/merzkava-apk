@@ -11,6 +11,7 @@ import {
   isoMapStorageKey,
   normalizeIsoMapEditorData,
   normalizeIsoCanvasExpansion,
+  calculateIsoCanvasMargins,
   toggleIsoCellLayer,
 } from "../../src/offline-game/isometric-map-editor";
 
@@ -19,6 +20,29 @@ describe("shared isometric map editor data", () => {
     expect(normalizeIsoCanvasExpansion({ top: 250, bottom: 500, left: 900, right: -2 }))
       .toEqual({ top: 250, bottom: 500, left: 900, right: 0 });
     expect(normalizeIsoCanvasExpansion({ left: 99999 }).left).toBe(12000);
+  });
+
+  it("uses adaptive Academy-style outer margins and adds expansion on top of defaults", () => {
+    expect(calculateIsoCanvasMargins({
+      viewportWidth: 400, viewportHeight: 800,
+      artworkWidth: 2000, artworkHeight: 1000,
+      cellWidth: 64, cellHeight: 32,
+    })).toEqual({ left: 800, right: 200, top: 400, bottom: 400 });
+    expect(calculateIsoCanvasMargins({
+      viewportWidth: 400, viewportHeight: 800,
+      artworkWidth: 2000, artworkHeight: 1000,
+      cellWidth: 64, cellHeight: 32,
+      expansion: { left: 800 },
+    })).toEqual({ left: 1600, right: 200, top: 400, bottom: 400 });
+  });
+
+  it("scales the grid-cell minimum gap with the map artwork scale", () => {
+    expect(calculateIsoCanvasMargins({
+      viewportWidth: 100, viewportHeight: 100,
+      artworkWidth: 4000, artworkHeight: 2000,
+      cellWidth: 64, cellHeight: 32,
+      expansion: { top: 100, bottom: 200, left: 300, right: 400 },
+    })).toEqual({ left: 428, right: 528, top: 164, bottom: 264 });
   });
 
   it("keeps foreground, blocking, and opacity cell flags independent", () => {
