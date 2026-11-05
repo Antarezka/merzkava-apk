@@ -47,11 +47,11 @@ The header Bubble Mode action retains its original layered Kitty artwork and its
 
 **World Atlas is a different authentication system.** Its external login gate still requires the existing local password creation/verification flow (including confirmation when setting a first password). The new passwordless player-name gate must not bypass or modify World Atlas authentication.
 
-On developer sign-out, revoke the in-memory state, remove the remembered marker, call `setWorldMapDeveloperMode(false)`, return to Floating Control and rerender. Never make developer access depend only on CSS, a hidden attribute or an obscured URL.
+On Developer Lock/sign-out, revoke in-memory access immediately, clear only the active authorization marker (preserve an explicitly remembered credential record), call `setWorldMapDeveloperMode(false)`, return to the Developer login panel and rerender. If SecureStorage cannot delete the active marker, write the explicit `locked` value; session restoration accepts only `authorized`. If both SecureStorage operations fail, surface the lock failure and do not claim durable revocation. Never make Developer access depend only on CSS, a hidden attribute or an obscured URL.
 
 ### Credential handling and security limit
 
-The user-supplied Developer ID/password are not stored as plaintext in source, UI, docs, build notes or storage. developer-access.ts holds salted PBKDF2-SHA-256 verifier material and derives the submitted identifier/password using 600,000 iterations. The raw typed password is used for verification only. Remember Me stores only a small authorization marker through native Capacitor SecureStorage; a non-remembered session is held in memory.
+The Developer verifier material in `src/security/developer-access.ts` is salted PBKDF2-SHA-256 and derives the submitted identifier/password using 600,000 iterations. Without Remember Me, credentials are used only for verification and the active session remains in memory. When the owner explicitly selects Remember Me on native Android, the identifier and password are saved in Capacitor SecureStorage so the initial login form can be prefilled after Lock; a separate active-session marker controls whether Developer access is restored at launch. Lock clears that active marker while preserving the opt-in credential record. Browser preview does not persist the raw credentials. The World Atlas account remains separate and never stores its raw password.
 
 Important security truth: a static client-side verifier is extractable from an APK. A sufficiently motivated attacker can attempt offline guesses against it. Base64, binary encoding or hashing does not make a credential hidden from reverse engineering. This Developer Mode is a local UI/feature gate, not server-grade authorization. Any operation that protects important remote data or privileged server actions must also be authorized server-side. Do not claim this local verifier is unbreakable.
 
@@ -105,7 +105,7 @@ The Eternal Path TV trigger is data-idle-rpg-open. On every external open:
 8. Before accepting the login, require `navigator.onLine` and perform a fresh, uncached request to `players.md` at the currently verified Universe `ACTIVE_SHA` via `verifyCanonSourceConnection()`. A missing connection, missing active snapshot, HTTP failure, empty source or timeout fails closed with the localized internet/source-unavailable message. The check uses a seven-second timeout. No first-time password or Remember Me player selection is written, and the Atlas remains locked, when this check fails.
 9. Run the four-second CSS/Anime.js access sequence alongside the real source request and local credential verification. The buffer remains visible until the live source request settles, so a slow or failed connection does not leave an inert login form exposed. Its stages describe the actual player/source/credential/session steps; this is not a remote account-security or server-authentication system.
 10. Only after a reachable official source and valid local password are confirmed, create a first-time local password when needed, store only the remembered player name when selected, and unlock the Atlas for the current session. The raw Atlas password is never stored.
-10. X/back closes the Atlas gate and returns to Eternal Path without deleting the journey.
+11. X/back, Escape or Android Back closes the external Atlas modal. When a login is in progress, closing it aborts the uncached source request and animation, invalidates the attempt, and restores the form state. A cancelled or stale async attempt must never unlock the Atlas after the modal has closed or been reopened.
 
 Failed password, no matching local save, missing/invalid registry snapshot or a cancelled login must not expose a partially unlocked Atlas.
 
@@ -151,8 +151,10 @@ Current dedicated tests:
 
 - tests/offline-game/world-atlas-account.test.ts: salted hash/no plaintext, password verification, remember preference separation, password length and sign-out behavior.
 - tests/offline-game/world-atlas-login.test.ts: modal markup, first-password/sign-in mode, localized access-buffer stages, remember, and back action across eight languages.
-- The World Atlas access-buffer motion is isolated to `src/offline-game/world-atlas-login-motion.ts`; it is finite, four seconds, and respects reduced-motion preferences.
-- Developer Remember Me uses native SecureStorage for its opt-in credential record; Lock clears the active authorization marker but retains the saved record for prefill. The initial login eye control is presentation-only.
+- The World Atlas access-buffer motion is isolated to `src/offline-game/world-atlas-login-motion.ts`; it is finite, four seconds, respects reduced-motion preferences, and cancels cleanly with the external login attempt.
+- The World Atlas live-source request accepts an AbortSignal; closing via X, Escape or Android Back cancels the pending request and blocks stale completion from unlocking the map.
+- Developer Remember Me uses native SecureStorage for the opt-in ID/password prefill record; Lock clears the separate active authorization marker, falls back to a persistent `locked` marker if deletion fails, and returns to the Developer tab. The initial login eye control is presentation-only.
+- `tests/security/developer-access.test.ts`: verifies secure lock preserves remembered credentials and fails closed when the active marker cannot be removed.
 - tests/app/exit-confirm-panel.test.ts: localized Home exit confirmation, No/Yes controls.
 - tests/offline-game/isometric-npc-chat.test.ts: map editor gate, chat markup, scan effects and field-window markup.
 - The main CI pipeline also runs gameplay formula/map/editor tests and TypeScript/Vite build.
