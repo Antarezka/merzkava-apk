@@ -192,7 +192,7 @@
 .wmh-chat-input-row [data-wmh-replies]{display:flex;flex-wrap:wrap;gap:5px}.wmh-chat-input-row button{padding:7px 9px;border:1px solid #b89964;background:#29372e;color:#f2dfbb;font:9px Arial}
 .wmh-local-footer{gap:8px}.wmh-local-footer span{max-width:70%;line-height:1.4}
 @media(max-width:390px){.wmh-isometric-board{width:460px;max-width:none;transform:rotateX(49deg) rotateZ(45deg) scale(.7)}.wmh-chat-bust{width:48px;height:58px}.wmh-chat-copy p{font-size:11px}}
-@media(prefers-reduced-motion:no-preference){.wmh-character-token{transition:grid-column .13s linear,grid-row .13s linear,transform .15s ease}.wmh-character-token:not(.wmh-player-token){animation:wmh-npc-idle 2.8s ease-in-out infinite alternate}@keyframes wmh-npc-idle{to{transform:translateY(-9px)}}}
+@media(prefers-reduced-motion:no-preference){.wmh-character-token{transition:grid-column .13s linear,grid-row .13s linear,transform .15s ease}.wmh-character-token:not(.wmh-player-token){animation:wmh-npc-idle 2.8s ease-in-out infinite alternate}.wmh-character-token.wmh-npc-moving{animation:none!important;transition:none!important}@keyframes wmh-npc-idle{to{transform:translateY(-9px)}}}
 
 /* Single-selection glass window: one area preview at a time. */
 .wmh-world-map{position:relative}
