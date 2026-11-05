@@ -1178,17 +1178,21 @@ root.addEventListener("click", async (event: MouseEvent) => {
     if(!developerAuthenticated)return;activeScreen="control";notice="";render();return;
   }
   if(target.closest("[data-player-logout]")){
-    await signOutDeveloper();
-    if(getAuthSession())await signOut();
+    // Revoke visible/in-memory permissions before awaiting secure-storage or network cleanup.
     developerAuthenticated=false;playerAuthenticated=false;playerLoginName="";activeCharacterId="";activeProfileMarkdown="";activeChat={messages:[],started:false,showOptions:activeChat.showOptions};
     authMessage="";setWorldMapDeveloperMode(false);activeScreen="control";accessLoginMode="player";notice="";
-    history.pushState({merzkavaScreen:"control",merzkavaHome:false},"");render();return;
+    history.pushState({merzkavaScreen:"control",merzkavaHome:false},"");render();
+    try{await signOutDeveloper();}catch(error){recordBug(error,"Revoke developer marker after player logout","Developer access");}
+    try{if(getAuthSession())await signOut();}catch(error){recordBug(error,"Clear cloud session after player logout","Authentication");}
+    return;
   }
   if(target.closest("[data-dev-logout]")){
-    await signOutDeveloper();
-    if(getAuthSession())await signOut();
+    // Fail closed immediately; storage cleanup must never leave Developer Mode visible.
     developerAuthenticated=false;playerAuthenticated=false;playerLoginName="";activeCharacterId="";activeProfileMarkdown="";activeChat={messages:[],started:false,showOptions:activeChat.showOptions};
-    authMessage="";setWorldMapDeveloperMode(false);activeScreen="control";accessLoginMode="player";notice="";render();return;
+    authMessage="";setWorldMapDeveloperMode(false);activeScreen="control";accessLoginMode="player";notice="";render();
+    try{await signOutDeveloper();}catch(error){recordBug(error,"Revoke developer marker after logout","Developer access");}
+    try{if(getAuthSession())await signOut();}catch(error){recordBug(error,"Clear cloud session after developer logout","Authentication");}
+    return;
   }
   if(!hasAppAccess()&&target.closest("[data-floating-action]"))return;
   if(!developerAuthenticated&&target.closest("[data-auth-logout],[data-refresh-canon],[data-bug-copy],[data-bug-minimize],[data-bug-dismiss]"))return;
