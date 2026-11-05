@@ -1857,7 +1857,7 @@ root.addEventListener("click", async event => {
       first?.focus();
     });
   };
-  const restoreLoginPanel=async()=>{  const restoreLoginPanel=async()=>{
+  const restoreLoginPanel=async()=>{
     if(panel)panel.hidden=true;
     if(loginBlock)loginBlock.hidden=false;
     if(playerSelect)playerSelect.disabled=false;
