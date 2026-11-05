@@ -1321,8 +1321,8 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     if(mergeClearButton)mergeClearButton.hidden=mode()!=="cell-merge";
     if(mode()!=="cell-merge")selectedMergeCells.clear();
     redraw();
-    setStatus(mode()==="cell-add"?"ADD CELL: tap an ungridded part of the Map Base image. The editor calculates the next isometric coordinate and adds one new diamond there. The full cell must fit inside the image; canvas margins are excluded. Drag only pans."
-      :mode()==="cell-delete"?"DELETE CELL: tap a blue cell to remove it. If it belongs to a merged group, that cell is removed from the group too."
+    setStatus(mode()==="cell-add"?"ADD CELL: tap an existing diamond to select it as walkable, or tap an ungridded part of the Map Base image to create one new diamond there. New cells must fit fully inside the image; canvas margins are excluded. Drag only pans."
+      :mode()==="cell-delete"?"DELETE CELL: tap a blue cell to remove it from the walkable area. Extra image cells are removed entirely; original base-grid diamonds remain visible."
       :mode()==="cell-merge"?"SELECT & MERGE: tap two or more adjacent blue cells, including bends, then press MERGE SELECTED CELLS to make one flexible logical area."
       :mode()==="cell-unmerge"?"UNMERGE: tap any cell inside a merged region to split that group back into its individual cells."
       :mode()==="foreground"?"Tap one of the 4 small sectors: ○ redraws that part of the same Map Base above characters."
