@@ -1797,3 +1797,131 @@
 .wmh-academy-canvas-editor textarea:placeholder-shown{display:none}
 .wmh-academy-canvas-editor [data-wmh-canvas-status]{display:block;margin-top:8px;color:#d8c49c;line-height:1.4}
 @media(max-width:420px){.wmh-academy-canvas-editor{width:min(280px,calc(100% - 20px))}.wmh-academy-canvas-editor>[data-wmh-academy-editor-panel]{max-height:52vh}}
+
+
+/* Shared Merzkava Archive glass HUD. */
+.wmh-isometric-play-screen .wmh-world-status{
+  border:1px solid #c7ae7a!important;border-radius:8px!important;color:#f1e5c8!important;
+  background:linear-gradient(145deg,#21342bdc,#111b16d9 72%,#17231ddd)!important;
+  box-shadow:0 10px 26px #0008,inset 0 1px #ffffff22,inset 0 0 0 3px #c5a36a16!important;
+  clip-path:none!important;backdrop-filter:blur(13px) saturate(1.18)!important;-webkit-backdrop-filter:blur(13px) saturate(1.18)!important;
+}
+.wmh-isometric-play-screen .wmh-world-status:before{width:3px!important;background:linear-gradient(#e2c77f,#90704a)!important;border-left:0!important}
+.wmh-isometric-play-screen .wmh-world-status-top{border-bottom:1px solid #c8ae7b7a!important}
+.wmh-isometric-play-screen .wmh-status-cycle-icon{border:1px solid #d7bd80!important;background:radial-gradient(circle at 35% 25%,#fff4cf,#a98b55)!important;color:#243127!important;box-shadow:0 0 0 3px #d8be7a22!important}
+.wmh-isometric-play-screen .wmh-world-status-top b{color:#f4e5c2!important;text-shadow:0 1px 8px #e9d18b26!important}
+.wmh-isometric-play-screen .wmh-world-status-top small,.wmh-isometric-play-screen .wmh-status-location{color:#cdb98d!important}
+.wmh-isometric-play-screen .wmh-world-status-bottom strong{color:#fff0ce!important;font-size:14px!important;min-width:64px!important}
+.wmh-isometric-play-screen .wmh-status-day{border:1px solid #c3a46e!important;background:#c8ad7933!important;color:#efdfba!important}
+.wmh-isometric-play-screen .wmh-status-weather b{color:#e8d6ad!important}
+.wmh-isometric-play-screen .wmh-status-coordinates{color:#bda879!important}
+
+/* Right-side clockwork/arcane tool drawer and fixed pull lever. */
+.wmh-isometric-play-screen .wmh-overlay-editor{z-index:700!important;pointer-events:none!important}
+.wmh-isometric-play-screen .wmh-overlay-float{
+  position:absolute!important;right:0!important;top:50%!important;bottom:auto!important;left:auto!important;
+  width:34px!important;height:132px!important;min-height:132px!important;padding:9px 5px!important;
+  display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:10px!important;
+  border:1px solid #d9bc78!important;border-right:0!important;border-radius:10px 0 0 10px!important;
+  background:linear-gradient(90deg,#17271fef,#314335f7)!important;color:#f3dfad!important;
+  box-shadow:-5px 5px 18px #0009,inset 1px 0 #ffffff28!important;pointer-events:auto!important;touch-action:manipulation!important;cursor:pointer!important;
+}
+.wmh-isometric-play-screen .wmh-overlay-float i{font:22px/1 Georgia,serif;font-style:normal}
+.wmh-isometric-play-screen .wmh-overlay-float span{writing-mode:vertical-rl;font:800 7px/1 Arial,sans-serif;letter-spacing:.2em}
+.wmh-isometric-play-screen .wmh-overlay-modal{
+  position:absolute!important;z-index:720!important;inset:0!important;display:block!important;pointer-events:none!important;background:transparent!important;
+}
+.wmh-isometric-play-screen .wmh-overlay-modal[hidden]{display:block!important;visibility:visible!important}
+.wmh-isometric-play-screen .wmh-overlay-modal>.wmh-overlay-tools{
+  position:absolute!important;top:max(8px,env(safe-area-inset-top))!important;right:0!important;bottom:max(8px,env(safe-area-inset-bottom))!important;left:auto!important;
+  width:min(340px,88vw)!important;height:auto!important;min-height:0!important;max-height:none!important;
+  padding:12px 13px 16px 18px!important;border:1px solid #d5b975!important;border-right:0!important;border-radius:12px 0 0 12px!important;
+  background:linear-gradient(145deg,#27392feF,#101a14f7 78%)!important;
+  box-shadow:-14px 0 38px #000b,inset 1px 0 #ffffff25,inset 0 0 0 4px #c7a66a14!important;
+  backdrop-filter:blur(18px) saturate(1.22)!important;-webkit-backdrop-filter:blur(18px) saturate(1.22)!important;
+  transform:translateX(0);transition:transform .38s cubic-bezier(.2,.75,.2,1)!important;pointer-events:auto!important;
+}
+.wmh-isometric-play-screen .wmh-overlay-modal[hidden]>.wmh-overlay-tools{transform:translateX(105%)!important;pointer-events:none!important}
+.wmh-isometric-play-screen .wmh-overlay-drawer-lever{
+  position:absolute!important;left:-26px!important;top:50%!important;transform:translateY(-50%)!important;
+  width:26px!important;height:104px!important;min-height:104px!important;padding:4px!important;
+  border:1px solid #d5b975!important;border-right:0!important;border-radius:9px 0 0 9px!important;
+  background:linear-gradient(90deg,#8d7145,#27392f)!important;color:#fff0c8!important;font:22px/1 Georgia,serif!important;
+}
+.wmh-isometric-play-screen .wmh-overlay-modal-head{background:linear-gradient(145deg,#2c4034,#1b2a21)!important}
+.wmh-isometric-play-screen .wmh-drawer-map-controls{
+  display:grid!important;grid-template-columns:1fr 30px 56px 30px 42px!important;align-items:center!important;gap:5px!important;
+  margin:4px 0 12px!important;padding:8px!important;border:1px solid #c5a66d66!important;border-radius:7px!important;background:#0e1812a8!important;
+}
+.wmh-isometric-play-screen .wmh-drawer-map-controls>span{grid-column:1/-1;color:#d9c28d;font:800 7px Arial,sans-serif;letter-spacing:.16em}
+.wmh-isometric-play-screen .wmh-drawer-map-controls button{min-height:32px!important;padding:4px!important;border:1px solid #b89d66!important;border-radius:4px!important;background:#29392f!important;color:#f3e4c4!important;font:800 10px Arial,sans-serif!important}
+.wmh-isometric-play-screen .wmh-drawer-map-controls output{color:#f4e4c0;text-align:center;font:800 9px ui-monospace,monospace}
+.wmh-isometric-play-screen .wmh-drawer-map-controls [data-wmh-map-center]{grid-column:1/-1}
+.wmh-isometric-play-screen .wmh-overlay-tools{overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important}
+
+/* NPC dialogue is a compact, clickable box anchored to the bottom of the screen. */
+.wmh-isometric-play-screen .wmh-chat-panel{
+  position:fixed!important;z-index:10000!important;inset:auto 0 0!important;width:100vw!important;height:auto!important;max-height:54dvh!important;
+  display:flex!important;align-items:flex-end!important;justify-content:center!important;box-sizing:border-box!important;
+  padding:0 10px max(8px,env(safe-area-inset-bottom))!important;overflow:visible!important;border:0!important;
+  background:linear-gradient(0deg,#07100de0 0%,#07100d66 72%,transparent 100%)!important;
+  backdrop-filter:none!important;-webkit-backdrop-filter:none!important;pointer-events:none!important;touch-action:pan-y!important;
+}
+.wmh-isometric-play-screen .wmh-chat-panel[hidden]{display:none!important}
+.wmh-isometric-play-screen .wmh-chat-card{
+  width:min(100%,720px)!important;max-height:min(42dvh,360px)!important;overflow:auto!important;
+  padding:16px 13px 12px!important;margin:0!important;border:1px solid #c7aa72!important;border-radius:12px 12px 5px 5px!important;
+  background:linear-gradient(145deg,#26382feF,#111b15f5 78%)!important;box-shadow:0 -8px 32px #0008,inset 0 1px #fff2!important;
+  backdrop-filter:blur(14px) saturate(1.2)!important;-webkit-backdrop-filter:blur(14px) saturate(1.2)!important;pointer-events:auto!important;
+}
+.wmh-isometric-play-screen .wmh-chat-close{position:absolute!important;top:5px!important;right:7px!important;width:28px!important;height:28px!important;border:1px solid #c8ad76!important;border-radius:50%!important;background:#15241c!important;color:#f5e8c9!important;z-index:4!important}
+.wmh-isometric-play-screen .wmh-chat-thread{gap:5px!important}
+.wmh-isometric-play-screen .wmh-chat-bust{width:40px!important;height:48px!important}
+.wmh-isometric-play-screen .wmh-chat-copy{max-width:min(75vw,530px)!important;padding:7px 9px!important;border:1px solid #c9ab7166!important;border-radius:7px!important;background:#0e1812a8!important}
+.wmh-isometric-play-screen .wmh-chat-copy p{margin:3px 0 0!important;color:#f2e5c7!important;font:13px/1.38 Georgia,serif!important}
+.wmh-isometric-play-screen .wmh-chat-input-row{margin-top:8px!important;padding-top:8px!important;border-top:1px solid #c9ab7155!important}
+.wmh-isometric-play-screen .wmh-chat-input-row>span{color:#cbb483!important;font:800 7px Arial,sans-serif!important;letter-spacing:.16em!important}
+.wmh-isometric-play-screen .wmh-chat-input-row [data-wmh-replies]{gap:6px!important}
+.wmh-isometric-play-screen .wmh-chat-input-row [data-wmh-replies] button{border:1px solid #c8ad78!important;border-radius:6px!important;background:linear-gradient(145deg,#31483a,#17251c)!important;color:#f4e5c4!important;pointer-events:auto!important}
+
+/* Runtime transition markers, a lower dialogue and a dimmed event notification. */
+.wmh-isometric-play-screen [data-wmh-transition-layer]{position:absolute;inset:0;z-index:380;pointer-events:none}
+.wmh-isometric-play-screen .wmh-transition-token{
+  position:absolute!important;left:var(--transition-x)!important;top:var(--transition-y)!important;transform:translate(-50%,-50%)!important;
+  display:grid!important;place-items:center!important;width:34px!important;height:34px!important;min-height:34px!important;padding:0!important;
+  border:1px solid #f2d89a!important;border-radius:50%!important;background:radial-gradient(circle at 35% 25%,#536a54ed,#101a14f5 74%)!important;
+  color:#f5e4b8!important;box-shadow:0 0 0 3px #d5b87828,0 3px 12px #000a!important;pointer-events:auto!important;touch-action:manipulation!important;
+}
+.wmh-isometric-play-screen .wmh-transition-token i{font:18px/1 Georgia,serif;font-style:normal}
+.wmh-isometric-play-screen .wmh-transition-token.is-dialogue{border-color:#b9d3df!important;background:radial-gradient(circle,#3a6475,#14242d)!important}
+.wmh-isometric-play-screen .wmh-transition-token.is-event{border-color:#e7d08b!important;background:radial-gradient(circle,#806b39,#282014)!important}
+.wmh-isometric-play-screen .wmh-transition-token.is-gate{border-color:#95c7e6!important;background:radial-gradient(circle,#366b83,#152a35)!important}
+.wmh-transition-dialog,.wmh-transition-notice{
+  position:fixed!important;z-index:11000!important;inset:0!important;display:flex!important;align-items:flex-end!important;justify-content:center!important;
+  padding:0 12px max(12px,env(safe-area-inset-bottom))!important;box-sizing:border-box!important;background:#060b09a8!important;
+  backdrop-filter:blur(5px)!important;-webkit-backdrop-filter:blur(5px)!important;pointer-events:auto!important;
+}
+.wmh-transition-dialog[hidden],.wmh-transition-notice[hidden]{display:none!important}
+.wmh-transition-dialog-card{
+  width:min(100%,680px)!important;padding:16px!important;border:1px solid #c7a86e!important;border-radius:10px 10px 5px 5px!important;
+  background:linear-gradient(145deg,#293b30,#101a14)!important;color:#f1e2c1!important;box-shadow:0 10px 35px #000b,inset 0 1px #fff2!important;
+}
+.wmh-transition-dialog-card small,.wmh-transition-notice-card small{color:#cbb17b!important;font:800 8px Arial,sans-serif!important;letter-spacing:.18em!important}
+.wmh-transition-dialog-card p{margin:8px 0 12px!important;font:16px/1.45 Georgia,serif!important;color:#f5e8cb!important}
+.wmh-transition-dialog-card button,.wmh-transition-notice-card button{
+  min-height:38px!important;padding:8px 18px!important;border:1px solid #c8ad76!important;border-radius:5px!important;
+  background:linear-gradient(145deg,#384c3c,#18261d)!important;color:#f2e2c1!important;font:800 8px Arial,sans-serif!important;letter-spacing:.13em!important;
+}
+.wmh-transition-notice{align-items:center!important;justify-content:center!important;background:#030806d9!important}
+.wmh-transition-notice-card{
+  width:min(88vw,460px)!important;padding:24px 20px!important;text-align:center!important;border:1px solid #ddc17f!important;border-radius:12px!important;
+  background:linear-gradient(145deg,#26392f,#101913 72%)!important;color:#f3e4c4!important;box-shadow:0 0 0 4px #c9aa6725,0 18px 50px #000d!important;
+}
+.wmh-transition-notice-card h3{margin:10px 0!important;color:#f4e2bc!important;font:600 21px/1.2 Georgia,serif!important}
+.wmh-transition-notice-card p{margin:10px 0 20px!important;color:#e3d2b1!important;font:14px/1.55 Georgia,serif!important}
+@media(max-width:390px){
+  .wmh-isometric-play-screen .wmh-overlay-modal>.wmh-overlay-tools{width:min(330px,88vw)!important;padding-left:15px!important}
+  .wmh-isometric-play-screen .wmh-world-status{width:clamp(158px,49vw,190px)!important}
+  .wmh-isometric-play-screen .wmh-chat-card{max-height:48dvh!important;padding:14px 9px 9px!important}
+  .wmh-isometric-play-screen .wmh-transition-token{width:30px!important;height:30px!important}
+}

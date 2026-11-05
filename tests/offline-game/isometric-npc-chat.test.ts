@@ -15,14 +15,14 @@ describe("isometric NPC conversations", () => {
     expect(html).toContain('data-wmh-npc="test-mechanic"');
   });
 
-  it("centers the conversation as a full-screen modal instead of docking it below the map", () => {
+  it("docks the choice conversation at the bottom of the isometric map", () => {
     const rules = [...chatStyles.matchAll(/\.wmh-isometric-play-screen \.wmh-chat-panel\{([^}]*)\}/g)];
-    const finalRule = rules.find(rule => rule[1].includes("position:fixed"))?.[1] ?? "";
+    const finalRule = rules.filter(rule => rule[1].includes("position:fixed")).at(-1)?.[1] ?? "";
     expect(finalRule).toContain("position:fixed");
     expect(finalRule).toContain("inset:0");
-    expect(finalRule).toContain("display:grid");
-    expect(finalRule).toContain("place-items:center");
-    expect(finalRule).not.toContain("bottom:62px");
+    expect(finalRule).toContain("bottom:0");
+    expect(finalRule).toContain("align-items:flex-end");
+    expect(finalRule).not.toContain("place-items:center");
   });
 
   it("keeps the hidden state intact until a player taps an NPC", () => {
