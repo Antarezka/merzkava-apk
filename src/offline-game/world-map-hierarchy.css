@@ -585,6 +585,9 @@
 /* Transition markers: red means no destination label, blue means named destination. */
 .wmh-transition-marker{pointer-events:all;cursor:pointer}
 .wmh-transition-marker circle{fill:#bd3939;stroke:#ffd0c8;stroke-width:2;vector-effect:non-scaling-stroke;filter:drop-shadow(0 2px 3px #000b)}
+.wmh-transition-marker .wmh-transition-cell-highlight{fill:#bd393944;stroke:#ffd0c8;stroke-width:1.4;stroke-opacity:.9;vector-effect:non-scaling-stroke}
+.wmh-transition-marker.is-named .wmh-transition-cell-highlight{fill:#287acb55;stroke:#bde2ff}
+.wmh-transition-marker.is-selected .wmh-transition-cell-highlight{stroke:#ffe29b;stroke-width:3}
 .wmh-transition-marker text{font:700 11px Arial;fill:#fff;text-shadow:0 1px 2px #000;pointer-events:none}
 .wmh-transition-marker.is-named circle{fill:#287acb;stroke:#c5e4ff}
 .wmh-transition-marker.is-selected circle{stroke:#ffe59b;stroke-width:4}
