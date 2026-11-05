@@ -7,6 +7,7 @@ on:
       - setup/project-foundation
       - feature/**
       - fix/**
+      - feat/secure-atlas-reset-transitions-2026-11-06
   pull_request:
 
 jobs:
