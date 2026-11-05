@@ -472,3 +472,54 @@
 @media(max-width:360px){
   .arcanist-device-drawer{width:84vw!important;max-width:84vw!important}
 }
+
+
+/* External World Atlas player gate. The field is a modal glass veil; the map behind it is inert. */
+.idle-home-dialog{position:relative}
+.world-atlas-login-layer{
+  position:fixed!important;inset:0!important;z-index:2147483600!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  box-sizing:border-box!important;padding:max(16px,env(safe-area-inset-top)) 14px max(16px,env(safe-area-inset-bottom))!important;
+  background:rgba(5,10,8,.78)!important;backdrop-filter:blur(10px) saturate(.78)!important;-webkit-backdrop-filter:blur(10px) saturate(.78)!important;
+  pointer-events:auto!important;touch-action:pan-y!important;
+}
+.world-atlas-login-layer[hidden]{display:none!important}
+.world-atlas-login-card{
+  position:relative!important;width:min(100%,370px)!important;max-height:calc(100dvh - 36px)!important;overflow:auto!important;
+  padding:24px 20px 18px!important;border:1px solid #d6b97b!important;border-radius:13px!important;
+  background:linear-gradient(145deg,#263a30f7,#111a14fa 78%)!important;color:#f2e5c6!important;
+  box-shadow:0 20px 54px #000d,inset 0 1px #fff2,0 0 0 4px #cfad6e1c!important;
+  overscroll-behavior:contain!important;
+}
+.world-atlas-login-close{
+  position:absolute!important;top:8px!important;right:9px!important;width:34px!important;height:34px!important;min-height:34px!important;
+  display:grid!important;place-items:center!important;border:1px solid #bba06c!important;border-radius:50%!important;
+  background:#14231b!important;color:#f1e2bf!important;font:22px/1 Arial,sans-serif!important;
+}
+.world-atlas-login-eyebrow{display:block!important;margin:0 32px 10px 0!important;color:#cdb37d!important;font:800 8px/1.3 Arial,sans-serif!important;letter-spacing:.19em!important}
+.world-atlas-login-card h2{margin:0 34px 8px 0!important;color:#f4e8cb!important;font:600 clamp(21px,6vw,26px)/1.15 Georgia,serif!important}
+.world-atlas-login-intro{margin:0 0 18px!important;color:#d3c5a6!important;font:13px/1.45 Georgia,serif!important}
+.world-atlas-login-card form{display:grid!important;gap:7px!important}
+.world-atlas-login-card form>label:not(.world-atlas-remember){margin-top:5px!important;color:#d9c393!important;font:800 8px/1.3 Arial,sans-serif!important;letter-spacing:.1em!important;text-transform:uppercase!important}
+.world-atlas-login-card select,.world-atlas-login-card input:not([type=checkbox]){
+  width:100%!important;min-height:42px!important;box-sizing:border-box!important;padding:9px 11px!important;
+  border:1px solid #9b895f!important;border-radius:6px!important;background:#0f1913!important;color:#f4e7c8!important;
+  font:14px/1.3 Arial,sans-serif!important;outline-color:#dfc17f!important;
+}
+.world-atlas-login-card select:disabled,.world-atlas-login-card input:disabled{opacity:.55!important}
+.world-atlas-confirm-row{display:grid!important;gap:7px!important}
+.world-atlas-confirm-row[hidden]{display:none!important}
+.world-atlas-remember{display:flex!important;align-items:center!important;gap:9px!important;margin:8px 0 2px!important;color:#e1d2b2!important;font:12px/1.35 Arial,sans-serif!important}
+.world-atlas-remember input{width:17px!important;height:17px!important;accent-color:#c9a768!important}
+.world-atlas-login-message{min-height:18px!important;margin:4px 0!important;color:#d9c18f!important;font:11px/1.4 Arial,sans-serif!important}
+.world-atlas-login-submit{
+  min-height:42px!important;margin-top:2px!important;border:1px solid #e0c580!important;border-radius:6px!important;
+  background:linear-gradient(145deg,#4a624b,#1d3024)!important;color:#fff0cb!important;
+  font:800 9px/1 Arial,sans-serif!important;letter-spacing:.14em!important;text-transform:uppercase!important;
+}
+.world-atlas-login-submit:disabled{opacity:.42!important;cursor:not-allowed!important}
+.world-atlas-login-foot{display:block!important;margin-top:14px!important;color:#a99c7c!important;font:10px/1.4 Arial,sans-serif!important}
+@media(max-width:390px){
+ .world-atlas-login-card{width:min(100%,340px)!important;padding:20px 15px 15px!important}
+ .world-atlas-login-card h2{font-size:22px!important}
+}
