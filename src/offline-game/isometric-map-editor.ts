@@ -401,6 +401,19 @@ export function isoCellCenter(
   };
 }
 
+/** Convert screen coordinates directly through the rendered Map Base image bounds. */
+export function isoClientToImagePoint(
+  clientX: number,
+  clientY: number,
+  image: { left: number; top: number; width: number; height: number; naturalWidth: number; naturalHeight: number },
+): IsoMapPoint | null {
+  if (image.width <= 0 || image.height <= 0 || image.naturalWidth <= 0 || image.naturalHeight <= 0) return null;
+  return {
+    x: (clientX - image.left) * image.naturalWidth / image.width,
+    y: (clientY - image.top) * image.naturalHeight / image.height,
+  };
+}
+
 /** Resolve a pointer position to the isometric diamond cell under it. */
 export function isoCellAtPoint(
   point: IsoMapPoint,
