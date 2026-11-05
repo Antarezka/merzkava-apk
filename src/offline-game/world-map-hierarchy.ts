@@ -838,6 +838,11 @@ function renderIsometricMinimap(board:HTMLElement):void {
     foreground:data.foregroundCells,
     blocked:data.blockedCells,
     opacity:data.opacityCells,
+    walkable:data.walkableCells,
+    walkableAreaEnabled:data.walkableAreaEnabled,
+    foregroundQuadrants:data.foregroundQuadrants,
+    blockedQuadrants:data.blockedQuadrants,
+    opacityQuadrants:data.opacityQuadrants,
     transitions:data.transitions,
   });
   const renderGrid=(interactive:boolean):string=>{
@@ -856,6 +861,15 @@ function renderIsometricMinimap(board:HTMLElement):void {
     data.foregroundCells.forEach(key=>{const [x,y]=key.split(",").map(Number);overlays.push(polygon(x,y,"is-foreground"));});
     data.blockedCells.forEach(key=>{const [x,y]=key.split(",").map(Number);overlays.push(polygon(x,y,"is-blocked"));});
     data.opacityCells.forEach(key=>{const [x,y]=key.split(",").map(Number);overlays.push(polygon(x,y,"is-opacity"));});
+    data.walkableCells.forEach(key=>{const [x,y]=key.split(",").map(Number);overlays.push(polygon(x,y,"is-walkable"));});
+    const addQuadrants=(keys:string[],cls:string)=>{
+      keys.forEach(key=>{
+        const match=/^([0-9]+),([0-9]+):(tl|tr|bl|br)$/.exec(key);if(!match)return;
+        const points=isoQuadrantTrianglePoints(Number(match[1]),Number(match[2]),match[3] as IsoQuadrant,grid);
+        overlays.push('<polygon class="wmh-minimap-cell '+cls+' is-quadrant" points="'+points+'"/>');
+      });
+    };
+    addQuadrants(data.foregroundQuadrants,"is-foreground");addQuadrants(data.blockedQuadrants,"is-blocked");addQuadrants(data.opacityQuadrants,"is-opacity");
     const transitions=data.transitions.map(marker=>{
       const c=isoCellCenter(marker.x,marker.y,grid);
       return '<circle class="wmh-minimap-transition '+(marker.label.trim()?"is-named":"is-unlabelled")+'" cx="'+c.x+'" cy="'+c.y+'" r="22"><title>'+escapeMapEditorText(marker.label||"Unlabelled transition")+'</title></circle>';
