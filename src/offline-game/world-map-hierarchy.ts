@@ -11,6 +11,7 @@ import {
   type IsoMapEditorData, type IsoMapGridConfig, type IsoMapPoint, type IsoQuadrant, type IsoQuadrantLayer,
 } from "./isometric-map-editor";
 import { renderIsometricSvgSceneMarkup, refreshIsometricSvgScene, type IsometricSvgTheme } from "./isometric-svg-board";
+import { isNpcInteractionCellReachable } from "./isometric-interaction";
 
 let worldMapDeveloperMode = false;
 export function setWorldMapDeveloperMode(enabled: boolean): void {
@@ -1414,6 +1415,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       }
       board.dataset.editorPaused="true";
       board.classList.add("wmh-overlay-editing","wmh-editor-paused");
+      updateNpcInteractionProximity(board);
       board.querySelectorAll<HTMLElement>("[data-wmh-player-token],[data-wmh-npc]").forEach(token=>token.getAnimations().forEach(animation=>animation.pause()));
       if(!relocateActorsFromBlockedCells(board,data))setStatus("Warning: this map has no free cell for one or more characters. Clear some X cells before resuming play.");
       panel.hidden=false;toggle.hidden=true;
@@ -2173,6 +2175,7 @@ function syncIsoDepthAndOcclusion(board:HTMLElement):void {
   renderIsometricMinimap(board);
   const dialog=board.closest<HTMLElement>("[data-wmh-dialog]");
   if(dialog)renderIsometricWorldStatus(dialog);
+  updateNpcInteractionProximity(board);
 }
 
 type ActorScanTone="friendly"|"hostile"|"spirit-expert"|"unknown";
@@ -2184,6 +2187,54 @@ function actorScanTone(actor:HTMLElement):ActorScanTone {
 function actorScanColor(tone:ActorScanTone):string {
   return tone==="friendly"?"#55baff":tone==="hostile"?"#ed5353":tone==="spirit-expert"?"#090b0d":"#f5f6f7";
 }
+
+const npcProximityAnimations=new WeakMap<HTMLElement,{pause?:()=>void}>();
+function isNpcInteractionReady(board:HTMLElement,npc:HTMLElement):boolean {
+  if(board.dataset.editorPaused==="true"||board.classList.contains("wmh-overlay-editing"))return false;
+  if(board.closest<HTMLElement>("[data-wmh-dialog]")?.querySelector<HTMLElement>("[data-wmh-chat]")?.hidden===false)return false;
+  const player=board.querySelector<HTMLElement>("[data-wmh-player-token]");
+  if(!player)return false;
+  const data=readIsoMapData(board);
+  return isNpcInteractionCellReachable(
+    data,
+    {x:Number(player.dataset.x||0),y:Number(player.dataset.y||0)},
+    {x:Number(npc.dataset.x||0),y:Number(npc.dataset.y||0)}
+  );
+}
+function updateNpcInteractionProximity(board:HTMLElement):void {
+  const reduceMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches===true;
+  board.querySelectorAll<HTMLElement>("[data-wmh-npc]").forEach(npc=>{
+    const ready=isNpcInteractionReady(board,npc);
+    if(npc.dataset.interactionReady===String(ready))return;
+    npc.dataset.interactionReady=String(ready);
+    npc.setAttribute("aria-disabled",String(!ready));
+    npc.title=ready?"Within reach · interact":"Move to an adjacent open tile to interact";
+    let glow=npc.querySelector<HTMLElement>(":scope > .wmh-npc-proximity-glow");
+    if(!glow){
+      glow=document.createElement("span");
+      glow.className="wmh-npc-proximity-glow";
+      glow.setAttribute("aria-hidden","true");
+      glow.style.opacity="0";
+      glow.style.transform="scale(.82)";
+      npc.prepend(glow);
+    }
+    glow.style.setProperty("--npc-proximity-color",actorScanColor(actorScanTone(npc)));
+    npcProximityAnimations.get(glow)?.pause?.();
+    if(reduceMotion){
+      glow.style.opacity=ready?".72":"0";
+      glow.style.transform=ready?"scale(1)":"scale(.82)";
+      return;
+    }
+    const animation=animate(glow,{
+      opacity:ready?.72:0,
+      scale:ready?1:.82,
+      duration:ready?360:420,
+      ease:ready?"outCubic":"inOutSine"
+    });
+    npcProximityAnimations.set(glow,animation);
+  });
+}
+
 function emitTileTrailWave(board:HTMLElement,actor:HTMLElement):void {
   const x=Number(actor.dataset.x||0),y=Number(actor.dataset.y||0);
   const tile=board.querySelector<HTMLElement>('[data-wmh-tile][data-x="'+x+'"][data-y="'+y+'"]');
@@ -2226,6 +2277,7 @@ function updateScannerContacts(board:HTMLElement):void {
     board.dispatchEvent(new CustomEvent("merzkava:field-scanner-clear",{bubbles:true,detail:{actor,target}}));
   }
   scannerContacts.set(board,next);
+  updateNpcInteractionProximity(board);
 }
 function pulseActorScanner(actor:HTMLElement,index:number):void {
   const tone=actorScanTone(actor),color=actorScanColor(tone);
@@ -2334,6 +2386,7 @@ function renderChat(dialog:HTMLElement,npcId:string):void {
   if(moveTimer){window.clearTimeout(moveTimer);delete player!.dataset.moveTimer;}
   chat.hidden=false;
   chat.setAttribute("aria-modal","true");
+  if(board)updateNpcInteractionProximity(board);
   thread.innerHTML='<article class="wmh-chat-message npc-message"><div class="wmh-chat-bust '+npc.gender+'"><i></i></div><div class="wmh-chat-copy"><b>'+npc.name+'</b><p>'+npc.greeting+'</p></div></article>';
   replies.innerHTML=npc.choices.map((choice,i)=>'<button type="button" data-wmh-reply="'+i+'" data-npc-id="'+npcId+'">'+choice+'</button>').join("");
 }
@@ -2543,8 +2596,15 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
     const player=board?.querySelector<HTMLElement>("[data-wmh-player-token]");
     const px=Number(player?.dataset.x||5),py=Number(player?.dataset.y||8);
     const nx=Number(action.dataset.x||0),ny=Number(action.dataset.y||0);
-    const distance=Math.abs(px-nx)+Math.abs(py-ny);
-    if(distance<1){dialog.insertAdjacentHTML("beforeend",'<div class="wmh-toast">Stand at least one tile away to interact.</div>');return true;}
+    const ready=!!board&&!!player&&isNpcInteractionCellReachable(
+      readIsoMapData(board),
+      {x:px,y:py},
+      {x:nx,y:ny}
+    );
+    if(!ready){
+      dialog.insertAdjacentHTML("beforeend",'<div class="wmh-toast">Move to an adjacent open tile to interact. Blocked cells and closed tile edges cannot be crossed.</div>');
+      return true;
+    }
     renderChat(dialog,npcId);return true;
   }
   if(action.dataset.wmhReply!==undefined){
