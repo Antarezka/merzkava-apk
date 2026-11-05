@@ -2815,3 +2815,31 @@ body { color:var(--ui-ink); }
 
 .app-exit-confirm.is-back-repeat .app-exit-confirm-card{animation:merzkava-exit-repeat .42s ease}
 @keyframes merzkava-exit-repeat{0%{transform:scale(.97);opacity:.7}60%{transform:scale(1.015);opacity:1}100%{transform:scale(1);opacity:1}}
+
+
+/* Account controls now live in Settings; the header keeps Kitty Bubble and Settings only. */
+.developer-password-field{position:relative;display:flex;align-items:center;min-width:0}
+.developer-login-card .developer-password-field input{padding-right:52px}
+.developer-password-toggle{position:absolute;right:5px;top:50%;display:grid;place-items:center;width:38px;height:34px;transform:translateY(-50%);border:1px solid #b49b68;border-radius:3px;background:linear-gradient(145deg,#eee7d6,#e0d4bc);color:#526b5d}
+.developer-password-toggle svg{width:19px;height:19px;display:block}
+.developer-password-toggle:active{background:#d9c89e;transform:translateY(-50%) scale(.94)}
+:root[data-theme="dark"] .developer-password-toggle{border-color:#756847;background:linear-gradient(145deg,#39473c,#26332b);color:#e1cc9c}
+.account-access-settings{margin-top:27px;padding:16px;border:1px solid #c7bea9;border-radius:4px;background:linear-gradient(145deg,#f1ebdd,#e7decc);box-shadow:0 5px 18px #293d3810}
+.account-access-settings>.muted{margin:0 0 12px}
+.account-access-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.account-access-action{display:grid;grid-template-columns:38px minmax(0,1fr) 18px;align-items:center;gap:10px;min-width:0;min-height:58px;padding:9px 11px;border:1px solid #b9a578;border-radius:4px;background:linear-gradient(145deg,#f6f0e2,#e7dcc4);color:#344a40;text-align:left;font:600 10px Cinzel,Georgia,serif;letter-spacing:.035em;box-shadow:inset 0 1px #fff9,0 3px 8px #293d380c}
+.account-access-action>b{color:#9a8153;font:16px Georgia,serif;text-align:center}
+.account-access-action:active{transform:translateY(1px);background:#ded0b2}
+.account-access-action.is-lock{border-color:#c1a79a;background:linear-gradient(145deg,#f1e8df,#e6d8cb);color:#765d53}
+.account-access-action.is-lock>b{color:#9a7264}
+.account-access-icon{position:relative;display:block;width:36px;height:36px;border:1px solid #b49b68;border-radius:50%;background:radial-gradient(circle at 35% 28%,#fff9e9,#d8c9a7);box-shadow:inset 0 1px #fff9,0 2px 5px #293d3820}
+.account-access-icon.icon-floating:before{position:absolute;content:"";left:8px;top:8px;width:18px;height:16px;border:1.5px solid #526b5d;border-radius:2px;background:linear-gradient(180deg,#718778 0 3px,#e8dfcc 3px)}
+.account-access-icon.icon-floating:after{position:absolute;content:"";left:13px;bottom:6px;width:10px;height:3px;border-top:1px solid #8f7750;border-bottom:1px solid #8f7750}
+.account-access-icon.icon-lock:before{position:absolute;content:"";left:10px;top:7px;width:14px;height:14px;border:2px solid #92745f;border-bottom:0;border-radius:9px 9px 0 0}
+.account-access-icon.icon-lock:after{position:absolute;content:"";left:8px;top:17px;width:18px;height:13px;border:1.5px solid #92745f;border-radius:3px;background:linear-gradient(145deg,#e9d7c6,#c9ad94)}
+:root[data-theme="dark"] .account-access-settings{border-color:#536052;background:linear-gradient(145deg,#344138,#29342d);color:#e8dfcf}
+:root[data-theme="dark"] .account-access-action{border-color:#756847;background:linear-gradient(145deg,#39473c,#26332b);color:#e8dfcf;box-shadow:inset 0 1px #fff1,0 3px 8px #0003}
+:root[data-theme="dark"] .account-access-action.is-lock{border-color:#80695e;background:linear-gradient(145deg,#403630,#302923);color:#e6cfc0}
+:root[data-theme="dark"] .account-access-icon{border-color:#8c7950;background:radial-gradient(circle at 35% 28%,#465447,#29342d)}
+@media(max-width:430px){.account-access-actions{grid-template-columns:1fr}.account-access-action{min-height:54px}}
+@media(prefers-reduced-motion:reduce){.account-access-action,.developer-password-toggle{transition:none}}
