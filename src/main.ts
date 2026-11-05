@@ -11,7 +11,7 @@ import { initializeIdleTriggerDrag } from "./offline-game/idle-trigger-drag";
 import { initializeArcanistryTransitDrag } from "./offline-game/transit-pull-drag";
 import { animateExpeditionChoiceModal, animateExpeditionPanel, mountExpeditionAnimations } from "./offline-game/expedition-animations";
 import { deleteEternalSave, exportEternalSave, importEternalSave, listEternalSaves, loadEternalSave, renameEternalSave, resetEternalGame, resolveEternalSituationChoice, advanceEternalWorldTime, setEternalLocation, startEternalGame, unloadEternalGame, type EternalRegion } from "./offline-game/expedition-game";
-import { atlasPasswordPolicyError, getAtlasPasswordRevision, getAtlasResetRevision, hasAtlasPassword, requestAtlasDeveloperReset, requestAtlasMasterReset, setAtlasPassword, verifyAtlasPassword, rememberAtlasPlayer, restoreAtlasPlayer } from "./offline-game/world-atlas-account";
+import { atlasPasswordPolicyError, clearAtlasPassword, hasAtlasPassword, setAtlasPassword, verifyAtlasMasterResetPassword, verifyAtlasPassword, rememberAtlasPlayer, restoreAtlasPlayer } from "./offline-game/world-atlas-account";
 import { authenticateDeveloper, restoreDeveloperSession, restoreRememberedDeveloperCredentials, signOutDeveloper, type RememberedDeveloperCredentials } from "./security/developer-access";
 import { getCanonIndex, getCanonStatus, loadCanonModule, loadPlayerRegistry, loadRegisteredPlayerProfile, refreshCanon, refreshLatestPlayerRegistry, verifyCanonSourceConnection, type CanonDocument } from "./convo/canon/canon-loader";
 import { routeCanonActivity } from "./convo/canon/canon-router";
@@ -21,7 +21,7 @@ import { parseCharacterProfile, parseGameplayResponseProfile, validateCharacterP
 import { reconcileGMProposal } from "./convo/engine/state-reconciliation";
 import { selectTrustedProfileBaseline } from "./convo/engine/profile-baseline";
 import { buildSaveCheckpointPrompt } from "./convo/engine/save-checkpoint";
-import { getAuthSession, getValidAccessToken, isSupabaseConfigured, restoreAuthSession, signInWithPassword, signOut } from "./convo/auth/supabase-auth";
+import { getAuthSession, isSupabaseConfigured, restoreAuthSession, signInWithPassword, signOut } from "./convo/auth/supabase-auth";
 import { GatewayGMProvider, isGMGatewayConfigured } from "./convo/engine/gateway-gm-provider";
 import { getLedgerLog, initializeLedgerNotifications, showLedgerProposalBubble } from "./ui/ledger-log";
 import { startFloatingMode, requestFloatingOverlayPermission, getFloatingReadiness, requestFloatingNotifications, requestFloatingBatteryExemption, showFloatingBubble, stopFloatingService, exitMerzkavaApplication, type FloatingReadiness } from "./native/floating-window";
@@ -779,11 +779,8 @@ async function refreshAtlasPasswordMode(gate:HTMLElement):Promise<void> {
     return;
   }
   try{
-    const resetRevision=await getAtlasResetRevision(selected);
+    const exists=await hasAtlasPassword(selected);
     if(select?.value!==selected)return;
-    const localPasswordExists=await hasAtlasPassword(selected);
-    const exists=await hasAtlasPassword(selected,resetRevision);
-    gate.dataset.atlasResetRevision=resetRevision;
     if(resetPanel)resetPanel.hidden=true;
     if(resetActions)resetActions.hidden=false;
     if(changeButton)changeButton.hidden=!exists;
@@ -795,13 +792,11 @@ async function refreshAtlasPasswordMode(gate:HTMLElement):Promise<void> {
     button.textContent=exists?(button.dataset.loginLabel||"Sign in"):(button.dataset.signupLabel||"Sign up");
     button.disabled=false;
     if(message)message.textContent=exists
-      ?(gate.dataset.loginPrompt||"Enter the local password for this character.")
-      :localPasswordExists
-        ?(gate.dataset.passwordResetRequiredLabel||"This account was reset. Create a new password on this device.")
-        :(gate.dataset.signupPrompt||"Create a local password to continue.");
+      ?(gate.dataset.loginPrompt||"Enter this character's password.")
+      :(gate.dataset.signupPrompt||"Create a password to continue.");
   }catch(error){
     button.disabled=true;
-    if(message)message.textContent=error instanceof Error?error.message:"Secure local account storage is unavailable.";
+    if(message)message.textContent=error instanceof Error?error.message:"Could not read the account credential.";
   }
 }
 function unlockAtlasBackground(gate:HTMLElement):void {
@@ -1302,17 +1297,21 @@ root.addEventListener("click", async (event: MouseEvent) => {
   if(target.closest("[data-atlas-developer-reset-submit]")){
     if(!developerAuthenticated)return;
     const playerInput=root.querySelector<HTMLInputElement>("#developer-atlas-reset-player");
+    const proofInput=root.querySelector<HTMLInputElement>("[data-atlas-developer-reset-proof]");
     const resetMessage=root.querySelector<HTMLElement>("[data-developer-atlas-reset-message]");
-    const playerName=playerInput?.value.trim()??"";
-    if(!playerName){if(resetMessage)resetMessage.textContent="Enter the registered player name.";return;}
+    const requestedName=playerInput?.value.trim()??"";
+    if(!requestedName){if(resetMessage)resetMessage.textContent="Enter the registered player name.";return;}
+    const eligible=atlasEligiblePlayers().find(player=>player.name.toLocaleLowerCase()===requestedName.toLocaleLowerCase());
+    if(!eligible){if(resetMessage)resetMessage.textContent="That player is not present in the current player list.";return;}
+    if(!proofInput?.checked){if(resetMessage)resetMessage.textContent="Confirm that account ownership has been verified through an official channel.";return;}
     const resetButton=root.querySelector<HTMLButtonElement>("[data-atlas-developer-reset-submit]");
     if(resetButton)resetButton.disabled=true;
-    if(resetMessage)resetMessage.textContent="Verifying Developer authorization and invalidating the local password...";
+    if(resetMessage)resetMessage.textContent="Preparing the account reset...";
     try{
-      const accessToken=await getValidAccessToken();
-      await requestAtlasDeveloperReset(playerName,accessToken);
-      if(resetMessage)resetMessage.textContent=playerName+" password invalidated. The player must create a new password on their own device.";
+      await clearAtlasPassword(eligible.name);
+      if(resetMessage)resetMessage.textContent=eligible.name+" is ready to create a new password.";
       if(playerInput)playerInput.value="";
+      if(proofInput)proofInput.checked=false;
     }catch(error){
       if(resetMessage)resetMessage.textContent=error instanceof Error?error.message:"Developer reset failed.";
     }finally{
@@ -1808,11 +1807,19 @@ root.addEventListener("click", async event => {
   const setPanelMode=(mode:"change"|"master")=>{
     if(!panel)return;
     panel.dataset.atlasResetMode=mode;
+    panel.dataset.atlasCurrentAuthorized="false";
+    panel.dataset.atlasMasterAuthorized="false";
     panel.hidden=false;
     const currentRow=panel.querySelector<HTMLElement>("[data-atlas-reset-current-row]");
     const masterRow=panel.querySelector<HTMLElement>("[data-atlas-reset-master-row]");
+    const newRow=panel.querySelector<HTMLElement>("[data-atlas-reset-new-row]");
+    const policyRow=panel.querySelector<HTMLElement>("[data-atlas-reset-policy]");
+    const confirmNewRow=panel.querySelector<HTMLElement>("[data-atlas-reset-confirm-row]");
     if(currentRow)currentRow.hidden=mode!=="change";
     if(masterRow)masterRow.hidden=mode!=="master";
+    if(newRow)newRow.hidden=true;
+    if(policyRow)policyRow.hidden=true;
+    if(confirmNewRow)confirmNewRow.hidden=true;
     if(loginBlock)loginBlock.hidden=true;
     if(confirmRow)confirmRow.hidden=true;
     if(rememberRow)rememberRow.hidden=true;
@@ -1820,6 +1827,10 @@ root.addEventListener("click", async event => {
     if(submit)submit.hidden=true;
     if(actions)actions.hidden=true;
     if(playerSelect)playerSelect.disabled=true;
+    const apply=panel.querySelector<HTMLButtonElement>("[data-atlas-reset-apply]");
+    if(apply)apply.textContent=mode==="change"
+      ?(gate.dataset.resetContinueChangeLabel||"Verify current password")
+      :(gate.dataset.resetContinueMasterLabel||"Verify master password");
     const resetMessage=panel.querySelector<HTMLElement>("[data-atlas-reset-message]");
     if(resetMessage)resetMessage.textContent="";
     ["#atlas-reset-current","#atlas-reset-master","#atlas-reset-new","#atlas-reset-confirm"].forEach(selector=>{
@@ -1830,7 +1841,7 @@ root.addEventListener("click", async event => {
       first?.focus();
     });
   };
-  const restoreLoginPanel=async()=>{
+  const restoreLoginPanel=async()=>{  const restoreLoginPanel=async()=>{
     if(panel)panel.hidden=true;
     if(loginBlock)loginBlock.hidden=false;
     if(playerSelect)playerSelect.disabled=false;
@@ -1857,23 +1868,44 @@ root.addEventListener("click", async event => {
   const confirmation=panel.querySelector<HTMLInputElement>("#atlas-reset-confirm")?.value||"";
   const resetMessage=panel.querySelector<HTMLElement>("[data-atlas-reset-message]");
   const apply=panel.querySelector<HTMLButtonElement>("[data-atlas-reset-apply]");
-  const policyError=atlasPasswordPolicyError(next);
-  if(policyError){if(resetMessage)resetMessage.textContent=gate.dataset.passwordPolicyLabel||policyError;return;}
-  if(next!==confirmation){if(resetMessage)resetMessage.textContent=gate.dataset.resetMismatch||"The new passwords do not match.";return;}
   worldAtlasResetBusy=true;
   const resetAttempt=++worldAtlasResetAttempt;
   if(apply)apply.disabled=true;
-  if(resetMessage)resetMessage.textContent=gate.dataset.loadingLabel||"Verifying local account reset…";
+  if(resetMessage)resetMessage.textContent=gate.dataset.loadingLabel||"Checking account credentials...";
   try{
-    let resetRevision:string;
-    if(mode==="change"){
-      resetRevision=(await getAtlasPasswordRevision(playerName))??"0";
-      if(!await verifyAtlasPassword(playerName,current,resetRevision))throw new Error(gate.dataset.resetCurrentInvalid||"The current password is incorrect.");
-    }else{
-      resetRevision=await requestAtlasMasterReset(playerName,master);
+    const authorized=mode==="change"
+      ?panel.dataset.atlasCurrentAuthorized==="true"
+      :panel.dataset.atlasMasterAuthorized==="true";
+    if(!authorized){
+      const valid=mode==="change"
+        ?await verifyAtlasPassword(playerName,current)
+        :await verifyAtlasMasterResetPassword(master);
+      if(resetAttempt!==worldAtlasResetAttempt)return;
+      if(!valid)throw new Error(mode==="change"
+        ?(gate.dataset.resetCurrentInvalid||"The current password is incorrect.")
+        :(gate.dataset.resetMasterInvalid||"The master reset password is incorrect."));
+      if(mode==="change")panel.dataset.atlasCurrentAuthorized="true";
+      else panel.dataset.atlasMasterAuthorized="true";
+      const currentRow=panel.querySelector<HTMLElement>("[data-atlas-reset-current-row]");
+      const masterRow=panel.querySelector<HTMLElement>("[data-atlas-reset-master-row]");
+      const newRow=panel.querySelector<HTMLElement>("[data-atlas-reset-new-row]");
+      const policyRow=panel.querySelector<HTMLElement>("[data-atlas-reset-policy]");
+      const confirmNewRow=panel.querySelector<HTMLElement>("[data-atlas-reset-confirm-row]");
+      if(currentRow)currentRow.hidden=true;
+      if(masterRow)masterRow.hidden=true;
+      if(newRow)newRow.hidden=false;
+      if(policyRow)policyRow.hidden=false;
+      if(confirmNewRow)confirmNewRow.hidden=false;
+      if(apply)apply.textContent=gate.dataset.resetSetPasswordLabel||"Set new password";
+      if(resetMessage)resetMessage.textContent=gate.dataset.resetAuthorizedLabel||"Verified. You can now set a new password.";
+      requestAnimationFrame(()=>panel.querySelector<HTMLInputElement>("#atlas-reset-new")?.focus());
+      return;
     }
+    const policyError=atlasPasswordPolicyError(next);
+    if(policyError)throw new Error(gate.dataset.passwordPolicyLabel||policyError);
+    if(next!==confirmation)throw new Error(gate.dataset.resetMismatch||"The new passwords do not match.");
     if(resetAttempt!==worldAtlasResetAttempt)return;
-    await setAtlasPassword(playerName,next,resetRevision);
+    await setAtlasPassword(playerName,next);
     if(resetAttempt!==worldAtlasResetAttempt)return;
     await restoreLoginPanel();
     if(message)message.textContent=gate.dataset.passwordUpdatedLabel||"Password updated. Sign in again with your new password.";
@@ -1978,9 +2010,8 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     if(message)message.textContent="Preparing World Atlas access…";
     try{
       let passwordExists=false;
-      let resetRevision="0";
-      try{resetRevision=await getAtlasResetRevision(playerName);passwordExists=await hasAtlasPassword(playerName,resetRevision);}
-      catch(error){throw new Error(error instanceof Error?error.message:"Secure local account storage is unavailable.");}
+      try{passwordExists=await hasAtlasPassword(playerName);}
+      catch(error){throw new Error(error instanceof Error?error.message:"Could not read the account credential.");}
       if(loginAttempt!==worldAtlasLoginAttempt||abortController.signal.aborted)return;
       if(!passwordExists){
         const policyError=atlasPasswordPolicyError(password);
@@ -1990,7 +2021,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       const connectionWork=verifyCanonSourceConnection(activeCanon.commitSha,abortController.signal);
       const credentialWork=(async()=>{
         if(passwordExists){
-          const valid=await verifyAtlasPassword(playerName,password,resetRevision);
+          const valid=await verifyAtlasPassword(playerName,password);
           if(!valid)throw new Error("Incorrect local password.");
         }
       })();
@@ -2003,7 +2034,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       if(results[0].status==="rejected")throw new Error(offlineMessage);
       if(results[1].status==="rejected")throw results[1].reason;
       // A first-time password is persisted only after the live official-source check succeeds.
-      if(!passwordExists)await setAtlasPassword(playerName,password,resetRevision);
+      if(!passwordExists)await setAtlasPassword(playerName,password);
       if(loginAttempt!==worldAtlasLoginAttempt||abortController.signal.aborted)return;
       await rememberAtlasPlayer(playerName,remember);
       if(loginAttempt!==worldAtlasLoginAttempt||abortController.signal.aborted)return;
