@@ -1435,12 +1435,12 @@ function isometricHudMarkup(title: string, mapImage: string, showMinimap = true)
 }
 function isometricCanvasEditorMarkup(): string {
   const sides=["top","bottom","left","right"] as const;
-  return '<div class="wmh-academy-canvas-editor" data-wmh-canvas-editor>'+
+  return '<div class="wmh-isometric-canvas-editor" data-wmh-canvas-editor>'+
     '<button type="button" data-wmh-canvas-editor-toggle aria-expanded="false">▦ CANVAS EDITOR</button>'+
-    '<section data-wmh-canvas-editor-panel hidden><b>ACADEMY CANVAS EXPANSION</b><small>Adjust each side independently. Preview updates live; confirm to save.</small>'+
+    '<section data-wmh-canvas-editor-panel hidden><b>ISOMETRIC CANVAS EXPANSION</b><small>Adjust each side independently. Preview updates live; confirm to save.</small>'+
     sides.map(side=>'<label>'+side.toUpperCase()+' <output data-wmh-canvas-value="'+side+'">0 px</output><input type="range" min="0" max="12000" step="100" value="0" data-wmh-canvas-side="'+side+'"/></label>').join("")+
     '<div class="wmh-academy-canvas-actions"><button type="button" data-wmh-canvas-refresh>↻ REFRESH PREVIEW</button><button type="button" data-wmh-canvas-confirm>✓ CONFIRM & SAVE</button><button type="button" data-wmh-canvas-copy>COPY CONFIG</button></div>'+
-    '<textarea data-wmh-canvas-export readonly aria-label="Copyable Academy canvas configuration" placeholder="Confirmed canvas configuration appears here..."></textarea><small data-wmh-canvas-status>Unconfirmed changes are preview-only.</small></section></div>';
+    '<textarea data-wmh-canvas-export readonly aria-label="Copyable isometric canvas configuration" placeholder="Confirmed canvas configuration appears here..."></textarea><small data-wmh-canvas-status>Unconfirmed changes are preview-only.</small></section></div>';
 }
 function bindIsometricCanvasEditor(dialog:HTMLElement):void {
   const editor=dialog.querySelector<HTMLElement>("[data-wmh-canvas-editor]");
