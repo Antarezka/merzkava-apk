@@ -4,7 +4,7 @@ import { playFootstep } from "../audio/sound-effects";
 import { animateExpeditionPanel } from "./expedition-animations";
 import { getEternalSave, getExpeditionAtmosphere } from "./expedition-game";
 import {
-  createIsoMapEditorData, DEFAULT_ISOMETRIC_GRID, DEFAULT_ISO_CANVAS_EXPANSION, normalizeIsoCanvasExpansion, isoCellAtPoint, isoCellCenter, isoCellHasLayer,
+  createIsoMapEditorData, DEFAULT_ISOMETRIC_GRID, DEFAULT_ISO_CANVAS_EXPANSION, normalizeIsoCanvasExpansion, calculateIsoCanvasMargins, isoCellAtPoint, isoCellCenter, isoCellHasLayer,
   isoCellKey, isoMapStorageKey, normalizeIsoMapEditorData, toggleIsoCellLayer,
   type IsoCellLayer, type IsoMapEditorData, type IsoMapGridConfig,
 } from "./isometric-map-editor";
@@ -209,14 +209,17 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
     academyImageWidth = Math.max(rect.width, rect.height * ratio);
     academyImageHeight = Math.max(rect.height, rect.width / ratio);
     if(academyCanvas){
-      // Preserve the existing top, right and bottom canvas margins. Give only
-      // the left side a longer runway so the camera can travel much farther.
-      const artworkScale=image.naturalWidth>0?academyImageWidth/image.naturalWidth:1;
+      // Use the same image-scaled cell dimensions and four-side gap formula as
+      // every other isometric map camera.
+      const artworkScale=academyImageWidth/(image.naturalWidth||academyImageWidth);
       const cellW=128*artworkScale,cellH=69.5*artworkScale;
-      academyMarginLeft=Math.max(cellW*2,rect.width*2)+academyExpansion.left;
-      academyMarginRight=Math.max(cellW*2,rect.width/2)+academyExpansion.right;
-      academyMarginTop=Math.max(cellH*2,rect.height/2)+academyExpansion.top;
-      academyMarginBottom=Math.max(cellH*2,rect.height/2)+academyExpansion.bottom;
+      const margins=calculateIsoCanvasMargins({
+        viewportWidth:Math.max(1,rect.width),viewportHeight:Math.max(1,rect.height),
+        artworkWidth:image.naturalWidth||academyImageWidth,artworkHeight:image.naturalHeight||academyImageHeight,
+        displayedArtworkWidth:academyImageWidth,cellWidth:128,cellHeight:69.5,expansion:academyExpansion,
+      });
+      academyMarginLeft=margins.left;academyMarginRight=margins.right;
+      academyMarginTop=margins.top;academyMarginBottom=margins.bottom;
       baseWidth=academyImageWidth+academyMarginLeft+academyMarginRight;
       baseHeight=academyImageHeight+academyMarginTop+academyMarginBottom;
       if(academyGrid){
@@ -714,15 +717,18 @@ function drawIsometricForeground(board:HTMLElement,data=readIsoMapData(board)):v
     const camera=board.closest<HTMLElement>("[data-wmh-iso-camera]");
     const viewport=board.closest<HTMLElement>("[data-wmh-iso-viewport]");
     if(camera&&viewport){
-      const padX=Number.parseFloat(board.style.getPropertyValue("--wmh-camera-pad-x"))||Math.max(1,viewport.clientWidth)*4;
-      const padY=Number.parseFloat(board.style.getPropertyValue("--wmh-camera-pad-y"))||Math.max(1,viewport.clientHeight)*4;
+      const padX=Number.parseFloat(board.style.getPropertyValue("--wmh-camera-pad-x"))||Math.max(1,viewport.clientWidth)*2;
+      const padY=Number.parseFloat(board.style.getPropertyValue("--wmh-camera-pad-y"))||Math.max(1,viewport.clientHeight)/2;
+      const padRight=Number.parseFloat(board.style.getPropertyValue("--wmh-camera-pad-right"))||padX/2;
+      const padBottom=Number.parseFloat(board.style.getPropertyValue("--wmh-camera-pad-bottom"))||padY;
       const zoom=Number.parseFloat(board.style.getPropertyValue("--wmh-camera-zoom"))||1;
-      camera.style.width=(boardWidth*zoom+padX*2)+"px";
-      camera.style.height=(boardHeight*zoom+padY*2)+"px";
+      camera.style.width=(boardWidth*zoom+padX+padRight)+"px";
+      camera.style.height=(boardHeight*zoom+padY+padBottom)+"px";
       board.style.setProperty("--wmh-camera-pad-x",padX+"px");
       board.style.setProperty("--wmh-camera-pad-y",padY+"px");
       viewport.scrollLeft=padX+boardWidth*zoom/2-viewport.clientWidth/2;
       viewport.scrollTop=padY+boardHeight*zoom/2-viewport.clientHeight/2;
+      viewport.dispatchEvent(new Event("merzkava-isometric-artwork-resized"));
     }
   }
   const width=image.clientWidth||image.naturalWidth,height=image.clientHeight||image.naturalHeight;
@@ -1281,7 +1287,8 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
 }
 
 function bindIsometricCamera(dialog:HTMLElement):void {
-  // Academy artwork uses the same cover-fit, drag and pinch camera as World Map.
+  // Academy artwork uses the same image-relative canvas-gap rules as every
+  // other isometric map, but keeps its dedicated artwork camera.
   if(dialog.querySelector<HTMLElement>(".wmh-academy-map-viewport[data-wmh-map-viewport]")){
     bindWorldMapZoom(dialog);
     return;
@@ -1293,17 +1300,46 @@ function bindIsometricCamera(dialog:HTMLElement):void {
   viewport.dataset.cameraBound="true";
   syncIsoDepthAndOcclusion(board);
   let zoom=1,baseW=0,baseH=0,initialFitApplied=false;
-  const padX=()=>Math.max(1,viewport.clientWidth)*4;
-  const padY=()=>Math.max(1,viewport.clientHeight)*4;
+  let margins={...DEFAULT_ISO_CANVAS_EXPANSION};
+  const expansionKey="merzkava.academy-canvas-expansion.v1";
+  let expansion={...DEFAULT_ISO_CANVAS_EXPANSION};
+  try{expansion=normalizeIsoCanvasExpansion(JSON.parse(localStorage.getItem(expansionKey)||"{}"));}catch{}
+  const mapArt=board.querySelector<HTMLImageElement>("[data-wmh-map-art]");
+  const scaledPad=(side:keyof typeof margins)=>margins[side]*zoom;
+  const layoutCamera=()=>{
+    const left=scaledPad("left"),right=scaledPad("right"),top=scaledPad("top"),bottom=scaledPad("bottom");
+    camera.style.position="relative";camera.style.display="block";
+    camera.style.width=((baseW+margins.left+margins.right)*zoom)+"px";
+    camera.style.height=((baseH+margins.top+margins.bottom)*zoom)+"px";
+    board.style.setProperty("--wmh-camera-pad-x",left+"px");
+    board.style.setProperty("--wmh-camera-pad-y",top+"px");
+    board.style.setProperty("--wmh-camera-pad-right",right+"px");
+    board.style.setProperty("--wmh-camera-pad-bottom",bottom+"px");
+    board.style.setProperty("--wmh-camera-zoom",String(zoom));
+    board.style.setProperty("--wmh-camera-inverse-zoom",String(1/zoom));
+    const scaleLabel=dialog.querySelector<HTMLElement>("[data-wmh-iso-level]");
+    if(scaleLabel)scaleLabel.textContent=Math.round(zoom*100)+"%";
+  };
   const measure=()=>{
     const style=getComputedStyle(board);
-    // The level may be bound while its parent is hidden; fall back to this
-    // map's own calibrated grid instead of assuming Academy dimensions.
     const cols=Number(board.dataset.cols)||12,rows=Number(board.dataset.rows)||10;
-    const tileW=Number.parseFloat(style.getPropertyValue("--tile-w"))||64;
-    const tileH=Number.parseFloat(style.getPropertyValue("--tile-h"))||32;
+    const tileW=Number.parseFloat(style.getPropertyValue("--tile-w"))||Number(board.dataset.tileW)||64;
+    const tileH=Number.parseFloat(style.getPropertyValue("--tile-h"))||Number(board.dataset.tileH)||32;
     baseW=board.offsetWidth||Number.parseFloat(style.width)||(cols+rows-2)*tileW/2+tileW;
     baseH=board.offsetHeight||Number.parseFloat(style.height)||(cols+rows-2)*tileH/2+tileH+7;
+    const naturalWidth=mapArt?.naturalWidth||baseW;
+    const naturalHeight=mapArt?.naturalHeight||baseH;
+    const displayedWidth=mapArt?(mapArt.clientWidth||naturalWidth):baseW;
+    margins=calculateIsoCanvasMargins({
+      viewportWidth:Math.max(1,viewport.clientWidth),
+      viewportHeight:Math.max(1,viewport.clientHeight),
+      artworkWidth:naturalWidth,
+      artworkHeight:naturalHeight,
+      displayedArtworkWidth:displayedWidth,
+      cellWidth:tileW,
+      cellHeight:tileH,
+      expansion,
+    });
     if(!initialFitApplied){
       const isTianhaiAcademy=board.dataset.mapId==="golden-dragon-empire:tianhai-academy:exterior";
       const fitWidth=(viewport.clientWidth-24)/Math.max(1,baseW);
@@ -1312,39 +1348,24 @@ function bindIsometricCamera(dialog:HTMLElement):void {
       zoom=isTianhaiAcademy?Math.max(.08,Math.min(2.4,cover)):Math.max(.08,Math.min(1,fitWidth,fitHeight));
       initialFitApplied=true;
     }
-    const px=padX(),py=padY();
-    camera.style.position="relative";camera.style.display="block";
-    camera.style.width=(baseW*zoom+px*2)+"px";
-    camera.style.height=(baseH*zoom+py*2)+"px";
-    board.style.setProperty("--wmh-camera-pad-x",px+"px");
-    board.style.setProperty("--wmh-camera-pad-y",py+"px");
-    board.style.setProperty("--wmh-camera-zoom",String(zoom));
-    board.style.setProperty("--wmh-camera-inverse-zoom",String(1/zoom));
-    const scaleLabel=dialog.querySelector<HTMLElement>("[data-wmh-iso-level]");
-    if(scaleLabel)scaleLabel.textContent=Math.round(zoom*100)+"%";
+    layoutCamera();
   };
   const centerMap=()=>{
     if(!baseW||!baseH)measure();
-    viewport.scrollLeft=padX()+baseW*zoom/2-viewport.clientWidth/2;
-    viewport.scrollTop=padY()+baseH*zoom/2-viewport.clientHeight/2;
+    viewport.scrollLeft=scaledPad("left")+baseW*zoom/2-viewport.clientWidth/2;
+    viewport.scrollTop=scaledPad("top")+baseH*zoom/2-viewport.clientHeight/2;
   };
   const apply=(next:number,focusX?:number,focusY?:number)=>{
     if(!baseW||!baseH)measure();
-    const old=zoom;zoom=Math.max(.08,Math.min(2.4,next));
-    const rect=viewport.getBoundingClientRect(),px=padX(),py=padY();
+    const old=zoom,rect=viewport.getBoundingClientRect();
     const fx=focusX==null?viewport.clientWidth/2:focusX-rect.left;
     const fy=focusY==null?viewport.clientHeight/2:focusY-rect.top;
-    const ax=viewport.scrollLeft+fx-px,ay=viewport.scrollTop+fy-py;
-    camera.style.width=(baseW*zoom+px*2)+"px";
-    camera.style.height=(baseH*zoom+py*2)+"px";
-    board.style.setProperty("--wmh-camera-pad-x",px+"px");
-    board.style.setProperty("--wmh-camera-pad-y",py+"px");
-    board.style.setProperty("--wmh-camera-zoom",String(zoom));
-    board.style.setProperty("--wmh-camera-inverse-zoom",String(1/zoom));
-    viewport.scrollLeft=px+ax*zoom/old-fx;
-    viewport.scrollTop=py+ay*zoom/old-fy;
-    const label=dialog.querySelector<HTMLElement>("[data-wmh-iso-level]");
-    if(label)label.textContent=Math.round(zoom*100)+"%";
+    const worldX=(viewport.scrollLeft+fx-scaledPad("left"))/old;
+    const worldY=(viewport.scrollTop+fy-scaledPad("top"))/old;
+    zoom=Math.max(.08,Math.min(2.4,next));
+    layoutCamera();
+    viewport.scrollLeft=scaledPad("left")+worldX*zoom-fx;
+    viewport.scrollTop=scaledPad("top")+worldY*zoom-fy;
   };
   dialog.querySelectorAll<HTMLElement>("[data-wmh-iso-zoom]").forEach(button=>button.addEventListener("click",()=>{
     const action=button.dataset.wmhIsoZoom;
@@ -1358,7 +1379,7 @@ function bindIsometricCamera(dialog:HTMLElement):void {
   viewport.addEventListener("pointermove",e=>{if(!pts.has(e.pointerId))return;pts.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pts.size===2&&pinch){const p=[...pts.values()];apply(pinch.zoom*dist(p[0],p[1])/pinch.distance,(p[0].x+p[1].x)/2,(p[0].y+p[1].y)/2);e.preventDefault();}});
   const finish=(e:PointerEvent)=>{pts.delete(e.pointerId);if(pts.size<2)pinch=null;};
   viewport.addEventListener("pointerup",finish);viewport.addEventListener("pointercancel",finish);
-  // Wait until the map view is visible; hidden-parent measurements can be zero.
+  viewport.addEventListener("merzkava-isometric-artwork-resized",()=>{measure();centerMap();});
   const initialize=()=>{measure();centerMap();};
   requestAnimationFrame(()=>requestAnimationFrame(initialize));
   if(typeof ResizeObserver!=="undefined"){
