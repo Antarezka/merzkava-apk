@@ -945,11 +945,13 @@ function relocateActorsFromBlockedCells(board:HTMLElement,data:IsoMapEditorData)
     const queue:Array<[number,number]>=[[sx,sy]],visited=new Set<string>([sx+","+sy]);
     for(let cursor=0;cursor<queue.length;cursor++){
       const [x,y]=queue[cursor],key=x+","+y;
-      if(!isoCellHasLayer(data,"blockedCells",x,y)&&!reserved.has(key))return{x,y};
+      if(isoCellIsWalkable(data,x,y)&&!reserved.has(key))return{x,y};
       const neighbors:[[number,number],[number,number],[number,number],[number,number]]=[[x,y-1],[x+1,y],[x,y+1],[x-1,y]];
       for(const [nx,ny] of neighbors){
         const next=nx+","+ny;
         if(nx<0||ny<0||nx>=cols||ny>=rows||visited.has(next))continue;
+        if(isoCellIsWalkable(data,x,y)&&!isoCanStep(data,x,y,nx,ny))continue;
+        if(!isoCellIsWalkable(data,nx,ny))continue;
         visited.add(next);queue.push([nx,ny]);
       }
     }
@@ -961,7 +963,7 @@ function relocateActorsFromBlockedCells(board:HTMLElement,data:IsoMapEditorData)
     const x=Number(actor.dataset.x||0),y=Number(actor.dataset.y||0);
     const inside=x>=0&&y>=0&&x<cols&&y<rows;
     const key=x+","+y;
-    if(inside&&!isoCellHasLayer(data,"blockedCells",x,y)&&!reserved.has(key)){
+    if(inside&&isoCellIsWalkable(data,x,y)&&!reserved.has(key)){
       reserved.add(key);placements.push({actor,x,y});continue;
     }
     const safe=nearestSafe(x,y);
@@ -1296,7 +1298,9 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       const previousGrid={...grid};
       remember();const property=input.dataset.wmhGridControl as keyof IsoMapGridConfig;grid[property]=Number(input.value);
       const valid=(key:string)=>{const [x,y]=key.split(",").map(Number);return x<grid.cols&&y<grid.rows;};
-      data.foregroundCells=data.foregroundCells.filter(valid);data.blockedCells=data.blockedCells.filter(valid);data.opacityCells=data.opacityCells.filter(valid);
+      const validQuadrant=(key:string)=>{const match=/^([0-9]+),([0-9]+):(tl|tr|bl|br)$/.exec(key);return !!match&&Number(match[1])<grid.cols&&Number(match[2])<grid.rows;};
+      data.foregroundCells=data.foregroundCells.filter(valid);data.blockedCells=data.blockedCells.filter(valid);data.opacityCells=data.opacityCells.filter(valid);data.walkableCells=data.walkableCells.filter(valid);
+      data.foregroundQuadrants=data.foregroundQuadrants.filter(validQuadrant);data.blockedQuadrants=data.blockedQuadrants.filter(validQuadrant);data.opacityQuadrants=data.opacityQuadrants.filter(validQuadrant);
       data.transitions=data.transitions.filter(m=>m.x<grid.cols&&m.y<grid.rows);applyGrid();
       if(!relocateActorsFromBlockedCells(board,data)){
         data=previous;Object.assign(grid,previousGrid);history.pop();input.value=String(grid[property]);applyGrid();
@@ -1315,7 +1319,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
   });
   panel.querySelector<HTMLElement>("[data-wmh-overlay-clear]")?.addEventListener("click",()=>{
     if(!window.confirm("Clear foreground, blocked, opacity, and transition settings for this map?"))return;
-    remember();data.foregroundCells=[];data.blockedCells=[];data.opacityCells=[];data.transitions=[];selectedTransitionId=null;
+    remember();data.foregroundCells=[];data.blockedCells=[];data.opacityCells=[];data.walkableCells=[];data.walkableAreaEnabled=false;data.foregroundQuadrants=[];data.blockedQuadrants=[];data.opacityQuadrants=[];data.transitions=[];selectedTransitionId=null;if(walkableToggle)walkableToggle.checked=false;
     if(transitionField)transitionField.value="";persist();setStatus("All map cell layers and transitions cleared.");
   });
   panel.querySelector<HTMLElement>("[data-wmh-overlay-save]")?.addEventListener("click",()=>{
@@ -1686,7 +1690,7 @@ function startNpcWander(dialog:HTMLElement):void {
       const options=[[x+1,y],[x-1,y],[x,y+1],[x,y-1]].filter(([nx,ny])=>{
         const tile=board.querySelector<HTMLElement>('[data-wmh-tile][data-x="'+nx+'"][data-y="'+ny+'"]');
         return nx>=0&&nx<Number(board.dataset.cols||12)&&ny>=0&&ny<Number(board.dataset.rows||10)&&
-          isoCanWalkTile(board,tile,nx,ny,mapData)&&
+          !!tile&&isoCanStep(mapData,x,y,nx,ny)&&
           !(Number(player?.dataset.x||5)===nx&&Number(player?.dataset.y||8)===ny);
       });
       if(!options.length)return;
@@ -1740,7 +1744,7 @@ function walkToTile(dialog:HTMLElement,targetX:number,targetY:number,surface:str
       const key=nx+","+ny;
       if(nx<0||nx>=cols||ny<0||ny>=rows||previous.has(key))continue;
       const nextTile=board.querySelector<HTMLElement>('[data-wmh-tile][data-x="'+nx+'"][data-y="'+ny+'"]');
-      if(!isoCanWalkTile(board,nextTile,nx,ny,mapData))continue;
+      if(!nextTile||!isoCanStep(mapData,x,y,nx,ny))continue;
       previous.set(key,x+","+y);queue.push([nx,ny]);
     }
   }
