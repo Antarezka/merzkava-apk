@@ -57,7 +57,7 @@ export function calculateIsoCanvasMargins(input: {
   const viewportWidth = finitePositive(input.viewportWidth);
   const viewportHeight = finitePositive(input.viewportHeight);
   const artworkWidth = finitePositive(input.artworkWidth);
-  const artworkHeight = finitePositive(input.artworkHeight);
+  finitePositive(input.artworkHeight);
   const scale = finitePositive(input.displayedArtworkWidth ?? artworkWidth) / artworkWidth;
   const cellWidth = finitePositive(input.cellWidth) * scale;
   const cellHeight = finitePositive(input.cellHeight) * scale;
