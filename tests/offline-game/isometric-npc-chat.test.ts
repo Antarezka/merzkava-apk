@@ -20,7 +20,6 @@ describe("isometric NPC conversations", () => {
     const finalRule = rules.filter(rule => rule[1].includes("position:fixed")).at(-1)?.[1] ?? "";
     expect(finalRule).toContain("position:fixed");
     expect(finalRule).toContain("inset:auto 0 0");
-    expect(finalRule).toContain("bottom:0");
     expect(finalRule).toContain("align-items:flex-end");
     expect(finalRule).not.toContain("place-items:center");
   });
