@@ -1,8 +1,3 @@
-export interface KVNamespaceLike {
-  get(key: string): Promise<string | null>;
-  put(key: string, value: string, options?: { expirationTtl?: number }): Promise<void>;
-}
-
 export interface Env {
   SUPABASE_URL: string;
   SUPABASE_ANON_KEY: string;
@@ -11,10 +6,6 @@ export interface Env {
   AI_MODEL: string;
   ALLOWED_ORIGINS: string;
   AI_RATE_LIMITER?: { limit(options: { key: string }): Promise<{ success: boolean }> };
-  ATLAS_RESET_KV?: KVNamespaceLike;
-  ATLAS_RESET_LIMITER?: { limit(options: { key: string }): Promise<{ success: boolean }> };
-  ATLAS_MASTER_RESET_PASSWORD?: string;
-  ATLAS_DEVELOPER_EMAILS?: string;
 }
 
 interface GMRequest {
@@ -29,7 +20,6 @@ interface AuthIdentity {
 
 const MAX_BODY_BYTES = 180000;
 const MAX_PROMPT_CHARS = 160000;
-const AUDIT_RETENTION_SECONDS = 60 * 60 * 24 * 180;
 
 function response(body: unknown, status: number, origin: string | null, env: Env): Response {
   const allowed = (env.ALLOWED_ORIGINS ?? "").split(",").map(value => value.trim()).filter(Boolean);
@@ -75,91 +65,7 @@ async function authenticate(request: Request, env: Env): Promise<AuthIdentity | 
   }
 }
 
-function validPlayerName(value: unknown): string | null {
-  if (typeof value !== "string") return null;
-  const playerName = value.trim();
-  if (!playerName || playerName.length > 80 || /[\u0000-\u001f]/.test(playerName)) return null;
-  return playerName;
-}
-
-async function playerResetKey(playerName: string): Promise<string> {
-  const bytes = new Uint8Array(await crypto.subtle.digest(
-    "SHA-256",
-    new TextEncoder().encode(playerName.trim().toLocaleLowerCase())
-  ));
-  const hex = Array.from(bytes, byte => byte.toString(16).padStart(2, "0")).join("");
-  return "atlas-reset:v1:" + hex;
-}
-
-function secretMatches(actual: string, expected: string): boolean {
-  const left = new TextEncoder().encode(actual);
-  const right = new TextEncoder().encode(expected);
-  let difference = left.length ^ right.length;
-  const length = Math.max(left.length, right.length);
-  for (let index = 0; index < length; index++) {
-    difference |= (left[index] ?? 0) ^ (right[index] ?? 0);
-  }
-  return difference === 0;
-}
-
-async function readJson(request: Request): Promise<Record<string, unknown> | null> {
-  try {
-    const raw = await request.text();
-    if (new TextEncoder().encode(raw).byteLength > MAX_BODY_BYTES) return null;
-    const value: unknown = JSON.parse(raw);
-    return value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : null;
-  } catch {
-    return null;
-  }
-}
-
-async function resetRateAllowed(request: Request, env: Env): Promise<boolean> {
-  if (!env.ATLAS_RESET_LIMITER) return false;
-  const address = request.headers.get("CF-Connecting-IP") ?? "unknown-client";
-  try {
-    const result = await env.ATLAS_RESET_LIMITER.limit({ key: address });
-    return result.success;
-  } catch {
-    return false;
-  }
-}
-
-async function readPlayerResetRevision(playerName: string, env: Env): Promise<string> {
-  if (!env.ATLAS_RESET_KV) throw new Error("The World Atlas reset registry is not configured.");
-  return await env.ATLAS_RESET_KV.get(await playerResetKey(playerName)) ?? "0";
-}
-
-async function invalidatePlayerPassword(
-  playerName: string,
-  env: Env,
-  resetType: "master" | "developer",
-  actor: string
-): Promise<string> {
-  if (!env.ATLAS_RESET_KV) throw new Error("The World Atlas reset registry is not configured.");
-  const resetRevision = crypto.randomUUID();
-  const key = await playerResetKey(playerName);
-  await env.ATLAS_RESET_KV.put(key, resetRevision);
-  const auditId = "atlas-reset-audit:v1:" + Date.now() + ":" + crypto.randomUUID();
-  const playerHash = key.slice("atlas-reset:v1:".length);
-  await env.ATLAS_RESET_KV.put(auditId, JSON.stringify({
-    resetType,
-    actor,
-    playerHash,
-    resetRevision,
-    timestamp: new Date().toISOString()
-  }), { expirationTtl: AUDIT_RETENTION_SECONDS });
-  return resetRevision;
-}
-
-async function parseResetRequest(request: Request, origin: string | null, env: Env): Promise<Record<string, unknown> | Response> {
-  const contentLength = Number(request.headers.get("Content-Length") ?? "0");
-  if (contentLength > 4096) return response({ error: "Request too large." }, 413, origin, env);
-  const body = await readJson(request);
-  if (!body) return response({ error: "Request body must be a valid JSON object." }, 400, origin, env);
-  return body;
-}
-
-export default {
+export default {export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const origin = request.headers.get("Origin");
     const allowed = (env.ALLOWED_ORIGINS ?? "").split(",").map(value => value.trim()).filter(Boolean);
@@ -169,69 +75,6 @@ export default {
     const url = new URL(request.url);
     if (request.method === "GET" && url.pathname === "/health") {
       return response({ ok: true, service: "merzkava-gm-gateway" }, 200, origin, env);
-    }
-
-    if (request.method === "GET" && url.pathname === "/v1/atlas/reset-status") {
-      const playerName = validPlayerName(url.searchParams.get("player"));
-      if (!playerName) return response({ error: "A valid player name is required." }, 400, origin, env);
-      try {
-        const resetRevision = await readPlayerResetRevision(playerName, env);
-        return response({ resetRevision }, 200, origin, env);
-      } catch (error) {
-        return response({ error: error instanceof Error ? error.message : "Reset registry unavailable." }, 503, origin, env);
-      }
-    }
-
-    if (request.method === "POST" && url.pathname === "/v1/atlas/master-reset") {
-      if (!env.ATLAS_MASTER_RESET_PASSWORD) {
-        return response({ error: "The master reset credential is not configured on the server." }, 503, origin, env);
-      }
-      if (!env.ATLAS_RESET_KV || !env.ATLAS_RESET_LIMITER) {
-        return response({ error: "The secure reset registry or rate limiter is not configured." }, 503, origin, env);
-      }
-      if (!await resetRateAllowed(request, env)) {
-        return response({ error: "Too many reset attempts or reset protection is unavailable. Try again later." }, 429, origin, env);
-      }
-      const parsed = await parseResetRequest(request, origin, env);
-      if (parsed instanceof Response) return parsed;
-      const playerName = validPlayerName(parsed.playerName);
-      const masterPassword = typeof parsed.masterPassword === "string" ? parsed.masterPassword : "";
-      if (!playerName || !masterPassword) return response({ error: "A valid player name and master reset password are required." }, 400, origin, env);
-      if (!secretMatches(masterPassword, env.ATLAS_MASTER_RESET_PASSWORD)) {
-        return response({ error: "The master reset password is incorrect." }, 403, origin, env);
-      }
-      try {
-        const resetRevision = await invalidatePlayerPassword(playerName, env, "master", "master-reset");
-        return response({ resetRevision }, 200, origin, env);
-      } catch (error) {
-        return response({ error: error instanceof Error ? error.message : "Could not invalidate the player password." }, 503, origin, env);
-      }
-    }
-
-    if (request.method === "POST" && url.pathname === "/v1/atlas/developer-reset") {
-      if (!env.ATLAS_RESET_KV || !env.ATLAS_RESET_LIMITER) {
-        return response({ error: "The secure reset registry or rate limiter is not configured." }, 503, origin, env);
-      }
-      if (!await resetRateAllowed(request, env)) {
-        return response({ error: "Too many reset attempts or reset protection is unavailable. Try again later." }, 429, origin, env);
-      }
-      const identity = await authenticate(request, env);
-      if (!identity?.email) return response({ error: "An authenticated Developer account is required." }, 401, origin, env);
-      const authorizedEmails = (env.ATLAS_DEVELOPER_EMAILS ?? "")
-        .split(",").map(value => value.trim().toLowerCase()).filter(Boolean);
-      if (!authorizedEmails.length || !authorizedEmails.includes(identity.email)) {
-        return response({ error: "This Supabase account is not authorized to reset player passwords." }, 403, origin, env);
-      }
-      const parsed = await parseResetRequest(request, origin, env);
-      if (parsed instanceof Response) return parsed;
-      const playerName = validPlayerName(parsed.playerName);
-      if (!playerName) return response({ error: "A valid player name is required." }, 400, origin, env);
-      try {
-        const resetRevision = await invalidatePlayerPassword(playerName, env, "developer", identity.email);
-        return response({ resetRevision }, 200, origin, env);
-      } catch (error) {
-        return response({ error: error instanceof Error ? error.message : "Could not invalidate the player password." }, 503, origin, env);
-      }
     }
 
     if (request.method !== "POST" || url.pathname !== "/v1/gm") {
