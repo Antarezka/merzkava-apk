@@ -12,7 +12,7 @@ import { initializeArcanistryTransitDrag } from "./offline-game/transit-pull-dra
 import { animateExpeditionChoiceModal, animateExpeditionPanel, mountExpeditionAnimations } from "./offline-game/expedition-animations";
 import { deleteEternalSave, exportEternalSave, importEternalSave, listEternalSaves, loadEternalSave, renameEternalSave, resetEternalGame, resolveEternalSituationChoice, advanceEternalWorldTime, setEternalLocation, startEternalGame, unloadEternalGame, type EternalRegion } from "./offline-game/expedition-game";
 import { hasAtlasPassword, setAtlasPassword, verifyAtlasPassword, rememberAtlasPlayer, restoreAtlasPlayer } from "./offline-game/world-atlas-account";
-import { authenticateDeveloper, restoreDeveloperSession, signOutDeveloper } from "./security/developer-access";
+import { authenticateDeveloper, restoreDeveloperSession, restoreRememberedDeveloperCredentials, signOutDeveloper, type RememberedDeveloperCredentials } from "./security/developer-access";
 import { getCanonIndex, getCanonStatus, loadCanonModule, loadPlayerRegistry, loadRegisteredPlayerProfile, refreshCanon, refreshLatestPlayerRegistry, type CanonDocument } from "./convo/canon/canon-loader";
 import { routeCanonActivity } from "./convo/canon/canon-router";
 import { assembleGameplayContext } from "./convo/canon/context-assembler";
@@ -27,7 +27,7 @@ import { getLedgerLog, initializeLedgerNotifications, showLedgerProposalBubble }
 import { startFloatingMode, requestFloatingOverlayPermission, getFloatingReadiness, requestFloatingNotifications, requestFloatingBatteryExemption, showFloatingBubble, stopFloatingService, exitMerzkavaApplication, type FloatingReadiness } from "./native/floating-window";
 import { floatingControlMarkup } from "./app/floating-control";
 import { exitConfirmationPanelMarkup } from "./app/exit-confirm-panel";
-import { developerHeaderControls, developerLoginPanel } from "./app/developer-access-panel";
+import { accountSettingsPanel, developerLoginPanel } from "./app/developer-access-panel";
 import { dustyLetterMarkup } from "./app/dusty-letter";
 import { APP_NAME, APP_VERSION } from "./app/app-meta";
 import { getLanguage, languagePanelMarkup, translateLabel, translateRenderedContent, setLanguage, type AppLanguage } from "./i18n";
@@ -36,7 +36,7 @@ import { animateAppScreen } from "./ui/app-shell-motion";
 import { initializeGravityPullCord } from "./ui/gravity-pull-cord";
 import { mountArcanistryTicketMachine } from "./offline-game/arcanistry-ticket-machine";
 import { handleWorldMapHierarchyClick, initializeWorldMapHierarchy, setWorldMapDeveloperMode } from "./offline-game/world-map-hierarchy";
-import { closeLoreEntry, closeLoreSource, closeLorePlaceholder, openLoreEntry, openLoreSource, openLorePlaceholder, setLoreCategory, setLoreSearch, renderLoreResults } from "./world-archive/lore-library";
+import { closeLoreEntry, closeLoreSource, closeLorePlaceholder, openLoreEntry, openLoreSource, openLorePlaceholder, setLoreCategory, setLoreSearch, renderLoreResults } from "./world-archive/lore-library";\nimport { playWorldAtlasAccessSequence } from "./offline-game/world-atlas-login-motion";
 
 const app = document.querySelector<HTMLDivElement>("#app");
 if (!app) throw new Error("App root element was not found.");
@@ -175,7 +175,7 @@ type AppScreen = ScreenId | "control";
 let activeScreen: AppScreen = "control";
 let developerAuthenticated = false;
 let developerLoginMessage = "";
-let developerLoginBusy = false;
+let developerLoginBusy = false;\nlet rememberedDeveloperCredentials: RememberedDeveloperCredentials | null = null;
 let playerAuthenticated = false;
 let playerLoginMessage = "";
 let playerLoginBusy = false;
@@ -549,16 +549,16 @@ function render(): void {
   const previousNavigation = root.querySelector<HTMLElement>(".nav-roulette-track");
   if (previousNavigation) savedNavigationScrollLeft = previousNavigation.scrollLeft;
   root.innerHTML = `<div class="app-shell ${isControl ? "control-shell" : ""} ${menuRevealPending ? "is-entering" : ""} ${navigationCollapsed ? "is-nav-collapsed" : ""}">
-    ${isControl ? "" : `<header class="app-header"><button class="brand" data-screen="home" aria-label="Merzkava home"><span class="brand-mark">M</span><span class="brand-wordmark"><small>MERZKAVA UNIVERSE</small><strong>Merzkava</strong></span></button><div class="header-context"><small>TACTICAL ACADEMY</small><strong>${translateLabel(navigation.find(item => item.id === activeScreen)?.label ?? "Command Hall", currentLanguage)}</strong></div><div class="header-tools"><button class="header-settings header-kitty-trigger" data-floating-action="start-bubble" aria-label="Start Bubble Mode" title="Start Bubble Mode"><span class="header-kitty-mascot" aria-hidden="true"><img class="header-kitty-layer header-kitty-shadow" src="/kitty/shadow/kitty-shadow.png" alt="" /><img class="header-kitty-layer header-kitty-tail" src="/kitty/ekor/kitty-tail.png" alt="" /><img class="header-kitty-layer header-kitty-body" src="/kitty/body/kitty-body.png" alt="" /><img class="header-kitty-layer header-kitty-head" src="/kitty/kepala/kitty-head.png" alt="" /></span></button>${developerHeaderControls(currentLanguage,developerAuthenticated,playerAuthenticated)}<button class="header-settings" data-screen="settings" aria-label="Settings">⚙</button></div></header>
+    ${isControl ? "" : `<header class="app-header"><button class="brand" data-screen="home" aria-label="Merzkava home"><span class="brand-mark">M</span><span class="brand-wordmark"><small>MERZKAVA UNIVERSE</small><strong>Merzkava</strong></span></button><div class="header-context"><small>TACTICAL ACADEMY</small><strong>${translateLabel(navigation.find(item => item.id === activeScreen)?.label ?? "Command Hall", currentLanguage)}</strong></div><div class="header-tools"><button class="header-settings header-kitty-trigger" data-floating-action="start-bubble" aria-label="Start Bubble Mode" title="Start Bubble Mode"><span class="header-kitty-mascot" aria-hidden="true"><img class="header-kitty-layer header-kitty-shadow" src="/kitty/shadow/kitty-shadow.png" alt="" /><img class="header-kitty-layer header-kitty-tail" src="/kitty/ekor/kitty-tail.png" alt="" /><img class="header-kitty-layer header-kitty-body" src="/kitty/body/kitty-body.png" alt="" /><img class="header-kitty-layer header-kitty-head" src="/kitty/kepala/kitty-head.png" alt="" /></span></button><button class="header-settings" data-screen="settings" aria-label="Settings">⚙</button></div></header>
     `}${notice ? `<p class="notice" role="status">${escapeHtml(notice)}</p>` : ""}
-    ${isControl ? content : `<main class="main-content">${activeScreen === "settings" ? `<details class="settings-category app-settings-category" open><summary><span>APP SETTINGS</span><small>Appearance · Wallpapers · Language · Sound · Storage</small></summary><div class="settings-category-content">${languagePanelMarkup(currentLanguage)}${content}</div></details>${developerAuthenticated ? `<details class="settings-category world-settings-category"><summary><span>WORLD & ACCOUNT</span><small>Supabase · AI Gateway · Canon Source</small></summary><div class="settings-category-content">${authPanel()}${canonPanel()}</div></details>` : ""}` : `${content}${activeScreen === "home" ? dustyLetterMarkup(currentLanguage, APP_VERSION) : ""}`}</main>`}
+    ${isControl ? content : `<main class="main-content">${activeScreen === "settings" ? `<details class="settings-category app-settings-category" open><summary><span>APP SETTINGS</span><small>Appearance · Wallpapers · Language · Sound · Storage</small></summary><div class="settings-category-content">${languagePanelMarkup(currentLanguage)}${content}${accountSettingsPanel(currentLanguage,developerAuthenticated,playerAuthenticated)}</div></details>${developerAuthenticated ? `<details class="settings-category world-settings-category"><summary><span>WORLD & ACCOUNT</span><small>Supabase · AI Gateway · Canon Source</small></summary><div class="settings-category-content">${authPanel()}${canonPanel()}</div></details>` : ""}` : `${content}${activeScreen === "home" ? dustyLetterMarkup(currentLanguage, APP_VERSION) : ""}`}</main>`}
     ${isControl ? "" : `<nav class="bottom-nav" aria-label="Academy navigation"><span class="nav-cable nav-cable-left" aria-hidden="true"></span><span class="nav-cable nav-cable-right" aria-hidden="true"></span><div class="nav-roulette-track">${visibleNavigation.map((item, index) => `<button class="nav-item ${activeScreen === item.id ? "active" : ""}" data-screen="${item.id}" ${activeScreen === item.id ? 'aria-current="page"' : ""}><span class="nav-item-motion"><span class="nav-index">${String(index + 1).padStart(2, "0")}</span><span class="nav-rotor" aria-hidden="true"><span class="nav-rotor-mark"></span><span class="nav-rotor-grip" data-nav-rotor="${item.id}"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="21" fill="none" stroke="transparent" stroke-width="7" pointer-events="stroke"/></svg></span><span class="nav-icon-frame nav-icon-frame-${item.id}"><span class="nav-icon"><span class="nav-icon-art">${item.icon}</span></span></span></span><small>${translateLabel(item.label, currentLanguage)}</small></span></button>`).join("")}</div></nav>`}
     ${!isControl ? `<div class="gravity-pull-cord" data-gravity-cord aria-hidden="true"><span class="gravity-cord-anchor"></span><svg class="gravity-cord-line" viewBox="0 0 54 210" aria-hidden="true"><defs><linearGradient id="cord-braid" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#491416"/><stop offset=".28" stop-color="#9d302c"/><stop offset=".52" stop-color="#d26b52"/><stop offset=".72" stop-color="#9d302c"/><stop offset="1" stop-color="#491416"/></linearGradient></defs><path data-cord-line d="M 27 5 C 27 48, 27 76, 27 118"/><path class="cord-thread-highlight" d="M 27 5 C 27 48, 27 76, 27 118"/></svg><button class="gravity-cord-terminal" type="button" data-cord-handle aria-label="${translateLabel(navigationCollapsed ? "Pull upward to show toolbar" : "Pull downward to hide toolbar", currentLanguage)}" title="${translateLabel(navigationCollapsed ? "Show toolbar" : "Hide toolbar", currentLanguage)}"><span class="gravity-cord-jewel" aria-hidden="true"></span></button></div>` : ""}
 
     ${isControl ? "" : `<div class="storage-status"><span class="status-dot"></span>${databaseMessage}</div>`}
     ${activeScreen === "gameplay" ? snapshotBlindMarkup() : ""}
     ${activeScreen === "home" && noticeboardVisible ? noticeboardMarkup() : ""}
-    ${developerLoginPanel(currentLanguage,developerLoginMessage,developerLoginBusy,!hasAppAccess()&&activeScreen==="control",playerLoginMessage,playerLoginBusy,accessLoginMode,playerLoginName)}
+    ${developerLoginPanel(currentLanguage,developerLoginMessage,developerLoginBusy,!hasAppAccess()&&activeScreen==="control",playerLoginMessage,playerLoginBusy,accessLoginMode,playerLoginName,rememberedDeveloperCredentials)}
     ${exitConfirmationPanelMarkup(currentLanguage)}
     ${developerAuthenticated ? bugPanelMarkup() : ""}
   </div>`;
@@ -679,16 +679,29 @@ async function refreshPlayerRegistry(): Promise<void> {
   }
 }
 
-type AtlasEligiblePlayer = { id:string; name:string; registryPath:string };
+type AtlasEligiblePlayer = { id:string; name:string; registryPath:string; source:"universe"|"local-profile"|"local-journey" };
 function atlasEligiblePlayers():AtlasEligiblePlayer[] {
-  const localNames=new Set(listEternalSaves().map(save=>save.characterName.trim().toLocaleLowerCase()));
   const seen=new Set<string>();
-  return registeredCharacters.flatMap(player=>{
+  const result:AtlasEligiblePlayer[]=[];
+  for(const player of registeredCharacters){
     const key=player.name.trim().toLocaleLowerCase();
-    if(!key||!localNames.has(key)||seen.has(key))return [];
+    if(!key||seen.has(key))continue;
     seen.add(key);
-    return [{id:player.id,name:player.name,registryPath:player.registryPath||""}];
-  });
+    result.push({id:player.id,name:player.name,registryPath:player.registryPath||"",source:"universe"});
+  }
+  for(const character of characters){
+    const key=character.name.trim().toLocaleLowerCase();
+    if(!key||seen.has(key))continue;
+    seen.add(key);
+    result.push({id:character.id,name:character.name,registryPath:"",source:"local-profile"});
+  }
+  for(const journey of listEternalSaves()){
+    const key=journey.characterName.trim().toLocaleLowerCase();
+    if(!key||seen.has(key))continue;
+    seen.add(key);
+    result.push({id:"journey:"+journey.id,name:journey.characterName,registryPath:"",source:"local-journey"});
+  }
+  return result;
 }
 function lockAtlasBackground(gate:HTMLElement,locked:boolean):void {
   const dialog=gate.parentElement;
@@ -776,11 +789,17 @@ async function openWorldAtlasFromTv():Promise<void> {
     }
     if(!canon.commitSha||canon.status==="error")throw new Error("The verified players.md snapshot is unavailable. Refresh the World Archive source and try again.");
     while(playerRegistryBusy)await new Promise<void>(resolve=>window.setTimeout(resolve,60));
-    if(!registeredCharacters.length)await refreshPlayerRegistry();
+    const registry=await refreshLatestPlayerRegistry(canon.commitSha);
+    if(registry.commitSha!==canon.commitSha)throw new Error("The player registry does not match the verified active Universe snapshot.");
+    registeredCharacters=mapRegistryCharacters(registry);
+    playerRegistryMessage=registeredCharacters.length+" Universe players · snapshot "+registry.commitSha;
     const options=atlasEligiblePlayers();
     const remembered=await restoreAtlasPlayer().catch(()=> "");
     if(select){
-      select.innerHTML='<option value="">— Select a character —</option>'+options.map(player=>'<option value="'+escapeHtml(player.name)+'">'+escapeHtml(player.name)+'</option>').join("");
+      select.innerHTML='<option value="">— Select a character —</option>'+options.map(player=>{
+        const sourceLabel=player.source==="universe"?" · Universe":player.source==="local-journey"?" · Local Journey":" · Local Profile";
+        return '<option value="'+escapeHtml(player.name)+'">'+escapeHtml(player.name+sourceLabel)+'</option>';
+      }).join("");
       if(options.some(player=>player.name===remembered))select.value=remembered;
       if(select.dataset.atlasLoginBound!=="true"){
         select.dataset.atlasLoginBound="true";
@@ -788,7 +807,7 @@ async function openWorldAtlasFromTv():Promise<void> {
       }
     }
     if(!options.length){
-      if(message)message.textContent="No eligible account found. A player must exist in the verified players.md registry and have a matching local Eternal Path save.";
+      if(message)message.textContent=gate.dataset.emptyLabel||"No local or Universe player records are available. Create a character in Profile or add one to the Universe registry.";
       if(submit)submit.disabled=true;
     }else{
       await refreshAtlasPasswordMode(gate);
@@ -1152,6 +1171,19 @@ function selectArcanistDestination(place:HTMLElement):void{
 root.addEventListener("click", async (event: MouseEvent) => {
   const target = event.target;
   if (!(target instanceof Element)) return;
+  const passwordVisibilityToggle=target.closest<HTMLButtonElement>("[data-password-visibility-toggle]");
+  if(passwordVisibilityToggle){
+    const input=root.querySelector<HTMLInputElement>("#developer-login-password");
+    if(input){
+      const visible=input.type==="password";
+      input.type=visible?"text":"password";
+      passwordVisibilityToggle.setAttribute("aria-pressed",String(visible));
+      passwordVisibilityToggle.setAttribute("aria-label",visible?(passwordVisibilityToggle.dataset.hideLabel||"Hide password"):(passwordVisibilityToggle.dataset.showLabel||"Show password"));
+      passwordVisibilityToggle.classList.toggle("is-visible",visible);
+      input.focus();
+    }
+    return;
+  }
   if(target.closest("[data-app-exit-no]")){
     const panel=root.querySelector<HTMLElement>("[data-app-exit-panel]");if(panel)panel.hidden=true;return;
   }
@@ -1236,7 +1268,7 @@ root.addEventListener("click", async (event: MouseEvent) => {
   if(idlePlaceButton){selectArcanistDestination(idlePlaceButton);return;}
   if(target.closest("[data-arcanist-pull]")){const drawer=root.querySelector<HTMLElement>("[data-arcanist-device]");const trigger=root.querySelector<HTMLButtonElement>("[data-arcanist-pull]");const machine=root.querySelector<HTMLElement>("[data-arcanistry-machine]");if(drawer&&trigger){if(!drawer.hidden&&machine?.dataset.machineState!=="idle")return;drawer.hidden = !drawer.hidden;trigger.setAttribute("aria-expanded",String(!drawer.hidden));}return;}
   if(target.closest("[data-arcanist-close]")){const drawer=root.querySelector<HTMLElement>("[data-arcanist-device]");const trigger=root.querySelector<HTMLButtonElement>("[data-arcanist-pull]");const machine=root.querySelector<HTMLElement>("[data-arcanistry-machine]");if(machine&&machine.dataset.machineState!=="idle")return;if(drawer&&trigger){drawer.hidden=true;trigger.setAttribute("aria-expanded","false");}return;}
-  if(target.closest("[data-world-atlas-gate-back]")){
+  if(target.closest("[data-world-atlas-gate-back]")){\n    if(worldAtlasLoginBusy)return;
     closeWorldAtlas();return;
   }
   if (target.closest("[data-idle-rpg-open]")) { await openWorldAtlasFromTv(); return; }
@@ -1702,28 +1734,42 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     const button=form.querySelector<HTMLButtonElement>("[data-world-atlas-submit]");
     if(!gate||!eligible){if(message)message.textContent="This character is not registered in the verified players.md and local Eternal Path account list.";return;}
     if(password.length<8||password.length>128){if(message)message.textContent="Use a password between 8 and 128 characters.";return;}
-    worldAtlasLoginBusy=true;if(button)button.disabled=true;
-    if(message)message.textContent="Checking local account credentials…";
+    let passwordExists=false;
+    try{passwordExists=await hasAtlasPassword(playerName);}
+    catch(error){if(message)message.textContent=error instanceof Error?error.message:"Secure local account storage is unavailable.";return;}
+    if(!passwordExists&&password!==confirmation){if(message)message.textContent="The two passwords do not match.";return;}
+    worldAtlasLoginBusy=true;
+    if(button)button.disabled=true;
+    const closeButton=gate.querySelector<HTMLButtonElement>("[data-world-atlas-gate-back]");
+    if(closeButton)closeButton.disabled=true;
+    const loginForm=gate.querySelector<HTMLFormElement>("#world-atlas-login-form");
+    if(loginForm)loginForm.inert=true;
+    if(message)message.textContent="Preparing World Atlas access…";
     try{
-      const exists=await hasAtlasPassword(playerName);
-      if(exists){
-        const valid=await verifyAtlasPassword(playerName,password);
-        if(!valid)throw new Error("Incorrect local password.");
-      }else{
-        if(password!==confirmation)throw new Error("The two passwords do not match.");
-        await setAtlasPassword(playerName,password);
-      }
+      const credentialWork=(async()=>{
+        if(passwordExists){
+          const valid=await verifyAtlasPassword(playerName,password);
+          if(!valid)throw new Error("Incorrect local password.");
+        }else{
+          await setAtlasPassword(playerName,password);
+        }
+      })();
+      const results=await Promise.allSettled([credentialWork,playWorldAtlasAccessSequence(gate,4000)]);
+      const failed=results.find(result=>result.status==="rejected");
+      if(failed&&failed.status==="rejected")throw failed.reason;
       await rememberAtlasPlayer(playerName,remember);
-      worldAtlasLoginBusy=false;
       if(message)message.textContent=gate.dataset.successLabel||"Access granted.";
       form.querySelector<HTMLInputElement>("#world-atlas-password")!.value="";
       const confirm=form.querySelector<HTMLInputElement>("#world-atlas-password-confirm");if(confirm)confirm.value="";
       unlockAtlasBackground(gate);
       gate.setAttribute("aria-hidden","true");
     }catch(error){
-      worldAtlasLoginBusy=false;
       if(message)message.textContent=error instanceof Error?error.message:"Local account verification failed.";
+      if(loginForm)loginForm.inert=false;
       if(button)button.disabled=false;
+    }finally{
+      worldAtlasLoginBusy=false;
+      if(closeButton)closeButton.disabled=false;
     }
     return;
   }
@@ -1788,7 +1834,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
         const nextButton=root.querySelector<HTMLButtonElement>("#developer-login-form [type=submit]");if(nextButton)nextButton.disabled=false;
         return;
       }
-      developerAuthenticated=true;playerAuthenticated=false;activeCharacterId="";activeProfileMarkdown="";
+      rememberedDeveloperCredentials=remember?{identifier:identifier.trim().toLowerCase(),password}:null;\n      developerAuthenticated=true;playerAuthenticated=false;activeCharacterId="";activeProfileMarkdown="";
       setWorldMapDeveloperMode(true);
       developerLoginBusy=false;developerLoginMessage="";playerLoginMessage="";playerLoginName="";
       activeScreen="control";notice="";render();
@@ -2063,7 +2109,7 @@ window.addEventListener("focus", () => { void refreshFloatingReadiness(); });
 void initializeDatabase().then(async status => {
   databaseMessage = status.message;
   await refreshCharacters();
-  try{developerAuthenticated=await restoreDeveloperSession();setWorldMapDeveloperMode(developerAuthenticated);}catch{developerAuthenticated=false;setWorldMapDeveloperMode(false);}
+  try{rememberedDeveloperCredentials=await restoreRememberedDeveloperCredentials();developerAuthenticated=await restoreDeveloperSession();setWorldMapDeveloperMode(developerAuthenticated);}catch{rememberedDeveloperCredentials=null;developerAuthenticated=false;setWorldMapDeveloperMode(false);}
   try {
     await restoreAuthSession();
     authMessage = getAuthSession() ? "Saved secure session restored." : "";
