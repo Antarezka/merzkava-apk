@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
-  clearAtlasPlayer, hasAtlasPassword, rememberAtlasPlayer, restoreAtlasPlayer,
-  setAtlasPassword, verifyAtlasPassword
+  atlasPasswordPolicyError, clearAtlasPlayer, hasAtlasPassword, rememberAtlasPlayer, restoreAtlasPlayer,
+  setAtlasPassword, verifyAtlasMasterResetPassword, verifyAtlasPassword
 } from "../../src/offline-game/world-atlas-account";
 
 const values=new Map<string,string>();
@@ -17,7 +17,7 @@ afterEach(()=>{vi.unstubAllGlobals();});
 
 describe("World Atlas local player accounts",()=>{
   it("stores only a salted password verifier, never the entered password",async()=>{
-    const password="synthetic-test-password-123";
+    const password="Synthetic-Test-Password-123!";
     await setAtlasPassword("Nafila",password);
     expect(await hasAtlasPassword("Nafila")).toBe(true);
     const stored=[...values.entries()].filter(([key])=>key.startsWith("merzkava.world-atlas.account."));
@@ -30,7 +30,7 @@ describe("World Atlas local player accounts",()=>{
   });
 
   it("keeps the remembered player name separate from the password verifier",async()=>{
-    await setAtlasPassword("Nafila","another-synthetic-password");
+    await setAtlasPassword("Nafila","Another-Synthetic-Password-123!");
     await rememberAtlasPlayer("Nafila",true);
     expect(await restoreAtlasPlayer()).toBe("Nafila");
     await rememberAtlasPlayer("Nafila",false);
@@ -38,12 +38,22 @@ describe("World Atlas local player accounts",()=>{
     expect(await hasAtlasPassword("Nafila")).toBe(true);
   });
 
-  it("requires the password to be at least eight characters",async()=>{
+  it("requires at least eight characters and uppercase, lowercase, digit, and symbol",async()=>{
     await expect(setAtlasPassword("Nafila","short")).rejects.toThrow(/8/);
+    expect(atlasPasswordPolicyError("lowercase123!")).toMatch(/uppercase/i);
+    expect(atlasPasswordPolicyError("UPPERCASE123!")).toMatch(/lowercase/i);
+    expect(atlasPasswordPolicyError("NoDigitsHere!")).toMatch(/number/i);
+    expect(atlasPasswordPolicyError("NoSymbols123")).toMatch(/symbol/i);
+    expect(atlasPasswordPolicyError("Valid-Pass-123!")).toBeNull();
+  });
+
+  it("verifies the master reset phrase without storing it as plaintext",async()=>{
+    expect(await verifyAtlasMasterResetPassword("not-the-master-reset")).toBe(false);
+    expect(await verifyAtlasMasterResetPassword("")).toBe(false);
   });
 
   it("clears only the remembered player session when signed out",async()=>{
-    await setAtlasPassword("Nafila","synthetic-local-password");
+    await setAtlasPassword("Nafila","Synthetic-Local-Password-123!");
     await rememberAtlasPlayer("Nafila",true);
     await clearAtlasPlayer();
     expect(await restoreAtlasPlayer()).toBe("");
