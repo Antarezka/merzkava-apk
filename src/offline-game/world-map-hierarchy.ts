@@ -182,7 +182,7 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
   // Android WebView begin a competing native scroll gesture on the viewport.
   if(academyCanvas)viewport.style.setProperty("touch-action","none","important");
   let academyImageWidth=0,academyImageHeight=0,academyMarginLeft=0,academyMarginRight=0,academyMarginTop=0,academyMarginBottom=0;
-  const academyExpansionKey="merzkava.academy-canvas-expansion.v1";
+  const academyExpansionKey="merzkava.academy-canvas-expansion.v2";
   let academyExpansion={...DEFAULT_ISO_CANVAS_EXPANSION};
   if(academyCanvas){try{academyExpansion=normalizeIsoCanvasExpansion(JSON.parse(localStorage.getItem(academyExpansionKey)||"{}"));}catch{}}
   const pointers = new Map<number, { x: number; y: number }>();
@@ -1419,7 +1419,7 @@ function bindAcademyCanvasEditor(dialog:HTMLElement):void {
   const toggle=editor?.querySelector<HTMLButtonElement>("[data-wmh-academy-editor-toggle]");
   if(!editor||!panel||!toggle||editor.dataset.bound==="true")return;
   editor.dataset.bound="true";
-  const key="merzkava.academy-canvas-expansion.v1";
+  const key="merzkava.academy-canvas-expansion.v2";
   const controls=[...panel.querySelectorAll<HTMLInputElement>("[data-wmh-canvas-side]")];
   const mapViewport=dialog.querySelector<HTMLElement>("[data-wmh-map-viewport]");
   const status=panel.querySelector<HTMLElement>("[data-wmh-canvas-status]");
