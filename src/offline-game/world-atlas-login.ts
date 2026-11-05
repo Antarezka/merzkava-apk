@@ -21,6 +21,17 @@ const statusCopy:Record<AppLanguage,{checking:string;select:string;loginPrompt:s
   ko:{checking:"등록 캐릭터와 로컬 저장 데이터를 확인하는 중…",select:"계속하려면 등록된 캐릭터를 선택하세요.",loginPrompt:"이 캐릭터의 로컬 비밀번호를 입력하세요.",signupPrompt:"이 캐릭터에는 로컬 비밀번호가 없습니다. 새로 만드세요.",success:"접근이 허용되었습니다."}
 };
 
+const offlineCopy:Record<AppLanguage,string> = {
+  id:"Internet tidak terhubung atau sumber Universe tidak dapat dijangkau. Periksa koneksi internet Anda, lalu coba masuk kembali.",
+  en:"No internet connection or the Universe source cannot be reached. Please check your connection and try signing in again.",
+  pt:"Sem conexão com a internet ou sem acesso à fonte Universe. Verifique sua conexão e tente entrar novamente.",
+  fr:"Aucune connexion Internet ou source Universe inaccessible. Vérifiez votre connexion, puis réessayez.",
+  ru:"Нет подключения к интернету или источник Universe недоступен. Проверьте соединение и повторите вход.",
+  ja:"インターネットに接続されていないか、Universe のデータソースに接続できません。接続を確認して、もう一度お試しください。",
+  "zh-CN":"未连接互联网或无法访问 Universe 数据源。请检查网络连接后重试登录。",
+  ko:"인터넷에 연결되어 있지 않거나 Universe 데이터 소스에 접근할 수 없습니다. 연결을 확인한 뒤 다시 로그인하세요。"
+};
+
 type BufferCopy = { stages:string[]; logs:string[] };
 const bufferCopy:Record<AppLanguage,BufferCopy> = {
   id:{stages:["Mengenali identitas pemain...","Memeriksa snapshot data dunia...","Memverifikasi kata sandi lokal...","Menyiapkan akses World Atlas..."],logs:["RUTE IDENTITAS ...","SNAPSHOT SUMBER ...","VERIFIKASI LOKAL ...","PENGALIHAN SESI ..."]},
@@ -39,7 +50,7 @@ export function worldAtlasLoginPanelMarkup(language:AppLanguage):string {
   const t=copy[language]||copy.en;
   const s=statusCopy[language]||statusCopy.en;
   const loading=bufferCopy[language]||bufferCopy.en;
-  return '<div class="world-atlas-login-layer" data-world-atlas-gate hidden data-empty-label="'+esc(t.empty)+'" data-select-label="'+esc(s.select)+'" data-loading-label="'+esc(s.checking)+'" data-login-prompt="'+esc(s.loginPrompt)+'" data-signup-prompt="'+esc(s.signupPrompt)+'" data-success-label="'+esc(s.success)+'" data-buffer-stages="'+esc(loading.stages.join("|"))+'" data-buffer-logs="'+esc(loading.logs.join("|"))+'">'+
+  return '<div class="world-atlas-login-layer" data-world-atlas-gate hidden data-empty-label="'+esc(t.empty)+'" data-select-label="'+esc(s.select)+'" data-loading-label="'+esc(s.checking)+'" data-login-prompt="'+esc(s.loginPrompt)+'" data-signup-prompt="'+esc(s.signupPrompt)+'" data-success-label="'+esc(s.success)+'" data-offline-label="'+esc(offlineCopy[language]||offlineCopy.en)+'" data-buffer-stages="'+esc(loading.stages.join("|"))+'" data-buffer-logs="'+esc(loading.logs.join("|"))+'">'+
     '<section class="world-atlas-login-card" role="dialog" aria-modal="true" aria-labelledby="world-atlas-login-title">'+
     '<button type="button" class="world-atlas-login-close" data-world-atlas-gate-back aria-label="'+esc(t.back)+'">×</button>'+
     '<small class="world-atlas-login-eyebrow">'+esc(t.eyebrow)+'</small><h2 id="world-atlas-login-title">'+esc(t.title)+'</h2><p class="world-atlas-login-intro">'+esc(t.intro)+'</p>'+
