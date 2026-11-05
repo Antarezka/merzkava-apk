@@ -971,21 +971,14 @@ function relocateActorsFromBlockedCells(board:HTMLElement,data:IsoMapEditorData)
   const placements:Array<{actor:HTMLElement;x:number;y:number}>=[];
   const cols=data.grid.cols,rows=data.grid.rows;
   const nearestSafe=(startX:number,startY:number):{x:number;y:number}|null=>{
-    const sx=Math.max(0,Math.min(cols-1,startX)),sy=Math.max(0,Math.min(rows-1,startY));
-    const queue:Array<[number,number]>=[[sx,sy]],visited=new Set<string>([sx+","+sy]);
-    for(let cursor=0;cursor<queue.length;cursor++){
-      const [x,y]=queue[cursor],key=x+","+y;
-      if(isoCellIsWalkable(data,x,y)&&!reserved.has(key))return{x,y};
-      const neighbors:[[number,number],[number,number],[number,number],[number,number]]=[[x,y-1],[x+1,y],[x,y+1],[x-1,y]];
-      for(const [nx,ny] of neighbors){
-        const next=nx+","+ny;
-        if(nx<0||ny<0||nx>=cols||ny>=rows||visited.has(next))continue;
-        if(isoCellIsWalkable(data,x,y)&&!isoCanStep(data,x,y,nx,ny))continue;
-        if(!isoCellIsWalkable(data,nx,ny))continue;
-        visited.add(next);queue.push([nx,ny]);
-      }
+    const candidates:Array<{x:number;y:number;distance:number}>=[];
+    for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){
+      const key=x+","+y;
+      if(!isoCellIsWalkable(data,x,y)||reserved.has(key))continue;
+      candidates.push({x,y,distance:Math.abs(x-startX)+Math.abs(y-startY)});
     }
-    return null;
+    candidates.sort((a,b)=>a.distance-b.distance||a.y-b.y||a.x-b.x);
+    return candidates[0]?{x:candidates[0].x,y:candidates[0].y}:null;
   };
   // Player gets first claim on its safe cell; NPCs are moved afterward if needed.
   actors.sort((a,b)=>(a.hasAttribute("data-wmh-player-token")?-1:0)-(b.hasAttribute("data-wmh-player-token")?-1:0));
@@ -1278,8 +1271,12 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
   if(walkableToggle)walkableToggle.checked=data.walkableAreaEnabled;
   walkableToggle?.addEventListener("change",()=>{
     if(walkableToggle.checked&&!data.walkableCells.length){walkableToggle.checked=false;setStatus("Paint the walkable area first, then turn this limit on.");return;}
-    remember();data.walkableAreaEnabled=walkableToggle.checked;persist();
-    setStatus(data.walkableAreaEnabled?"Movement is limited to blue walkable cells. Actors outside the area may step back in through a connected cell.":"Movement limit disabled; all non-X cells may be used.");
+    remember();data.walkableAreaEnabled=walkableToggle.checked;
+    if(data.walkableAreaEnabled&&!relocateActorsFromBlockedCells(board,data)){
+      data.walkableAreaEnabled=false;walkableToggle.checked=false;history.pop();setStatus("The selected area needs at least one free cell per character. Paint a larger area before enabling the limit.");return;
+    }
+    persist();
+    setStatus(data.walkableAreaEnabled?"Movement is limited to blue walkable cells. Characters outside the area were placed on their nearest selected cells.":"Movement limit disabled; all non-X cells may be used.");
   });
   const point=(e:PointerEvent)=>{const r=svg.getBoundingClientRect(),box=svg.viewBox.baseVal;return{x:(e.clientX-r.left)*box.width/Math.max(1,r.width),y:(e.clientY-r.top)*box.height/Math.max(1,r.height)};};
   if(board.dataset.academyArtworkBoard==="true"&&board.dataset.imageTapBound!=="true"){
@@ -1311,8 +1308,13 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       persist();setStatus("Transition selected. Enter its destination name to turn it blue.");return;
     }
     if(mode()==="walkable"){
-      remember();const key=isoCellKey(cell.x,cell.y),wasSelected=data.walkableCells.includes(key);
-      data.walkableCells=wasSelected?data.walkableCells.filter(item=>item!==key):[...data.walkableCells,key];
+      const key=isoCellKey(cell.x,cell.y),wasSelected=data.walkableCells.includes(key);
+      if(wasSelected&&data.walkableAreaEnabled&&data.walkableCells.length===1){setStatus("Disable AREA LIMIT before removing the final walkable cell.");return;}
+      remember();data.walkableCells=wasSelected?data.walkableCells.filter(item=>item!==key):[...data.walkableCells,key];
+      if(data.walkableAreaEnabled&&!relocateActorsFromBlockedCells(board,data)){
+        data.walkableCells=wasSelected?[...data.walkableCells,key]:data.walkableCells.filter(item=>item!==key);
+        history.pop();redraw();setStatus("That change leaves too few free cells for every character. Add more blue cells first.");return;
+      }
       persist();setStatus((wasSelected?"Removed":"Added")+" walkable cell ("+cell.x+","+cell.y+"). Blue cells define the optional movement area; enable AREA LIMIT when the region is complete.");return;
     }
     const quadrant=isoQuadrantAtPoint(mapPoint,cell.x,cell.y,grid);
