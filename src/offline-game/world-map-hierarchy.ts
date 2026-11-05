@@ -671,6 +671,21 @@ function makeIsometricMapId(regionId: RegionId, selectedBuilding: string, interi
   const slug=selectedBuilding.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
   return regionId+":"+(slug||"unnamed-area")+":"+(interior?"interior":"exterior");
 }
+function isoMergedGroupBoundaryPath(cells:string[],grid:IsoMapGridConfig):string {
+  const edges=new Map<string,{a:{x:number;y:number};b:{x:number;y:number};count:number}>();
+  const vertexKey=(point:{x:number;y:number})=>Math.round(point.x*1000)+","+Math.round(point.y*1000);
+  const addEdge=(a:{x:number;y:number},b:{x:number;y:number})=>{
+    const ka=vertexKey(a),kb=vertexKey(b),key=ka<kb?ka+"|"+kb:kb+"|"+ka;
+    const edge=edges.get(key);
+    if(edge)edge.count++;else edges.set(key,{a,b,count:1});
+  };
+  for(const cell of cells){
+    const [x,y]=cell.split(",").map(Number),center=isoCellCenter(x,y,grid),hw=grid.tileW/2,hh=grid.tileH/2;
+    const top={x:center.x,y:center.y-hh},right={x:center.x+hw,y:center.y},bottom={x:center.x,y:center.y+hh},left={x:center.x-hw,y:center.y};
+    addEdge(top,right);addEdge(right,bottom);addEdge(bottom,left);addEdge(left,top);
+  }
+  return [...edges.values()].filter(edge=>edge.count===1).map(edge=>"M"+edge.a.x+" "+edge.a.y+" L"+edge.b.x+" "+edge.b.y).join(" ");
+}
 function isoCellIsWalkable(data:IsoMapEditorData,x:number,y:number):boolean {
   return (!data.walkableAreaEnabled||data.walkableCells.includes(isoCellKey(x,y)))&&!isoCellHasLayer(data,"blockedCells",x,y);
 }
@@ -1103,7 +1118,18 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       };
       add(data.foregroundCells,"is-foreground","○");add(data.blockedCells,"is-blocked","X");add(data.opacityCells,"is-opacity","◌");
       addQuadrants(data.foregroundQuadrants,"is-foreground","○");addQuadrants(data.blockedQuadrants,"is-blocked","X");addQuadrants(data.opacityQuadrants,"is-opacity","◌");
+      data.walkableCellGroups.forEach(group=>{
+        const d=isoMergedGroupBoundaryPath(group.cells,grid);
+        if(d)marks.push('<path class="wmh-walkable-merged-boundary" d="'+d+'"><title>MERGED CELL · '+escapeMapEditorText(group.id)+' · '+group.cells.length+' cells</title></path>');
+      });
+      selectedMergeCells.forEach(key=>{
+        const [x,y]=key.split(",").map(Number),c=isoCellCenter(x,y,grid),hw=grid.tileW/2,hh=grid.tileH/2;
+        const points=[c.x+","+(c.y-hh),(c.x+hw)+","+c.y,c.x+","+(c.y+hh),(c.x-hw)+","+c.y].join(" ");
+        marks.push('<polygon class="wmh-cell-merge-selected" points="'+points+'"/>');
+      });
       cellGroup.innerHTML=marks.join("");
+    }
+    if(selectionCount)selectionCount.textContent=selectedMergeCells.size+" CELLS SELECTED";
     }
     if(transitionGroup)transitionGroup.innerHTML=data.transitions.map(marker=>{
       const c=isoCellCenter(marker.x,marker.y,grid),label=escapeMapEditorText(marker.label),hw=grid.tileW/2,hh=grid.tileH/2;
