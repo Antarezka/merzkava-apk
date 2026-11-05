@@ -72,7 +72,7 @@ describe("isometric NPC conversations", () => {
     expect(worldMapSource).toContain("function startActorScanners");
     expect(worldMapSource).toContain("updateNpcInteractionProximity(board)");
     expect(worldMapSource).toContain("isNpcInteractionCellReachable(");
-    expect(worldMapSource).toContain("data-interaction-ready");
+    expect(worldMapSource).toContain("dataset.interactionReady");
     expect(chatStyles).toContain(".wmh-npc-proximity-glow");
     expect(worldMapSource).toContain("animate(token,{translateX:[dx,0],translateY:[dy,0]");
     expect(worldMapSource).toContain("scanTone:\"friendly\"");
