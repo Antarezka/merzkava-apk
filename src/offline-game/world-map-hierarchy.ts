@@ -200,11 +200,11 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
       image.style.setProperty("width",artWidth+"px","important");
       image.style.setProperty("height",artHeight+"px","important");
       const overlay=surface.querySelector<SVGSVGElement>("[data-wmh-overlay-svg]");
-      if(overlay){overlay.style.left=artLeft+"px";overlay.style.top=artTop+"px";overlay.style.right="auto";overlay.style.bottom="auto";overlay.style.width=artWidth+"px";overlay.style.height=artHeight+"px";overlay.setAttribute("viewBox","0 0 "+(image.naturalWidth||2816)+" "+(image.naturalHeight||1536));}
+      if(overlay){overlay.style.position="absolute";overlay.style.left=artLeft+"px";overlay.style.top=artTop+"px";overlay.style.right="auto";overlay.style.bottom="auto";overlay.style.width=artWidth+"px";overlay.style.height=artHeight+"px";overlay.setAttribute("viewBox","0 0 "+(image.naturalWidth||2816)+" "+(image.naturalHeight||1536));}
       const foreground=surface.querySelector<HTMLCanvasElement>("[data-wmh-foreground-canvas]");
-      if(foreground){foreground.style.left=artLeft+"px";foreground.style.top=artTop+"px";foreground.style.right="auto";foreground.style.bottom="auto";foreground.style.width=artWidth+"px";foreground.style.height=artHeight+"px";}
+      if(foreground){foreground.style.position="absolute";foreground.style.left=artLeft+"px";foreground.style.top=artTop+"px";foreground.style.right="auto";foreground.style.bottom="auto";foreground.style.width=artWidth+"px";foreground.style.height=artHeight+"px";}
       const actors=surface.querySelector<HTMLElement>("[data-wmh-actor-layer]");
-      if(actors){actors.style.left=artLeft+"px";actors.style.top=artTop+"px";actors.style.right="auto";actors.style.bottom="auto";actors.style.width=artWidth+"px";actors.style.height=artHeight+"px";}
+      if(actors){actors.style.position="absolute";actors.style.left=artLeft+"px";actors.style.top=artTop+"px";actors.style.right="auto";actors.style.bottom="auto";actors.style.width=artWidth+"px";actors.style.height=artHeight+"px";}
     }else{
       image.style.width="100%";
       image.style.height="100%";
@@ -289,6 +289,10 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
     applyZoom(action === "in" ? zoom + .25 : zoom - .25);
   }));
   viewport.addEventListener("pointerdown", event => {
+    // The active image-grid editor owns pointer gestures over its SVG. Do not
+    // register these pointers in the camera a second time.
+    if(academyCanvas&&surface.classList.contains("wmh-overlay-editing")&&
+      (event.target as Element).closest("[data-wmh-overlay-svg]"))return;
     // A marker tap is a selection, never a map-pan gesture. Do not register it
     // in the gesture tracker; otherwise a stale one-finger pan can move the map.
     if ((event.target as Element).closest(".wmh-power")) {
@@ -1218,6 +1222,8 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     redraw();drawIsometricForeground(board,data);syncIsoDepthAndOcclusion(board);
   };
   const setActive=(active:boolean)=>{
+    const cameraViewport=board.closest<HTMLElement>("[data-wmh-map-viewport],[data-wmh-iso-viewport]");
+    const cameraScrollBefore=cameraViewport?{left:cameraViewport.scrollLeft,top:cameraViewport.scrollTop}:null;
     if(active){
       stopNpcWander(dialog);
       const chat=dialog.querySelector<HTMLElement>("[data-wmh-chat]");
@@ -1257,6 +1263,12 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     toggle.hidden=active;
     toggle.setAttribute("aria-pressed",String(active));
     toggle.setAttribute("aria-expanded",String(active));
+    // Editor visibility may trigger layout recalculation, but it must never
+    // reset the live camera anchor or active zoom.
+    if(cameraViewport&&cameraScrollBefore)requestAnimationFrame(()=>{
+      cameraViewport.scrollLeft=cameraScrollBefore.left;
+      cameraViewport.scrollTop=cameraScrollBefore.top;
+    });
   };
   let suppressToggleClick=false;
   toggle.addEventListener("click",()=>{if(suppressToggleClick){suppressToggleClick=false;return;}setActive(panel.hidden);});
@@ -1394,9 +1406,12 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       pendingTap.dragged=true;
       // Academy's camera already pans through bindWorldMapZoom. Other map
       // viewports need this one-finger pan while the editor overlay is active.
-      if(!academyArtwork&&activePointers.size===1&&viewport){
+      if(activePointers.size===1&&viewport){
+        // Pan the existing scroll viewport only. Never create an editor-local
+        // zoom/transform; the Academy zoom controls retain their original state.
         viewport.scrollLeft=pendingTap.scrollLeft-(event.clientX-pendingTap.startX);
         viewport.scrollTop=pendingTap.scrollTop-(event.clientY-pendingTap.startY);
+        event.preventDefault();
       }
     }
   };
@@ -1488,6 +1503,9 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
   },true);
   svg.addEventListener("pointerdown",event=>{
     if(!board.classList.contains("wmh-overlay-editing"))return;
+    // Own this gesture here. The parent camera must not process the same
+    // pointer as a second pan/pinch source.
+    event.stopPropagation();
     const target=event.target as Element;
     activePointers.add(event.pointerId);
     if(activePointers.size>1){
