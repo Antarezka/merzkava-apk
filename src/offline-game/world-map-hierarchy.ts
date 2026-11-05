@@ -205,11 +205,13 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
     academyImageWidth = Math.max(rect.width, rect.height * ratio);
     academyImageHeight = Math.max(rect.height, rect.width / ratio);
     if(academyCanvas){
-      // Two Academy-sized isometric cells of breathing room on every edge.
+      // Keep two grid cells of visible canvas, but never let the side margin
+      // be narrower than half the viewport. This lets either artwork edge move
+      // all the way into the center of the phone screen before the pan clamps.
       const artworkScale=image.naturalWidth>0?academyImageWidth/image.naturalWidth:1;
       const cellW=128*artworkScale,cellH=69.5*artworkScale;
-      academyMarginX=cellW*2;
-      academyMarginY=cellH*2;
+      academyMarginX=Math.max(cellW*2,rect.width/2);
+      academyMarginY=Math.max(cellH*2,rect.height/2);
       baseWidth=academyImageWidth+academyMarginX*2;
       baseHeight=academyImageHeight+academyMarginY*2;
       if(academyGrid){
