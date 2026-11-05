@@ -35,3 +35,12 @@ Standalone local game mode inside the same Merzkava APK. Owns deterministic mech
 - Choices resolve locally and deterministically; event history, energy/insight changes, disposition evidence and world-clock advancement are saved with the journey.
 - The bootstrap content is explicitly `IN_GAME_ORIGINAL`, separate from Universe canon and separate from Patch 1. Patch 1 remains on hold until UI repair and EP-2 contracts are verified, and retains the minimum of 1,000 genuinely distinct situations.
 - Web App Validation and the Eternal Path quality gate passed for code commit `51f8b748` (22 test files / 171 tests); the Android APK build is pending and physical Android QA remains open.
+
+
+## Isometric NPC proximity and cell interaction
+
+- NPC pins use a restrained Anime.js halo only when the player occupies a directly adjacent orthogonal grid cell and the shared edge is open.
+- The same reachability helper governs both the glow state and the NPC click handler: `isometric-interaction.ts`. It respects map bounds, custom grid cells, the active walkable-cell whitelist, blocked cells, and blocked quadrant edges.
+- Being visually near or diagonally adjacent is not enough. Distant clicks leave the conversation closed and explain that the player must move to an adjacent open tile.
+- The halo fades out when the player moves away, during map editing, or while the conversation panel is active. `prefers-reduced-motion` sets the state directly without an animation.
+- NPC wander and player movement refresh proximity from the same grid coordinates used by pathfinding; the visual halo does not change collision, NPC movement, tile occupancy, or the pathfinder.
