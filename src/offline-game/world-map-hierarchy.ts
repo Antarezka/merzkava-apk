@@ -15,7 +15,7 @@ import { renderIsometricSvgSceneMarkup, refreshIsometricSvgScene, type Isometric
 let worldMapDeveloperMode = false;
 export function setWorldMapDeveloperMode(enabled: boolean): void {
   worldMapDeveloperMode = enabled;
-  if (enabled) return;
+  if (enabled || typeof document === "undefined") return;
   document.querySelectorAll<HTMLElement>("[data-wmh-editor-dock],[data-wmh-academy-editor]").forEach(node => node.remove());
   document.querySelectorAll<HTMLElement>("[data-wmh-board].wmh-overlay-editing").forEach(board => {
     board.classList.remove("wmh-overlay-editing","wmh-editor-paused");

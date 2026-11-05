@@ -10,7 +10,7 @@ import { renderScreen, type ScreenId } from "./app/screens";
 import { initializeIdleTriggerDrag } from "./offline-game/idle-trigger-drag";
 import { initializeArcanistryTransitDrag } from "./offline-game/transit-pull-drag";
 import { animateExpeditionChoiceModal, animateExpeditionPanel, mountExpeditionAnimations } from "./offline-game/expedition-animations";
-import { deleteEternalSave, exportEternalSave, importEternalSave, listEternalSaves, loadEternalSave, renameEternalSave, resetEternalGame, resolveEternalSituationChoice, advanceEternalWorldTime, setEternalLocation, startEternalGame, unloadEternalGame, type EternalRegion } from "./offline-game/expedition-game";
+import { deleteEternalSave, exportEternalSave, importEternalSave, loadEternalSave, renameEternalSave, resetEternalGame, resolveEternalSituationChoice, advanceEternalWorldTime, setEternalLocation, startEternalGame, unloadEternalGame, type EternalRegion } from "./offline-game/expedition-game";
 import { authenticateDeveloper, restoreDeveloperSession, signOutDeveloper } from "./security/developer-access";
 import { getCanonIndex, getCanonStatus, loadCanonModule, loadPlayerRegistry, loadRegisteredPlayerProfile, refreshCanon, refreshLatestPlayerRegistry, type CanonDocument } from "./convo/canon/canon-loader";
 import { routeCanonActivity } from "./convo/canon/canon-router";
@@ -34,7 +34,6 @@ import { animateAppScreen } from "./ui/app-shell-motion";
 import { initializeGravityPullCord } from "./ui/gravity-pull-cord";
 import { mountArcanistryTicketMachine } from "./offline-game/arcanistry-ticket-machine";
 import { handleWorldMapHierarchyClick, initializeWorldMapHierarchy, setWorldMapDeveloperMode } from "./offline-game/world-map-hierarchy";
-import { hasAtlasPassword, setAtlasPassword, verifyAtlasPassword, rememberAtlasPlayer, restoreAtlasPlayer, clearAtlasPlayer } from "./offline-game/world-atlas-account";
 import { closeLoreEntry, closeLoreSource, closeLorePlaceholder, openLoreEntry, openLoreSource, openLorePlaceholder, setLoreCategory, setLoreSearch, renderLoreResults } from "./world-archive/lore-library";
 
 const app = document.querySelector<HTMLDivElement>("#app");
