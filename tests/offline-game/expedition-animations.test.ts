@@ -56,6 +56,25 @@ describe("Eternal Path event-driven Anime.js motion",()=>{
   mocks.animate.mockReturnValue({pause:vi.fn()});
   mocks.scope.add.mockImplementation((setup:(self:{matches:{reduceMotion:boolean}})=>void)=>{setup({matches:{reduceMotion:false}});return mocks.scope;});
  });
+ it("plays entrance fades only when entering the Eternal Path screen",()=>{
+  const heading={};
+  const root:any={
+    querySelector:vi.fn(()=>null),
+    querySelectorAll:vi.fn((selector:string)=>selector===".expedition-heading, .expedition-character-panel, .expedition-disposition-line, .expedition-dialogue, .expedition-footer"?[heading]:[])
+  };
+  const disposeUpdate=mountExpeditionAnimations(root,false);
+  expect(mocks.animate).not.toHaveBeenCalled();
+  disposeUpdate();
+
+  vi.clearAllMocks();
+  mocks.animate.mockReturnValue({pause:vi.fn()});
+  const disposeEntry=mountExpeditionAnimations(root,true);
+  expect(mocks.animate).toHaveBeenCalledWith([heading],expect.objectContaining({
+    opacity:[0,1],
+    translateY:[13,0]
+  }));
+  disposeEntry();
+ });
  it("keeps scene motion idle until the Scene Window itself is activated",()=>{
   const {root,scene}=makeSceneRoot();
   const dispose=mountExpeditionAnimations(root);
