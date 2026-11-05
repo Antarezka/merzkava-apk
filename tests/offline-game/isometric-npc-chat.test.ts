@@ -44,10 +44,10 @@ describe("isometric NPC conversations", () => {
 
   it("places the Academy player at its named entrance and starts NPCs on the approved path", () => {
     expect(worldMapSource).toContain('data-wmh-player-token data-scan-tone="unknown" data-token-label="" data-x="12" data-y="31"');
-    expect(worldMapSource).toContain('{id:"student-lin",x:7,y:4,gender:"female"}');
-    expect(worldMapSource).toContain('{id:"student-wei",x:10,y:9,gender:"male"}');
-    expect(worldMapSource).toContain('{id:"teacher-mei",x:6,y:15,gender:"female"}');
-    expect(worldMapSource).toContain('{id:"groundskeeper",x:22,y:10,gender:"male"}');
+    expect(worldMapSource).toContain('{id:"student-lin",x:7,y:4,gender:"female",scanTone:"friendly"}');
+    expect(worldMapSource).toContain('{id:"student-wei",x:10,y:9,gender:"male",scanTone:"friendly"}');
+    expect(worldMapSource).toContain('{id:"teacher-mei",x:6,y:15,gender:"female",scanTone:"friendly"}');
+    expect(worldMapSource).toContain('{id:"groundskeeper",x:22,y:10,gender:"male",scanTone:"friendly"}');
     expect(worldMapSource).toContain('const occupiedNpcs=new Set');
     expect(worldMapSource).toContain('!occupied.has(nx+","+ny)');
   });
