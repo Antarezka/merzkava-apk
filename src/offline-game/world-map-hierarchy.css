@@ -1106,6 +1106,11 @@
 .wmh-cell-mark.is-quadrant polygon{stroke-width:1.5}
 .wmh-cell-mark.is-quadrant text{font-size:9px}
 .wmh-walkable-cell{fill:#287acb55;stroke:#8bc8ff;stroke-width:2;vector-effect:non-scaling-stroke;pointer-events:none}
+.wmh-academy-hit-cell.is-custom-grid-cell{fill:rgba(70,160,225,.06);stroke:rgba(143,210,255,.88);stroke-width:1.8;vector-effect:non-scaling-stroke}
+.wmh-academy-hit-cell.is-custom-grid-cell.is-walkable{fill:rgba(45,133,219,.3);stroke:#9bd7ff;stroke-width:2.2}
+.wmh-isometric-board .wmh-academy-hit-cell.is-custom-grid-cell{fill:rgba(70,160,225,.08);stroke:rgba(143,210,255,.82);stroke-width:1.5;vector-effect:non-scaling-stroke;pointer-events:all}
+.wmh-isometric-board.wmh-overlay-editing .wmh-academy-hit-cell.is-custom-grid-cell{fill:rgba(70,160,225,.12);stroke:#9bd7ff;stroke-width:2}
+.wmh-minimap-cell.is-custom-grid-cell{stroke:#a8defc;stroke-width:5}
 .wmh-walkable-merged-boundary{fill:none;stroke:#ffe29a;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke;pointer-events:none;filter:drop-shadow(0 0 3px #000c)}
 .wmh-cell-merge-selected{fill:#f5ce5f55;stroke:#fff0a8;stroke-width:3;vector-effect:non-scaling-stroke;pointer-events:none}
 .wmh-minimap-merged-boundary{fill:none;stroke:#ffe29a;stroke-width:9;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
