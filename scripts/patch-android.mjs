@@ -108,8 +108,8 @@ let backCallbackActivity = await readFile(mainActivityPath, "utf8");
 if (!backCallbackActivity.includes("MerzkavaAndroidBackCallback")) {
   if (!backCallbackActivity.includes("import androidx.activity.OnBackPressedCallback;")) {
     backCallbackActivity = backCallbackActivity.replace(
-      /^package\\s+[\\w.]+;/m,
-      match => match + "\\n\\nimport androidx.activity.OnBackPressedCallback;"
+      /^package\s+[\w.]+;/m,
+      match => match + "\n\nimport androidx.activity.OnBackPressedCallback;"
     );
   }
   const callback = `
@@ -135,7 +135,7 @@ if (!backCallbackActivity.includes("MerzkavaAndroidBackCallback")) {
   }
   backCallbackActivity = backCallbackActivity.replace(
     "super.onCreate(savedInstanceState);",
-    "super.onCreate(savedInstanceState);\\n" + callback
+    "super.onCreate(savedInstanceState);\n" + callback
   );
   await writeFile(mainActivityPath, backCallbackActivity);
 }
