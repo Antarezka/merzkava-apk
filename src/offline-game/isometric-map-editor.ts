@@ -296,7 +296,7 @@ export function removeIsoWalkableCell(data: IsoMapEditorData,x:number,y:number):
   data.walkableCells=data.walkableCells.filter(item=>item!==key);
   data.walkableCellGroups=data.walkableCellGroups.flatMap(group=>{
     const cells=group.cells.filter(item=>item!==key);
-    return cells.length>=2?[{...group,cells}]:[];
+    return cells.length>=2&&isoWalkableCellsConnected(cells)?[{...group,cells}]:[];
   });
   return true;
 }
