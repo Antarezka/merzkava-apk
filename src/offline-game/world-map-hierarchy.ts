@@ -209,8 +209,7 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
     academyImageWidth = Math.max(rect.width, rect.height * ratio);
     academyImageHeight = Math.max(rect.height, rect.width / ratio);
     if(academyCanvas){
-      // Preserve the existing top, right and bottom canvas margins. Give only
-      // the left side a longer runway so the camera can travel much farther.
+      // Each side has its own configurable gap, added outside the artwork.
       const artworkScale=image.naturalWidth>0?academyImageWidth/image.naturalWidth:1;
       const cellW=128*artworkScale,cellH=69.5*artworkScale;
       academyMarginLeft=Math.max(cellW*2,rect.width*2)+academyExpansion.left;
@@ -1410,7 +1409,7 @@ function academyCanvasEditorMarkup(): string {
   return '<div class="wmh-academy-canvas-editor" data-wmh-academy-editor>'+
     '<button type="button" data-wmh-academy-editor-toggle aria-expanded="false">▦ CANVAS EDITOR</button>'+
     '<section data-wmh-academy-editor-panel hidden><b>ACADEMY CANVAS EXPANSION</b><small>Adjust each side independently. Preview updates live; confirm to save.</small>'+
-    sides.map(side=>'<label>'+side.toUpperCase()+' <output data-wmh-canvas-value="'+side+'">0 px</output><input type="range" min="0" max="12000" step="100" value="0" data-wmh-canvas-side="'+side+'"/></label>').join("")+
+    sides.map(side=>'<label>'+side.toUpperCase()+' <output data-wmh-canvas-value="'+side+'">'+DEFAULT_ISO_CANVAS_EXPANSION[side]+' px</output><input type="range" min="0" max="12000" step="100" value="'+DEFAULT_ISO_CANVAS_EXPANSION[side]+'" data-wmh-canvas-side="'+side+'"/></label>').join("")+
     '<div class="wmh-academy-canvas-actions"><button type="button" data-wmh-canvas-refresh>↻ REFRESH PREVIEW</button><button type="button" data-wmh-canvas-confirm>✓ CONFIRM & SAVE</button><button type="button" data-wmh-canvas-copy>COPY CONFIG</button></div>'+
     '<textarea data-wmh-canvas-export readonly aria-label="Copyable Academy canvas configuration" placeholder="Confirmed canvas configuration appears here..."></textarea><small data-wmh-canvas-status>Unconfirmed changes are preview-only.</small></section></div>';
 }
