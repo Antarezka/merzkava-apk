@@ -5,8 +5,8 @@ import { animateExpeditionPanel } from "./expedition-animations";
 import { getEternalSave, getExpeditionAtmosphere } from "./expedition-game";
 import {
   createIsoMapEditorData, DEFAULT_ISOMETRIC_GRID, DEFAULT_ISO_CANVAS_EXPANSION, normalizeIsoCanvasExpansion, isoCellAtPoint, isoCellCenter, isoCellHasLayer,
-  isoCellKey, isoMapStorageKey, isoQuadrantAtPoint, isoQuadrantHasLayer, isoQuadrantKey, normalizeIsoMapEditorData, toggleIsoCellLayer, toggleIsoQuadrantLayer,
-  type IsoCellLayer, type IsoMapEditorData, type IsoMapGridConfig, type IsoQuadrant, type IsoQuadrantLayer,
+  isoCellKey, isoMapStorageKey, isoQuadrantAtPoint, isoQuadrantHasLayer, normalizeIsoMapEditorData, toggleIsoCellLayer, toggleIsoQuadrantLayer,
+  type IsoMapEditorData, type IsoMapGridConfig, type IsoQuadrant, type IsoQuadrantLayer,
 } from "./isometric-map-editor";
 import { renderIsometricSvgSceneMarkup, refreshIsometricSvgScene, type IsometricSvgTheme } from "./isometric-svg-board";
 
@@ -758,13 +758,14 @@ function drawIsometricForeground(board:HTMLElement,data=readIsoMapData(board)):v
   }
   const width=image.clientWidth||image.naturalWidth,height=image.clientHeight||image.naturalHeight;
   const dpr=Math.max(1,Math.min(2,window.devicePixelRatio||1));
+  const scaleX=width/image.naturalWidth,scaleY=height/image.naturalHeight;
   canvas.width=Math.max(1,Math.round(width*dpr));canvas.height=Math.max(1,Math.round(height*dpr));
   canvas.style.left=image.offsetLeft+"px";canvas.style.top=image.offsetTop+"px";
   canvas.style.width=width+"px";canvas.style.height=height+"px";
   const ctx=canvas.getContext("2d");if(!ctx)return;
-  ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,width,height);
+  ctx.setTransform(dpr*scaleX,0,0,dpr*scaleY,0,0);ctx.clearRect(0,0,image.naturalWidth,image.naturalHeight);
   if(!data.foregroundCells.length&&!data.foregroundQuadrants.length)return;
-  const halfW=data.grid.tileW/2,halfH=data.grid.tileH/2,left=image.offsetLeft,top=image.offsetTop;
+  const halfW=data.grid.tileW/2,halfH=data.grid.tileH/2,left=0,top=0;
   ctx.save();ctx.beginPath();
   for(const key of data.foregroundCells){
     const [x,y]=key.split(",").map(Number),center=isoCellCenter(x,y,data.grid),cx=center.x-left,cy=center.y-top;
@@ -777,7 +778,7 @@ function drawIsometricForeground(board:HTMLElement,data=readIsoMapData(board)):v
     for(let i=1;i<points.length;i++)ctx.lineTo(points[i][0]-left,points[i][1]-top);
     ctx.closePath();
   }
-  ctx.clip();ctx.drawImage(image,0,0,width,height);ctx.restore();
+  ctx.clip();ctx.drawImage(image,0,0,image.naturalWidth,image.naturalHeight);ctx.restore();
 }
 function isoCanWalkTile(board:HTMLElement,tile:HTMLElement|null,x:number,y:number,data=readIsoMapData(board)):boolean {
   if(!tile)return false;
@@ -1686,6 +1687,8 @@ function syncIsoDepthAndOcclusion(board:HTMLElement):void {
 function animateGridMove(token:HTMLElement,update:()=>void):void {
   const before=token.getBoundingClientRect();
   update();
+  const board=token.closest<HTMLElement>("[data-wmh-board]");
+  if(board)syncIsoDepthAndOcclusion(board);
   const after=token.getBoundingClientRect();
   const dx=before.left-after.left,dy=before.top-after.top;
   token.animate([
@@ -1786,6 +1789,7 @@ function walkToTile(dialog:HTMLElement,targetX:number,targetY:number,surface:str
     const [x,y]=path[step++];
     const tile=board.querySelector<HTMLElement>('[data-wmh-tile][data-x="'+x+'"][data-y="'+y+'"]');
     animateGridMove(player,()=>{
+      player.dataset.x=String(x);player.dataset.y=String(y);
       player.style.setProperty("--token-x",String(x));
       player.style.setProperty("--token-y",String(y));
     });
