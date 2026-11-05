@@ -1226,7 +1226,7 @@ root.addEventListener("click", async (event: MouseEvent) => {
   if(target.closest("[data-dev-logout]")){
     // Fail closed immediately; storage cleanup must never leave Developer Mode visible.
     developerAuthenticated=false;playerAuthenticated=false;playerLoginName="";activeCharacterId="";activeProfileMarkdown="";activeChat={messages:[],started:false,showOptions:activeChat.showOptions};
-    authMessage="";setWorldMapDeveloperMode(false);activeScreen="control";accessLoginMode="player";notice="";render();
+    authMessage="";setWorldMapDeveloperMode(false);activeScreen="control";accessLoginMode=rememberedDeveloperCredentials?"developer":"player";notice="";render();
     try{await signOutDeveloper();}catch(error){recordBug(error,"Revoke developer marker after logout","Developer access");}
     try{if(getAuthSession())await signOut();}catch(error){recordBug(error,"Clear cloud session after developer logout","Authentication");}
     return;
@@ -2116,7 +2116,7 @@ window.addEventListener("focus", () => { void refreshFloatingReadiness(); });
 void initializeDatabase().then(async status => {
   databaseMessage = status.message;
   await refreshCharacters();
-  try{rememberedDeveloperCredentials=await restoreRememberedDeveloperCredentials();developerAuthenticated=await restoreDeveloperSession();setWorldMapDeveloperMode(developerAuthenticated);}catch{rememberedDeveloperCredentials=null;developerAuthenticated=false;setWorldMapDeveloperMode(false);}
+  try{rememberedDeveloperCredentials=await restoreRememberedDeveloperCredentials();developerAuthenticated=await restoreDeveloperSession();if(rememberedDeveloperCredentials&&!developerAuthenticated)accessLoginMode="developer";setWorldMapDeveloperMode(developerAuthenticated);}catch{rememberedDeveloperCredentials=null;developerAuthenticated=false;setWorldMapDeveloperMode(false);}
   try {
     await restoreAuthSession();
     authMessage = getAuthSession() ? "Saved secure session restored." : "";
