@@ -863,7 +863,6 @@ function renderIsometricMinimap(board:HTMLElement):void {
     customGridCells:data.customGridCells,
     walkableGroups:data.walkableCellGroups,
     walkableAreaEnabled:data.walkableAreaEnabled,
-    customGridCells:data.customGridCells,
     foregroundQuadrants:data.foregroundQuadrants,
     blockedQuadrants:data.blockedQuadrants,
     opacityQuadrants:data.opacityQuadrants,
