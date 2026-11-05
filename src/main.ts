@@ -185,6 +185,8 @@ let playerLoginName = "";
 let accessLoginMode: "player" | "developer" = "player";
 let accessSessionRestored = false;
 let worldAtlasLoginBusy = false;
+let worldAtlasLoginAttempt = 0;
+let worldAtlasLoginAbort: AbortController | null = null;
 function hasAppAccess(): boolean { return developerAuthenticated || playerAuthenticated; }
 let floatingReadiness: FloatingReadiness = { displayOverApps: false, notifications: false, batteryExemption: false, serviceRunning: false };
 let floatingBusy = false;
@@ -760,7 +762,15 @@ function closeWorldAtlas(syncHistory=true):void {
   if(modal&&!modal.hidden)modal.hidden=true;
   root.querySelector(".app-shell")?.classList.remove("is-idle-world");
   trigger?.setAttribute("aria-expanded","false");
-  worldAtlasLoginBusy=false;
+  // Back/Escape/close invalidates the in-flight attempt and aborts the live source request.
+  worldAtlasLoginAttempt += 1;
+  worldAtlasLoginAbort?.abort();
+  worldAtlasLoginAbort = null;
+  worldAtlasLoginBusy = false;
+  const loginForm=gate?.querySelector<HTMLFormElement>("#world-atlas-login-form");
+  if(loginForm)loginForm.inert=false;
+  const closeButton=gate?.querySelector<HTMLButtonElement>("[data-world-atlas-gate-back]");
+  if(closeButton)closeButton.disabled=false;
   trigger?.focus();
   if(syncHistory&&history.state?.idleRpgNotice)history.back();
 }
@@ -782,6 +792,10 @@ async function openWorldAtlasFromTv():Promise<void> {
   const select=gate.querySelector<HTMLSelectElement>("[data-world-atlas-player]");
   const message=gate.querySelector<HTMLElement>("[data-world-atlas-message]");
   const submit=gate.querySelector<HTMLButtonElement>("[data-world-atlas-submit]");
+  const closeButton=gate.querySelector<HTMLButtonElement>("[data-world-atlas-gate-back]");
+  const loginForm=gate.querySelector<HTMLFormElement>("#world-atlas-login-form");
+  if(closeButton)closeButton.disabled=false;
+  if(loginForm)loginForm.inert=false;
   if(message)message.textContent=gate.dataset.loadingLabel||"Verifying registered players and local saves…";
   if(select)select.innerHTML='<option value="">Loading registered players…</option>';
   if(submit)submit.disabled=true;
@@ -1227,8 +1241,13 @@ root.addEventListener("click", async (event: MouseEvent) => {
   if(target.closest("[data-dev-logout]")){
     // Fail closed immediately; storage cleanup must never leave Developer Mode visible.
     developerAuthenticated=false;playerAuthenticated=false;playerLoginName="";activeCharacterId="";activeProfileMarkdown="";activeChat={messages:[],started:false,showOptions:activeChat.showOptions};
-    authMessage="";setWorldMapDeveloperMode(false);activeScreen="control";accessLoginMode=rememberedDeveloperCredentials?"developer":"player";notice="";render();
-    try{await signOutDeveloper();}catch(error){recordBug(error,"Revoke developer marker after logout","Developer access");}
+    authMessage="";setWorldMapDeveloperMode(false);activeScreen="control";accessLoginMode="developer";notice="";render();
+    try{await signOutDeveloper();}catch(error){
+      developerLoginMessage=error instanceof Error?error.message:"Could not securely lock the Developer session.";
+      recordBug(error,"Revoke developer marker after logout","Developer access");
+      const message=root.querySelector<HTMLElement>("[data-dev-login-message]");
+      if(message)message.textContent=developerLoginMessage;
+    }
     try{if(getAuthSession())await signOut();}catch(error){recordBug(error,"Clear cloud session after developer logout","Authentication");}
     return;
   }
@@ -1751,19 +1770,21 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       if(message)message.textContent=offlineMessage;
       return;
     }
-    let passwordExists=false;
-    try{passwordExists=await hasAtlasPassword(playerName);}
-    catch(error){if(message)message.textContent=error instanceof Error?error.message:"Secure local account storage is unavailable.";return;}
-    if(!passwordExists&&password!==confirmation){if(message)message.textContent="The two passwords do not match.";return;}
     worldAtlasLoginBusy=true;
+    const loginAttempt=++worldAtlasLoginAttempt;
+    const abortController=new AbortController();
+    worldAtlasLoginAbort=abortController;
     if(button)button.disabled=true;
-    const closeButton=gate.querySelector<HTMLButtonElement>("[data-world-atlas-gate-back]");
-    if(closeButton)closeButton.disabled=true;
-    const loginForm=gate.querySelector<HTMLFormElement>("#world-atlas-login-form");
+    closeButton.disabled=true;
     if(loginForm)loginForm.inert=true;
     if(message)message.textContent="Preparing World Atlas access…";
     try{
-      const connectionWork=verifyCanonSourceConnection(activeCanon.commitSha);
+      let passwordExists=false;
+      try{passwordExists=await hasAtlasPassword(playerName);}
+      catch(error){throw new Error(error instanceof Error?error.message:"Secure local account storage is unavailable.");}
+      if(loginAttempt!==worldAtlasLoginAttempt||abortController.signal.aborted)return;
+      if(!passwordExists&&password!==confirmation)throw new Error("The two passwords do not match.");
+      const connectionWork=verifyCanonSourceConnection(activeCanon.commitSha,abortController.signal);
       const credentialWork=(async()=>{
         if(passwordExists){
           const valid=await verifyAtlasPassword(playerName,password);
@@ -1773,25 +1794,32 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       const results=await Promise.allSettled([
         connectionWork,
         credentialWork,
-        playWorldAtlasAccessSequence(gate,4000,connectionWork)
+        playWorldAtlasAccessSequence(gate,4000,connectionWork,abortController.signal)
       ]);
+      if(loginAttempt!==worldAtlasLoginAttempt||abortController.signal.aborted)return;
       if(results[0].status==="rejected")throw new Error(offlineMessage);
       if(results[1].status==="rejected")throw results[1].reason;
       // A first-time password is persisted only after the live official-source check succeeds.
       if(!passwordExists)await setAtlasPassword(playerName,password);
+      if(loginAttempt!==worldAtlasLoginAttempt||abortController.signal.aborted)return;
       await rememberAtlasPlayer(playerName,remember);
+      if(loginAttempt!==worldAtlasLoginAttempt||abortController.signal.aborted)return;
       if(message)message.textContent=gate.dataset.successLabel||"Access granted.";
       form.querySelector<HTMLInputElement>("#world-atlas-password")!.value="";
       const confirm=form.querySelector<HTMLInputElement>("#world-atlas-password-confirm");if(confirm)confirm.value="";
       unlockAtlasBackground(gate);
       gate.setAttribute("aria-hidden","true");
     }catch(error){
+      if(loginAttempt!==worldAtlasLoginAttempt||abortController.signal.aborted)return;
       if(message)message.textContent=error instanceof Error?error.message:"Local account verification failed.";
       if(loginForm)loginForm.inert=false;
       if(button)button.disabled=false;
     }finally{
-      worldAtlasLoginBusy=false;
-      if(closeButton)closeButton.disabled=false;
+      if(loginAttempt===worldAtlasLoginAttempt){
+        worldAtlasLoginBusy=false;
+        if(worldAtlasLoginAbort===abortController)worldAtlasLoginAbort=null;
+        if(closeButton)closeButton.disabled=false;
+      }
     }
     return;
   }
@@ -1849,13 +1877,15 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     // Initial app Developer access is intentionally local/offline-capable.
     // Only the separate World Atlas form performs the live Universe connectivity check.
     developerLoginBusy=true;developerLoginMessage="";
-    const button=form.querySelector<HTMLButtonElement>("[type=submit]");if(button)button.disabled=true;
+    const button=form.querySelector<HTMLButtonElement>("[type=submit]");
+    const submitLabel=button?.textContent??"";
+    if(button){button.disabled=true;button.textContent="…";}
     try{
       const valid=await authenticateDeveloper(identifier,password,remember);
       if(!valid){
         developerLoginBusy=false;developerLoginMessage="Access denied. Check the developer ID and password.";
         const message=root.querySelector<HTMLElement>("[data-dev-login-message]");if(message)message.textContent=developerLoginMessage;
-        const nextButton=root.querySelector<HTMLButtonElement>("#developer-login-form [type=submit]");if(nextButton)nextButton.disabled=false;
+        const nextButton=root.querySelector<HTMLButtonElement>("#developer-login-form [type=submit]");if(nextButton){nextButton.disabled=false;nextButton.textContent=submitLabel;}
         return;
       }
       rememberedDeveloperCredentials=remember?{identifier:identifier.trim().toLowerCase(),password}:null;
@@ -1866,7 +1896,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     }catch(error){
       developerLoginBusy=false;developerLoginMessage=error instanceof Error?error.message:"Developer authentication failed.";
       const message=root.querySelector<HTMLElement>("[data-dev-login-message]");if(message)message.textContent=developerLoginMessage;
-      const nextButton=root.querySelector<HTMLButtonElement>("#developer-login-form [type=submit]");if(nextButton)nextButton.disabled=false;
+      const nextButton=root.querySelector<HTMLButtonElement>("#developer-login-form [type=submit]");if(nextButton){nextButton.disabled=false;nextButton.textContent=submitLabel;}
     }
     return;
   }
