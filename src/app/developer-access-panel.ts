@@ -44,8 +44,8 @@ export function developerLoginPanel(
   return '<div class="developer-login-backdrop" data-dev-login-panel '+(required?"":"hidden")+'><section class="developer-login-card" role="dialog" aria-modal="true" aria-labelledby="developer-login-title">'+
     closeButton+'<small>MERZKAVA · ACCOUNT ACCESS</small><h2 id="developer-login-title">'+t.title+'</h2>'+
     '<div class="access-mode-tabs" role="tablist" aria-label="Account type">'+
-      '<button type="button" role="tab" data-access-mode="player" aria-selected="'+(mode==="player")+'" class="'+(mode==="player"?"is-active":"")+'">'+t.playerMode+'</button>'+
-      '<button type="button" role="tab" data-access-mode="developer" aria-selected="'+(mode==="developer")+'" class="'+(mode==="developer"?"is-active":"")+'">'+t.developerMode+'</button>'+
+      '<button type="button" role="tab" data-access-mode="player" aria-selected="'+(mode==="player")+'" class="'+(mode==="player"?"is-active":"")+'" '+((playerBusy||developerBusy)?"disabled":"")+'>'+t.playerMode+'</button>'+
+      '<button type="button" role="tab" data-access-mode="developer" aria-selected="'+(mode==="developer")+'" class="'+(mode==="developer"?"is-active":"")+'" '+((playerBusy||developerBusy)?"disabled":"")+'>'+t.developerMode+'</button>'+
     '</div>'+
     '<form id="player-login-form"'+playerHidden+'>'+
       '<label for="player-login-name">'+t.playerName+'</label>'+
