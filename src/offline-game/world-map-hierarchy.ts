@@ -1026,6 +1026,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
   const transitionTools=panel.querySelector<HTMLElement>("[data-wmh-transition-tools]");
   const transitionField=panel.querySelector<HTMLInputElement>("[data-wmh-transition-label]");
   const exportField=panel.querySelector<HTMLTextAreaElement>("[data-wmh-overlay-export]");
+  const exportWrap=panel.querySelector<HTMLElement>("[data-wmh-overlay-export-wrap]");
   const importField=panel.querySelector<HTMLTextAreaElement>("[data-wmh-overlay-import-text]");
   const workbench=panel.querySelector<HTMLElement>(".wmh-overlay-tools");
   const dock=dialog.querySelector<HTMLElement>("[data-wmh-editor-dock]");
@@ -1418,15 +1419,15 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     try{
       data.confirmed=true;data.confirmedAt=new Date().toISOString();
       localStorage.setItem(key,JSON.stringify(data));
-      if(exportField){exportField.hidden=false;exportField.value=JSON.stringify(exportPackage(),null,2);}
+      if(exportField){if(exportWrap)exportWrap.hidden=false;exportField.value=JSON.stringify(exportPackage(),null,2);}
       setStatus("✓ Configuration confirmed and saved for "+data.mapId+". Use COPY DATA FOR AI to send this exact version.");
     }catch{data.confirmed=false;data.confirmedAt="";setStatus("Confirmation could not be saved. Use COPY DATA FOR AI as a backup.");}
   });
   panel.querySelector<HTMLElement>("[data-wmh-overlay-copy]")?.addEventListener("click",async()=>{
     const json=JSON.stringify(exportPackage(),null,2);
-    if(exportField){exportField.hidden=false;exportField.value=json;}
+    if(exportField){if(exportWrap)exportWrap.hidden=false;exportField.value=json;}
     try{await navigator.clipboard.writeText(json);setStatus("AI reference copied for "+data.mapId+". Paste this JSON into your next update request.");}
-    catch{if(exportField){exportField.focus();exportField.select();}setStatus("Clipboard is unavailable. The complete AI reference JSON is shown below; select and copy it.");}
+    catch{if(exportField){if(exportWrap)exportWrap.hidden=false;exportField.focus();exportField.select();}setStatus("Clipboard is unavailable. The complete AI reference JSON is shown below; select and copy it.");}
   });
   panel.querySelector<HTMLElement>("[data-wmh-overlay-import]")?.addEventListener("click",()=>{
     const previous=JSON.parse(JSON.stringify(data)) as IsoMapEditorData;
@@ -1438,7 +1439,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
         data=previous;Object.assign(grid,previousGrid);history.pop();applyGrid();
         setStatus("Import rejected: the new X cells leave no safe destination for every character.");return;
       }
-      persist();if(exportField)exportField.hidden=true;setStatus("Map data imported for "+data.mapId+". Characters inside X cells were moved to safe cells.");
+      persist();if(exportWrap)exportWrap.hidden=true;setStatus("Map data imported for "+data.mapId+". Characters inside X cells were moved to safe cells.");
     }catch{data=previous;Object.assign(grid,previousGrid);setStatus("Import failed. Paste a valid isometric-map JSON backup.");}
   });
   applyGrid();
@@ -1552,7 +1553,7 @@ function isometricEditorMarkup(): string {
     '<div data-wmh-grid-row><label>Player scale <output data-wmh-grid-value="playerScale">1</output></label><button type="button" data-wmh-grid-dir="minus" data-wmh-grid-step="0.05">−</button><input type="range" min="0.4" max="2" step="0.05" value="1" data-wmh-grid-control="playerScale"/><button type="button" data-wmh-grid-dir="plus" data-wmh-grid-step="0.05">+</button></div>'+
     '<div data-wmh-grid-row><label>NPC scale <output data-wmh-grid-value="npcScale">1</output></label><button type="button" data-wmh-grid-dir="minus" data-wmh-grid-step="0.05">−</button><input type="range" min="0.4" max="2" step="0.05" value="1" data-wmh-grid-control="npcScale"/><button type="button" data-wmh-grid-dir="plus" data-wmh-grid-step="0.05">+</button></div></div>'+
     '<div class="wmh-overlay-tool-actions"><button type="button" data-wmh-overlay-undo>UNDO</button><button type="button" data-wmh-overlay-clear>CLEAR MAP</button><button type="button" data-wmh-overlay-save>SAVE DRAFT</button><button type="button" data-wmh-overlay-confirm>✓ CONFIRM &amp; SAVE</button><button type="button" data-wmh-overlay-copy>COPY DATA FOR AI</button></div>'+
-    '<textarea data-wmh-overlay-export hidden readonly></textarea><label>IMPORT MAP DATA<textarea data-wmh-overlay-import-text placeholder="Paste a saved isometric-map JSON backup..."></textarea></label><button type="button" data-wmh-overlay-import>IMPORT MAP DATA</button>'+
+    '<label class="wmh-ai-export" data-wmh-overlay-export-wrap hidden>AI-READY MAP DATA · JSON<textarea data-wmh-overlay-export readonly spellcheck="false" placeholder="Use COPY DATA FOR AI to generate the complete map reference..."></textarea><small>Copy this complete JSON and paste it into your next AI update request. It includes the grid, selected walkable cells, all four-sector flags, and transition labels.</small></label><label>IMPORT MAP DATA<textarea data-wmh-overlay-import-text placeholder="Paste a saved isometric-map JSON reference..."></textarea></label><button type="button" data-wmh-overlay-import>IMPORT MAP DATA</button>'+
     '<small data-wmh-overlay-status>Choose a tool, then tap individual diamond cells. The world pauses while the editor is open.</small></section></div></div>';
 }
 function isometricHudMarkup(title: string, mapImage: string, showMinimap = true): string {
