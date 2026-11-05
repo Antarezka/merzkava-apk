@@ -1411,10 +1411,10 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
   });
   panel.querySelector<HTMLElement>("[data-wmh-overlay-confirm]")?.addEventListener("click",()=>{
     data.grid={...grid};
-    const summary=data.mapId+"\\n"+grid.cols+" columns × "+grid.rows+" rows"+
-      "\\nWalkable cells: "+data.walkableCells.length+
-      "\\nTransitions: "+data.transitions.length+
-      "\\nConfirm this exact grid configuration and save it on this device?";
+    const summary=data.mapId+"\n"+grid.cols+" columns × "+grid.rows+" rows"+
+      "\nWalkable cells: "+data.walkableCells.length+
+      "\nTransitions: "+data.transitions.length+
+      "\nConfirm this exact grid configuration and save it on this device?";
     if(!window.confirm(summary)){setStatus("Confirmation cancelled. Your draft remains available.");return;}
     try{
       data.confirmed=true;data.confirmedAt=new Date().toISOString();
