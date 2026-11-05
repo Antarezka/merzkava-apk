@@ -1102,8 +1102,8 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       cellGroup.innerHTML=marks.join("");
     }
     if(transitionGroup)transitionGroup.innerHTML=data.transitions.map(marker=>{
-      const c=isoCellCenter(marker.x,marker.y,grid),label=escapeMapEditorText(marker.label);
-      return '<g class="wmh-transition-marker '+(marker.label.trim()?"is-named":"is-unlabelled")+(selectedTransitionId===marker.id?" is-selected":"")+'" data-transition-id="'+escapeMapEditorText(marker.id)+'" transform="translate('+c.x+" "+c.y+')"><circle r="11"></circle><text text-anchor="middle" dominant-baseline="central">'+(marker.label.trim()?"↗":"?")+'</text><title>'+(label||"UNLABELLED TRANSITION")+'</title></g>';
+      const c=isoCellCenter(marker.x,marker.y,grid),label=escapeMapEditorText(marker.label),hw=grid.tileW/2,hh=grid.tileH/2;
+      return '<g class="wmh-transition-marker '+(marker.label.trim()?"is-named":"is-unlabelled")+(selectedTransitionId===marker.id?" is-selected":"")+'" data-transition-id="'+escapeMapEditorText(marker.id)+'" transform="translate('+c.x+" "+c.y+')"><polygon class="wmh-transition-cell-highlight" points="0 '+(-hh)+' '+hw+' 0 0 '+hh+' '+(-hw)+' 0"/><circle r="11"></circle><text text-anchor="middle" dominant-baseline="central">'+(marker.label.trim()?"↗":"?")+'</text><title>'+(label||"UNLABELLED TRANSITION")+'</title></g>';
     }).join("");
     if(walkableToggle)walkableToggle.checked=data.walkableAreaEnabled;
   };
