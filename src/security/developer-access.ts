@@ -44,6 +44,20 @@ export function isDeveloperAuthenticated(): boolean {
   return authenticated;
 }
 
+async function clearDeveloperSessionMarker(): Promise<void> {
+  if (!Capacitor.isNativePlatform()) return;
+  try {
+    await SecureStorage.removeItem(REMEMBER_KEY);
+  } catch {
+    // If deletion fails, overwrite the marker so a later launch cannot restore access.
+    try {
+      await SecureStorage.setItem(REMEMBER_KEY, "locked");
+    } catch {
+      throw new Error("Could not securely lock the Developer session on this device.");
+    }
+  }
+}
+
 /** Returns saved form credentials only on native Android, where SecureStorage protects the record. */
 export async function restoreRememberedDeveloperCredentials(): Promise<RememberedDeveloperCredentials | null> {
   if (!Capacitor.isNativePlatform()) return null;
@@ -85,7 +99,7 @@ export async function authenticateDeveloper(
     constantTimeEqual(passwordCandidate, decodeBase64(PASSWORD_VERIFIER));
   if (!valid) {
     authenticated = false;
-    try { if (Capacitor.isNativePlatform()) await SecureStorage.removeItem(REMEMBER_KEY); } catch { /* fail closed */ }
+    await clearDeveloperSessionMarker();
     return false;
   }
 
@@ -117,9 +131,5 @@ export async function authenticateDeveloper(
 /** Lock the current Developer session without deleting an explicitly remembered credential. */
 export async function signOutDeveloper(): Promise<void> {
   authenticated = false;
-  try {
-    if (Capacitor.isNativePlatform()) await SecureStorage.removeItem(REMEMBER_KEY);
-  } catch {
-    // In-memory developer access is still revoked.
-  }
+  await clearDeveloperSessionMarker();
 }
