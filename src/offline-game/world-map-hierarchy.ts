@@ -1130,7 +1130,6 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       cellGroup.innerHTML=marks.join("");
     }
     if(selectionCount)selectionCount.textContent=selectedMergeCells.size+" CELLS SELECTED";
-    }
     if(transitionGroup)transitionGroup.innerHTML=data.transitions.map(marker=>{
       const c=isoCellCenter(marker.x,marker.y,grid),label=escapeMapEditorText(marker.label),hw=grid.tileW/2,hh=grid.tileH/2;
       return '<g class="wmh-transition-marker '+(marker.label.trim()?"is-named":"is-unlabelled")+(selectedTransitionId===marker.id?" is-selected":"")+'" data-transition-id="'+escapeMapEditorText(marker.id)+'" transform="translate('+c.x+" "+c.y+')"><polygon class="wmh-transition-cell-highlight" points="0 '+(-hh)+' '+hw+' 0 0 '+hh+' '+(-hw)+' 0"/><circle r="11"></circle><text text-anchor="middle" dominant-baseline="central">'+(marker.label.trim()?"↗":"?")+'</text><title>'+(label||"UNLABELLED TRANSITION")+'</title></g>';
@@ -1393,9 +1392,11 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       redraw();setStatus(selectedMergeCells.size+" cells selected. Choose adjacent cells in any connected shape, then press MERGE SELECTED CELLS.");return;
     }
     if(mode()==="cell-unmerge"){
-      const group=unmergeIsoWalkableCell(data,cell.x,cell.y);
-      if(!group){setStatus("This cell is not part of a merged group.");return;}
-      remember();persist();setStatus("Unmerged "+group.id+". Its "+group.cells.length+" component cells can now be edited or merged again.");return;
+      const existingGroup=data.walkableCellGroups.find(item=>item.cells.includes(key));
+      if(!existingGroup){setStatus("This cell is not part of a merged group.");return;}
+      remember();const group=unmergeIsoWalkableCell(data,cell.x,cell.y);
+      if(group)persist();
+      setStatus("Unmerged "+existingGroup.id+". Its "+existingGroup.cells.length+" component cells can now be edited or merged again.");return;
     }
     const quadrant=isoQuadrantAtPoint(mapPoint,cell.x,cell.y,grid);
     const layer:IsoQuadrantLayer=mode()==="blocked"?"blockedQuadrants":mode()==="opacity"?"opacityQuadrants":"foregroundQuadrants";
@@ -1502,6 +1503,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       grid:{...grid},
       walkableAreaEnabled:data.walkableAreaEnabled,
       walkableCells:[...data.walkableCells],
+      walkableCellGroups:data.walkableCellGroups.map(group=>({id:group.id,cells:[...group.cells]})),
       foregroundCells:[...data.foregroundCells],
       blockedCells:[...data.blockedCells],
       opacityCells:[...data.opacityCells],
