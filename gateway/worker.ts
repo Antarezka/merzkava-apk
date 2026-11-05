@@ -65,7 +65,7 @@ async function authenticate(request: Request, env: Env): Promise<AuthIdentity | 
   }
 }
 
-export default {export default {
+export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const origin = request.headers.get("Origin");
     const allowed = (env.ALLOWED_ORIGINS ?? "").split(",").map(value => value.trim()).filter(Boolean);
