@@ -49,7 +49,7 @@ export function calculateIsoCanvasMargins(input: {
   artworkHeight: number;
   cellWidth: number;
   cellHeight: number;
-  artworkScale?: number;
+  displayedArtworkWidth?: number;
   expansion?: Partial<IsoCanvasExpansion>;
 }): IsoCanvasExpansion {
   const finitePositive = (value: number, fallback = 1) =>
@@ -58,7 +58,7 @@ export function calculateIsoCanvasMargins(input: {
   const viewportHeight = finitePositive(input.viewportHeight);
   const artworkWidth = finitePositive(input.artworkWidth);
   const artworkHeight = finitePositive(input.artworkHeight);
-  const scale = finitePositive(input.artworkScale ?? 1);
+  const scale = finitePositive(input.displayedArtworkWidth ?? artworkWidth) / artworkWidth;
   const cellWidth = finitePositive(input.cellWidth) * scale;
   const cellHeight = finitePositive(input.cellHeight) * scale;
   const extra = normalizeIsoCanvasExpansion(input.expansion ?? DEFAULT_ISO_CANVAS_EXPANSION);
