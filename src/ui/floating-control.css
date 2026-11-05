@@ -109,3 +109,18 @@
 :root[data-theme="dark"] .developer-login-card input:not([type=checkbox]){border-color:#596653;background:#202923;color:#e8dfcf}
 :root[data-theme="dark"] .developer-login-close{border-color:#596653;background:#303b33;color:#e8dfcf}
 @media(max-width:380px){.developer-login-card{padding:22px 17px 18px}.developer-login-card h2{font-size:22px}}
+
+
+/* Role selector and name-only player access. The native Floating Control UI and permission handlers remain untouched. */
+.developer-login-card [hidden]{display:none!important}
+.access-mode-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:0 0 17px;padding:4px;border:1px solid #c7bea9;border-radius:4px;background:#e6ddca}
+.access-mode-tabs button{min-height:38px;border:1px solid transparent;border-radius:3px;background:transparent;color:#68766b;font-size:10px;font-weight:700;letter-spacing:.06em}
+.access-mode-tabs button.is-active{border-color:#b49b68;background:linear-gradient(145deg,#f3eddf,#e6ddca);color:#31483f;box-shadow:0 2px 7px #293d3816}
+.access-mode-tabs button:disabled{opacity:.45}
+.access-login-hint{margin:0;color:#7a8175;font-size:10px;line-height:1.55}
+.developer-player-logout{min-height:35px;padding:0 10px;border:1px solid #66503a;border-radius:3px;background:linear-gradient(145deg,#302522,#211d1c);color:#d8b77e;font-size:10px;font-weight:600}
+.developer-player-logout:active{transform:scale(.96);border-color:#c18b45;background:#493426}
+:root[data-theme="dark"] .access-mode-tabs{border-color:#536052;background:#202923}
+:root[data-theme="dark"] .access-mode-tabs button{color:#bdc1b0}
+:root[data-theme="dark"] .access-mode-tabs button.is-active{border-color:#8c7950;background:linear-gradient(145deg,#39473c,#303b33);color:#e8dfcf}
+:root[data-theme="dark"] .access-login-hint{color:#bdc1b0}
