@@ -9,10 +9,14 @@ import {
   isoCellAtPoint,
   isoCellCenter,
   isoCellHasLayer,
+  isoQuadrantAtPoint,
+  isoQuadrantHasLayer,
+  isoQuadrantKey,
   isoMapStorageKey,
   normalizeIsoMapEditorData,
   normalizeIsoCanvasExpansion,
   toggleIsoCellLayer,
+  toggleIsoQuadrantLayer,
 } from "../../src/offline-game/isometric-map-editor";
 
 describe("shared isometric map editor data", () => {
@@ -42,6 +46,52 @@ describe("shared isometric map editor data", () => {
     expect(isoCellHasLayer(data, "foregroundCells", 4, 6)).toBe(false);
     expect(isoCellHasLayer(data, "blockedCells", 4, 6)).toBe(true);
     expect(isoCellHasLayer(data, "opacityCells", 4, 6)).toBe(true);
+  });
+
+  it("keeps walkable regions and quadrant flags independent", () => {
+    const data = createIsoMapEditorData("quadrant-test");
+    expect(data.walkableAreaEnabled).toBe(false);
+    expect(data.walkableCells).toEqual([]);
+    expect(data.foregroundQuadrants).toEqual([]);
+    expect(data.blockedQuadrants).toEqual([]);
+    expect(data.opacityQuadrants).toEqual([]);
+
+    data.walkableAreaEnabled = true;
+    data.walkableCells = ["4,6"];
+    expect(toggleIsoQuadrantLayer(data, "blockedQuadrants", 4, 6, "tl")).toBe(true);
+    expect(toggleIsoQuadrantLayer(data, "foregroundQuadrants", 4, 6, "br")).toBe(true);
+    expect(toggleIsoQuadrantLayer(data, "opacityQuadrants", 4, 6, "tr")).toBe(true);
+    expect(isoQuadrantHasLayer(data, "blockedQuadrants", 4, 6, "tl")).toBe(true);
+    expect(isoQuadrantHasLayer(data, "foregroundQuadrants", 4, 6, "br")).toBe(true);
+    expect(isoQuadrantHasLayer(data, "opacityQuadrants", 4, 6, "tr")).toBe(true);
+    expect(isoQuadrantKey(4, 6, "bl")).toBe("4,6:bl");
+    expect(toggleIsoQuadrantLayer(data, "blockedQuadrants", 4, 6, "tl")).toBe(false);
+    expect(isoQuadrantHasLayer(data, "foregroundQuadrants", 4, 6, "br")).toBe(true);
+  });
+
+  it("resolves the four sub-sectors inside one diamond", () => {
+    const grid = { ...DEFAULT_ISOMETRIC_GRID, tileW: 120, tileH: 60 };
+    const center = isoCellCenter(3, 5, grid);
+    expect(isoQuadrantAtPoint({ x: center.x - 20, y: center.y - 10 }, 3, 5, grid)).toBe("tl");
+    expect(isoQuadrantAtPoint({ x: center.x + 20, y: center.y - 10 }, 3, 5, grid)).toBe("tr");
+    expect(isoQuadrantAtPoint({ x: center.x - 20, y: center.y + 10 }, 3, 5, grid)).toBe("bl");
+    expect(isoQuadrantAtPoint({ x: center.x + 20, y: center.y + 10 }, 3, 5, grid)).toBe("br");
+  });
+
+  it("normalizes walkable areas and quadrant keys while dropping invalid sectors", () => {
+    const data = normalizeIsoMapEditorData({
+      grid: { cols: 8, rows: 6 },
+      walkableAreaEnabled: true,
+      walkableCells: ["1,2", "1,2", "8,2", "bad"],
+      foregroundQuadrants: ["1,2:tl", "1,2:br", "1,2:middle", "8,2:tr", "bad"],
+      blockedQuadrants: ["4,5:bl", "4,6:br"],
+      opacityQuadrants: ["0,0:tr"],
+    }, "map-quadrants");
+    expect(data.walkableAreaEnabled).toBe(true);
+    expect(data.walkableCells).toEqual(["1,2"]);
+    expect(data.foregroundQuadrants).toEqual(["1,2:tl", "1,2:br"]);
+    expect(data.blockedQuadrants).toEqual(["4,5:bl"]);
+    expect(data.opacityQuadrants).toEqual(["0,0:tr"]);
   });
 
   it("maps isometric diamond centers back to their exact cells with grid offsets", () => {
@@ -84,6 +134,11 @@ describe("shared isometric map editor data", () => {
     expect(data.foregroundCells).toEqual([]);
     expect(data.blockedCells).toEqual([]);
     expect(data.opacityCells).toEqual([]);
+    expect(data.walkableCells).toEqual([]);
+    expect(data.walkableAreaEnabled).toBe(false);
+    expect(data.foregroundQuadrants).toEqual([]);
+    expect(data.blockedQuadrants).toEqual([]);
+    expect(data.opacityQuadrants).toEqual([]);
     expect(data.transitions).toEqual([]);
   });
 
