@@ -1643,7 +1643,7 @@
   max-width:none!important;
   max-height:none!important;
 }
-.wmh-academy-map-surface>img{
+.wmh-academy-isometric-board>img{
   display:block!important;
   width:100%!important;
   height:100%!important;
@@ -1725,6 +1725,21 @@
   user-select:none!important;
   -webkit-user-drag:none!important;
 }
+
+.wmh-academy-isometric-board{
+  position:absolute!important;left:0;top:0;width:2816px;height:1536px;
+  transform-origin:top left;overflow:visible!important;z-index:2;
+}
+.wmh-academy-isometric-board>img{
+  position:absolute!important;left:0;top:0;z-index:1!important;
+  width:2816px;height:1536px;max-width:none!important;max-height:none!important;
+  object-fit:fill!important;pointer-events:none!important;user-select:none!important;
+  -webkit-user-drag:none!important;
+}
+.wmh-academy-isometric-board>[data-wmh-foreground-canvas]{
+  position:absolute;left:0;top:0;z-index:2;pointer-events:none;
+}
+.wmh-academy-isometric-board>[data-wmh-scene-svg]{display:none!important}
 
 
 /* Shared live canvas expansion workbench. */
