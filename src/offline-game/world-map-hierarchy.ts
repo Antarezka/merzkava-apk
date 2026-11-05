@@ -2149,7 +2149,6 @@ function startNpcWander(dialog:HTMLElement):void {
   stopNpcWander(dialog);
   const timer=window.setInterval(()=>{
     const mapData=readIsoMapData(board);
-    const player=board.querySelector<HTMLElement>("[data-wmh-player-token]");
     board.querySelectorAll<HTMLElement>("[data-wmh-npc]").forEach(npc=>{
       if(Math.random()>.48)return;
       const x=Number(npc.dataset.x||0),y=Number(npc.dataset.y||0);
@@ -2297,19 +2296,22 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
   }
   if(action.dataset.wmhAction==="academy-home"){
     if(current==="local"){
-      dialog.querySelector<HTMLButtonElement>("[data-wmh-iso-center]")?.click();
+      dialog.querySelector<HTMLButtonElement>("[data-wmh-map-center],[data-wmh-iso-center]")?.click();
       return true;
     }
+    const arrival=captureArrivalState();
     stopNpcWander(dialog);
     overlay.dataset.region="golden-dragon-empire";
     overlay.dataset.level="local";
     overlay.dataset.building="Tianhai Academy";
     dialog.innerHTML=panelMarkup("local","golden-dragon-empire","Tianhai Academy");
+    onAdvanceTime(180);
     bindIsoAreaEditor(dialog);
     bindIsometricCamera(dialog);
     bindIsometricMapArt(dialog);
     bindIsometricHud(dialog);
     startNpcWander(dialog);
+    requestAnimationFrame(()=>animateIsometricArrival(dialog,arrival));
     return true;
   }
   if(action.dataset.wmhAction==="back"){
@@ -2368,9 +2370,14 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
     return true;
   }
   if(action.dataset.wmhBuilding && current==="local"){
+    const arrival=captureArrivalState();
     stopNpcWander(dialog);
     overlay.dataset.level="interior";overlay.dataset.building=action.dataset.wmhBuilding;
-    dialog.innerHTML=panelMarkup("interior",regionId,action.dataset.wmhBuilding);bindIsoAreaEditor(dialog);bindIsometricCamera(dialog);bindIsometricMapArt(dialog);bindIsometricHud(dialog);return true;
+    dialog.innerHTML=panelMarkup("interior",regionId,action.dataset.wmhBuilding);
+    onAdvanceTime(180);
+    bindIsoAreaEditor(dialog);bindIsometricCamera(dialog);bindIsometricMapArt(dialog);bindIsometricHud(dialog);
+    requestAnimationFrame(()=>animateIsometricArrival(dialog,arrival));
+    return true;
   }
   if(action.hasAttribute("data-wmh-tile")){
     if(dialog.querySelector<HTMLElement>("[data-wmh-board]")?.classList.contains("wmh-overlay-editing"))return true;
