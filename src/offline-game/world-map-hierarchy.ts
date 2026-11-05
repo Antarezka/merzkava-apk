@@ -5,7 +5,7 @@ import { animateExpeditionPanel } from "./expedition-animations";
 import { getEternalSave, getExpeditionAtmosphere } from "./expedition-game";
 import {
   createIsoMapEditorData, DEFAULT_ISOMETRIC_GRID, DEFAULT_ISO_CANVAS_EXPANSION, normalizeIsoCanvasExpansion, isoCellAtPoint, isoCellCenter, isoCellHasLayer,
-  isoCellKey, isoClientToImagePoint, isoMapStorageKey, isoPointerGesture, isoQuadrantAtPoint, isoQuadrantHasLayer, mergeIsoWalkableCells, normalizeIsoMapEditorData, removeIsoWalkableCell, toggleIsoQuadrantLayer, unmergeIsoWalkableCell,
+  isoCellKey, isoClientToImagePoint, isoMapStorageKey, isoPointerGesture, isoQuadrantAtPoint, isoQuadrantHasParentLayer, mergeIsoWalkableCells, normalizeIsoMapEditorData, removeIsoWalkableCell, toggleIsoQuadrantLayer, unmergeIsoWalkableCell,
   type IsoMapEditorData, type IsoMapGridConfig, type IsoMapPoint, type IsoQuadrant, type IsoQuadrantLayer,
 } from "./isometric-map-editor";
 import { renderIsometricSvgSceneMarkup, refreshIsometricSvgScene, type IsometricSvgTheme } from "./isometric-svg-board";
@@ -719,13 +719,20 @@ function isoCellIsWalkable(data:IsoMapEditorData,x:number,y:number):boolean {
 }
 function isoCanStep(data:IsoMapEditorData,fromX:number,fromY:number,toX:number,toY:number):boolean {
   if(!isoGridCellExists(data,fromX,fromY)||!isoCellIsWalkable(data,toX,toY))return false;
-  const edges:Record<string,[IsoQuadrant,IsoQuadrant]>={"1,0":["br","tl"],"-1,0":["tl","br"],"0,1":["bl","tr"],"0,-1":["tr","bl"]};
+  const edges:Record<string,["tl"|"tr"|"bl"|"br","tl"|"tr"|"bl"|"br"]>={"1,0":["br","tl"],"-1,0":["tl","br"],"0,1":["bl","tr"],"0,-1":["tr","bl"]};
   const edge=edges[(toX-fromX)+","+(toY-fromY)];
-  return !!edge&&!isoQuadrantHasLayer(data,"blockedQuadrants",fromX,fromY,edge[0])&&!isoQuadrantHasLayer(data,"blockedQuadrants",toX,toY,edge[1]);
+  return !!edge&&!isoQuadrantHasParentLayer(data,"blockedQuadrants",fromX,fromY,edge[0])&&!isoQuadrantHasParentLayer(data,"blockedQuadrants",toX,toY,edge[1]);
 }
 function isoQuadrantTrianglePoints(x:number,y:number,quadrant:IsoQuadrant,grid:IsoMapGridConfig):string {
   const c=isoCellCenter(x,y,grid),top={x:c.x,y:c.y-grid.tileH/2},right={x:c.x+grid.tileW/2,y:c.y},bottom={x:c.x,y:c.y+grid.tileH/2},left={x:c.x-grid.tileW/2,y:c.y},center={x:c.x,y:c.y};
-  const triangles:Record<IsoQuadrant,Array<{x:number;y:number}>>={tl:[top,center,left],tr:[top,right,center],bl:[left,center,bottom],br:[center,right,bottom]};
+  const midpoint=(a:{x:number;y:number},b:{x:number;y:number})=>({x:(a.x+b.x)/2,y:(a.y+b.y)/2});
+  const nw=midpoint(top,left),ne=midpoint(top,right),sw=midpoint(left,bottom),se=midpoint(right,bottom);
+  const triangles:Record<IsoQuadrant,Array<{x:number;y:number}>>={
+    "tl-a":[top,center,nw],"tl-b":[center,left,nw],
+    "tr-a":[top,ne,center],"tr-b":[ne,right,center],
+    "bl-a":[left,center,sw],"bl-b":[sw,center,bottom],
+    "br-a":[center,right,se],"br-b":[se,center,bottom],
+  };
   return triangles[quadrant].map(point=>point.x+","+point.y).join(" ");
 }
 function academyInteractionGridMarkup(grid:IsoMapGridConfig,data:IsoMapEditorData):string {
@@ -735,7 +742,12 @@ function academyInteractionGridMarkup(grid:IsoMapGridConfig,data:IsoMapEditorDat
     const points=[c.x+","+(c.y-hh),(c.x+hw)+","+c.y,c.x+","+(c.y+hh),(c.x-hw)+","+c.y].join(" ");
     const selected=data.walkableCells.includes(isoCellKey(x,y));
     cells.push('<polygon class="wmh-academy-hit-cell'+(selected?' is-walkable':'')+(custom?' is-custom-grid-cell':'')+'" data-wmh-tile data-x="'+x+'" data-y="'+y+'" data-z="0" data-tile-id="academy-'+x+'-'+y+'" data-surface="earth" points="'+points+'" aria-label="Grid tile '+x+', '+y+'"/>');
-    cells.push('<path class="wmh-quadrant-divider" d="M'+c.x+' '+(c.y-hh)+' L'+c.x+' '+(c.y+hh)+' M'+(c.x-hw)+' '+c.y+' L'+(c.x+hw)+' '+c.y+'"/>');
+    const divider='M'+c.x+' '+(c.y-hh)+' L'+c.x+' '+(c.y+hh)+' M'+(c.x-hw)+' '+c.y+' L'+(c.x+hw)+' '+c.y+
+      ' M'+c.x+' '+c.y+' L'+(c.x-hw/2)+' '+(c.y-hh/2)+
+      ' M'+c.x+' '+c.y+' L'+(c.x+hw/2)+' '+(c.y-hh/2)+
+      ' M'+c.x+' '+c.y+' L'+(c.x-hw/2)+' '+(c.y+hh/2)+
+      ' M'+c.x+' '+c.y+' L'+(c.x+hw/2)+' '+(c.y+hh/2);
+    cells.push('<path class="wmh-quadrant-divider" d="'+divider+'"/>');
   };
   for(let y=0;y<grid.rows;y++)for(let x=0;x<grid.cols;x++)addCell(x,y,false);
   data.customGridCells.forEach(key=>{const [x,y]=key.split(",").map(Number);addCell(x,y,true);});
@@ -822,8 +834,8 @@ function drawIsometricForeground(board:HTMLElement,data=readIsoMapData(board)):v
     ctx.moveTo(cx,cy-halfH);ctx.lineTo(cx+halfW,cy);ctx.lineTo(cx,cy+halfH);ctx.lineTo(cx-halfW,cy);ctx.closePath();
   }
   for(const key of data.foregroundQuadrants){
-    const match=/^(-?[0-9]+),(-?[0-9]+):(tl|tr|bl|br)$/.exec(key);if(!match)continue;
-    const points=isoQuadrantTrianglePoints(Number(match[1]),Number(match[2]),match[3] as IsoQuadrant,data.grid).split(" ").map(point=>point.split(",").map(Number));
+    const match=/^(-?[0-9]+),(-?[0-9]+):(tl|tr|bl|br)-([ab])$/.exec(key);if(!match)continue;
+    const points=isoQuadrantTrianglePoints(Number(match[1]),Number(match[2]),(match[3]+"-"+match[4]) as IsoQuadrant,data.grid).split(" ").map(point=>point.split(",").map(Number));
     ctx.moveTo(points[0][0]-left,points[0][1]-top);
     for(let i=1;i<points.length;i++)ctx.lineTo(points[i][0]-left,points[i][1]-top);
     ctx.closePath();
@@ -921,8 +933,8 @@ function renderIsometricMinimap(board:HTMLElement):void {
     data.walkableCellGroups.forEach(group=>{const d=isoMergedGroupBoundaryPath(group.cells,grid);if(d)overlays.push('<path class="wmh-minimap-merged-boundary" d="'+d+'"/>');});
     const addQuadrants=(keys:string[],cls:string)=>{
       keys.forEach(key=>{
-        const match=/^(-?[0-9]+),(-?[0-9]+):(tl|tr|bl|br)$/.exec(key);if(!match)return;
-        const points=isoQuadrantTrianglePoints(Number(match[1]),Number(match[2]),match[3] as IsoQuadrant,grid);
+        const match=/^(-?[0-9]+),(-?[0-9]+):(tl|tr|bl|br)-([ab])$/.exec(key);if(!match)return;
+        const points=isoQuadrantTrianglePoints(Number(match[1]),Number(match[2]),(match[3]+"-"+match[4]) as IsoQuadrant,grid);
         overlays.push('<polygon class="wmh-minimap-cell '+cls+' is-quadrant" points="'+points+'"/>');
       });
     };
@@ -1144,12 +1156,22 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
         interactionGroup.innerHTML=academyInteractionGridMarkup(grid,data);
       }else{
         const marks:string[]=[];
+        const addDivider=(x:number,y:number)=>{
+          const c=isoCellCenter(x,y,grid),hw=grid.tileW/2,hh=grid.tileH/2;
+          const divider='M'+c.x+' '+(c.y-hh)+' L'+c.x+' '+(c.y+hh)+' M'+(c.x-hw)+' '+c.y+' L'+(c.x+hw)+' '+c.y+
+            ' M'+c.x+' '+c.y+' L'+(c.x-hw/2)+' '+(c.y-hh/2)+
+            ' M'+c.x+' '+c.y+' L'+(c.x+hw/2)+' '+(c.y-hh/2)+
+            ' M'+c.x+' '+c.y+' L'+(c.x-hw/2)+' '+(c.y+hh/2)+
+            ' M'+c.x+' '+c.y+' L'+(c.x+hw/2)+' '+(c.y+hh/2);
+          marks.push('<path class="wmh-quadrant-divider" d="'+divider+'"/>');
+        };
+        for(let y=0;y<grid.rows;y++)for(let x=0;x<grid.cols;x++)addDivider(x,y);
         for(const key of data.customGridCells){
           const [x,y]=key.split(",").map(Number),c=isoCellCenter(x,y,grid),hw=grid.tileW/2,hh=grid.tileH/2;
           const points=[c.x+","+(c.y-hh),(c.x+hw)+","+c.y,c.x+","+(c.y+hh),(c.x-hw)+","+c.y].join(" ");
           const selected=data.walkableCells.includes(key);
           marks.push('<polygon class="wmh-academy-hit-cell is-custom-grid-cell'+(selected?' is-walkable':'')+'" data-wmh-tile data-x="'+x+'" data-y="'+y+'" data-z="0" data-tile-id="custom-'+x+'-'+y+'" data-surface="earth" points="'+points+'" aria-label="Custom image grid cell '+x+', '+y+'"/>');
-          marks.push('<path class="wmh-quadrant-divider" d="M'+c.x+' '+(c.y-hh)+' L'+c.x+' '+(c.y+hh)+' M'+(c.x-hw)+' '+c.y+' L'+(c.x+hw)+' '+c.y+'"/>');
+          addDivider(x,y);
         }
         interactionGroup.innerHTML=marks.join("");
       }
@@ -1165,8 +1187,8 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       };
       const addQuadrants=(cells:string[],cls:string,symbol:string)=>{
         for(const key of cells){
-          const match=/^(-?[0-9]+),(-?[0-9]+):(tl|tr|bl|br)$/.exec(key);if(!match)continue;
-          const x=Number(match[1]),y=Number(match[2]),q=match[3] as IsoQuadrant;
+          const match=/^(-?[0-9]+),(-?[0-9]+):(tl|tr|bl|br)-([ab])$/.exec(key);if(!match)continue;
+          const x=Number(match[1]),y=Number(match[2]),q=(match[3]+"-"+match[4]) as IsoQuadrant;
           const points=isoQuadrantTrianglePoints(x,y,q,grid);
           const vertices=points.split(" ").map(point=>point.split(",").map(Number));
           const cx=vertices.reduce((sum,p)=>sum+p[0],0)/vertices.length,cy=vertices.reduce((sum,p)=>sum+p[1],0)/vertices.length;
@@ -1579,7 +1601,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       const nextContains=(x:number,y:number)=>x>=0&&y>=0&&x<grid.cols&&y<grid.rows;
       const promoted=new Set(data.customGridCells);
       const promoteKey=(key:string)=>{
-        const match=/^(-?[0-9]+),(-?[0-9]+)(?::(?:tl|tr|bl|br))?$/.exec(key);if(!match)return;
+        const match=/^(-?[0-9]+),(-?[0-9]+)(?::(?:tl|tr|bl|br)(?:-[ab])?)?$/.exec(key);if(!match)return;
         const x=Number(match[1]),y=Number(match[2]);
         if(previousContains(x,y)&&!nextContains(x,y))promoted.add(x+","+y);
       };
@@ -1638,7 +1660,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       transitions:data.transitions.map(marker=>({...marker})),
       notes:{
         cellSectorOrder:["top-left","top-right","bottom-left","bottom-right"],
-        quadrantKeys:"x,y:tl|tr|bl|br",
+        quadrantKeys:"x,y:tl-a|tl-b|tr-a|tr-b|bl-a|bl-b|br-a|br-b (legacy tl|tr|bl|br keys expand to both child sectors)",
         transitionColors:"red=unnamed, blue=named",
         walkableCellGroups:"Connected base cells may be merged into flexible logical cells; every group has an ID and retains its underlying grid coordinates.",
         customGridCells:"Extra isometric diamonds added on Map Base image areas outside the base cols×rows grid. Each coordinate is an individually placed cell; do not fill intervening image or canvas space automatically.",
@@ -1788,8 +1810,8 @@ function isometricEditorMarkup(): string {
     '<div class="wmh-overlay-modal" data-wmh-overlay-tools hidden><section class="wmh-overlay-tools" role="dialog" aria-modal="false" aria-label="Isometric map editor">'+
     '<div class="wmh-overlay-resize-grip" data-wmh-panel-resize-handle role="separator" aria-orientation="diagonal" aria-label="Resize editor from its upper-left corner"><span></span></div>'+
     '<header class="wmh-overlay-modal-head" data-wmh-overlay-drag-handle><div><b>ISOMETRIC EDITOR</b><small>MAP CELL WORKBENCH</small></div><button type="button" data-wmh-overlay-close aria-label="Return to editor bubble">×</button></header>'+
-    '<label>EDITING MODE<select data-wmh-overlay-mode><option value="cell-add">＋ ADD CELL</option><option value="cell-delete">－ DELETE CELL</option><option value="cell-merge">⇧ SELECT CELLS TO MERGE</option><option value="cell-unmerge">↔ UNMERGE CELL GROUP</option><option value="foreground">○ Foreground quadrants</option><option value="blocked">X Blocked quadrants</option><option value="opacity">◌ Character opacity quadrants</option><option value="transition">Area transition markers</option></select></label><div class="wmh-cell-layout-tools" data-wmh-cell-tools hidden><b>CELL LAYOUT</b><span data-wmh-cell-selection-count>0 CELLS SELECTED</span><button type="button" data-wmh-merge-apply>MERGE SELECTED CELLS</button><button type="button" data-wmh-merge-clear>CLEAR SELECTION</button><small>Tap adjacent cells to select them. Tap-drag only pans the map.</small></div><label class="wmh-walkable-switch"><input type="checkbox" data-wmh-walkable-enabled/> LIMIT MOVEMENT TO BLUE CELLS</label>'+
-    '<p class="wmh-editor-mode-note">Paint only the image area that should be used. Each main diamond has 4 sectors: top-left, top-right, bottom-left and bottom-right. X blocks a sector edge, ○ redraws that image sector above characters, and ◌ makes characters translucent. The source image and canvas gaps are never resized by grid calibration.</p>'+
+    '<label>EDITING MODE<select data-wmh-overlay-mode><option value="cell-add">＋ ADD CELL</option><option value="cell-delete">－ DELETE CELL</option><option value="cell-merge">⇧ SELECT CELLS TO MERGE</option><option value="cell-unmerge">↔ UNMERGE CELL GROUP</option><option value="foreground">○ Foreground sectors</option><option value="blocked">X Blocked sectors</option><option value="opacity">◌ Character opacity sectors</option><option value="transition">Area transition markers</option></select></label><div class="wmh-cell-layout-tools" data-wmh-cell-tools hidden><b>CELL LAYOUT</b><span data-wmh-cell-selection-count>0 CELLS SELECTED</span><button type="button" data-wmh-merge-apply>MERGE SELECTED CELLS</button><button type="button" data-wmh-merge-clear>CLEAR SELECTION</button><small>Tap adjacent cells to select them. Tap-drag only pans the map.</small></div><label class="wmh-walkable-switch"><input type="checkbox" data-wmh-walkable-enabled/> LIMIT MOVEMENT TO BLUE CELLS</label>'+
+    '<p class="wmh-editor-mode-note">Paint only the image area that should be used. Each main diamond has 8 smaller sectors: two inside each of the four former quadrants. X blocks a sector edge, ○ redraws that image sector above characters, and ◌ makes characters translucent. The source image and canvas gaps are never resized by grid calibration.</p>'+
     '<div data-wmh-transition-tools hidden><label>DESTINATION LABEL<input type="text" maxlength="80" data-wmh-transition-label placeholder="e.g. Academy · Main Hall"/></label><button type="button" data-wmh-transition-apply>APPLY LABEL</button><button type="button" data-wmh-transition-delete>DELETE SELECTED</button><p>Red = unnamed. Blue = named. Tap a marker to select it.</p></div>'+
     '<div class="wmh-grid-calibration"><b>GRID CALIBRATION</b>'+
     '<div data-wmh-grid-row><label>Columns <output data-wmh-grid-value="cols">24</output></label><button type="button" data-wmh-grid-dir="minus" data-wmh-grid-step="1">−</button><input type="range" min="1" max="128" step="1" value="24" data-wmh-grid-control="cols"/><button type="button" data-wmh-grid-dir="plus" data-wmh-grid-step="1">+</button></div>'+

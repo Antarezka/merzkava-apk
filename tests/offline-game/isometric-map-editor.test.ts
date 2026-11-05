@@ -12,6 +12,7 @@ import {
   isoCellHasLayer,
   isoQuadrantAtPoint,
   isoQuadrantHasLayer,
+  isoQuadrantHasParentLayer,
   isoQuadrantKey,
   isoMapStorageKey,
   isoPointerGesture,
@@ -63,15 +64,17 @@ describe("shared isometric map editor data", () => {
 
     data.walkableAreaEnabled = true;
     data.walkableCells = ["4,6"];
-    expect(toggleIsoQuadrantLayer(data, "blockedQuadrants", 4, 6, "tl")).toBe(true);
-    expect(toggleIsoQuadrantLayer(data, "foregroundQuadrants", 4, 6, "br")).toBe(true);
-    expect(toggleIsoQuadrantLayer(data, "opacityQuadrants", 4, 6, "tr")).toBe(true);
-    expect(isoQuadrantHasLayer(data, "blockedQuadrants", 4, 6, "tl")).toBe(true);
-    expect(isoQuadrantHasLayer(data, "foregroundQuadrants", 4, 6, "br")).toBe(true);
-    expect(isoQuadrantHasLayer(data, "opacityQuadrants", 4, 6, "tr")).toBe(true);
-    expect(isoQuadrantKey(4, 6, "bl")).toBe("4,6:bl");
-    expect(toggleIsoQuadrantLayer(data, "blockedQuadrants", 4, 6, "tl")).toBe(false);
-    expect(isoQuadrantHasLayer(data, "foregroundQuadrants", 4, 6, "br")).toBe(true);
+    expect(toggleIsoQuadrantLayer(data, "blockedQuadrants", 4, 6, "tl-a")).toBe(true);
+    expect(toggleIsoQuadrantLayer(data, "foregroundQuadrants", 4, 6, "br-b")).toBe(true);
+    expect(toggleIsoQuadrantLayer(data, "opacityQuadrants", 4, 6, "tr-a")).toBe(true);
+    expect(isoQuadrantHasLayer(data, "blockedQuadrants", 4, 6, "tl-a")).toBe(true);
+    expect(isoQuadrantHasParentLayer(data, "blockedQuadrants", 4, 6, "tl")).toBe(true);
+    expect(isoQuadrantHasLayer(data, "foregroundQuadrants", 4, 6, "br-b")).toBe(true);
+    expect(isoQuadrantHasLayer(data, "opacityQuadrants", 4, 6, "tr-a")).toBe(true);
+    expect(isoQuadrantKey(4, 6, "bl-b")).toBe("4,6:bl-b");
+    expect(toggleIsoQuadrantLayer(data, "blockedQuadrants", 4, 6, "tl-a")).toBe(false);
+    expect(isoQuadrantHasParentLayer(data, "blockedQuadrants", 4, 6, "tl")).toBe(false);
+    expect(isoQuadrantHasLayer(data, "foregroundQuadrants", 4, 6, "br-b")).toBe(true);
   });
 
   it("merges adjacent walkable cells into one flexible logical cell and can split it", () => {
@@ -137,27 +140,31 @@ describe("shared isometric map editor data", () => {
       walkableCellGroups: [
         { id: "outer-path", cells: ["8,2", "9,2"] },
       ],
-      foregroundQuadrants: ["8,2:tl", "-1,3:br", "1,2:tr"],
-      blockedQuadrants: ["9,2:bl"],
+      foregroundQuadrants: ["8,2:tl", "-1,3:br", "1,2:tr-a"],
+      blockedQuadrants: ["9,2:bl-b"],
       opacityQuadrants: ["-1,3:tr"],
       transitions: [{ id: "outer-gate", x: 8, y: 2, label: "Academy Outer Gate" }],
     }, "custom-grid");
     expect(data.customGridCells).toEqual(["8,2", "9,2", "-1,3"]);
     expect(data.walkableCells).toEqual(["1,2", "8,2", "9,2", "-1,3"]);
     expect(data.walkableCellGroups).toEqual([{ id: "outer-path", cells: ["8,2", "9,2"] }]);
-    expect(data.foregroundQuadrants).toEqual(["8,2:tl", "-1,3:br", "1,2:tr"]);
-    expect(data.blockedQuadrants).toEqual(["9,2:bl"]);
-    expect(data.opacityQuadrants).toEqual(["-1,3:tr"]);
+    expect(data.foregroundQuadrants).toEqual(["8,2:tl-a", "8,2:tl-b", "-1,3:br-a", "-1,3:br-b", "1,2:tr-a"]);
+    expect(data.blockedQuadrants).toEqual(["9,2:bl-b"]);
+    expect(data.opacityQuadrants).toEqual(["-1,3:tr-a", "-1,3:tr-b"]);
     expect(data.transitions).toEqual([{ id: "outer-gate", x: 8, y: 2, label: "Academy Outer Gate" }]);
   });
 
-  it("resolves the four sub-sectors inside one diamond", () => {
+  it("resolves eight finer sectors inside one diamond", () => {
     const grid = { ...DEFAULT_ISOMETRIC_GRID, tileW: 120, tileH: 60 };
     const center = isoCellCenter(3, 5, grid);
-    expect(isoQuadrantAtPoint({ x: center.x - 20, y: center.y - 10 }, 3, 5, grid)).toBe("tl");
-    expect(isoQuadrantAtPoint({ x: center.x + 20, y: center.y - 10 }, 3, 5, grid)).toBe("tr");
-    expect(isoQuadrantAtPoint({ x: center.x - 20, y: center.y + 10 }, 3, 5, grid)).toBe("bl");
-    expect(isoQuadrantAtPoint({ x: center.x + 20, y: center.y + 10 }, 3, 5, grid)).toBe("br");
+    expect(isoQuadrantAtPoint({ x: center.x - 10, y: center.y - 20 }, 3, 5, grid)).toBe("tl-a");
+    expect(isoQuadrantAtPoint({ x: center.x - 30, y: center.y - 5 }, 3, 5, grid)).toBe("tl-b");
+    expect(isoQuadrantAtPoint({ x: center.x + 10, y: center.y - 20 }, 3, 5, grid)).toBe("tr-a");
+    expect(isoQuadrantAtPoint({ x: center.x + 30, y: center.y - 5 }, 3, 5, grid)).toBe("tr-b");
+    expect(isoQuadrantAtPoint({ x: center.x - 30, y: center.y + 5 }, 3, 5, grid)).toBe("bl-a");
+    expect(isoQuadrantAtPoint({ x: center.x - 10, y: center.y + 20 }, 3, 5, grid)).toBe("bl-b");
+    expect(isoQuadrantAtPoint({ x: center.x + 30, y: center.y + 5 }, 3, 5, grid)).toBe("br-a");
+    expect(isoQuadrantAtPoint({ x: center.x + 10, y: center.y + 20 }, 3, 5, grid)).toBe("br-b");
   });
 
   it("normalizes walkable areas and quadrant keys while dropping invalid sectors", () => {
@@ -165,15 +172,15 @@ describe("shared isometric map editor data", () => {
       grid: { cols: 8, rows: 6 },
       walkableAreaEnabled: true,
       walkableCells: ["1,2", "1,2", "8,2", "bad"],
-      foregroundQuadrants: ["1,2:tl", "1,2:br", "1,2:middle", "8,2:tr", "bad"],
-      blockedQuadrants: ["4,5:bl", "4,6:br"],
-      opacityQuadrants: ["0,0:tr"],
+      foregroundQuadrants: ["1,2:tl", "1,2:br", "1,2:tl-c", "8,2:tr-a", "bad"],
+      blockedQuadrants: ["4,5:bl-b", "4,6:br"],
+      opacityQuadrants: ["0,0:tr-a"],
     }, "map-quadrants");
     expect(data.walkableAreaEnabled).toBe(true);
     expect(data.walkableCells).toEqual(["1,2"]);
-    expect(data.foregroundQuadrants).toEqual(["1,2:tl", "1,2:br"]);
-    expect(data.blockedQuadrants).toEqual(["4,5:bl"]);
-    expect(data.opacityQuadrants).toEqual(["0,0:tr"]);
+    expect(data.foregroundQuadrants).toEqual(["1,2:tl-a", "1,2:tl-b", "1,2:br-a", "1,2:br-b"]);
+    expect(data.blockedQuadrants).toEqual(["4,5:bl-b"]);
+    expect(data.opacityQuadrants).toEqual(["0,0:tr-a"]);
   });
 
   it("preserves explicit confirmation metadata for saved AI references", () => {
@@ -188,7 +195,7 @@ describe("shared isometric map editor data", () => {
     expect(confirmed.confirmed).toBe(true);
     expect(confirmed.confirmedAt).toBe("2026-11-05T12:00:00.000Z");
     expect(confirmed.walkableCells).toEqual(["1,2"]);
-    expect(confirmed.blockedQuadrants).toEqual(["1,2:tl"]);
+    expect(confirmed.blockedQuadrants).toEqual(["1,2:tl-a", "1,2:tl-b"]);
 
     const draft = normalizeIsoMapEditorData({
       grid: { cols: 8, rows: 6 },

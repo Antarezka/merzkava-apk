@@ -12,7 +12,11 @@ export type IsoMapGridConfig = {
 };
 
 export type IsoCellLayer = "foregroundCells" | "blockedCells" | "opacityCells";
-export type IsoQuadrant = "tl" | "tr" | "bl" | "br";
+export type IsoQuadrantParent = "tl" | "tr" | "bl" | "br";
+export type IsoQuadrant = "tl-a" | "tl-b" | "tr-a" | "tr-b" | "bl-a" | "bl-b" | "br-a" | "br-b";
+const ISO_QUADRANT_CHILDREN: Record<IsoQuadrantParent, readonly [IsoQuadrant, IsoQuadrant]> = {
+  tl: ["tl-a", "tl-b"], tr: ["tr-a", "tr-b"], bl: ["bl-a", "bl-b"], br: ["br-a", "br-b"],
+};
 export type IsoQuadrantLayer = "foregroundQuadrants" | "blockedQuadrants" | "opacityQuadrants";
 export type IsoWalkableCellGroup = { id: string; cells: string[] };
 
@@ -38,7 +42,7 @@ export type IsoMapEditorData = {
   /** Connected sets of walkable diamonds merged into one logical area/cell. */
   walkableCellGroups: IsoWalkableCellGroup[];
   walkableAreaEnabled: boolean;
-  /** Per-quadrant flags use keys such as "4,7:tl" (top-left). */
+  /** Fine-grained sector flags use keys such as "4,7:tl-a"; legacy parent keys expand on import. */
   foregroundQuadrants: string[];
   blockedQuadrants: string[];
   opacityQuadrants: string[];
@@ -195,10 +199,13 @@ export function normalizeIsoMapEditorData(
     if (!Array.isArray(value)) return [];
     const result = new Set<string>();
     for (const item of value) {
-      const match = /^(-?[0-9]+),(-?[0-9]+):(tl|tr|bl|br)$/.exec(String(item));
+      const match = /^(-?[0-9]+),(-?[0-9]+):(tl|tr|bl|br)(?:-([ab]))?$/.exec(String(item));
       if (!match) continue;
-      const x = Number(match[1]), y = Number(match[2]);
-      if (isConfiguredCell(x,y)) result.add(String(item));
+      const x = Number(match[1]), y = Number(match[2]), parent = match[3] as IsoQuadrantParent;
+      if (!isConfiguredCell(x,y)) continue;
+      const child = match[4];
+      if (child) result.add(isoCellKey(x,y) + ":" + parent + "-" + child);
+      else ISO_QUADRANT_CHILDREN[parent].forEach(sector => result.add(isoCellKey(x,y) + ":" + sector));
     }
     return [...result];
   };
@@ -364,7 +371,18 @@ export function isoQuadrantHasLayer(
   return data[layer].includes(isoQuadrantKey(x, y, quadrant));
 }
 
-/** Resolve a point inside an isometric diamond to its top-left, top-right, bottom-left or bottom-right triangular sector. */
+/** Treat either child sector as occupying its former parent zone for tile-edge collision. */
+export function isoQuadrantHasParentLayer(
+  data: IsoMapEditorData,
+  layer: IsoQuadrantLayer,
+  x: number,
+  y: number,
+  parent: IsoQuadrantParent,
+): boolean {
+  return ISO_QUADRANT_CHILDREN[parent].some(sector => isoQuadrantHasLayer(data, layer, x, y, sector));
+}
+
+/** Resolve a point inside a diamond to one of eight triangular sub-sectors. */
 export function isoQuadrantAtPoint(
   point: IsoMapPoint,
   cellX: number,
@@ -373,10 +391,12 @@ export function isoQuadrantAtPoint(
 ): IsoQuadrant {
   const center = isoCellCenter(cellX, cellY, grid);
   const dx = point.x - center.x, dy = point.y - center.y;
-  if (dx <= 0 && dy <= 0) return "tl";
-  if (dx > 0 && dy <= 0) return "tr";
-  if (dx <= 0 && dy > 0) return "bl";
-  return "br";
+  const xRatio = Math.abs(dx) / Math.max(1, grid.tileW / 2);
+  const yRatio = Math.abs(dy) / Math.max(1, grid.tileH / 2);
+  if (dx <= 0 && dy <= 0) return xRatio <= yRatio ? "tl-a" : "tl-b";
+  if (dx > 0 && dy <= 0) return xRatio <= yRatio ? "tr-a" : "tr-b";
+  if (dx <= 0 && dy > 0) return xRatio >= yRatio ? "bl-a" : "bl-b";
+  return xRatio >= yRatio ? "br-a" : "br-b";
 }
 
 /** Distinguish a deliberate cell tap from a map-pan gesture. */
