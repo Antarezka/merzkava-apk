@@ -1210,6 +1210,11 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
 }
 
 function bindIsometricCamera(dialog:HTMLElement):void {
+  // Academy artwork uses the same cover-fit, drag and pinch camera as World Map.
+  if(dialog.querySelector<HTMLElement>(".wmh-academy-map-viewport[data-wmh-map-viewport]")){
+    bindWorldMapZoom(dialog);
+    return;
+  }
   const viewport=dialog.querySelector<HTMLElement>("[data-wmh-iso-viewport]");
   const camera=dialog.querySelector<HTMLElement>("[data-wmh-iso-camera]");
   const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
@@ -1334,12 +1339,12 @@ function isometricPlayMarkup(regionId: RegionId, selectedBuilding: string, inter
     selectedBuilding.trim().toLowerCase() === "tianhai academy";
   if (isEmptyAcademy) {
     const academyMapImage="/maps/academy/full-map/1_academy.jpg";
-    const academyMapId=makeIsometricMapId(regionId,selectedBuilding,false);
-    return '<div class="wmh-isometric-play-screen wmh-academy-empty-screen" data-wmh-isometric-play-screen>'+
-      tileMapMarkup(false,academyMapId,academyMapImage,regionId,selectedBuilding)+
-      isometricHudMarkup("Tianhai Academy",academyMapImage,false)+
+    // Academy is temporarily artwork-only: no isometric board, grid, minimap,
+    // player/NPC tokens, editor, or overlay data is mounted in this view.
+    return '<div class="wmh-isometric-play-screen wmh-academy-map-screen" data-wmh-isometric-play-screen>'+
+      '<div class="wmh-map-zoom wmh-academy-map-zoom" aria-label="Academy map zoom controls"><button type="button" data-wmh-zoom="out" aria-label="Zoom out">−</button><span data-wmh-zoom-level>100%</span><button type="button" data-wmh-zoom="in" aria-label="Zoom in">+</button><button type="button" data-wmh-zoom="reset">RESET</button></div>'+
+      '<div class="wmh-academy-map-viewport" data-wmh-map-viewport><div class="wmh-academy-map-surface" data-wmh-map-surface><img src="'+academyMapImage+'" alt="Tianhai Academy full map" draggable="false" loading="eager" decoding="async"/></div></div>'+
       '<button type="button" class="wmh-map-back wmh-academy-map-back" data-wmh-action="back" aria-label="Return to Golden Dragon Empire map"><i class="wmh-academy-back-icon" aria-hidden="true"></i><b>GOLDEN DRAGON EMPIRE</b></button>'+
-      '<section class="wmh-chat-panel" data-wmh-chat hidden role="dialog" aria-label="Character conversation"><div class="wmh-chat-card"><button type="button" class="wmh-chat-close" data-wmh-action="chat-close" aria-label="Close conversation">×</button><div class="wmh-chat-thread" data-wmh-thread></div><div class="wmh-chat-input-row"><span>YOUR RESPONSE</span><div data-wmh-replies></div></div></div></section>'+
       '</div>';
   }
   const mapId=makeIsometricMapId(regionId,selectedBuilding,interior);
@@ -1387,7 +1392,7 @@ export function renderWorldMapHierarchy(): string {
 }
 function resetLegacyIsometricMapLayouts(): void {
   // Clear only Tianhai Academy exterior once; other regions keep their saved editor data.
-  const academyMarker="merzkava.isometric-map-academy-reset.v2";
+  const academyMarker="merzkava.isometric-map-academy-reset.v3";
   try {
     if(localStorage.getItem(academyMarker)!=="done"){
       const academyId="golden-dragon-empire:tianhai-academy:exterior";

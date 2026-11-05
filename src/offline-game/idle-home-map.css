@@ -400,3 +400,75 @@
 .idle-home-dialog .wmh-bottom-actions{margin-bottom:8px}
 .idle-home-dialog>.idle-region-switch,.idle-home-dialog>.idle-navigation-layout{display:none!important}
 .idle-home-dialog .idle-home-header small{color:#d5bd90}
+
+
+/* Opaque left-side transit panel: keep the world map visible beside it. */
+.arcanist-device-drawer{
+  width:min(460px,86vw);
+  max-width:86vw;
+  background:#111713;
+  opacity:1;
+  backdrop-filter:none;
+}
+.arcanist-machine-shell{
+  background:#1b211b;
+  opacity:1;
+}
+.arcanist-destination-panel{
+  background:#171d18;
+}
+.arcanist-lever-panel{
+  background:#1b211b;
+}
+.arcanist-transmission-bay{
+  background:#171d18;
+}
+.arcanist-machine-status{
+  background:#171d18;
+}
+@media(max-width:360px){
+  .arcanist-device-drawer{width:84vw;max-width:84vw}
+}
+
+
+/* Transit is a true top-layer drawer while open, above Atlas and map screens. */
+.expedition-idle-modal:has(.arcanist-device-drawer:not([hidden])){
+  z-index:2147483000!important;
+}
+.idle-home-dialog:has(.arcanist-device-drawer:not([hidden])){
+  overflow:visible!important;
+}
+.arcanist-device-drawer{
+  position:fixed!important;
+  z-index:2147483646!important;
+  inset:0 auto 0 0!important;
+  width:min(460px,84vw)!important;
+  max-width:84vw!important;
+  height:100dvh!important;
+  box-sizing:border-box!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  background:#111713!important;
+  opacity:1!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+}
+.arcanist-machine-shell{
+  min-height:100%!important;
+  background:#1b211b!important;
+  opacity:1!important;
+}
+.arcanist-destination-panel{background:#171d18!important}
+.arcanist-lever-panel{background:#1b211b!important}
+.arcanist-transmission-bay{background:#171d18!important}
+.arcanist-machine-status{background:#171d18!important}
+.arcanist-pull-tab{
+  position:fixed!important;
+  z-index:2147483647!important;
+  left:10px!important;
+  right:auto!important;
+  bottom:max(10px,env(safe-area-inset-bottom))!important;
+}
+@media(max-width:360px){
+  .arcanist-device-drawer{width:84vw!important;max-width:84vw!important}
+}
