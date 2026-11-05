@@ -249,6 +249,7 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
       baseHeight=academyImageHeight;
     }
     applySurfaceSize(1);
+    if(academyCanvas&&academyBoard&&image.complete&&image.naturalWidth)drawIsometricForeground(academyBoard);
   };
   const applyZoom = (next: number, focusX?: number, focusY?: number) => {
     if (!baseWidth || !baseHeight) sizeBaseMap();
