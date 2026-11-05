@@ -25,6 +25,8 @@ This document is the security and navigation contract. It records which gates ex
 
 The app's first screen remains **Floating Control**. Before any role is authenticated, the account-access overlay is rendered above the original Floating Control menu; it does not replace or restructure that menu.
 
+The initial **Developer** login is deliberately local and remains available without an internet connection. It verifies the embedded PBKDF2 credential using the on-device verifier and SecureStorage; its existing submit-busy/loading indicator is retained. The live internet requirement and four-second animated access buffer apply only to the separate external **World Atlas** login. Never add the Atlas connectivity check to `developer-login-form`.
+
 The gate has two separate modes:
 
 - **Player:** accepts only a character name, with no password field and no Remember Me option. The submitted name must match a character name exactly (case-sensitive, no trimming-based correction, aliases, fuzzy matching or Unicode normalization) in `players.md` loaded from the currently verified Universe `ACTIVE_SHA`. The app fails closed if the official registry cannot be verified. A local World Atlas password or unrelated local character is not a substitute for official registry membership. Successful player access stays on the same Floating Control screen as Developer and can use the same permission-setup steps. Developer-only tools remain hidden. The player explicitly selects Open game / continue playing to enter the normal Home screen.
