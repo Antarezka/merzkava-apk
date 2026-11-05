@@ -180,7 +180,7 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
   // Academy pan and pinch are handled by this pointer controller. Do not let
   // Android WebView begin a competing native scroll gesture on the viewport.
   if(academyCanvas)viewport.style.setProperty("touch-action","none","important");
-  let academyImageWidth=0,academyImageHeight=0,academyMarginX=0,academyMarginY=0;
+  let academyImageWidth=0,academyImageHeight=0,academyMarginLeft=0,academyMarginRight=0,academyMarginY=0;
   const pointers = new Map<number, { x: number; y: number }>();
   let panStart: { x: number; y: number; scrollLeft: number; scrollTop: number } | null = null;
   let pinchStart: { distance: number; zoom: number } | null = null;
@@ -190,7 +190,7 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
     surface.style.width=(baseWidth*scale)+"px";
     surface.style.height=(baseHeight*scale)+"px";
     if(academyCanvas){
-      image.style.setProperty("left",(academyMarginX*scale)+"px","important");
+      image.style.setProperty("left",(academyMarginLeft*scale)+"px","important");
       image.style.setProperty("top",(academyMarginY*scale)+"px","important");
       image.style.setProperty("width",(academyImageWidth*scale)+"px","important");
       image.style.setProperty("height",(academyImageHeight*scale)+"px","important");
@@ -205,19 +205,19 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
     academyImageWidth = Math.max(rect.width, rect.height * ratio);
     academyImageHeight = Math.max(rect.height, rect.width / ratio);
     if(academyCanvas){
-      // Keep two grid cells of visible canvas, but never let the side margin
-      // be narrower than half the viewport. This lets either artwork edge move
-      // all the way into the center of the phone screen before the pan clamps.
+      // Preserve the existing top, right and bottom canvas margins. Give only
+      // the left side a longer runway so the camera can travel much farther.
       const artworkScale=image.naturalWidth>0?academyImageWidth/image.naturalWidth:1;
       const cellW=128*artworkScale,cellH=69.5*artworkScale;
-      academyMarginX=Math.max(cellW*2,rect.width/2);
+      academyMarginLeft=Math.max(cellW*2,rect.width*2);
+      academyMarginRight=Math.max(cellW*2,rect.width/2);
       academyMarginY=Math.max(cellH*2,rect.height/2);
-      baseWidth=academyImageWidth+academyMarginX*2;
+      baseWidth=academyImageWidth+academyMarginLeft+academyMarginRight;
       baseHeight=academyImageHeight+academyMarginY*2;
       if(academyGrid){
         academyGrid.setAttribute("viewBox","0 0 "+baseWidth+" "+baseHeight);
         academyGrid.innerHTML=academyMarginGridMarkup(
-          baseWidth,baseHeight,academyMarginX,academyMarginY,academyImageWidth,academyImageHeight,cellW,cellH
+          baseWidth,baseHeight,academyMarginLeft,academyMarginY,academyImageWidth,academyImageHeight,cellW,cellH
         );
       }
     }else{
