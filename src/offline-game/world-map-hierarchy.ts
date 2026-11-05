@@ -2189,12 +2189,11 @@ function actorScanColor(tone:ActorScanTone):string {
 }
 
 const npcProximityAnimations=new WeakMap<HTMLElement,{pause?:()=>void}>();
-function isNpcInteractionReady(board:HTMLElement,npc:HTMLElement):boolean {
+function isNpcInteractionReady(board:HTMLElement,npc:HTMLElement,data:IsoMapEditorData):boolean {
   if(board.dataset.editorPaused==="true"||board.classList.contains("wmh-overlay-editing"))return false;
   if(board.closest<HTMLElement>("[data-wmh-dialog]")?.querySelector<HTMLElement>("[data-wmh-chat]")?.hidden===false)return false;
   const player=board.querySelector<HTMLElement>("[data-wmh-player-token]");
   if(!player)return false;
-  const data=readIsoMapData(board);
   return isNpcInteractionCellReachable(
     data,
     {x:Number(player.dataset.x||0),y:Number(player.dataset.y||0)},
@@ -2203,8 +2202,9 @@ function isNpcInteractionReady(board:HTMLElement,npc:HTMLElement):boolean {
 }
 function updateNpcInteractionProximity(board:HTMLElement):void {
   const reduceMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches===true;
+  const data=readIsoMapData(board);
   board.querySelectorAll<HTMLElement>("[data-wmh-npc]").forEach(npc=>{
-    const ready=isNpcInteractionReady(board,npc);
+    const ready=isNpcInteractionReady(board,npc,data);
     if(npc.dataset.interactionReady===String(ready))return;
     npc.dataset.interactionReady=String(ready);
     npc.setAttribute("aria-disabled",String(!ready));
@@ -2226,7 +2226,7 @@ function updateNpcInteractionProximity(board:HTMLElement):void {
       return;
     }
     const animation=animate(glow,{
-      opacity:ready?.72:0,
+      opacity:ready ? 0.72 : 0,
       scale:ready?1:.82,
       duration:ready?360:420,
       ease:ready?"outCubic":"inOutSine"
