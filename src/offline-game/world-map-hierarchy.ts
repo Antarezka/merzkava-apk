@@ -1054,11 +1054,15 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
   const remember=()=>{history.push(JSON.parse(JSON.stringify(data)) as IsoMapEditorData);if(history.length>40)history.shift();};
   const redraw=()=>{
     if(interactionGroup){
-      interactionGroup.innerHTML=data.walkableCells.map(key=>{
-        const [x,y]=key.split(",").map(Number),c=isoCellCenter(x,y,grid),hw=grid.tileW/2,hh=grid.tileH/2;
-        const points=[c.x+","+(c.y-hh),(c.x+hw)+","+c.y,c.x+","+(c.y+hh),(c.x-hw)+","+c.y].join(" ");
-        return '<polygon class="wmh-walkable-cell" points="'+points+'" aria-label="Walkable image cell '+x+', '+y+'"/>';
-      }).join("");
+      if(board.dataset.academyArtworkBoard==="true"){
+        interactionGroup.innerHTML=academyInteractionGridMarkup(grid,data);
+      }else{
+        interactionGroup.innerHTML=data.walkableCells.map(key=>{
+          const [x,y]=key.split(",").map(Number),c=isoCellCenter(x,y,grid),hw=grid.tileW/2,hh=grid.tileH/2;
+          const points=[c.x+","+(c.y-hh),(c.x+hw)+","+c.y,c.x+","+(c.y+hh),(c.x-hw)+","+c.y].join(" ");
+          return '<polygon class="wmh-walkable-cell" points="'+points+'" aria-label="Walkable image cell '+x+', '+y+'"/>';
+        }).join("");
+      }
     }
     if(cellGroup){
       const marks:string[]=[];
@@ -1250,9 +1254,6 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
   });
   modeSelect?.addEventListener("change",()=>{
     if(transitionTools)transitionTools.hidden=mode()!=="transition";
-    if(mode()==="walkable"&&!data.walkableAreaEnabled){
-      data.walkableAreaEnabled=true;if(walkableToggle)walkableToggle.checked=true;persist();
-    }
     setStatus(mode()==="walkable"?"Brush the image tiles that should be used. Selected tiles turn blue; only these tiles are walkable while AREA LIMIT is ON."
       :mode()==="foreground"?"Tap one of the 4 small sectors: ○ redraws that part of the same Map Base above characters."
       :mode()==="blocked"?"Tap one of the 4 small sectors: X blocks movement across that sector's edge."
@@ -1262,9 +1263,9 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
   if(transitionTools)transitionTools.hidden=mode()!=="transition";
   if(walkableToggle)walkableToggle.checked=data.walkableAreaEnabled;
   walkableToggle?.addEventListener("change",()=>{
+    if(walkableToggle.checked&&!data.walkableCells.length){walkableToggle.checked=false;setStatus("Paint the walkable area first, then turn this limit on.");return;}
     remember();data.walkableAreaEnabled=walkableToggle.checked;persist();
-    if(!relocateActorsFromBlockedCells(board,data))setStatus("No safe cells are selected. Paint the walkable area before enabling this limit.");
-    else setStatus(data.walkableAreaEnabled?"Movement is limited to blue walkable cells.":"Movement limit disabled; all non-X cells may be used.");
+    setStatus(data.walkableAreaEnabled?"Movement is limited to blue walkable cells. Actors outside the area may step back in through a connected cell.":"Movement limit disabled; all non-X cells may be used.");
   });
   const point=(e:PointerEvent)=>{const r=svg.getBoundingClientRect(),box=svg.viewBox.baseVal;return{x:(e.clientX-r.left)*box.width/Math.max(1,r.width),y:(e.clientY-r.top)*box.height/Math.max(1,r.height)};};
   if(board.dataset.academyArtworkBoard==="true"&&board.dataset.imageTapBound!=="true"){
@@ -1298,12 +1299,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     if(mode()==="walkable"){
       remember();const key=isoCellKey(cell.x,cell.y),wasSelected=data.walkableCells.includes(key);
       data.walkableCells=wasSelected?data.walkableCells.filter(item=>item!==key):[...data.walkableCells,key];
-      data.walkableAreaEnabled=true;if(walkableToggle)walkableToggle.checked=true;
-      if(!relocateActorsFromBlockedCells(board,data)){
-        data.walkableCells=wasSelected?[...data.walkableCells,key]:data.walkableCells.filter(item=>item!==key);
-        history.pop();redraw();setStatus("That cell cannot be removed because it would leave a character outside the remaining walkable area.");return;
-      }
-      persist();setStatus((wasSelected?"Removed":"Added")+" walkable cell ("+cell.x+","+cell.y+"). Blue cells are the active movement area.");return;
+      persist();setStatus((wasSelected?"Removed":"Added")+" walkable cell ("+cell.x+","+cell.y+"). Blue cells define the optional movement area; enable AREA LIMIT when the region is complete.");return;
     }
     const quadrant=isoQuadrantAtPoint(mapPoint,cell.x,cell.y,grid);
     const layer:IsoQuadrantLayer=mode()==="blocked"?"blockedQuadrants":mode()==="opacity"?"opacityQuadrants":"foregroundQuadrants";
