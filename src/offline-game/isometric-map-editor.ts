@@ -12,6 +12,8 @@ export type IsoMapGridConfig = {
 };
 
 export type IsoCellLayer = "foregroundCells" | "blockedCells" | "opacityCells";
+export type IsoQuadrant = "tl" | "tr" | "bl" | "br";
+export type IsoQuadrantLayer = "foregroundQuadrants" | "blockedQuadrants" | "opacityQuadrants";
 
 export type IsoTransitionMarker = {
   id: string;
@@ -28,6 +30,13 @@ export type IsoMapEditorData = {
   foregroundCells: string[];
   blockedCells: string[];
   opacityCells: string[];
+  /** Optional movement whitelist; when enabled, only these image cells are traversable. */
+  walkableCells: string[];
+  walkableAreaEnabled: boolean;
+  /** Per-quadrant flags use keys such as "4,7:tl" (top-left). */
+  foregroundQuadrants: string[];
+  blockedQuadrants: string[];
+  opacityQuadrants: string[];
   transitions: IsoTransitionMarker[];
 };
 
@@ -115,6 +124,11 @@ export function createIsoMapEditorData(
     foregroundCells: [],
     blockedCells: [],
     opacityCells: [],
+    walkableCells: [],
+    walkableAreaEnabled: false,
+    foregroundQuadrants: [],
+    blockedQuadrants: [],
+    opacityQuadrants: [],
     transitions: [],
   };
 }
@@ -154,6 +168,17 @@ export function normalizeIsoMapEditorData(
     })
     : [];
 
+  const cleanQuadrants = (value: unknown): string[] => {
+    if (!Array.isArray(value)) return [];
+    const result = new Set<string>();
+    for (const item of value) {
+      const match = /^(\\d+),(\\d+):(tl|tr|bl|br)$/.exec(String(item));
+      if (!match) continue;
+      const x = Number(match[1]), y = Number(match[2]);
+      if (x >= 0 && x < grid.cols && y >= 0 && y < grid.rows) result.add(String(item));
+    }
+    return [...result];
+  };
   return {
     format: "merzkava-isometric-map-editor",
     version: 1,
@@ -162,6 +187,11 @@ export function normalizeIsoMapEditorData(
     foregroundCells: cleanCells(source.foregroundCells, grid),
     blockedCells: cleanCells(source.blockedCells, grid),
     opacityCells: cleanCells(source.opacityCells, grid),
+    walkableCells: cleanCells(source.walkableCells, grid),
+    walkableAreaEnabled: source.walkableAreaEnabled === true,
+    foregroundQuadrants: cleanQuadrants(source.foregroundQuadrants),
+    blockedQuadrants: cleanQuadrants(source.blockedQuadrants),
+    opacityQuadrants: cleanQuadrants(source.opacityQuadrants),
     transitions,
   };
 }
@@ -191,6 +221,51 @@ export function isoCellHasLayer(
   y: number,
 ): boolean {
   return data[layer].includes(isoCellKey(x, y));
+}
+
+export function isoQuadrantKey(x: number, y: number, quadrant: IsoQuadrant): string {
+  return isoCellKey(x, y) + ":" + quadrant;
+}
+
+export function toggleIsoQuadrantLayer(
+  data: IsoMapEditorData,
+  layer: IsoQuadrantLayer,
+  x: number,
+  y: number,
+  quadrant: IsoQuadrant,
+): boolean {
+  if (!Number.isInteger(x) || !Number.isInteger(y) || x < 0 || y < 0 || x >= data.grid.cols || y >= data.grid.rows) return false;
+  const key = isoQuadrantKey(x, y, quadrant);
+  const cells = new Set(data[layer]);
+  const enabled = !cells.has(key);
+  if (enabled) cells.add(key); else cells.delete(key);
+  data[layer] = [...cells];
+  return enabled;
+}
+
+export function isoQuadrantHasLayer(
+  data: IsoMapEditorData,
+  layer: IsoQuadrantLayer,
+  x: number,
+  y: number,
+  quadrant: IsoQuadrant,
+): boolean {
+  return data[layer].includes(isoQuadrantKey(x, y, quadrant));
+}
+
+/** Resolve a point inside an isometric diamond to its top-left, top-right, bottom-left or bottom-right triangular sector. */
+export function isoQuadrantAtPoint(
+  point: IsoMapPoint,
+  cellX: number,
+  cellY: number,
+  grid: IsoMapGridConfig,
+): IsoQuadrant {
+  const center = isoCellCenter(cellX, cellY, grid);
+  const dx = point.x - center.x, dy = point.y - center.y;
+  if (dx <= 0 && dy <= 0) return "tl";
+  if (dx > 0 && dy <= 0) return "tr";
+  if (dx <= 0 && dy > 0) return "bl";
+  return "br";
 }
 
 export function isoCellCenter(
