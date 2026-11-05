@@ -1103,6 +1103,8 @@
 .wmh-cell-mark.is-quadrant polygon{stroke-width:1.5}
 .wmh-cell-mark.is-quadrant text{font-size:9px}
 .wmh-walkable-cell{fill:#287acb55;stroke:#8bc8ff;stroke-width:2;vector-effect:non-scaling-stroke;pointer-events:none}
+.wmh-quadrant-divider{fill:none;stroke:transparent;stroke-width:1.2;vector-effect:non-scaling-stroke;pointer-events:none}
+.wmh-isometric-board.wmh-overlay-editing .wmh-quadrant-divider,.wmh-academy-map-surface.wmh-overlay-editing .wmh-quadrant-divider{stroke:rgba(245,235,207,.75);stroke-width:1.35}
 .wmh-editor-mode-note{margin:7px 0;color:#d5c49f;font:10px/1.45 Arial,sans-serif}
 .wmh-transition-marker{pointer-events:all;cursor:pointer}
 .wmh-transition-marker circle{fill:#bd3939;stroke:#ffd0c8;stroke-width:2;vector-effect:non-scaling-stroke;filter:drop-shadow(0 2px 3px #000b)}
