@@ -1773,7 +1773,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       const results=await Promise.allSettled([
         connectionWork,
         credentialWork,
-        playWorldAtlasAccessSequence(gate,4000)
+        playWorldAtlasAccessSequence(gate,4000,connectionWork)
       ]);
       if(results[0].status==="rejected")throw new Error(offlineMessage);
       if(results[1].status==="rejected")throw results[1].reason;
