@@ -1749,7 +1749,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       loadCharacterWorldTime(selected.id);
       loadCharacterChat(selected.id);
       playerLoginBusy=false;playerLoginMessage="";playerLoginName="";
-      accessLoginMode="player";activeScreen="home";notice="";
+      accessLoginMode="player";activeScreen="control";notice="";
       render();
     }catch(error){
       playerLoginBusy=false;
