@@ -1389,11 +1389,18 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     const mapPoint=point(event),cell=isoCellAtPoint(mapPoint,grid,true);if(!cell)return;
     if(mode()!=="cell-add"&&!isoGridCellExists(data,cell.x,cell.y)){setStatus("No grid cell exists here yet. Switch to ADD CELL and tap this Map Base area first.");return;}
     if(mode()==="cell-add"){
-      const key=isoCellKey(cell.x,cell.y);
-      if(cell.x>=0&&cell.y>=0&&cell.x<grid.cols&&cell.y<grid.rows){
-        setStatus("A base grid cell already exists here. Tap an ungridded part of the Map Base image to add an extra cell.");return;
+      const key=isoCellKey(cell.x,cell.y),isBase=cell.x>=0&&cell.y>=0&&cell.x<grid.cols&&cell.y<grid.rows;
+      if(isBase){
+        if(data.walkableCells.includes(key)){setStatus("This base grid cell is already selected as walkable.");return;}
+        remember();data.walkableCells=[...data.walkableCells,key];persist();
+        setStatus("Selected existing base grid cell ("+cell.x+","+cell.y+"). It is now blue and can be included in a movement area or merged with adjacent cells.");
+        return;
       }
-      if(data.customGridCells.includes(key)){setStatus("This extra image cell already exists. Choose another ungridded image position.");return;}
+      if(data.customGridCells.includes(key)){
+        if(data.walkableCells.includes(key)){setStatus("This extra image cell already exists and is selected.");return;}
+        remember();data.walkableCells=[...data.walkableCells,key];persist();
+        setStatus("Selected existing extra image cell ("+cell.x+","+cell.y+").");return;
+      }
       if(!isCellInsideMapArtwork(cell.x,cell.y)){
         setStatus("Cell not added: the full diamond must fit inside the Map Base image. Canvas expansion margins and blank canvas are excluded.");return;
       }
@@ -1417,21 +1424,17 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       persist();setStatus("Transition cell selected. Enter its destination label; it stays red until named.");return;
     }
     const key=isoCellKey(cell.x,cell.y),isWalkable=data.walkableCells.includes(key);
-    if(mode()==="cell-add"){
-      if(isWalkable){setStatus("Cell ("+cell.x+","+cell.y+") is already added. Select another diamond or use DELETE CELL.");return;}
-      remember();data.walkableCells.push(key);
-      persist();setStatus("Added cell ("+cell.x+","+cell.y+"). Add any other cells you need; adjacent cells can later be merged into one flexible area.");return;
-    }
     if(mode()==="cell-delete"){
       if(!isWalkable){setStatus("There is no added cell at ("+cell.x+","+cell.y+").");return;}
       if(data.walkableAreaEnabled&&data.walkableCells.length===1){setStatus("Disable AREA LIMIT before deleting the final walkable cell.");return;}
       const previousCells=[...data.walkableCells],previousCustom=[...data.customGridCells],previousGroups=JSON.parse(JSON.stringify(data.walkableCellGroups)) as IsoMapEditorData["walkableCellGroups"];
+      const wasCustom=data.customGridCells.includes(key);
       remember();removeIsoWalkableCell(data,cell.x,cell.y);
-      data.customGridCells=data.customGridCells.filter(item=>item!==key);
+      if(wasCustom)data.customGridCells=data.customGridCells.filter(item=>item!==key);
       if(data.walkableAreaEnabled&&!relocateActorsFromBlockedCells(board,data)){
         data.walkableCells=previousCells;data.customGridCells=previousCustom;data.walkableCellGroups=previousGroups;history.pop();redraw();setStatus("Cell deletion cancelled because it would leave a character without a valid destination.");return;
       }
-      persist();setStatus("Deleted cell ("+cell.x+","+cell.y+"). Its merged group was updated automatically.");return;
+      persist();setStatus(wasCustom?"Deleted extra image cell ("+cell.x+","+cell.y+"). Its merged group was updated automatically.":"Removed base cell ("+cell.x+","+cell.y+") from the selected walkable area; the original base grid remains visible.");return;
     }
     if(mode()==="cell-merge"){
       if(!isWalkable){setStatus("Only added blue cells can be merged. Use ADD CELL first.");return;}
