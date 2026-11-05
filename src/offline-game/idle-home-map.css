@@ -2,7 +2,7 @@
 .expedition-idle-modal{position:fixed;z-index:90;inset:0;display:grid;place-items:center;padding:0;background:#090807e8}
 .expedition-idle-modal[hidden]{display:none!important}
 .expedition-idle-backdrop{position:absolute;inset:0;width:100%;height:100%;border:0;background:#090807c9;backdrop-filter:blur(4px)}
-.idle-home-dialog{position:relative;z-index:1;width:min(100%,520px);height:100dvh;max-height:100dvh;overflow:hidden;display:flex;flex-direction:column;padding:max(10px,env(safe-area-inset-top)) 12px max(8px,env(safe-area-inset-bottom));background:linear-gradient(160deg,#252d28,#151b18 68%,#24251e);color:#efe4d0}
+.idle-home-dialog{position:relative;z-index:1;width:min(100%,520px);height:100svh;max-height:100svh;overflow:hidden;display:flex;flex-direction:column;padding:max(10px,env(safe-area-inset-top)) 12px max(8px,env(safe-area-inset-bottom));background:linear-gradient(160deg,#252d28,#151b18 68%,#24251e);color:#efe4d0}
 .idle-home-header{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:5px 3px 10px;border-bottom:1px solid #b99a6655}
 .idle-home-kicker,.idle-panel-kicker{font-size:8px;letter-spacing:.16em;color:#c8a875;font-weight:700}
 .idle-home-header h3{margin:3px 0 2px;font:26px/1.05 Georgia,serif;color:#f2e6d1}
@@ -444,7 +444,7 @@
   inset:0 auto 0 0!important;
   width:min(460px,84vw)!important;
   max-width:84vw!important;
-  height:100dvh!important;
+  height:100svh!important;
   box-sizing:border-box!important;
   overflow-x:hidden!important;
   overflow-y:auto!important;
@@ -559,3 +559,19 @@
 .world-atlas-password-safety{display:block;margin:-5px 0 5px;padding:7px 9px;border-left:2px solid #b99a61;background:linear-gradient(90deg,#d7c49a2b,transparent);color:#8b7550;font:500 9px/1.5 system-ui,sans-serif;letter-spacing:.005em}
 .world-atlas-password-safety:before{content:"✧";display:inline-block;margin-right:6px;color:#a58752;font-size:10px}
 :root[data-theme="dark"] .world-atlas-password-safety{border-left-color:#b69d68;background:linear-gradient(90deg,#c7ad7020,transparent);color:#d4c39e}
+
+
+/* Soft keyboard must not trigger the short-screen compression rules on the map
+   or its independent Anime.js mechanisms. The input overlay keeps its own scroll. */
+html.soft-keyboard-open .idle-home-header {
+  padding-top:calc(env(safe-area-inset-top) + 8px) !important;
+  padding-bottom:8px !important;
+}
+html.soft-keyboard-open .idle-home-header h3 { font-size:23px !important; }
+html.soft-keyboard-open .idle-region-switch { padding:7px 0 8px !important; }
+html.soft-keyboard-open .idle-map-stage { flex-basis:47% !important; min-height:190px !important; }
+html.soft-keyboard-open .idle-destination-menu { padding-top:7px !important; }
+html.soft-keyboard-open .idle-destination-option { min-height:29px !important; padding:4px 5px !important; }
+html.soft-keyboard-open .idle-global-menu > .idle-destination-option { min-height:25px !important; }
+html.soft-keyboard-open .idle-coming-panel { padding:7px 9px !important; margin-top:6px !important; }
+html.soft-keyboard-open .idle-home-footer { padding-top:6px !important; }
