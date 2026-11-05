@@ -14,6 +14,12 @@ describe("World Atlas player login gate",()=>{
       expect(html).toContain('data-login-label=');
       expect(html).toContain('data-signup-label=');
       expect(html).toContain('data-world-atlas-gate-back');
+      expect(html).toContain('data-world-atlas-buffer');
+      expect(html).toContain('data-buffer-stages=');
+      expect(html).toContain('AUTHENTICATION SEQUENCE');
+      expect(html).toContain('data-atlas-buffer-status');
+      expect(html).toContain('data-atlas-buffer-log');
+      expect(html).toContain('data-atlas-buffer-progress');
     }
   });
 });
