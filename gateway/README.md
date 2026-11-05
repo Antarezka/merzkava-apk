@@ -90,7 +90,7 @@ Successful response:
 
 ## World Atlas password reset service
 
-World Atlas passwords remain device-local salted verifiers. The service never stores or reveals a player's password. Each verifier carries a shared reset revision from Cloudflare KV. A master or authorized Developer reset rotates that player's revision, so verifiers on other devices stop matching the server revision the next time those devices reconnect. The player then creates a new local password on their own device.
+World Atlas passwords remain device-local salted verifiers. The service never stores or reveals a player's password. Each verifier carries a shared reset revision from Cloudflare KV. A master or authorized Developer reset rotates that player's revision, so verifiers on other devices stop matching the server revision the next time those devices run a supported build and reconnect. The player then creates a new local password on their own device. This update requirement applies to forced Master Reset; normal password changes remain immediate and local after the current password is verified.
 
 Before deploying this Worker, create a Cloudflare KV namespace and replace REPLACE_WITH_CLOUDFLARE_KV_NAMESPACE_ID in gateway/wrangler.toml. Set these values:
 
@@ -106,7 +106,7 @@ Routes:
 - POST /v1/atlas/master-reset — validate the master credential server-side and rotate one selected player's reset revision.
 - POST /v1/atlas/developer-reset — require an authorized Supabase Developer identity and rotate one selected player's reset revision without setting or revealing a password.
 
-A successful server reset does not create a password. It invalidates the old local verifier on every device after that device checks the latest revision; the player creates the replacement password locally. A normal password change still requires the current local password.
+A successful server reset does not create a password. It invalidates the old local verifier on every device after that device checks the latest revision; the player creates the replacement password locally. A normal password change requires only the current local password and updates that device immediately without a master-reset operation.
 
 The Worker deployment workflow is intentionally manual for this feature. Configure the KV namespace, secret, Developer email allowlist and rate-limit binding before deploying. Until all are configured, reset routes fail closed.
 

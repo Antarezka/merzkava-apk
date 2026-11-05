@@ -8,13 +8,13 @@ A normal password change requires the current password and updates the verifier 
 
 ## Supported app version requirement
 
-The reset flow is delivered in the latest Merzkava APK build. Players must install that updated build before using the master reset or before a Developer reset can be enforced on their device. Previous APK builds do not query the shared reset revision, so they cannot enforce a newly recorded reset. Do not claim the player is locked out until the player opens the latest build and it reads the new revision. After updating, the new build prompts the player to create a new local password. This is an app-update requirement, not an action that can inject UI into an older APK.
+The shared reset-revision check is required only for a forced Master Reset. Players need the latest Merzkava APK to detect that global reset; an older APK cannot read the new server revision. Once updated and connected, it invalidates the old local verifier and asks the player to create a new password. A normal password change is different: the player enters the existing password, verifies it locally, and the new password is saved immediately on that device. It does not need the master credential or a reset-revision update.
 
 ## Master reset
 
 The owner-provided master credential is configured only as the Cloudflare Worker secret ATLAS_MASTER_RESET_PASSWORD. Never put its value or a derived verifier in the client app, APK, source repository, build logs or public documentation.
 
-When the player selects an account and submits the master credential, the Worker validates it and rotates that account's shared reset revision. The current device can then create a replacement local password. Other devices discover the changed revision after their players install and open the latest app build; older APKs do not check reset revisions. Each updated device must create a new local password. The same master credential can be used for any registered/local player account, including accounts created after the feature is deployed.
+When the player selects an account and submits the master credential, the Worker validates it and rotates that account's shared reset revision. The current device can then create a replacement local password. Other devices discover the changed revision after their players install and open the latest app build; older APKs do not check master-reset revisions. Each updated device must create a new local password. The same master credential can be used for any registered/local player account, including accounts created after the feature is deployed.
 
 ## Developer-assisted reset
 
@@ -23,7 +23,7 @@ The Developer account panel accepts a player name only; it has no new-password f
 - the authenticated email to appear in ATLAS_DEVELOPER_EMAILS;
 - the Cloudflare KV reset registry and reset rate limiter.
 
-Before submitting a reset, the Developer must verify ownership through a known official channel. A successful request records the reset revision. The player must install the latest APK build; the new app then invalidates the old local verifier and asks the player to create a new password on their own device. The server records a limited audit entry with the reset type, authorized actor, hashed player identifier, revision and timestamp; it never includes the player's password.
+Before submitting a reset, the Developer must verify ownership through a known official channel. A successful Developer-assisted reset records a targeted reset revision. The player must use a build that supports shared account-reset revisions to have the old local verifier invalidated on that device, then creates the replacement password locally. The server records a limited audit entry with the reset type, authorized actor, hashed player identifier, revision and timestamp; it never includes the player's password.
 
 Local Developer Mode is not server authority. The Supabase session and Worker email allowlist are the actual authorization boundary.
 
@@ -40,7 +40,7 @@ Old passwords cannot be recovered because only salted hashes are retained. Playe
 5. Keep the ATLAS_RESET_KV and ATLAS_RESET_LIMITER bindings enabled.
 6. Deploy the gateway manually after all configuration is present.
 
-Until this setup is complete, the account reset endpoints return an unavailable/denied response. Do not tell players that cross-device resets are active before the deployed Worker has been configured and tested. Do not claim a reset has taken effect on an older APK: the player must update to the latest app build first.
+Until this setup is complete, the account reset endpoints return an unavailable/denied response. Do not tell players that cross-device resets are active before the deployed Worker has been configured and tested. Do not claim a Master Reset has taken effect on an older APK: the player must update to a build that checks shared reset revisions first.
 
 ## Screen transitions
 

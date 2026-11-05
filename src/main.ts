@@ -11,7 +11,7 @@ import { initializeIdleTriggerDrag } from "./offline-game/idle-trigger-drag";
 import { initializeArcanistryTransitDrag } from "./offline-game/transit-pull-drag";
 import { animateExpeditionChoiceModal, animateExpeditionPanel, mountExpeditionAnimations } from "./offline-game/expedition-animations";
 import { deleteEternalSave, exportEternalSave, importEternalSave, listEternalSaves, loadEternalSave, renameEternalSave, resetEternalGame, resolveEternalSituationChoice, advanceEternalWorldTime, setEternalLocation, startEternalGame, unloadEternalGame, type EternalRegion } from "./offline-game/expedition-game";
-import { atlasPasswordPolicyError, getAtlasResetRevision, hasAtlasPassword, requestAtlasDeveloperReset, requestAtlasMasterReset, setAtlasPassword, verifyAtlasPassword, rememberAtlasPlayer, restoreAtlasPlayer } from "./offline-game/world-atlas-account";
+import { atlasPasswordPolicyError, getAtlasPasswordRevision, getAtlasResetRevision, hasAtlasPassword, requestAtlasDeveloperReset, requestAtlasMasterReset, setAtlasPassword, verifyAtlasPassword, rememberAtlasPlayer, restoreAtlasPlayer } from "./offline-game/world-atlas-account";
 import { authenticateDeveloper, restoreDeveloperSession, restoreRememberedDeveloperCredentials, signOutDeveloper, type RememberedDeveloperCredentials } from "./security/developer-access";
 import { getCanonIndex, getCanonStatus, loadCanonModule, loadPlayerRegistry, loadRegisteredPlayerProfile, refreshCanon, refreshLatestPlayerRegistry, verifyCanonSourceConnection, type CanonDocument } from "./convo/canon/canon-loader";
 import { routeCanonActivity } from "./convo/canon/canon-router";
@@ -1867,7 +1867,7 @@ root.addEventListener("click", async event => {
   try{
     let resetRevision:string;
     if(mode==="change"){
-      resetRevision=await getAtlasResetRevision(playerName);
+      resetRevision=(await getAtlasPasswordRevision(playerName))??"0";
       if(!await verifyAtlasPassword(playerName,current,resetRevision))throw new Error(gate.dataset.resetCurrentInvalid||"The current password is incorrect.");
     }else{
       resetRevision=await requestAtlasMasterReset(playerName,master);
