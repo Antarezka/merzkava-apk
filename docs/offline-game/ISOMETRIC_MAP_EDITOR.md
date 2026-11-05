@@ -12,11 +12,11 @@ The isometric map editor is a reusable editor/runtime contract. It is not Academ
 
 ## Independent cell metadata
 
-Each cell may independently carry any combination of these flags. The editor can paint a walkable-area whitelist over the image; when walkableAreaEnabled is turned on, Player and NPC movement is restricted to the selected blue cells. Keep the limit off while painting, then enable it after the route is complete.
+Each cell may independently carry any combination of these flags. The editor can add and delete walkable cells one tap at a time. Several adjacent cells may be selected and merged into one flexible logical cell group, including bent or uneven shapes; existing groups can be extended by merging again or split with UNMERGE. A drag pans the map and is never treated as a tap. When walkableAreaEnabled is turned on, Player and NPC movement is restricted to the selected blue base cells. Keep the limit off while painting, then enable it after the route is complete.
 
 | Flag | Editor mode | Runtime behavior |
 |---|---|---|
-| Walkable region | `▧ Walkable area brush` | Selected blue cells form the movement whitelist when walkableAreaEnabled is on |
+| Walkable region | `▧ Walkable area brush` | Added blue cells form the movement whitelist; connected cells can be stored together as a merged logical area |
 | Foreground | `○ Foreground` | Redraw the selected image sector above characters |
 | Blocked | `X Blocked quadrants` | Prevent movement across the corresponding isometric edge |
 | Opacity | `◌ Character opacity quadrants` | Characters become translucent while occupying a cell with an opacity sector |
@@ -33,13 +33,13 @@ Each map stores transition markers independently. An unnamed marker is red; afte
 
 ## Persistence and reuse
 
-Editor data is saved in local storage under `merzkava.isometric-map-editor.v2:<encoded map ID>`. Exported JSON uses format `merzkava-isometric-map-editor`, version 1, and contains the map ID, grid, walkable cells and activation flag, three whole-cell arrays, three quadrant arrays, and transitions. Grid calibration affects only the transparent image overlay; it does not resize the source artwork or the separately configured canvas expansion margins.
+Editor data is saved in local storage under `merzkava.isometric-map-editor.v2:<encoded map ID>`. Exported JSON uses format `merzkava-isometric-map-editor`, version 1, and contains the map ID, grid, walkable cells and activation flag, merged walkable cell groups (each with its own ID and component coordinates), three whole-cell arrays, three quadrant arrays, and transitions. An AI can preserve or extend a merged group by using its group ID and component cell coordinates. Grid calibration affects only the transparent image overlay; it does not resize the source artwork or the separately configured canvas expansion margins.
 
 Use unique stable map IDs for each exterior, interior, or other isometric scene. Do not reuse one ID for different map artwork. A map board that has no base image can still use grid, collision, opacity, and transition data; foreground rendering becomes active when a base image is supplied.
 
 ## Current map rollout
 
-- **Tianhai Academy exterior:** source artwork is `public/maps/academy/full-map/1_academy.jpg`. It is the sole visual Map Base; the old procedural pond, path, garden, and building-footprint decorations are removed from this image-backed board. Transparent diamond cells remain only as interaction and editor geometry. The same source JPG feeds the foreground-cell canvas and minimap. The floating editor grid is positioned over the artwork bounds only, while the image and canvas expansion gaps remain unchanged. It includes a draggable workbench icon, walkable-area brush, four-sector X/O/opacity tools, grid size/offset calibration, and red/blue transition markers. Player and NPC tokens use the same grid coordinates, tap-to-walk pathfinding, wandering limits, and existing NPC conversation panel.
+- **Tianhai Academy exterior:** source artwork is `public/maps/academy/full-map/1_academy.jpg`. It is the sole visual Map Base; the old procedural pond, path, garden, and building-footprint decorations are removed from this image-backed board. Transparent diamond cells remain only as interaction and editor geometry. The same source JPG feeds the foreground-cell canvas and minimap. The floating editor grid is positioned over the artwork bounds only, while the image and canvas expansion gaps remain unchanged. It includes a draggable workbench icon, ADD CELL, DELETE CELL, SELECT & MERGE, and UNMERGE tools, four-sector X/O/opacity tools, grid size/offset calibration, and red/blue transition markers. Player and NPC tokens use the same grid coordinates, tap-to-walk pathfinding, wandering limits, and existing NPC conversation panel.
 - The source artwork is **2816×1536 px**. The Academy grid remains calibrated at **24×20 cells of 128×69.5 px**. A one-time Academy-only reset clears its previous saved cell layers, transitions, and editor-window placement; other map IDs retain their own data. The map starts with empty foreground, blocked, opacity, and transition arrays, plus the existing Player and four Academy NPCs. The Academy uses the same map-ID persistence and editor export format as other isometric areas.
 - The minimap draws the same isometric cell geometry, selected walkable regions, whole-cell and quadrant flags, transition colors, and live actor coordinates. The HUD also reports the Player's current grid X/Y. Character opacity and depth order are controlled through CSS variables so editor flags are not overridden by the global token style.
 - **Golden Dragon Empire, Tianhai Yunzhou, and Beiming Gu:** all local areas use the same isometric board/editor, each with a separate map ID and no Map Base image for now. They show a restrained isometric placeholder grid until artwork is supplied; regional panorama artwork is not substituted for a playable map.
