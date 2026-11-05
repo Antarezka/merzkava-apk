@@ -25,7 +25,7 @@ describe("Account controls in Settings",()=>{
 
 describe("Initial Developer login panel",()=>{
   it("renders the accessible password eye toggle",()=>{
-    const html=developerLoginPanel("id","","false" as unknown as boolean,true);
+    const html=developerLoginPanel("id","",false,true);
     expect(html).toContain('data-password-visibility-toggle="developer-login-password"');
     expect(html).toContain('aria-pressed="false"');
     expect(html).toContain("<svg");
