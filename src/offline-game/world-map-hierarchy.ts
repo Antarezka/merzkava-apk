@@ -793,7 +793,7 @@ function drawIsometricForeground(board:HTMLElement,data=readIsoMapData(board)):v
     ctx.moveTo(cx,cy-halfH);ctx.lineTo(cx+halfW,cy);ctx.lineTo(cx,cy+halfH);ctx.lineTo(cx-halfW,cy);ctx.closePath();
   }
   for(const key of data.foregroundQuadrants){
-    const match=/^([0-9]+),([0-9]+):(tl|tr|bl|br)$/.exec(key);if(!match)continue;
+    const match=/^(-?[0-9]+),(-?[0-9]+):(tl|tr|bl|br)$/.exec(key);if(!match)continue;
     const points=isoQuadrantTrianglePoints(Number(match[1]),Number(match[2]),match[3] as IsoQuadrant,data.grid).split(" ").map(point=>point.split(",").map(Number));
     ctx.moveTo(points[0][0]-left,points[0][1]-top);
     for(let i=1;i<points.length;i++)ctx.lineTo(points[i][0]-left,points[i][1]-top);
@@ -893,7 +893,7 @@ function renderIsometricMinimap(board:HTMLElement):void {
     data.walkableCellGroups.forEach(group=>{const d=isoMergedGroupBoundaryPath(group.cells,grid);if(d)overlays.push('<path class="wmh-minimap-merged-boundary" d="'+d+'"/>');});
     const addQuadrants=(keys:string[],cls:string)=>{
       keys.forEach(key=>{
-        const match=/^([0-9]+),([0-9]+):(tl|tr|bl|br)$/.exec(key);if(!match)return;
+        const match=/^(-?[0-9]+),(-?[0-9]+):(tl|tr|bl|br)$/.exec(key);if(!match)return;
         const points=isoQuadrantTrianglePoints(Number(match[1]),Number(match[2]),match[3] as IsoQuadrant,grid);
         overlays.push('<polygon class="wmh-minimap-cell '+cls+' is-quadrant" points="'+points+'"/>');
       });
@@ -987,8 +987,8 @@ function bindIsometricHud(dialog:HTMLElement):void {
         x:Math.max(0,Math.min(1,(event.clientX-rect.left)/Math.max(1,rect.width)))*boardWidth,
         y:Math.max(0,Math.min(1,(event.clientY-rect.top)/Math.max(1,rect.height)))*boardHeight,
       };
-      const cell=isoCellAtPoint(point,readIsoMapData(board).grid);
-      if(cell)walkToTile(dialog,cell.x,cell.y,"earth");
+      const data=readIsoMapData(board),cell=isoCellAtPoint(point,data.grid,true);
+      if(cell&&isoGridCellExists(data,cell.x,cell.y))walkToTile(dialog,cell.x,cell.y,"earth");
     });
   }
   renderIsometricWorldStatus(dialog);
@@ -1367,7 +1367,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       const image=board.querySelector<HTMLImageElement>("[data-wmh-map-art]");if(!image)return;
       const rect=image.getBoundingClientRect();
       const mapPoint={x:(event.clientX-rect.left)*image.naturalWidth/Math.max(1,rect.width),y:(event.clientY-rect.top)*image.naturalHeight/Math.max(1,rect.height)};
-      const cell=isoCellAtPoint(mapPoint,grid);if(cell)walkToTile(dialog,cell.x,cell.y,"earth");
+      const data=readIsoMapData(board),cell=isoCellAtPoint(mapPoint,grid,true);if(cell&&isoGridCellExists(data,cell.x,cell.y))walkToTile(dialog,cell.x,cell.y,"earth");
     });
   }
   const viewport=board.closest<HTMLElement>("[data-wmh-map-viewport],[data-wmh-iso-viewport]");
@@ -1387,7 +1387,8 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     }
   };
   const applyCellTap=(event:PointerEvent,transitionId:string|null)=>{
-    const mapPoint=point(event),cell=isoCellAtPoint(mapPoint,grid,mode()==="cell-add");if(!cell)return;
+    const mapPoint=point(event),cell=isoCellAtPoint(mapPoint,grid,true);if(!cell)return;
+    if(mode()!=="cell-add"&&!isoGridCellExists(data,cell.x,cell.y)){setStatus("No grid cell exists here yet. Switch to ADD CELL and tap this Map Base area first.");return;}
     if(mode()==="cell-add"){
       const key=isoCellKey(cell.x,cell.y);
       if(cell.x>=0&&cell.y>=0&&cell.x<grid.cols&&cell.y<grid.rows){
