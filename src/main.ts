@@ -520,7 +520,7 @@ function bugPanelMarkup(): string {
 function render(): void {
   if(!hasAppAccess()&&activeScreen!=="control")activeScreen="control";
   if(!hasAppAccess()&&activeScreen==="gameplay")activeScreen="control";
-  const visibleNavigation=hasAppAccess()?navigation:navigation.filter(item=>item.id!=="gameplay");
+  const visibleNavigation=developerAuthenticated?navigation:navigation.filter(item=>item.id!=="gameplay");
   // Each render replaces the screen DOM. Stop all Anime.js loops/listeners
   // attached to the previous Eternal Path tree before those nodes are detached.
   // Without this, route switches and repeated game actions accumulate infinite
@@ -549,7 +549,7 @@ function render(): void {
   const previousNavigation = root.querySelector<HTMLElement>(".nav-roulette-track");
   if (previousNavigation) savedNavigationScrollLeft = previousNavigation.scrollLeft;
   root.innerHTML = `<div class="app-shell ${isControl ? "control-shell" : ""} ${menuRevealPending ? "is-entering" : ""} ${navigationCollapsed ? "is-nav-collapsed" : ""}">
-    ${isControl ? "" : `<header class="app-header"><button class="brand" data-screen="home" aria-label="Merzkava home"><span class="brand-mark">M</span><span class="brand-wordmark"><small>MERZKAVA UNIVERSE</small><strong>Merzkava</strong></span></button><div class="header-context"><small>TACTICAL ACADEMY</small><strong>${translateLabel(navigation.find(item => item.id === activeScreen)?.label ?? "Command Hall", currentLanguage)}</strong></div><div class="header-tools">${developerAuthenticated ? `<button class="header-settings header-kitty-trigger" data-floating-action="start-bubble" aria-label="Start Bubble Mode" title="Start Bubble Mode"><span class="header-kitty-mascot" aria-hidden="true"><img class="header-kitty-layer header-kitty-shadow" src="/kitty/shadow/kitty-shadow.png" alt="" /><img class="header-kitty-layer header-kitty-tail" src="/kitty/ekor/kitty-tail.png" alt="" /><img class="header-kitty-layer header-kitty-body" src="/kitty/body/kitty-body.png" alt="" /><img class="header-kitty-layer header-kitty-head" src="/kitty/kepala/kitty-head.png" alt="" /></span></button>` : ""}${developerHeaderControls(currentLanguage,developerAuthenticated,playerAuthenticated)}<button class="header-settings" data-screen="settings" aria-label="Settings">⚙</button></div></header>
+    ${isControl ? "" : `<header class="app-header"><button class="brand" data-screen="home" aria-label="Merzkava home"><span class="brand-mark">M</span><span class="brand-wordmark"><small>MERZKAVA UNIVERSE</small><strong>Merzkava</strong></span></button><div class="header-context"><small>TACTICAL ACADEMY</small><strong>${translateLabel(navigation.find(item => item.id === activeScreen)?.label ?? "Command Hall", currentLanguage)}</strong></div><div class="header-tools"><button class="header-settings header-kitty-trigger" data-floating-action="start-bubble" aria-label="Start Bubble Mode" title="Start Bubble Mode"><span class="header-kitty-mascot" aria-hidden="true"><img class="header-kitty-layer header-kitty-shadow" src="/kitty/shadow/kitty-shadow.png" alt="" /><img class="header-kitty-layer header-kitty-tail" src="/kitty/ekor/kitty-tail.png" alt="" /><img class="header-kitty-layer header-kitty-body" src="/kitty/body/kitty-body.png" alt="" /><img class="header-kitty-layer header-kitty-head" src="/kitty/kepala/kitty-head.png" alt="" /></span></button>${developerHeaderControls(currentLanguage,developerAuthenticated,playerAuthenticated)}<button class="header-settings" data-screen="settings" aria-label="Settings">⚙</button></div></header>
     `}${notice ? `<p class="notice" role="status">${escapeHtml(notice)}</p>` : ""}
     ${isControl ? content : `<main class="main-content">${activeScreen === "settings" ? `<details class="settings-category app-settings-category" open><summary><span>APP SETTINGS</span><small>Appearance · Wallpapers · Language · Sound · Storage</small></summary><div class="settings-category-content">${languagePanelMarkup(currentLanguage)}${content}</div></details>${developerAuthenticated ? `<details class="settings-category world-settings-category"><summary><span>WORLD & ACCOUNT</span><small>Supabase · AI Gateway · Canon Source</small></summary><div class="settings-category-content">${authPanel()}${canonPanel()}</div></details>` : ""}` : `${content}${activeScreen === "home" ? dustyLetterMarkup(currentLanguage, APP_VERSION) : ""}`}</main>`}
     ${isControl ? "" : `<nav class="bottom-nav" aria-label="Academy navigation"><span class="nav-cable nav-cable-left" aria-hidden="true"></span><span class="nav-cable nav-cable-right" aria-hidden="true"></span><div class="nav-roulette-track">${visibleNavigation.map((item, index) => `<button class="nav-item ${activeScreen === item.id ? "active" : ""}" data-screen="${item.id}" ${activeScreen === item.id ? 'aria-current="page"' : ""}><span class="nav-item-motion"><span class="nav-index">${String(index + 1).padStart(2, "0")}</span><span class="nav-rotor" aria-hidden="true"><span class="nav-rotor-mark"></span><span class="nav-rotor-grip" data-nav-rotor="${item.id}"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="21" fill="none" stroke="transparent" stroke-width="7" pointer-events="stroke"/></svg></span><span class="nav-icon-frame nav-icon-frame-${item.id}"><span class="nav-icon"><span class="nav-icon-art">${item.icon}</span></span></span></span><small>${translateLabel(item.label, currentLanguage)}</small></span></button>`).join("")}</div></nav>`}
@@ -1620,7 +1620,7 @@ root.addEventListener("click", async (event: MouseEvent) => {
   const button = target.closest<HTMLButtonElement>("[data-screen]");
   const nextScreen = button?.dataset.screen as ScreenId | undefined;
   if (!nextScreen || !navigation.some(item => item.id === nextScreen)) return;
-  if(nextScreen==="gameplay"&&!hasAppAccess())return;
+  if(nextScreen==="gameplay"&&!developerAuthenticated)return;
   if(nextScreen!==activeScreen)history.pushState({merzkavaScreen:nextScreen},"");
   if (nextScreen === "gameplay" && activeScreen !== "gameplay") {
     const selected = root.querySelector<HTMLSelectElement>("#gameplay-character")?.value ?? activeCharacterId;
@@ -1792,8 +1792,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     }
     return;
   }
-  if(!developerAuthenticated&&(form.id==="auth-form"||form.id==="canon-route-form"||form.id==="canon-module-form")){event.preventDefault();return;}
-  if(!hasAppAccess()&&form.id==="gameplay-route-form"){event.preventDefault();return;}
+  if(!developerAuthenticated&&(form.id==="auth-form"||form.id==="canon-route-form"||form.id==="canon-module-form"||form.id==="gameplay-route-form")){event.preventDefault();return;}
   if (form.matches("[data-eternal-rename-form]")) {
     event.preventDefault();
     const id=form.getAttribute("data-eternal-rename-form")??"";
