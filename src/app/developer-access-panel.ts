@@ -34,7 +34,8 @@ export function developerLoginPanel(
   required:boolean=false,
   playerMessage:string="",
   playerBusy:boolean=false,
-  mode:AccessMode="player"
+  mode:AccessMode="player",
+  playerName:string=""
 ):string {
   const t=labels[language]||labels.en;
   const closeButton=required?"":'<button type="button" class="developer-login-close" data-dev-login-close aria-label="'+t.close+'">×</button>';
@@ -48,7 +49,7 @@ export function developerLoginPanel(
     '</div>'+
     '<form id="player-login-form"'+playerHidden+'>'+
       '<label for="player-login-name">'+t.playerName+'</label>'+
-      '<input id="player-login-name" name="playerName" type="text" maxlength="80" autocomplete="off" autocapitalize="off" spellcheck="false" required/>'+
+      '<input id="player-login-name" name="playerName" type="text" maxlength="80" autocomplete="off" autocapitalize="off" spellcheck="false" value="'+escape(playerName)+'" required/>'+
       '<p class="access-login-hint">'+t.playerHint+'</p>'+
       '<p class="developer-login-message" data-player-login-message role="status">'+escape(playerMessage)+'</p>'+
       '<button type="submit" class="developer-login-submit" '+(playerBusy?"disabled":"")+'>'+(playerBusy?"…":t.playerContinue)+'</button>'+
