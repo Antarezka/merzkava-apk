@@ -177,7 +177,6 @@ let developerAuthenticated = false;
 let developerLoginMessage = "";
 let developerLoginBusy = false;
 let playerAuthenticated = false;
-let activePlayerName = "";
 let playerLoginMessage = "";
 let playerLoginBusy = false;
 let playerLoginName = "";
@@ -1180,13 +1179,13 @@ root.addEventListener("click", async (event: MouseEvent) => {
   }
   if(target.closest("[data-player-logout]")){
     await signOutDeveloper();
-    developerAuthenticated=false;playerAuthenticated=false;activePlayerName="";playerLoginName="";activeCharacterId="";activeProfileMarkdown="";activeChat={messages:[],started:false,showOptions:activeChat.showOptions};
+    developerAuthenticated=false;playerAuthenticated=false;playerLoginName="";activeCharacterId="";activeProfileMarkdown="";activeChat={messages:[],started:false,showOptions:activeChat.showOptions};
     authMessage="";setWorldMapDeveloperMode(false);activeScreen="control";accessLoginMode="player";notice="";
     history.pushState({merzkavaScreen:"control",merzkavaHome:false},"");render();return;
   }
   if(target.closest("[data-dev-logout]")){
     await signOutDeveloper();
-    developerAuthenticated=false;playerAuthenticated=false;activePlayerName="";playerLoginName="";activeCharacterId="";activeProfileMarkdown="";activeChat={messages:[],started:false,showOptions:activeChat.showOptions};
+    developerAuthenticated=false;playerAuthenticated=false;playerLoginName="";activeCharacterId="";activeProfileMarkdown="";activeChat={messages:[],started:false,showOptions:activeChat.showOptions};
     authMessage="";setWorldMapDeveloperMode(false);activeScreen="control";accessLoginMode="player";notice="";render();return;
   }
   if(!hasAppAccess()&&target.closest("[data-floating-action]"))return;
@@ -1744,7 +1743,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       developerAuthenticated=false;
       setWorldMapDeveloperMode(false);
       playerAuthenticated=true;
-      activePlayerName=selected.name;
+      
       activeCharacterId=selected.id;
       activeProfileMarkdown=selected.profileMarkdown??"";
       loadCharacterWorldTime(selected.id);
@@ -1782,7 +1781,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
         const nextButton=root.querySelector<HTMLButtonElement>("#developer-login-form [type=submit]");if(nextButton)nextButton.disabled=false;
         return;
       }
-      developerAuthenticated=true;playerAuthenticated=false;activePlayerName="";activeCharacterId="";activeProfileMarkdown="";
+      developerAuthenticated=true;playerAuthenticated=false;activeCharacterId="";activeProfileMarkdown="";
       setWorldMapDeveloperMode(true);
       developerLoginBusy=false;developerLoginMessage="";playerLoginMessage="";playerLoginName="";
       activeScreen="control";notice="";render();
