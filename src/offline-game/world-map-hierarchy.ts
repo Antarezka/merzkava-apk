@@ -855,6 +855,7 @@ function renderIsometricMinimap(board:HTMLElement):void {
     blocked:data.blockedCells,
     opacity:data.opacityCells,
     walkable:data.walkableCells,
+    walkableGroups:data.walkableCellGroups,
     walkableAreaEnabled:data.walkableAreaEnabled,
     foregroundQuadrants:data.foregroundQuadrants,
     blockedQuadrants:data.blockedQuadrants,
@@ -878,6 +879,7 @@ function renderIsometricMinimap(board:HTMLElement):void {
     data.blockedCells.forEach(key=>{const [x,y]=key.split(",").map(Number);overlays.push(polygon(x,y,"is-blocked"));});
     data.opacityCells.forEach(key=>{const [x,y]=key.split(",").map(Number);overlays.push(polygon(x,y,"is-opacity"));});
     data.walkableCells.forEach(key=>{const [x,y]=key.split(",").map(Number);overlays.push(polygon(x,y,"is-walkable"));});
+    data.walkableCellGroups.forEach(group=>{const d=isoMergedGroupBoundaryPath(group.cells,grid);if(d)overlays.push('<path class="wmh-minimap-merged-boundary" d="'+d+'"/>');});
     const addQuadrants=(keys:string[],cls:string)=>{
       keys.forEach(key=>{
         const match=/^([0-9]+),([0-9]+):(tl|tr|bl|br)$/.exec(key);if(!match)return;
@@ -1463,10 +1465,9 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       const previous=JSON.parse(JSON.stringify(data)) as IsoMapEditorData;
       const previousGrid={...grid};
       remember();const property=input.dataset.wmhGridControl as keyof IsoMapGridConfig;grid[property]=Number(input.value);
-      const valid=(key:string)=>{const [x,y]=key.split(",").map(Number);return x<grid.cols&&y<grid.rows;};
-      const validQuadrant=(key:string)=>{const match=/^([0-9]+),([0-9]+):(tl|tr|bl|br)$/.exec(key);return !!match&&Number(match[1])<grid.cols&&Number(match[2])<grid.rows;};
-      data.foregroundCells=data.foregroundCells.filter(valid);data.blockedCells=data.blockedCells.filter(valid);data.opacityCells=data.opacityCells.filter(valid);data.walkableCells=data.walkableCells.filter(valid);
-      data.foregroundQuadrants=data.foregroundQuadrants.filter(validQuadrant);data.blockedQuadrants=data.blockedQuadrants.filter(validQuadrant);data.opacityQuadrants=data.opacityQuadrants.filter(validQuadrant);
+      data.grid={...grid};
+      data=normalizeIsoMapEditorData(data,data.mapId,grid);
+      selectedMergeCells.forEach(key=>{if(!data.walkableCells.includes(key))selectedMergeCells.delete(key);});
       data.transitions=data.transitions.filter(m=>m.x<grid.cols&&m.y<grid.rows);applyGrid();
       if(!relocateActorsFromBlockedCells(board,data)){
         data=previous;Object.assign(grid,previousGrid);history.pop();input.value=String(grid[property]);applyGrid();
