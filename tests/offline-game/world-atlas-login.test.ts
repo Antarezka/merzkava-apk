@@ -8,6 +8,8 @@ describe("World Atlas player login gate",()=>{
       const html=worldAtlasLoginPanelMarkup(language.code);
       expect(html).toContain('data-world-atlas-gate hidden');
       expect(html).toContain('id="world-atlas-login-form"');
+      expect(html).toContain('id="world-atlas-login-form" novalidate');
+      expect(html).toContain('data-password-required-label=');
       expect(html).toContain('data-world-atlas-player');
       expect(html).toContain('data-world-atlas-confirm-row');
       expect(html).toContain('name="remember"');
