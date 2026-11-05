@@ -1232,12 +1232,13 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
   });
   modeSelect?.addEventListener("change",()=>{
     if(transitionTools)transitionTools.hidden=mode()!=="transition";
-  if(mode()==="foreground"&&!board.querySelector("[data-wmh-map-art]")) {
-    setStatus("This map has no Map Base image yet. Foreground cell flags can be saved now and will render when a base image is assigned.");
-  }
-    setStatus(mode()==="foreground"?"Tap cells to toggle ○ foreground priority; the same JPG is clipped and redrawn above characters."
-      :mode()==="blocked"?"Tap cells to toggle X collision. Blocked cells cannot be entered."
-      :mode()==="opacity"?"Tap cells to toggle opacity zones. Characters become translucent while inside them."
+    if(mode()==="walkable"&&!data.walkableAreaEnabled){
+      data.walkableAreaEnabled=true;if(walkableToggle)walkableToggle.checked=true;persist();
+    }
+    setStatus(mode()==="walkable"?"Brush the image tiles that should be used. Selected tiles turn blue; only these tiles are walkable while AREA LIMIT is ON."
+      :mode()==="foreground"?"Tap one of the 4 small sectors: ○ redraws that part of the same Map Base above characters."
+      :mode()==="blocked"?"Tap one of the 4 small sectors: X blocks movement across that sector's edge."
+      :mode()==="opacity"?"Tap one of the 4 small sectors: ◌ makes characters translucent in that image area."
       :"Tap a cell to add/select a transition. Red is unnamed; blue is named.");
   });
   if(transitionTools)transitionTools.hidden=mode()!=="transition";
@@ -1256,7 +1257,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       const marker=data.transitions.find(m=>m.id===selectedTransitionId);if(transitionField)transitionField.value=marker?.label||"";
       redraw();return;
     }
-    const cell=isoCellAtPoint(point(e),grid);if(!cell)return;
+    const mapPoint=point(e),cell=isoCellAtPoint(mapPoint,grid);if(!cell)return;
     if(mode()==="transition"){
       remember();
       let marker=data.transitions.find(m=>m.x===cell.x&&m.y===cell.y);
@@ -1264,14 +1265,21 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       selectedTransitionId=marker.id;if(transitionField)transitionField.value=marker.label;
       persist();setStatus("Transition selected. Enter its destination name to turn it blue.");return;
     }
-    const layer:IsoCellLayer=mode()==="blocked"?"blockedCells":mode()==="opacity"?"opacityCells":"foregroundCells";
-    remember();const enabled=toggleIsoCellLayer(data,layer,cell.x,cell.y);
-    if(layer==="blockedCells"&&enabled&&!relocateActorsFromBlockedCells(board,data)){
-      toggleIsoCellLayer(data,layer,cell.x,cell.y);history.pop();redraw();
-      setStatus("Cannot block that cell: no safe destination is available for every character. Clear another X cell first.");return;
+    if(mode()==="walkable"){
+      remember();const key=isoCellKey(cell.x,cell.y),wasSelected=data.walkableCells.includes(key);
+      data.walkableCells=wasSelected?data.walkableCells.filter(item=>item!==key):[...data.walkableCells,key];
+      data.walkableAreaEnabled=true;if(walkableToggle)walkableToggle.checked=true;
+      if(!relocateActorsFromBlockedCells(board,data)){
+        data.walkableCells=wasSelected?[...data.walkableCells,key]:data.walkableCells.filter(item=>item!==key);
+        history.pop();redraw();setStatus("That cell cannot be removed because it would leave a character outside the remaining walkable area.");return;
+      }
+      persist();setStatus((wasSelected?"Removed":"Added")+" walkable cell ("+cell.x+","+cell.y+"). Blue cells are the active movement area.");return;
     }
+    const quadrant=isoQuadrantAtPoint(mapPoint,cell.x,cell.y,grid);
+    const layer:IsoQuadrantLayer=mode()==="blocked"?"blockedQuadrants":mode()==="opacity"?"opacityQuadrants":"foregroundQuadrants";
+    remember();const enabled=toggleIsoQuadrantLayer(data,layer,cell.x,cell.y,quadrant);
     persist();
-    setStatus((layer==="foregroundCells"?"○ foreground":layer==="blockedCells"?"X blocked":"Opacity")+(enabled?" enabled":" cleared")+" at ("+cell.x+","+cell.y+"). Characters occupying a newly blocked cell are moved to the nearest safe cell.");
+    setStatus((layer==="foregroundQuadrants"?"○ Foreground":layer==="blockedQuadrants"?"X Blocked":"◌ Opacity")+(enabled?" enabled":" cleared")+" in "+quadrant.toUpperCase()+" sector of ("+cell.x+","+cell.y+").");
   });
   panel.querySelector<HTMLElement>("[data-wmh-transition-apply]")?.addEventListener("click",()=>{
     const marker=data.transitions.find(m=>m.id===selectedTransitionId);if(!marker){setStatus("Select a transition marker first.");return;}
