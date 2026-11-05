@@ -1,13 +1,13 @@
 .wmh-open{display:flex;align-items:center;justify-content:center;width:100%;min-height:38px;margin:8px 0 4px;border:1px solid #c7a56e;background:linear-gradient(110deg,#29382e,#18221d);color:#f2dfb9;font:700 9px Georgia,serif;letter-spacing:.14em;touch-action:manipulation}
 .wmh-overlay{position:fixed;z-index:150;inset:0;display:grid;place-items:center;background:#080b09ed;padding:0}
 .wmh-overlay[hidden]{display:none!important}
-.wmh-dialog{position:relative;width:min(100%,520px);height:100dvh;max-height:100dvh;overflow:auto;display:flex;flex-direction:column;padding:max(12px,env(safe-area-inset-top)) 12px max(12px,env(safe-area-inset-bottom));background:linear-gradient(155deg,#27352d,#111914 75%,#28251d);color:#f1e5ce}
+.wmh-dialog{position:relative;width:min(100%,520px);height:100svh;max-height:100svh;overflow:auto;display:flex;flex-direction:column;padding:max(12px,env(safe-area-inset-top)) 12px max(12px,env(safe-area-inset-bottom));background:linear-gradient(155deg,#27352d,#111914 75%,#28251d);color:#f1e5ce}
 .wmh-level-header{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 3px 12px;border-bottom:1px solid #bda06c66}
 .wmh-level-tag{display:inline-block;padding:4px 7px;border:1px solid #c7a56e;color:#f1d39a;font:700 9px Georgia,serif;letter-spacing:.18em}
 .wmh-level-header h3{margin:7px 0 3px;font:clamp(23px,6vw,31px)/1 Georgia,serif;color:#f4e6ca}
 .wmh-level-header p{margin:0;color:#b9b29f;font:8px/1.4 Arial,sans-serif;letter-spacing:.12em}
 .wmh-close{width:36px;height:36px;border:1px solid #92784e;background:#1d2922;color:#f2dfb9;font-size:24px}
-.wmh-world-map{position:relative;flex:1;min-height:420px;max-height:calc(100dvh - 190px);margin:8px 0 12px;background:radial-gradient(ellipse at 50% 45%,#536b58,#18251e 70%);border:1px solid #a78b5e;overflow:auto;display:block;overscroll-behavior:contain;scrollbar-color:#a78b5e #17231c;scrollbar-width:thin;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
+.wmh-world-map{position:relative;flex:1;min-height:420px;max-height:calc(100svh - 190px);margin:8px 0 12px;background:radial-gradient(ellipse at 50% 45%,#536b58,#18251e 70%);border:1px solid #a78b5e;overflow:auto;display:block;overscroll-behavior:contain;scrollbar-color:#a78b5e #17231c;scrollbar-width:thin;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
 .wmh-world-map-image{position:relative;width:100%;flex:none}
 .wmh-world-map-image>img{display:block;width:100%;height:auto;max-height:none;object-fit:contain;filter:drop-shadow(0 8px 12px #0008)}
 .wmh-power{position:absolute;display:flex;align-items:center;gap:6px;padding:7px 9px;border:1px solid #e0c38d;background:#18221de8;color:#f5e5c6;box-shadow:0 3px 10px #0008;font-size:9px;touch-action:manipulation}
@@ -243,7 +243,7 @@
   inset:0;
   width:100vw;
   height:100vh;
-  height:100dvh;
+  height:100svh;
   box-sizing:border-box;
   display:grid;
   place-items:center;
@@ -256,18 +256,18 @@
   inset:0;
   width:100vw;
   height:100vh;
-  height:100dvh;
+  height:100svh;
   pointer-events:none;
 }
 .wmh-selection-card{
   box-sizing:border-box;
   width:min(100%,390px);
   max-width:calc(100vw - 24px);
-  max-height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 28px);
+  max-height:calc(100svh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 28px);
   overflow-y:auto;
   overscroll-behavior:contain;
 }
-.wmh-selection-art{height:clamp(135px,28dvh,230px);min-height:0}
+.wmh-selection-art{height:clamp(135px,28svh,230px);min-height:0}
 .wmh-selection-question{padding-top:10px}
 @media(max-width:390px){
   .wmh-isometric-board{transform:perspective(900px) rotateX(53deg) rotateZ(45deg) scale(.66)}
@@ -1143,7 +1143,7 @@
   display:block!important;place-items:stretch!important;padding:0!important;background:#090d0d!important;
 }
 .wmh-dialog:has(.wmh-isometric-play-screen){
-  position:fixed!important;inset:0!important;width:100vw!important;height:100vh!important;height:100dvh!important;
+  position:fixed!important;inset:0!important;width:100vw!important;height:100vh!important;height:100svh!important;
   max-width:none!important;max-height:none!important;min-height:0!important;margin:0!important;padding:0!important;
   overflow:hidden!important;border:0!important;border-radius:0!important;background:#0b1110!important;box-shadow:none!important;
 }
@@ -1647,7 +1647,7 @@
   z-index:1!important;
   inset:0!important;
   width:100vw!important;
-  height:100dvh!important;
+  height:100svh!important;
   min-height:0!important;
   overflow:hidden!important;
   background:#090d0b!important;
