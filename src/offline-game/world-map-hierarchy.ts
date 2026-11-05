@@ -177,6 +177,9 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
   let baseHeight = 0;
   const academyCanvas=surface.hasAttribute("data-wmh-academy-canvas");
   const academyGrid=academyCanvas?surface.querySelector<SVGSVGElement>("[data-wmh-academy-margin-grid]"):null;
+  // Academy pan and pinch are handled by this pointer controller. Do not let
+  // Android WebView begin a competing native scroll gesture on the viewport.
+  if(academyCanvas)viewport.style.setProperty("touch-action","none","important");
   let academyImageWidth=0,academyImageHeight=0,academyMarginX=0,academyMarginY=0;
   const pointers = new Map<number, { x: number; y: number }>();
   let panStart: { x: number; y: number; scrollLeft: number; scrollTop: number } | null = null;
@@ -272,6 +275,8 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
       pinchStart = null;
       return;
     }
+    // Keep the custom camera in charge of every Academy drag direction.
+    if(academyCanvas)event.preventDefault();
     pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
     if (pointers.size === 1) {
       panStart = { x: event.clientX, y: event.clientY, scrollLeft: viewport.scrollLeft, scrollTop: viewport.scrollTop };
