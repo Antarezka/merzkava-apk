@@ -1646,14 +1646,14 @@
   max-width:none!important;
   max-height:none!important;
 }
-.wmh-academy-map-surface.wmh-overlay-editing .wmh-area-overlay-svg{z-index:400!important;pointer-events:auto!important;touch-action:none!important;cursor:crosshair}
+.wmh-academy-map-surface .wmh-area-overlay-svg{z-index:500!important;pointer-events:none!important;touch-action:none!important}.wmh-academy-map-surface.wmh-overlay-editing .wmh-area-overlay-svg{pointer-events:auto!important;cursor:crosshair}
 .wmh-academy-map-surface.wmh-overlay-editing .wmh-academy-hit-cell{stroke:rgba(255,255,255,.72);stroke-width:1.5;fill:rgba(255,255,255,.015)}
-.wmh-academy-map-surface .wmh-academy-grid-overlay .wmh-academy-hit-cell{pointer-events:all;fill:transparent;stroke:transparent;stroke-width:1;vector-effect:non-scaling-stroke}
+.wmh-academy-map-surface .wmh-academy-grid-overlay .wmh-academy-hit-cell{pointer-events:none;fill:transparent;stroke:transparent;stroke-width:1;vector-effect:non-scaling-stroke}
 .wmh-academy-map-surface .wmh-academy-grid-overlay .wmh-academy-hit-cell.is-walkable{fill:rgba(45,133,219,.27);stroke:#82c5ff;stroke-width:2}
-.wmh-academy-map-surface.wmh-overlay-editing .wmh-academy-grid-overlay .wmh-academy-hit-cell{stroke:rgba(235,238,226,.54);stroke-width:1.1}
-.wmh-academy-map-surface .wmh-academy-grid-overlay [data-wmh-transition-marks]{pointer-events:all}
+.wmh-academy-map-surface.wmh-overlay-editing .wmh-academy-grid-overlay .wmh-academy-hit-cell{pointer-events:all;stroke:rgba(235,238,226,.54);stroke-width:1.1}
+.wmh-academy-map-surface .wmh-academy-grid-overlay [data-wmh-transition-marks]{pointer-events:none;visibility:visible!important}
 .wmh-academy-map-surface.wmh-overlay-editing .wmh-character-token{pointer-events:none!important}
-.wmh-academy-actor-layer{position:absolute;z-index:350;pointer-events:none;overflow:visible}
+.wmh-academy-actor-layer{position:absolute;z-index:350;pointer-events:none;overflow:visible}.wmh-academy-map-surface>.wmh-isometric-foreground{z-index:400!important;pointer-events:none!important}
 .wmh-academy-actor-layer .wmh-character-token{position:absolute!important;left:0;top:0;right:auto;bottom:auto;display:block!important;justify-self:auto;align-self:auto;transform:translate(-50%,-100%) translateY(-7px)!important;pointer-events:auto}
 .wmh-academy-actor-layer .wmh-npc-token{z-index:2}
 .wmh-academy-actor-layer .wmh-player-token{z-index:3}
