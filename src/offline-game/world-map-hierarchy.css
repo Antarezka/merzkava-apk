@@ -1692,3 +1692,34 @@
   z-index:630!important;
   bottom:max(14px,env(safe-area-inset-bottom))!important;
 }
+
+
+/* The expanded Academy canvas shows its lightweight isometric guide only
+   in the transparent margin; the original JPG remains completely ungridded. */
+.wmh-academy-map-surface{
+  position:relative!important;
+  isolation:isolate!important;
+  background:transparent!important;
+}
+.wmh-academy-map-surface>.wmh-academy-margin-grid{
+  position:absolute!important;
+  z-index:0!important;
+  inset:0 auto auto 0!important;
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  overflow:visible!important;
+  pointer-events:none!important;
+}
+.wmh-academy-map-surface>img{
+  position:absolute!important;
+  z-index:1!important;
+  width:auto!important;
+  height:auto!important;
+  max-width:none!important;
+  max-height:none!important;
+  object-fit:fill!important;
+  pointer-events:none!important;
+  user-select:none!important;
+  -webkit-user-drag:none!important;
+}

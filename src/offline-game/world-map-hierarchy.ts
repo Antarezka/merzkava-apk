@@ -141,6 +141,31 @@ function serializeWorldMapCoordinates(markers: WorldMarker[]): string {
     markers: markers.map(({ id, name, x, y, category, placementStatus }) => ({ id, name, category, x, y, placementStatus }))
   }, null, 2);
 }
+function academyMarginGridMarkup(
+  width:number,height:number,imageLeft:number,imageTop:number,imageWidth:number,imageHeight:number,cellW:number,cellH:number,
+):string {
+  const slope=cellH/cellW;
+  const first=Math.floor(-slope*width/cellH)-1;
+  const last=Math.ceil((height+slope*width)/cellH)+1;
+  const lines:string[]=[];
+  for(let index=first;index<=last;index++){
+    const y=index*cellH;
+    lines.push("M0 "+y.toFixed(2)+" L"+width.toFixed(2)+" "+(slope*width+y).toFixed(2));
+    lines.push("M0 "+y.toFixed(2)+" L"+width.toFixed(2)+" "+(-slope*width+y).toFixed(2));
+  }
+  const right=imageLeft+imageWidth,bottom=imageTop+imageHeight;
+  // Four clipping bands keep every guide line outside the Academy artwork.
+  return '<defs><clipPath id="academy-canvas-margin-only">'+
+    '<rect x="0" y="0" width="'+width.toFixed(2)+'" height="'+imageTop.toFixed(2)+'"/>'+
+    '<rect x="0" y="'+bottom.toFixed(2)+'" width="'+width.toFixed(2)+'" height="'+Math.max(0,height-bottom).toFixed(2)+'"/>'+
+    '<rect x="0" y="'+imageTop.toFixed(2)+'" width="'+imageLeft.toFixed(2)+'" height="'+imageHeight.toFixed(2)+'"/>'+
+    '<rect x="'+right.toFixed(2)+'" y="'+imageTop.toFixed(2)+'" width="'+Math.max(0,width-right).toFixed(2)+'" height="'+imageHeight.toFixed(2)+'"/>'+
+    '</clipPath></defs>'+
+    '<path d="'+lines.join(" ")+'" clip-path="url(#academy-canvas-margin-only)" fill="none" stroke="#d9c9a4" stroke-width="1.5" stroke-opacity=".36"/>'+
+    '<rect x=".75" y=".75" width="'+Math.max(0,width-1.5).toFixed(2)+'" height="'+Math.max(0,height-1.5).toFixed(2)+'" fill="none" stroke="#cbb37f" stroke-width="1.5" stroke-opacity=".58"/>'+
+    '<rect x="'+imageLeft.toFixed(2)+'" y="'+imageTop.toFixed(2)+'" width="'+imageWidth.toFixed(2)+'" height="'+imageHeight.toFixed(2)+'" fill="none" stroke="#e4d2a9" stroke-width="1.25" stroke-opacity=".42" stroke-dasharray="7 7"/>';
+}
+
 function bindWorldMapZoom(dialog: HTMLElement): void {
   const viewport = dialog.querySelector<HTMLElement>("[data-wmh-map-viewport]");
   const surface = dialog.querySelector<HTMLElement>("[data-wmh-map-surface]");
@@ -150,23 +175,51 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
   let zoom = 1;
   let baseWidth = 0;
   let baseHeight = 0;
+  const academyCanvas=surface.hasAttribute("data-wmh-academy-canvas");
+  const academyGrid=academyCanvas?surface.querySelector<SVGSVGElement>("[data-wmh-academy-margin-grid]"):null;
+  let academyImageWidth=0,academyImageHeight=0,academyMarginX=0,academyMarginY=0;
   const pointers = new Map<number, { x: number; y: number }>();
   let panStart: { x: number; y: number; scrollLeft: number; scrollTop: number } | null = null;
   let pinchStart: { distance: number; zoom: number } | null = null;
   const distance = (a: {x:number;y:number}, b: {x:number;y:number}) => Math.hypot(a.x-b.x,a.y-b.y);
   const midpoint = (a: {x:number;y:number}, b: {x:number;y:number}) => ({x:(a.x+b.x)/2,y:(a.y+b.y)/2});
+  const applySurfaceSize=(scale:number) => {
+    surface.style.width=(baseWidth*scale)+"px";
+    surface.style.height=(baseHeight*scale)+"px";
+    if(academyCanvas){
+      image.style.setProperty("left",(academyMarginX*scale)+"px","important");
+      image.style.setProperty("top",(academyMarginY*scale)+"px","important");
+      image.style.setProperty("width",(academyImageWidth*scale)+"px","important");
+      image.style.setProperty("height",(academyImageHeight*scale)+"px","important");
+    }else{
+      image.style.width="100%";
+      image.style.height="100%";
+    }
+  };
   const sizeBaseMap = () => {
     const rect = viewport.getBoundingClientRect();
     const ratio = image.naturalWidth > 0 && image.naturalHeight > 0 ? image.naturalWidth / image.naturalHeight : 1;
-    // Cover the complete viewport at minimum zoom: no map edge or empty canvas
-    // is exposed. The larger dimension remains pannable inside the viewport.
-    baseWidth = Math.max(rect.width, rect.height * ratio);
-    baseHeight = Math.max(rect.height, rect.width / ratio);
-    surface.style.width = baseWidth + "px";
-    surface.style.height = baseHeight + "px";
-    image.style.width = "100%";
-    image.style.height = "100%";
-    image.style.objectFit = "fill";
+    academyImageWidth = Math.max(rect.width, rect.height * ratio);
+    academyImageHeight = Math.max(rect.height, rect.width / ratio);
+    if(academyCanvas){
+      // Two Academy-sized isometric cells of breathing room on every edge.
+      const artworkScale=image.naturalWidth>0?academyImageWidth/image.naturalWidth:1;
+      const cellW=128*artworkScale,cellH=69.5*artworkScale;
+      academyMarginX=cellW*2;
+      academyMarginY=cellH*2;
+      baseWidth=academyImageWidth+academyMarginX*2;
+      baseHeight=academyImageHeight+academyMarginY*2;
+      if(academyGrid){
+        academyGrid.setAttribute("viewBox","0 0 "+baseWidth+" "+baseHeight);
+        academyGrid.innerHTML=academyMarginGridMarkup(
+          baseWidth,baseHeight,academyMarginX,academyMarginY,academyImageWidth,academyImageHeight,cellW,cellH
+        );
+      }
+    }else{
+      baseWidth=academyImageWidth;
+      baseHeight=academyImageHeight;
+    }
+    applySurfaceSize(1);
   };
   const applyZoom = (next: number, focusX?: number, focusY?: number) => {
     if (!baseWidth || !baseHeight) sizeBaseMap();
@@ -176,8 +229,7 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
     const localY = focusY == null ? viewport.clientHeight / 2 : focusY - viewport.getBoundingClientRect().top;
     const anchoredX = viewport.scrollLeft + localX;
     const anchoredY = viewport.scrollTop + localY;
-    surface.style.width = (baseWidth * zoom) + "px";
-    surface.style.height = (baseHeight * zoom) + "px";
+    applySurfaceSize(zoom);
     viewport.scrollLeft = anchoredX * zoom / previous - localX;
     viewport.scrollTop = anchoredY * zoom / previous - localY;
     const level = dialog.querySelector<HTMLElement>("[data-wmh-zoom-level]");
@@ -186,8 +238,7 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
   const centerMap = () => {
     sizeBaseMap();
     zoom = 1;
-    surface.style.width = baseWidth + "px";
-    surface.style.height = baseHeight + "px";
+    applySurfaceSize(1);
     viewport.scrollLeft = Math.max(0, (baseWidth - viewport.clientWidth) / 2);
     viewport.scrollTop = Math.max(0, (baseHeight - viewport.clientHeight) / 2);
     const level = dialog.querySelector<HTMLElement>("[data-wmh-zoom-level]");
@@ -1343,7 +1394,10 @@ function isometricPlayMarkup(regionId: RegionId, selectedBuilding: string, inter
     // player/NPC tokens, editor, or overlay data is mounted in this view.
     return '<div class="wmh-isometric-play-screen wmh-academy-map-screen" data-wmh-isometric-play-screen>'+
       '<div class="wmh-map-zoom wmh-academy-map-zoom" aria-label="Academy map zoom controls"><button type="button" data-wmh-zoom="out" aria-label="Zoom out">−</button><span data-wmh-zoom-level>100%</span><button type="button" data-wmh-zoom="in" aria-label="Zoom in">+</button><button type="button" data-wmh-zoom="reset">RESET</button></div>'+
-      '<div class="wmh-academy-map-viewport" data-wmh-map-viewport><div class="wmh-academy-map-surface" data-wmh-map-surface><img src="'+academyMapImage+'" alt="Tianhai Academy full map" draggable="false" loading="eager" decoding="async"/></div></div>'+
+      '<div class="wmh-academy-map-viewport" data-wmh-map-viewport><div class="wmh-academy-map-surface" data-wmh-map-surface data-wmh-academy-canvas>'+
+      '<svg class="wmh-academy-margin-grid" data-wmh-academy-margin-grid preserveAspectRatio="none" aria-hidden="true"></svg>'+
+      '<img src="'+academyMapImage+'" alt="Tianhai Academy full map" draggable="false" loading="eager" decoding="async"/>'+
+      '</div></div>'+
       '<button type="button" class="wmh-map-back wmh-academy-map-back" data-wmh-action="back" aria-label="Return to Golden Dragon Empire map"><i class="wmh-academy-back-icon" aria-hidden="true"></i><b>GOLDEN DRAGON EMPIRE</b></button>'+
       '</div>';
   }
