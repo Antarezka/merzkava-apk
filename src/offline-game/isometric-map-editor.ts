@@ -172,7 +172,7 @@ export function normalizeIsoMapEditorData(
     if (!Array.isArray(value)) return [];
     const result = new Set<string>();
     for (const item of value) {
-      const match = /^(\\d+),(\\d+):(tl|tr|bl|br)$/.exec(String(item));
+      const match = /^([0-9]+),([0-9]+):(tl|tr|bl|br)$/.exec(String(item));
       if (!match) continue;
       const x = Number(match[1]), y = Number(match[2]);
       if (x >= 0 && x < grid.cols && y >= 0 && y < grid.rows) result.add(String(item));
