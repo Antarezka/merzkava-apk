@@ -105,6 +105,12 @@ console.log("Patched generated Android project with Merzkava Floating Mode plugi
 
 
 let backCallbackActivity = await readFile(mainActivityPath, "utf8");
+if (!backCallbackActivity.includes("import android.webkit.WebView;")) {
+  backCallbackActivity = backCallbackActivity.replace(
+    /^package\s+[\w.]+;/m,
+    match => match + "\n\nimport android.webkit.WebView;"
+  );
+}
 if (!backCallbackActivity.includes("MerzkavaAndroidBackCallback")) {
   if (!backCallbackActivity.includes("import androidx.activity.OnBackPressedCallback;")) {
     backCallbackActivity = backCallbackActivity.replace(
