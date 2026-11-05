@@ -996,8 +996,11 @@ function relocateActorsFromBlockedCells(board:HTMLElement,data:IsoMapEditorData)
   const cols=data.grid.cols,rows=data.grid.rows;
   const nearestSafe=(startX:number,startY:number):{x:number;y:number}|null=>{
     const candidates:Array<{x:number;y:number;distance:number}>=[];
-    for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){
-      const key=x+","+y;
+    const available=new Set<string>();
+    for(let y=0;y<rows;y++)for(let x=0;x<cols;x++)available.add(x+","+y);
+    data.customGridCells.forEach(key=>available.add(key));
+    for(const key of available){
+      const [x,y]=key.split(",").map(Number);
       if(!isoCellIsWalkable(data,x,y)||reserved.has(key))continue;
       candidates.push({x,y,distance:Math.abs(x-startX)+Math.abs(y-startY)});
     }
@@ -1008,7 +1011,7 @@ function relocateActorsFromBlockedCells(board:HTMLElement,data:IsoMapEditorData)
   actors.sort((a,b)=>(a.hasAttribute("data-wmh-player-token")?-1:0)-(b.hasAttribute("data-wmh-player-token")?-1:0));
   for(const actor of actors){
     const x=Number(actor.dataset.x||0),y=Number(actor.dataset.y||0);
-    const inside=x>=0&&y>=0&&x<cols&&y<rows;
+    const inside=isoGridCellExists(data,x,y);
     const key=x+","+y;
     if(inside&&isoCellIsWalkable(data,x,y)&&!reserved.has(key)){
       reserved.add(key);placements.push({actor,x,y});continue;
@@ -1956,7 +1959,7 @@ function startNpcWander(dialog:HTMLElement):void {
       const x=Number(npc.dataset.x||0),y=Number(npc.dataset.y||0);
       const options=[[x+1,y],[x-1,y],[x,y+1],[x,y-1]].filter(([nx,ny])=>{
         const tile=board.querySelector<HTMLElement>('[data-wmh-tile][data-x="'+nx+'"][data-y="'+ny+'"]');
-        return nx>=0&&nx<Number(board.dataset.cols||12)&&ny>=0&&ny<Number(board.dataset.rows||10)&&
+        return isoGridCellExists(mapData,nx,ny)&&
           !!tile&&isoCanStep(mapData,x,y,nx,ny)&&
           !(Number(player?.dataset.x||5)===nx&&Number(player?.dataset.y||8)===ny);
       });
@@ -1990,15 +1993,14 @@ function walkToTile(dialog:HTMLElement,targetX:number,targetY:number,surface:str
   const player=board?.querySelector<HTMLElement>("[data-wmh-player-token]");
   if(!board||!player)return;
   const runtime=board as HTMLElement & {__wmhPendingPlayerDestination?:{x:number;y:number;surface:string}};
-  const cols=Number(board.dataset.cols||12),rows=Number(board.dataset.rows||10);
-  if(!Number.isInteger(targetX)||!Number.isInteger(targetY)||targetX<0||targetX>=cols||targetY<0||targetY>=rows)return;
+  const mapData=readIsoMapData(board);
+  if(!Number.isInteger(targetX)||!Number.isInteger(targetY)||!isoGridCellExists(mapData,targetX,targetY))return;
   const destination=board.querySelector<HTMLElement>('[data-wmh-tile][data-x="'+targetX+'"][data-y="'+targetY+'"]');
   if(!destination||!isoCanWalkTile(board,destination,targetX,targetY)){delete runtime.__wmhPendingPlayerDestination;return;}
   runtime.__wmhPendingPlayerDestination={x:targetX,y:targetY,surface};
   const oldTimer=Number(player.dataset.moveTimer||0);
   if(oldTimer)window.clearTimeout(oldTimer);
   const startX=Number(player.dataset.x||5),startY=Number(player.dataset.y||8);
-  const mapData=readIsoMapData(board);
   // Fixed-order breadth-first path: every tap resolves to the exact tile's
   // stored grid coordinates; no random destination or visual-position guess.
   const queue:Array<[number,number]>=[[startX,startY]];
@@ -2009,7 +2011,7 @@ function walkToTile(dialog:HTMLElement,targetX:number,targetY:number,surface:str
     const neighbors:[[number,number],[number,number],[number,number],[number,number]]=[[x,y-1],[x+1,y],[x,y+1],[x-1,y]];
     for(const [nx,ny] of neighbors){
       const key=nx+","+ny;
-      if(nx<0||nx>=cols||ny<0||ny>=rows||previous.has(key))continue;
+      if(!isoGridCellExists(mapData,nx,ny)||previous.has(key))continue;
       const nextTile=board.querySelector<HTMLElement>('[data-wmh-tile][data-x="'+nx+'"][data-y="'+ny+'"]');
       if(!nextTile||!isoCanStep(mapData,x,y,nx,ny))continue;
       previous.set(key,x+","+y);queue.push([nx,ny]);
