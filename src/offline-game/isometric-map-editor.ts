@@ -37,6 +37,8 @@ export type IsoMapEditorData = {
   foregroundQuadrants: string[];
   blockedQuadrants: string[];
   opacityQuadrants: string[];
+  confirmed: boolean;
+  confirmedAt: string;
   transitions: IsoTransitionMarker[];
 };
 
@@ -129,6 +131,8 @@ export function createIsoMapEditorData(
     foregroundQuadrants: [],
     blockedQuadrants: [],
     opacityQuadrants: [],
+    confirmed: false,
+    confirmedAt: "",
     transitions: [],
   };
 }
@@ -192,6 +196,8 @@ export function normalizeIsoMapEditorData(
     foregroundQuadrants: cleanQuadrants(source.foregroundQuadrants),
     blockedQuadrants: cleanQuadrants(source.blockedQuadrants),
     opacityQuadrants: cleanQuadrants(source.opacityQuadrants),
+    confirmed: source.confirmed === true,
+    confirmedAt: source.confirmed === true ? String(source.confirmedAt || "").slice(0, 48) : "",
     transitions,
   };
 }
