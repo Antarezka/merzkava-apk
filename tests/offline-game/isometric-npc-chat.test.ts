@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import { renderIsometricMapTestArea } from "../../src/offline-game/world-map-hierarchy";
 import { readFileSync } from "node:fs";
 
+const worldMapSource = readFileSync(new URL("../../src/offline-game/world-map-hierarchy.ts", import.meta.url), "utf8");
+
 const chatStyles = readFileSync(new URL("../../src/offline-game/world-map-hierarchy.css", import.meta.url), "utf8");
 
 describe("isometric NPC conversations", () => {
@@ -33,7 +35,18 @@ describe("isometric NPC conversations", () => {
     expect(html).toContain('data-wmh-time');
     expect(html).toContain('data-wmh-overlay-toggle');
     expect(html).toContain('data-wmh-overlay-tools');
+    expect(html).toContain('class="wmh-overlay-drawer-lever"');
     expect(html).not.toContain('wmh-iso-controls');
+  });
+
+  it("places the Academy player at its named entrance and starts NPCs on the approved path", () => {
+    expect(worldMapSource).toContain('data-wmh-player-token data-token-label="" data-x="12" data-y="31"');
+    expect(worldMapSource).toContain('{id:"student-lin",x:7,y:4,gender:"female"}');
+    expect(worldMapSource).toContain('{id:"student-wei",x:10,y:9,gender:"male"}');
+    expect(worldMapSource).toContain('{id:"teacher-mei",x:6,y:15,gender:"female"}');
+    expect(worldMapSource).toContain('{id:"groundskeeper",x:22,y:10,gender:"male"}');
+    expect(worldMapSource).toContain('const occupiedNpcs=new Set');
+    expect(worldMapSource).toContain('!occupied.has(nx+","+ny)');
   });
 
   it("keeps the hidden state intact until a player taps an NPC", () => {

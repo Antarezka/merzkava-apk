@@ -1896,9 +1896,9 @@ function bindIsometricCamera(dialog:HTMLElement):void {
 function isometricEditorMarkup(): string {
   return '<div class="wmh-overlay-editor" data-wmh-editor-dock>'+
     '<button type="button" class="wmh-overlay-float" data-wmh-overlay-toggle aria-label="Open map tools drawer" aria-pressed="false" aria-expanded="false"><i class="wmh-tool-map">☷</i><span>MAP TOOLS</span></button>'+
-    '<div class="wmh-overlay-modal" data-wmh-overlay-tools hidden><button type="button" class="wmh-overlay-drawer-lever" data-wmh-overlay-close aria-label="Close map tools drawer">‹</button><section class="wmh-overlay-tools" role="dialog" aria-modal="false" aria-label="Map and isometric editor tools">'+
-    '<div class="wmh-overlay-resize-grip" data-wmh-panel-resize-handle role="separator" aria-orientation="diagonal" aria-label="Resize editor from its upper-left corner"><span></span></div>'+
-    '<header class="wmh-overlay-modal-head" data-wmh-overlay-drag-handle><div><b>WORLD ARCHIVE · FIELD TOOLS</b><small>MAP GLASS · CAMERA · CELL WORKBENCH</small></div><button type="button" data-wmh-overlay-close aria-label="Close map tools drawer">×</button></header><div class="wmh-drawer-map-controls" aria-label="Map camera controls"><span>CAMERA</span><button type="button" data-wmh-zoom="out" aria-label="Zoom out">−</button><output data-wmh-zoom-level>100%</output><button type="button" data-wmh-zoom="in" aria-label="Zoom in">+</button><button type="button" data-wmh-zoom="reset">FIT</button><button type="button" data-wmh-map-center>⌖ CENTER MAP</button></div>'+
+    '<div class="wmh-overlay-modal" data-wmh-overlay-tools hidden><section class="wmh-overlay-tools" role="dialog" aria-modal="false" aria-label="Map and isometric editor tools">'+
+    '<button type="button" class="wmh-overlay-drawer-lever" data-wmh-overlay-close aria-label="Close map tools drawer">‹</button>'+
+    '<header class="wmh-overlay-modal-head"><div><b>WORLD ARCHIVE · FIELD TOOLS</b><small>MAP GLASS · CAMERA · CELL WORKBENCH</small></div><button type="button" data-wmh-overlay-close aria-label="Close map tools drawer">×</button></header><div class="wmh-drawer-map-controls" aria-label="Map camera controls"><span>CAMERA</span><button type="button" data-wmh-zoom="out" aria-label="Zoom out">−</button><output data-wmh-zoom-level>100%</output><button type="button" data-wmh-zoom="in" aria-label="Zoom in">+</button><button type="button" data-wmh-zoom="reset">FIT</button><button type="button" data-wmh-map-center>⌖ CENTER MAP</button></div>'+
     '<label>EDITING MODE<select data-wmh-overlay-mode><option value="cell-add">＋ ADD CELL</option><option value="cell-delete">－ DELETE CELL</option><option value="cell-merge">⇧ SELECT CELLS TO MERGE</option><option value="cell-unmerge">↔ UNMERGE CELL GROUP</option><option value="foreground">○ Foreground sectors</option><option value="blocked">X Blocked sectors</option><option value="opacity">◌ Character opacity sectors</option><option value="transition">Area transition markers</option></select></label><div class="wmh-cell-layout-tools" data-wmh-cell-tools hidden><b>CELL LAYOUT</b><span data-wmh-cell-selection-count>0 CELLS SELECTED</span><button type="button" data-wmh-merge-apply>MERGE SELECTED CELLS</button><button type="button" data-wmh-merge-clear>CLEAR SELECTION</button><small>Tap adjacent cells to select them. Tap-drag only pans the map.</small></div><label class="wmh-walkable-switch"><input type="checkbox" data-wmh-walkable-enabled/> LIMIT MOVEMENT TO BLUE CELLS</label>'+
     '<p class="wmh-editor-mode-note">Paint only the image area that should be used. Each main diamond has 8 smaller sectors: two inside each of the four former quadrants. X blocks a sector edge, ○ redraws that image sector above characters, and ◌ makes characters translucent. The source image and canvas gaps are never resized by grid calibration.</p>'+
     '<div data-wmh-transition-tools hidden><label>DESTINATION LABEL<input type="text" maxlength="80" data-wmh-transition-label placeholder="e.g. Academy · Main Hall"/></label><button type="button" data-wmh-transition-apply>APPLY LABEL</button><button type="button" data-wmh-transition-delete>DELETE SELECTED</button><p>Red = unnamed. Blue = named. Tap a marker to select it.</p></div>'+
@@ -2153,11 +2153,14 @@ function startNpcWander(dialog:HTMLElement):void {
     board.querySelectorAll<HTMLElement>("[data-wmh-npc]").forEach(npc=>{
       if(Math.random()>.48)return;
       const x=Number(npc.dataset.x||0),y=Number(npc.dataset.y||0);
+      const occupied=new Set(Array.from(board.querySelectorAll<HTMLElement>("[data-wmh-player-token],[data-wmh-npc]"))
+        .filter(actor=>actor!==npc)
+        .map(actor=>String(actor.dataset.x||0)+","+String(actor.dataset.y||0)));
       const options=[[x+1,y],[x-1,y],[x,y+1],[x,y-1]].filter(([nx,ny])=>{
         const tile=board.querySelector<HTMLElement>('[data-wmh-tile][data-x="'+nx+'"][data-y="'+ny+'"]');
         return isoGridCellExists(mapData,nx,ny)&&
           !!tile&&isoCanStep(mapData,x,y,nx,ny)&&
-          !(Number(player?.dataset.x||5)===nx&&Number(player?.dataset.y||8)===ny);
+          !occupied.has(nx+","+ny);
       });
       if(!options.length)return;
       const [nx,ny]=options[Math.floor(Math.random()*options.length)];
@@ -2201,6 +2204,8 @@ function walkToTile(dialog:HTMLElement,targetX:number,targetY:number,surface:str
   // stored grid coordinates; no random destination or visual-position guess.
   const queue:Array<[number,number]>=[[startX,startY]];
   const previous=new Map<string,string|null>([[startX+","+startY,null]]);
+  const occupiedNpcs=new Set(Array.from(board.querySelectorAll<HTMLElement>("[data-wmh-npc]"))
+    .map(npc=>String(npc.dataset.x||0)+","+String(npc.dataset.y||0)));
   for(let cursor=0;cursor<queue.length;cursor++){
     const [x,y]=queue[cursor];
     if(x===targetX&&y===targetY)break;
@@ -2210,6 +2215,7 @@ function walkToTile(dialog:HTMLElement,targetX:number,targetY:number,surface:str
       if(!isoGridCellExists(mapData,nx,ny)||previous.has(key))continue;
       const nextTile=board.querySelector<HTMLElement>('[data-wmh-tile][data-x="'+nx+'"][data-y="'+ny+'"]');
       if(!nextTile||!isoCanStep(mapData,x,y,nx,ny))continue;
+      if(occupiedNpcs.has(key))continue;
       previous.set(key,x+","+y);queue.push([nx,ny]);
     }
   }
