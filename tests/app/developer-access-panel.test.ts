@@ -10,6 +10,8 @@ describe("Account controls in Settings",()=>{
       expect(html).toContain("data-dev-logout");
       expect(html).toContain("account-access-icon icon-floating");
       expect(html).toContain("account-access-icon icon-lock");
+      expect(html).toContain("data-atlas-developer-reset-submit");
+      expect(html).toContain("developer-atlas-reset-player");
     }
   });
 
@@ -17,6 +19,7 @@ describe("Account controls in Settings",()=>{
     for(const language of APP_LANGUAGES){
       const player=accountSettingsPanel(language.code,false,true);
       expect(player).toContain("data-player-logout");
+      expect(player).not.toContain("data-atlas-developer-reset-submit");
       expect(player).not.toContain("data-dev-logout");
       expect(accountSettingsPanel(language.code,false,false)).toBe("");
     }

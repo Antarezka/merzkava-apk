@@ -26,7 +26,7 @@ describe("screen and noticeboard transitions",()=>{
     animateAppScreenExit(shell,complete);
     expect(shell.style.pointerEvents).toBe("none");
     expect(mocks.animate).toHaveBeenCalledWith(shell,expect.objectContaining({
-      opacity:[1,0],translateY:[0,-5],duration:190
+      opacity:[1,0],translateY:[0,-7],scale:[1,0.994],duration:300
     }));
     mocks.animate.mock.calls[0][1].onComplete();
     expect(complete).toHaveBeenCalledOnce();

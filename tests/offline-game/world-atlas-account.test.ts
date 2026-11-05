@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
-  atlasPasswordPolicyError, clearAtlasPlayer, hasAtlasPassword, rememberAtlasPlayer, restoreAtlasPlayer,
-  setAtlasPassword, verifyAtlasMasterResetPassword, verifyAtlasPassword
+  atlasPasswordPolicyError, clearAtlasPlayer, getAtlasPasswordRevision, hasAtlasPassword, rememberAtlasPlayer, restoreAtlasPlayer,
+  setAtlasPassword, verifyAtlasPassword
 } from "../../src/offline-game/world-atlas-account";
 
 const values=new Map<string,string>();
@@ -47,9 +47,20 @@ describe("World Atlas local player accounts",()=>{
     expect(atlasPasswordPolicyError("Valid-Pass-123!")).toBeNull();
   });
 
-  it("verifies the master reset phrase without storing it as plaintext",async()=>{
-    expect(await verifyAtlasMasterResetPassword("not-the-master-reset")).toBe(false);
-    expect(await verifyAtlasMasterResetPassword("")).toBe(false);
+  it("binds salted verifiers to the shared reset revision",async()=>{
+    const password="Revision-Bound-Password-123!";
+    await setAtlasPassword("Nafila",password,"revision-one");
+    expect(await getAtlasPasswordRevision("Nafila")).toBe("revision-one");
+    expect(await hasAtlasPassword("Nafila","revision-one")).toBe(true);
+    expect(await hasAtlasPassword("Nafila","revision-two")).toBe(false);
+    expect(await verifyAtlasPassword("Nafila",password,"revision-one")).toBe(true);
+    expect(await verifyAtlasPassword("Nafila",password,"revision-two")).toBe(false);
+  });
+
+  it("keeps legacy local passwords valid at reset revision zero",async()=>{
+    await setAtlasPassword("Ilya","Legacy-Password-123!");
+    expect(await getAtlasPasswordRevision("Ilya")).toBe("0");
+    expect(await hasAtlasPassword("Ilya","0")).toBe(true);
   });
 
   it("clears only the remembered player session when signed out",async()=>{

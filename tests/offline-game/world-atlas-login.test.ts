@@ -16,6 +16,7 @@ describe("World Atlas player login gate",()=>{
       expect(html).toContain('data-login-label=');
       expect(html).toContain('data-signup-label=');
       expect(html).toContain('data-world-atlas-gate-back');
+      expect(html).toContain('minlength="8"');
       expect(html).toContain('data-offline-label=');
       const offlineLabelStart=html.indexOf('data-offline-label="')+'data-offline-label="'.length;
       const offlineLabelEnd=html.indexOf('"',offlineLabelStart);
@@ -33,6 +34,8 @@ describe("World Atlas player login gate",()=>{
       expect(html).toContain('data-atlas-buffer-log');
       expect(html).toContain('data-atlas-buffer-progress');
       expect(html).toContain('data-password-safety-note');
+      expect(html).toContain('data-password-recovery-note');
+      expect(html).toContain('data-password-reset-required-label=');
       const warningStart=html.indexOf('data-password-safety-note>')+'data-password-safety-note>'.length;
       const warningEnd=html.indexOf('</small>',warningStart);
       const warningText=html.slice(warningStart,warningEnd);
