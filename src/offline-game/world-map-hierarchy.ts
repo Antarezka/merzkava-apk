@@ -209,8 +209,10 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
     academyImageWidth = Math.max(rect.width, rect.height * ratio);
     academyImageHeight = Math.max(rect.height, rect.width / ratio);
     if(academyCanvas){
-      // Preserve the existing top, right and bottom canvas margins. Give only
-      // the left side a longer runway so the camera can travel much farther.
+      // Use the same image-scaled cell dimensions and four-side gap formula as
+      // every other isometric map camera.
+      const artworkScale=academyImageWidth/(image.naturalWidth||academyImageWidth);
+      const cellW=128*artworkScale,cellH=69.5*artworkScale;
       const margins=calculateIsoCanvasMargins({
         viewportWidth:Math.max(1,rect.width),viewportHeight:Math.max(1,rect.height),
         artworkWidth:image.naturalWidth||academyImageWidth,artworkHeight:image.naturalHeight||academyImageHeight,
