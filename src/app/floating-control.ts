@@ -8,8 +8,9 @@ function status(ready: boolean): string {
     : '<span class="floating-status not-ready"><i></i>NOT READY</span>';
 }
 
-export function floatingControlMarkup(state: FloatingReadiness, language: AppLanguage = "en"): string {
+export function floatingControlMarkup(state: FloatingReadiness, language: AppLanguage = "en", loginPanel = ""): string {
   return `<main class="floating-control">
+    ${loginPanel}
     <div class="floating-control-brand"><span class="floating-brand-mark">M</span><div><small>${APP_NAME.toUpperCase()} · APK ${APP_VERSION}</small><h1>Floating Control</h1></div></div>
     ${languagePanelMarkup(language)}
     <p class="floating-control-intro">Prepare the permissions and background service before entering your world. Complete each step in order.</p>
