@@ -1416,7 +1416,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     }
   };
   const applyCellTap=(event:PointerEvent,transitionId:string|null)=>{
-    const mapPoint=point(event),cell=isoCellAtPoint(mapPoint,grid,true);if(!cell)return;
+    const mapPoint=point(event);if(!mapPoint)return;const cell=isoCellAtPoint(mapPoint,grid,true);if(!cell)return;
     if(mode()!=="cell-add"&&!isoGridCellExists(data,cell.x,cell.y)){setStatus("No grid cell exists here yet. Switch to ADD CELL and tap this Map Base area first.");return;}
     if(mode()==="cell-add"){
       const key=isoCellKey(cell.x,cell.y),isBase=cell.x>=0&&cell.y>=0&&cell.x<grid.cols&&cell.y<grid.rows;
