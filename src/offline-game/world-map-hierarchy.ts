@@ -725,6 +725,7 @@ function drawIsometricForeground(board:HTMLElement,data=readIsoMapData(board)):v
       board.style.setProperty("--wmh-camera-pad-y",padY+"px");
       viewport.scrollLeft=padX+boardWidth*zoom/2-viewport.clientWidth/2;
       viewport.scrollTop=padY+boardHeight*zoom/2-viewport.clientHeight/2;
+      viewport.dispatchEvent(new Event("merzkava-isometric-artwork-resized"));
     }
   }
   const width=image.clientWidth||image.naturalWidth,height=image.clientHeight||image.naturalHeight;
@@ -1375,6 +1376,7 @@ function bindIsometricCamera(dialog:HTMLElement):void {
   viewport.addEventListener("pointermove",e=>{if(!pts.has(e.pointerId))return;pts.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pts.size===2&&pinch){const p=[...pts.values()];apply(pinch.zoom*dist(p[0],p[1])/pinch.distance,(p[0].x+p[1].x)/2,(p[0].y+p[1].y)/2);e.preventDefault();}});
   const finish=(e:PointerEvent)=>{pts.delete(e.pointerId);if(pts.size<2)pinch=null;};
   viewport.addEventListener("pointerup",finish);viewport.addEventListener("pointercancel",finish);
+  viewport.addEventListener("merzkava-isometric-artwork-resized",()=>{measure();centerMap();});
   const initialize=()=>{measure();centerMap();};
   requestAnimationFrame(()=>requestAnimationFrame(initialize));
   if(typeof ResizeObserver!=="undefined"){
