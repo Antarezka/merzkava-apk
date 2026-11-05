@@ -14,7 +14,10 @@ import {
   isoQuadrantKey,
   isoMapStorageKey,
   isoPointerGesture,
+  mergeIsoWalkableCells,
   normalizeIsoMapEditorData,
+  removeIsoWalkableCell,
+  unmergeIsoWalkableCell,
   normalizeIsoCanvasExpansion,
   toggleIsoCellLayer,
   toggleIsoQuadrantLayer,
@@ -68,6 +71,37 @@ describe("shared isometric map editor data", () => {
     expect(isoQuadrantKey(4, 6, "bl")).toBe("4,6:bl");
     expect(toggleIsoQuadrantLayer(data, "blockedQuadrants", 4, 6, "tl")).toBe(false);
     expect(isoQuadrantHasLayer(data, "foregroundQuadrants", 4, 6, "br")).toBe(true);
+  });
+
+  it("merges adjacent walkable cells into one flexible logical cell and can split it", () => {
+    const data = createIsoMapEditorData("merge-test");
+    data.walkableCells = ["2,2", "3,2", "3,3", "4,3"];
+    const group = mergeIsoWalkableCells(data, ["2,2", "3,2", "3,3"], "pathway-west");
+    expect(group).toEqual({ id: "pathway-west", cells: ["2,2", "3,2", "3,3"] });
+    expect(data.walkableCellGroups).toHaveLength(1);
+    expect(mergeIsoWalkableCells(data, ["2,2", "4,3"], "separate")).toBeNull();
+    expect(mergeIsoWalkableCells(data, ["3,2", "3,3"], "overlap")).toBeNull();
+
+    const split = unmergeIsoWalkableCell(data, 3, 2);
+    expect(split).toEqual(group);
+    expect(data.walkableCellGroups).toEqual([]);
+    expect(data.walkableCells).toEqual(["2,2", "3,2", "3,3", "4,3"]);
+  });
+
+  it("preserves connected merged cells and rejects invalid imported groups", () => {
+    const data = normalizeIsoMapEditorData({
+      grid: { cols: 8, rows: 6 },
+      walkableCells: ["1,1", "2,1", "2,2", "5,5"],
+      walkableCellGroups: [
+        { id: "valid", cells: ["1,1", "2,1", "2,2"] },
+        { id: "disconnected", cells: ["1,1", "5,5"] },
+        { id: "outside", cells: ["1,1", "8,1"] },
+      ],
+    }, "merge-import");
+    expect(data.walkableCellGroups).toEqual([{ id: "valid", cells: ["1,1", "2,1", "2,2"] }]);
+    expect(removeIsoWalkableCell(data, 2, 1)).toBe(true);
+    expect(data.walkableCells).toEqual(["1,1", "2,2", "5,5"]);
+    expect(data.walkableCellGroups).toEqual([]);
   });
 
   it("resolves the four sub-sectors inside one diamond", () => {
@@ -166,6 +200,7 @@ describe("shared isometric map editor data", () => {
     expect(data.blockedCells).toEqual([]);
     expect(data.opacityCells).toEqual([]);
     expect(data.walkableCells).toEqual([]);
+    expect(data.walkableCellGroups).toEqual([]);
     expect(data.walkableAreaEnabled).toBe(false);
     expect(data.foregroundQuadrants).toEqual([]);
     expect(data.blockedQuadrants).toEqual([]);
