@@ -1846,6 +1846,8 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     const identifier=String(data.get("identifier")??"");
     const password=String(data.get("password")??"");
     const remember=data.get("remember")==="yes";
+    // Initial app Developer access is intentionally local/offline-capable.
+    // Only the separate World Atlas form performs the live Universe connectivity check.
     developerLoginBusy=true;developerLoginMessage="";
     const button=form.querySelector<HTMLButtonElement>("[type=submit]");if(button)button.disabled=true;
     try{
