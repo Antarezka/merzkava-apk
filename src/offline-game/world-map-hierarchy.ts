@@ -692,6 +692,7 @@ function academyInteractionGridMarkup(grid:IsoMapGridConfig,data:IsoMapEditorDat
     const points=[c.x+","+(c.y-hh),(c.x+hw)+","+c.y,c.x+","+(c.y+hh),(c.x-hw)+","+c.y].join(" ");
     const selected=data.walkableCells.includes(isoCellKey(x,y));
     cells.push('<polygon class="wmh-academy-hit-cell'+(selected?' is-walkable':'')+'" data-wmh-tile data-x="'+x+'" data-y="'+y+'" data-z="0" data-tile-id="academy-'+x+'-'+y+'" data-surface="earth" points="'+points+'" aria-label="Grid tile '+x+', '+y+'"/>');
+    cells.push('<path class="wmh-quadrant-divider" d="M'+c.x+' '+(c.y-hh)+' L'+c.x+' '+(c.y+hh)+' M'+(c.x-hw)+' '+c.y+' L'+(c.x+hw)+' '+c.y+'"/>');
   }
   return cells.join("");
 }
@@ -1064,11 +1065,17 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       if(board.dataset.academyArtworkBoard==="true"){
         interactionGroup.innerHTML=academyInteractionGridMarkup(grid,data);
       }else{
-        interactionGroup.innerHTML=data.walkableCells.map(key=>{
+        const marks:string[]=[];
+        for(const key of data.walkableCells){
           const [x,y]=key.split(",").map(Number),c=isoCellCenter(x,y,grid),hw=grid.tileW/2,hh=grid.tileH/2;
           const points=[c.x+","+(c.y-hh),(c.x+hw)+","+c.y,c.x+","+(c.y+hh),(c.x-hw)+","+c.y].join(" ");
-          return '<polygon class="wmh-walkable-cell" points="'+points+'" aria-label="Walkable image cell '+x+', '+y+'"/>';
-        }).join("");
+          marks.push('<polygon class="wmh-walkable-cell" points="'+points+'" aria-label="Walkable image cell '+x+', '+y+'"/>');
+        }
+        for(let y=0;y<grid.rows;y++)for(let x=0;x<grid.cols;x++){
+          const c=isoCellCenter(x,y,grid),hw=grid.tileW/2,hh=grid.tileH/2;
+          marks.push('<path class="wmh-quadrant-divider" d="M'+c.x+' '+(c.y-hh)+' L'+c.x+' '+(c.y+hh)+' M'+(c.x-hw)+' '+c.y+' L'+(c.x+hw)+' '+c.y+'"/>');
+        }
+        interactionGroup.innerHTML=marks.join("");
       }
     }
     if(cellGroup){
