@@ -1734,6 +1734,7 @@
 .wmh-academy-canvas-editor>[data-wmh-academy-editor-panel]{max-height:58vh;overflow:auto;margin-top:6px;padding:12px;border:1px solid #b99761;background:#17231bf2;box-shadow:0 8px 24px #000b;overscroll-behavior:contain}
 .wmh-academy-canvas-editor>[data-wmh-academy-editor-panel]>b{display:block;color:#f0d39e;font:700 11px Georgia,serif;letter-spacing:.08em}
 .wmh-academy-canvas-editor>[data-wmh-academy-editor-panel]>small{display:block;margin:6px 0 10px;color:#c9b991;line-height:1.4}
+.wmh-canvas-default-gap{margin:10px 0;padding:9px;border:1px solid #8f9b83;background:#101a16;color:#e9dfc8}.wmh-canvas-default-gap>b{display:block;margin-bottom:7px;color:#e7c98e;font:700 9px Arial,sans-serif;letter-spacing:.06em}.wmh-canvas-default-gap>div{display:grid;grid-template-columns:1fr auto;gap:5px 12px;align-items:center;font:700 9px Arial,sans-serif}.wmh-canvas-default-gap output{color:#d9e4c8;font-variant-numeric:tabular-nums;text-align:right}.wmh-canvas-default-gap>small{display:block;margin-top:7px;color:#b9c3ad;font:8px Arial,sans-serif;line-height:1.4}
 .wmh-academy-canvas-editor label{display:grid;grid-template-columns:1fr auto;gap:3px 8px;align-items:center;margin:8px 0;color:#ead8b4;font:700 9px Arial,sans-serif}
 .wmh-academy-canvas-editor label output{color:#f0c77e;font-variant-numeric:tabular-nums}
 .wmh-academy-canvas-editor input[type=range]{grid-column:1/-1;width:100%;accent-color:#d6b578}
