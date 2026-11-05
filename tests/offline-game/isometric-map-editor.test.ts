@@ -94,6 +94,29 @@ describe("shared isometric map editor data", () => {
     expect(data.opacityQuadrants).toEqual(["0,0:tr"]);
   });
 
+  it("preserves explicit confirmation metadata for saved AI references", () => {
+    const confirmed = normalizeIsoMapEditorData({
+      grid: { cols: 8, rows: 6 },
+      confirmed: true,
+      confirmedAt: "2026-11-05T12:00:00.000Z",
+      walkableAreaEnabled: true,
+      walkableCells: ["1,2"],
+      blockedQuadrants: ["1,2:tl"],
+    }, "map-confirmed");
+    expect(confirmed.confirmed).toBe(true);
+    expect(confirmed.confirmedAt).toBe("2026-11-05T12:00:00.000Z");
+    expect(confirmed.walkableCells).toEqual(["1,2"]);
+    expect(confirmed.blockedQuadrants).toEqual(["1,2:tl"]);
+
+    const draft = normalizeIsoMapEditorData({
+      grid: { cols: 8, rows: 6 },
+      confirmed: false,
+      confirmedAt: "stale-confirmation",
+    }, "map-draft");
+    expect(draft.confirmed).toBe(false);
+    expect(draft.confirmedAt).toBe("");
+  });
+
   it("maps isometric diamond centers back to their exact cells with grid offsets", () => {
     const grid = { ...DEFAULT_ISOMETRIC_GRID, offsetX: 18, offsetY: -12, tileW: 72, tileH: 36 };
     const center = isoCellCenter(7, 9, grid);
@@ -139,6 +162,8 @@ describe("shared isometric map editor data", () => {
     expect(data.foregroundQuadrants).toEqual([]);
     expect(data.blockedQuadrants).toEqual([]);
     expect(data.opacityQuadrants).toEqual([]);
+    expect(data.confirmed).toBe(false);
+    expect(data.confirmedAt).toBe("");
     expect(data.transitions).toEqual([]);
   });
 
