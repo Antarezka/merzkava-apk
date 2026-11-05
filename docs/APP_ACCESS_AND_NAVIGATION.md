@@ -80,6 +80,7 @@ src/offline-game/world-atlas-account.ts provides:
 The local password rules:
 
 - 8–128 characters.
+- The first-password form displays a localized reminder to create a unique World Atlas password; do not reuse an email, Google/Apple, or other personal-service password.
 - Random 16-byte salt per player account.
 - PBKDF2-SHA-256 with 310,000 iterations.
 - Persisted record contains version, iteration count, salt and verifier hash; no plaintext password.
