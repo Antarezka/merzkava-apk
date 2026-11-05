@@ -684,7 +684,7 @@ async function refreshAtlasPasswordMode(gate:HTMLElement):Promise<void> {
   if(!eligible){
     confirmRow.hidden=true;
     button.disabled=true;
-    if(message)message.textContent=atlasEligiblePlayers().length?"Select a registered character to continue.":"";
+    if(message)message.textContent=atlasEligiblePlayers().length?(gate.dataset.selectLabel||"Select a registered character to continue."):(gate.dataset.emptyLabel||"");
     return;
   }
   try{
@@ -695,7 +695,7 @@ async function refreshAtlasPasswordMode(gate:HTMLElement):Promise<void> {
     button.dataset.atlasMode=exists?"login":"signup";
     button.textContent=exists?(button.dataset.loginLabel||"Sign in"):(button.dataset.signupLabel||"Sign up");
     button.disabled=false;
-    if(message)message.textContent=exists?"Enter the local password for this character.":"This registered character has no local password yet. Create one to continue.";
+    if(message)message.textContent=exists?(gate.dataset.loginPrompt||"Enter the local password for this character."):(gate.dataset.signupPrompt||"Create a local password to continue.");
   }catch(error){
     button.disabled=true;
     if(message)message.textContent=error instanceof Error?error.message:"Secure local account storage is unavailable.";
@@ -729,12 +729,13 @@ async function openWorldAtlasFromTv():Promise<void> {
   initializeWorldMapHierarchy(root);
   history.pushState({idleRpgNotice:true,worldAtlasFromTv:true},"");
   gate.hidden=false;
+  gate.removeAttribute("aria-hidden");
   lockAtlasBackground(gate,true);
   worldAtlasLoginBusy=false;
   const select=gate.querySelector<HTMLSelectElement>("[data-world-atlas-player]");
   const message=gate.querySelector<HTMLElement>("[data-world-atlas-message]");
   const submit=gate.querySelector<HTMLButtonElement>("[data-world-atlas-submit]");
-  if(message)message.textContent="Verifying the registered player list and local journey saves…";
+  if(message)message.textContent=gate.dataset.loadingLabel||"Verifying registered players and local saves…";
   if(select)select.innerHTML='<option value="">Loading registered players…</option>';
   if(submit)submit.disabled=true;
   try{
@@ -1655,7 +1656,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       }
       await rememberAtlasPlayer(playerName,remember);
       worldAtlasLoginBusy=false;
-      if(message)message.textContent="Access granted.";
+      if(message)message.textContent=gate.dataset.successLabel||"Access granted.";
       form.querySelector<HTMLInputElement>("#world-atlas-password")!.value="";
       const confirm=form.querySelector<HTMLInputElement>("#world-atlas-password-confirm");if(confirm)confirm.value="";
       unlockAtlasBackground(gate);

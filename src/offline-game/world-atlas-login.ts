@@ -10,12 +10,23 @@ const copy:Record<AppLanguage,{eyebrow:string;title:string;intro:string;player:s
   "zh-CN":{eyebrow:"WORLD ARCHIVE · 玩家访问",title:"进入 World Atlas",intro:"使用 World Archive 中已登记的角色，以及本机 Eternal Path 存档。",player:"已登记角色",password:"本地密码",confirm:"确认密码",remember:"在此设备上记住我",signIn:"登录",signUp:"注册新账号",back:"返回 Eternal Path",empty:"此设备上的 Eternal Path 本地存档中没有与 players.md 匹配的角色。",foot:"密码以带盐哈希形式保存在本地。"},
   ko:{eyebrow:"WORLD ARCHIVE · 플레이어 접속",title:"World Atlas 입장",intro:"World Archive에 등록된 캐릭터와 기기의 Eternal Path 로컬 저장 데이터를 사용하세요.",player:"등록된 캐릭터",password:"로컬 비밀번호",confirm:"비밀번호 확인",remember:"이 기기에서 기억하기",signIn:"로그인",signUp:"새 계정 등록",back:"Eternal Path로 돌아가기",empty:"이 기기의 Eternal Path 저장 데이터에서 players.md와 일치하는 캐릭터를 찾을 수 없습니다.",foot:"비밀번호는 솔트 해시로 로컬에 저장됩니다."}
 };
+const statusCopy:Record<AppLanguage,{checking:string;select:string;loginPrompt:string;signupPrompt:string;success:string}> = {
+  id:{checking:"Memeriksa daftar karakter dan save lokal…",select:"Pilih karakter terdaftar untuk melanjutkan.",loginPrompt:"Masukkan kata sandi lokal karakter ini.",signupPrompt:"Karakter ini belum memiliki kata sandi lokal. Buat kata sandi untuk melanjutkan.",success:"Akses diberikan."},
+  en:{checking:"Checking the registered players and local saves…",select:"Select a registered character to continue.",loginPrompt:"Enter this character's local password.",signupPrompt:"This registered character has no local password yet. Create one to continue.",success:"Access granted."},
+  pt:{checking:"Verificando personagens registrados e saves locais…",select:"Selecione um personagem registrado para continuar.",loginPrompt:"Digite a senha local deste personagem.",signupPrompt:"Este personagem ainda não tem senha local. Crie uma para continuar.",success:"Acesso concedido."},
+  fr:{checking:"Vérification des personnages inscrits et des sauvegardes locales…",select:"Sélectionnez un personnage inscrit pour continuer.",loginPrompt:"Saisissez le mot de passe local de ce personnage.",signupPrompt:"Ce personnage n'a pas encore de mot de passe local. Créez-en un pour continuer.",success:"Accès autorisé."},
+  ru:{checking:"Проверка зарегистрированных персонажей и локальных сохранений…",select:"Выберите зарегистрированного персонажа.",loginPrompt:"Введите локальный пароль этого персонажа.",signupPrompt:"У персонажа ещё нет локального пароля. Создайте его.",success:"Доступ разрешён."},
+  ja:{checking:"登録キャラクターとローカルセーブを確認しています…",select:"続行するには登録キャラクターを選択してください。",loginPrompt:"このキャラクターのローカルパスワードを入力してください。",signupPrompt:"このキャラクターにはローカルパスワードがありません。作成してください。",success:"アクセスが許可されました。"},
+  "zh-CN":{checking:"正在验证已登记角色和本地存档…",select:"请选择一个已登记角色。",loginPrompt:"请输入该角色的本地密码。",signupPrompt:"该角色尚未设置本地密码，请先创建。",success:"访问已授权。"},
+  ko:{checking:"등록 캐릭터와 로컬 저장 데이터를 확인하는 중…",select:"계속하려면 등록된 캐릭터를 선택하세요.",loginPrompt:"이 캐릭터의 로컬 비밀번호를 입력하세요.",signupPrompt:"이 캐릭터에는 로컬 비밀번호가 없습니다. 새로 만드세요.",success:"접근이 허용되었습니다."}
+};
 function esc(value:string):string {
   return value.replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]||char));
 }
 export function worldAtlasLoginPanelMarkup(language:AppLanguage):string {
   const t=copy[language]||copy.en;
-  return '<div class="world-atlas-login-layer" data-world-atlas-gate hidden data-empty-label="'+esc(t.empty)+'" data-select-label="'+esc(t.player)+'" data-loading-label="'+esc(t.intro)+'" data-login-prompt="Enter the local password for this character." data-signup-prompt="This registered character has no local password yet. Create one to continue." data-success-label="Access granted.">'+
+  const s=statusCopy[language]||statusCopy.en;
+  return '<div class="world-atlas-login-layer" data-world-atlas-gate hidden data-empty-label="'+esc(t.empty)+'" data-select-label="'+esc(s.select)+'" data-loading-label="'+esc(s.checking)+'" data-login-prompt="'+esc(s.loginPrompt)+'" data-signup-prompt="'+esc(s.signupPrompt)+'" data-success-label="'+esc(s.success)+'" data-login-prompt="Enter the local password for this character." data-signup-prompt="This registered character has no local password yet. Create one to continue." data-success-label="Access granted.">'+
     '<section class="world-atlas-login-card" role="dialog" aria-modal="true" aria-labelledby="world-atlas-login-title">'+
     '<button type="button" class="world-atlas-login-close" data-world-atlas-gate-back aria-label="'+esc(t.back)+'">×</button>'+
     '<small class="world-atlas-login-eyebrow">'+esc(t.eyebrow)+'</small><h2 id="world-atlas-login-title">'+esc(t.title)+'</h2><p class="world-atlas-login-intro">'+esc(t.intro)+'</p>'+
