@@ -860,6 +860,7 @@ function renderIsometricMinimap(board:HTMLElement):void {
     blocked:data.blockedCells,
     opacity:data.opacityCells,
     walkable:data.walkableCells,
+    customGridCells:data.customGridCells,
     walkableGroups:data.walkableCellGroups,
     walkableAreaEnabled:data.walkableAreaEnabled,
     customGridCells:data.customGridCells,
@@ -881,6 +882,10 @@ function renderIsometricMinimap(board:HTMLElement):void {
     const cells:string[]=[];
     for(let y=0;y<grid.rows;y++)for(let x=0;x<grid.cols;x++)cells.push(polygon(x,y,""));
     const overlays:string[]=[];
+    data.customGridCells.forEach(key=>{
+      const [x,y]=key.split(",").map(Number);
+      overlays.push(polygon(x,y,data.walkableCells.includes(key)?"is-walkable is-custom-grid-cell":"is-custom-grid-cell"));
+    });
     data.foregroundCells.forEach(key=>{const [x,y]=key.split(",").map(Number);overlays.push(polygon(x,y,"is-foreground"));});
     data.blockedCells.forEach(key=>{const [x,y]=key.split(",").map(Number);overlays.push(polygon(x,y,"is-blocked"));});
     data.opacityCells.forEach(key=>{const [x,y]=key.split(",").map(Number);overlays.push(polygon(x,y,"is-opacity"));});
@@ -1420,10 +1425,11 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     if(mode()==="cell-delete"){
       if(!isWalkable){setStatus("There is no added cell at ("+cell.x+","+cell.y+").");return;}
       if(data.walkableAreaEnabled&&data.walkableCells.length===1){setStatus("Disable AREA LIMIT before deleting the final walkable cell.");return;}
-      const previousCells=[...data.walkableCells],previousGroups=JSON.parse(JSON.stringify(data.walkableCellGroups)) as IsoMapEditorData["walkableCellGroups"];
+      const previousCells=[...data.walkableCells],previousCustom=[...data.customGridCells],previousGroups=JSON.parse(JSON.stringify(data.walkableCellGroups)) as IsoMapEditorData["walkableCellGroups"];
       remember();removeIsoWalkableCell(data,cell.x,cell.y);
+      data.customGridCells=data.customGridCells.filter(item=>item!==key);
       if(data.walkableAreaEnabled&&!relocateActorsFromBlockedCells(board,data)){
-        data.walkableCells=previousCells;data.walkableCellGroups=previousGroups;history.pop();redraw();setStatus("Cell deletion cancelled because it would leave a character without a valid destination.");return;
+        data.walkableCells=previousCells;data.customGridCells=previousCustom;data.walkableCellGroups=previousGroups;history.pop();redraw();setStatus("Cell deletion cancelled because it would leave a character without a valid destination.");return;
       }
       persist();setStatus("Deleted cell ("+cell.x+","+cell.y+"). Its merged group was updated automatically.");return;
     }
