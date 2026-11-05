@@ -12,6 +12,18 @@ import {
 } from "./isometric-map-editor";
 import { renderIsometricSvgSceneMarkup, refreshIsometricSvgScene, type IsometricSvgTheme } from "./isometric-svg-board";
 
+let worldMapDeveloperMode = false;
+export function setWorldMapDeveloperMode(enabled: boolean): void {
+  worldMapDeveloperMode = enabled;
+  if (enabled) return;
+  document.querySelectorAll<HTMLElement>("[data-wmh-editor-dock],[data-wmh-academy-editor]").forEach(node => node.remove());
+  document.querySelectorAll<HTMLElement>("[data-wmh-board].wmh-overlay-editing").forEach(board => {
+    board.classList.remove("wmh-overlay-editing","wmh-editor-paused");
+    board.dataset.editorPaused = "false";
+  });
+}
+export function isWorldMapDeveloperMode(): boolean { return worldMapDeveloperMode; }
+
 type Level = "world" | "regional" | "local" | "interior" | "home" | "map-editor" | "test";
 type RegionId = "golden-dragon-empire" | "tianhai-yunzhou" | "beiming-gu";
 const regionData: Record<RegionId, { name: string; subtitle: string; image: string; sites: string[] }> = {
@@ -367,6 +379,7 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
   else image.addEventListener("load", centerMap, { once: true });
 }
 function mapEditorMarkup(): string {
+  if (!worldMapDeveloperMode) return "";
   const markers = readWorldMarkers();
   return '<div class="wmh-map-editor"><div class="wmh-editor-intro"><b>WORLD MAP · COORDINATE EDITOR</b><span>DRAG MARKERS OR EDIT X / Y · NEW PLACEMENTS ARE PROVISIONAL · 0–100%</span></div>' +
     '<div class="wmh-map-zoom" data-wmh-zoom-controls><button type="button" data-wmh-zoom="out" aria-label="Zoom out">−</button><span data-wmh-zoom-level>100%</span><button type="button" data-wmh-zoom="in" aria-label="Zoom in">+</button><button type="button" data-wmh-zoom="reset">RESET</button></div>' +
@@ -377,6 +390,7 @@ function mapEditorMarkup(): string {
     '</tbody></table></div><section class="wmh-coordinate-transfer"><div class="wmh-transfer-heading"><b>COORDINATE REFERENCE</b><span>PORTABLE COPY · JSON</span></div><p>Copy this complete reference to preserve every power, territory, forest, sea, and landmark marker. Provisional positions are clearly tagged.</p><textarea readonly spellcheck="false" data-wmh-export aria-label="Exportable world map coordinate reference"></textarea><div class="wmh-editor-actions"><button type="button" data-wmh-action="editor-copy">COPY COORDINATES</button></div><label class="wmh-import-label" for="wmh-coordinate-import">PASTE A PREVIOUS COORDINATE REFERENCE</label><textarea id="wmh-coordinate-import" spellcheck="false" data-wmh-import placeholder="Paste the copied JSON reference here..."></textarea><button class="wmh-import-button" type="button" data-wmh-action="editor-import">IMPORT PASTED COORDINATES</button></section><div class="wmh-editor-actions"><button type="button" data-wmh-action="editor-reset">RESET DEFAULTS</button><button type="button" data-wmh-action="editor-close">← WORLD MAP</button></div><p class="wmh-editor-status" data-wmh-editor-status>New locations use provisional display positions. Move them to their correct map locations, then confirm to save.</p><div class="wmh-editor-confirm-bar"><span>POSITION PREVIEW</span><button type="button" data-wmh-action="editor-confirm">✓ &nbsp; CONFIRM &amp; LOCK POSITIONS</button></div></div>';
 }
 function bindWorldMapEditor(dialog: HTMLElement): void {
+  if (!worldMapDeveloperMode) return;
   const canvas = dialog.querySelector<HTMLElement>("[data-wmh-editor-canvas]");
   if (!canvas || canvas.dataset.bound === "true") return;
   canvas.dataset.bound = "true";
@@ -1154,6 +1168,7 @@ function relocateActorsFromBlockedCells(board:HTMLElement,data:IsoMapEditorData)
 }
 
 function bindIsoAreaEditor(dialog:HTMLElement):void {
+  if (!worldMapDeveloperMode) return;
   const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
   const svg=board?.querySelector<SVGSVGElement>("[data-wmh-overlay-svg]");
   const toggle=dialog.querySelector<HTMLButtonElement>("[data-wmh-overlay-toggle]");
@@ -1894,11 +1909,12 @@ function bindIsometricCamera(dialog:HTMLElement):void {
 }
 
 function isometricEditorMarkup(): string {
+  if (!worldMapDeveloperMode) return "";
   return '<div class="wmh-overlay-editor" data-wmh-editor-dock>'+
     '<button type="button" class="wmh-overlay-float" data-wmh-overlay-toggle aria-label="Open map tools drawer" aria-pressed="false" aria-expanded="false"><i class="wmh-tool-map">☷</i><span>MAP TOOLS</span></button>'+
     '<div class="wmh-overlay-modal" data-wmh-overlay-tools hidden><section class="wmh-overlay-tools" role="dialog" aria-modal="false" aria-label="Map and isometric editor tools">'+
     '<button type="button" class="wmh-overlay-drawer-lever" data-wmh-overlay-close aria-label="Close map tools drawer">‹</button>'+
-    '<header class="wmh-overlay-modal-head"><div><b>WORLD ARCHIVE · FIELD TOOLS</b><small>MAP GLASS · CAMERA · CELL WORKBENCH</small></div><button type="button" data-wmh-overlay-close aria-label="Close map tools drawer">×</button></header><div class="wmh-drawer-map-controls" aria-label="Map camera controls"><span>CAMERA</span><button type="button" data-wmh-zoom="out" aria-label="Zoom out">−</button><output data-wmh-zoom-level>100%</output><button type="button" data-wmh-zoom="in" aria-label="Zoom in">+</button><button type="button" data-wmh-zoom="reset">FIT</button><button type="button" data-wmh-map-center>⌖ CENTER MAP</button></div>'+
+    '<header class="wmh-overlay-modal-head" data-wmh-overlay-drag-handle><div><b>WORLD ARCHIVE · FIELD TOOLS</b><small>MAP GLASS · CAMERA · CELL WORKBENCH</small></div><div class="wmh-overlay-window-actions"><button type="button" data-wmh-overlay-minimize aria-label="Minimize editor panel" title="Minimize">—</button><button type="button" data-wmh-overlay-close aria-label="Close editor mode" title="Close editor mode">×</button></div></header><div class="wmh-drawer-map-controls" aria-label="Map camera controls"><span>CAMERA</span><button type="button" data-wmh-zoom="out" aria-label="Zoom out">−</button><output data-wmh-zoom-level>100%</output><button type="button" data-wmh-zoom="in" aria-label="Zoom in">+</button><button type="button" data-wmh-zoom="reset">FIT</button><button type="button" data-wmh-map-center>⌖ CENTER MAP</button></div>'+
     '<label>EDITING MODE<select data-wmh-overlay-mode><option value="cell-add">＋ ADD CELL</option><option value="cell-delete">－ DELETE CELL</option><option value="cell-merge">⇧ SELECT CELLS TO MERGE</option><option value="cell-unmerge">↔ UNMERGE CELL GROUP</option><option value="foreground">○ Foreground sectors</option><option value="blocked">X Blocked sectors</option><option value="opacity">◌ Character opacity sectors</option><option value="transition">Area transition markers</option></select></label><div class="wmh-cell-layout-tools" data-wmh-cell-tools hidden><b>CELL LAYOUT</b><span data-wmh-cell-selection-count>0 CELLS SELECTED</span><button type="button" data-wmh-merge-apply>MERGE SELECTED CELLS</button><button type="button" data-wmh-merge-clear>CLEAR SELECTION</button><small>Tap adjacent cells to select them. Tap-drag only pans the map.</small></div><label class="wmh-walkable-switch"><input type="checkbox" data-wmh-walkable-enabled/> LIMIT MOVEMENT TO BLUE CELLS</label>'+
     '<p class="wmh-editor-mode-note">Paint only the image area that should be used. Each main diamond has 8 smaller sectors: two inside each of the four former quadrants. X blocks a sector edge, ○ redraws that image sector above characters, and ◌ makes characters translucent. The source image and canvas gaps are never resized by grid calibration.</p>'+
     '<div data-wmh-transition-tools hidden><label>DESTINATION LABEL<input type="text" maxlength="80" data-wmh-transition-label placeholder="e.g. Academy · Main Hall"/></label><button type="button" data-wmh-transition-apply>APPLY LABEL</button><button type="button" data-wmh-transition-delete>DELETE SELECTED</button><p>Red = unnamed. Blue = named. Tap a marker to select it.</p></div>'+
@@ -1931,6 +1947,7 @@ function isometricHudMarkup(title: string, mapImage: string, showMinimap = true)
     (showMinimap?minimapMarkup:"")+'</div>';
 }
 function academyCanvasEditorMarkup(): string {
+  if (!worldMapDeveloperMode) return "";
   const sides=["top","bottom","left","right"] as const;
   return '<div class="wmh-academy-canvas-editor" data-wmh-academy-editor>'+
     '<button type="button" data-wmh-academy-editor-toggle aria-expanded="false">▦ CANVAS EDITOR</button>'+
@@ -1941,6 +1958,7 @@ function academyCanvasEditorMarkup(): string {
     '<textarea data-wmh-canvas-export readonly aria-label="Copyable Academy canvas configuration" placeholder="Confirmed canvas configuration appears here..."></textarea><small data-wmh-canvas-status>Unconfirmed changes are preview-only.</small></section></div>';
 }
 function bindAcademyCanvasEditor(dialog:HTMLElement):void {
+  if (!worldMapDeveloperMode) return;
   const editor=dialog.querySelector<HTMLElement>("[data-wmh-academy-editor]");
   const panel=editor?.querySelector<HTMLElement>("[data-wmh-academy-editor-panel]");
   const toggle=editor?.querySelector<HTMLButtonElement>("[data-wmh-academy-editor-toggle]");
@@ -2033,8 +2051,8 @@ function panelMarkup(level: Level, regionId: RegionId = "golden-dragon-empire", 
   if (level === "world") return header("WORLD MAP","Merzkava Universe","THREE GREAT POWERS · EXTERNAL TERRITORIES · SEAS")+
     '<div class="wmh-map-zoom"><button type="button" data-wmh-zoom="out">−</button><span data-wmh-zoom-level>100%</span><button type="button" data-wmh-zoom="in">+</button><button type="button" data-wmh-zoom="reset">RESET</button></div>'+
     '<div class="wmh-world-map" data-wmh-map-viewport><div class="wmh-world-map-image" data-wmh-map-surface><img src="/world/Untitled77_20261029054536.png" alt="Merzkava Universe world map"/>'+readWorldMarkers().map(marker=>worldMapMarkerMarkup(marker)).join("")+'</div><div data-wmh-selection-host></div></div>'+
-    '<div class="wmh-bottom-actions"><span>SELECT A POWER TO OPEN ITS REGIONAL MAP</span><button type="button" data-wmh-action="test-isometric">▦ ISOMETRIC TEST AREA</button><button data-wmh-action="editor-open">⊞ MAP EDITOR</button></div>';
-  if (level === "map-editor") return header("WORLD MAP TOOLS","Map Editor","FLAT WORLD MAP · NORMALIZED COORDINATES")+mapEditorMarkup();
+    '<div class="wmh-bottom-actions"><span>SELECT A POWER TO OPEN ITS REGIONAL MAP</span>'+(worldMapDeveloperMode?'<button type="button" data-wmh-action="test-isometric">▦ ISOMETRIC TEST AREA</button><button data-wmh-action="editor-open">⊞ MAP EDITOR</button>':"")+'</div>';
+  if (level === "map-editor") return worldMapDeveloperMode ? header("WORLD MAP TOOLS","Map Editor","FLAT WORLD MAP · NORMALIZED COORDINATES")+mapEditorMarkup() : header("WORLD MAP","Merzkava Universe","THREE GREAT POWERS · EXTERNAL TERRITORIES · SEAS")+'<div class="wmh-bottom-actions"><span>SELECT A POWER TO OPEN ITS REGIONAL MAP</span></div>';
   if (level === "test") return renderIsometricMapTestArea();
   if (level === "regional") return header("REGIONAL MAP",selectedArea?.name||region.name,selectedArea?.subtitle||region.subtitle)+
     '<div class="wmh-regional-placeholder"><div class="wmh-regional-land"><span class="wmh-regional-river"></span><span class="wmh-regional-road road-one"></span><span class="wmh-regional-road road-two"></span><span class="wmh-regional-road road-three"></span><span class="wmh-regional-label">'+(selectedArea?selectedArea.name.toUpperCase():"REGIONAL MAP ART · PLACEHOLDER")+'</span>'+
@@ -2274,6 +2292,7 @@ function captureArrivalState():{day:number;minutes:number;cycle:string;weather:s
   return {day:save.day,minutes:save.hour*60+save.minute,cycle:atmosphere.cycle,weather:atmosphere.weather};
 }
 export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement, onAdvanceTime: (minutes: number) => void): boolean {
+  if (!worldMapDeveloperMode && target.closest("[data-wmh-overlay-toggle],[data-wmh-overlay-tools],[data-wmh-overlay-minimize],[data-wmh-overlay-close],[data-wmh-academy-editor],[data-wmh-drag-marker],[data-wmh-coordinate],[data-wmh-editor-canvas]")) return true;
   const action=target.closest<HTMLElement>("[data-wmh-action],[data-wmh-info],[data-wmh-site],[data-wmh-building],[data-wmh-npc],[data-wmh-plot],[data-wmh-tile],[data-wmh-reply],[data-wmh-transition],[data-wmh-transition-close],[data-wmh-dismiss-layer],[data-wmh-selection-card]");
   if(!action)return false;
   const overlay=root.querySelector<HTMLElement>("[data-world-map-hierarchy]");
@@ -2283,11 +2302,12 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
   const regionId=(overlay.dataset.region as RegionId)||"golden-dragon-empire";
   const building=overlay.dataset.building||"Tianhai Academy";
   if(action.dataset.wmhAction==="open"){overlay.hidden=false;overlay.dataset.level="world";dialog.innerHTML=panelMarkup("world");bindWorldMapZoom(dialog);return true;}
-  if(action.dataset.wmhAction==="editor-open"){overlay.dataset.level="map-editor";dialog.innerHTML=panelMarkup("map-editor");bindWorldMapEditor(dialog);return true;}
+  if(action.dataset.wmhAction==="editor-open"){if(!worldMapDeveloperMode)return true;overlay.dataset.level="map-editor";dialog.innerHTML=panelMarkup("map-editor");bindWorldMapEditor(dialog);return true;}
   if(action.dataset.wmhAction==="editor-close"){overlay.dataset.level="world";dialog.innerHTML=panelMarkup("world");bindWorldMapZoom(dialog);return true;}
   if(action.dataset.wmhAction==="editor-confirm"||action.dataset.wmhAction==="editor-reset")return true;
   if(action.dataset.wmhAction==="close"){const outerClose=root.querySelector<HTMLButtonElement>("[data-idle-rpg-close]");if(outerClose)outerClose.click();else overlay.hidden=true;return true;}
   if(action.dataset.wmhAction==="test-isometric"){
+    if(!worldMapDeveloperMode)return true;
     stopNpcWander(dialog);
     overlay.dataset.level="test";
     dialog.innerHTML=panelMarkup("test",regionId,"Isometric Render Test");
