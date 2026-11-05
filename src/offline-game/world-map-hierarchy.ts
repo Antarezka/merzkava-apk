@@ -6,7 +6,7 @@ import { getEternalSave, getExpeditionAtmosphere } from "./expedition-game";
 import {
   createIsoMapEditorData, DEFAULT_ISOMETRIC_GRID, DEFAULT_ISO_CANVAS_EXPANSION, normalizeIsoCanvasExpansion, isoCellAtPoint, isoCellCenter, isoCellHasLayer,
   isoCellKey, isoMapStorageKey, isoPointerGesture, isoQuadrantAtPoint, isoQuadrantHasLayer, mergeIsoWalkableCells, normalizeIsoMapEditorData, removeIsoWalkableCell, toggleIsoQuadrantLayer, unmergeIsoWalkableCell,
-  type IsoMapEditorData, type IsoMapGridConfig, type IsoQuadrant, type IsoQuadrantLayer,
+  type IsoMapEditorData, type IsoMapGridConfig, type IsoMapPoint, type IsoQuadrant, type IsoQuadrantLayer,
 } from "./isometric-map-editor";
 import { renderIsometricSvgSceneMarkup, refreshIsometricSvgScene, type IsometricSvgTheme } from "./isometric-svg-board";
 
