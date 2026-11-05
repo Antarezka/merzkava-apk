@@ -141,6 +141,15 @@ function serializeWorldMapCoordinates(markers: WorldMarker[]): string {
     markers: markers.map(({ id, name, x, y, category, placementStatus }) => ({ id, name, category, x, y, placementStatus }))
   }, null, 2);
 }
+function academyIsometricGridLinesMarkup(grid:IsoMapGridConfig={cols:24,rows:20,tileW:128,tileH:69.5,offsetX:0,offsetY:0,playerScale:1,npcScale:1}):string {
+  const marks:string[]=[];
+  for(let y=0;y<grid.rows;y++)for(let x=0;x<grid.cols;x++){
+    const center=isoCellCenter(x,y,grid),halfW=grid.tileW/2,halfH=grid.tileH/2;
+    const points=[center.x+","+(center.y-halfH),(center.x+halfW)+","+center.y,center.x+","+(center.y+halfH),(center.x-halfW)+","+center.y].join(" ");
+    marks.push('<polygon points="'+points+'" fill="none" stroke="#e2d3b4" stroke-opacity=".22" stroke-width="1"/>');
+  }
+  return marks.join("");
+}
 function academyMarginGridMarkup(
   width:number,height:number,imageLeft:number,imageTop:number,imageWidth:number,imageHeight:number,cellW:number,cellH:number,
 ):string {
@@ -176,15 +185,17 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
   let baseWidth = 0;
   let baseHeight = 0;
   const academyCanvas=surface.hasAttribute("data-wmh-academy-canvas");
-  if(academyCanvas)bindAcademyCanvasEditor(dialog);
+  if(academyCanvas){bindIsoAreaEditor(dialog);bindIsometricCanvasEditor(dialog);}
   const academyGrid=academyCanvas?surface.querySelector<SVGSVGElement>("[data-wmh-academy-margin-grid]"):null;
+  const academyBoard=academyCanvas?surface.querySelector<HTMLElement>("[data-wmh-board]"):null;
   // Academy pan and pinch are handled by this pointer controller. Do not let
   // Android WebView begin a competing native scroll gesture on the viewport.
   if(academyCanvas)viewport.style.setProperty("touch-action","none","important");
   let academyImageWidth=0,academyImageHeight=0,academyMarginLeft=0,academyMarginRight=0,academyMarginTop=0,academyMarginBottom=0;
-  const academyExpansionKey="merzkava.academy-canvas-expansion.v1";
+  const academyMapId="golden-dragon-empire:tianhai-academy:exterior";
+  const academyExpansionKey="merzkava.isometric-canvas-expansion.v1:"+encodeURIComponent(academyMapId);
   let academyExpansion={...DEFAULT_ISO_CANVAS_EXPANSION};
-  if(academyCanvas){try{academyExpansion=normalizeIsoCanvasExpansion(JSON.parse(localStorage.getItem(academyExpansionKey)||"{}"));}catch{}}
+  if(academyCanvas){try{academyExpansion=normalizeIsoCanvasExpansion(JSON.parse(localStorage.getItem(academyExpansionKey)||localStorage.getItem("merzkava.academy-canvas-expansion.v1")||"{}"));}catch{}}
   const pointers = new Map<number, { x: number; y: number }>();
   let panStart: { x: number; y: number; scrollLeft: number; scrollTop: number } | null = null;
   let pinchStart: { distance: number; zoom: number } | null = null;
@@ -194,10 +205,15 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
     surface.style.width=(baseWidth*scale)+"px";
     surface.style.height=(baseHeight*scale)+"px";
     if(academyCanvas){
-      image.style.setProperty("left",(academyMarginLeft*scale)+"px","important");
-      image.style.setProperty("top",(academyMarginTop*scale)+"px","important");
-      image.style.setProperty("width",(academyImageWidth*scale)+"px","important");
-      image.style.setProperty("height",(academyImageHeight*scale)+"px","important");
+      const naturalWidth=image.naturalWidth||academyImageWidth,naturalHeight=image.naturalHeight||academyImageHeight;
+      const artworkScale=academyImageWidth/Math.max(1,naturalWidth);
+      if(academyBoard){
+        academyBoard.style.left=(academyMarginLeft*scale)+"px";academyBoard.style.top=(academyMarginTop*scale)+"px";
+        academyBoard.style.width=naturalWidth+"px";academyBoard.style.height=naturalHeight+"px";
+        academyBoard.style.transformOrigin="top left";academyBoard.style.transform="scale("+(artworkScale*scale)+")";
+      }
+      image.style.setProperty("left","0px","important");image.style.setProperty("top","0px","important");
+      image.style.setProperty("width",naturalWidth+"px","important");image.style.setProperty("height",naturalHeight+"px","important");
     }else{
       image.style.width="100%";
       image.style.height="100%";
@@ -233,6 +249,7 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
       baseHeight=academyImageHeight;
     }
     applySurfaceSize(1);
+    if(academyCanvas&&academyBoard&&image.complete&&image.naturalWidth)drawIsometricForeground(academyBoard);
   };
   const applyZoom = (next: number, focusX?: number, focusY?: number) => {
     if (!baseWidth || !baseHeight) sizeBaseMap();
@@ -249,7 +266,7 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
     if (level) level.textContent = Math.round(zoom * 100) + "%";
   };
   if(academyCanvas){
-    viewport.addEventListener("merzkava-academy-canvas-expansion-preview",((event:Event)=>{
+    viewport.addEventListener("merzkava-isometric-canvas-expansion-preview",((event:Event)=>{
       academyExpansion=normalizeIsoCanvasExpansion((event as CustomEvent<unknown>).detail);
       const left=viewport.scrollLeft,top=viewport.scrollTop;
       sizeBaseMap();applySurfaceSize(zoom);
@@ -1016,6 +1033,10 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
   }catch{}
   const remember=()=>{history.push(JSON.parse(JSON.stringify(data)) as IsoMapEditorData);if(history.length>40)history.shift();};
   const redraw=()=>{
+    if(board.classList.contains("wmh-academy-isometric-board")){
+      const gridLines=svg.querySelector<SVGGElement>("[data-wmh-overlay-marks]");
+      if(gridLines)gridLines.innerHTML=academyIsometricGridLinesMarkup(grid);
+    }
     if(cellGroup){
       const marks:string[]=[];
       const add=(cells:string[],cls:string,symbol:string)=>{
@@ -1301,7 +1322,8 @@ function bindIsometricCamera(dialog:HTMLElement):void {
   syncIsoDepthAndOcclusion(board);
   let zoom=1,baseW=0,baseH=0,initialFitApplied=false;
   let margins={...DEFAULT_ISO_CANVAS_EXPANSION};
-  const expansionKey="merzkava.academy-canvas-expansion.v1";
+  const mapId=board.dataset.mapId||"unnamed-isometric-map";
+  const expansionKey="merzkava.isometric-canvas-expansion.v1:"+encodeURIComponent(mapId);
   let expansion={...DEFAULT_ISO_CANVAS_EXPANSION};
   try{expansion=normalizeIsoCanvasExpansion(JSON.parse(localStorage.getItem(expansionKey)||"{}"));}catch{}
   const mapArt=board.querySelector<HTMLImageElement>("[data-wmh-map-art]");
@@ -1380,6 +1402,11 @@ function bindIsometricCamera(dialog:HTMLElement):void {
   const finish=(e:PointerEvent)=>{pts.delete(e.pointerId);if(pts.size<2)pinch=null;};
   viewport.addEventListener("pointerup",finish);viewport.addEventListener("pointercancel",finish);
   viewport.addEventListener("merzkava-isometric-artwork-resized",()=>{measure();centerMap();});
+  viewport.addEventListener("merzkava-isometric-canvas-expansion-preview",((event:Event)=>{
+    expansion=normalizeIsoCanvasExpansion((event as CustomEvent<unknown>).detail);
+    const left=viewport.scrollLeft,top=viewport.scrollTop;
+    measure();layoutCamera();viewport.scrollLeft=left;viewport.scrollTop=top;
+  }) as EventListener);
   const initialize=()=>{measure();centerMap();};
   requestAnimationFrame(()=>requestAnimationFrame(initialize));
   if(typeof ResizeObserver!=="undefined"){
@@ -1426,42 +1453,46 @@ function isometricHudMarkup(title: string, mapImage: string, showMinimap = true)
     '<small class="wmh-status-location">'+escapeMapEditorText(title)+'</small><small class="wmh-status-coordinates" data-wmh-player-grid>GRID X 05 · Y 17</small></section>'+
     (showMinimap?minimapMarkup:"")+'</div>';
 }
-function academyCanvasEditorMarkup(): string {
+function isometricCanvasEditorMarkup(): string {
   const sides=["top","bottom","left","right"] as const;
-  return '<div class="wmh-academy-canvas-editor" data-wmh-academy-editor>'+
-    '<button type="button" data-wmh-academy-editor-toggle aria-expanded="false">▦ CANVAS EDITOR</button>'+
-    '<section data-wmh-academy-editor-panel hidden><b>ACADEMY CANVAS EXPANSION</b><small>Adjust each side independently. Preview updates live; confirm to save.</small>'+
+  return '<div class="wmh-isometric-canvas-editor" data-wmh-canvas-editor>'+
+    '<button type="button" data-wmh-canvas-editor-toggle aria-expanded="false">▦ CANVAS EDITOR</button>'+
+    '<section data-wmh-canvas-editor-panel hidden><b>ISOMETRIC CANVAS EXPANSION</b><small>Adjust each side independently. Preview updates live; confirm to save.</small>'+
     sides.map(side=>'<label>'+side.toUpperCase()+' <output data-wmh-canvas-value="'+side+'">0 px</output><input type="range" min="0" max="12000" step="100" value="0" data-wmh-canvas-side="'+side+'"/></label>').join("")+
     '<div class="wmh-academy-canvas-actions"><button type="button" data-wmh-canvas-refresh>↻ REFRESH PREVIEW</button><button type="button" data-wmh-canvas-confirm>✓ CONFIRM & SAVE</button><button type="button" data-wmh-canvas-copy>COPY CONFIG</button></div>'+
-    '<textarea data-wmh-canvas-export readonly aria-label="Copyable Academy canvas configuration" placeholder="Confirmed canvas configuration appears here..."></textarea><small data-wmh-canvas-status>Unconfirmed changes are preview-only.</small></section></div>';
+    '<textarea data-wmh-canvas-export readonly aria-label="Copyable isometric canvas configuration" placeholder="Confirmed canvas configuration appears here..."></textarea><small data-wmh-canvas-status>Unconfirmed changes are preview-only.</small></section></div>';
 }
-function bindAcademyCanvasEditor(dialog:HTMLElement):void {
-  const editor=dialog.querySelector<HTMLElement>("[data-wmh-academy-editor]");
-  const panel=editor?.querySelector<HTMLElement>("[data-wmh-academy-editor-panel]");
-  const toggle=editor?.querySelector<HTMLButtonElement>("[data-wmh-academy-editor-toggle]");
+function bindIsometricCanvasEditor(dialog:HTMLElement):void {
+  const editor=dialog.querySelector<HTMLElement>("[data-wmh-canvas-editor]");
+  const panel=editor?.querySelector<HTMLElement>("[data-wmh-canvas-editor-panel]");
+  const toggle=editor?.querySelector<HTMLButtonElement>("[data-wmh-canvas-editor-toggle]");
   if(!editor||!panel||!toggle||editor.dataset.bound==="true")return;
   editor.dataset.bound="true";
-  const key="merzkava.academy-canvas-expansion.v1";
+  const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
+  const academyCanvas=!!dialog.querySelector<HTMLElement>("[data-wmh-academy-canvas]");
+  const mapId=board?.dataset.mapId||(academyCanvas?"golden-dragon-empire:tianhai-academy:exterior":"unnamed-isometric-map");
+  const key="merzkava.isometric-canvas-expansion.v1:"+encodeURIComponent(mapId);
+  const legacyKey="merzkava.academy-canvas-expansion.v1";
   const controls=[...panel.querySelectorAll<HTMLInputElement>("[data-wmh-canvas-side]")];
-  const mapViewport=dialog.querySelector<HTMLElement>("[data-wmh-map-viewport]");
+  const mapViewport=dialog.querySelector<HTMLElement>(academyCanvas?".wmh-academy-map-viewport":"[data-wmh-iso-viewport]");
   const status=panel.querySelector<HTMLElement>("[data-wmh-canvas-status]");
   const output=panel.querySelector<HTMLTextAreaElement>("[data-wmh-canvas-export]");
   const read=()=>normalizeIsoCanvasExpansion(Object.fromEntries(controls.map(input=>[input.dataset.wmhCanvasSide||"",Number(input.value)])));
   const showValues=()=>controls.forEach(input=>{const side=input.dataset.wmhCanvasSide||"",value=panel.querySelector<HTMLOutputElement>('[data-wmh-canvas-value="'+side+'"]');if(value)value.value=Number(input.value).toLocaleString()+" px";});
-  const preview=()=>{showValues();mapViewport?.dispatchEvent(new CustomEvent("merzkava-academy-canvas-expansion-preview",{detail:read()}));if(status)status.textContent="Live preview updated. Confirm to save these values.";};
+  const preview=()=>{showValues();mapViewport?.dispatchEvent(new CustomEvent("merzkava-isometric-canvas-expansion-preview",{detail:read()}));if(status)status.textContent="Live preview updated. Confirm to save these values.";};
   try{
-    const saved=normalizeIsoCanvasExpansion(JSON.parse(localStorage.getItem(key)||"{}"));
+    const saved=normalizeIsoCanvasExpansion(JSON.parse(localStorage.getItem(key)||(academyCanvas?localStorage.getItem(legacyKey):null)||"{}"));
     controls.forEach(input=>{input.value=String(saved[(input.dataset.wmhCanvasSide||"left") as keyof typeof saved]);});showValues();
   }catch{}
   toggle.addEventListener("click",()=>{panel.hidden=!panel.hidden;toggle.setAttribute("aria-expanded",String(!panel.hidden));});
   controls.forEach(input=>input.addEventListener("input",preview));
   panel.querySelector<HTMLElement>("[data-wmh-canvas-refresh]")?.addEventListener("click",preview);
   panel.querySelector<HTMLElement>("[data-wmh-canvas-confirm]")?.addEventListener("click",()=>{
-    const value=read();try{localStorage.setItem(key,JSON.stringify(value));if(status)status.textContent="Canvas expansion confirmed and saved on this device.";if(output)output.value=JSON.stringify({format:"merzkava-academy-canvas-expansion",version:1,mapId:"golden-dragon-empire:tianhai-academy:exterior",canvasExpansion:value},null,2);}
+    const value=read();try{localStorage.setItem(key,JSON.stringify(value));if(status)status.textContent="Canvas expansion confirmed and saved for "+mapId+".";if(output)output.value=JSON.stringify({format:"merzkava-isometric-canvas-expansion",version:1,mapId,canvasExpansion:value},null,2);}
     catch{if(status)status.textContent="Could not save. Use COPY CONFIG to keep the current settings.";}
   });
   panel.querySelector<HTMLElement>("[data-wmh-canvas-copy]")?.addEventListener("click",async()=>{
-    const value=JSON.stringify({format:"merzkava-academy-canvas-expansion",version:1,mapId:"golden-dragon-empire:tianhai-academy:exterior",canvasExpansion:read()},null,2);
+    const value=JSON.stringify({format:"merzkava-isometric-canvas-expansion",version:1,mapId,canvasExpansion:read()},null,2);
     if(output)output.value=value;
     try{await navigator.clipboard.writeText(value);if(status)status.textContent="Configuration copied. Send that JSON here.";}
     catch{output?.focus();output?.select();if(status)status.textContent="Clipboard unavailable. Select and copy the JSON shown above.";}
@@ -1478,8 +1509,11 @@ function isometricPlayMarkup(regionId: RegionId, selectedBuilding: string, inter
       '<div class="wmh-map-zoom wmh-academy-map-zoom" aria-label="Academy map zoom controls"><button type="button" data-wmh-zoom="out" aria-label="Zoom out">−</button><span data-wmh-zoom-level>100%</span><button type="button" data-wmh-zoom="in" aria-label="Zoom in">+</button><button type="button" data-wmh-zoom="reset">RESET</button></div>'+
       '<div class="wmh-academy-map-viewport" data-wmh-map-viewport><div class="wmh-academy-map-surface" data-wmh-map-surface data-wmh-academy-canvas>'+
       '<svg class="wmh-academy-margin-grid" data-wmh-academy-margin-grid preserveAspectRatio="none" aria-hidden="true"></svg>'+
-      '<img src="'+academyMapImage+'" alt="Tianhai Academy full map" draggable="false" loading="eager" decoding="async"/>'+
-      '</div></div>'+academyCanvasEditorMarkup()+
+      '<div class="wmh-isometric-board wmh-academy-isometric-board has-map-base" data-wmh-board data-map-id="golden-dragon-empire:tianhai-academy:exterior" data-map-theme="golden-dragon-empire" data-map-title="Tianhai Academy" data-map-interior="false" data-cols="24" data-rows="20" data-tile-w="128" data-tile-h="69.5" data-offset-x="0" data-offset-y="0" style="--tile-cols:24;--tile-rows:20;--tile-w:128px;--tile-h:69.5px;--iso-half-w:64px;--iso-half-h:34.75px;width:2816px;height:1536px">'+
+      '<img class="wmh-academy-map-art" data-wmh-map-art src="'+academyMapImage+'" alt="Tianhai Academy full map" draggable="false" loading="eager" decoding="async"/><canvas class="wmh-isometric-foreground" data-wmh-foreground-canvas aria-hidden="true"></canvas>'+
+      '<svg class="wmh-area-overlay-svg" data-wmh-overlay-svg viewBox="0 0 2816 1536" preserveAspectRatio="none"><g data-wmh-overlay-marks>'+academyIsometricGridLinesMarkup()+'</g><g data-wmh-manual-marks></g><g data-wmh-transition-marks></g><path data-wmh-overlay-preview class="wmh-area-mark-preview" d=""></path></svg><svg data-wmh-scene-svg style="display:none" aria-hidden="true"></svg>'+
+      '</div>'+
+      '</div></div></div>'+isometricEditorMarkup()+isometricCanvasEditorMarkup()+
       '<button type="button" class="wmh-map-back wmh-academy-map-back" data-wmh-action="back" aria-label="Return to Golden Dragon Empire map"><i class="wmh-academy-back-icon" aria-hidden="true"></i><b>GOLDEN DRAGON EMPIRE</b></button>'+
       '</div>';
   }
@@ -1489,7 +1523,7 @@ function isometricPlayMarkup(regionId: RegionId, selectedBuilding: string, inter
   return '<div class="wmh-isometric-play-screen" data-wmh-isometric-play-screen>'+
     tileMapMarkup(interior,mapId,mapImage,regionId,selectedBuilding)+
     isometricHudMarkup(title,mapImage)+
-    isometricEditorMarkup()+
+    isometricEditorMarkup()+isometricCanvasEditorMarkup()+
     '<button type="button" class="wmh-map-back" data-wmh-action="back" aria-label="Leave isometric area"><span>‹</span><b>BACK</b></button>'+
     '<section class="wmh-chat-panel" data-wmh-chat hidden role="dialog" aria-label="Character conversation"><div class="wmh-chat-card"><button type="button" class="wmh-chat-close" data-wmh-action="chat-close" aria-label="Close conversation">×</button><div class="wmh-chat-thread" data-wmh-thread></div><div class="wmh-chat-input-row"><span>YOUR RESPONSE</span><div data-wmh-replies></div></div></div></section>'+
     '</div>';
@@ -1498,7 +1532,7 @@ function isometricPlayMarkup(regionId: RegionId, selectedBuilding: string, inter
 export function renderIsometricMapTestArea(): string {
   const mapId="isometric-render-test:render-yard:exterior";
   return '<div class="wmh-isometric-play-screen" data-wmh-isometric-play-screen>'+
-    tileMapMarkup(false,mapId,"")+isometricHudMarkup("ISOMETRIC RENDER TEST","")+isometricEditorMarkup()+
+    tileMapMarkup(false,mapId,"")+isometricHudMarkup("ISOMETRIC RENDER TEST","")+isometricEditorMarkup()+isometricCanvasEditorMarkup()+
     '<div class="wmh-isometric-test-caption"><b>ISOMETRIC RENDER TEST</b><span>16 × 12 TILES · PLAYER · 3 NPCs · LIVE CAMERA</span></div>'+
     '<button type="button" class="wmh-map-back" data-wmh-action="back" aria-label="Leave isometric test area"><span>‹</span><b>EXIT TEST</b></button>'+
     '<section class="wmh-chat-panel" data-wmh-chat hidden role="dialog" aria-label="Character conversation"><div class="wmh-chat-card"><button type="button" class="wmh-chat-close" data-wmh-action="chat-close" aria-label="Close conversation">×</button><div class="wmh-chat-thread" data-wmh-thread></div><div class="wmh-chat-input-row"><span>YOUR RESPONSE</span><div data-wmh-replies></div></div></div></section></div>';
@@ -1729,7 +1763,7 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
     stopNpcWander(dialog);
     overlay.dataset.level="test";
     dialog.innerHTML=panelMarkup("test",regionId,"Isometric Render Test");
-    bindIsoAreaEditor(dialog);bindIsometricCamera(dialog);bindIsometricMapArt(dialog);bindIsometricHud(dialog);startNpcWander(dialog);
+    bindIsoAreaEditor(dialog);bindIsometricCanvasEditor(dialog);bindIsometricCamera(dialog);bindIsometricMapArt(dialog);bindIsometricHud(dialog);startNpcWander(dialog);
     return true;
   }
   if(action.dataset.wmhAction==="academy-home"){
@@ -1743,6 +1777,7 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
     overlay.dataset.building="Tianhai Academy";
     dialog.innerHTML=panelMarkup("local","golden-dragon-empire","Tianhai Academy");
     bindIsoAreaEditor(dialog);
+    bindIsometricCanvasEditor(dialog);
     bindIsometricCamera(dialog);
     bindIsometricMapArt(dialog);
     bindIsometricHud(dialog);
@@ -1751,7 +1786,7 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
   }
   if(action.dataset.wmhAction==="back"){
     const next:Level=current==="interior"?"local":current==="local"?"regional":"world";
-    stopNpcWander(dialog);overlay.dataset.level=next;dialog.innerHTML=panelMarkup(next,regionId,building);if(next==="world")bindWorldMapZoom(dialog);if(next==="regional")bindIsometricMapArt(dialog);if(next==="local"){bindIsoAreaEditor(dialog);bindIsometricCamera(dialog);bindIsometricMapArt(dialog);bindIsometricHud(dialog);startNpcWander(dialog);}return true;
+    stopNpcWander(dialog);overlay.dataset.level=next;dialog.innerHTML=panelMarkup(next,regionId,building);if(next==="world")bindWorldMapZoom(dialog);if(next==="regional")bindIsometricMapArt(dialog);if(next==="local"){bindIsoAreaEditor(dialog);bindIsometricCanvasEditor(dialog);bindIsometricCamera(dialog);bindIsometricMapArt(dialog);bindIsometricHud(dialog);startNpcWander(dialog);}return true;
   }
   if(action.dataset.wmhAction==="chat-close"){
     const chat=dialog.querySelector<HTMLElement>("[data-wmh-chat]");
@@ -1778,12 +1813,12 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
   }
   if(action.dataset.wmhSite){
     overlay.dataset.level="local";overlay.dataset.building=action.dataset.wmhSite;
-    dialog.innerHTML=panelMarkup("local",regionId,action.dataset.wmhSite);bindIsoAreaEditor(dialog);bindIsometricCamera(dialog);bindIsometricMapArt(dialog);bindIsometricHud(dialog);startNpcWander(dialog);return true;
+    dialog.innerHTML=panelMarkup("local",regionId,action.dataset.wmhSite);bindIsoAreaEditor(dialog);bindIsometricCanvasEditor(dialog);bindIsometricCamera(dialog);bindIsometricMapArt(dialog);bindIsometricHud(dialog);startNpcWander(dialog);return true;
   }
   if(action.dataset.wmhBuilding && current==="local"){
     stopNpcWander(dialog);
     overlay.dataset.level="interior";overlay.dataset.building=action.dataset.wmhBuilding;
-    dialog.innerHTML=panelMarkup("interior",regionId,action.dataset.wmhBuilding);bindIsoAreaEditor(dialog);bindIsometricCamera(dialog);bindIsometricMapArt(dialog);bindIsometricHud(dialog);return true;
+    dialog.innerHTML=panelMarkup("interior",regionId,action.dataset.wmhBuilding);bindIsoAreaEditor(dialog);bindIsometricCanvasEditor(dialog);bindIsometricCamera(dialog);bindIsometricMapArt(dialog);bindIsometricHud(dialog);return true;
   }
   if(action.hasAttribute("data-wmh-tile")){
     if(dialog.querySelector<HTMLElement>("[data-wmh-board]")?.classList.contains("wmh-overlay-editing"))return true;
