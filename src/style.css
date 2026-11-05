@@ -234,12 +234,12 @@ body:has(.noticeboard-backdrop){overflow:hidden;overscroll-behavior:none;}
   border:1px solid #7d3030;
   background:#f2e5dc;
   color:#743b35;
-  box-shadow:0 0 0 1px #7d303022;
+  box-shadow:0 0 0 1px #e04b4b55, 0 0 9px #d9434344;
   animation:play-warning-outline 1.35s ease-in-out infinite alternate;
 }
 @keyframes play-warning-outline {
-  from { border-color:#6e2929; box-shadow:0 0 0 1px #6e292933, 0 0 3px #8e30301a; }
-  to { border-color:#e04b4b; box-shadow:0 0 0 1px #e04b4b88, 0 0 9px #d9434344; }
+  from { border-color:#6e2929; }
+  to { border-color:#e04b4b; }
 }
 @media(prefers-reduced-motion:reduce) {
   .app-shell:has(.conversation-window) > .notice,
@@ -409,7 +409,7 @@ body:has(.noticeboard-backdrop){overflow:hidden;overscroll-behavior:none;}
   88% { opacity:.92; transform:translate3d(7px,-98vh,0) scale(.96); }
   100% { opacity:0; transform:translate3d(-5px,-116vh,0) scale(.9); }
 }
-@keyframes ledger-bubble-pop { to { opacity:0; transform:scale(1.14); filter:blur(5px); } }
+@keyframes ledger-bubble-pop { to { opacity:0; transform:scale(1.14); } }
 :root[data-theme="dark"] .ledger-bubble {
   border-color:#b8a06c; color:#e8e0cf;
   background:radial-gradient(ellipse at 28% 12%,#657064f0 0%,#344139f0 55%,#26332bf0 100%);
