@@ -1,47 +1,27 @@
-# World Atlas Password and Account Reset
+# World Atlas Account Recovery
 
-## Credential model
+## Password policy
 
-World Atlas stores a salted PBKDF2 verifier locally on each device. It does not store a player's entered password in plaintext and cannot reveal or recover an old password. Every local verifier carries a shared reset revision held by the Merzkava Cloudflare Worker in KV.
+A new World Atlas password must be 8–128 characters and include an uppercase letter, a lowercase letter, a number, and a symbol.
 
-A normal password change requires the current password and updates the verifier on that device. Password policy: 8–128 characters, at least one uppercase letter, one lowercase letter, one digit and one symbol.
+The app does not retain a readable copy of a player's previous password. A forgotten password cannot be revealed or recovered.
 
-## Supported app version requirement
+## Change a known password
 
-The shared reset-revision check is required only for a forced Master Reset. Players need the latest Merzkava APK to detect that global reset; an older APK cannot read the new server revision. Once updated and connected, it invalidates the old local verifier and asks the player to create a new password. A normal password change is different: the player enters the existing password, verifies it locally, and the new password is saved immediately on that device. It does not need the master credential or a reset-revision update.
+A player who knows the current password can open **Change password** and verify it. The app then opens the replacement form immediately. The player enters and confirms the new password. This flow does not require the Master Reset credential or a special app update.
 
-## Master reset
+## Master Reset
 
-The owner-provided master credential is configured only as the Cloudflare Worker secret ATLAS_MASTER_RESET_PASSWORD. Never put its value or a derived verifier in the client app, APK, source repository, build logs or public documentation.
+The Master Reset feature is available in the updated Merzkava app. A player must install a build containing this feature to use it. It can be used for eligible accounts that already exist and accounts created later.
 
-When the player selects an account and submits the master credential, the Worker validates it and rotates that account's shared reset revision. The current device can then create a replacement local password. Other devices discover the changed revision after their players install and open the latest app build; older APKs do not check master-reset revisions. Each updated device must create a new local password. The same master credential can be used for any registered/local player account, including accounts created after the feature is deployed.
+The app checks the Master Reset credential before displaying the replacement form. Once verified, the player creates and confirms a new password. The update requirement applies only to Master Reset; ordinary password changes remain available using the current password.
 
-## Developer-assisted reset
+## Developer-assisted recovery
 
-The Developer account panel accepts a player name only; it has no new-password field. The Worker requires:
-- a valid Supabase access token;
-- the authenticated email to appear in ATLAS_DEVELOPER_EMAILS;
-- the Cloudflare KV reset registry and reset rate limiter.
+In Settings → Account & Access, the Developer can select a registered player for a targeted password reset. The Developer does not receive or set the replacement password. Before proceeding, the Developer must verify account ownership through the official Discord or email channel when available, using evidence other than the password, and confirm that verification in the panel.
 
-Before submitting a reset, the Developer must verify ownership through a known official channel. A successful Developer-assisted reset records a targeted reset revision. The player must use a build that supports shared account-reset revisions to have the old local verifier invalidated on that device, then creates the replacement password locally. The server records a limited audit entry with the reset type, authorized actor, hashed player identifier, revision and timestamp; it never includes the player's password.
+After the reset, the player creates a new password themselves. Never ask anyone to share their email, Google, Apple, or other personal-account password.
 
-Local Developer Mode is not server authority. The Supabase session and Worker email allowlist are the actual authorization boundary.
+## Forgot-password notice
 
-## Password recovery notice
-
-Old passwords cannot be recovered because only salted hashes are retained. Players who forget a password must contact the Developer through an official Discord or email channel when available. The Developer should verify ownership using evidence other than the password, then use the account-specific reset. Never ask the player to send their current email, Google, Apple or other personal-account password.
-
-## Required Cloudflare setup
-
-1. Create a Cloudflare KV namespace for the World Atlas reset registry.
-2. Replace REPLACE_WITH_CLOUDFLARE_KV_NAMESPACE_ID in gateway/wrangler.toml with that namespace ID.
-3. Set ATLAS_MASTER_RESET_PASSWORD as a Worker secret using the Wrangler secret prompt.
-4. Set ATLAS_DEVELOPER_EMAILS to the exact authorized Supabase email address(es).
-5. Keep the ATLAS_RESET_KV and ATLAS_RESET_LIMITER bindings enabled.
-6. Deploy the gateway manually after all configuration is present.
-
-Until this setup is complete, the account reset endpoints return an unavailable/denied response. Do not tell players that cross-device resets are active before the deployed Worker has been configured and tested. Do not claim a Master Reset has taken effect on an older APK: the player must update to a build that checks shared reset revisions first.
-
-## Screen transitions
-
-The shared app shell fades the outgoing screen before render() replaces its DOM, then animates the new shell in with a restrained opacity/vertical/scale entrance. Individual panels keep their own scoped transitions. Respect prefers-reduced-motion; no game state or navigation state is advanced by an animation callback.
+A forgotten password cannot be recovered. Contact the Developer through the official Discord or email channel if available, and be prepared to prove ownership of the account. The old password will not be disclosed; only a reset can be arranged.
