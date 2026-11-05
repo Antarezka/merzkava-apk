@@ -120,7 +120,7 @@ export async function authenticateDeveloper(
       }
     } catch (error) {
       authenticated = false;
-      try { await SecureStorage.removeItem(REMEMBER_KEY); } catch { /* remain locked */ }
+      try { await clearDeveloperSessionMarker(); } catch { /* Keep the original SecureStorage failure visible. */ }
       throw new Error("Could not save the Remember Me credential securely on this device.");
     }
   }
