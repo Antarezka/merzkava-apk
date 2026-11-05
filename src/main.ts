@@ -111,8 +111,6 @@ let menuToggleAnimationPending = false;
 let languageAnimationPending = false;
 let cleanupExpeditionAnimations: (() => void) | undefined;
 let lastAnimatedScreen: AppScreen | null = null;
-let screenTransitionInFlight = false;
-let screenTransitionSettled = false;
 const splashAnimationCleanup=new WeakMap<HTMLDivElement,()=>void>();
 initializeLedgerNotifications();
 
@@ -545,22 +543,37 @@ function bugPanelMarkup(): string {
   </div>`;
 }
 function render(): void {
-  if (screenTransitionInFlight) return;
-  if (!screenTransitionSettled && lastAnimatedScreen !== null &&
-      activeScreen !== lastAnimatedScreen) {
-    const outgoingShell = root.querySelector<HTMLElement>(".app-shell");
-    if (outgoingShell) {
-      screenTransitionInFlight = true;
-      animateAppScreenExit(outgoingShell, () => {
-        screenTransitionInFlight = false;
-        screenTransitionSettled = true;
-        render();
-      });
-      return;
-    }
-  }
   if(!hasAppAccess()&&activeScreen!=="control")activeScreen="control";
   if(!developerAuthenticated&&activeScreen==="gameplay")activeScreen="home";
+
+  // Keep a non-interactive visual snapshot of the previous screen above the
+  // new shell. Both surfaces animate at the same time, so navigation never
+  // flashes through an empty frame between render() calls.
+  let outgoingTransitionGhost: HTMLElement | null = null;
+  if (lastAnimatedScreen !== null && activeScreen !== lastAnimatedScreen) {
+    const outgoingShell = root.querySelector<HTMLElement>(".app-shell");
+    if (outgoingShell) {
+      const bounds = outgoingShell.getBoundingClientRect();
+      const computed = window.getComputedStyle(outgoingShell);
+      outgoingTransitionGhost = outgoingShell.cloneNode(true) as HTMLElement;
+      outgoingTransitionGhost.setAttribute("aria-hidden", "true");
+      outgoingTransitionGhost.inert = true;
+      outgoingTransitionGhost.classList.add("app-shell-transition-ghost");
+      outgoingTransitionGhost.style.position = "fixed";
+      outgoingTransitionGhost.style.top = bounds.top + "px";
+      outgoingTransitionGhost.style.left = bounds.left + "px";
+      outgoingTransitionGhost.style.width = bounds.width + "px";
+      outgoingTransitionGhost.style.height = bounds.height + "px";
+      outgoingTransitionGhost.style.minHeight = "100svh";
+      outgoingTransitionGhost.style.margin = "0";
+      outgoingTransitionGhost.style.zIndex = "2147483000";
+      outgoingTransitionGhost.style.pointerEvents = "none";
+      outgoingTransitionGhost.style.transform = "none";
+      outgoingTransitionGhost.style.opacity = computed.opacity;
+      outgoingTransitionGhost.style.willChange = "opacity";
+      document.body.append(outgoingTransitionGhost);
+    }
+  }
   const visibleNavigation=developerAuthenticated?navigation:navigation.filter(item=>item.id!=="gameplay");
   // Each render replaces the screen DOM. Stop all Anime.js loops/listeners
   // attached to the previous Eternal Path tree before those nodes are detached.
@@ -627,12 +640,15 @@ function render(): void {
     menuToggleAnimationPending = false;
     languageAnimationPending = false;
   }
+  if (outgoingTransitionGhost) {
+    const ghost = outgoingTransitionGhost;
+    animateAppScreenExit(ghost, () => ghost.remove());
+  }
   if (activeScreen === "offline-game") {
     const expeditionPage = root.querySelector<HTMLElement>(".expedition-page");
     if (expeditionPage) cleanupExpeditionAnimations = mountExpeditionAnimations(expeditionPage, shouldAnimateScreen);
   }
   lastAnimatedScreen = activeScreen;
-  screenTransitionSettled = false;
   updateSessionCalendar();
   renderChat();
   translateRenderedContent(root, currentLanguage);
