@@ -963,6 +963,21 @@ function selectArcanistDestination(place:HTMLElement):void{
 root.addEventListener("click", async (event: MouseEvent) => {
   const target = event.target;
   if (!(target instanceof Element)) return;
+  if(target.closest("[data-dev-login-open]")){
+    const panel=root.querySelector<HTMLElement>("[data-dev-login-panel]");
+    if(panel){panel.hidden=false;panel.querySelector<HTMLInputElement>("#developer-login-id")?.focus();}
+    return;
+  }
+  if(target.closest("[data-dev-login-close]")){
+    const panel=root.querySelector<HTMLElement>("[data-dev-login-panel]");if(panel)panel.hidden=true;return;
+  }
+  if(target.closest("[data-dev-open-control]")){
+    if(!developerAuthenticated)return;activeScreen="control";notice="";render();return;
+  }
+  if(target.closest("[data-dev-logout]")){
+    await signOutDeveloper();developerAuthenticated=false;setWorldMapDeveloperMode(false);activeScreen="home";notice="";render();return;
+  }
+  if(!developerAuthenticated&&target.closest("[data-floating-action],[data-auth-logout],[data-refresh-canon],[data-refresh-players],[data-bug-copy],[data-bug-minimize],[data-bug-dismiss]"))return;
   const activeEternalModal=root.querySelector<HTMLElement>(".expedition-choice-modal:not([hidden])");
   if(activeEternalModal && !target.closest(".expedition-choice-modal")) return;
   if (event.detail !== 0 && suppressNextPointerClick) {
@@ -1419,6 +1434,7 @@ root.addEventListener("click", async (event: MouseEvent) => {
   const button = target.closest<HTMLButtonElement>("[data-screen]");
   const nextScreen = button?.dataset.screen as ScreenId | undefined;
   if (!nextScreen || !navigation.some(item => item.id === nextScreen)) return;
+  if(nextScreen==="gameplay"&&!developerAuthenticated)return;
   if (nextScreen === "gameplay" && activeScreen !== "gameplay") {
     const selected = root.querySelector<HTMLSelectElement>("#gameplay-character")?.value ?? activeCharacterId;
     loadCharacterWorldTime(selected);
@@ -1475,6 +1491,33 @@ root.addEventListener("change", async event => {
 root.addEventListener("submit", async (event: SubmitEvent) => {
   const form = event.target;
   if (!(form instanceof HTMLFormElement)) return;
+  if(form.id==="developer-login-form"){
+    event.preventDefault();if(developerLoginBusy)return;
+    const data=new FormData(form);
+    const identifier=String(data.get("identifier")??"");
+    const password=String(data.get("password")??"");
+    const remember=data.get("remember")==="yes";
+    developerLoginBusy=true;developerLoginMessage="";
+    const button=form.querySelector<HTMLButtonElement>("[type=submit]");if(button)button.disabled=true;
+    try{
+      const valid=await authenticateDeveloper(identifier,password,remember);
+      if(!valid){
+        developerLoginBusy=false;developerLoginMessage="Access denied. Check the developer ID and password.";
+        const message=root.querySelector<HTMLElement>("[data-dev-login-message]");if(message)message.textContent=developerLoginMessage;
+        const nextButton=root.querySelector<HTMLButtonElement>("#developer-login-form [type=submit]");if(nextButton)nextButton.disabled=false;
+        return;
+      }
+      developerAuthenticated=true;setWorldMapDeveloperMode(true);
+      developerLoginBusy=false;developerLoginMessage="";
+      activeScreen="home";notice="";render();
+    }catch(error){
+      developerLoginBusy=false;developerLoginMessage=error instanceof Error?error.message:"Developer authentication failed.";
+      const message=root.querySelector<HTMLElement>("[data-dev-login-message]");if(message)message.textContent=developerLoginMessage;
+      const nextButton=root.querySelector<HTMLButtonElement>("#developer-login-form [type=submit]");if(nextButton)nextButton.disabled=false;
+    }
+    return;
+  }
+  if(!developerAuthenticated&&(form.id==="auth-form"||form.id==="canon-route-form"||form.id==="canon-module-form"||form.id==="gameplay-route-form")){event.preventDefault();return;}
   if (form.matches("[data-eternal-rename-form]")) {
     event.preventDefault();
     const id=form.getAttribute("data-eternal-rename-form")??"";
@@ -1734,6 +1777,7 @@ window.addEventListener("focus", () => { void refreshFloatingReadiness(); });
 void initializeDatabase().then(async status => {
   databaseMessage = status.message;
   await refreshCharacters();
+  try{developerAuthenticated=await restoreDeveloperSession();setWorldMapDeveloperMode(developerAuthenticated);}catch{developerAuthenticated=false;setWorldMapDeveloperMode(false);}
   try {
     await restoreAuthSession();
     authMessage = getAuthSession() ? "Saved secure session restored." : "";
