@@ -141,6 +141,15 @@ function serializeWorldMapCoordinates(markers: WorldMarker[]): string {
     markers: markers.map(({ id, name, x, y, category, placementStatus }) => ({ id, name, category, x, y, placementStatus }))
   }, null, 2);
 }
+function academyIsometricGridLinesMarkup(grid:IsoMapGridConfig={cols:24,rows:20,tileW:128,tileH:69.5,offsetX:0,offsetY:0,playerScale:1,npcScale:1}):string {
+  const marks:string[]=[];
+  for(let y=0;y<grid.rows;y++)for(let x=0;x<grid.cols;x++){
+    const center=isoCellCenter(x,y,grid),halfW=grid.tileW/2,halfH=grid.tileH/2;
+    const points=[center.x+","+(center.y-halfH),(center.x+halfW)+","+center.y,center.x+","+(center.y+halfH),(center.x-halfW)+","+center.y].join(" ");
+    marks.push('<polygon points="'+points+'" fill="none" stroke="#e2d3b4" stroke-opacity=".22" stroke-width="1"/>');
+  }
+  return marks.join("");
+}
 function academyMarginGridMarkup(
   width:number,height:number,imageLeft:number,imageTop:number,imageWidth:number,imageHeight:number,cellW:number,cellH:number,
 ):string {
@@ -176,8 +185,9 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
   let baseWidth = 0;
   let baseHeight = 0;
   const academyCanvas=surface.hasAttribute("data-wmh-academy-canvas");
-  if(academyCanvas)bindIsometricCanvasEditor(dialog);
+  if(academyCanvas){bindIsoAreaEditor(dialog);bindIsometricCanvasEditor(dialog);}
   const academyGrid=academyCanvas?surface.querySelector<SVGSVGElement>("[data-wmh-academy-margin-grid]"):null;
+  const academyBoard=academyCanvas?surface.querySelector<HTMLElement>("[data-wmh-board]"):null;
   // Academy pan and pinch are handled by this pointer controller. Do not let
   // Android WebView begin a competing native scroll gesture on the viewport.
   if(academyCanvas)viewport.style.setProperty("touch-action","none","important");
@@ -195,10 +205,15 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
     surface.style.width=(baseWidth*scale)+"px";
     surface.style.height=(baseHeight*scale)+"px";
     if(academyCanvas){
-      image.style.setProperty("left",(academyMarginLeft*scale)+"px","important");
-      image.style.setProperty("top",(academyMarginTop*scale)+"px","important");
-      image.style.setProperty("width",(academyImageWidth*scale)+"px","important");
-      image.style.setProperty("height",(academyImageHeight*scale)+"px","important");
+      const naturalWidth=image.naturalWidth||academyImageWidth,naturalHeight=image.naturalHeight||academyImageHeight;
+      const artworkScale=academyImageWidth/Math.max(1,naturalWidth);
+      if(academyBoard){
+        academyBoard.style.left=(academyMarginLeft*scale)+"px";academyBoard.style.top=(academyMarginTop*scale)+"px";
+        academyBoard.style.width=naturalWidth+"px";academyBoard.style.height=naturalHeight+"px";
+        academyBoard.style.transformOrigin="top left";academyBoard.style.transform="scale("+(artworkScale*scale)+")";
+      }
+      image.style.setProperty("left","0px","important");image.style.setProperty("top","0px","important");
+      image.style.setProperty("width",naturalWidth+"px","important");image.style.setProperty("height",naturalHeight+"px","important");
     }else{
       image.style.width="100%";
       image.style.height="100%";
@@ -1017,6 +1032,10 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
   }catch{}
   const remember=()=>{history.push(JSON.parse(JSON.stringify(data)) as IsoMapEditorData);if(history.length>40)history.shift();};
   const redraw=()=>{
+    if(board.classList.contains("wmh-academy-isometric-board")){
+      const gridLines=svg.querySelector<SVGGElement>("[data-wmh-overlay-marks]");
+      if(gridLines)gridLines.innerHTML=academyIsometricGridLinesMarkup(grid);
+    }
     if(cellGroup){
       const marks:string[]=[];
       const add=(cells:string[],cls:string,symbol:string)=>{
@@ -1489,8 +1508,11 @@ function isometricPlayMarkup(regionId: RegionId, selectedBuilding: string, inter
       '<div class="wmh-map-zoom wmh-academy-map-zoom" aria-label="Academy map zoom controls"><button type="button" data-wmh-zoom="out" aria-label="Zoom out">−</button><span data-wmh-zoom-level>100%</span><button type="button" data-wmh-zoom="in" aria-label="Zoom in">+</button><button type="button" data-wmh-zoom="reset">RESET</button></div>'+
       '<div class="wmh-academy-map-viewport" data-wmh-map-viewport><div class="wmh-academy-map-surface" data-wmh-map-surface data-wmh-academy-canvas>'+
       '<svg class="wmh-academy-margin-grid" data-wmh-academy-margin-grid preserveAspectRatio="none" aria-hidden="true"></svg>'+
-      '<img src="'+academyMapImage+'" alt="Tianhai Academy full map" draggable="false" loading="eager" decoding="async"/>'+
-      '</div></div>'+isometricCanvasEditorMarkup()+
+      '<div class="wmh-isometric-board wmh-academy-isometric-board has-map-base" data-wmh-board data-map-id="golden-dragon-empire:tianhai-academy:exterior" data-map-theme="golden-dragon-empire" data-map-title="Tianhai Academy" data-map-interior="false" data-cols="24" data-rows="20" data-tile-w="128" data-tile-h="69.5" data-offset-x="0" data-offset-y="0" style="--tile-cols:24;--tile-rows:20;--tile-w:128px;--tile-h:69.5px;--iso-half-w:64px;--iso-half-h:34.75px;width:2816px;height:1536px">'+
+      '<img class="wmh-academy-map-art" data-wmh-map-art src="'+academyMapImage+'" alt="Tianhai Academy full map" draggable="false" loading="eager" decoding="async"/><canvas class="wmh-isometric-foreground" data-wmh-foreground-canvas aria-hidden="true"></canvas>'+
+      '<svg class="wmh-area-overlay-svg" data-wmh-overlay-svg viewBox="0 0 2816 1536" preserveAspectRatio="none"><g data-wmh-overlay-marks>'+academyIsometricGridLinesMarkup()+'</g><g data-wmh-manual-marks></g><g data-wmh-transition-marks></g><path data-wmh-overlay-preview class="wmh-area-mark-preview" d=""></path></svg><svg data-wmh-scene-svg style="display:none" aria-hidden="true"></svg>'+
+      '</div>'+
+      '</div></div></div>'+isometricEditorMarkup()+isometricCanvasEditorMarkup()+
       '<button type="button" class="wmh-map-back wmh-academy-map-back" data-wmh-action="back" aria-label="Return to Golden Dragon Empire map"><i class="wmh-academy-back-icon" aria-hidden="true"></i><b>GOLDEN DRAGON EMPIRE</b></button>'+
       '</div>';
   }
