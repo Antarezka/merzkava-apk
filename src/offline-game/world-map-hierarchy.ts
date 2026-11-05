@@ -1125,7 +1125,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       };
       const addQuadrants=(cells:string[],cls:string,symbol:string)=>{
         for(const key of cells){
-          const match=/^([0-9]+),([0-9]+):(tl|tr|bl|br)$/.exec(key);if(!match)continue;
+          const match=/^(-?[0-9]+),(-?[0-9]+):(tl|tr|bl|br)$/.exec(key);if(!match)continue;
           const x=Number(match[1]),y=Number(match[2]),q=match[3] as IsoQuadrant;
           const points=isoQuadrantTrianglePoints(x,y,q,grid);
           const vertices=points.split(" ").map(point=>point.split(",").map(Number));
@@ -1511,10 +1511,23 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       const previous=JSON.parse(JSON.stringify(data)) as IsoMapEditorData;
       const previousGrid={...grid};
       remember();const property=input.dataset.wmhGridControl as keyof IsoMapGridConfig;grid[property]=Number(input.value);
+      const previousContains=(x:number,y:number)=>x>=0&&y>=0&&x<previousGrid.cols&&y<previousGrid.rows;
+      const nextContains=(x:number,y:number)=>x>=0&&y>=0&&x<grid.cols&&y<grid.rows;
+      const promoted=new Set(data.customGridCells);
+      const promoteKey=(key:string)=>{
+        const match=/^(-?[0-9]+),(-?[0-9]+)(?::(?:tl|tr|bl|br))?$/.exec(key);if(!match)return;
+        const x=Number(match[1]),y=Number(match[2]);
+        if(previousContains(x,y)&&!nextContains(x,y))promoted.add(x+","+y);
+      };
+      [...data.walkableCells,...data.foregroundCells,...data.blockedCells,...data.opacityCells,
+        ...data.foregroundQuadrants,...data.blockedQuadrants,...data.opacityQuadrants,
+        ...data.transitions.map(marker=>marker.x+","+marker.y),
+        ...data.walkableCellGroups.flatMap(group=>group.cells)].forEach(promoteKey);
+      data.customGridCells=[...promoted];
       data.grid={...grid};
       data=normalizeIsoMapEditorData(data,data.mapId,grid);
       selectedMergeCells.forEach(key=>{if(!data.walkableCells.includes(key))selectedMergeCells.delete(key);});
-      data.transitions=data.transitions.filter(m=>m.x<grid.cols&&m.y<grid.rows);applyGrid();
+      applyGrid();
       if(!relocateActorsFromBlockedCells(board,data)){
         data=previous;Object.assign(grid,previousGrid);history.pop();input.value=String(grid[property]);applyGrid();
         setStatus("Grid change cancelled: there is no safe destination for every character.");return;
