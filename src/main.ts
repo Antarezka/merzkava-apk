@@ -39,12 +39,36 @@ import { mountArcanistryTicketMachine } from "./offline-game/arcanistry-ticket-m
 import { handleWorldMapHierarchyClick, initializeWorldMapHierarchy, setWorldMapDeveloperMode } from "./offline-game/world-map-hierarchy";
 import { closeLoreEntry, closeLoreSource, closeLorePlaceholder, openLoreEntry, openLoreSource, openLorePlaceholder, setLoreCategory, setLoreSearch, renderLoreResults } from "./world-archive/lore-library";
 import { playWorldAtlasAccessSequence } from "./offline-game/world-atlas-login-motion";
+import { worldAtlasAccessBufferMarkup } from "./offline-game/world-atlas-login";
 
 installSoftKeyboardStability();
 
 const app = document.querySelector<HTMLDivElement>("#app");
 if (!app) throw new Error("App root element was not found.");
 const root = app;
+
+async function runAccountAccessTransition<T>(
+  context:"player"|"developer",
+  action:()=>Promise<T>,
+  duration=3600
+):Promise<T> {
+  const host=document.createElement("div");
+  host.className="account-transition-overlay";
+  host.innerHTML=worldAtlasAccessBufferMarkup(currentLanguage,context);
+  document.body.append(host);
+  try {
+    const task=Promise.resolve().then(action);
+    const results=await Promise.allSettled([
+      task,
+      playWorldAtlasAccessSequence(host,duration,task)
+    ]);
+    const result=results[0];
+    if(result.status==="rejected")throw result.reason;
+    return result.value;
+  } finally {
+    host.remove();
+  }
+}
 
 root.addEventListener("arcanistry:lever-lock", () => playClockworkRatchet());
 mountArcanistryTicketMachine(root, async sceneId => {
