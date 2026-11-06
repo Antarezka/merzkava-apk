@@ -1,12 +1,18 @@
 import { Capacitor } from "@capacitor/core";
 import { SecureStorage } from "@aparajita/capacitor-secure-storage";
+import { ATLAS_RESET_GRANTS } from "./atlas-reset-grants.generated";
 
 const ITERATIONS = 310_000;
 const KEY_PREFIX = "merzkava.world-atlas.account.";
 const REMEMBER_KEY = "merzkava.world-atlas.remembered-player.v1";
-const MASTER_RESET_SALT = new TextEncoder().encode("Merzkava.WorldAtlas.MasterReset.v1");
-const MASTER_RESET_HASH = "aHqvTavnyWOM/bTAJMNRxRbV3qfGdwQYgCfoTo/BgrI=";
-let activePlayer = "";
+
+type StoredCredential = {
+  version?: number;
+  iterations?: number;
+  salt?: string;
+  hash?: string;
+  usedMasterResetGrantIds?: string[];
+};
 
 function bytesToBase64(bytes: Uint8Array): string {
   let binary = "";
@@ -54,6 +60,10 @@ async function digest(value: string): Promise<string> {
   const result = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value.trim().toLocaleLowerCase()));
   return bytesToBase64(new Uint8Array(result)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
 }
+async function sha256Hex(value: string): Promise<string> {
+  const result = new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value)));
+  return Array.from(result, byte => byte.toString(16).padStart(2, "0")).join("");
+}
 async function accountKey(playerName: string): Promise<string> {
   return KEY_PREFIX + await digest(playerName);
 }
@@ -64,6 +74,35 @@ function validPlayerName(playerName: string): string {
   }
   return name;
 }
+function randomHex(byteLength: number): string {
+  const bytes = crypto.getRandomValues(new Uint8Array(byteLength));
+  return Array.from(bytes, byte => byte.toString(16).padStart(2, "0")).join("");
+}
+function normalizeResetCode(code: string): string {
+  return code.trim().toUpperCase().replace(/^MZK1-/, "").replace(/[\s-]/g, "");
+}
+function readCredential(raw: string | null): StoredCredential | null {
+  if (!raw) return null;
+  try { return JSON.parse(raw) as StoredCredential; }
+  catch { return null; }
+}
+function usedGrantIds(stored: StoredCredential | null): string[] {
+  return Array.isArray(stored?.usedMasterResetGrantIds)
+    ? stored!.usedMasterResetGrantIds!.filter(value => typeof value === "string")
+    : [];
+}
+async function resolveMasterResetGrant(playerName: string, code: string) {
+  const name = validPlayerName(playerName);
+  const normalized = normalizeResetCode(code);
+  if (!/^[0-9A-F]{64}$/.test(normalized)) return null;
+  const playerKey = await digest(name);
+  const codeHash = await sha256Hex(normalized);
+  return ATLAS_RESET_GRANTS.find(grant =>
+    grant.playerKey === playerKey &&
+    grant.codeHash === codeHash
+  ) ?? null;
+}
+
 export function atlasPasswordPolicyError(password: string): string | null {
   if (password.length < 8) return "Use at least 8 characters.";
   if (password.length > 128) return "Use no more than 128 characters.";
@@ -73,16 +112,73 @@ export function atlasPasswordPolicyError(password: string): string | null {
   if (!/[^A-Za-z0-9\s]/.test(password)) return "Include at least one symbol.";
   return null;
 }
-export async function verifyAtlasMasterResetPassword(password: string): Promise<boolean> {
-  if (!password) return false;
-  const actual = await derive(password, MASTER_RESET_SALT);
-  return constantTimeEqual(actual, base64ToBytes(MASTER_RESET_HASH));
+
+/**
+ * Creates a non-authorizing request for the Developer to paste into the AI handoff.
+ * A request is not a reset code. The AI adds a matching one-time grant to the next APK source.
+ */
+export async function createAtlasMasterResetRequest(playerName: string): Promise<string> {
+  const name = validPlayerName(playerName);
+  const playerKey = await digest(name);
+  const requestId = randomHex(16);
+  const challenge = randomHex(32);
+  return [
+    "MERZKAVA_ATLAS_MASTER_RESET_REQUEST_V1",
+    "Request-ID: " + requestId,
+    "Player-Name: " + name,
+    "Player-Key: " + playerKey,
+    "Challenge: " + challenge,
+    "Action: Generate one unique player confirmation code and add only its SHA-256 hash to src/offline-game/atlas-reset-grants.generated.ts for the next app build.",
+    "Scope: This request is for the selected World Atlas player only."
+  ].join("\n");
 }
+
+/** Checks the code against the account-bound grants compiled into this app build. */
+export async function verifyAtlasMasterResetCode(playerName: string, code: string): Promise<boolean> {
+  if (!code.trim()) return false;
+  const grant = await resolveMasterResetGrant(playerName, code);
+  if (!grant) return false;
+  const stored = readCredential(await readStored(await accountKey(validPlayerName(playerName))));
+  return !usedGrantIds(stored).includes(grant.requestId);
+}
+
+/**
+ * Replaces the selected account password and records the grant as consumed in the same
+ * credential record. A grant is single-use per installation/account record.
+ */
+export async function completeAtlasMasterReset(
+  playerName: string,
+  code: string,
+  newPassword: string
+): Promise<void> {
+  const name = validPlayerName(playerName);
+  const policyError = atlasPasswordPolicyError(newPassword);
+  if (policyError) throw new Error(policyError);
+
+  const grant = await resolveMasterResetGrant(name, code);
+  if (!grant) throw new Error("The reset code is invalid, belongs to another account, or is not included in this app update.");
+
+  const key = await accountKey(name);
+  const previous = readCredential(await readStored(key));
+  const used = usedGrantIds(previous);
+  if (used.includes(grant.requestId)) throw new Error("This reset code has already been used for this account on this device.");
+
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const hash = await derive(newPassword, salt);
+  await writeStored(key, JSON.stringify({
+    version: 1,
+    iterations: ITERATIONS,
+    salt: bytesToBase64(salt),
+    hash: bytesToBase64(hash),
+    usedMasterResetGrantIds: [...used, grant.requestId]
+  }));
+}
+
 export async function hasAtlasPassword(playerName: string): Promise<boolean> {
   const raw = await readStored(await accountKey(validPlayerName(playerName)));
   if (!raw) return false;
   try {
-    const stored = JSON.parse(raw) as { version?: number; iterations?: number; salt?: string; hash?: string };
+    const stored = JSON.parse(raw) as StoredCredential;
     return stored.version === 1 && stored.iterations === ITERATIONS && Boolean(stored.salt && stored.hash);
   } catch { return false; }
 }
@@ -90,20 +186,23 @@ export async function setAtlasPassword(playerName: string, password: string): Pr
   const name = validPlayerName(playerName);
   const policyError = atlasPasswordPolicyError(password);
   if (policyError) throw new Error(policyError);
+  const key = await accountKey(name);
+  const previous = readCredential(await readStored(key));
   const salt = crypto.getRandomValues(new Uint8Array(16));
   const hash = await derive(password, salt);
-  await writeStored(await accountKey(name), JSON.stringify({
-    version: 1, iterations: ITERATIONS, salt: bytesToBase64(salt), hash: bytesToBase64(hash)
+  await writeStored(key, JSON.stringify({
+    version: 1,
+    iterations: ITERATIONS,
+    salt: bytesToBase64(salt),
+    hash: bytesToBase64(hash),
+    usedMasterResetGrantIds: usedGrantIds(previous)
   }));
-}
-export async function clearAtlasPassword(playerName: string): Promise<void> {
-  await writeStored(await accountKey(validPlayerName(playerName)), null);
 }
 export async function verifyAtlasPassword(playerName: string, password: string): Promise<boolean> {
   const raw = await readStored(await accountKey(validPlayerName(playerName)));
   if (!raw) return false;
   try {
-    const stored = JSON.parse(raw) as { version?: number; iterations?: number; salt?: string; hash?: string };
+    const stored = JSON.parse(raw) as StoredCredential;
     if (stored.version !== 1 || stored.iterations !== ITERATIONS || !stored.salt || !stored.hash) return false;
     const actual = await derive(password, base64ToBytes(stored.salt));
     return constantTimeEqual(actual, base64ToBytes(stored.hash));
