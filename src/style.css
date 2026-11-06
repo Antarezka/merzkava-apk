@@ -2885,3 +2885,34 @@ html.soft-keyboard-open .conversation-composer { padding-top:10px !important; }
 :root[data-theme="dark"] .developer-atlas-reset-confirm input[type=checkbox]{accent-color:#c4a56a}
 :root[data-theme="dark"] .developer-atlas-reset-proof,
 :root[data-theme="dark"] .developer-atlas-reset [data-developer-atlas-reset-message]{color:#c6c1a8}
+
+
+/* Account/login access routine — shared World Atlas-style animation surface. */
+.developer-login-card{position:relative!important;isolation:isolate}
+.developer-login-card>.atlas-access-buffer{inset:0;border-radius:inherit;min-height:100%}
+.developer-atlas-reset{position:relative;isolation:isolate;overflow:hidden}
+.atlas-buffer-track{position:relative;height:3px;border-radius:999px;box-shadow:inset 0 1px #0005}
+.atlas-buffer-track span{position:relative;border-radius:999px;will-change:transform;filter:drop-shadow(0 0 4px #e6c98288)}
+.atlas-buffer-track span:after{
+  position:absolute;top:-2px;right:-2px;width:9px;height:7px;border-radius:50%;
+  background:#fff1bf;box-shadow:0 0 8px 2px #ffe7a9a6;content:"";
+}
+.account-transition-overlay{
+  position:fixed!important;inset:0!important;z-index:2147483602!important;
+  display:grid!important;place-items:center!important;box-sizing:border-box!important;
+  padding:max(16px,env(safe-area-inset-top)) 14px max(16px,env(safe-area-inset-bottom))!important;
+  background:rgba(4,9,6,.82)!important;backdrop-filter:blur(11px) saturate(.76)!important;
+  -webkit-backdrop-filter:blur(11px) saturate(.76)!important;
+}
+.account-transition-overlay .atlas-access-buffer{
+  position:relative!important;inset:auto!important;width:min(100%,390px)!important;
+  min-height:min(430px,calc(100dvh - 38px))!important;padding:25px 22px!important;
+  border-radius:13px!important;box-shadow:0 24px 70px #000c,inset 0 0 0 5px #d4bd7a0e!important;
+}
+.account-transition-overlay .atlas-buffer-visual{width:112px;height:112px}
+.account-transition-overlay .atlas-buffer-status strong{font-size:19px}
+@media(max-width:390px){
+  .account-transition-overlay .atlas-access-buffer{padding:20px 16px!important;gap:13px}
+  .account-transition-overlay .atlas-buffer-visual{width:96px;height:96px}
+  .account-transition-overlay .atlas-buffer-status strong{font-size:16px}
+}
