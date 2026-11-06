@@ -38,7 +38,7 @@ import { animateAppScreen, animateNoticeboardExit } from "./ui/app-shell-motion"
 import { initializeGravityPullCord } from "./ui/gravity-pull-cord";
 import { installSoftKeyboardStability } from "./ui/soft-keyboard-stability";
 import { mountArcanistryTicketMachine } from "./offline-game/arcanistry-ticket-machine";
-import { handleWorldMapHierarchyClick, initializeWorldMapHierarchy, setWorldMapDeveloperMode } from "./offline-game/world-map-hierarchy";
+import { handleWorldMapHierarchyClick, initializeWorldMapHierarchy, setWorldMapDeveloperMode, disposeWorldMapHierarchy } from "./offline-game/world-map-hierarchy";
 import { bindScrollableResizableWindows } from "./offline-game/player-hud";
 import { closeLoreEntry, closeLoreSource, closeLorePlaceholder, openLoreEntry, openLoreSource, openLorePlaceholder, setLoreCategory, setLoreSearch, renderLoreResults } from "./world-archive/lore-library";
 import { playWorldAtlasAccessSequence } from "./offline-game/world-atlas-login-motion";
@@ -944,12 +944,15 @@ function setWorldAtlasAccessBufferContext(gate:HTMLElement,context:"world-atlas-
 }
 function closeWorldAtlas(syncHistory=true):void {
   const modal=root.querySelector<HTMLElement>("[data-idle-rpg-modal]");
-  const trigger=root.querySelector<HTMLButtonElement>("[data-idle-rpg-open]");
+  const renderer=modal?.dataset.renderer==="augusto-pxl"?"augusto-pxl":"dom";
+  const trigger=root.querySelector<HTMLButtonElement>(renderer==="augusto-pxl"?"[data-augusto-pxl-open]":"[data-idle-rpg-open]");
   const gate=modal?.querySelector<HTMLElement>("[data-world-atlas-gate]");
   if(gate)unlockAtlasBackground(gate);
   if(modal&&!modal.hidden)modal.hidden=true;
+  if(modal)delete modal.dataset.renderer;
   root.querySelector(".app-shell")?.classList.remove("is-idle-world");
-  trigger?.setAttribute("aria-expanded","false");
+  root.querySelectorAll<HTMLButtonElement>("[data-idle-rpg-open],[data-augusto-pxl-open]").forEach(item=>item.setAttribute("aria-expanded","false"));
+  disposeWorldMapHierarchy(root);
   // Back/Escape/close invalidates the in-flight attempt and aborts the live source request.
   worldAtlasLoginAttempt += 1;
   worldAtlasLoginAbort?.abort();
@@ -966,15 +969,20 @@ function closeWorldAtlas(syncHistory=true):void {
   trigger?.focus();
   if(syncHistory&&history.state?.idleRpgNotice)history.back();
 }
-async function openWorldAtlasFromTv():Promise<void> {
+async function openWorldAtlasFromTv(renderer:"dom"|"augusto-pxl"="dom"):Promise<void> {
   const modal=root.querySelector<HTMLElement>("[data-idle-rpg-modal]");
-  const trigger=root.querySelector<HTMLButtonElement>("[data-idle-rpg-open]");
+  const trigger=root.querySelector<HTMLButtonElement>(renderer==="augusto-pxl"?"[data-augusto-pxl-open]":"[data-idle-rpg-open]");
   const gate=modal?.querySelector<HTMLElement>("[data-world-atlas-gate]");
   if(!modal||!gate)return;
   if(!modal.hidden){closeWorldAtlas();return;}
   modal.hidden=false;
+  modal.dataset.renderer=renderer;
+  const legacyAtlas=modal.querySelector<HTMLElement>('[data-world-map-hierarchy][data-visual-mode="legacy"]');
+  const pxlAtlas=modal.querySelector<HTMLElement>('[data-world-map-hierarchy][data-visual-mode="augusto-pxl"]');
+  if(legacyAtlas)legacyAtlas.hidden=renderer!=="dom";
+  if(pxlAtlas)pxlAtlas.hidden=renderer!=="augusto-pxl";
   root.querySelector(".app-shell")?.classList.add("is-idle-world");
-  trigger?.setAttribute("aria-expanded","true");
+  root.querySelectorAll<HTMLButtonElement>("[data-idle-rpg-open],[data-augusto-pxl-open]").forEach(item=>item.setAttribute("aria-expanded",String(item===trigger)));
   initializeWorldMapHierarchy(root);
   history.pushState({idleRpgNotice:true,worldAtlasFromTv:true},"");
   gate.hidden=false;
@@ -1234,13 +1242,6 @@ function closeIdleAtlasFromBack():void {
 }
 window.addEventListener("merzkava:android-back",()=>{history.back();});
 window.addEventListener("popstate",(event:PopStateEvent)=>{
-  const pxlPanel=root.querySelector<HTMLElement>("[data-augusto-pxl-modal]");
-  if(pxlPanel&&!pxlPanel.hidden){
-    pxlPanel.hidden=true;
-    root.querySelector<HTMLButtonElement>("[data-augusto-pxl-open]")?.setAttribute("aria-expanded","false");
-    root.querySelector<HTMLButtonElement>("[data-augusto-pxl-open]")?.focus();
-    return;
-  }
   const idleNotice=root.querySelector<HTMLElement>("[data-idle-rpg-modal]");
   if(idleNotice&&!idleNotice.hidden){closeIdleAtlasFromBack();return;}
   const devPanel=root.querySelector<HTMLElement>("[data-dev-login-panel]");
@@ -1284,25 +1285,13 @@ window.addEventListener("popstate",(event:PopStateEvent)=>{
   history.pushState({merzkavaScreen:"control",merzkavaHome:false},"");
 });
 root.addEventListener("keydown", event => {
-  const pxlPanel=root.querySelector<HTMLElement>("[data-augusto-pxl-modal]");
-  if(event.key==="Escape"&&pxlPanel&&!pxlPanel.hidden){
-    pxlPanel.hidden=true;
-    root.querySelector<HTMLButtonElement>("[data-augusto-pxl-open]")?.setAttribute("aria-expanded","false");
-    root.querySelector<HTMLButtonElement>("[data-augusto-pxl-open]")?.focus();
-    if(history.state?.augustoPxlPanel)history.back();
-    return;
-  }
   const atlasGate=root.querySelector<HTMLElement>("[data-world-atlas-gate]");
   if(event.key==="Escape"&&atlasGate&&!atlasGate.hidden){closeWorldAtlas();return;}
   const devAccess=root.querySelector<HTMLElement>("[data-dev-login-panel]");
   if(event.key==="Escape"&&devAccess&&!devAccess.hidden){if(!hasAppAccess()&&activeScreen==="control")return;devAccess.hidden=true;return;}
   const idleNotice=root.querySelector<HTMLElement>("[data-idle-rpg-modal]");
   if(event.key==="Escape"&&idleNotice&&!idleNotice.hidden){
-    idleNotice.hidden=true;
-    root.querySelector(".app-shell")?.classList.remove("is-idle-world");
-    root.querySelector<HTMLButtonElement>("[data-idle-rpg-open]")?.setAttribute("aria-expanded","false");
-    root.querySelector<HTMLButtonElement>("[data-idle-rpg-open]")?.focus();
-    if(history.state?.idleRpgNotice) history.back();
+    closeWorldAtlas();
     return;
   }
   if(event.key==="Tab"&&idleNotice&&!idleNotice.hidden){
@@ -1618,18 +1607,7 @@ root.addEventListener("click", async (event: MouseEvent) => {
     if(worldAtlasLoginBusy)return;
     closeWorldAtlas();return;
   }
-  if (target.closest("[data-augusto-pxl-open]")) {
-    const panel=root.querySelector<HTMLElement>("[data-augusto-pxl-modal]");
-    const trigger=root.querySelector<HTMLButtonElement>("[data-augusto-pxl-open]");
-    if(panel&&trigger){panel.hidden=false;trigger.setAttribute("aria-expanded","true");history.pushState({augustoPxlPanel:true},"");panel.querySelector<HTMLButtonElement>(".expedition-pxl-dialog header [data-augusto-pxl-close]")?.focus();}
-    return;
-  }
-  if (target.closest("[data-augusto-pxl-close]")) {
-    const panel=root.querySelector<HTMLElement>("[data-augusto-pxl-modal]");
-    const trigger=root.querySelector<HTMLButtonElement>("[data-augusto-pxl-open]");
-    if(panel&&!panel.hidden){panel.hidden=true;trigger?.setAttribute("aria-expanded","false");trigger?.focus();if(history.state?.augustoPxlPanel)history.back();}
-    return;
-  }
+  if (target.closest("[data-augusto-pxl-open]")) { await openWorldAtlasFromTv("augusto-pxl"); return; }
   if (target.closest("[data-idle-rpg-open]")) { await openWorldAtlasFromTv(); return; }
   if (target.closest("[data-idle-rpg-close]")) { closeWorldAtlas(); return; }
   if (target.closest("[data-eternal-manager-toggle]")) {
