@@ -12,8 +12,9 @@ describe("in-world player HUD preview",()=>{
     expect(html).toContain("AFFILIATION");
     expect(html).toContain("Clan · Sect · Trade Guild · Assassin Guild · Empire Unit");
     expect((html.match(/class="wmh-skill-slot"/g)||[]).length).toBe(4);
-    expect(html).toContain('data-realm-tier="0"');
-    expect(html).toContain('data-realm-tier="3"');
+    expect(html).toContain('data-realm-tier="1"');
+    expect(html).toContain('data-realm-tier="4"');
+    expect(html).toContain("SR 1 · SPIRIT INITIATE");
     expect(html).toContain("TURN-BASED · TIME ORDER NOT CONNECTED");
     expect(html).toContain('data-hud-panel="quests"');
     expect(html).toContain('data-hud-panel="social"');

@@ -21,6 +21,7 @@ on:
       - feat/developer-issued-atlas-reset-2026-11-06
       - fix/mobile-scrollable-panels-2026-11-06
       - fix/world-atlas-isometric-runtime-2026-11-06
+      - feat/player-hud-subcell-runtime-2026-11-06
     paths:
       - "src/**"
       - "public/**"
