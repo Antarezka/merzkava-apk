@@ -56,7 +56,7 @@ describe("fractional isometric actor positions",()=>{
     const point={x:center.x+(DEFAULT_ISOMETRIC_GRID.tileW/2)*0.3,y:center.y+(DEFAULT_ISOMETRIC_GRID.tileH/2)*0.1};
     const resolved=isoSubcellPositionAtPoint(point,4,6,DEFAULT_ISOMETRIC_GRID);
     expect(resolved?.x).toBeCloseTo(4.2,5);
-    expect(resolved?.y).toBeCloseTo(6.1,5);
+    expect(resolved?.y).toBeCloseTo(5.9,5);
   });
   it("keeps edge taps inside the actor-safe diamond while rejecting taps outside",()=>{
     const center=isoCellCenter(2,3,DEFAULT_ISOMETRIC_GRID);
