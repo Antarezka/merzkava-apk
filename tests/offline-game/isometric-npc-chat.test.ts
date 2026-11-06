@@ -75,6 +75,8 @@ describe("isometric NPC conversations", () => {
     expect(worldMapSource).toContain("function updateIsometricMinimapActors");
     expect(worldMapSource).toContain("const queuePanFrame=");
     expect(worldMapSource).toContain("const queuePinchFrame=");
+    expect(worldMapSource).toContain("canvas.dataset.cropLeft=String(cropLeft)");
+    expect(worldMapSource).toContain("const stride=Math.max(1,Math.ceil(lineCount/160))");
     expect(worldMapSource).toContain("requestAnimationFrame(()=>{");
     expect(chatStyles).toContain("width:calc(var(--tile-w,64px)*3)!important");
     expect(worldMapSource).toContain("animate(token,{translateX:[dx,0],translateY:[dy,0]");
