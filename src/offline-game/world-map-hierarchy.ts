@@ -920,7 +920,7 @@ function drawIsometricForeground(board:HTMLElement,data=readIsoMapData(board)):v
   }
   for(const key of data.foregroundQuadrants){
     const match=/^(-?[0-9]+),(-?[0-9]+):(tl|tr|bl|br)-([ab])$/.exec(key);if(!match)continue;
-    const points=isoQuadrantTrianglePoints(Number(match[1]),Number(match[2]),(match[3]+"-"+match[4]) as IsoQuadrant).split(" ").map(point=>point.split(",").map(Number));
+    const points=isoQuadrantTrianglePoints(Number(match[1]),Number(match[2]),(match[3]+"-"+match[4]) as IsoQuadrant,data.grid).split(" ").map(point=>point.split(",").map(Number));
     points.forEach(point=>include(point[0],point[1]));
   }
   const naturalWidth=image.naturalWidth,naturalHeight=image.naturalHeight;
@@ -952,7 +952,7 @@ function drawIsometricForeground(board:HTMLElement,data=readIsoMapData(board)):v
   }
   for(const key of data.foregroundQuadrants){
     const match=/^(-?[0-9]+),(-?[0-9]+):(tl|tr|bl|br)-([ab])$/.exec(key);if(!match)continue;
-    const points=isoQuadrantTrianglePoints(Number(match[1]),Number(match[2]),(match[3]+"-"+match[4]) as IsoQuadrant).split(" ").map(point=>point.split(",").map(Number));
+    const points=isoQuadrantTrianglePoints(Number(match[1]),Number(match[2]),(match[3]+"-"+match[4]) as IsoQuadrant,data.grid).split(" ").map(point=>point.split(",").map(Number));
     ctx.moveTo(points[0][0],points[0][1]);
     for(let i=1;i<points.length;i++)ctx.lineTo(points[i][0],points[i][1]);
     ctx.closePath();
