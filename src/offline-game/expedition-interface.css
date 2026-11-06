@@ -532,3 +532,93 @@ body.eternal-choice-open{overflow:hidden}
 .app-shell.is-idle-world>.gravity-pull-cord{
   display:none!important;
 }
+
+/* Second Eternal Path gateway: a CSS-drawn CRT receiver with a compact console and stick. */
+.expedition-pixi-trigger{
+  position:fixed;z-index:80;right:max(12px,env(safe-area-inset-right));
+  bottom:calc(174px + env(safe-area-inset-bottom));left:auto;top:auto;
+  display:block;width:72px;height:72px;padding:0;border:0;border-radius:15px;
+  background:radial-gradient(circle at 40% 25%,#6e806f44,transparent 70%);
+  color:#dfc18b;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;
+  -webkit-tap-highlight-color:transparent;filter:drop-shadow(0 5px 9px #0009);
+}
+.expedition-pixi-trigger:before{
+  content:"";position:absolute;inset:4px 3px 6px;border:1px solid #c1a16a66;
+  border-radius:13px;background:linear-gradient(145deg,#26342d99,#11191433 68%,#382b1d55);
+  box-shadow:inset 0 1px 0 #fff2,0 0 0 2px #070b0888;
+}
+.pixi-tv-antenna{position:absolute;z-index:1;left:24px;top:1px;width:26px;height:15px}
+.pixi-tv-antenna:before,.pixi-tv-antenna:after{
+  content:"";position:absolute;bottom:1px;left:12px;width:1.5px;height:14px;
+  background:linear-gradient(#e7d6a8,#947449);transform-origin:bottom center;
+  box-shadow:0 0 2px #f0d8a166;
+}
+.pixi-tv-antenna:before{transform:rotate(-34deg)}
+.pixi-tv-antenna:after{transform:rotate(34deg)}
+.pixi-tv-antenna i,.pixi-tv-antenna b{
+  position:absolute;top:0;width:4px;height:4px;border-radius:50%;
+  border:1px solid #f1d69b;background:#805f36;box-shadow:0 0 5px #e8c78b66;
+}
+.pixi-tv-antenna i{left:2px}.pixi-tv-antenna b{right:2px}
+.pixi-tv-shell{
+  position:absolute;z-index:2;left:7px;top:12px;width:51px;height:37px;
+  border:2px solid #bd9a62;border-radius:8px 8px 7px 7px;
+  background:linear-gradient(145deg,#3b493d,#1b241e 74%);
+  box-shadow:inset 0 1px 2px #fff3,inset 0 -5px 8px #0008,0 3px 5px #0008;
+}
+.pixi-tv-shell:after{
+  content:"";position:absolute;left:5px;right:5px;bottom:2px;height:2px;
+  background:linear-gradient(90deg,transparent,#e7c78f88,transparent);opacity:.7;
+}
+.pixi-tv-screen{
+  position:absolute;left:5px;top:5px;width:31px;height:23px;overflow:hidden;
+  border:1px solid #a98a58;border-radius:4px;
+  background:
+    repeating-linear-gradient(0deg,#9fbd9b10 0 1px,transparent 1px 3px),
+    radial-gradient(ellipse at 52% 40%,#82977b 0%,#30493b 46%,#111d19 100%);
+  box-shadow:inset 0 0 7px #000c,0 0 5px #b5d09a44;
+}
+.pixi-tv-screen:before{
+  content:"";position:absolute;inset:2px 4px;
+  border-left:1px solid #d3d8af66;border-right:1px solid #d3d8af22;
+  transform:skewY(-9deg);opacity:.45;
+}
+.pixi-tv-screen:after{
+  content:"";position:absolute;left:3px;right:3px;bottom:4px;height:1px;
+  background:#dec78e77;box-shadow:0 -5px #b6d4ae22,0 -9px #b6d4ae18;
+}
+.pixi-tv-knobs{position:absolute;right:3px;top:7px;display:grid;gap:4px}
+.pixi-tv-knobs b{display:block;width:5px;height:5px;border:1px solid #d2b47b;border-radius:50%;background:radial-gradient(circle at 35% 30%,#e9d6a6,#69502f 75%);box-shadow:0 1px 2px #000}
+.pixi-console-box{
+  position:absolute;z-index:3;right:1px;bottom:6px;width:42px;height:18px;
+  border:1px solid #b3915f;border-radius:4px;
+  background:linear-gradient(155deg,#4b4030,#24251d 72%);
+  box-shadow:inset 0 1px #fff3,0 3px 5px #0009;transform:rotate(-5deg);
+}
+.pixi-console-box:before{
+  content:"";position:absolute;left:5px;right:5px;top:3px;height:1px;
+  background:linear-gradient(90deg,transparent,#e6c58d88,transparent);
+}
+.pixi-console-dpad{
+  position:absolute;left:8px;top:6px;width:8px;height:2px;border-radius:1px;background:#d1b47c;
+  box-shadow:3px -3px #d1b47c,3px 3px #d1b47c;
+}
+.pixi-console-stick{
+  position:absolute;right:8px;top:-5px;width:7px;height:7px;border:1px solid #e5c88e;
+  border-radius:50%;background:radial-gradient(circle at 30% 25%,#f4dfb0,#755331 70%);
+  box-shadow:0 0 5px #caa46b66;
+}
+.pixi-console-stick b{
+  position:absolute;left:2px;top:5px;width:2px;height:7px;border-radius:2px;background:#b99661;
+  transform:rotate(15deg);transform-origin:top center;
+}
+.pixi-console-lamp{
+  position:absolute;left:23px;bottom:3px;width:3px;height:3px;border-radius:50%;
+  background:#d8c08a;box-shadow:0 0 5px #e7c88b99;
+}
+.expedition-pixi-trigger:active{cursor:grabbing}
+.expedition-pixi-trigger.is-dragging{
+  cursor:grabbing;transform:scale(1.04);filter:brightness(1.15) drop-shadow(0 7px 10px #000b);
+}
+.expedition-pixi-trigger:focus-visible{outline:2px solid #e6c58e;outline-offset:4px}
+@media(prefers-reduced-motion:reduce){.expedition-pixi-trigger{transition:none}}
