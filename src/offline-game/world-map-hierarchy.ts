@@ -229,6 +229,23 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
   };
   const distance = (a: {x:number;y:number}, b: {x:number;y:number}) => Math.hypot(a.x-b.x,a.y-b.y);
   const midpoint = (a: {x:number;y:number}, b: {x:number;y:number}) => ({x:(a.x+b.x)/2,y:(a.y+b.y)/2});
+  let pinchFrame=0;
+  let queuedPinch:{zoom:number;x:number;y:number}|null=null;
+  const flushPinchFrame=()=>{
+    if(pinchFrame)cancelAnimationFrame(pinchFrame);
+    pinchFrame=0;
+    const next=queuedPinch;queuedPinch=null;
+    if(next)applyZoom(next.zoom,next.x,next.y);
+  };
+  const queuePinchFrame=(nextZoom:number,x:number,y:number)=>{
+    queuedPinch={zoom:nextZoom,x,y};
+    if(pinchFrame)return;
+    pinchFrame=requestAnimationFrame(()=>{
+      pinchFrame=0;
+      const next=queuedPinch;queuedPinch=null;
+      if(next)applyZoom(next.zoom,next.x,next.y);
+    });
+  };
   const applySurfaceSize=(scale:number) => {
     surface.style.width=(baseWidth*scale)+"px";
     surface.style.height=(baseHeight*scale)+"px";
@@ -278,6 +295,7 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
   };
   const applyZoom = (next: number, focusX?: number, focusY?: number) => {
     flushPanFrame();
+    if(pinchFrame){cancelAnimationFrame(pinchFrame);pinchFrame=0;queuedPinch=null;}
     if (!baseWidth || !baseHeight) sizeBaseMap();
     const previous = zoom;
     zoom = Math.max(1, Math.min(2.5, next));
@@ -363,10 +381,11 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
     if (!pointers.has(event.pointerId)) return;
     pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
     if (pointers.size >= 2 && pinchStart) {
+      flushPanFrame();
       pendingCameraPan=null;
       const pair = [...pointers.values()].slice(0,2);
       const center = midpoint(pair[0], pair[1]);
-      applyZoom(pinchStart.zoom * distance(pair[0], pair[1]) / pinchStart.distance, center.x, center.y);
+      queuePinchFrame(pinchStart.zoom * distance(pair[0], pair[1]) / pinchStart.distance, center.x, center.y);
       event.preventDefault();
     } else if (pointers.size === 1) {
       if(!panStart&&pendingCameraPan&&isoPointerGesture(
@@ -383,6 +402,7 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
   });
   const endPointer = (event: PointerEvent) => {
     flushPanFrame();
+    if(pointers.size<=2)flushPinchFrame();
     pointers.delete(event.pointerId);
     if (pointers.size < 2) pinchStart = null;
     if (pointers.size === 1) {
