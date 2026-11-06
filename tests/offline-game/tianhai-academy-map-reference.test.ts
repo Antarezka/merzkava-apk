@@ -24,8 +24,8 @@ describe("Tianhai Academy owner-supplied map reference", () => {
 
   it("retains the four transition actions and their owner-set positions", () => {
     expect(normalized.transitions).toEqual([
-      {id:"transition-1793864008899-0",x:11,y:31,label:"Akses ke map golden dragon empire"},
-      {id:"transition-1793864011340-1",x:12,y:31,label:"Akses ke map golden dragon empire"},
+      {id:"transition-1793864008899-0",x:11,y:31,label:"Akses ke map golden dragon empire",targetRegion:"golden-dragon-empire"},
+      {id:"transition-1793864011340-1",x:12,y:31,label:"Akses ke map golden dragon empire",targetRegion:"golden-dragon-empire"},
       {id:"transition-1793864745728-2",x:9,y:3,label:"Dialog box: you're not qualified yet"},
       {id:"transition-1793864803234-3",x:14,y:-5,label:"Event scene: pengenalan dunia merzkava tentang spirit realm dan archanistry"},
     ]);
