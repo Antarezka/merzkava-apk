@@ -123,3 +123,106 @@
   transform:var(--hud-layout-transform,none)!important;
   transform-origin:top left!important;
 }
+
+
+/* Compact field HUD: preserve the instruments while returning most of the map to play. */
+.wmh-isometric-play-screen .wmh-player-card{
+  width:min(214px,calc(100vw - 150px))!important;
+  padding:6px 7px!important;
+  border-radius:8px!important;
+  background:rgba(8,14,10,.94)!important;
+  box-shadow:0 2px 8px #0007!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+}
+.wmh-isometric-play-screen .wmh-player-hud-header{grid-template-columns:21px minmax(0,1fr) auto!important;gap:5px!important;padding-bottom:4px!important}
+.wmh-isometric-play-screen .wmh-player-crest{width:20px!important;height:20px!important;font-size:12px!important;box-shadow:none!important}
+.wmh-isometric-play-screen .wmh-player-id>strong{font-size:10px!important}
+.wmh-isometric-play-screen .wmh-player-id>em{display:none!important}
+.wmh-isometric-play-screen .wmh-player-id>small,.wmh-isometric-play-screen .wmh-player-realm small{font-size:5px!important}
+.wmh-isometric-play-screen .wmh-player-realm>b{padding:3px 4px!important;font-size:6px!important}
+.wmh-isometric-play-screen .wmh-player-vitals{grid-template-columns:1fr!important;gap:4px!important;padding:5px 0!important}
+.wmh-isometric-play-screen .wmh-player-meter-copy{margin-bottom:2px!important}
+.wmh-isometric-play-screen .wmh-player-meter-copy>b{font-size:6px!important}
+.wmh-isometric-play-screen .wmh-player-meter-copy>strong{font-size:8px!important}
+.wmh-isometric-play-screen .wmh-player-meter-track{height:3px!important;border:0!important}
+.wmh-isometric-play-screen .wmh-player-affiliation{padding:4px 0!important}
+.wmh-isometric-play-screen .wmh-player-affiliation>span{gap:2px!important}
+.wmh-isometric-play-screen .wmh-player-affiliation small{font-size:5px!important}
+.wmh-isometric-play-screen .wmh-player-affiliation b{font-size:7px!important}
+.wmh-isometric-play-screen .wmh-player-affiliation>em{display:none!important}
+.wmh-isometric-play-screen .wmh-player-hud-actions{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:3px!important;margin-top:4px!important}
+.wmh-isometric-play-screen .wmh-player-hud-actions button,
+.wmh-isometric-play-screen .wmh-player-hud-actions button:last-child{
+  grid-column:auto!important;display:flex!important;min-width:0!important;min-height:22px!important;
+  flex-direction:row!important;align-items:center!important;justify-content:center!important;gap:2px!important;
+  padding:3px 2px!important;border-radius:4px!important;font-size:5.5px!important;letter-spacing:0!important;
+  white-space:nowrap!important;overflow:hidden!important;text-align:center!important;
+}
+.wmh-isometric-play-screen .wmh-player-hud-actions button small{display:none!important}
+.wmh-isometric-play-screen .wmh-player-hud-feedback{display:none!important}
+.wmh-isometric-play-screen .wmh-hud-drawer{
+  top:calc(100% + 4px)!important;max-height:42dvh!important;overflow:auto!important;
+  background:rgba(8,14,10,.98)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+  box-shadow:0 3px 10px #0008!important;
+}
+.wmh-isometric-play-screen .wmh-player-dock{
+  width:min(232px,calc(100vw - 16px))!important;padding:5px!important;
+  border:1px solid #b99a6266!important;border-radius:8px!important;
+  background:rgba(8,14,10,.88)!important;box-shadow:0 2px 8px #0006!important;
+  backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+}
+.wmh-isometric-play-screen .wmh-player-dock>div>header{margin-bottom:3px!important}
+.wmh-isometric-play-screen .wmh-player-dock>div>header>b{font-size:6px!important}
+.wmh-isometric-play-screen .wmh-player-dock>div>header>small{font-size:5px!important}
+.wmh-isometric-play-screen .wmh-skill-dock{padding-bottom:4px!important}
+.wmh-isometric-play-screen .wmh-skill-slots{gap:3px!important}
+.wmh-isometric-play-screen .wmh-skill-slot{min-height:43px!important;gap:2px!important;padding:3px 1px!important;border-radius:4px!important;background:rgba(15,22,17,.82)!important;box-shadow:none!important}
+.wmh-isometric-play-screen .wmh-skill-ring{width:20px!important;height:20px!important;box-shadow:inset 0 0 0 3px #0a100d!important;will-change:auto!important}
+.wmh-isometric-play-screen .wmh-skill-ring>i{inset:4px!important;will-change:auto!important}
+.wmh-isometric-play-screen .wmh-skill-realm{font-size:4.5px!important;letter-spacing:0!important}
+.wmh-isometric-play-screen .wmh-skill-slot>strong{font-size:6.5px!important}
+.wmh-isometric-play-screen .wmh-skill-slot>em{display:none!important}
+.wmh-isometric-play-screen .wmh-inventory-dock{padding-top:4px!important}
+.wmh-isometric-play-screen .wmh-inventory-slots{gap:3px!important}
+.wmh-isometric-play-screen .wmh-inventory-item{grid-template-columns:13px minmax(0,1fr) auto!important;gap:3px!important;padding:3px!important;box-shadow:none!important}
+.wmh-isometric-play-screen .wmh-inventory-glyph{width:12px!important;height:12px!important;font-size:8px!important}
+.wmh-isometric-play-screen .wmh-inventory-copy>b{font-size:5.5px!important}
+.wmh-isometric-play-screen .wmh-inventory-copy>small{display:none!important}
+.wmh-isometric-play-screen .wmh-inventory-item>strong{font-size:6px!important}
+.wmh-isometric-play-screen .wmh-world-status,
+.wmh-isometric-play-screen .wmh-rpg-minimap{
+  backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+  box-shadow:0 2px 7px #0006!important;
+}
+.wmh-isometric-play-screen .wmh-map-back{
+  width:36px!important;min-width:36px!important;height:36px!important;min-height:36px!important;
+  justify-content:center!important;padding:3px!important;border-radius:50%!important;
+}
+.wmh-isometric-play-screen .wmh-map-back b{display:none!important}
+.wmh-isometric-play-screen .wmh-map-back span{font-size:25px!important}
+
+/* Realm rings keep their tier-specific rotation without eight Anime.js loops. */
+.wmh-isometric-play-screen .wmh-skill-ring{animation:wmh-hud-ring-spin var(--ring-speed,36s) linear infinite!important}
+.wmh-isometric-play-screen .wmh-skill-ring>i{animation:wmh-hud-ring-spin-reverse var(--inner-speed,28s) linear infinite!important}
+.wmh-isometric-play-screen .wmh-skill-slot[data-realm-tier="1"]{--ring-speed:42s;--inner-speed:32s}
+.wmh-isometric-play-screen .wmh-skill-slot[data-realm-tier="2"]{--ring-speed:36s;--inner-speed:27s}
+.wmh-isometric-play-screen .wmh-skill-slot[data-realm-tier="3"]{--ring-speed:30s;--inner-speed:23s}
+.wmh-isometric-play-screen .wmh-skill-slot[data-realm-tier="4"]{--ring-speed:25s;--inner-speed:19s}
+@keyframes wmh-hud-ring-spin{to{transform:rotate(360deg)}}
+@keyframes wmh-hud-ring-spin-reverse{to{transform:rotate(-360deg)}}
+.wmh-player-hud.wmh-hud-motion-paused .wmh-skill-ring,
+.wmh-player-hud.wmh-hud-motion-paused .wmh-skill-ring>i{animation-play-state:paused!important}
+@media(max-width:520px){
+ .wmh-isometric-play-screen .wmh-player-card{width:clamp(136px,42vw,164px)!important;right:max(7px,env(safe-area-inset-right))!important;padding:5px 6px!important}
+ .wmh-isometric-play-screen .wmh-player-dock{right:max(6px,env(safe-area-inset-right))!important;bottom:max(6px,env(safe-area-inset-bottom))!important;width:min(232px,calc(100vw - 16px))!important}
+}
+@media(max-height:700px){
+ .wmh-isometric-play-screen .wmh-player-card{padding:4px 6px!important}
+ .wmh-isometric-play-screen .wmh-player-vitals{gap:3px!important;padding:3px 0!important}
+ .wmh-isometric-play-screen .wmh-player-hud-actions{margin-top:3px!important}
+ .wmh-isometric-play-screen .wmh-player-dock{bottom:max(4px,env(safe-area-inset-bottom))!important}
+}
+@media(prefers-reduced-motion:reduce){
+ .wmh-isometric-play-screen .wmh-skill-ring,.wmh-isometric-play-screen .wmh-skill-ring>i{animation:none!important}
+}
