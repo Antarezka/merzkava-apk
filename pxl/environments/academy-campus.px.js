@@ -147,7 +147,14 @@ function hallAtScreen(sx,sy,w,d,wallH,rise,base=0) {
 }
 function bridgeAtScreen(sx,sy,width=3.6) {
   const [x,z]=atScreen(sx,sy)
-  academyBridge(x,z,width)
+  block("wood","wood",x-width/2,z-0.42,x+width/2,z+0.42,0.36,0.62)
+  block("brass","wood",x-width/2,z-0.48,x+width/2,z-0.38,0.72,0.82)
+  block("brass","wood",x-width/2,z+0.38,x+width/2,z+0.48,0.72,0.82)
+  for(let i=0;i<=4;i++) {
+    const px=x-width/2+i*width/4
+    block("wood","wood",px-0.055,z-0.5,px+0.055,z-0.38,0.62,1.12)
+    block("wood","wood",px-0.055,z+0.38,px+0.055,z+0.5,0.62,1.12)
+  }
 }
 
 // The full ground plane extends beyond all four screen edges so the exported map has no blank border.
