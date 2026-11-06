@@ -20,17 +20,8 @@ sprite("_academy-pixel-source", {
   pivot: "center",
   genre: "atlas-art",
 })
-scene("academy-campus-pixel-pass", {
-  w: 704,
-  h: 384,
-  bg: "0",
-  sizes: { "academy-exterior": 4 },
-},
-  layer("approved-campus-composition", stamp("_academy-pixel-source", 352, 192)),
-  // A restrained highlight roll-off and vignette gives the PXL render a model-like HD-2D finish
-  // without repainting, shifting, hiding or reinterpreting any playable landmark.
-  post({ bloom: { strength: 0.16, r: 3 }, vignette: 0.12 }),
-)
+// The old map remains a PXL reference layer only. The runtime export is now a PXL-authored
+// perspective/mesh campus scene with the same world-map bounds and Academy landmark arrangement.
 
 sprite("academy-minimap", {
   png: "references/academy-exterior-source.png",
@@ -70,3 +61,6 @@ for (const [id,x,y,w,h] of REGIONS) {
     genre: "atlas-art",
   })
 }
+
+// Included last so the Academy scene can use the approved campus art as a faint, non-exported guide.
+include("../environments/academy-campus.px.js")
