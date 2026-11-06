@@ -2245,21 +2245,6 @@ function actorScanTone(actor:HTMLElement):ActorScanTone {
 function actorScanColor(tone:ActorScanTone):string {
   return tone==="friendly"?"#55baff":tone==="hostile"?"#ed5353":tone==="spirit-expert"?"#090b0d":"#f5f6f7";
 }
-function emitTileTrailWave(board:HTMLElement,actor:HTMLElement):void {
-  const x=Number(actor.dataset.x||0),y=Number(actor.dataset.y||0);
-  const tile=board.querySelector<HTMLElement>('[data-wmh-tile][data-x="'+x+'"][data-y="'+y+'"]');
-  if(!tile)return;
-  const boardRect=board.getBoundingClientRect(),tileRect=tile.getBoundingClientRect();
-  const wave=document.createElement("span"),tone=actorScanTone(actor);
-  wave.className="wmh-tile-trail-wave tone-"+tone;
-  wave.style.left=(tileRect.left+tileRect.width/2-boardRect.left)+"px";
-  wave.style.top=(tileRect.top+tileRect.height/2-boardRect.top)+"px";
-  wave.style.setProperty("--scan-color",actorScanColor(tone));
-  board.append(wave);
-  const reduceMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches===true;
-  if(reduceMotion){wave.remove();return;}
-  animate(wave,{scale:[.2,1.65],opacity:[.42,0],duration:760,ease:"outQuad",onComplete:()=>wave.remove()});
-}
 function updateScannerContacts(board:HTMLElement):void {
   const actors=Array.from(board.querySelectorAll<HTMLElement>("[data-wmh-player-token],[data-wmh-npc]"));
   const previous=scannerContacts.get(board)||new Set<string>(),next=new Set<string>();
