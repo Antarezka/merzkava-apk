@@ -2176,6 +2176,7 @@
 [data-wmh-board].wmh-pixi-render-active [data-wmh-tile]{pointer-events:all!important}
 [data-wmh-board].wmh-pixi-render-active .wmh-character-token{
   opacity:0!important;pointer-events:auto!important;
+  animation:none!important;transition:none!important;will-change:auto!important;
 }
 [data-wmh-board].wmh-pixi-render-active .wmh-npc-proximity-glow,
 [data-wmh-board].wmh-pixi-render-active .wmh-sonar-ring,
