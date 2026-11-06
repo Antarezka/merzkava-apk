@@ -390,7 +390,7 @@ button.wmh-inventory-slot{cursor:pointer!important;touch-action:manipulation!imp
 
 /* Every long in-world window has internal scrolling and a touch resize grip. */
 .wmh-scroll-resize-window{
-  position:relative!important;max-height:min(82dvh,720px)!important;min-height:110px!important;
+  max-height:min(82dvh,720px)!important;min-height:110px!important;
   overflow-x:hidden!important;overflow-y:auto!important;overscroll-behavior:contain!important;
   -webkit-overflow-scrolling:touch!important;resize:both!important;
 }
