@@ -1,6 +1,6 @@
 # Isometric Game-Mode Renderer — PixiJS Evaluation
 
-**Status:** isolated dual-renderer prototype; CI passed at `8823d0d3ad50f685057046210960d0716b145d80`; physical-device QA remains pending, not approved for production merge.
+**Status:** isolated dual-renderer prototype; CI passed at `28d088a896b65df2c2bbd13c8bea1d3c08d1cfe4`; physical-device QA remains pending, not approved for production merge.
 **Evaluation base:** Build #1341 lineage, with the first performance pass carried forward.
 **Primary runtime:** `src/offline-game/world-map-hierarchy.ts`
 **Data authority:** `IsoMapEditorData` and the existing deterministic movement / interaction helpers.
@@ -147,4 +147,4 @@ Automated tests and Web build validation are necessary but do not certify Androi
 
 The owner has explicitly authorized this isolated Pixi World Atlas prototype. The exception is limited to the second Eternal Path floating gateway and the visual renderer in `src/offline-game/pixi-world-atlas-renderer.ts`. The original Coastal Receiver remains DOM/SVG.
 
-The canonical safeguards in `docs/FORBIDDEN_TECHNOLOGIES.md` remain active everywhere else. GitHub Actions Web App Validation #42192239379 passed on commit `8823d0d3ad50f685057046210960d0716b145d80` (40 test files / 295 tests, TypeScript, gateway type-check, Vite production build, npm audit with 0 vulnerabilities). The latest prototype also refreshes Pixi map textures after Developer editor changes and releases generated SVG texture sources on cleanup. This branch is not production-approved until physical-device QA verifies both TV icons, DOM controls, gestures, editor handoff, cleanup, and fallback on the TECNO target. A successful CI build alone is not production approval.
+The canonical safeguards in `docs/FORBIDDEN_TECHNOLOGIES.md` remain active everywhere else. GitHub Actions Web App Validation #42193130033 passed on commit `28d088a896b65df2c2bbd13c8bea1d3c08d1cfe4` (40 test files / 297 tests, TypeScript, gateway type-check, Vite production build, npm audit with 0 vulnerabilities). The prototype also refreshes Pixi map textures after Developer editor changes, releases generated SVG texture sources on cleanup, keeps DOM transition markers above the Pixi canvas, and uses a 1× canvas buffer for the low-end Android target. This branch is not production-approved until physical-device QA verifies both TV icons, DOM controls, gestures, editor handoff, cleanup, and fallback on the TECNO target. A successful CI build alone is not production approval.
