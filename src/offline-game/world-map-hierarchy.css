@@ -2163,21 +2163,74 @@
 }
 
 
-/* Low-power field rendering: keep map artwork stable while tokens move. */
+/* Low-power field rendering: preserve actor character through compositor-friendly effects. */
 .wmh-isometric-play-screen .wmh-isometric-board,
 .wmh-isometric-play-screen .wmh-academy-map-surface{filter:none!important}
-.wmh-isometric-play-screen .wmh-character-token{transition:none!important;will-change:transform}
+.wmh-isometric-play-screen .wmh-character-token{transition:none!important}
 .wmh-isometric-play-screen .wmh-character-token:not(.wmh-player-token){animation:none!important}
-.wmh-isometric-play-screen .wmh-sonar-ring,
-.wmh-isometric-play-screen .wmh-token-movement-glow,
-.wmh-isometric-play-screen .wmh-tile-trail-wave{display:none!important}
-.wmh-isometric-play-screen .wmh-character-token>.wmh-npc-proximity-glow{
-  background:transparent!important;box-shadow:none!important;filter:none!important;
-  transition:none!important;will-change:auto!important
-}
 .wmh-isometric-play-screen .wmh-world-status,
 .wmh-isometric-play-screen .wmh-player-card,
 .wmh-isometric-play-screen .wmh-skill-dock,
-.wmh-isometric-play-screen .wmh-hud-drawer{
-  backdrop-filter:none!important;-webkit-backdrop-filter:none!important
+.wmh-isometric-play-screen .wmh-hud-drawer{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+
+/* The inner sprite bobs independently from the token's path transform. */
+.wmh-isometric-play-screen .wmh-character-token:not(.wmh-player-token)>i{animation:wmh-actor-idle 2.8s ease-in-out infinite alternate;transform-origin:50% 70%}
+@keyframes wmh-actor-idle{from{transform:translateY(0)}to{transform:translateY(-2px)}}
+
+/* Two thin sonar traces are pseudo-elements, not separate animated DOM nodes. */
+.wmh-isometric-play-screen .wmh-character-token.wmh-scanner-active::before,
+.wmh-isometric-play-screen .wmh-character-token.wmh-scanner-active::after{
+  content:"";position:absolute;left:50%;top:50%;z-index:0;display:block;pointer-events:none;
+  width:calc(var(--tile-w,64px)*4.6);height:calc(var(--tile-h,32px)*4.6);
+  border:1px solid var(--scan-color,#d8c18b);border-radius:50%;opacity:0;
+  background:transparent;transform:translate(-50%,-50%) scale(.08);
+  animation:wmh-field-sonar 3.6s ease-out infinite
 }
+.wmh-isometric-play-screen .wmh-character-token.wmh-scanner-active::after{animation-delay:-1.8s;border-style:dashed;opacity:0}
+@keyframes wmh-field-sonar{
+  0%{opacity:.3;transform:translate(-50%,-50%) scale(.08)}
+  72%{opacity:.12}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(1)}
+}
+
+/* Proximity glow keeps its soft halo, but animates only transform and opacity. */
+.wmh-isometric-play-screen .wmh-character-token>.wmh-npc-proximity-glow{
+  position:absolute!important;z-index:1!important;left:-7px!important;top:-7px!important;right:-7px!important;bottom:-7px!important;
+  border:1.5px solid var(--npc-proximity-color,#e5d9b9)!important;border-radius:50%!important;
+  background:radial-gradient(circle,transparent 52%,color-mix(in srgb,var(--npc-proximity-color,#e5d9b9) 13%,transparent) 100%)!important;
+  box-shadow:0 0 6px color-mix(in srgb,var(--npc-proximity-color,#e5d9b9) 32%,transparent)!important;
+  filter:none!important;transition:opacity 180ms ease,transform 220ms ease!important;will-change:auto!important
+}
+
+/* Reuse one short-lived step trace per actor instead of creating particles per frame. */
+.wmh-isometric-play-screen .wmh-character-token>.wmh-token-movement-glow{
+  position:absolute!important;z-index:1!important;left:calc(50% + var(--move-shift-x,0px))!important;top:calc(50% + var(--move-shift-y,0px))!important;
+  width:145%!important;height:125%!important;translate:-50% -50%!important;border:1px solid #e8c78399!important;
+  border-radius:50%!important;background:radial-gradient(ellipse,#e7c77a28 0%,transparent 72%)!important;
+  box-shadow:none!important;filter:none!important;opacity:0!important;pointer-events:none!important
+}
+.wmh-isometric-play-screen .wmh-character-token>.wmh-token-movement-glow.is-active{animation:wmh-token-step-trail 480ms ease-out both}
+@keyframes wmh-token-step-trail{0%{opacity:0;transform:scale(.55)}32%{opacity:.44}100%{opacity:0;transform:scale(1.25)}}
+
+/* Backgrounding the app pauses decorative loops and NPC wander updates. */
+.wmh-isometric-play-screen .wmh-motion-paused .wmh-character-token::before,
+.wmh-isometric-play-screen .wmh-motion-paused .wmh-character-token::after,
+.wmh-isometric-play-screen .wmh-motion-paused .wmh-character-token>i{animation-play-state:paused!important}
+@media(prefers-reduced-motion:reduce){
+  .wmh-isometric-play-screen .wmh-character-token:not(.wmh-player-token)>i,
+  .wmh-isometric-play-screen .wmh-character-token::before,
+  .wmh-isometric-play-screen .wmh-character-token::after,
+  .wmh-isometric-play-screen .wmh-character-token>.wmh-token-movement-glow{animation:none!important;display:none!important}
+  .wmh-isometric-play-screen .wmh-character-token>.wmh-npc-proximity-glow{transition:none!important}
+}
+
+/* Keep the minimap visible below the world-status instrument. */
+.wmh-isometric-play-screen .wmh-rpg-minimap{
+  top:max(112px,calc(env(safe-area-inset-top) + 104px))!important;
+  left:max(8px,env(safe-area-inset-left))!important;right:auto!important;width:clamp(96px,29vw,112px)!important;
+  gap:3px!important;padding:4px!important
+}
+.wmh-isometric-play-screen .wmh-minimap-world{aspect-ratio:1.83/1!important}
+.wmh-isometric-play-screen .wmh-minimap-heading{font-size:6px!important}
+.wmh-isometric-play-screen .wmh-minimap-footer{font-size:5px!important}
+@media(max-height:700px){.wmh-isometric-play-screen .wmh-rpg-minimap{top:max(104px,calc(env(safe-area-inset-top) + 96px))!important}}

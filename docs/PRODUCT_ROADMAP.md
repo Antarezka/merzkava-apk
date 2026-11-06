@@ -1097,3 +1097,12 @@ Current source baseline for this workstream: ed5ef007cead9ecf8e6e70662c29ec5cce9
 - Center Map now uses the saved Map Base focal point with the Academy canvas margins applied. Developer Settings now scans local profiles, local journeys and the verified pinned `players.md` name list without downloading every profile or running access animations.
 
 **Still open:** physical-device verification on Tecno Spark Go 1 KL4; confirm the dark-map flicker is gone during simultaneous player/NPC movement; verify center selection against several points on the expanded Academy canvas; verify Master Reset options and request generation with online and offline states; verify no regression in map editing, NPC interactions or menu navigation.
+
+
+### 13O. Build #1343 isometric effects and minimap restoration (2026-11-06)
+
+- Restore NPC idle motion, dual sonar pulses, proximity halo and short movement trails using a small set of CSS transforms/opacity animations and reusable actor elements; avoid a per-actor Anime.js pulse loop and pause decorative motion while the document is hidden.
+- Show the minimap on all isometric areas, including Tianhai Academy. Academy minimap geometry uses the actual 2816×1536 map artwork rather than the expanded camera canvas, keeping actor dots and minimap tap coordinates aligned.
+- No new animation or rendering dependency is added. PixiJS, Phaser and Konva remain possible future renderer options, but replacing the current interactive map for these effects is not needed for this performance pass.
+
+**Still open:** verify the restored effects and minimap on the Tecno Spark Go 1 KL4; confirm minimap taps route to the same visible map coordinates; confirm map flicker, touch interaction, app memory and movement frame pacing under simultaneous NPC/player motion.

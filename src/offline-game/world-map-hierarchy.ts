@@ -944,10 +944,9 @@ function renderIsometricWorldStatus(dialog:HTMLElement):void {
   const overlay=dialog.closest<HTMLElement>("[data-world-map-hierarchy]");
   if(overlay){overlay.dataset.wmhCycle=atmosphere.cycle.toLowerCase();overlay.dataset.wmhWeather=atmosphere.weather.toLowerCase();}
 }
-function shouldShowIsometricMinimap(mapId:string,title:string):boolean {
-  const key=(mapId+" "+title).toLowerCase();
-  if(/academy|capital|market|harbor|harbour|city|village|settlement|district|arena|terrace|port|hall|interior|school/.test(key))return false;
-  return /forest|wilds|wilderness|transit|traveller|travel-road|roadway|mountain-pass|trail|frontier|expedition|outer-route|field-route/.test(key);
+function shouldShowIsometricMinimap(_mapId:string,_title:string):boolean {
+  // Every local isometric area keeps the compact field map available.
+  return true;
 }
 function captureIsometricClockState():{day:number;minutes:number;cycle:string;weather:string}|null {
   const save=getEternalSave();if(!save)return null;
@@ -1011,14 +1010,18 @@ function renderIsometricMinimap(board:HTMLElement):void {
   if(!world||!actors)return;
   const data=readIsoMapData(board);
   const style=getComputedStyle(board);
-  const boardWidth=Number.parseFloat(style.getPropertyValue("--iso-board-width"))||board.offsetWidth||1;
-  const boardHeight=Number.parseFloat(style.getPropertyValue("--iso-board-height"))||board.offsetHeight||1;
+  const isTianhaiAcademy=board.dataset.mapId==="golden-dragon-empire:tianhai-academy:exterior";
+  const academyArtwork=board.querySelector<HTMLImageElement>("[data-wmh-map-art]");
+  // The Academy camera canvas includes large pan margins. The minimap maps
+  // only the artwork coordinate space, never the empty expansion margins.
+  const boardWidth=isTianhaiAcademy?(academyArtwork?.naturalWidth||2816):
+    (Number.parseFloat(style.getPropertyValue("--iso-board-width"))||board.offsetWidth||1);
+  const boardHeight=isTianhaiAcademy?(academyArtwork?.naturalHeight||1536):
+    (Number.parseFloat(style.getPropertyValue("--iso-board-height"))||board.offsetHeight||1);
   board.dataset.wmhMinimapBoardWidth=String(boardWidth);
   board.dataset.wmhMinimapBoardHeight=String(boardHeight);
   world.dataset.wmhRendered="true";
   world.style.setProperty("aspect-ratio",boardWidth+" / "+boardHeight,"important");
-
-  const isTianhaiAcademy=board.dataset.mapId==="golden-dragon-empire:tianhai-academy:exterior";
   const gridSvg=world.querySelector<SVGSVGElement>("[data-wmh-minimap-grid]");
   const mainGridSvg=board.classList.contains("is-minimap-style")?board.querySelector<SVGSVGElement>("[data-wmh-scene-svg]"):null;
   if(gridSvg)gridSvg.style.display="";
@@ -1179,8 +1182,8 @@ function bindIsometricHud(dialog:HTMLElement):void {
       if(board.classList.contains("wmh-overlay-editing"))return;
       const rect=world.getBoundingClientRect();
       const style=getComputedStyle(board);
-      const boardWidth=Number.parseFloat(style.getPropertyValue("--iso-board-width"))||board.offsetWidth||1;
-      const boardHeight=Number.parseFloat(style.getPropertyValue("--iso-board-height"))||board.offsetHeight||1;
+      const boardWidth=Number(board.dataset.wmhMinimapBoardWidth)||Number.parseFloat(style.getPropertyValue("--iso-board-width"))||board.offsetWidth||1;
+      const boardHeight=Number(board.dataset.wmhMinimapBoardHeight)||Number.parseFloat(style.getPropertyValue("--iso-board-height"))||board.offsetHeight||1;
       const point={
         x:Math.max(0,Math.min(1,(event.clientX-rect.left)/Math.max(1,rect.width)))*boardWidth,
         y:Math.max(0,Math.min(1,(event.clientY-rect.top)/Math.max(1,rect.height)))*boardHeight,
@@ -2109,7 +2112,7 @@ function isometricEditorMarkup(): string {
     '<small data-wmh-overlay-status>Choose a tool, then tap individual diamond cells. The world pauses while the editor is open.</small></section></div></div>';
 }
 function isometricHudMarkup(title: string, mapImage: string, showMinimap = true): string {
-  // The shared HUD is universal; the field map is reserved for wilderness and transit areas.
+  // The shared HUD and compact field map are available in every local isometric area.
   const minimapMarkup=
     '<button type="button" class="wmh-rpg-minimap" data-wmh-minimap aria-label="Minimap. Tap a location to walk there." title="Tap the map to move">'+
     '<span class="wmh-minimap-heading">FIELD MAP <i>⌖</i></span><span class="wmh-minimap-world" data-wmh-minimap-world>'+
@@ -2195,7 +2198,7 @@ function isometricPlayMarkup(regionId: RegionId, selectedBuilding: string, inter
       '<canvas class="wmh-isometric-foreground" data-wmh-foreground-canvas aria-hidden="true"></canvas>'+
       '<svg class="wmh-area-overlay-svg wmh-academy-grid-overlay" data-wmh-overlay-svg viewBox="0 0 2816 1536" preserveAspectRatio="none" aria-label="Editable isometric interaction grid"><g data-wmh-interaction-grid></g><g data-wmh-overlay-marks></g><g data-wmh-manual-marks></g><g data-wmh-transition-marks></g><path data-wmh-overlay-preview class="wmh-area-mark-preview" d=""></path></svg>'+
       '<div class="wmh-academy-actor-layer" data-wmh-actor-layer><button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token data-scan-tone="unknown" data-token-label="" data-x="12" data-y="31" aria-label="Player character"><i></i></button>'+isometricNpcTokensMarkup(academyMapId,false)+'<div data-wmh-transition-layer></div></div>'+
-      '</div></div>'+isometricHudMarkup("Tianhai Academy",academyMapImage,false)+academyCanvasEditorMarkup()+isometricEditorMarkup()+
+      '</div></div>'+isometricHudMarkup("Tianhai Academy",academyMapImage,true)+academyCanvasEditorMarkup()+isometricEditorMarkup()+
       '<button type="button" class="wmh-map-back wmh-academy-map-back" data-wmh-action="back" aria-label="Return to Golden Dragon Empire map"><i class="wmh-academy-back-icon" aria-hidden="true"></i><b>GOLDEN DRAGON EMPIRE</b></button>'+
       '<section class="wmh-chat-panel" data-wmh-chat hidden role="dialog" aria-label="Character conversation"><div class="wmh-chat-card"><button type="button" class="wmh-chat-close" data-wmh-action="chat-close" aria-label="Close conversation">×</button><div class="wmh-chat-thread" data-wmh-thread></div><div class="wmh-chat-input-row"><span>YOUR RESPONSE</span><div data-wmh-replies></div></div></div></section><section class="wmh-transition-dialog" data-wmh-transition-dialog hidden role="dialog" aria-label="World dialogue"><div class="wmh-transition-dialog-card"><small data-wmh-transition-speaker>WORLD ARCHIVE</small><p data-wmh-transition-dialog-text></p><button type="button" data-wmh-transition-close>CONTINUE</button></div></section><section class="wmh-transition-notice" data-wmh-transition-notice hidden role="dialog" aria-label="World event notification"><div class="wmh-transition-notice-card"><small>WORLD EVENT · ARCHIVE NOTICE</small><h3 data-wmh-transition-notice-title></h3><p data-wmh-transition-notice-text></p><button type="button" data-wmh-transition-close>CONTINUE</button></div></section>'+
       '</div>';
@@ -2344,6 +2347,7 @@ function syncIsoDepthAndOcclusion(board:HTMLElement):void {
 }
 type ActorScanTone="friendly"|"hostile"|"spirit-expert"|"unknown";
 const scannerContacts=new WeakMap<HTMLElement,Set<string>>();
+const scannerVisibilityHandlers=new WeakMap<HTMLElement,()=>void>();
 function actorScanTone(actor:HTMLElement):ActorScanTone {
   const value=(actor.dataset.scanTone||"unknown") as ActorScanTone;
   return value==="friendly"||value==="hostile"||value==="spirit-expert"||value==="unknown"?value:"unknown";
@@ -2378,8 +2382,9 @@ function updateNpcInteractionProximity(board:HTMLElement):void {
       npc.prepend(glow);
     }
     glow.style.setProperty("--npc-proximity-color",actorScanColor(actorScanTone(npc)));
+    glow.classList.toggle("is-ready",ready);
     glow.style.opacity=ready?".58":"0";
-    glow.style.transform=ready?"scale(1)":"scale(.9)";
+    glow.style.transform=ready?"scale(1)":"scale(.86)";
   });
 }
 
@@ -2416,12 +2421,42 @@ function stopActorScanners(board:HTMLElement):void {
   const timer=Number(board.dataset.scannerTimer||0);
   if(timer)window.clearInterval(timer);
   delete board.dataset.scannerTimer;
-  board.querySelectorAll<HTMLElement>(".wmh-sonar-ring").forEach(ring=>ring.remove());
+  const visibilityHandler=scannerVisibilityHandlers.get(board);
+  if(visibilityHandler)document.removeEventListener("visibilitychange",visibilityHandler);
+  scannerVisibilityHandlers.delete(board);
+  board.classList.remove("wmh-motion-paused");
+  board.querySelectorAll<HTMLElement>("[data-wmh-player-token],[data-wmh-npc]").forEach(actor=>actor.classList.remove("wmh-scanner-active"));
+}
+function emitTileTrailWave(board:HTMLElement,actor:HTMLElement,dx=0,dy=0):void {
+  if(!board.isConnected||window.matchMedia?.("(prefers-reduced-motion: reduce)").matches)return;
+  let glow=actor.querySelector<HTMLElement>(":scope > .wmh-token-movement-glow");
+  if(!glow){
+    glow=document.createElement("span");
+    glow.className="wmh-token-movement-glow";
+    glow.setAttribute("aria-hidden","true");
+    glow.addEventListener("animationend",()=>glow?.classList.remove("is-active"));
+    actor.append(glow);
+  }
+  glow.style.setProperty("--move-shift-x",(-Math.sign(dx)*5)+"px");
+  glow.style.setProperty("--move-shift-y",(-Math.sign(dy)*4)+"px");
+  // One short CSS animation per step; the same element is reused later.
+  if(!glow.classList.contains("is-active"))glow.classList.add("is-active");
 }
 function startActorScanners(board:HTMLElement):void {
-  // Scanner overlap/clear events are evaluated on actor movement. No perpetual
-  // sonar animation loop is needed to preserve their gameplay semantics.
   stopActorScanners(board);
+  const reduceMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches===true;
+  if(!reduceMotion){
+    board.querySelectorAll<HTMLElement>("[data-wmh-player-token],[data-wmh-npc]").forEach(actor=>{
+      actor.style.setProperty("--scan-color",actorScanColor(actorScanTone(actor)));
+      actor.classList.add("wmh-scanner-active");
+    });
+  }
+  // CSS owns the visual pulse. JavaScript only pauses it while the app is hidden;
+  // no per-actor interval or Anime.js loop is created.
+  const visibilityHandler=()=>board.classList.toggle("wmh-motion-paused",document.hidden);
+  document.addEventListener("visibilitychange",visibilityHandler);
+  scannerVisibilityHandlers.set(board,visibilityHandler);
+  visibilityHandler();
   updateScannerContacts(board);
 }
 function animateGridMove(token:HTMLElement,update:()=>void,sync=true,updateSensors=true):void {
@@ -2440,7 +2475,10 @@ function animateGridMove(token:HTMLElement,update:()=>void,sync=true,updateSenso
   const reduceMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches===true;
   if(reduceMotion||Math.abs(dx)+Math.abs(dy)<.01)token.style.transform="";
   else animate(token,{translateX:[dx,0],translateY:[dy,0],duration:150,ease:"outQuad"});
-  if(board&&updateSensors)updateScannerContacts(board,false);
+  if(board){
+    if(!reduceMotion)emitTileTrailWave(board,token,toX-fromX,toY-fromY);
+    if(updateSensors)updateScannerContacts(board,false);
+  }
 }
 function stopNpcWander(dialog:HTMLElement):void {
   const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
@@ -2455,6 +2493,8 @@ function startNpcWander(dialog:HTMLElement):void {
   stopNpcWander(dialog);
   startActorScanners(board);
   const timer=window.setInterval(()=>{
+    if(document.hidden)return;
+    if(!board.isConnected){window.clearInterval(Number(board.dataset.npcTimer||0));delete board.dataset.npcTimer;return;}
     const mapData=readIsoMapData(board);
     let actorsMoved=false;
     board.querySelectorAll<HTMLElement>("[data-wmh-npc]").forEach(npc=>{
