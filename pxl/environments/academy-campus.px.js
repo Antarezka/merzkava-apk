@@ -116,107 +116,142 @@ function academyHall(x,z,w,d,wallH,rise,base=0) {
   block("brass","wood",x-0.13,z-0.12,x+0.13,z+0.12,peak+0.08,peak+0.42)
 }
 
-// Academy perimeter and open walking courts.
-ground("grass",-19,Z-13,19,Z+15,0)
-ground("stone",-8.8,Z-7.6,8.8,Z+7.2,0.06)
-ground("stone",-2.4,Z+6.8,2.4,Z+11.7,0.07)
-ground("stone",-13.2,Z-5.8,-8.2,Z+8.2,0.05)
-ground("stone",8.2,Z-6.4,13.2,Z+8.8,0.05)
+// Place the 3D scene by screen-space anchors taken from the approved campus composition.
+// CAM.at() converts those exact preview pixels back to the ground plane, preserving the old landmark layout.
+function atScreen(sx,sy) {
+  const point=CAM.at(sx,sy)
+  if(!point) throw new Error("Academy layout anchor is above the perspective horizon: "+sx+","+sy)
+  return point
+}
+function groundScreen(mat,x1,y1,x2,y2,up=0) {
+  const pts=[[x1,y1],[x2,y1],[x2,y2],[x1,y2]].map(([sx,sy])=>{
+    const [x,z]=atScreen(sx,sy)
+    return [x,z,up]
+  })
+  CAMPUS.face(mat,...pts)
+}
+function polygonScreen(mat,points,up=0) {
+  const pts=points.map(([sx,sy])=>{
+    const [x,z]=atScreen(sx,sy)
+    return [x,z,up]
+  })
+  CAMPUS.face(mat,...pts)
+}
+function blockAtScreen(top,side,sx,sy,w,d,base,height) {
+  const [x,z]=atScreen(sx,sy)
+  block(top,side,x-w/2,z-d/2,x+w/2,z+d/2,base,height)
+}
+function hallAtScreen(sx,sy,w,d,wallH,rise,base=0) {
+  const [x,z]=atScreen(sx,sy)
+  academyHall(x,z,w,d,wallH,rise,base)
+}
+function bridgeAtScreen(sx,sy,width=3.6) {
+  const [x,z]=atScreen(sx,sy)
+  academyBridge(x,z,width)
+}
 
-// Main courtyard: a broad quiet floor with a ceremonial medallion and clear actor lanes.
+// The full ground plane extends beyond all four screen edges so the exported map has no blank border.
+ground("grass",-55,Z-55,55,Z+55,0)
+
+// Courtyard, the main east/west walkways and the southern approach.
+// The center stays open for the existing player/NPC grid and touch targets.
+groundScreen("stone",158,91,548,252,0.06)
+groundScreen("stone",325,235,387,305,0.07)
+groundScreen("stone",112,181,205,226,0.055)
+groundScreen("stone",505,177,578,254,0.055)
+groundScreen("stone",112,252,184,322,0.065)
+groundScreen("stone",520,207,687,294,0.075)
+
+// Small ceremonial medallion, kept clear of actor spawn and navigation lanes.
 const medallion=Array.from({length:32},(_,i)=>{
   const a=2*Math.PI*i/32
-  return [Math.cos(a)*2.35,Z+0.8+Math.sin(a)*2.35,0.105]
+  const [x,z]=atScreen(353+Math.cos(a)*19,173+Math.sin(a)*18)
+  return [x,z,0.105]
 })
 CAMPUS.face("trim",...medallion)
 const innerMedallion=Array.from({length:24},(_,i)=>{
   const a=2*Math.PI*i/24
-  return [Math.cos(a)*1.35,Z+0.8+Math.sin(a)*1.35,0.112]
+  const [x,z]=atScreen(353+Math.cos(a)*9,173+Math.sin(a)*8)
+  return [x,z,0.112]
 })
 CAMPUS.face("stone",...innerMedallion)
 
-// The main rear hall and the two flanking study buildings.
-academyHall(0,Z-7.1,7.6,4.1,2.45,1.5)
-academyHall(-10.1,Z-7.1,5.3,3.5,2.05,1.15)
-academyHall(10.1,Z-7.2,5.4,3.5,2.05,1.15)
-// An upper pavilion on the central hall creates the layered academy roofline.
-academyHall(0,Z-7.15,4.6,2.7,1.05,0.86,3.25)
-// Lower wings: library, lecture pavilion and the training-yard hall.
-academyHall(-10.4,Z+4.5,4.8,3.0,1.8,0.95)
-academyHall(10.6,Z+6.4,5.0,3.2,1.85,1.0)
+// Three rear study halls and the layered central academy hall.
+hallAtScreen(104,78,5.9,3.9,2.05,1.18)
+hallAtScreen(352,70,7.5,4.2,2.5,1.55)
+hallAtScreen(604,82,5.8,3.8,2.05,1.18)
+hallAtScreen(352,63,4.4,2.6,1.05,0.88,3.25)
 
-// Steps leading to the main hall and east training terrace.
+// Side wings, lecture pavilions and the small waterside pavilion.
+hallAtScreen(194,205,4.9,3.1,1.8,0.98)
+hallAtScreen(533,190,5.2,3.25,1.85,1.02)
+hallAtScreen(424,295,3.45,2.25,1.28,0.78)
+
+// Main hall steps: shallow horizontal risers that lead from the court to the upper terrace.
 for(let i=0;i<6;i++) {
-  const y=Z-4.8-i*0.24
-  const up=0.08+i*0.11
-  block("stone","stone", -2.35-i*0.09,y,2.35+i*0.09,y+0.28,up,up+0.11)
+  const inset=i*5, y=111-i*3, up=0.07+i*0.10
+  groundScreen("stone",316-inset,y,388+inset,y+5,up)
 }
 for(let i=0;i<5;i++) {
-  const y=Z+3.0+i*0.28
-  const up=0.06+i*0.08
-  block("stone","stone",8.5,y,12.4,y+0.22,up,up+0.10)
+  const y=217+i*4, up=0.06+i*0.075
+  groundScreen("stone",520+i*2,y,574+i*2,y+4,up)
 }
 
-// West garden pond, its stepping-stone edge and the south reflecting pool.
-CAMPUS.face("water",
-  [-17,Z-1.5,0.015],[-15.8,Z-3.2,0.015],[-12.1,Z-2.9,0.015],
-  [-10.9,Z-0.7,0.015],[-11.6,Z+3.9,0.015],[-14.3,Z+5.1,0.015],
-  [-16.8,Z+3.4,0.015])
-CAMPUS.face("water",
-  [1.5,Z+10.9,0.012],[3.1,Z+9.8,0.012],[8.8,Z+10.1,0.012],
-  [10.7,Z+11.3,0.012],[9.5,Z+13.9,0.012],[4.2,Z+14.2,0.012],
-  [1.8,Z+12.8,0.012])
-// Stone edging around ponds.
-for(const [x,z] of [[-16.4,Z-1],[-15.5,Z-3],[-12.2,Z-2.7],[-11.2,Z+0.5],[-12,Z+3.7],[-14.5,Z+4.8],[-16.7,Z+2.8],
-                    [2.1,Z+11.1],[4.5,Z+9.9],[8.6,Z+10.3],[10.4,Z+11.4],[9.2,Z+13.6],[4.2,Z+13.9],[2.1,Z+12.8]]) {
-  block("stone","stone",x-0.22,z-0.22,x+0.22,z+0.22,0.02,0.22)
-}
+// Western garden pond and the large southern reflecting pond, placed at their approved map positions.
+polygonScreen("water",[
+  [28,149],[41,126],[73,113],[112,119],[145,140],
+  [156,166],[144,190],[112,204],[71,198],[39,177],
+],0.015)
+polygonScreen("water",[
+  [235,318],[252,291],[294,279],[353,275],[413,282],
+  [457,300],[479,324],[462,347],[414,360],[354,364],
+  [296,357],[258,342],
+],0.012)
 
-// Two arched-looking raised bridges over the water channels.
-function academyBridge(x,z,width=3.6) {
-  block("wood","wood",x-width/2,z-0.42,x+width/2,z+0.42,0.36,0.62)
-  block("brass","wood",x-width/2,z-0.48,x+width/2,z-0.38,0.72,0.82)
-  block("brass","wood",x-width/2,z+0.38,x+width/2,z+0.48,0.72,0.82)
-  for(let i=0;i<=4;i++) {
-    const px=x-width/2+i*width/4
-    block("wood","wood",px-0.055,z-0.5,px+0.055,z-0.38,0.62,1.12)
-    block("wood","wood",px-0.055,z+0.38,px+0.055,z+0.5,0.62,1.12)
-  }
-}
-academyBridge(-10.3,Z+1.4,3.8)
-academyBridge(6.5,Z+11.3,4.5)
+// Irregular stone edging keeps the waterline readable without covering the clear walkable lanes.
+for(const [sx,sy] of [
+  [31,151],[45,130],[74,116],[111,121],[142,141],[153,166],[141,188],[111,201],[72,196],[40,177],
+  [239,318],[258,294],[297,282],[351,278],[411,285],[453,302],[474,324],[458,345],[411,357],[355,361],[298,354],[263,340],
+]) blockAtScreen("stone","stone",sx,sy,0.34,0.34,0.02,0.18)
 
-// Formal southern gate: stone piers, lacquered lintel and a tiled ceremonial cap.
-block("stone","stone",-3.0,Z+9.2,-2.35,Z+9.8,0.05,2.5)
-block("stone","stone",2.35,Z+9.2,3.0,Z+9.8,0.05,2.5)
-block("wood","wood",-3.25,Z+9.0,3.25,Z+10.0,2.3,2.65)
-CAMPUS.face("roof",[-3.35,Z+8.9,2.67],[0,Z+8.75,3.35],[3.35,Z+8.9,2.67],[0,Z+9.05,3.35])
-block("brass","wood",-0.15,Z+8.85,0.15,Z+9.0,3.25,3.55)
+// Garden bridges cross the western pond path and the east lip of the reflecting pond.
+bridgeAtScreen(151,169,3.8)
+bridgeAtScreen(468,322,4.5)
 
-// Training yard on the southeast terrace, separate from the courtyard floor.
-ground("stone",8.7,Z+4.5,16.1,Z+9.0,0.08)
-block("wood","wood",10.1,Z+5.8,14.7,Z+7.5,0.11,0.29)
-block("brass","wood",10.1,Z+5.76,14.7,Z+5.9,0.29,0.34)
-block("brass","wood",10.1,Z+7.4,14.7,Z+7.54,0.29,0.34)
-block("wood","wood",10.0,Z+5.7,10.16,Z+7.6,0.29,0.36)
-block("wood","wood",14.64,Z+5.7,14.8,Z+7.6,0.29,0.36)
+// Southern ceremonial gate, moved to the original southwest entrance instead of the middle of the map.
+const [gateX,gateZ]=atScreen(148,289)
+block("stone","stone",gateX-2.95,gateZ-0.34,gateX-2.28,gateZ+0.34,0.05,2.5)
+block("stone","stone",gateX+2.28,gateZ-0.34,gateX+2.95,gateZ+0.34,0.05,2.5)
+block("wood","wood",gateX-3.15,gateZ-0.48,gateX+3.15,gateZ+0.48,2.3,2.65)
+CAMPUS.face("roof",
+  [gateX-3.25,gateZ-0.52,2.67],[gateX,gateZ-0.72,3.35],
+  [gateX+3.25,gateZ-0.52,2.67],[gateX,gateZ-0.25,3.35])
+block("brass","wood",gateX-0.15,gateZ-0.7,gateX+0.15,gateZ-0.55,3.25,3.55)
 
-// Low garden walls and boundary details; the south gate remains the only formal entrance.
-for(const [x1,z1,x2,z2] of [
-  [-17,Z-9,-8,Z-8.7],[-7,Z-9,8,Z-8.7],[9,Z-9,17,Z-8.7],
-  [-17,Z-8.8,-16.7,Z+8.5],[16.7,Z-8.8,17,Z+9.5],
-  [-17,Z+8.5,-4,Z+8.8],[4,Z+8.5,17,Z+8.8],
-]) block("stone","stone",x1,z1,x2,z2,0.06,0.62)
+// The southeast training yard keeps its own rectangular floor and raised practice platform.
+groundScreen("stone",520,207,687,294,0.075)
+groundScreen("stone",538,222,671,281,0.09)
+groundScreen("trim",566,233,641,269,0.105)
+blockAtScreen("wood","wood",603,251,4.5,2.1,0.11,0.29)
+blockAtScreen("brass","wood",603,246,4.5,0.14,0.29,0.34)
+blockAtScreen("brass","wood",603,257,4.5,0.14,0.29,0.34)
+
+// Low boundary stones define gardens while leaving every central route visually open.
+for(const [sx,sy,w,d] of [
+  [31,102,3.2,0.22],[112,96,3.0,0.22],[194,93,2.8,0.22],
+  [510,98,2.8,0.22],[599,106,3.0,0.22],[677,138,0.22,3.2],
+  [20,215,0.22,3.0],[682,234,0.22,3.0],
+]) blockAtScreen("stone","stone",sx,sy,w,d,0.06,0.48)
 
 // Small ornate garden lamps and carved stone lanterns.
-sprite("_academy-cherry", { w:48, h:72, pivot:"bottom", height:3.0 }, c => {
+sprite("_academy-cherry", { w:48, h:72, pivot:"bottom", height:2.55 }, c => {
   c.ellipse(24,70,12,3,"k");c.vline(23,43,27,"n");c.vline(25,47,23,"N")
   for(const [x,y,r] of [[15,29,12],[29,24,13],[20,15,10],[36,37,9],[9,41,8]]) {
     c.circ(x,y,r,"r");c.circ(x-2,y-3,Math.max(2,r-4),"R");c.px(x+2,y-4,"W")
   }
   for(const [x,y] of [[12,19],[29,12],[36,32],[8,38],[24,28]])c.px(x,y,"P")
 })
-sprite("_academy-pine", { w:44, h:72, pivot:"bottom", height:3.2 }, c => {
+sprite("_academy-pine", { w:44, h:72, pivot:"bottom", height:2.7 }, c => {
   c.vline(21,41,29,"n");c.vline(23,45,25,"N")
   for(let t=0;t<4;t++) {
     const y=12+t*11, r=17-t*2
@@ -242,32 +277,36 @@ sprite("_academy-stone-lantern", { w:24, h:38, pivot:"bottom", height:1.6 }, c =
 })
 
 const treePlaces = [
-  [-16,Z-7],[-14,Z-5],[-18,Z+1],[-16,Z+6],[-13,Z+9],[-9,Z+10],[-5,Z+11],
-  [4,Z+13],[9,Z+12],[14,Z+10],[17,Z+6],[17,Z+1],[15,Z-5],[12,Z-10],
-  [6,Z-10],[-5,Z-11],[-13,Z-11],[-18,Z-5],
+  [24,127],[28,213],[142,112],[170,225],[222,345],
+  [468,350],[508,296],[647,112],[683,181],[672,249],
+  [286,39],[478,46],[34,260],
 ]
-const sprites = treePlaces.map(([x,z],i)=>({
-  name:i%3===0?"_academy-cherry":"_academy-pine",
-  at:[x,z],seed:31+i,shadow:0.65,
-}))
+const sprites = treePlaces.map(([sx,sy],i)=>{
+  const [x,z]=atScreen(sx,sy)
+  return {name:i%3===0?"_academy-cherry":"_academy-pine",at:[x,z],seed:31+i,shadow:0.55}
+})
+const shrubPlaces=[[166,132],[198,246],[491,211],[501,280],[75,222]]
+for(const [sx,sy] of shrubPlaces){
+  const [x,z]=atScreen(sx,sy)
+  sprites.push({name:"_academy-shrub",at:[x,z],shadow:0.18})
+}
+const lanternOne=atScreen(214,238),lanternTwo=atScreen(493,232)
+const stoneLanternOne=atScreen(243,295),stoneLanternTwo=atScreen(455,294)
 sprites.push(
-  {name:"_academy-shrub",at:[-8.8,Z+1.0],shadow:0.2},
-  {name:"_academy-shrub",at:[8.5,Z+2.6],shadow:0.2},
-  {name:"_academy-shrub",at:[-12.0,Z-4.4],shadow:0.2},
-  {name:"_academy-lantern",at:[-7.1,Z+2.5],light:{r:2.8,strength:0.8},shadow:0.15},
-  {name:"_academy-lantern",at:[7.1,Z+2.5],light:{r:2.8,strength:0.8},shadow:0.15},
-  {name:"_academy-stone-lantern",at:[-4.2,Z+5.4],shadow:0.25},
-  {name:"_academy-stone-lantern",at:[4.2,Z+5.4],shadow:0.25},
+  {name:"_academy-lantern",at:lanternOne,light:{r:2.5,strength:0.65},shadow:0.12},
+  {name:"_academy-lantern",at:lanternTwo,light:{r:2.5,strength:0.65},shadow:0.12},
+  {name:"_academy-stone-lantern",at:stoneLanternOne,shadow:0.2},
+  {name:"_academy-stone-lantern",at:stoneLanternTwo,shadow:0.2},
 )
 
 const LIGHT = {
   light:[-0.72,0.42,0.55],
-  sun:{color:"#ffe0b2",strength:1.18},
-  sky:{color:"#8baac7",strength:0.42},
+  sun:{color:"#ffe0b2",strength:1.12},
+  sky:{color:"#9ab2c9",strength:0.45},
   shadows:true,
   lamps:[
-    {at:[-7.1,Z+2.5,1.25],color:"#ffbf78",r:3.4,strength:1.15},
-    {at:[7.1,Z+2.5,1.25],color:"#ffbf78",r:3.4,strength:1.15},
+    {at:[lanternOne[0],lanternOne[1],1.25],color:"#ffbf78",r:2.6,strength:0.8},
+    {at:[lanternTwo[0],lanternTwo[1],1.25],color:"#ffbf78",r:2.6,strength:0.8},
   ],
 }
 
@@ -279,5 +318,5 @@ scene("academy-exterior-render", {
   // The faint guide is editor-only and excluded from the exported PNG.
   layer("approved-layout-reference",{ref:0.12},stamp("_academy-pixel-source",352,192)),
   (c)=>c.mesh(CAM,CAMPUS.faces,MATS,{sprites,...LIGHT}),
-  post({blur:2,focus:[W/2,H*0.54],sharp:2,soft:[2,6],bloom:{levels:4,strength:0.34,above:0.92},vignette:0.14}),
+  post({bloom:{levels:3,strength:0.18,above:0.95},vignette:0.06}),
 )
