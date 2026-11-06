@@ -58,6 +58,14 @@ describe("Pixi World Atlas Android input isolation",()=>{
     expect(mainSource).toContain('import("./offline-game/pixi-world-atlas-renderer")');
   });
 
+  it("rebuilds map textures after editor changes and releases the prior layers",()=>{
+    expect(rendererSource).toContain("const refreshStaticWorld=async()");
+    expect(rendererSource).toContain("worldLayer.removeChildren()");
+    expect(rendererSource).toContain("foregroundLayer.removeChildren()");
+    expect(rendererSource).toContain("textures.forEach(asset=>asset.release())");
+    expect(rendererSource).toContain("if(editorChanged&&!editorNow)");
+  });
+
   it("keeps independent draggable positions for the two Eternal Path TVs",()=>{
     expect(dragSource).toContain("merzkava.eternal-path.floating-tv-position.v1");
     expect(dragSource).toContain("merzkava.eternal-path.floating-pixi-tv-position.v1");
