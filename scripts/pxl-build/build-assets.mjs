@@ -93,8 +93,10 @@ async function copyGeneratedOutput(sourceFile) {
     for (const entry of await fs.readdir(from, { withFileTypes: true })) {
       const source = path.join(from, entry.name);
       const child = path.join(relative, entry.name);
-      if (entry.isDirectory()) await copyTree(source, child);
-      else if (entry.isFile() && ALLOWED_OUTPUT_EXTENSIONS.has(path.extname(entry.name).toLowerCase())) {
+      if (entry.isDirectory()) {
+        if (entry.name === "_preview") continue;
+        await copyTree(source, child);
+      } else if (entry.isFile() && ALLOWED_OUTPUT_EXTENSIONS.has(path.extname(entry.name).toLowerCase())) {
         const destination = path.join(EXPORT_DIR, sourceFolder, child);
         await fs.mkdir(path.dirname(destination), { recursive: true });
         await fs.copyFile(source, destination);
