@@ -792,6 +792,9 @@ function escapeMapEditorText(value: unknown): string {
 function isoOverlayKey(board: HTMLElement): string {
   return isoMapStorageKey(board.dataset.mapId||"unnamed-isometric-map");
 }
+type IsoMapDataCacheEntry={signature:string;raw:string|null;data:IsoMapEditorData};
+const isoMapDataCache=new WeakMap<HTMLElement,IsoMapDataCacheEntry>();
+
 function readIsoMapData(board: HTMLElement): IsoMapEditorData {
   const mapId=board.dataset.mapId||"unnamed-isometric-map";
   const fallback:IsoMapGridConfig={
@@ -803,25 +806,41 @@ function readIsoMapData(board: HTMLElement): IsoMapEditorData {
     offsetX:Number(board.dataset.offsetX||0),
     offsetY:Number(board.dataset.offsetY||0),
   };
-  if(mapId===TIANHAI_ACADEMY_MAP_REFERENCE.mapId){
-    const appliedKey="merzkava.tianhai-academy-map-reference.v1.applied";
-    try{
-      if(localStorage.getItem(appliedKey)!=="done"){
-        const bundled=normalizeIsoMapEditorData(TIANHAI_ACADEMY_MAP_REFERENCE,mapId,fallback);
-        localStorage.setItem(isoOverlayKey(board),JSON.stringify(bundled));
-        localStorage.setItem(appliedKey,"done");
-      }
-      const saved=JSON.parse(localStorage.getItem(isoOverlayKey(board))||"null");
-      if(saved)return normalizeIsoMapEditorData(saved,mapId,fallback);
-    }catch{/* bundled reference remains available when local persistence is unavailable */}
-    return normalizeIsoMapEditorData(TIANHAI_ACADEMY_MAP_REFERENCE,mapId,fallback);
+  const signature=[mapId,fallback.cols,fallback.rows,fallback.tileW,fallback.tileH,fallback.offsetX,fallback.offsetY,fallback.playerScale,fallback.npcScale].join("|");
+  const isAcademy=mapId===TIANHAI_ACADEMY_MAP_REFERENCE.mapId;
+  const appliedKey="merzkava.tianhai-academy-map-reference.v1.applied";
+  let raw:string|null=null;
+  try{
+    if(isAcademy&&localStorage.getItem(appliedKey)!=="done"){
+      const bundled=normalizeIsoMapEditorData(TIANHAI_ACADEMY_MAP_REFERENCE,mapId,fallback);
+      localStorage.setItem(isoOverlayKey(board),JSON.stringify(bundled));
+      localStorage.setItem(appliedKey,"done");
+    }
+    raw=localStorage.getItem(isoOverlayKey(board));
+  }catch{
+    return isAcademy
+      ?normalizeIsoMapEditorData(TIANHAI_ACADEMY_MAP_REFERENCE,mapId,fallback)
+      :createIsoMapEditorData(mapId,fallback);
   }
-  try {
-    const saved=JSON.parse(localStorage.getItem(isoOverlayKey(board))||"null");
-    if(saved)return normalizeIsoMapEditorData(saved,mapId,fallback);
-  } catch {}
-  // Other map IDs start clean; old maps are not silently imported.
-  return createIsoMapEditorData(mapId,fallback);
+
+  const cached=isoMapDataCache.get(board);
+  if(cached&&cached.signature===signature&&cached.raw===raw)return cached.data;
+
+  let data:IsoMapEditorData;
+  try{
+    const saved=raw?JSON.parse(raw):null;
+    data=saved
+      ?normalizeIsoMapEditorData(saved,mapId,fallback)
+      :isAcademy
+        ?normalizeIsoMapEditorData(TIANHAI_ACADEMY_MAP_REFERENCE,mapId,fallback)
+        :createIsoMapEditorData(mapId,fallback);
+  }catch{
+    data=isAcademy
+      ?normalizeIsoMapEditorData(TIANHAI_ACADEMY_MAP_REFERENCE,mapId,fallback)
+      :createIsoMapEditorData(mapId,fallback);
+  }
+  isoMapDataCache.set(board,{signature,raw,data});
+  return data;
 }
 function drawIsometricForeground(board:HTMLElement,data=readIsoMapData(board)):void {
   const canvas=board.querySelector<HTMLCanvasElement>("[data-wmh-foreground-canvas]");
@@ -2363,8 +2382,9 @@ function updateScannerContacts(board:HTMLElement,refreshProximity=true):void {
     const dx=Number(first.dataset.x||0)-Number(second.dataset.x||0);
     const dy=Number(first.dataset.y||0)-Number(second.dataset.y||0);
     // Two sonar fields each reach about 2.5 cells; their overlap is a sensor event only.
-    const distance=Math.hypot(dx,dy);
-    if(distance>5)continue;
+    const distanceSquared=dx*dx+dy*dy;
+    if(distanceSquared>25)continue;
+    const distance=Math.sqrt(distanceSquared);
     const pair=[first.dataset.wmhNpc||"player",second.dataset.wmhNpc||"player"].sort().join("|");
     next.add(pair);
     if(previous.has(pair))continue;
@@ -2417,29 +2437,47 @@ function startActorScanners(board:HTMLElement):void {
   const pulse=()=>{
     if(!board.isConnected||board.dataset.editorPaused==="true"||board.hidden){stopActorScanners(board);return;}
     board.querySelectorAll<HTMLElement>("[data-wmh-player-token],[data-wmh-npc]").forEach((actor,index)=>pulseActorScanner(actor,index));
-    updateScannerContacts(board);
   };
   pulse();
+  updateScannerContacts(board);
   board.dataset.scannerTimer=String(window.setInterval(pulse,2450));
 }
 function animateGridMove(token:HTMLElement,update:()=>void,sync=true,updateSensors=true):void {
   const board=token.closest<HTMLElement>("[data-wmh-board]");
-  const fromX=Number(token.dataset.x||0),fromY=Number(token.dataset.y||0);
-  const before=token.getBoundingClientRect();
+  const fromCellX=Number(token.dataset.x||0),fromCellY=Number(token.dataset.y||0);
+  const from={x:Number(token.dataset.posX??fromCellX),y:Number(token.dataset.posY??fromCellY)};
+  const mapData=board?readIsoMapData(board):null;
+  const grid=mapData?.grid||DEFAULT_ISOMETRIC_GRID;
+  const zoom=board?Number.parseFloat(getComputedStyle(board).getPropertyValue("--wmh-camera-zoom"))||1:1;
+  let renderScaleX=1,renderScaleY=1;
+  if(board?.dataset.academyArtworkBoard==="true"){
+    const image=board.querySelector<HTMLImageElement>("[data-wmh-map-art]");
+    if(image?.naturalWidth&&image.naturalHeight){
+      renderScaleX=(image.clientWidth||image.naturalWidth)/image.naturalWidth;
+      renderScaleY=(image.clientHeight||image.naturalHeight)/image.naturalHeight;
+    }
+  }
   update();
   if(board&&sync)syncIsoDepthAndOcclusion(board);
+  const to={x:Number(token.dataset.posX??token.dataset.x??0),y:Number(token.dataset.posY??token.dataset.y??0)};
+  const dx=((from.x-to.x)-(from.y-to.y))*(grid.tileW/2)*renderScaleX/zoom;
+  const dy=((from.x-to.x)+(from.y-to.y))*(grid.tileH/2)*renderScaleY/zoom;
   const reduceMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches===true;
   const suspendNpcIdle=!reduceMotion&&token.matches(".wmh-character-token:not(.wmh-player-token)");
   if(suspendNpcIdle)token.classList.add("wmh-npc-moving");
-  const after=token.getBoundingClientRect();
-  const zoom=board?Number.parseFloat(getComputedStyle(board).getPropertyValue("--wmh-camera-zoom"))||1:1;
-  const dx=(before.left-after.left)/zoom,dy=(before.top-after.top)/zoom;
-  if(reduceMotion)token.style.transform="";
-  else animate(token,{translateX:[dx,0],translateY:[dy,0],duration:225,ease:"outCubic",
-    onComplete:()=>{if(suspendNpcIdle)token.classList.remove("wmh-npc-moving");}
-  });
+  if(reduceMotion){
+    token.style.transform="";
+  }else{
+    token.classList.add("wmh-token-moving");
+    animate(token,{translateX:[dx,0],translateY:[dy,0],duration:225,ease:"outCubic",
+      onComplete:()=>{
+        if(suspendNpcIdle)token.classList.remove("wmh-npc-moving");
+        token.classList.remove("wmh-token-moving");
+      }
+    });
+  }
   if(board){
-    emitTileTrailWave(board,token,Number(token.dataset.x||0)-fromX,Number(token.dataset.y||0)-fromY);
+    emitTileTrailWave(board,token,Number(token.dataset.x||0)-fromCellX,Number(token.dataset.y||0)-fromCellY);
     if(updateSensors)updateScannerContacts(board,false);
   }
 }
@@ -2457,21 +2495,35 @@ function startNpcWander(dialog:HTMLElement):void {
   startActorScanners(board);
   const timer=window.setInterval(()=>{
     const mapData=readIsoMapData(board);
+    const actors=Array.from(board.querySelectorAll<HTMLElement>("[data-wmh-player-token],[data-wmh-npc]"));
+    const npcs=actors.filter(actor=>actor.matches("[data-wmh-npc]"));
+    const occupied=new Map<string,number>();
+    const addOccupant=(key:string)=>occupied.set(key,(occupied.get(key)||0)+1);
+    const removeOccupant=(key:string)=>{
+      const count=occupied.get(key)||0;
+      if(count<=1)occupied.delete(key);else occupied.set(key,count-1);
+    };
+    actors.forEach(actor=>addOccupant(isoCellKey(Number(actor.dataset.x||0),Number(actor.dataset.y||0))));
+    const tilesByCell=new Map<string,HTMLElement>();
+    board.querySelectorAll<HTMLElement>("[data-wmh-tile]").forEach(tile=>{
+      tilesByCell.set(isoCellKey(Number(tile.dataset.x||0),Number(tile.dataset.y||0)),tile);
+    });
     let actorsMoved=false;
-    board.querySelectorAll<HTMLElement>("[data-wmh-npc]").forEach(npc=>{
+    npcs.forEach(npc=>{
       if(Math.random()>.48)return;
       const x=Number(npc.dataset.x||0),y=Number(npc.dataset.y||0);
-      const occupied=new Set(Array.from(board.querySelectorAll<HTMLElement>("[data-wmh-player-token],[data-wmh-npc]"))
-        .filter(actor=>actor!==npc)
-        .map(actor=>String(actor.dataset.x||0)+","+String(actor.dataset.y||0)));
-      const options=[[x+1,y],[x-1,y],[x,y+1],[x,y-1]].filter(([nx,ny])=>{
-        const tile=board.querySelector<HTMLElement>('[data-wmh-tile][data-x="'+nx+'"][data-y="'+ny+'"]');
+      const options:[[number,number],[number,number],[number,number],[number,number]]=[
+        [x+1,y],[x-1,y],[x,y+1],[x,y-1]
+      ].filter(([nx,ny])=>{
+        const key=isoCellKey(nx,ny),tile=tilesByCell.get(key);
         return isoGridCellExists(mapData,nx,ny)&&
           !!tile&&isoCanStep(mapData,x,y,nx,ny)&&
-          !occupied.has(nx+","+ny);
-      });
+          !occupied.has(key);
+      }) as [[number,number],[number,number],[number,number],[number,number]];
       if(!options.length)return;
       const [nx,ny]=options[Math.floor(Math.random()*options.length)];
+      removeOccupant(isoCellKey(x,y));
+      addOccupant(isoCellKey(nx,ny));
       animateGridMove(npc,()=>{
         npc.dataset.x=String(nx);npc.dataset.y=String(ny);
         npc.style.setProperty("--token-x",String(nx));npc.style.setProperty("--token-y",String(ny));
