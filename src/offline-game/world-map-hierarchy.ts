@@ -954,13 +954,11 @@ function renderIsometricWorldStatus(dialog:HTMLElement):void {
   const minute=String(save?.minute??0).padStart(2,"0");
   const meridiem=rawHour<12?"AM":"PM";
   const set=(selector:string,value:string)=>{const node=hud.querySelector<HTMLElement>(selector);if(node)node.textContent=value;};
-  set("[data-wmh-cycle-icon]",c.icon);set("[data-wmh-cycle-label]",c.label);set("[data-wmh-cycle-caption]",c.caption);
   set("[data-wmh-weather-icon]",w.icon);set("[data-wmh-weather-label]",w.label);
-  set("[data-wmh-day]","HARI "+String(save?.day??1).padStart(2,"0"));
   set("[data-wmh-time]",hour+":"+minute+" "+meridiem);
   const player=dialog.querySelector<HTMLElement>("[data-wmh-board] [data-wmh-player-token]");
   const px=player?Number(player.dataset.posX??player.dataset.x??0):0,py=player?Number(player.dataset.posY??player.dataset.y??0):0;
-  set("[data-wmh-player-grid]",player?"GRID X "+px.toFixed(1)+" · Y "+py.toFixed(1):"GRID X -- · Y --");
+  set("[data-wmh-player-grid]",player?"(X: "+px.toFixed(1)+" · Y: "+py.toFixed(1)+")":"(X: -- · Y: --)");
   refreshPlayerHud(dialog);
   const overlay=dialog.closest<HTMLElement>("[data-world-map-hierarchy]");
   if(overlay){overlay.dataset.wmhCycle=atmosphere.cycle.toLowerCase();overlay.dataset.wmhWeather=atmosphere.weather.toLowerCase();}
@@ -1184,22 +1182,52 @@ function bindAcademyMapControls(dialog:HTMLElement):void {
 }
 function bindIsometricHud(dialog:HTMLElement):void {
   const hud=dialog.querySelector<HTMLElement>("[data-wmh-isometric-hud]");
-  const minimap=dialog.querySelector<HTMLButtonElement>("[data-wmh-minimap]");
+  const minimap=dialog.querySelector<HTMLElement>("[data-wmh-minimap]");
+  const minimapToggle=dialog.querySelector<HTMLButtonElement>("[data-wmh-minimap-toggle]");
   const world=minimap?.querySelector<HTMLElement>("[data-wmh-minimap-world]");
+  const dragHandle=minimap?.querySelector<HTMLElement>("[data-wmh-minimap-drag-handle]");
   const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
   if(!hud)return;
   refreshPlayerHud(dialog);
   mountPlayerHudMotion(dialog);
   bindPlayerHudLayoutEditor(dialog);
-  // Academy is an artwork-only view, so bind its dedicated camera controls without an actor board.
   if(!board){
     renderIsometricWorldStatus(dialog);
     bindAcademyMapControls(dialog);
     return;
   }
-  if(minimap&&world&&minimap.dataset.bound!=="true"){
-    minimap.dataset.bound="true";
-    minimap.addEventListener("click",event=>{
+  if(minimapToggle&&minimap&&minimapToggle.dataset.bound!=="true"){
+    minimapToggle.dataset.bound="true";
+    minimapToggle.addEventListener("click",()=>{
+      minimap.hidden=!minimap.hidden;
+      minimapToggle.setAttribute("aria-expanded",String(!minimap.hidden));
+    });
+    minimap.querySelector<HTMLButtonElement>("[data-wmh-minimap-close]")?.addEventListener("click",()=>{minimap.hidden=true;minimapToggle.setAttribute("aria-expanded","false");});
+  }
+  if(minimap&&dragHandle&&dragHandle.dataset.dragBound!=="true"){
+    dragHandle.dataset.dragBound="true";
+    let drag:{pointerId:number;x:number;y:number;left:number;top:number}|null=null;
+    dragHandle.addEventListener("pointerdown",event=>{
+      if((event.target as Element|null)?.closest("button"))return;
+      const rect=minimap.getBoundingClientRect();
+      drag={pointerId:event.pointerId,x:event.clientX,y:event.clientY,left:rect.left,top:rect.top};
+      dragHandle.setPointerCapture(event.pointerId);
+      event.preventDefault();
+    });
+    dragHandle.addEventListener("pointermove",event=>{
+      if(!drag||drag.pointerId!==event.pointerId)return;
+      const width=minimap.offsetWidth,height=minimap.offsetHeight;
+      const left=Math.max(8,Math.min(window.innerWidth-width-8,drag.left+event.clientX-drag.x));
+      const top=Math.max(8,Math.min(window.innerHeight-height-8,drag.top+event.clientY-drag.y));
+      minimap.style.left=left+"px";minimap.style.top=top+"px";minimap.style.right="auto";
+    });
+    const finish=()=>{drag=null;};
+    dragHandle.addEventListener("pointerup",finish);
+    dragHandle.addEventListener("pointercancel",finish);
+  }
+  if(world&&world.dataset.bound!=="true"){
+    world.dataset.bound="true";
+    world.addEventListener("click",event=>{
       if(board.classList.contains("wmh-overlay-editing"))return;
       const rect=world.getBoundingClientRect();
       const style=getComputedStyle(board);
@@ -1216,6 +1244,47 @@ function bindIsometricHud(dialog:HTMLElement):void {
   renderIsometricWorldStatus(dialog);
   renderIsometricTransitions(board);
   if(world)renderIsometricMinimap(board);
+  bindScrollableResizableWindows(dialog);
+  bindArcanistryBackClearance(dialog);
+}
+function bindArcanistryBackClearance(dialog:HTMLElement):void {
+  const screen=dialog.querySelector<HTMLElement>("[data-wmh-isometric-play-screen]");
+  const back=screen?.querySelector<HTMLElement>(".wmh-map-back");
+  if(!screen||!back||screen.dataset.machineClearanceBound==="true")return;
+  screen.dataset.machineClearanceBound="true";
+  const selectors="[data-arcanistry-machine],.wmh-arcanistry-machine,.wmh-archanistry-machine,[data-wmh-arcanistry-machine]";
+  const machine=document.querySelector<HTMLElement>(selectors);
+  if(!machine)return;
+  let frame=0;
+  const sync=()=>{
+    const rect=machine.getBoundingClientRect(),screenRect=screen.getBoundingClientRect();
+    const visible=!machine.hidden&&getComputedStyle(machine).display!=="none"&&rect.width>0&&rect.height>0&&rect.right>0&&rect.left<window.innerWidth&&rect.bottom>0&&rect.top<window.innerHeight;
+    const nearBack=visible&&rect.bottom>screenRect.bottom-110&&rect.left<screenRect.left+120;
+    if(nearBack){
+      screen.style.setProperty("--wmh-machine-back-offset",Math.max(54,rect.right-screenRect.left+10)+"px");
+      screen.classList.add("has-archanistry-machine");
+    }else{
+      screen.style.removeProperty("--wmh-machine-back-offset");
+      screen.classList.remove("has-archanistry-machine");
+    }
+  };
+  const follow=()=>{
+    if(frame)cancelAnimationFrame(frame);
+    const tick=()=>{
+      sync();
+      if(machine.getAnimations().some(animation=>animation.playState==="running"))frame=requestAnimationFrame(tick);
+      else frame=0;
+    };
+    frame=requestAnimationFrame(tick);
+  };
+  const observer=new MutationObserver(()=>{sync();follow();});
+  observer.observe(machine,{attributes:true,attributeFilter:["class","style","hidden"]});
+  machine.addEventListener("transitionrun",follow);
+  machine.addEventListener("transitionend",sync);
+  machine.addEventListener("animationstart",follow);
+  machine.addEventListener("animationend",sync);
+  window.addEventListener("resize",sync,{passive:true});
+  sync();
 }
 function relocateActorsFromBlockedCells(board:HTMLElement,data:IsoMapEditorData):boolean {
   const actors=Array.from(board.querySelectorAll<HTMLElement>("[data-wmh-player-token],[data-wmh-npc]"));
@@ -2141,19 +2210,25 @@ function isometricEditorMarkup(): string {
     '<small data-wmh-overlay-status>Choose a tool, then tap individual diamond cells. The world pauses while the editor is open.</small></section></div></div>';
 }
 function isometricHudMarkup(title: string, mapImage: string, showMinimap = true): string {
-  // The shared HUD and compact field map are available in every local isometric area.
   const minimapMarkup=
-    '<button type="button" class="wmh-rpg-minimap" data-wmh-minimap aria-label="Minimap. Tap a location to walk there." title="Tap the map to move">'+
-    '<span class="wmh-minimap-heading">FIELD MAP <i>⌖</i></span><span class="wmh-minimap-world" data-wmh-minimap-world>'+
-    (mapImage?'<img data-wmh-academy-map-art src="'+mapImage+'" alt="" aria-hidden="true" draggable="false"/>':"")+
-    '<svg class="wmh-minimap-grid" data-wmh-minimap-grid viewBox="0 0 2816 1536" preserveAspectRatio="none" aria-hidden="true"></svg><span class="wmh-minimap-actors" data-wmh-minimap-actors></span></span>'+
-    '<span class="wmh-minimap-footer" data-wmh-minimap-footer>YOU · X 05 / Y 17 · TAP TO MOVE</span></button>';
+    '<button type="button" class="wmh-minimap-toggle" data-wmh-minimap-toggle aria-label="Open draggable field minimap" aria-expanded="false" title="Open minimap"><span aria-hidden="true">⌖</span></button>'+
+    '<section class="wmh-minimap-window" data-wmh-minimap data-wmh-scroll-resize hidden role="dialog" aria-label="Draggable field minimap">'+
+      '<header class="wmh-minimap-window-header" data-wmh-minimap-drag-handle><b>FIELD MAP</b><button type="button" data-wmh-minimap-close aria-label="Close minimap">×</button></header>'+
+      '<div class="wmh-minimap-world" data-wmh-minimap-world>'+
+        (mapImage?'<img data-wmh-academy-map-art src="'+mapImage+'" alt="" aria-hidden="true" draggable="false"/>':"")+
+        '<svg class="wmh-minimap-grid" data-wmh-minimap-grid viewBox="0 0 2816 1536" preserveAspectRatio="none" aria-hidden="true"></svg><span class="wmh-minimap-actors" data-wmh-minimap-actors></span>'+
+      '</div><small class="wmh-minimap-footer" data-wmh-minimap-footer>YOU · X 05 / Y 17 · TAP TO MOVE</small>'+
+    '</section>';
   return '<div class="wmh-isometric-hud" data-wmh-isometric-hud>'+
-    '<section class="wmh-world-status" data-wmh-hud-layout="world-status" aria-label="World conditions">'+
-    '<div class="wmh-world-status-top"><span class="wmh-status-cycle-icon" data-wmh-cycle-icon>☼</span><div><b data-wmh-cycle-label>PAGI</b><small data-wmh-cycle-caption>WORLD CYCLE</small></div></div>'+
-    '<div class="wmh-world-status-bottom"><span class="wmh-status-weather"><i data-wmh-weather-icon>☀</i><b data-wmh-weather-label>CLEAR</b></span><span class="wmh-status-day" data-wmh-day>HARI 01</span><strong data-wmh-time>08:00</strong></div>'+
-    '<small class="wmh-status-location">'+escapeMapEditorText(title)+'</small><small class="wmh-status-coordinates" data-wmh-player-grid>GRID X 05 · Y 17</small></section>'+
-    renderPlayerHudMarkup() + (showMinimap?minimapMarkup:"")+'</div>';
+    '<section class="wmh-top-info" aria-label="World conditions">'+
+      '<span class="wmh-top-weather"><i data-wmh-weather-icon>☀</i><b data-wmh-weather-label>CERAH</b></span>'+
+      '<span class="wmh-top-location" data-wmh-status-location>'+escapeMapEditorText(title)+'</span>'+
+      '<strong data-wmh-time>8:00 AM</strong>'+
+      '<span class="wmh-top-coordinates" data-wmh-player-grid>(X: -- · Y: --)</span>'+
+      (showMinimap?minimapMarkup:"")+
+    '</section>'+
+    renderPlayerHudMarkup()+
+  '</div>';
 }
 function academyCanvasEditorMarkup(): string {
   if (!worldMapDeveloperMode) return "";
