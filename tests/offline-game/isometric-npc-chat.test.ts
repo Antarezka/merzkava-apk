@@ -33,10 +33,14 @@ describe("isometric NPC conversations", () => {
   it("renders the shared world HUD and map-tool drawer on the isometric play screen", () => {
     const html = renderIsometricMapTestArea();
     expect(html).toContain('data-wmh-isometric-hud');
-    expect(html).toContain('data-wmh-cycle-icon');
+    expect(html).toContain('class="wmh-top-info"');
     expect(html).toContain('data-wmh-weather-icon');
-    expect(html).toContain('data-wmh-day');
+    expect(html).toContain('data-wmh-status-location');
+    expect(html).toContain('data-wmh-player-grid');
     expect(html).toContain('data-wmh-time');
+    expect(html).toContain('data-wmh-minimap-toggle');
+    expect(html).toContain('class="wmh-minimap-window"');
+    expect(html).not.toContain('class="wmh-world-status"');
     expect(html).toContain('data-wmh-overlay-toggle');
     expect(html).toContain('data-wmh-overlay-tools');
     expect(html).toContain('class="wmh-overlay-drawer-lever"');
