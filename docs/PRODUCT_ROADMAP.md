@@ -1100,7 +1100,7 @@ Current source baseline for this workstream: ed5ef007cead9ecf8e6e70662c29ec5cce9
 - [x] Add a very small, low-opacity brush-ink `Pixi Architecture` annotation to the shared Atlas header only while the Pixi entry is active.
 - [x] Add a separate lazy-loaded PixiJS v8 visual renderer for the isometric game board. The shared DOM/gameplay engine remains authoritative; Pixi does not resolve input, movement, walkability, NPC intent, combat, saves, or dialogue.
 - [x] Remove Pixi EventSystem and AccessibilitySystem before renderer initialization; keep every tap, drag, pinch, button and editor action on existing DOM controls.
-- [x] GitHub Actions Web App Validation #42192239379 passed on `8823d0d3ad50f685057046210960d0716b145d80`: 40 test files / 295 tests passed; TypeScript, gateway type-check and Vite production build passed; npm audit reported 0 vulnerabilities.
+- [x] GitHub Actions Web App Validation #42193130033 passed on `28d088a896b65df2c2bbd13c8bea1d3c08d1cfe4`: 40 test files / 297 tests passed; TypeScript, gateway type-check and Vite production build passed; npm audit reported 0 vulnerabilities.
 - [ ] Verify repeated open/close, route changes, editor handoff, DOM fallback and all protected touch controls on the TECNO Spark Go 1 KL4 (Android 14). No physical-device QA is claimed by this source update.
 
 **Renderer contract:** the original receiver remains the default DOM/SVG path. The Pixi CRT console activates the isolated Pixi visual renderer in the same Atlas. A Pixi initialization failure returns to the existing DOM visuals; it must never leave a blank map or disable DOM controls. The Eternal Path cinematic Scene Window remains owned by its existing Anime.js scope and is not migrated by this workstream.
