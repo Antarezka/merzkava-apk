@@ -12,7 +12,7 @@ import {
 } from "./isometric-map-editor";
 import { renderIsometricSvgSceneMarkup, refreshIsometricSvgScene, type IsometricSvgTheme } from "./isometric-svg-board";
 import { findIsoQuadrantPath, isIsoQuadrantEdgeFullyBlocked, isIsoQuadrantWalkable, isNpcInteractionCellReachable, isoQuadrantCenterGridPosition, isoSubcellPositionAtPoint, nearestWalkableIsoQuadrant } from "./isometric-interaction";
-import { getIsoMovementOffset } from "./isometric-runtime-performance";
+import { getIsoMovementOffset, startNativeMotion } from "./isometric-runtime-performance";
 import { renderPlayerHudMarkup, refreshPlayerHud, handlePlayerHudClick, mountPlayerHudMotion, disposePlayerHudMotion, bindPlayerHudLayoutEditor } from "./player-hud";
 import "./player-hud.css";
 
@@ -2316,7 +2316,7 @@ function actorScanColor(tone:ActorScanTone):string {
   return tone==="friendly"?"#55baff":tone==="hostile"?"#ed5353":tone==="spirit-expert"?"#090b0d":"#f5f6f7";
 }
 
-const npcProximityAnimations=new WeakMap<HTMLElement,{pause?:()=>void}>();
+const npcProximityAnimations=new WeakMap<HTMLElement,Animation>();
 function isNpcInteractionReady(board:HTMLElement,npc:HTMLElement,data:IsoMapEditorData):boolean {
   if(board.dataset.editorPaused==="true"||board.classList.contains("wmh-overlay-editing"))return false;
   if(board.closest<HTMLElement>("[data-wmh-dialog]")?.querySelector<HTMLElement>("[data-wmh-chat]")?.hidden===false)return false;
@@ -2347,19 +2347,29 @@ function updateNpcInteractionProximity(board:HTMLElement):void {
       npc.prepend(glow);
     }
     glow.style.setProperty("--npc-proximity-color",actorScanColor(actorScanTone(npc)));
-    npcProximityAnimations.get(glow)?.pause?.();
+    const previousAnimation=npcProximityAnimations.get(glow);
+    const computed=getComputedStyle(glow);
+    const fromOpacity=computed.opacity;
+    const fromTransform=computed.transform;
+    previousAnimation?.cancel();
     if(reduceMotion){
       glow.style.opacity=ready?".72":"0";
       glow.style.transform=ready?"scale(1)":"scale(.82)";
       return;
     }
-    const animation=animate(glow,{
-      opacity:ready ? 0.72 : 0,
-      scale:ready?1:.82,
+    const animation=startNativeMotion(glow,[
+      {opacity:fromOpacity,transform:fromTransform},
+      {opacity:ready?".72":"0",transform:ready?"scale(1)":"scale(.82)"}
+    ],{
       duration:ready?360:420,
-      ease:ready?"outCubic":"inOutSine"
+      easing:ready?"cubic-bezier(0.22,1,0.36,1)":"cubic-bezier(0.37,0,0.63,1)",
+      fill:"forwards"
     });
-    npcProximityAnimations.set(glow,animation);
+    if(animation)npcProximityAnimations.set(glow,animation);
+    else{
+      glow.style.opacity=ready?".72":"0";
+      glow.style.transform=ready?"scale(1)":"scale(.82)";
+    }
   });
 }
 
@@ -2372,7 +2382,13 @@ function emitTileTrailWave(_board:HTMLElement,actor:HTMLElement,dx=0,dy=0):void 
   glow.style.setProperty("--move-shift-y",(-Math.sign(dy)*4)+"px");
   actor.append(glow);
   if(window.matchMedia?.("(prefers-reduced-motion: reduce)").matches){glow.remove();return;}
-  animate(glow,{scale:[.62,1.5],opacity:[0,.42,0],duration:540,ease:"outCubic",onComplete:()=>glow.remove()});
+  const animation=startNativeMotion(glow,[
+    {transform:"scale(.62)",opacity:0},
+    {transform:"scale(1.5)",opacity:.42,offset:.55},
+    {transform:"scale(1.5)",opacity:0}
+  ],{duration:540,easing:"cubic-bezier(0.22,1,0.36,1)",fill:"none"});
+  if(animation)animation.onfinish=()=>glow.remove();
+  else glow.remove();
 }
 
 function updateScannerContacts(board:HTMLElement,refreshProximity=true):void {
@@ -2423,7 +2439,11 @@ function pulseActorScanner(actor:HTMLElement,index:number):void {
     if(window.matchMedia?.("(prefers-reduced-motion: reduce)").matches){
       ring.style.opacity=".1";ring.style.transform="scale(1)";
     }else{
-      animate(ring,{scale:[.08,1],opacity:[.44,0],duration:1800,ease:"outQuad",delay:index*65+n*820});
+      ring.getAnimations().forEach(animation=>animation.cancel());
+      startNativeMotion(ring,[
+        {transform:"scale(.08)",opacity:.44},
+        {transform:"scale(1)",opacity:0}
+      ],{duration:1800,delay:index*65+n*820,easing:"cubic-bezier(0,0,0.2,1)",fill:"none"});
     }
   });
 }
@@ -2466,15 +2486,26 @@ function animateGridMove(token:HTMLElement,update:()=>void,sync=true,updateSenso
   const suspendNpcIdle=!reduceMotion&&token.matches(".wmh-character-token:not(.wmh-player-token)");
   if(suspendNpcIdle)token.classList.add("wmh-npc-moving");
   if(reduceMotion){
-    token.style.transform="";
+    token.style.removeProperty("translate");
   }else{
     token.classList.add("wmh-token-moving");
-    animate(token,{translateX:[dx,0],translateY:[dy,0],duration:225,ease:"outCubic",
-      onComplete:()=>{
+    const animation=startNativeMotion(token,[
+      {translate:dx+"px "+dy+"px"},
+      {translate:"0px 0px"}
+    ],{duration:225,easing:"cubic-bezier(0.22,1,0.36,1)",fill:"none"});
+    if(animation){
+      animation.onfinish=()=>{
         if(suspendNpcIdle)token.classList.remove("wmh-npc-moving");
         token.classList.remove("wmh-token-moving");
-      }
-    });
+      };
+      animation.oncancel=()=>{
+        if(suspendNpcIdle)token.classList.remove("wmh-npc-moving");
+        token.classList.remove("wmh-token-moving");
+      };
+    }else{
+      if(suspendNpcIdle)token.classList.remove("wmh-npc-moving");
+      token.classList.remove("wmh-token-moving");
+    }
   }
   if(board){
     emitTileTrailWave(board,token,Number(token.dataset.x||0)-fromCellX,Number(token.dataset.y||0)-fromCellY);
