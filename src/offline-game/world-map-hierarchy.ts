@@ -14,7 +14,7 @@ import { renderIsometricSvgSceneMarkup, refreshIsometricSvgScene, type Isometric
 import { findIsoQuadrantPath, isIsoQuadrantWalkable, isNpcInteractionCellReachable, isoQuadrantCenterGridPosition, isoSubcellPositionAtPoint, nearestWalkableIsoQuadrant } from "./isometric-interaction";
 import { renderPlayerHudMarkup, refreshPlayerHud, handlePlayerHudClick, mountPlayerHudMotion, disposePlayerHudMotion, bindPlayerHudLayoutEditor, bindScrollableResizableWindows } from "./player-hud";
 import "./player-hud.css";
-import { mountAugustoPxlAssets } from "./augusto-pxl-runtime";
+import { disposeAugustoPxlAssets, mountAugustoPxlAssets } from "./augusto-pxl-runtime";
 
 let worldMapDeveloperMode = false;
 export function setWorldMapDeveloperMode(enabled: boolean): void {
