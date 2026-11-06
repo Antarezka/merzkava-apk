@@ -38,7 +38,7 @@ import { animateAppScreen, animateNoticeboardExit } from "./ui/app-shell-motion"
 import { initializeGravityPullCord } from "./ui/gravity-pull-cord";
 import { installSoftKeyboardStability } from "./ui/soft-keyboard-stability";
 import { mountArcanistryTicketMachine } from "./offline-game/arcanistry-ticket-machine";
-import { handleWorldMapHierarchyClick, initializeWorldMapHierarchy, setWorldMapDeveloperMode, disposeWorldMapHierarchy } from "./offline-game/world-map-hierarchy";
+import { handleWorldMapHierarchyClick, initializeWorldMapHierarchy, setWorldMapDeveloperMode, disposeWorldMapHierarchy, renderWorldMapHierarchy } from "./offline-game/world-map-hierarchy";
 import { bindScrollableResizableWindows } from "./offline-game/player-hud";
 import { closeLoreEntry, closeLoreSource, closeLorePlaceholder, openLoreEntry, openLoreSource, openLorePlaceholder, setLoreCategory, setLoreSearch, renderLoreResults } from "./world-archive/lore-library";
 import { playWorldAtlasAccessSequence } from "./offline-game/world-atlas-login-motion";
@@ -995,10 +995,8 @@ async function openWorldAtlasFromTv(renderer:"dom"|"augusto-pxl"="dom"):Promise<
   if(!modal.hidden){closeWorldAtlas();return;}
   modal.hidden=false;
   modal.dataset.renderer=renderer;
-  const legacyAtlas=modal.querySelector<HTMLElement>('[data-world-map-hierarchy][data-visual-mode="legacy"]');
-  const pxlAtlas=modal.querySelector<HTMLElement>('[data-world-map-hierarchy][data-visual-mode="augusto-pxl"]');
-  if(legacyAtlas)legacyAtlas.hidden=renderer!=="dom";
-  if(pxlAtlas)pxlAtlas.hidden=renderer!=="augusto-pxl";
+  const mapHost=modal.querySelector<HTMLElement>("[data-world-map-host]");
+  if(mapHost)mapHost.innerHTML=renderWorldMapHierarchy(renderer==="augusto-pxl"?"augusto-pxl":"legacy",false);
   root.querySelector(".app-shell")?.classList.add("is-idle-world");
   root.querySelectorAll<HTMLButtonElement>("[data-idle-rpg-open],[data-augusto-pxl-open]").forEach(item=>item.setAttribute("aria-expanded",String(item===trigger)));
   initializeWorldMapHierarchy(root);
