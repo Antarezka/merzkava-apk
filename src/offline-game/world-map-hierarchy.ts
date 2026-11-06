@@ -2348,7 +2348,7 @@ function isometricPlayMarkup(regionId: RegionId, selectedBuilding: string, inter
       '<div class="wmh-academy-actor-layer" data-wmh-actor-layer><button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token data-scan-tone="unknown" data-token-label="" data-x="12" data-y="31" aria-label="Player character">'+pxlActorMarkup("character.player.idle",visualMode)+'</button>'+isometricNpcTokensMarkup(academyMapId,false,visualMode)+'<div data-wmh-transition-layer></div></div>'+
       '</div></div>'+(visualMode==="augusto-pxl"?isometricHudMarkup("Tianhai Academy",academyMapImage,true,visualMode):isometricHudMarkup("Tianhai Academy",academyMapImage,true))+academyCanvasEditorMarkup()+isometricEditorMarkup()+
       '<button type="button" class="wmh-map-back wmh-academy-map-back" data-wmh-action="back" aria-label="Return to Golden Dragon Empire map"><i class="wmh-academy-back-icon" aria-hidden="true"></i><b>GOLDEN DRAGON EMPIRE</b></button>'+
-      '<section class="wmh-chat-panel" data-wmh-chat hidden role="dialog" aria-label="Character conversation"><div class="wmh-chat-card" data-wmh-scroll-resize><button type="button" class="wmh-chat-close" data-wmh-action="chat-close" aria-label="Close conversation">×</button><div class="wmh-chat-thread" data-wmh-thread></div><div class="wmh-chat-input-row"><span>YOUR RESPONSE</span><div data-wmh-replies></div></div></div></section><section class="wmh-transition-dialog" data-wmh-transition-dialog hidden role="dialog" aria-label="World dialogue"><div class="wmh-transition-dialog-card" data-wmh-scroll-resize><small data-wmh-transition-speaker>WORLD ARCHIVE</small><p data-wmh-transition-dialog-text></p><button type="button" data-wmh-transition-close>CONTINUE</button></div></section><section class="wmh-transition-notice" data-wmh-transition-notice hidden role="dialog" aria-label="World event notification"><div class="wmh-transition-notice-card" data-wmh-scroll-resize><small>WORLD EVENT · ARCHIVE NOTICE</small><h3 data-wmh-transition-notice-title></h3><p data-wmh-transition-notice-text></p><button type="button" data-wmh-transition-close>CONTINUE</button></div></section>'+
+      '<section class="wmh-chat-panel" data-wmh-chat hidden role="dialog" aria-label="Character conversation"><div class="wmh-chat-card" data-wmh-scroll-resize><button type="button" class="wmh-chat-close" data-wmh-action="chat-close" aria-label="Close conversation">×</button><div class="wmh-chat-thread" data-wmh-thread></div><div class="wmh-chat-input-row"><span>YOUR RESPONSE</span><div data-wmh-replies></div></div></div></section><section class="wmh-transition-dialog" data-wmh-transition-dialog hidden role="dialog" aria-label="World dialogue"><div class="wmh-transition-dialog-card" data-wmh-scroll-resize><small data-wmh-transition-speaker>WORLD ARCHIVE</small><p data-wmh-transition-dialog-text></p><button type="button" data-wmh-transition-close>CONTINUE</button></div></section><section class="wmh-transition-notice" data-wmh-transition-notice hidden role="dialog" aria-label="World event notification"><div class="wmh-transition-notice-card" data-wmh-scroll-resize><small>WORLD EVENT · ARCHIVE NOTICE</small><h3 data-wmh-transition-notice-title></h3><p data-wmh-transition-notice-text></p><button type="button" data-wmh-transition-close>CONTINUE</button></div></section><section class="wmh-transition-confirm" data-wmh-transition-confirm-panel hidden role="dialog" aria-modal="true" aria-label="Confirm academy exit"><div class="wmh-transition-confirm-card" data-wmh-scroll-resize><small>TIANHAI ACADEMY · GATE</small><h3 data-wmh-transition-confirm-title>Leave Tianhai Academy?</h3><p data-wmh-transition-confirm-text>Leave through the academy gate and travel to Golden Dragon Empire?</p><div class="wmh-transition-confirm-actions"><button type="button" data-wmh-transition-confirm="no">NO · STAY</button><button type="button" data-wmh-transition-confirm="yes">YES · LEAVE ACADEMY</button></div></div></section>'+
       '</div>';
   }
   const mapId=makeIsometricMapId(regionId,selectedBuilding,interior);
@@ -2733,7 +2733,12 @@ function walkToTile(
   if(board?.dataset.editorPaused==="true"||board?.classList.contains("wmh-overlay-editing"))return;
   const player=board?.querySelector<HTMLElement>("[data-wmh-player-token]");
   if(!board||!player)return;
-  const runtime=board as HTMLElement & {__wmhPendingPlayerDestination?:{x:number;y:number;surface:string};__wmhPendingNpcInteraction?:string};
+  const runtime=board as HTMLElement & {
+    __wmhPendingPlayerDestination?:{x:number;y:number;surface:string};
+    __wmhPendingNpcInteraction?:string;
+    __wmhPendingTransitionReturn?:{x:number;y:number;quadrant:IsoQuadrant;position:{x:number;y:number};surface:string};
+    __wmhSkipTransitionId?:string;
+  };
   const mapData=readIsoMapData(board);
   if(!Number.isInteger(targetX)||!Number.isInteger(targetY)||!isoGridCellExists(mapData,targetX,targetY))return;
   const academyArtwork=board.dataset.academyArtworkBoard==="true";
@@ -2801,6 +2806,34 @@ function walkToTile(
   const finishMovement=()=>{
     delete player.dataset.moveTimer;
     delete runtime.__wmhPendingPlayerDestination;
+    const arrivedX=Number(player.dataset.x||0),arrivedY=Number(player.dataset.y||0);
+    const transition=readIsoMapData(board).transitions.find(item=>item.x===arrivedX&&item.y===arrivedY);
+    if(transition&&runtime.__wmhSkipTransitionId===transition.id){
+      delete runtime.__wmhSkipTransitionId;
+    }else if(transition){
+      const label=transition.label.trim();
+      if(/^akses ke map golden dragon empire$/i.test(label)){
+        runtime.__wmhPendingTransitionReturn={
+          x:startX,y:startY,quadrant:startQuadrant,
+          position:{x:currentVisualX,y:currentVisualY},surface
+        };
+        stopNpcWander(dialog);
+        showTransitionConfirmation(dialog,transition.id);
+        return;
+      }
+      if(/^dialog box:/i.test(label)){
+        showTransitionDialogue(dialog,"TIANHAI ACADEMY",label.replace(/^dialog box:\s*/i,""));
+        return;
+      }
+      if(/^event scene:/i.test(label)){
+        showTransitionNotice(dialog,"An Introduction to Merzkava",label.replace(/^event scene:\s*/i,""));
+        return;
+      }
+      showTransitionDialogue(dialog,"WORLD ARCHIVE",label||"The route is not yet identified.");
+      return;
+    }else{
+      delete runtime.__wmhSkipTransitionId;
+    }
     const pendingNpcId=runtime.__wmhPendingNpcInteraction;
     delete runtime.__wmhPendingNpcInteraction;
     if(!pendingNpcId)return;
@@ -2892,7 +2925,20 @@ function walkToNpcAndInteract(dialog:HTMLElement,npcId:string):void {
 }
 
 function closeTransitionOverlays(dialog:HTMLElement):void {
-  dialog.querySelectorAll<HTMLElement>("[data-wmh-transition-dialog],[data-wmh-transition-notice]").forEach(node=>node.hidden=true);
+  dialog.querySelectorAll<HTMLElement>("[data-wmh-transition-dialog],[data-wmh-transition-notice],[data-wmh-transition-confirm-panel]").forEach(node=>node.hidden=true);
+}
+function showTransitionConfirmation(dialog:HTMLElement,markerId:string):void {
+  closeTransitionOverlays(dialog);
+  const panel=dialog.querySelector<HTMLElement>("[data-wmh-transition-confirm-panel]");
+  if(!panel)return;
+  panel.dataset.transitionId=markerId;
+  panel.hidden=false;
+  const title=panel.querySelector<HTMLElement>("[data-wmh-transition-confirm-title]");
+  const text=panel.querySelector<HTMLElement>("[data-wmh-transition-confirm-text]");
+  if(title)title.textContent="Leave Tianhai Academy?";
+  if(text)text.textContent="Leave through the academy gate and travel to Golden Dragon Empire?";
+  const card=panel.querySelector<HTMLElement>(".wmh-transition-confirm-card");
+  if(card&&!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches)animate(card,{opacity:[0,1],scale:[.96,1],translateY:[14,0],duration:320,ease:"outCubic"});
 }
 function showTransitionDialogue(dialog:HTMLElement,speaker:string,message:string):void {
   closeTransitionOverlays(dialog);
@@ -2927,7 +2973,7 @@ function replaceWorldMapDialogMarkup(dialog:HTMLElement,markup:string):void {
 }
 export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement, onAdvanceTime: (minutes: number) => void, pointer?: {clientX:number;clientY:number}): boolean {
   if (!worldMapDeveloperMode && target.closest("[data-wmh-overlay-toggle],[data-wmh-overlay-tools],[data-wmh-overlay-minimize],[data-wmh-overlay-close],[data-wmh-academy-editor],[data-wmh-drag-marker],[data-wmh-coordinate],[data-wmh-editor-canvas]")) return true;
-  const action=target.closest<HTMLElement>("[data-wmh-action],[data-wmh-info],[data-wmh-site],[data-wmh-building],[data-wmh-npc],[data-wmh-plot],[data-wmh-tile],[data-wmh-map-hit],[data-wmh-reply],[data-wmh-transition],[data-wmh-transition-close],[data-wmh-dismiss-layer],[data-wmh-selection-card],[data-hud-action]");
+  const action=target.closest<HTMLElement>("[data-wmh-action],[data-wmh-info],[data-wmh-site],[data-wmh-building],[data-wmh-npc],[data-wmh-plot],[data-wmh-tile],[data-wmh-map-hit],[data-wmh-reply],[data-wmh-transition],[data-wmh-transition-close],[data-wmh-transition-confirm],[data-wmh-dismiss-layer],[data-wmh-selection-card],[data-hud-action]");
   if(!action)return false;
   const overlay=target.closest<HTMLElement>("[data-world-map-hierarchy]");
   const dialog=overlay?.querySelector<HTMLElement>("[data-wmh-dialog]");
@@ -2979,14 +3025,45 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
     closeTransitionOverlays(dialog);
     return true;
   }
+  if(action.dataset.wmhTransitionConfirm==="yes"){
+    const board=dialog.querySelector<HTMLElement>("[data-wmh-board]") as (HTMLElement & {__wmhPendingTransitionReturn?:unknown})|null;
+    if(board)delete board.__wmhPendingTransitionReturn;
+    closeTransitionOverlays(dialog);stopNpcWander(dialog);
+    overlay.dataset.level="regional";overlay.dataset.region="golden-dragon-empire";
+    replaceWorldMapDialogMarkup(dialog,renderPanel("regional","golden-dragon-empire"));
+    bindIsometricMapArt(dialog);
+    return true;
+  }
+  if(action.dataset.wmhTransitionConfirm==="no"){
+    const board=dialog.querySelector<HTMLElement>("[data-wmh-board]") as (HTMLElement & {
+      __wmhPendingTransitionReturn?:{x:number;y:number;quadrant:IsoQuadrant;position:{x:number;y:number};surface:string};
+      __wmhSkipTransitionId?:string;
+    })|null;
+    const pending=board?.__wmhPendingTransitionReturn;
+    if(board)delete board.__wmhPendingTransitionReturn;
+    closeTransitionOverlays(dialog);
+    if(board&&pending){
+      const returnMarker=readIsoMapData(board).transitions.find(item=>item.x===pending.x&&item.y===pending.y);
+      if(returnMarker)board.__wmhSkipTransitionId=returnMarker.id;
+      walkToTile(dialog,pending.x,pending.y,pending.surface,{position:pending.position,quadrant:pending.quadrant});
+    }
+    return true;
+  }
   if(action.dataset.wmhTransition){
     const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
     const marker=board?readIsoMapData(board).transitions.find(item=>item.id===action.dataset.wmhTransition):null;
     const label=marker?.label.trim()||"";
     if(/^akses ke map golden dragon empire$/i.test(label)){
-      closeTransitionOverlays(dialog);stopNpcWander(dialog);
-      overlay.dataset.level="regional";overlay.dataset.region="golden-dragon-empire";
-      replaceWorldMapDialogMarkup(dialog,renderPanel("regional","golden-dragon-empire"));bindIsometricMapArt(dialog);
+      const player=board?.querySelector<HTMLElement>("[data-wmh-player-token]");
+      if(board&&player){
+        const x=Number(player.dataset.x||0),y=Number(player.dataset.y||0);
+        const quadrant=(player.dataset.quadrant as IsoQuadrant)||nearestWalkableIsoQuadrant(readIsoMapData(board),x,y,{x:Number(player.dataset.posX??x),y:Number(player.dataset.posY??y)});
+        if(quadrant){
+          const runtime=board as HTMLElement & {__wmhPendingTransitionReturn?:{x:number;y:number;quadrant:IsoQuadrant;position:{x:number;y:number};surface:string}};
+          runtime.__wmhPendingTransitionReturn={x,y,quadrant,position:{x:Number(player.dataset.posX??x),y:Number(player.dataset.posY??y)},surface:"earth"};
+        }
+      }
+      showTransitionConfirmation(dialog,action.dataset.wmhTransition);
       return true;
     }
     if(/^dialog box:/i.test(label)){showTransitionDialogue(dialog,"TIANHAI ACADEMY",label.replace(/^dialog box:\\s*/i,""));return true;}
