@@ -12,7 +12,7 @@ The second icon is a CSS-only vintage CRT plus console box/joystick and has an i
 
 This remains a prototype, not production approval. Do not change the shared app shell or gameplay rules to accommodate the renderer.
 
-**Academy artwork safety rule (2026-11-06):** the high-resolution Academy Map Base and its foreground-priority redraw remain in their original DOM image/canvas layers beneath the transparent Pixi canvas. Pixi must not upload a second full-size copy of either layer. It may render the isometric SVG guides/overlays and actor/effect layer above them. The renderer must wait for non-Academy source images to load before hiding their DOM source; a failed or incomplete source must return to the DOM renderer rather than activating an empty canvas.
+**Academy static-layer safety rule (2026-11-06):** the high-resolution Academy Map Base, foreground-priority redraw, isometric SVG scene, and interaction/mark SVG remain in their original DOM layers beneath the transparent Pixi actor canvas. Pixi must not upload second full-size copies of these static layers. It owns the dynamic Player/NPC/sonar/proximity visual layer for Academy. For other maps, the renderer must wait for source images to load before hiding their DOM source; a failed or incomplete source must return to the DOM renderer rather than activating an empty canvas.
 
 ## 1. Why the game mode is the target
 
