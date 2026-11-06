@@ -919,8 +919,8 @@ async function refreshAtlasPasswordMode(gate:HTMLElement):Promise<void> {
     const exists=await hasAtlasPassword(selected);
     if(select?.value!==selected)return;
     if(resetPanel)resetPanel.hidden=true;
-    if(resetActions)resetActions.hidden=false;
-    if(changeButton)changeButton.hidden=!exists;
+    if(resetActions)resetActions.hidden=pxlOffline;
+    if(changeButton)changeButton.hidden=pxlOffline||!exists;
     loginBlock.hidden=!exists;
     if(safetyNote)safetyNote.hidden=!exists;
     signupOpen.hidden=exists;
@@ -2079,6 +2079,12 @@ root.addEventListener("click", async event => {
   if(!(target instanceof Element))return;
   const gate=target.closest<HTMLElement>("[data-world-atlas-gate]");
   if(!gate)return;
+  const pxlOffline=gate.closest<HTMLElement>("[data-idle-rpg-modal]")?.dataset.renderer==="augusto-pxl";
+  if(pxlOffline&&target.closest("[data-atlas-change-open],[data-atlas-master-open],[data-atlas-reset-apply]")){
+    const resetMessage=gate.querySelector<HTMLElement>("[data-atlas-reset-message]");
+    if(resetMessage)resetMessage.textContent="PXL Offline: password changes and master-reset recovery require the online account service. Existing local credentials still work offline.";
+    return;
+  }
   const panel=gate.querySelector<HTMLElement>("[data-atlas-reset-panel]");
   const actions=gate.querySelector<HTMLElement>("[data-atlas-password-actions]");
   const loginPanel=gate.querySelector<HTMLElement>("[data-atlas-login-panel]");
