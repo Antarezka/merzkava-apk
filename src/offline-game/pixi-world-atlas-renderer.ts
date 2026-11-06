@@ -35,7 +35,6 @@ type TextureAsset={texture:PIXI.Texture;release:()=>void};
 const MOVE_DURATION=225;
 const SCAN_DURATION=1800;
 const SCAN_INTERVAL=2450;
-const SCAN_RADIUS=5;
 
 function numberValue(value:string|undefined,fallback:number):number {
   const parsed=Number(value);
@@ -57,7 +56,33 @@ function boardGrid(board:HTMLElement):{cols:number;rows:number;tileW:number;tile
   };
 }
 
-/** Projection helper kept pure so fractional Player coordinates can be tested. */
+export type PixiGridProjection={
+  halfW?:number;halfH?:number;centerX?:number;offsetY?:number;
+  imageScaleX?:number;imageScaleY?:number;
+};
+
+/** Pure isometric projection, including fractional positions inside a cell. */
+export function projectIsoActorPosition(
+  actor:ProjectedPoint,
+  grid:{cols:number;rows:number;tileW:number;tileH:number;offsetX:number;offsetY:number},
+  projection:PixiGridProjection={}
+):ProjectedPoint {
+  const halfW=projection.halfW??grid.tileW/2;
+  const halfH=projection.halfH??grid.tileH/2;
+  const centerX=projection.centerX??grid.rows*halfW+grid.offsetX;
+  const offsetY=projection.offsetY??grid.offsetY;
+  const x=(actor.x-actor.y)*halfW+centerX;
+  const y=(actor.x+actor.y)*halfH+offsetY+halfH;
+  if(projection.imageScaleX!==undefined||projection.imageScaleY!==undefined){
+    return {
+      x:x*(projection.imageScaleX??1),
+      y:y*(projection.imageScaleY??1)-22
+    };
+  }
+  return {x,y:y-22};
+}
+
+/** DOM adapter; CSS and the map JSON remain the source of screen projection. */
 export function projectPixiActorPosition(
   board:HTMLElement,
   actor:{x:number;y:number},
@@ -65,21 +90,21 @@ export function projectPixiActorPosition(
 ):ProjectedPoint {
   const image=board.querySelector<HTMLImageElement>("[data-wmh-map-art]");
   const style=getComputedStyle(board);
-  const centerX=(actor.x-actor.y)*(grid.tileW/2)+grid.rows*(grid.tileW/2)+grid.offsetX;
-  const centerY=(actor.x+actor.y)*(grid.tileH/2)+grid.offsetY+(grid.tileH/2);
   if(board.dataset.academyArtworkBoard==="true"&&image?.naturalWidth&&image.naturalHeight){
-    const scaleX=(image.clientWidth||image.naturalWidth)/image.naturalWidth;
-    const scaleY=(image.clientHeight||image.naturalHeight)/image.naturalHeight;
-    return {x:centerX*scaleX,y:centerY*scaleY-22};
+    return projectIsoActorPosition(actor,grid,{
+      halfW:grid.tileW/2,
+      halfH:grid.tileH/2,
+      centerX:grid.rows*(grid.tileW/2)+grid.offsetX,
+      offsetY:grid.offsetY,
+      imageScaleX:(image.clientWidth||image.naturalWidth)/image.naturalWidth,
+      imageScaleY:(image.clientHeight||image.naturalHeight)/image.naturalHeight
+    });
   }
   const halfW=readCssNumber(style,"--iso-half-w",grid.tileW/2);
   const halfH=readCssNumber(style,"--iso-half-h",grid.tileH/2);
   const isoCenterX=readCssNumber(style,"--iso-center-x",grid.rows*halfW+grid.offsetX);
   const offsetY=readCssNumber(style,"--iso-offset-y",grid.offsetY);
-  return {
-    x:(actor.x-actor.y)*halfW+isoCenterX,
-    y:(actor.x+actor.y)*halfH+offsetY+halfH-22
-  };
+  return projectIsoActorPosition(actor,grid,{halfW,halfH,centerX:isoCenterX,offsetY});
 }
 
 function loadSvgTexture(svg:SVGSVGElement):Promise<TextureAsset> {
@@ -222,7 +247,6 @@ function mountPixiBoard(board:HTMLElement,modal:HTMLElement,onFailure:()=>void):
   let textures:TextureAsset[]=[];
   let frameId=0;
   let pulseTimer=0;
-  let lastFrame=0;
   let resizeObserver:ResizeObserver|null=null;
   let actorObserver:MutationObserver|null=null;
 
@@ -363,7 +387,6 @@ function mountPixiBoard(board:HTMLElement,modal:HTMLElement,onFailure:()=>void):
       return;
     }
     setPaused(false);
-    lastFrame=time;
     let moving=false;
     for(const actor of actors.values()){
       if(actor.motionUntil>time){
