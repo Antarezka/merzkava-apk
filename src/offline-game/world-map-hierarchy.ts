@@ -1250,6 +1250,7 @@ function bindArcanistryBackClearance(dialog:HTMLElement):void {
     const found=document.querySelector<HTMLElement>(selectors);
     if(found&&found!==boundMachine){
       machine=found;boundMachine=found;
+      observer.observe(machine,{attributes:true,attributeFilter:["class","style","hidden"]});
       machine.addEventListener("transitionrun",follow);
       machine.addEventListener("transitionend",sync);
       machine.addEventListener("animationstart",follow);
