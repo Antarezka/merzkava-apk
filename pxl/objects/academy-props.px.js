@@ -1,5 +1,5 @@
 // Reusable, original Academy props. These remain visual children; the map editor owns placement and collision.
-pal({k:"#241f1a",n:"#49362a",b:"#66503a",B:"#987a50",g:"#516b4c",G:"#8eaa6b",y:"#c39d5f",Y:"#ead08e",s:"#9c9c8a",S:"#ddd2b9",c:"#4c8990",C:"#8cc4bd",r:"#864b3d"})
+pal({k:"#241f1a",n:"#49362a",b:"#66503a",B:"#987a50",g:"#516b4c",G:"#8eaa6b",y:"#c39d5f",Y:"#ead08e",s:"#9c9c8a",S:"#ddd2b9",c:"#4c8990",C:"#8cc4bd",r:"#864b3d",w:"#f4eddc"})
 sprite("academy-gate",{w:96,h:80,pivot:"bottom"},c=>{
  c.rect(12,28,8,45,"n");c.rect(76,28,8,45,"n");c.rect(8,23,80,7,"b");c.hline(8,23,80,"Y")
  c.rect(22,15,52,10,"r");c.rect(27,8,42,9,"n");c.hline(24,14,48,"Y")
