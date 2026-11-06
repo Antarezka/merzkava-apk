@@ -1,6 +1,7 @@
 // Tianhai Academy — an original PXL 3D-look HD-2D campus environment.
 // The old approved map is a faint editor-only composition guide. It is not baked into the export.
 // Merzkava remains authoritative for coordinates, grid, walkability, actor placement and minimap.
+include("../../.tools/claude-pxl/lib/architecture/surfaces.px.js", { as: "surfaces" })
 pal({
   k:"#211d24", K:"#403742", n:"#5a4a3e", N:"#786252",
   s:"#8b8479", S:"#b5aa98", p:"#d4c9b4", P:"#eee2ca",
