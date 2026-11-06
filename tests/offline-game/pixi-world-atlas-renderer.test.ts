@@ -57,6 +57,22 @@ describe("Pixi World Atlas Android input isolation",()=>{
     expect(rendererSource).not.toContain('addEventListener("touchstart"');
   });
 
+  it("keeps the high-resolution Academy Map Base in the native DOM layer",()=>{
+    expect(rendererSource).toContain('const keepMapArtworkInDom=board.classList.contains("has-map-base")');
+    expect(rendererSource).toContain("if(image&&!keepMapArtworkInDom)");
+    expect(rendererSource).toContain("foregroundLayer&&!keepMapArtworkInDom");
+    expect(rendererSource).toContain("image.offsetLeft,image.offsetTop");
+    expect(cssStyles).toContain(".wmh-isometric-board.has-map-base.wmh-pixi-render-active>[data-wmh-map-art]");
+    expect(cssStyles).toContain(".wmh-isometric-board.has-map-base.wmh-pixi-render-active>[data-wmh-foreground-canvas]");
+  });
+
+  it("does not switch to Pixi visuals before a non-Academy base image is ready",()=>{
+    expect(rendererSource).toContain("async function ensureImageReady(image:HTMLImageElement):Promise<boolean>");
+    expect(rendererSource).toContain("if(!imageReady)throw new Error(");
+    expect(rendererSource).toContain("backgroundAlpha:0,backgroundColor:0x000000");
+    expect(rendererSource).toContain('canvas.style.background="transparent"');
+  });
+
   it("lazy-loads Pixi only from the separate Pixi floating trigger",()=>{
     expect(expeditionSource).toContain('data-idle-rpg-open');
     expect(expeditionSource).toContain('data-idle-pixi-open');
