@@ -252,9 +252,8 @@ function bindPlayerHudInteractions(hud:HTMLElement):void {
 }
 const scrollResizeScopes=new WeakSet<HTMLElement>();
 export function bindScrollableResizableWindows(root:HTMLElement):void {
-  const panels=Array.from(root.querySelectorAll<HTMLElement>(
-    '[data-wmh-scroll-resize],.wmh-hud-drawer,.wmh-minimap-window,.wmh-inventory-window,.wmh-chat-card,.wmh-transition-dialog-card,.wmh-transition-notice-card,.wmh-academy-canvas-editor'
-  ));
+  const selector='[data-wmh-scroll-resize],[role="dialog"]:not(.wmh-chat-panel):not(.wmh-transition-dialog):not(.wmh-transition-notice):not([data-wmh-dialog]),.wmh-hud-drawer,.wmh-minimap-window,.wmh-inventory-window,.wmh-chat-card,.wmh-transition-dialog-card,.wmh-transition-notice-card,.wmh-academy-canvas-editor,.noticeboard-panel,.preference-panel,.registry-profile,.wmh-floating-panel,.wmh-panel-window';
+  const panels=[...(root.matches(selector)?[root]:[]),...Array.from(root.querySelectorAll<HTMLElement>(selector))];
   for(const panel of panels){
     if(scrollResizeScopes.has(panel))continue;
     scrollResizeScopes.add(panel);
