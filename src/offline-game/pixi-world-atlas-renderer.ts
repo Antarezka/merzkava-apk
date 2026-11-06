@@ -201,8 +201,10 @@ function actorGridPosition(element:HTMLElement):{x:number;y:number} {
   };
 }
 function isPaused(board:HTMLElement):boolean {
-  const chat=board.closest<HTMLElement>("[data-wmh-dialog]")?.querySelector<HTMLElement>("[data-wmh-chat]");
-  return document.hidden||board.dataset.editorPaused==="true"||board.classList.contains("wmh-overlay-editing")||chat?.hidden===false;
+  const dialog=board.closest<HTMLElement>("[data-wmh-dialog]");
+  const chat=dialog?.querySelector<HTMLElement>("[data-wmh-chat]");
+  const gate=board.closest<HTMLElement>("[data-idle-rpg-modal]")?.querySelector<HTMLElement>("[data-world-atlas-gate]");
+  return document.hidden||board.dataset.editorPaused==="true"||board.classList.contains("wmh-overlay-editing")||chat?.hidden===false||gate?.hidden===false;
 }
 
 function renderActorProximity(actor:PixiActor):void {
@@ -494,7 +496,7 @@ function mountPixiBoard(board:HTMLElement,modal:HTMLElement,onFailure:()=>void):
         if(actorChanged)syncActors(true);
         const modeChanged=records.some(record=>
           (record.target===board&&record.attributeName==="class")||
-          (record.target instanceof HTMLElement&&record.target.matches("[data-wmh-chat]")&&record.attributeName==="hidden")
+          (record.target instanceof HTMLElement&&record.target.matches("[data-wmh-chat],[data-world-atlas-gate]")&&record.attributeName==="hidden")
         );
         if(modeChanged)setPaused(isPaused(board));
         if(actorChanged||modeChanged)requestFrame();
@@ -507,7 +509,7 @@ function mountPixiBoard(board:HTMLElement,modal:HTMLElement,onFailure:()=>void):
         if(!app||disposed)return;
         const width=boardWidth(),height=boardHeight();
         app.renderer.resize(width,height);
-        app.renderer.render({container:app.stage});
+        if(!isPaused(board))app.renderer.render({container:app.stage});
       });
       resizeObserver.observe(board);
       document.addEventListener("visibilitychange",onVisibility);
