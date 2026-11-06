@@ -11,7 +11,10 @@ describe("Eternal Path live world scene", () => {
     const html=renderExpeditionInterface();
     expect(html).toContain('class="expedition-pxl-trigger" data-augusto-pxl-open');
     expect(html).toContain('aria-label="Open Augusto PXL integration panel"');
-    expect(html).toContain('class="expedition-pxl-emblem"');
+    expect(html).toContain('class="pxl-tv-art" aria-hidden="true"');
+    expect(html).toContain('class="pxl-tv-shell"');
+    expect(html).toContain('class="pxl-console-box"');
+    expect(html).toContain('class="pxl-console-ink">AUGUSTO PXL</small>');
     expect(html).toContain("AUGUSTO PXL");
     expect(html).toContain('class="expedition-pxl-modal" data-augusto-pxl-modal hidden');
     expect(html).toContain("Full visual-production pipeline for Merzkava Universe");
