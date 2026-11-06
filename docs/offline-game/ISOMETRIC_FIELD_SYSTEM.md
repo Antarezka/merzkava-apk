@@ -185,7 +185,7 @@ Rules:
 - Clean up intervals, animations, listeners, canvas and textures when a board is hidden/detached or the user changes Atlas mode.
 - Pixi stage/display objects remain non-interactive; remove PixiJS EventSystem and AccessibilitySystem before renderer initialization.
 - Every real tap, map gesture, editor action, NPC interaction and DOM button must continue through existing DOM handlers and deterministic gameplay APIs.
-- Keep the existing DOM/SVG fallback visible while Pixi is paused or fails to initialize. After Developer editor changes, rebuild the static Pixi map textures from the updated map artwork, foreground canvas and overlay SVG before resuming the Pixi canvas.
+- Keep the existing DOM/SVG fallback visible while Pixi is paused or fails to initialize. After Developer editor changes, rebuild the static Pixi map textures from the updated map artwork, foreground canvas and overlay SVG before resuming the Pixi canvas. The Pixi canvas is capped at 1× resolution on the target low-end Android profile, and its stacking layer remains below DOM transition controls.
 - Respect prefers-reduced-motion; keep static visuals when motion is disabled.
 - Prefer opacity/transform and avoid heavy layout animation on low-end Android.
 
