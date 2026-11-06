@@ -11,7 +11,7 @@ Editable PXL source for the separate pink World Atlas. The green/legacy Atlas re
 
 | Source | Scope |
 | --- | --- |
-| `maps/world-atlas.px.js` | Existing Merzkava world-map image, 35 regional crops, approved Academy map, minimap and local Tianhai environment image |
+| `maps/world-atlas.px.js` | Endesga32 PXL treatment for the world atlas and 35 regional crops; Academy pixel-art pass plus 4× full-size export; minimap and local Tianhai image |
 | `characters/academy-cast.px.js` | Player plus four seeded Academy NPC sprite sheets, eight directions, idle/walk frames |
 | `ui/merzkava-ui.px.js` | Satchel, skill/item/currency icons, HUD frames, minimap and map markers |
 | `effects/merzkava-effects.px.js` | Spirit Ring, Martial Soul, Arcanistry, Spirit Beast, water, foliage, clouds and weather sheets |
@@ -22,7 +22,7 @@ Editable PXL source for the separate pink World Atlas. The green/legacy Atlas re
 
 PXL owns image authoring and export. The app remains responsible for gameplay rules, map IDs, grid and walkability, camera, actors, NPC decisions, collision, hit targets, HUD data, accessibility and persistence. Character sprites use a fixed bottom-center ground pivot; sprite-sheet animation metadata is in `asset-map.json`.
 
-The Academy base is sourced from the already-approved `assets/maps/academy/full-map/1_academy.jpg`; its final PXL export is validated at exactly **2816 × 1536 px**. The crop regions are presentation art taken from the existing world map and do not define new geography.
+The Academy base is sourced from the already-approved `assets/maps/academy/full-map/1_academy.jpg`, reduced through PXL's Endesga32 palette at 4×4 source-pixel blocks, then exported as a 4× scene at exactly **2816 × 1536 px**. This preserves the approved campus composition and every coordinate landmark; it does not replace or redefine grid, walkability, actor positions or map geometry. The 35 regional panels are PXL-palette-treated crops from the approved world map and do not define new geography.
 
 ## CI and offline package
 

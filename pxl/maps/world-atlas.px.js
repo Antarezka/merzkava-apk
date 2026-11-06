@@ -1,9 +1,51 @@
-// Merzkava map illustrations: source crops only; never alter gameplay geometry.
+// Merzkava maps: PXL owns the image treatment; app-owned geometry and map data remain untouched.
+// Endesga32 keeps the atlas, Academy and regional crops inside one warm, readable pixel-art palette.
+use("endesga32")
 genre("atlas-art", { mix: true })
-sprite("world-map-overview", { png: "references/world-map-source.png", shrink: 2, genre: "atlas-art" })
-sprite("academy-exterior", { png: "references/academy-exterior-source.png" })
-sprite("academy-minimap", { png: "references/academy-exterior-source.png", shrink: 8, genre: "atlas-art" })
-sprite("local-default", { png: "references/local-default-source.png", shrink: 2, genre: "atlas-art" })
+
+sprite("world-map-overview", {
+  png: "references/world-map-source.png",
+  shrink: 2,
+  palettize: true,
+  genre: "atlas-art",
+})
+
+// The supplied Academy illustration is the approved composition reference, not a runtime passthrough.
+// PXL reduces it to a 704×384 art canvas, resolves it through Endesga32, then exports a 4× scene.
+// This returns to the exact 2816×1536 map coordinate space used by the Academy grid and walkability.
+sprite("_academy-pixel-source", {
+  png: "references/academy-exterior-source.png",
+  shrink: 4,
+  palettize: true,
+  pivot: "center",
+})
+scene("academy-campus-pixel-pass", {
+  w: 704,
+  h: 384,
+  bg: "0",
+  sizes: { "academy-exterior": 4 },
+},
+  layer("approved-campus-composition", stamp("_academy-pixel-source", 352, 192)),
+  // A restrained highlight roll-off and vignette gives the PXL render a model-like HD-2D finish
+  // without repainting, shifting, hiding or reinterpreting any playable landmark.
+  post({ bloom: { strength: 0.16, r: 3 }, vignette: 0.12 }),
+)
+
+sprite("academy-minimap", {
+  png: "references/academy-exterior-source.png",
+  shrink: 8,
+  palettize: true,
+  genre: "atlas-art",
+})
+sprite("local-default", {
+  png: "references/local-default-source.png",
+  shrink: 2,
+  palettize: true,
+  genre: "atlas-art",
+})
+
+// Crops are strictly presentation assets from the same approved world illustration.
+// Cropping precedes PXL reduction so every regional panel retains its original map location.
 const REGIONS = [
 ["golden-dragon-empire",1700,350,800,750],["tianhai-yunzhou",0,425,950,750],["beiming-gu",550,0,1300,675],
 ["lawless-territories",1200,850,1050,625],["ashen-borderlands",1050,850,650,625],["black-tide-expanse",1150,1175,900,450],
@@ -18,4 +60,12 @@ const REGIONS = [
 ["lanfan-port",2150,550,500,400],["chaoguan-port",2150,675,500,425],["yuhai-port",2100,825,550,450],
 ["yuandeng-port",2000,925,550,450],["longchao-port",1950,1075,700,500]
 ]
-for (const [id,x,y,w,h] of REGIONS) sprite("region-"+id,{png:"references/world-map-source.png",area:[x,y,w,h],shrink:2,genre:"atlas-art"})
+for (const [id,x,y,w,h] of REGIONS) {
+  sprite("region-"+id, {
+    png: "references/world-map-source.png",
+    area: [x,y,w,h],
+    shrink: 2,
+    palettize: true,
+    genre: "atlas-art",
+  })
+}
