@@ -122,12 +122,34 @@ function academyHall(x,z,w,d,wallH,rise,base=0) {
   block("brass","wood",x-0.13,z-0.12,x+0.13,z+0.12,peak+0.08,peak+0.42)
 }
 
-// Place the 3D scene by screen-space anchors taken from the approved campus composition.
-// CAM.at() converts those exact preview pixels back to the ground plane, preserving the old landmark layout.
-function atScreen(sx,sy) {
-  const point=CAM.at(sx,sy)
-  if(!point) throw new Error("Academy layout anchor is above the perspective horizon: "+sx+","+sy)
+// The approved composition is calibrated against the complete Tianhai Map Base grid.
+// All 3D geometry anchors pass through fractional isometric cell coordinates before CAM projection.
+// The preview is exactly 1:4 of the 2816 × 1536 Map Base; these constants must match the owner reference.
+const MAP_GRID = { cols:24, rows:20, tileW:128, tileH:69.5, offsetX:0, offsetY:0 }
+const MAP_PREVIEW_SCALE = 4
+function previewToGrid(sx,sy) {
+  const imageX=sx*MAP_PREVIEW_SCALE, imageY=sy*MAP_PREVIEW_SCALE
+  const dx=(imageX-(MAP_GRID.rows*MAP_GRID.tileW/2+MAP_GRID.offsetX))/(MAP_GRID.tileW/2)
+  const dy=(imageY-(MAP_GRID.offsetY+MAP_GRID.tileH/2))/(MAP_GRID.tileH/2)
+  return { x:(dx+dy)/2, y:(dy-dx)/2 }
+}
+function gridToPreview(cellX,cellY) {
+  return {
+    x:((cellX-cellY)*MAP_GRID.tileW/2+MAP_GRID.rows*MAP_GRID.tileW/2+MAP_GRID.offsetX)/MAP_PREVIEW_SCALE,
+    y:((cellX+cellY)*MAP_GRID.tileH/2+MAP_GRID.offsetY+MAP_GRID.tileH/2)/MAP_PREVIEW_SCALE
+  }
+}
+function atGrid(cellX,cellY) {
+  const preview=gridToPreview(cellX,cellY)
+  const point=CAM.at(preview.x,preview.y)
+  if(!point) throw new Error("Academy grid anchor is above the perspective horizon: "+cellX+","+cellY)
   return point
+}
+// Compatibility adapter for the approved landmark anchors. Their coordinates are immediately
+// converted into the owner-defined grid; no geometry is projected from an independent pixel grid.
+function atScreen(sx,sy) {
+  const cell=previewToGrid(sx,sy)
+  return atGrid(cell.x,cell.y)
 }
 function groundScreen(mat,x1,y1,x2,y2,up=0) {
   const pts=[[x1,y1],[x2,y1],[x2,y2],[x1,y2]].map(([sx,sy])=>{
