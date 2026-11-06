@@ -12,7 +12,7 @@ describe("Eternal Path live world scene", () => {
   it("opens an independent Augusto PXL World Atlas from the pink CRT console", () => {
     const html=renderExpeditionInterface();
     expect(html).toContain('class="expedition-pxl-trigger" data-augusto-pxl-open');
-    expect(html).toContain('aria-label="Open Augusto PXL integration panel"');
+    expect(html).toContain('aria-label="Open Augusto PXL World Atlas"');
     expect(html).toContain('class="pxl-tv-art" aria-hidden="true"');
     expect(html).toContain('class="pxl-tv-shell"');
     expect(html).toContain('class="pxl-console-box"');
