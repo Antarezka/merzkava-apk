@@ -253,8 +253,12 @@ function bindPlayerHudInteractions(hud:HTMLElement):void {
 }
 const scrollResizeScopes=new WeakSet<HTMLElement>();
 export function bindScrollableResizableWindows(root:HTMLElement):void {
-  const selector='[data-wmh-scroll-resize],[role="dialog"]:not(.wmh-chat-panel):not(.wmh-transition-dialog):not(.wmh-transition-notice):not([data-wmh-dialog]),.wmh-hud-drawer,.wmh-minimap-window,.wmh-inventory-window,.wmh-chat-card,.wmh-transition-dialog-card,.wmh-transition-notice-card,.wmh-academy-canvas-editor,.noticeboard-panel,.preference-panel,.registry-profile,.wmh-floating-panel,.wmh-panel-window';
-  const panels=[...(root.matches(selector)?[root]:[]),...Array.from(root.querySelectorAll<HTMLElement>(selector))];
+  const screen=root.matches(".wmh-isometric-play-screen")
+    ?root
+    :root.closest<HTMLElement>(".wmh-isometric-play-screen")||root.querySelector<HTMLElement>(".wmh-isometric-play-screen");
+  if(!screen)return;
+  const selector='[data-wmh-scroll-resize],[role="dialog"]:not(.wmh-chat-panel):not(.wmh-transition-dialog):not(.wmh-transition-notice):not([data-wmh-dialog]),.wmh-hud-drawer,.wmh-minimap-window,.wmh-inventory-window,.wmh-chat-card,.wmh-transition-dialog-card,.wmh-transition-notice-card,.wmh-overlay-tools,.wmh-canvas-editor-window,.wmh-item-action-dialog';
+  const panels=[...(screen.matches(selector)?[screen]:[]),...Array.from(screen.querySelectorAll<HTMLElement>(selector))];
   for(const panel of panels){
     if(scrollResizeScopes.has(panel))continue;
     scrollResizeScopes.add(panel);
