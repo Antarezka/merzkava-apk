@@ -1,5 +1,6 @@
 // Visual-novel plates. No words are baked into the artwork; dialogue and titles stay live UI.
 use("endesga32")
+genre("atlas-art", { mix: true })
 pal({k:"#18242a",n:"#30464b",b:"#4a7777",B:"#80aaa0",g:"#55724f",G:"#9db778",y:"#c9a56b",Y:"#f2dca3",r:"#8e5149",R:"#d48a67",s:"#a5b7c2",S:"#e2e9df",w:"#fff4da",p:"#77678e",P:"#c5addb"})
 // The arrival plate now uses the approved campus illustration as a cinematic detail crop,
 // processed through the same Endesga32 palette instead of the previous repeated placeholder blocks.
@@ -8,6 +9,7 @@ sprite("academy-arrival",{
  area:[768,256,1280,720],
  shrink:4,
  palettize:true,
+ genre:"atlas-art",
 })
 sprite("spirit-awakening",{w:320,h:180},c=>{
  c.rect(0,0,320,180,"k");c.rect(0,126,320,54,"n");c.hline(0,126,320,"p")
