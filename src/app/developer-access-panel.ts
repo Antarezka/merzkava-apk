@@ -94,7 +94,7 @@ export function developerLoginPanel(
       '<button type="button" role="tab" data-access-mode="player" aria-selected="'+(mode==="player")+'" class="'+(mode==="player"?"is-active":"")+'" '+((playerBusy||developerBusy)?"disabled":"")+'>'+t.playerMode+'</button>'+
       '<button type="button" role="tab" data-access-mode="developer" aria-selected="'+(mode==="developer")+'" class="'+(mode==="developer"?"is-active":"")+'" '+((playerBusy||developerBusy)?"disabled":"")+'>'+t.developerMode+'</button>'+
     '</div>'+
-    '<form id="player-login-form"'+playerHidden+'>'+
+    '<form id="player-login-form" data-offline-label="'+escape(t.playerOffline)+'"'+playerHidden+'>'+
       '<label for="player-login-name">'+t.playerName+'</label>'+
       '<input id="player-login-name" name="playerName" type="text" maxlength="80" autocomplete="off" autocapitalize="off" spellcheck="false" value="'+escape(playerName)+'" required/>'+
       '<p class="access-login-hint">'+t.playerHint+'</p>'+
