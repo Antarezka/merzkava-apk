@@ -20,7 +20,7 @@ const TEST_ITEMS:ReadonlyArray<HudItem>=[
 ];
 const STORAGE_PREFIX="merzkava.player-hud-preview.v2:";
 const DEFAULT_ITEMS:Record<string,number>={"ration-small":5,"ration-standard":3,"ration-large":2,bread:3,apple:4,wood:8,stone:12,herb:6,potion:2};
-const DEFAULT_WALLET={xc:79,xs:9,xg:4,zj:0,az:0};
+const DEFAULT_WALLET={xc:0,xs:0,xg:0,zj:0,az:0};
 
 export function createDefaultPlayerHudPreviewState():PlayerHudPreviewState {
   return {hp:100,maxHp:100,satiety:80,items:{...DEFAULT_ITEMS},wallet:{...DEFAULT_WALLET}};
