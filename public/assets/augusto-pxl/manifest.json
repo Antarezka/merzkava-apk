@@ -10,39 +10,471 @@
   "offline": true,
   "note": "An asset is usable only after CI has generated it and its entry has status=ready with an app-local src path. Pending entries are intentional placeholders, not generated artwork.",
   "assets": {
-    "map.world.overview": { "status": "pending", "type": "image" },
-    "map.region.golden-dragon-empire": { "status": "pending", "type": "image" },
-    "map.region.tianhai-yunzhou": { "status": "pending", "type": "image" },
-    "map.region.beiming-gu": { "status": "pending", "type": "image" },
-    "map.academy.exterior": { "status": "pending", "type": "image", "width": 2816, "height": 1536 },
-    "map.local.default": { "status": "pending", "type": "image" },
-    "character.player.idle": { "status": "pending", "type": "sprite-sheet" },
-    "character.npc.student-lin.idle": { "status": "pending", "type": "sprite-sheet" },
-    "character.npc.student-wei.idle": { "status": "pending", "type": "sprite-sheet" },
-    "character.npc.teacher-mei.idle": { "status": "pending", "type": "sprite-sheet" },
-    "character.npc.groundskeeper.idle": { "status": "pending", "type": "sprite-sheet" },
-    "ui.hud.traveler-satchel": { "status": "pending", "type": "image" },
-    "ui.skill.technique": { "status": "pending", "type": "image" },
-    "ui.skill.guard": { "status": "pending", "type": "image" },
-    "ui.skill.movement": { "status": "pending", "type": "image" },
-    "ui.skill.spirit-art": { "status": "pending", "type": "image" },
-    "ui.item.ration-small": { "status": "pending", "type": "image" },
-    "ui.item.ration-standard": { "status": "pending", "type": "image" },
-    "ui.item.ration-large": { "status": "pending", "type": "image" },
-    "ui.item.bread": { "status": "pending", "type": "image" },
-    "ui.item.apple": { "status": "pending", "type": "image" },
-    "ui.item.wood": { "status": "pending", "type": "image" },
-    "ui.item.stone": { "status": "pending", "type": "image" },
-    "ui.item.herb": { "status": "pending", "type": "image" },
-    "ui.item.potion": { "status": "pending", "type": "image" },
-    "effect.spirit-ring.tier-1": { "status": "pending", "type": "image" },
-    "effect.spirit-ring.tier-2": { "status": "pending", "type": "image" },
-    "effect.spirit-ring.tier-3": { "status": "pending", "type": "image" },
-    "effect.spirit-ring.tier-4": { "status": "pending", "type": "image" },
-    "ui.currency.xc": { "status": "pending", "type": "image" },
-    "ui.currency.xs": { "status": "pending", "type": "image" },
-    "ui.currency.xg": { "status": "pending", "type": "image" },
-    "ui.currency.zj": { "status": "pending", "type": "image" },
-    "ui.currency.az": { "status": "pending", "type": "image" }
+    "map.world.overview": {
+      "status": "pending",
+      "type": "image"
+    },
+    "map.region.golden-dragon-empire": {
+      "status": "pending",
+      "type": "image"
+    },
+    "map.region.tianhai-yunzhou": {
+      "status": "pending",
+      "type": "image"
+    },
+    "map.region.beiming-gu": {
+      "status": "pending",
+      "type": "image"
+    },
+    "map.academy.exterior": {
+      "status": "pending",
+      "type": "image",
+      "width": 2816,
+      "height": 1536
+    },
+    "map.local.default": {
+      "status": "pending",
+      "type": "image"
+    },
+    "character.player.idle": {
+      "status": "pending",
+      "type": "sprite-sheet"
+    },
+    "character.npc.student-lin.idle": {
+      "status": "pending",
+      "type": "sprite-sheet"
+    },
+    "character.npc.student-wei.idle": {
+      "status": "pending",
+      "type": "sprite-sheet"
+    },
+    "character.npc.teacher-mei.idle": {
+      "status": "pending",
+      "type": "sprite-sheet"
+    },
+    "character.npc.groundskeeper.idle": {
+      "status": "pending",
+      "type": "sprite-sheet"
+    },
+    "ui.hud.traveler-satchel": {
+      "status": "pending",
+      "type": "image"
+    },
+    "ui.skill.technique": {
+      "status": "pending",
+      "type": "image"
+    },
+    "ui.skill.guard": {
+      "status": "pending",
+      "type": "image"
+    },
+    "ui.skill.movement": {
+      "status": "pending",
+      "type": "image"
+    },
+    "ui.skill.spirit-art": {
+      "status": "pending",
+      "type": "image"
+    },
+    "ui.item.ration-small": {
+      "status": "pending",
+      "type": "image"
+    },
+    "ui.item.ration-standard": {
+      "status": "pending",
+      "type": "image"
+    },
+    "ui.item.ration-large": {
+      "status": "pending",
+      "type": "image"
+    },
+    "ui.item.bread": {
+      "status": "pending",
+      "type": "image"
+    },
+    "ui.item.apple": {
+      "status": "pending",
+      "type": "image"
+    },
+    "ui.item.wood": {
+      "status": "pending",
+      "type": "image"
+    },
+    "ui.item.stone": {
+      "status": "pending",
+      "type": "image"
+    },
+    "ui.item.herb": {
+      "status": "pending",
+      "type": "image"
+    },
+    "ui.item.potion": {
+      "status": "pending",
+      "type": "image"
+    },
+    "effect.spirit-ring.tier-1": {
+      "status": "pending",
+      "type": "image"
+    },
+    "effect.spirit-ring.tier-2": {
+      "status": "pending",
+      "type": "image"
+    },
+    "effect.spirit-ring.tier-3": {
+      "status": "pending",
+      "type": "image"
+    },
+    "effect.spirit-ring.tier-4": {
+      "status": "pending",
+      "type": "image"
+    },
+    "ui.currency.xc": {
+      "status": "pending",
+      "type": "image"
+    },
+    "ui.currency.xs": {
+      "status": "pending",
+      "type": "image"
+    },
+    "ui.currency.xg": {
+      "status": "pending",
+      "type": "image"
+    },
+    "ui.currency.zj": {
+      "status": "pending",
+      "type": "image"
+    },
+    "ui.currency.az": {
+      "status": "pending",
+      "type": "image"
+    },
+    "map.academy.minimap": {
+      "status": "pending",
+      "type": "image"
+    },
+    "ui.hud.player-frame": {
+      "status": "pending",
+      "type": "image"
+    },
+    "ui.hud.skill-dock-frame": {
+      "status": "pending",
+      "type": "image"
+    },
+    "ui.hud.satchel-panel": {
+      "status": "pending",
+      "type": "image"
+    },
+    "ui.hud.currency-purse": {
+      "status": "pending",
+      "type": "image"
+    },
+    "ui.hud.world-strip": {
+      "status": "pending",
+      "type": "image"
+    },
+    "ui.hud.weather-icon": {
+      "status": "pending",
+      "type": "image"
+    },
+    "ui.hud.minimap-frame": {
+      "status": "pending",
+      "type": "image"
+    },
+    "ui.hud.minimap-toggle": {
+      "status": "pending",
+      "type": "image"
+    },
+    "ui.item-frame.tier-1": {
+      "status": "pending",
+      "type": "image"
+    },
+    "ui.item-frame.tier-2": {
+      "status": "pending",
+      "type": "image"
+    },
+    "ui.map-marker.power": {
+      "status": "pending",
+      "type": "image"
+    },
+    "ui.map-marker.territory": {
+      "status": "pending",
+      "type": "image"
+    },
+    "ui.map-marker.forest": {
+      "status": "pending",
+      "type": "image"
+    },
+    "ui.map-marker.sea": {
+      "status": "pending",
+      "type": "image"
+    },
+    "ui.map-marker.landmark": {
+      "status": "pending",
+      "type": "image"
+    },
+    "ui.map-marker.mountains": {
+      "status": "pending",
+      "type": "image"
+    },
+    "ui.map-site.0": {
+      "status": "pending",
+      "type": "image"
+    },
+    "ui.map-site.1": {
+      "status": "pending",
+      "type": "image"
+    },
+    "ui.map-site.2": {
+      "status": "pending",
+      "type": "image"
+    },
+    "ui.map-site.3": {
+      "status": "pending",
+      "type": "image"
+    },
+    "ui.map-site.4": {
+      "status": "pending",
+      "type": "image"
+    },
+    "ui.map-site.5": {
+      "status": "pending",
+      "type": "image"
+    },
+    "environment.academy.water-shimmer": {
+      "status": "pending",
+      "type": "image"
+    },
+    "environment.academy.foliage-idle": {
+      "status": "pending",
+      "type": "image"
+    },
+    "environment.academy.foliage-wind": {
+      "status": "pending",
+      "type": "image"
+    },
+    "environment.academy.cloud-motion": {
+      "status": "pending",
+      "type": "image"
+    },
+    "environment.academy.weather-rain": {
+      "status": "pending",
+      "type": "image"
+    },
+    "environment.academy.weather-snow": {
+      "status": "pending",
+      "type": "image"
+    },
+    "environment.academy.weather-petals": {
+      "status": "pending",
+      "type": "image"
+    },
+    "environment.academy.lighting-day": {
+      "status": "pending",
+      "type": "image"
+    },
+    "environment.academy.lighting-dusk": {
+      "status": "pending",
+      "type": "image"
+    },
+    "environment.academy.lighting-night": {
+      "status": "pending",
+      "type": "image"
+    },
+    "effect.martial-soul.activation": {
+      "status": "pending",
+      "type": "image"
+    },
+    "effect.martial-soul.aura": {
+      "status": "pending",
+      "type": "image"
+    },
+    "effect.arcanistry.cast": {
+      "status": "pending",
+      "type": "image"
+    },
+    "effect.arcanistry.artifact-pulse": {
+      "status": "pending",
+      "type": "image"
+    },
+    "effect.spirit-beast.appearance": {
+      "status": "pending",
+      "type": "image"
+    },
+    "effect.spirit-beast.movement": {
+      "status": "pending",
+      "type": "image"
+    },
+    "object.academy.gate": {
+      "status": "pending",
+      "type": "image"
+    },
+    "object.academy.roof": {
+      "status": "pending",
+      "type": "image"
+    },
+    "object.academy.stairs": {
+      "status": "pending",
+      "type": "image"
+    },
+    "object.academy.bridge": {
+      "status": "pending",
+      "type": "image"
+    },
+    "object.academy.trees": {
+      "status": "pending",
+      "type": "image"
+    },
+    "object.academy.pond": {
+      "status": "pending",
+      "type": "image"
+    },
+    "object.academy.training-yard": {
+      "status": "pending",
+      "type": "image"
+    },
+    "object.academy.lanterns": {
+      "status": "pending",
+      "type": "image"
+    },
+    "cinematic.academy.arrival": {
+      "status": "pending",
+      "type": "image"
+    },
+    "cinematic.spirit-awakening": {
+      "status": "pending",
+      "type": "image"
+    },
+    "ui.cinematic.transition-frame": {
+      "status": "pending",
+      "type": "image"
+    },
+    "map.region.lawless-territories": {
+      "status": "pending",
+      "type": "image"
+    },
+    "map.region.ashen-borderlands": {
+      "status": "pending",
+      "type": "image"
+    },
+    "map.region.black-tide-expanse": {
+      "status": "pending",
+      "type": "image"
+    },
+    "map.region.nine-frost-wastes": {
+      "status": "pending",
+      "type": "image"
+    },
+    "map.region.wanluo-sacred-expanse": {
+      "status": "pending",
+      "type": "image"
+    },
+    "map.region.azerion-forest": {
+      "status": "pending",
+      "type": "image"
+    },
+    "map.region.dead-zone": {
+      "status": "pending",
+      "type": "image"
+    },
+    "map.region.inner-azerion": {
+      "status": "pending",
+      "type": "image"
+    },
+    "map.region.mega-colossal-labyrinth": {
+      "status": "pending",
+      "type": "image"
+    },
+    "map.region.high-cloud-sea-mountains": {
+      "status": "pending",
+      "type": "image"
+    },
+    "map.region.silverpine-wilds": {
+      "status": "pending",
+      "type": "image"
+    },
+    "map.region.frostmirror-sea": {
+      "status": "pending",
+      "type": "image"
+    },
+    "map.region.eastern-azure-sea": {
+      "status": "pending",
+      "type": "image"
+    },
+    "map.region.yunmeng-sea": {
+      "status": "pending",
+      "type": "image"
+    },
+    "map.region.wufeng-sea": {
+      "status": "pending",
+      "type": "image"
+    },
+    "map.region.black-tide-sea": {
+      "status": "pending",
+      "type": "image"
+    },
+    "map.region.guixu-canghai": {
+      "status": "pending",
+      "type": "image"
+    },
+    "map.region.lanternhook-isles": {
+      "status": "pending",
+      "type": "image"
+    },
+    "map.region.mega-colossal-labyrinth-exit": {
+      "status": "pending",
+      "type": "image"
+    },
+    "map.region.lantern-passage": {
+      "status": "pending",
+      "type": "image"
+    },
+    "map.region.changqion-harbour": {
+      "status": "pending",
+      "type": "image"
+    },
+    "map.region.three-lantern-passage": {
+      "status": "pending",
+      "type": "image"
+    },
+    "map.region.southwake-port": {
+      "status": "pending",
+      "type": "image"
+    },
+    "map.region.bitterglass-isle": {
+      "status": "pending",
+      "type": "image"
+    },
+    "map.region.dicewake-isle": {
+      "status": "pending",
+      "type": "image"
+    },
+    "map.region.dongxing-port": {
+      "status": "pending",
+      "type": "image"
+    },
+    "map.region.mingzhu-port": {
+      "status": "pending",
+      "type": "image"
+    },
+    "map.region.lanfan-port": {
+      "status": "pending",
+      "type": "image"
+    },
+    "map.region.chaoguan-port": {
+      "status": "pending",
+      "type": "image"
+    },
+    "map.region.yuhai-port": {
+      "status": "pending",
+      "type": "image"
+    },
+    "map.region.yuandeng-port": {
+      "status": "pending",
+      "type": "image"
+    },
+    "map.region.longchao-port": {
+      "status": "pending",
+      "type": "image"
+    }
   }
 }
