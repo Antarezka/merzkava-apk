@@ -2917,4 +2917,4 @@ html.soft-keyboard-open .conversation-composer { padding-top:10px !important; }
   .account-transition-overlay .atlas-buffer-status strong{font-size:16px}
 }
 
-.developer-atlas-copy-buffer{position:absolute;inset:0;z-index:10;pointer-events:none}
+.developer-atlas-copy-buffer{position:absolute;inset:0;z-index:10;pointer-events:auto}
