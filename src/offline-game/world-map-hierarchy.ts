@@ -756,7 +756,7 @@ function tileMapMarkup(
   const boardHeight=Math.max(projectedHeight,baseHeight);
   const theme:IsometricSvgTheme=interior?"interior":regionId;
   const title=selectedBuilding+(interior?" · INTERIOR":"");
-  const pxlMapAssetId=visualMode==="augusto-pxl"?"map.local.default":mapId==="golden-dragon-empire:tianhai-academy:exterior"?"map.academy.exterior":"map.area."+mapId.replace(/[^a-z0-9]+/gi,".").toLowerCase();
+  const pxlMapAssetId=visualMode==="augusto-pxl"&&["golden-dragon-empire","tianhai-yunzhou","beiming-gu"].includes(regionId)?"map.local."+regionId:visualMode==="augusto-pxl"?"map.local.default":mapId==="golden-dragon-empire:tianhai-academy:exterior"?"map.academy.exterior":"map.area."+mapId.replace(/[^a-z0-9]+/gi,".").toLowerCase();
   const imageMarkup=mapImage
     ? '<img class="wmh-isometric-map-base" data-wmh-map-art '+(visualMode==="augusto-pxl"?'data-pxl-asset-id="'+pxlMapAssetId+'" ':'')+'src="'+mapImage+'" alt="'+(visualMode==="augusto-pxl"?"Augusto PXL isometric environment":"Tianhai Academy map base")+'" draggable="false" loading="eager" decoding="async"/><canvas class="wmh-isometric-foreground" data-wmh-foreground-canvas aria-hidden="true"></canvas>'
     : "";
@@ -3135,7 +3135,7 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
     if(visualMode==="augusto-pxl")mountAugustoPxlAssets(overlay);
     const card=host.querySelector<HTMLElement>("[data-wmh-selection-card]");if(card)animateExpeditionPanel(card);
     const art=host.querySelector<HTMLElement>(".wmh-selection-scene-image");
-    if(art&&!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches)art.animate([{transform:"scale(1.045)",filter:"brightness(.78)"},{transform:"scale(1)",filter:"brightness(1)"}],{duration:760,easing:"cubic-bezier(.2,.75,.25,1)"});
+    if(art&&!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches)art.animate([{transform:"scale(1.018)",opacity:.82},{transform:"scale(1)",opacity:1}],{duration:520,easing:"cubic-bezier(.2,.75,.25,1)"});
     return true;
   }
   if(action.hasAttribute("data-wmh-dismiss-layer")||action.dataset.wmhAction==="selection-no"){dialog.querySelector("[data-wmh-selection-host]")?.replaceChildren();return true;}

@@ -2501,3 +2501,10 @@
 }
 .wmh-map-transition-confirm-card button[data-wmh-transition-yes]{background:#8a683a;color:#fff4db}
 @media(prefers-reduced-motion:reduce){.wmh-map-transition-confirm-card{animation:none!important;transition:none!important}}
+
+/* Each PXL actor is one fixed 32 × 48 frame, bottom-centred on its tile point. */
+.wmh-overlay[data-visual-mode="augusto-pxl"] .wmh-character-token>i.wmh-pxl-actor-sprite{
+  width:32px!important;height:48px!important;min-width:32px!important;min-height:48px!important;
+  max-width:32px!important;max-height:48px!important;overflow:hidden!important;
+  image-rendering:pixelated!important;background-position:0 0;background-repeat:no-repeat!important;
+}

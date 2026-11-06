@@ -2040,6 +2040,18 @@
           }
         }
       }
+    },
+    "map.local.golden-dragon-empire": {
+      "source": "maps/sprites/local-golden-dragon-empire.png",
+      "type": "image"
+    },
+    "map.local.tianhai-yunzhou": {
+      "source": "maps/sprites/local-tianhai-yunzhou.png",
+      "type": "image"
+    },
+    "map.local.beiming-gu": {
+      "source": "maps/sprites/local-beiming-gu.png",
+      "type": "image"
     }
   }
 }

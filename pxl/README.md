@@ -11,7 +11,7 @@ Editable PXL source for the separate pink World Atlas. The green/legacy Atlas re
 
 | Source | Scope |
 | --- | --- |
-| `maps/world-atlas.px.js` | PXL treatment for the world atlas and 35 regional crops; minimap and local Tianhai image |
+| `maps/world-atlas.px.js` | Original PXL world illustration, 35 distinct regional plates, three primary local isometric scenes and Academy minimap |
 | `environments/academy-campus.px.js` | Original PXL 3D-look isometric Tianhai Academy scene, textured architecture, courts, water, bridges, trees, lighting and camera |
 | `characters/academy-cast.px.js` | Player and seeded Academy NPC sprite sheets, eight directions, idle/walk frames |
 | `ui/merzkava-ui.px.js` | Satchel, skill/item/currency icons, HUD frames, minimap and map markers |
@@ -25,7 +25,7 @@ PXL owns image authoring and export. The app remains responsible for gameplay ru
 
 The approved Academy illustration remains a faint, non-exported visual guide for the PXL authoring preview. The runtime Academy image is authored as a separate PXL perspective/mesh scene and exported at exactly **2816 × 1536 px**. Keep the source map's major spatial organization (rear study halls, central courtyard, garden water, side wings, training terrace and south entrance) while leaving the app's 24 × 20 grid, 128 × 69.5 tile calibration, walkable-cell whitelist, actor coordinates, collision and minimap as the only gameplay authorities. Final visual alignment still requires side-by-side review before replacing any coordinate authority.
 
-The 35 regional panels remain PXL-treated crops from the approved world map; they do not define new geography.
+The overview and all 35 regional selection plates are newly authored with PXL primitives, not cropped from the legacy world image. Existing marker percentages and region IDs remain the authority for placement; map silhouettes and coastlines are visual artwork that still require owner review. Golden Dragon Empire, Tianhai Yunzhou and Beiming Gu have separate 24 × 20 isometric local-scene sheets; other local regions retain the generic fallback until their approved scene geometry is authored.
 
 ## CI and offline package
 
