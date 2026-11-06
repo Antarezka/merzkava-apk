@@ -19,6 +19,8 @@ The Developer and Player sign-in panels use the same Merzkava access-buffer pres
 - **Developer Master Reset request creation uses a dedicated local sequence:** account binding, random Request-ID, cryptographic challenge, Player-Key SHA-256, and request-block serialization. **Copying uses its own device-clipboard sequence** (clipboard capability, request-buffer read, text encoding, clipboard write, and copy confirmation). Neither operation requires internet or performs server synchronization.
 - Developer sign-out and Player sign-out each use separate local cleanup sequences. They remain available offline and describe session/authorization-marker revocation and secure-storage cleanup rather than a network sync.
 
+The World Atlas gate uses a registry-loading diagnostic profile while fetching `players.md`, player profiles, and the pinned commit snapshot. It does not claim PBKDF2 work during that list-loading phase. The buffer switches to the credential-verification profile only when a player signs in, verifies a current password, or completes a reset/change operation.
+
 The animation runs alongside the real operation and remains visible until verification finishes. If a required Player connection or source check fails, access is denied with an error; the animation never grants access by itself.
 
 ## Change a known password
