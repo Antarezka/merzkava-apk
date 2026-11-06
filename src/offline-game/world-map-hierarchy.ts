@@ -2328,9 +2328,14 @@ function isNpcInteractionReady(board:HTMLElement,npc:HTMLElement,data:IsoMapEdit
     {x:Number(npc.dataset.x||0),y:Number(npc.dataset.y||0)}
   );
 }
+function isPixiWorldAtlasBoard(board:HTMLElement):boolean {
+  return board.closest<HTMLElement>("[data-idle-rpg-modal]")?.dataset.renderer==="pixi";
+}
+
 function updateNpcInteractionProximity(board:HTMLElement):void {
   const reduceMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches===true;
   const data=readIsoMapData(board);
+  const pixiRenderer=isPixiWorldAtlasBoard(board);
   board.querySelectorAll<HTMLElement>("[data-wmh-npc]").forEach(npc=>{
     const ready=isNpcInteractionReady(board,npc,data);
     if(npc.dataset.interactionReady===String(ready))return;
@@ -2338,6 +2343,11 @@ function updateNpcInteractionProximity(board:HTMLElement):void {
     npc.setAttribute("aria-disabled","false");
     npc.title=ready?"Within reach · interact":"Tap to approach and interact";
     let glow=npc.querySelector<HTMLElement>(":scope > .wmh-npc-proximity-glow");
+    if(pixiRenderer){
+      if(glow)npcProximityAnimations.get(glow)?.cancel();
+      glow?.remove();
+      return;
+    }
     if(!glow){
       glow=document.createElement("span");
       glow.className="wmh-npc-proximity-glow";
@@ -2374,6 +2384,7 @@ function updateNpcInteractionProximity(board:HTMLElement):void {
 }
 
 function emitTileTrailWave(_board:HTMLElement,actor:HTMLElement,dx=0,dy=0):void {
+  if(isPixiWorldAtlasBoard(_board))return;
   actor.querySelectorAll(":scope > .wmh-token-movement-glow").forEach(node=>node.remove());
   const glow=document.createElement("span");
   glow.className="wmh-token-movement-glow";glow.setAttribute("aria-hidden","true");
@@ -2455,6 +2466,12 @@ function stopActorScanners(board:HTMLElement):void {
 }
 function startActorScanners(board:HTMLElement):void {
   stopActorScanners(board);
+  if(isPixiWorldAtlasBoard(board)){
+    // Pixi owns only the visual sonar layer. Sensor overlap/clear remains
+    // deterministic DOM/gameplay logic and is refreshed at startup and movement.
+    updateScannerContacts(board);
+    return;
+  }
   const pulse=()=>{
     if(!board.isConnected||board.dataset.editorPaused==="true"||board.hidden){stopActorScanners(board);return;}
     board.querySelectorAll<HTMLElement>("[data-wmh-player-token],[data-wmh-npc]").forEach((actor,index)=>pulseActorScanner(actor,index));
@@ -2481,6 +2498,16 @@ function animateGridMove(token:HTMLElement,update:()=>void,sync=true,updateSenso
   update();
   if(board&&sync)syncIsoDepthAndOcclusion(board);
   const to={x:Number(token.dataset.posX??token.dataset.x??0),y:Number(token.dataset.posY??token.dataset.y??0)};
+  if(board&&isPixiWorldAtlasBoard(board)){
+    // Keep cell/sub-cell state authoritative in the existing engine. Pixi
+    // observes these DOM attributes and animates its separate visual actor.
+    if(updateSensors)updateScannerContacts(board,false);
+    board.dispatchEvent(new CustomEvent("merzkava:actor-moved",{
+      bubbles:true,
+      detail:{actor:token.dataset.wmhNpc||"player",from,to}
+    }));
+    return;
+  }
   const {x:dx,y:dy}=getIsoMovementOffset(from,to,grid,zoom,renderScaleX,renderScaleY);
   const reduceMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches===true;
   const suspendNpcIdle=!reduceMotion&&token.matches(".wmh-character-token:not(.wmh-player-token)");
