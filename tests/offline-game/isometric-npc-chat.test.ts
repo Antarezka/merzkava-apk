@@ -50,7 +50,9 @@ describe("isometric NPC conversations", () => {
     expect(worldMapSource).toContain('{id:"teacher-mei",x:6,y:15,gender:"female",scanTone:"friendly"}');
     expect(worldMapSource).toContain('{id:"groundskeeper",x:22,y:10,gender:"male",scanTone:"friendly"}');
     expect(worldMapSource).toContain('const occupiedNpcs=new Set');
-    expect(worldMapSource).toContain('!occupied.has(nx+","+ny)');
+    expect(worldMapSource).toContain('const quadrants:IsoQuadrant[]');
+    expect(worldMapSource).toContain('const path=findIsoQuadrantPath(mapData,start,destination,occupied)');
+    expect(worldMapSource).toContain('if(path&&path.length===2)options.push(destination)');
   });
 
   it("keeps actor movement independent of layout measurement and repeated map redraws",()=>{
@@ -67,6 +69,9 @@ describe("isometric NPC conversations", () => {
     expect(worldMapSource).toContain("const saved=board?readIsoMapData(board).cameraCenter:undefined;");
     expect(worldMapSource).toContain("academyMarginLeft+(saved?saved.x");
     expect(worldMapSource).toContain("academyMarginTop+(saved?saved.y");
+    expect(worldMapSource).toContain('persist(false)');
+    expect(worldMapSource).toContain('dispatchEvent(new CustomEvent("merzkava:center-isometric-map"))');
+    expect(worldMapSource).toContain('viewport.addEventListener("merzkava:center-isometric-map",centerMap)');
   });
 
   it("keeps a visible, map-base-aligned minimap on every isometric area",()=>{
@@ -78,14 +83,17 @@ describe("isometric NPC conversations", () => {
     expect(worldMapSource).toContain("wmhMinimapBoardWidth");
   });
 
-  it("renders reusable compositor effects without per-actor animation loops",()=>{
+  it("renders lightweight actor effects without animating the world plane",()=>{
     expect(worldMapSource).toContain('actor.classList.add("wmh-scanner-active")');
     expect(worldMapSource).toContain("scannerVisibilityHandlers");
     expect(worldMapSource).toContain("if(document.hidden)return;");
     expect(worldMapSource).toContain("if(!board.isConnected)");
-    expect(chatStyles).toContain("@keyframes wmh-actor-idle");
-    expect(chatStyles).toContain("@keyframes wmh-token-step-trail");
-    expect(chatStyles).toContain("animation-play-state:paused!important");
+    expect(worldMapSource).toContain("const tokenMoveAnimations=new WeakMap<HTMLElement,Animation>()");
+    expect(worldMapSource).toContain("token.animate(");
+    expect(worldMapSource).toContain("[{translate:dx+\"px \"+dy+\"px\"},{translate:\"0px 0px\"}]");
+    expect(worldMapSource).not.toContain("drawIsometricForeground(board,data);");
+    expect(chatStyles).toContain(".wmh-isometric-actor-layer");
+    expect(chatStyles).toContain("display:none!important;content:none!important;animation:none!important");
     expect(worldMapSource).not.toContain("window.setInterval(pulse,2450)");
   });
   it("does not render editor controls when Developer Mode is disabled", () => {
@@ -115,15 +123,14 @@ describe("isometric NPC conversations", () => {
     expect(chatStyles).toContain("@keyframes wmh-field-sonar");
     expect(worldMapSource).toContain("merzkava:field-scanner-overlap");
     expect(worldMapSource).toContain("function startActorScanners");
-    expect(worldMapSource).toContain("function emitTileTrailWave");
-    expect(worldMapSource).toContain("animationend");
     expect(worldMapSource).toContain("updateNpcInteractionProximity(board)");
     expect(worldMapSource).toContain("isNpcInteractionCellReachable(");
     expect(worldMapSource).toContain("dataset.interactionReady");
     expect(chatStyles).toContain(".wmh-npc-proximity-glow");
-    expect(worldMapSource).toContain("translateX:[dx,0]");
-    expect(worldMapSource).toContain("translateY:[dy,0]");
-    expect(worldMapSource).toContain("duration:150,ease:\"outQuad\"");
+    expect(worldMapSource).toContain("token.animate(");
+    expect(worldMapSource).toContain("duration:150,easing:\"cubic-bezier(.2,.75,.25,1)\"");
+    expect(worldMapSource).not.toContain("emitTileTrailWave");
+    expect(worldMapSource).not.toContain("translateX:[dx,0]");
     expect(worldMapSource).toContain("scanTone:\"friendly\"");
     expect(worldMapSource).toContain("const minimizeWorkbench=()=>");
     expect(worldMapSource).toContain("const restoreWorkbench=()=>");
