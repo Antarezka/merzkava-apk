@@ -27,6 +27,24 @@ function withEllipsis(value:string):string {
   return value.replace(/[. …]+$/,"")+"...";
 }
 
+async function transitionDiagnostic(
+  element:HTMLElement,
+  nextText:string,
+  signal:AbortSignal|undefined,
+  reduced:boolean
+):Promise<void> {
+  if(reduced){
+    element.textContent=nextText;
+    return;
+  }
+  element.style.opacity="0.12";
+  element.style.transform="translateY(-3px)";
+  await wait(78,signal);
+  element.textContent=nextText;
+  element.style.opacity="1";
+  element.style.transform="translateY(0)";
+}
+
 /**
  * Shared Anime.js access presentation.
  * The status console cycles quickly; the indeterminate track and orbit remain smooth
@@ -68,15 +86,20 @@ export async function playWorldAtlasAccessSequence(
   });
 
   try{
-    const interval=reduced?520:330;
+    const interval=reduced?620:310;
     let index=0;
     while(performance.now()-started<duration){
       if(signal?.aborted)throw abortError();
-      status.textContent=withEllipsis(stages[index%stages.length]||"Preparing access");
-      log.textContent=withEllipsis(logs[index%logs.length]||"VERIFYING");
+      const stageStarted=performance.now();
+      const statusText=withEllipsis(stages[index%stages.length]||"Preparing access");
+      const logText=withEllipsis(logs[index%logs.length]||"VERIFYING");
+      await Promise.all([
+        transitionDiagnostic(status,statusText,signal,reduced),
+        transitionDiagnostic(log,logText,signal,reduced)
+      ]);
       index++;
-      const remaining=duration-(performance.now()-started);
-      if(remaining>0)await wait(Math.min(interval,remaining),signal);
+      const remaining=interval-(performance.now()-stageStarted);
+      if(remaining>0)await wait(remaining,signal);
     }
     if(signal?.aborted)throw abortError();
     // Do not dismiss the presentation while the actual task is still running.
@@ -89,6 +112,8 @@ export async function playWorldAtlasAccessSequence(
     buffer.setAttribute("aria-hidden","true");
     if(progress)progress.style.transform="scaleX(0)";
     status.style.opacity="";
+    status.style.transform="";
     log.style.opacity="";
+    log.style.transform="";
   }
 }
