@@ -78,8 +78,16 @@ Player movement is resolved by walkToTile(dialog, targetX, targetY, surface):
 2. Reject a destination that fails walkability checks.
 3. Resolve a deterministic breadth-first path in the fixed cardinal order north, east, south, west.
 4. Exclude occupied NPC cells.
-5. Update the Player one tile at a time, update depth/occlusion, emit the movement animation/trail and schedule the next step.
+5. Update the Player one tile at a time, update actor depth/occlusion and only the existing minimap actor dots, emit the tap route trace, then schedule the next step.
 6. Preserve the pending destination if movement is paused by entering editor mode; resume it only when editor mode exits and chat is not open.
+
+Movement performance contract:
+- Runtime Player/NPC steps use grid-center math rather than per-step getBoundingClientRect() layout reads.
+- Actor-only depth/occlusion synchronization must not rebuild tile z-index, the map SVG, minimap markup, or the full HUD for every step.
+- Existing minimap actor dots update in place. Full minimap geometry is rebuilt only when map/editor data changes.
+- A Player tap draws one lightweight SVG route trace along the already-resolved BFS path. Anime.js animates stroke offset/opacity; this is visual only and does not alter pathfinding.
+- Camera pan input is coalesced to at most one scroll write per animation frame. Foreground canvas remains hidden/1×1 when no foreground cells are marked; when needed, its raster DPR is capped at 1.25 on this mobile-first path.
+- Do not add a global will-change to every actor or use a moving board drop-shadow/backdrop blur on ordinary play. Keep will-change scoped to the token while it is actually moving.
 
 NPC wandering is deliberately simple presentation behavior, not an AI combatant brain:
 
@@ -127,8 +135,8 @@ The four Academy students/staff have explicit friendly metadata. Other NPCs/Play
 
 - animateGridMove() uses Anime.js to ease actor translation after a tile coordinate changes (225 ms, outCubic).
 - emitTileTrailWave() places one short-lived colored wave on the tile reached after movement (760 ms, outQuad). It is presentation only.
-- Each Player/NPC token receives two expanding sonar rings. Pulse interval: 2,450 ms; each ring duration: 1,800 ms with staggered delay.
-- CSS scanner bounds are approximately five tile widths/heights across (about 2.5 tiles radius from the actor).
+- Each Player/NPC token receives one expanding sonar ring. Pulse interval: 3,600 ms; ring duration: 1,100 ms.
+- CSS scanner bounds are three tile widths/heights across (one tile beyond the actor in each direction).
 - Reduced-motion users get a static scanner treatment and no animated tile trail.
 - Scanners start with the local actor/NPC field and stop when the field is hidden/paused, NPC wander lifecycle stops, chat opens, or editor mode begins.
 
@@ -138,7 +146,7 @@ updateScannerContacts(board) compares actor cell centers using Euclidean grid di
 
 distance = hypot(actorX - targetX, actorY - targetY)
 
-When distance <= 5 cells (two approximately 2.5-cell scanner fields overlap), the first transition into overlap dispatches:
+Each scanner reaches one tile beyond its actor; the first transition into overlap at distance <= 2 cells dispatches:
 
 merzkava:field-scanner-overlap
 
