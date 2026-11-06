@@ -365,7 +365,8 @@
   transition:opacity .18s ease;
 }
 .wmh-tile.building-footprint{transition:opacity .18s ease}
-.wmh-character-token{transition:filter .15s ease;will-change:left,top,transform}
+.wmh-character-token{transition:filter .15s ease}
+.wmh-character-token.wmh-token-moving{will-change:transform}
 
 
 /* Larger world-space footprints: small homes 2x2, academy buildings 4x4,
@@ -1940,7 +1941,7 @@
   background:radial-gradient(circle,transparent 52%,color-mix(in srgb,var(--npc-proximity-color,#e5d9b9) 17%,transparent) 100%)!important;
   box-shadow:0 0 7px color-mix(in srgb,var(--npc-proximity-color,#e5d9b9) 52%,transparent),
     0 0 14px color-mix(in srgb,var(--npc-proximity-color,#e5d9b9) 23%,transparent)!important;
-  opacity:0;transform:scale(.82);pointer-events:none!important;will-change:transform,opacity;
+  opacity:0;transform:scale(.82);pointer-events:none!important;
 }
 .wmh-character-token>i{z-index:1}
 @media(prefers-reduced-motion:reduce){.wmh-character-token>.wmh-npc-proximity-glow{will-change:auto}}
@@ -1988,7 +1989,7 @@
   position:absolute!important;z-index:1!important;left:calc(50% + var(--move-shift-x,0px))!important;top:calc(50% + var(--move-shift-y,0px))!important;
   width:135%!important;height:115%!important;translate:-50% -50%!important;border-radius:50%!important;
   background:radial-gradient(ellipse,#f3d99a55 0%,#d9ad5a2b 43%,transparent 76%)!important;
-  filter:blur(1.5px);pointer-events:none!important;will-change:transform,opacity;
+  filter:blur(1.5px);pointer-events:none!important;
 }
 .wmh-player-tap-glow{
   position:absolute!important;z-index:7!important;display:block!important;pointer-events:none!important;
