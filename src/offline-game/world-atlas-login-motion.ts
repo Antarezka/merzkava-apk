@@ -1,7 +1,7 @@
 import { animate, createScope } from "animejs";
 
 function abortError(): Error {
-  const error = new Error("World Atlas login was cancelled.");
+  const error = new Error("Account access sequence was cancelled.");
   error.name = "AbortError";
   return error;
 }
@@ -23,7 +23,16 @@ function wait(milliseconds:number,signal?:AbortSignal):Promise<void> {
   });
 }
 
-/** Four-second presentation sequence. Real source/password checks run separately. */
+function withEllipsis(value:string):string {
+  return value.replace(/[. …]+$/,"")+"...";
+}
+
+/**
+ * Shared Anime.js access presentation.
+ * The status console cycles quickly; the indeterminate track and orbit remain smooth
+ * until both the minimum presentation time and the real verification task are complete.
+ * This routine never performs or substitutes for authentication/network work.
+ */
 export async function playWorldAtlasAccessSequence(
   gate:HTMLElement,
   duration=4000,
@@ -36,8 +45,8 @@ export async function playWorldAtlasAccessSequence(
   const progress=gate.querySelector<HTMLElement>("[data-atlas-buffer-progress]");
   if(!buffer||!status||!log)return;
 
-  const stages=(gate.dataset.bufferStages||"Resolving player record...|Checking world data snapshot...|Verifying local credential...|Preparing Atlas access...").split("|");
-  const logs=(gate.dataset.bufferLogs||"IDENTITY ROUTE ...|SOURCE SNAPSHOT ...|LOCAL VERIFIER ...|SESSION HANDOFF ...").split("|");
+  const stages=(gate.dataset.bufferStages||buffer.dataset.bufferStages||"Resolving account identity...|Checking account state...|Verifying credentials...|Preparing access...").split("|");
+  const logs=(gate.dataset.bufferLogs||buffer.dataset.bufferLogs||"ACCOUNT ROUTE...|CREDENTIAL STORE...|VERIFICATION...|SESSION HANDOFF...").split("|");
   const started=performance.now();
   const reduced=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches??false;
   if(signal?.aborted)throw abortError();
@@ -46,27 +55,31 @@ export async function playWorldAtlasAccessSequence(
   gate.dataset.atlasBuffering="true";
 
   const scope=createScope({root:gate}).add(self=>{
-    if(!self||reduced)return;
+    if(!self)return;
     const orbit=buffer.querySelector<HTMLElement>(".atlas-buffer-orbit");
     const scan=buffer.querySelector<HTMLElement>(".atlas-buffer-scan");
     const glow=buffer.querySelector<HTMLElement>(".atlas-buffer-core");
-    if(orbit)animate(orbit,{rotate:"1turn",duration:2600,ease:"linear",loop:true});
-    if(scan)animate(scan,{translateX:["-120%","260%"],duration:1450,ease:"inOutSine",loop:true});
-    if(glow)animate(glow,{scale:[.94,1.06],opacity:[.58,1],duration:1150,ease:"inOutSine",loop:true,alternate:true});
-    if(progress)animate(progress,{scaleX:[0,1],duration,ease:"linear"});
+    // Keep the progress motion alive even when reduced-motion is requested; only
+    // the decorative rotations are softened.
+    if(orbit)animate(orbit,{rotate:"1turn",duration:reduced?9000:4200,ease:"linear",loop:true});
+    if(scan&&!reduced)animate(scan,{translateX:["-120%","260%"],duration:1350,ease:"inOutSine",loop:true});
+    if(glow)animate(glow,{scale:reduced?[.98,1.02]:[.94,1.06],opacity:reduced?[.78,1]:[.58,1],duration:reduced?2400:1150,ease:"inOutSine",loop:true,alternate:true});
+    if(progress)animate(progress,{scaleX:[.08,.96],duration:reduced?2400:1250,ease:"inOutSine",loop:true,alternate:true});
   });
 
   try{
-    const stageDuration=duration/stages.length;
-    for(let index=0;index<stages.length;index++){
-      status.textContent=stages[index]||"Preparing access...";
-      log.textContent=logs[index]||"VERIFYING ...";
-      await wait(stageDuration,signal);
+    const interval=reduced?520:330;
+    let index=0;
+    while(performance.now()-started<duration){
+      if(signal?.aborted)throw abortError();
+      status.textContent=withEllipsis(stages[index%stages.length]||"Preparing access");
+      log.textContent=withEllipsis(logs[index%logs.length]||"VERIFYING");
+      index++;
+      const remaining=duration-(performance.now()-started);
+      if(remaining>0)await wait(Math.min(interval,remaining),signal);
     }
-    const elapsed=performance.now()-started;
-    if(elapsed<duration)await wait(duration-elapsed,signal);
     if(signal?.aborted)throw abortError();
-    // Keep the visual buffer present until the live source check has actually settled.
+    // Do not dismiss the presentation while the actual task is still running.
     if(holdUntil)await holdUntil;
     if(signal?.aborted)throw abortError();
   }finally{
@@ -75,5 +88,7 @@ export async function playWorldAtlasAccessSequence(
     buffer.hidden=true;
     buffer.setAttribute("aria-hidden","true");
     if(progress)progress.style.transform="scaleX(0)";
+    status.style.opacity="";
+    log.style.opacity="";
   }
 }
