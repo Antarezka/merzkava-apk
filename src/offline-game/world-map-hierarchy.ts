@@ -151,9 +151,9 @@ function selectionImage(info: WorldMarker): string {
   if(info.id==="azerion-forest"||info.id==="inner-azerion"||info.id==="dead-zone")return "/game/scenery/special-locations/az-01-azerion-illusion-fog-boundary.png";
   return "";
 }
-function selectionMarkup(info: WorldMarker): string {
-  const image=selectionImage(info);
-  return '<div class="wmh-selection-backdrop" data-wmh-dismiss-layer><section class="wmh-selection-card" data-wmh-selection-card role="dialog" aria-modal="true" aria-label="'+info.name+'"><div class="wmh-selection-glass"><div class="wmh-selection-art">'+(image?'<img class="wmh-selection-scene-image" src="'+image+'" alt="'+info.name+'"/>':'<div class="wmh-selection-art-placeholder"><span>'+info.category.toUpperCase()+'</span><b>'+info.name+'</b><small>AREA ART · PLACEHOLDER</small></div>')+
+function selectionMarkup(info: WorldMarker,visualMode:WorldMapVisualMode="legacy"): string {
+  const image=visualMode==="augusto-pxl"?PXL_REGION_MAP_PLACEHOLDER:selectionImage(info);
+  return '<div class="wmh-selection-backdrop" data-wmh-dismiss-layer><section class="wmh-selection-card" data-wmh-selection-card role="dialog" aria-modal="true" aria-label="'+info.name+'"><div class="wmh-selection-glass"><div class="wmh-selection-art">'+(image?'<img class="wmh-selection-scene-image" '+(visualMode==="augusto-pxl"?'data-pxl-asset-id="map.region.'+info.id+'" ':'')+'src="'+image+'" alt="'+info.name+'"/>':'<div class="wmh-selection-art-placeholder"><span>'+info.category.toUpperCase()+'</span><b>'+info.name+'</b><small>AREA ART · PLACEHOLDER</small></div>')+
     '<div class="wmh-selection-glass-glow"></div><span class="wmh-selection-window-label">MERZKAVA · AREA WINDOW</span><div class="wmh-selection-title"><small>'+info.subtitle+'</small><h3>'+info.name+'</h3></div></div></div><div class="wmh-selection-question"><p>Would you like to access <b>'+info.name+'</b>?</p><div><button type="button" data-wmh-action="selection-yes" data-marker-id="'+info.id+'">YES · ENTER</button><button type="button" data-wmh-action="selection-no">NO · STAY HERE</button></div></div></section></div>';
 }
 function serializeWorldMapCoordinates(markers: WorldMarker[]): string {
@@ -2890,28 +2890,32 @@ function captureArrivalState():{day:number;minutes:number;cycle:string;weather:s
 function replaceWorldMapDialogMarkup(dialog:HTMLElement,markup:string):void {
   disposePlayerHudMotion(dialog);
   dialog.innerHTML=markup;
+  const overlay=dialog.closest<HTMLElement>("[data-world-map-hierarchy]");
+  if(overlay?.dataset.visualMode==="augusto-pxl")mountAugustoPxlAssets(overlay);
 }
 export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement, onAdvanceTime: (minutes: number) => void, pointer?: {clientX:number;clientY:number}): boolean {
   if (!worldMapDeveloperMode && target.closest("[data-wmh-overlay-toggle],[data-wmh-overlay-tools],[data-wmh-overlay-minimize],[data-wmh-overlay-close],[data-wmh-academy-editor],[data-wmh-drag-marker],[data-wmh-coordinate],[data-wmh-editor-canvas]")) return true;
   const action=target.closest<HTMLElement>("[data-wmh-action],[data-wmh-info],[data-wmh-site],[data-wmh-building],[data-wmh-npc],[data-wmh-plot],[data-wmh-tile],[data-wmh-reply],[data-wmh-transition],[data-wmh-transition-close],[data-wmh-dismiss-layer],[data-wmh-selection-card],[data-hud-action]");
   if(!action)return false;
-  const overlay=root.querySelector<HTMLElement>("[data-world-map-hierarchy]");
+  const overlay=target.closest<HTMLElement>("[data-world-map-hierarchy]");
   const dialog=overlay?.querySelector<HTMLElement>("[data-wmh-dialog]");
   if(!overlay||!dialog)return false;
+  const visualMode:WorldMapVisualMode=overlay.dataset.visualMode==="augusto-pxl"?"augusto-pxl":"legacy";
+  const renderPanel=(level:Level,region:RegionId="golden-dragon-empire",building="Tianhai Academy",area?:WorldMarker)=>panelMarkup(level,region,building,area,visualMode);
   if(handlePlayerHudClick(target,dialog))return true;
   const current=(overlay.dataset.level as Level)||"world";
   const regionId=(overlay.dataset.region as RegionId)||"golden-dragon-empire";
   const building=overlay.dataset.building||"Tianhai Academy";
-  if(action.dataset.wmhAction==="open"){overlay.hidden=false;overlay.dataset.level="world";replaceWorldMapDialogMarkup(dialog,panelMarkup("world"));bindWorldMapZoom(dialog);return true;}
-  if(action.dataset.wmhAction==="editor-open"){if(!worldMapDeveloperMode)return true;overlay.dataset.level="map-editor";replaceWorldMapDialogMarkup(dialog,panelMarkup("map-editor"));bindWorldMapEditor(dialog);return true;}
-  if(action.dataset.wmhAction==="editor-close"){overlay.dataset.level="world";replaceWorldMapDialogMarkup(dialog,panelMarkup("world"));bindWorldMapZoom(dialog);return true;}
+  if(action.dataset.wmhAction==="open"){overlay.hidden=false;overlay.dataset.level="world";replaceWorldMapDialogMarkup(dialog,renderPanel("world"));bindWorldMapZoom(dialog);return true;}
+  if(action.dataset.wmhAction==="editor-open"){if(!worldMapDeveloperMode)return true;overlay.dataset.level="map-editor";replaceWorldMapDialogMarkup(dialog,renderPanel("map-editor"));bindWorldMapEditor(dialog);return true;}
+  if(action.dataset.wmhAction==="editor-close"){overlay.dataset.level="world";replaceWorldMapDialogMarkup(dialog,renderPanel("world"));bindWorldMapZoom(dialog);return true;}
   if(action.dataset.wmhAction==="editor-confirm"||action.dataset.wmhAction==="editor-reset")return true;
   if(action.dataset.wmhAction==="close"){disposePlayerHudMotion(dialog);overlay.hidden=true;const outerClose=root.querySelector<HTMLButtonElement>("[data-idle-rpg-close]");if(outerClose)outerClose.click();return true;}
   if(action.dataset.wmhAction==="test-isometric"){
     if(!worldMapDeveloperMode)return true;
     stopNpcWander(dialog);
     overlay.dataset.level="test";
-    replaceWorldMapDialogMarkup(dialog,panelMarkup("test",regionId,"Isometric Render Test"));
+    replaceWorldMapDialogMarkup(dialog,renderPanel("test",regionId,"Isometric Render Test"));
     bindIsoAreaEditor(dialog);bindIsometricCamera(dialog);bindIsometricMapArt(dialog);bindIsometricHud(dialog);startNpcWander(dialog);
     return true;
   }
@@ -2925,7 +2929,7 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
     overlay.dataset.region="golden-dragon-empire";
     overlay.dataset.level="local";
     overlay.dataset.building="Tianhai Academy";
-    replaceWorldMapDialogMarkup(dialog,panelMarkup("local","golden-dragon-empire","Tianhai Academy"));
+    replaceWorldMapDialogMarkup(dialog,renderPanel("local","golden-dragon-empire","Tianhai Academy"));
     onAdvanceTime(180);
     bindIsoAreaEditor(dialog);
     bindIsometricCamera(dialog);
@@ -2937,7 +2941,7 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
   }
   if(action.dataset.wmhAction==="back"){
     const next:Level=current==="interior"?"local":current==="local"?"regional":"world";
-    stopNpcWander(dialog);overlay.dataset.level=next;replaceWorldMapDialogMarkup(dialog,panelMarkup(next,regionId,building));if(next==="world")bindWorldMapZoom(dialog);if(next==="regional")bindIsometricMapArt(dialog);if(next==="local"){bindIsoAreaEditor(dialog);bindIsometricCamera(dialog);bindIsometricMapArt(dialog);bindIsometricHud(dialog);startNpcWander(dialog);}return true;
+    stopNpcWander(dialog);overlay.dataset.level=next;replaceWorldMapDialogMarkup(dialog,renderPanel(next,regionId,building));if(next==="world")bindWorldMapZoom(dialog);if(next==="regional")bindIsometricMapArt(dialog);if(next==="local"){bindIsoAreaEditor(dialog);bindIsometricCamera(dialog);bindIsometricMapArt(dialog);bindIsometricHud(dialog);startNpcWander(dialog);}return true;
   }
   if(action.hasAttribute("data-wmh-transition-close")){
     closeTransitionOverlays(dialog);
@@ -2950,7 +2954,7 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
     if(/^akses ke map golden dragon empire$/i.test(label)){
       closeTransitionOverlays(dialog);stopNpcWander(dialog);
       overlay.dataset.level="regional";overlay.dataset.region="golden-dragon-empire";
-      replaceWorldMapDialogMarkup(dialog,panelMarkup("regional","golden-dragon-empire"));bindIsometricMapArt(dialog);
+      replaceWorldMapDialogMarkup(dialog,renderPanel("regional","golden-dragon-empire"));bindIsometricMapArt(dialog);
       return true;
     }
     if(/^dialog box:/i.test(label)){showTransitionDialogue(dialog,"TIANHAI ACADEMY",label.replace(/^dialog box:\\s*/i,""));return true;}
@@ -2967,7 +2971,8 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
   if(action.dataset.wmhInfo){
     const info=readWorldMarkers().find(item=>item.id===action.dataset.wmhInfo);if(!info)return true;
     const host=dialog.querySelector<HTMLElement>("[data-wmh-selection-host]");if(!host)return true;
-    host.innerHTML=selectionMarkup(info);
+    host.innerHTML=selectionMarkup(info,visualMode);
+    if(visualMode==="augusto-pxl")mountAugustoPxlAssets(overlay);
     const card=host.querySelector<HTMLElement>("[data-wmh-selection-card]");if(card)animateExpeditionPanel(card);
     const art=host.querySelector<HTMLElement>(".wmh-selection-scene-image");
     if(art&&!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches)art.animate([{transform:"scale(1.045)",filter:"brightness(.78)"},{transform:"scale(1)",filter:"brightness(1)"}],{duration:760,easing:"cubic-bezier(.2,.75,.25,1)"});
@@ -2976,15 +2981,15 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
   if(action.hasAttribute("data-wmh-dismiss-layer")||action.dataset.wmhAction==="selection-no"){dialog.querySelector("[data-wmh-selection-host]")?.replaceChildren();return true;}
   if(action.dataset.wmhAction==="selection-yes"){
     const id=action.dataset.markerId as WorldMarkerId;const info=readWorldMarkers().find(item=>item.id===id);if(!info)return true;
-    if(["golden-dragon-empire","tianhai-yunzhou","beiming-gu"].includes(id)){overlay.dataset.region=id;overlay.dataset.level="regional";replaceWorldMapDialogMarkup(dialog,panelMarkup("regional",id as RegionId));}
-    else {overlay.dataset.region="golden-dragon-empire";overlay.dataset.level="regional";replaceWorldMapDialogMarkup(dialog,panelMarkup("regional","golden-dragon-empire",info.name,info));}
+    if(["golden-dragon-empire","tianhai-yunzhou","beiming-gu"].includes(id)){overlay.dataset.region=id;overlay.dataset.level="regional";replaceWorldMapDialogMarkup(dialog,renderPanel("regional",id as RegionId));}
+    else {overlay.dataset.region="golden-dragon-empire";overlay.dataset.level="regional";replaceWorldMapDialogMarkup(dialog,renderPanel("regional","golden-dragon-empire",info.name,info));}
     bindIsometricMapArt(dialog);
     return true;
   }
   if(action.dataset.wmhSite){
     const arrival=captureArrivalState();
     overlay.dataset.level="local";overlay.dataset.building=action.dataset.wmhSite;
-    replaceWorldMapDialogMarkup(dialog,panelMarkup("local",regionId,action.dataset.wmhSite));
+    replaceWorldMapDialogMarkup(dialog,renderPanel("local",regionId,action.dataset.wmhSite));
     onAdvanceTime(180);
     bindIsoAreaEditor(dialog);bindIsometricCamera(dialog);bindIsometricMapArt(dialog);bindIsometricHud(dialog);startNpcWander(dialog);
     requestAnimationFrame(()=>animateIsometricArrival(dialog,arrival));
@@ -2994,7 +2999,7 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
     const arrival=captureArrivalState();
     stopNpcWander(dialog);
     overlay.dataset.level="interior";overlay.dataset.building=action.dataset.wmhBuilding;
-    replaceWorldMapDialogMarkup(dialog,panelMarkup("interior",regionId,action.dataset.wmhBuilding));
+    replaceWorldMapDialogMarkup(dialog,renderPanel("interior",regionId,action.dataset.wmhBuilding));
     onAdvanceTime(180);
     bindIsoAreaEditor(dialog);bindIsometricCamera(dialog);bindIsometricMapArt(dialog);bindIsometricHud(dialog);
     requestAnimationFrame(()=>animateIsometricArrival(dialog,arrival));
@@ -3021,7 +3026,7 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
     replies.innerHTML=npc.choices.map((c,i)=>'<button type="button" data-wmh-reply="'+i+'" data-npc-id="'+npcId+'">'+c+'</button>').join("");
     return true;
   }
-  if(action.dataset.wmhAction==="exit-local"){onAdvanceTime(180);overlay.dataset.level="regional";replaceWorldMapDialogMarkup(dialog,panelMarkup("regional",regionId));return true;}
+  if(action.dataset.wmhAction==="exit-local"){onAdvanceTime(180);overlay.dataset.level="regional";replaceWorldMapDialogMarkup(dialog,renderPanel("regional",regionId));return true;}
   if(action.dataset.wmhPlot){dialog.insertAdjacentHTML("beforeend",'<div class="wmh-toast">'+action.dataset.wmhPlot+' · function details coming soon</div>');return true;}
   return false;
 }
