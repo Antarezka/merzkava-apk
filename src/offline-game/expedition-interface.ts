@@ -94,7 +94,7 @@ export function renderExpeditionInterface():string {
           <path d="M14 45v2m24-2v2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
         </svg>
       </button>
-      <button type="button" class="expedition-pxl-trigger" data-augusto-pxl-open data-drag-position-key="merzkava.eternal-path.augusto-pxl-position.v1" aria-label="Open Augusto PXL integration panel" aria-haspopup="dialog" aria-expanded="false" title="Augusto PXL · Visual Asset Workshop">
+      <button type="button" class="expedition-pxl-trigger" data-augusto-pxl-open data-drag-position-key="merzkava.eternal-path.augusto-pxl-position.v1" aria-label="Open Augusto PXL World Atlas" aria-haspopup="dialog" aria-expanded="false" title="Augusto PXL · World Atlas">
         <span class="pxl-tv-art" aria-hidden="true">
           <span class="pxl-tv-antenna"><i></i><b></b></span>
           <span class="pxl-tv-shell"><i class="pxl-tv-screen"></i><i class="pxl-tv-knobs"><b></b><b></b></i></span>
