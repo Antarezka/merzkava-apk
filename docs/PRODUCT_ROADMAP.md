@@ -1088,3 +1088,19 @@ Current source baseline for this workstream: ed5ef007cead9ecf8e6e70662c29ec5cce9
 - [ ] Replace filled RPG HUD panels with transparent instrument frames; separate Player identity/status, skill/inventory dock, and world-time ticket into independently movable layers.
 - [ ] Add per-map HUD layout editor controls for drag, corner resize, two-finger pinch, save, and reset. Persist coordinates and scale separately from map walkability and grid data.
 - [ ] Verify NPC dialogue, movement, editor save/undo/import, camera gestures, HUD layout restore, World Atlas password flow, and emulator startup on a fresh Android build. Physical device QA remains separate.
+
+
+### 13O. Dual World Atlas gateways — CSS Coastal Receiver and Pixi CRT console (2026-11-06)
+
+**Owner-approved prototype branch:** `03-floating-pixi-world-atlas-tv-console-2026-11-06`. This adds a second floating entry point to Eternal Path without replacing the original Coastal Receiver.
+
+- [x] Keep the existing Coastal Receiver icon, original drag-position key, login gate, and DOM/SVG World Atlas route intact.
+- [x] Add a separate CSS-drawn vintage CRT + console box + joystick icon, visible only inside Eternal Path. It has its own drag position and does not overwrite the old receiver's position.
+- [x] Route both icons into the same World Atlas markup, account gate, map hierarchy, local save/gameplay functions, movement/pathfinding, sub-cell coordinates, NPC interactions, and dialogue system.
+- [x] Add a very small, low-opacity brush-ink `Pixi Architecture` annotation to the shared Atlas header only while the Pixi entry is active.
+- [x] Add a separate lazy-loaded PixiJS v8 visual renderer for the isometric game board. The shared DOM/gameplay engine remains authoritative; Pixi does not resolve input, movement, walkability, NPC intent, combat, saves, or dialogue.
+- [x] Remove Pixi EventSystem and AccessibilitySystem before renderer initialization; keep every tap, drag, pinch, button and editor action on existing DOM controls.
+- [ ] Confirm GitHub Actions typecheck, gameplay tests and production build on this branch.
+- [ ] Verify repeated open/close, route changes, editor handoff, DOM fallback and all protected touch controls on the TECNO Spark Go 1 KL4 (Android 14). No physical-device QA is claimed by this source update.
+
+**Renderer contract:** the original receiver remains the default DOM/SVG path. The Pixi CRT console activates the isolated Pixi visual renderer in the same Atlas. A Pixi initialization failure returns to the existing DOM visuals; it must never leave a blank map or disable DOM controls. The Eternal Path cinematic Scene Window remains owned by its existing Anime.js scope and is not migrated by this workstream.
