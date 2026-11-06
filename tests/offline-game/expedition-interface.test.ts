@@ -17,10 +17,10 @@ describe("Eternal Path live world scene", () => {
     expect(html).toContain('class="pxl-tv-shell"');
     expect(html).toContain('class="pxl-console-box"');
     expect(html).toContain('class="pxl-console-ink">AUGUSTO PXL</small>');
+    expect(html).toContain('<div data-world-map-host>');
     expect(html).toContain('data-world-map-hierarchy data-visual-mode="legacy"');
-    expect(html).toContain('data-world-map-hierarchy data-visual-mode="augusto-pxl" aria-label="Map Navigation" hidden');
-    expect(html).toContain('data-pxl-asset-id="map.world.overview"');
-    expect(html).toContain('/assets/augusto-pxl/placeholders/world-map-pending.svg');
+    expect(html).not.toContain('data-world-map-hierarchy data-visual-mode="augusto-pxl"');
+    expect(html).not.toContain('data-pxl-asset-id="map.world.overview"');
     expect(html).not.toContain('data-augusto-pxl-modal');
   });
 
