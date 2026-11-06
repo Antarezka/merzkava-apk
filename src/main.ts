@@ -1234,6 +1234,13 @@ function closeIdleAtlasFromBack():void {
 }
 window.addEventListener("merzkava:android-back",()=>{history.back();});
 window.addEventListener("popstate",(event:PopStateEvent)=>{
+  const pxlPanel=root.querySelector<HTMLElement>("[data-augusto-pxl-modal]");
+  if(pxlPanel&&!pxlPanel.hidden){
+    pxlPanel.hidden=true;
+    root.querySelector<HTMLButtonElement>("[data-augusto-pxl-open]")?.setAttribute("aria-expanded","false");
+    root.querySelector<HTMLButtonElement>("[data-augusto-pxl-open]")?.focus();
+    return;
+  }
   const idleNotice=root.querySelector<HTMLElement>("[data-idle-rpg-modal]");
   if(idleNotice&&!idleNotice.hidden){closeIdleAtlasFromBack();return;}
   const devPanel=root.querySelector<HTMLElement>("[data-dev-login-panel]");
@@ -1277,6 +1284,14 @@ window.addEventListener("popstate",(event:PopStateEvent)=>{
   history.pushState({merzkavaScreen:"control",merzkavaHome:false},"");
 });
 root.addEventListener("keydown", event => {
+  const pxlPanel=root.querySelector<HTMLElement>("[data-augusto-pxl-modal]");
+  if(event.key==="Escape"&&pxlPanel&&!pxlPanel.hidden){
+    pxlPanel.hidden=true;
+    root.querySelector<HTMLButtonElement>("[data-augusto-pxl-open]")?.setAttribute("aria-expanded","false");
+    root.querySelector<HTMLButtonElement>("[data-augusto-pxl-open]")?.focus();
+    if(history.state?.augustoPxlPanel)history.back();
+    return;
+  }
   const atlasGate=root.querySelector<HTMLElement>("[data-world-atlas-gate]");
   if(event.key==="Escape"&&atlasGate&&!atlasGate.hidden){closeWorldAtlas();return;}
   const devAccess=root.querySelector<HTMLElement>("[data-dev-login-panel]");
@@ -1602,6 +1617,18 @@ root.addEventListener("click", async (event: MouseEvent) => {
   if(target.closest("[data-world-atlas-gate-back]")){
     if(worldAtlasLoginBusy)return;
     closeWorldAtlas();return;
+  }
+  if (target.closest("[data-augusto-pxl-open]")) {
+    const panel=root.querySelector<HTMLElement>("[data-augusto-pxl-modal]");
+    const trigger=root.querySelector<HTMLButtonElement>("[data-augusto-pxl-open]");
+    if(panel&&trigger){panel.hidden=false;trigger.setAttribute("aria-expanded","true");history.pushState({augustoPxlPanel:true},"");panel.querySelector<HTMLButtonElement>("[data-augusto-pxl-close]")?.focus();}
+    return;
+  }
+  if (target.closest("[data-augusto-pxl-close]")) {
+    const panel=root.querySelector<HTMLElement>("[data-augusto-pxl-modal]");
+    const trigger=root.querySelector<HTMLButtonElement>("[data-augusto-pxl-open]");
+    if(panel&&!panel.hidden){panel.hidden=true;trigger?.setAttribute("aria-expanded","false");trigger?.focus();if(history.state?.augustoPxlPanel)history.back();}
+    return;
   }
   if (target.closest("[data-idle-rpg-open]")) { await openWorldAtlasFromTv(); return; }
   if (target.closest("[data-idle-rpg-close]")) { closeWorldAtlas(); return; }
