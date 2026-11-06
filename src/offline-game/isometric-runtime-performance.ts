@@ -24,3 +24,21 @@ export function getIsoMovementOffset(
     y: (deltaX + deltaY) * (grid.tileH / 2) * scaleY / zoom,
   };
 }
+
+/**
+ * Run a browser-native Web Animation. WAAPI lets the browser schedule
+ * transform/opacity effects independently of the application animation loop.
+ * A missing/failed API returns null so callers can snap to the safe final state.
+ */
+export function startNativeMotion(
+  element: Element,
+  keyframes: Keyframe[],
+  options: KeyframeAnimationOptions,
+): Animation | null {
+  if (typeof element.animate !== "function") return null;
+  try {
+    return element.animate(keyframes, options);
+  } catch {
+    return null;
+  }
+}
