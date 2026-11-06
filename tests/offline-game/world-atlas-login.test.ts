@@ -28,6 +28,8 @@ describe("World Atlas player login gate",()=>{
       };
       expect(offlineLabel).toContain(expectedOffline[language.code]);
       expect(html).toContain('data-world-atlas-buffer');
+      expect(html).toContain('data-buffer-context="world-atlas-list"');
+      expect(html).not.toContain("PBKDF2-SHA256 DERIVATION...");
       expect(html).toContain('data-buffer-stages=');
       expect(html).toContain('AUTHENTICATION SEQUENCE');
       expect(html).toContain('data-atlas-buffer-status');
@@ -69,6 +71,15 @@ describe("Shared Anime.js access buffer profiles",()=>{
     expect(html).toContain("ACTIVE_SHA VALIDATION...");
     expect(html).toContain("PBKDF2-SHA256 DERIVATION...");
     expect(html).toContain("WORLD ATLAS · ACCOUNT HANDSHAKE");
+  });
+
+  it("uses registry-fetch diagnostics before any password verification starts",()=>{
+    const html=worldAtlasAccessBufferMarkup("en","world-atlas-list");
+    expect(html).toContain("UNIVERSE API CONNECT...");
+    expect(html).toContain("PLAYER REGISTRY FETCH...");
+    expect(html).toContain("PLAYER PROFILE FETCH...");
+    expect(html).toContain("LOCAL CREDENTIAL RECORD...");
+    expect(html).not.toContain("PBKDF2-SHA256 DERIVATION...");
   });
 
   it("shows actual network steps for Player mode",()=>{
