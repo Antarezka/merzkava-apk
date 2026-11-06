@@ -233,8 +233,7 @@ function mountPixiBoard(board:HTMLElement,modal:HTMLElement,onFailure:()=>void):
     if(pulseTimer)window.clearInterval(pulseTimer);
     resizeObserver?.disconnect();
     actorObserver?.disconnect();
-    board.removeEventListener("merzkava:actor-moved",onActorMoved);
-    board.classList.remove("wmh-pixi-render-active","wmh-pixi-render-paused");
+      board.classList.remove("wmh-pixi-render-active","wmh-pixi-render-paused");
     delete modal.dataset.pixiRendererStatus;
     actors.clear();
     textures.forEach(asset=>asset.release());
@@ -448,11 +447,6 @@ function mountPixiBoard(board:HTMLElement,modal:HTMLElement,onFailure:()=>void):
     requestFrame();
   };
 
-  const onActorMoved=()=>{
-    syncActors(true);
-    requestFrame();
-  };
-
   void (async()=>{
     try{
       app=new PIXI.Application();
@@ -517,7 +511,6 @@ function mountPixiBoard(board:HTMLElement,modal:HTMLElement,onFailure:()=>void):
       });
       actorObserver.observe(board,{subtree:true,attributes:true,attributeFilter:["data-x","data-y","data-pos-x","data-pos-y","data-scan-tone","data-interaction-ready","class"]});
       actorObserver.observe(modal,{subtree:true,attributes:true,attributeFilter:["hidden"]});
-      board.addEventListener("merzkava:actor-moved",onActorMoved);
       setPaused(isPaused(board));
       resizeObserver=new ResizeObserver(()=>{
         if(!app||disposed)return;
@@ -589,7 +582,7 @@ export function mountPixiWorldAtlas(modal:HTMLElement):()=>void {
   };
 
   observer=new MutationObserver(schedule);
-  observer.observe(modal,{subtree:true,childList:true,attributes:true,attributeFilter:["data-x","data-y","data-pos-x","data-pos-y","data-wmh-board","class"]});
+  observer.observe(modal,{subtree:true,childList:true});
   synchronize();
 
   return ()=>{
