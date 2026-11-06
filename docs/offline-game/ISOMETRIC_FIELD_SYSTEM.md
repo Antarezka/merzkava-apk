@@ -86,7 +86,7 @@ Movement performance contract:
 - Actor-only depth/occlusion synchronization must not rebuild tile z-index, the map SVG, minimap markup, or the full HUD for every step.
 - Existing minimap actor dots update in place. Full minimap geometry is rebuilt only when map/editor data changes.
 - A Player tap draws one lightweight SVG route trace along the already-resolved BFS path. Anime.js animates stroke offset/opacity; this is visual only and does not alter pathfinding.
-- Camera pan and pinch input are coalesced to at most one camera update per animation frame; rapid pointer events only replace the queued latest position/zoom. Foreground canvas remains hidden/1×1 when no foreground cells are marked; when needed, its raster DPR is capped at 1.25 on this mobile-first path.
+- Camera pan and pinch input are coalesced to at most one camera update per animation frame; rapid pointer events only replace the queued latest position/zoom. The Academy margin guide caps its decorative line density, and the foreground occlusion canvas is cropped to the marked-cell bounds instead of allocating a full-map transparent bitmap. It remains hidden/1×1 when no foreground cells are marked; populated raster DPR is capped at 1.25 on this mobile-first path.
 - Do not add a global will-change to every actor or use a moving board drop-shadow/backdrop blur on ordinary play. Keep will-change scoped to the token while it is actually moving.
 
 NPC wandering is deliberately simple presentation behavior, not an AI combatant brain:
