@@ -1183,11 +1183,8 @@ function bindIsometricHud(dialog:HTMLElement):void {
   refreshPlayerHud(dialog);
   mountPlayerHudMotion(dialog);
   bindPlayerHudLayoutEditor(dialog);
-  if(!board){
-    renderIsometricWorldStatus(dialog);
-    bindAcademyMapControls(dialog);
-    return;
-  }
+  bindScrollableResizableWindows(dialog);
+  bindArcanistryBackClearance(dialog);
   if(minimapToggle&&minimap&&minimapToggle.dataset.bound!=="true"){
     minimapToggle.dataset.bound="true";
     minimapToggle.addEventListener("click",()=>{
@@ -1217,6 +1214,11 @@ function bindIsometricHud(dialog:HTMLElement):void {
     dragHandle.addEventListener("pointerup",finish);
     dragHandle.addEventListener("pointercancel",finish);
   }
+  if(!board){
+    renderIsometricWorldStatus(dialog);
+    bindAcademyMapControls(dialog);
+    return;
+  }
   if(world&&world.dataset.bound!=="true"){
     world.dataset.bound="true";
     world.addEventListener("click",event=>{
@@ -1236,8 +1238,6 @@ function bindIsometricHud(dialog:HTMLElement):void {
   renderIsometricWorldStatus(dialog);
   renderIsometricTransitions(board);
   if(world)renderIsometricMinimap(board);
-  bindScrollableResizableWindows(dialog);
-  bindArcanistryBackClearance(dialog);
 }
 function bindArcanistryBackClearance(dialog:HTMLElement):void {
   const screen=dialog.querySelector<HTMLElement>("[data-wmh-isometric-play-screen]");
