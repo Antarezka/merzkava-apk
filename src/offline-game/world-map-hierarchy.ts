@@ -206,6 +206,27 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
   // classifier, so a normal tap never nudges the saved camera position.
   let pendingCameraPan: { x: number; y: number; scrollLeft: number; scrollTop: number } | null = null;
   let pinchStart: { distance: number; zoom: number } | null = null;
+  let panFrame=0;
+  let queuedPanPoint:{x:number;y:number}|null=null;
+  const flushPanFrame=()=>{
+    if(panFrame)cancelAnimationFrame(panFrame);
+    panFrame=0;
+    const point=queuedPanPoint;queuedPanPoint=null;
+    if(!point||!panStart)return;
+    viewport.scrollLeft=panStart.scrollLeft-(point.x-panStart.x);
+    viewport.scrollTop=panStart.scrollTop-(point.y-panStart.y);
+  };
+  const queuePanFrame=(x:number,y:number)=>{
+    queuedPanPoint={x,y};
+    if(panFrame)return;
+    panFrame=requestAnimationFrame(()=>{
+      panFrame=0;
+      const point=queuedPanPoint;queuedPanPoint=null;
+      if(!point||!panStart)return;
+      viewport.scrollLeft=panStart.scrollLeft-(point.x-panStart.x);
+      viewport.scrollTop=panStart.scrollTop-(point.y-panStart.y);
+    });
+  };
   const distance = (a: {x:number;y:number}, b: {x:number;y:number}) => Math.hypot(a.x-b.x,a.y-b.y);
   const midpoint = (a: {x:number;y:number}, b: {x:number;y:number}) => ({x:(a.x+b.x)/2,y:(a.y+b.y)/2});
   const applySurfaceSize=(scale:number) => {
@@ -256,6 +277,7 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
     applySurfaceSize(1);
   };
   const applyZoom = (next: number, focusX?: number, focusY?: number) => {
+    flushPanFrame();
     if (!baseWidth || !baseHeight) sizeBaseMap();
     const previous = zoom;
     zoom = Math.max(1, Math.min(2.5, next));
@@ -278,6 +300,7 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
     }) as EventListener);
   }
   const centerMap = () => {
+    flushPanFrame();
     sizeBaseMap();
     zoom = 1;
     applySurfaceSize(1);
@@ -353,13 +376,13 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
         pendingCameraPan=null;
       }
       if(panStart){
-        viewport.scrollLeft = panStart.scrollLeft - (event.clientX - panStart.x);
-        viewport.scrollTop = panStart.scrollTop - (event.clientY - panStart.y);
+        queuePanFrame(event.clientX,event.clientY);
         event.preventDefault();
       }
     }
   });
   const endPointer = (event: PointerEvent) => {
+    flushPanFrame();
     pointers.delete(event.pointerId);
     if (pointers.size < 2) pinchStart = null;
     if (pointers.size === 1) {
@@ -846,15 +869,21 @@ function drawIsometricForeground(board:HTMLElement,data=readIsoMapData(board)):v
       viewport.scrollTop=padY+boardHeight*zoom/2-viewport.clientHeight/2;
     }
   }
+  if(!data.foregroundCells.length&&!data.foregroundQuadrants.length){
+    canvas.width=1;canvas.height=1;canvas.style.width="0px";canvas.style.height="0px";canvas.style.display="none";
+    return;
+  }
+  canvas.style.display="block";
   const width=image.clientWidth||image.naturalWidth,height=image.clientHeight||image.naturalHeight;
-  const dpr=Math.max(1,Math.min(2,window.devicePixelRatio||1));
+  // This is a static occlusion mask, not the source artwork. 1.25x is enough
+  // on mobile and avoids a second high-DPR copy of the full map in GPU memory.
+  const dpr=Math.max(1,Math.min(1.25,window.devicePixelRatio||1));
   const scaleX=width/image.naturalWidth,scaleY=height/image.naturalHeight;
   canvas.width=Math.max(1,Math.round(width*dpr));canvas.height=Math.max(1,Math.round(height*dpr));
   canvas.style.left=image.offsetLeft+"px";canvas.style.top=image.offsetTop+"px";
   canvas.style.width=width+"px";canvas.style.height=height+"px";
   const ctx=canvas.getContext("2d");if(!ctx)return;
   ctx.setTransform(dpr*scaleX,0,0,dpr*scaleY,0,0);ctx.clearRect(0,0,image.naturalWidth,image.naturalHeight);
-  if(!data.foregroundCells.length&&!data.foregroundQuadrants.length)return;
   const halfW=data.grid.tileW/2,halfH=data.grid.tileH/2,left=0,top=0;
   ctx.save();ctx.beginPath();
   for(const key of data.foregroundCells){
@@ -2153,23 +2182,55 @@ const npcData: Record<string,{name:string;gender:string;greeting:string;choices:
   "test-scholar":{name:"Scholar Bo",gender:"male",greeting:"I am checking the stone path and the reflection pool. Both should remain visible while the camera moves.",choices:["Ask about the terrain","Ask about movement"],replies:["The blue area is the pool, the pale strip is the main path, and the green cells mark gardens.","Tap any empty tile to move. The camera FIT and CENTER controls should also work."]},
   "test-mechanic":{name:"Artificer Mei",gender:"female",greeting:"I am watching the player and NPC layers. Their sprites should render above the ground tiles.",choices:["Ask about the map layers","Ask about the editor"],replies:["This test has no image layer. It isolates the isometric grid and character layers from external artwork loading.","Open the floating editor to test the grid and destination markers without leaving this room."]}
 };
+function syncActorDepthAndOcclusion(board:HTMLElement,data:IsoMapEditorData):void {
+  const academyArtwork=board.dataset.academyArtworkBoard==="true";
+  const image=academyArtwork?board.querySelector<HTMLImageElement>("[data-wmh-map-art]"):null;
+  const width=image?.naturalWidth||2816,height=image?.naturalHeight||1536;
+  board.querySelectorAll<HTMLElement>("[data-wmh-player-token],[data-wmh-npc]").forEach(token=>{
+    const x=Number(token.dataset.x||0),y=Number(token.dataset.y||0);
+    const opacity=isoCellHasLayer(data,"opacityCells",x,y)||data.opacityQuadrants.some(key=>key.startsWith(x+","+y+":"))?"0.42":"1";
+    token.style.setProperty("--character-z",String(20+x+y));
+    token.style.setProperty("--character-opacity",opacity);
+    if(academyArtwork){
+      const center=isoCellCenter(x,y,data.grid);
+      token.style.left=(center.x/width*100)+"%";token.style.top=(center.y/height*100)+"%";
+      token.style.zIndex=String(20+x+y);token.style.opacity=opacity;
+    }
+  });
+}
+function updateIsometricMinimapActors(board:HTMLElement,data:IsoMapEditorData):void {
+  const playScreen=board.closest<HTMLElement>("[data-wmh-isometric-play-screen]");
+  const world=playScreen?.querySelector<HTMLElement>("[data-wmh-minimap-world]");
+  const actors=world?.querySelector<HTMLElement>("[data-wmh-minimap-actors]");
+  if(!world||!actors)return;
+  const boardWidth=Number.parseFloat(board.style.getPropertyValue("--iso-board-width"))||board.offsetWidth||1;
+  const boardHeight=Number.parseFloat(board.style.getPropertyValue("--iso-board-height"))||board.offsetHeight||1;
+  const position=(actor:HTMLElement)=>{
+    const center=isoCellCenter(Number(actor.dataset.x||0),Number(actor.dataset.y||0),data.grid);
+    return {left:Math.max(0,Math.min(100,center.x/boardWidth*100))+"%",top:Math.max(0,Math.min(100,center.y/boardHeight*100))+"%"};
+  };
+  const player=board.querySelector<HTMLElement>("[data-wmh-player-token]");
+  const playerDot=actors.querySelector<HTMLElement>("[data-minimap-player]");
+  if(player&&playerDot){const point=position(player);playerDot.style.left=point.left;playerDot.style.top=point.top;}
+  board.querySelectorAll<HTMLElement>("[data-wmh-npc]").forEach((npc,index)=>{
+    const dot=actors.querySelector<HTMLElement>('[data-minimap-npc="'+index+'"]');
+    if(dot){const point=position(npc);dot.style.left=point.left;dot.style.top=point.top;}
+  });
+  const footer=world.closest<HTMLElement>("[data-wmh-minimap]")?.querySelector<HTMLElement>("[data-wmh-minimap-footer]");
+  if(footer&&player)footer.textContent="YOU · X "+String(player.dataset.x||0).padStart(2,"0")+" / Y "+String(player.dataset.y||0).padStart(2,"0")+" · TAP TO MOVE";
+}
+function updatePlayerGridStatus(board:HTMLElement,player:HTMLElement):void {
+  const dialog=board.closest<HTMLElement>("[data-wmh-dialog]");
+  const label=dialog?.querySelector<HTMLElement>("[data-wmh-player-grid]");
+  if(label)label.textContent="GRID X "+String(player.dataset.x||0).padStart(2,"0")+" · Y "+String(player.dataset.y||0).padStart(2,"0");
+}
 function syncIsoDepthAndOcclusion(board:HTMLElement):void {
   const data=readIsoMapData(board);
-  const tokens=Array.from(board.querySelectorAll<HTMLElement>("[data-wmh-player-token],[data-wmh-npc]"));
   board.querySelectorAll<HTMLElement>("[data-wmh-tile]").forEach(tile=>{
     const x=Number(tile.dataset.x||0),y=Number(tile.dataset.y||0);
     tile.style.zIndex=String(1+x+y);
   });
-  tokens.forEach(token=>{
-    const x=Number(token.dataset.x||0),y=Number(token.dataset.y||0);
-    token.style.setProperty("--character-z",String(20+x+y));
-    const opacity=isoCellHasLayer(data,"opacityCells",x,y)||data.opacityQuadrants.some(key=>key.startsWith(x+","+y+":"))?"0.42":"1";
-    token.style.setProperty("--character-opacity",opacity);
-    if(board.dataset.academyArtworkBoard==="true"){
-      const image=board.querySelector<HTMLImageElement>("[data-wmh-map-art]"),width=image?.naturalWidth||2816,height=image?.naturalHeight||1536,center=isoCellCenter(x,y,data.grid);
-      token.style.left=(center.x/width*100)+"%";token.style.top=(center.y/height*100)+"%";token.style.zIndex=String(20+x+y);token.style.opacity=opacity;
-    }
-  });
+  syncActorDepthAndOcclusion(board,data);
   renderIsometricMinimap(board);
   const dialog=board.closest<HTMLElement>("[data-wmh-dialog]");
   if(dialog)renderIsometricWorldStatus(dialog);
@@ -2206,9 +2267,9 @@ function updateScannerContacts(board:HTMLElement):void {
     const first=actors[i],second=actors[j];
     const dx=Number(first.dataset.x||0)-Number(second.dataset.x||0);
     const dy=Number(first.dataset.y||0)-Number(second.dataset.y||0);
-    // Two sonar fields each reach about 2.5 cells; their overlap is a sensor event only.
+    // Each actor's field reaches one cell beyond its token; overlap is sensor-only.
     const distance=Math.hypot(dx,dy);
-    if(distance>5)continue;
+    if(distance>2)continue;
     const pair=[first.dataset.wmhNpc||"player",second.dataset.wmhNpc||"player"].sort().join("|");
     next.add(pair);
     if(previous.has(pair))continue;
@@ -2227,27 +2288,23 @@ function updateScannerContacts(board:HTMLElement):void {
   }
   scannerContacts.set(board,next);
 }
-function pulseActorScanner(actor:HTMLElement,index:number):void {
-  const tone=actorScanTone(actor),color=actorScanColor(tone);
+function pulseActorScanner(actor:HTMLElement):void {
+  const color=actorScanColor(actorScanTone(actor));
   actor.style.setProperty("--scan-color",color);
-  let rings=Array.from(actor.querySelectorAll<HTMLElement>(".wmh-sonar-ring"));
-  if(rings.length!==2){
-    actor.querySelectorAll(".wmh-sonar-ring").forEach(node=>node.remove());
-    rings=[0,1].map(n=>{
-      const ring=document.createElement("span");
-      ring.className="wmh-sonar-ring ring-"+n;ring.setAttribute("aria-hidden","true");
-      actor.prepend(ring);return ring;
-    });
+  let ring=actor.querySelector<HTMLElement>(".wmh-sonar-ring");
+  actor.querySelectorAll<HTMLElement>(".wmh-sonar-ring").forEach((node,index)=>{if(index>0)node.remove();});
+  if(!ring){
+    ring=document.createElement("span");
+    ring.className="wmh-sonar-ring";ring.setAttribute("aria-hidden","true");
+    actor.prepend(ring);
   }
-  rings.forEach((ring,n)=>{
-    ring.style.borderColor=color;
-    ring.style.background="radial-gradient(ellipse,transparent 58%,"+color+"12 100%)";
-    if(window.matchMedia?.("(prefers-reduced-motion: reduce)").matches){
-      ring.style.opacity=".1";ring.style.transform="translate(-50%,-50%) scale(1)";
-    }else{
-      animate(ring,{scale:[.08,1],opacity:[.44,0],duration:1800,ease:"outQuad",delay:index*65+n*820});
-    }
-  });
+  ring.style.borderColor=color;
+  ring.style.background="transparent";
+  if(window.matchMedia?.("(prefers-reduced-motion: reduce)").matches){
+    ring.style.opacity=".08";ring.style.transform="translate(-50%,-50%) scale(1)";
+  }else{
+    animate(ring,{scale:[.35,1],opacity:[.22,0],duration:1100,ease:"outQuad"});
+  }
 }
 function stopActorScanners(board:HTMLElement):void {
   const timer=Number(board.dataset.scannerTimer||0);
@@ -2259,23 +2316,64 @@ function startActorScanners(board:HTMLElement):void {
   stopActorScanners(board);
   const pulse=()=>{
     if(!board.isConnected||board.dataset.editorPaused==="true"||board.hidden){stopActorScanners(board);return;}
-    board.querySelectorAll<HTMLElement>("[data-wmh-player-token],[data-wmh-npc]").forEach((actor,index)=>pulseActorScanner(actor,index));
+    board.querySelectorAll<HTMLElement>("[data-wmh-player-token],[data-wmh-npc]").forEach(actor=>pulseActorScanner(actor));
     updateScannerContacts(board);
   };
   pulse();
-  board.dataset.scannerTimer=String(window.setInterval(pulse,2450));
+  board.dataset.scannerTimer=String(window.setInterval(pulse,3600));
 }
-function animateGridMove(token:HTMLElement,update:()=>void):void {
-  const before=token.getBoundingClientRect();
-  update();
+function animateGridMove(token:HTMLElement,update:()=>void,data?:IsoMapEditorData):void {
   const board=token.closest<HTMLElement>("[data-wmh-board]");
-  if(board)syncIsoDepthAndOcclusion(board);
-  const after=token.getBoundingClientRect();
-  const dx=before.left-after.left,dy=before.top-after.top;
+  const startX=Number(token.dataset.x||0),startY=Number(token.dataset.y||0);
+  const academyArtwork=board?.dataset.academyArtworkBoard==="true";
+  const image=academyArtwork?board?.querySelector<HTMLImageElement>("[data-wmh-map-art]"):null;
+  const imageScaleX=image?(image.clientWidth||image.naturalWidth)/Math.max(1,image.naturalWidth):1;
+  const imageScaleY=image?(image.clientHeight||image.naturalHeight)/Math.max(1,image.naturalHeight):1;
+  update();
+  if(!board)return;
+  const mapData=data||readIsoMapData(board);
+  const endX=Number(token.dataset.x||0),endY=Number(token.dataset.y||0);
+  syncActorDepthAndOcclusion(board,mapData);
+  updateIsometricMinimapActors(board,mapData);
+  if(token.hasAttribute("data-wmh-player-token"))updatePlayerGridStatus(board,token);
+  const from=isoCellCenter(startX,startY,mapData.grid),to=isoCellCenter(endX,endY,mapData.grid);
+  const dx=(from.x-to.x)*imageScaleX,dy=(from.y-to.y)*imageScaleY;
   const reduceMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches===true;
   if(reduceMotion)token.style.transform="";
-  else animate(token,{translateX:[dx,0],translateY:[dy,0],duration:225,ease:"outCubic"});
-  if(board){emitTileTrailWave(board,token);updateScannerContacts(board);}
+  else{
+    token.classList.add("is-moving");
+    animate(token,{translateX:[dx,0],translateY:[dy,0],duration:190,ease:"outCubic",onComplete:()=>token.classList.remove("is-moving")});
+  }
+  updateScannerContacts(board);
+}
+function emitPlayerRouteTrail(board:HTMLElement,path:Array<[number,number]>,data:IsoMapEditorData):void {
+  const overlay=board.querySelector<SVGSVGElement>("[data-wmh-overlay-svg]");
+  if(!overlay||path.length<2)return;
+  overlay.querySelectorAll("[data-wmh-player-route-trail]").forEach(node=>node.remove());
+  const points=path.map(([x,y])=>isoCellCenter(x,y,data.grid));
+  let length=0;
+  for(let i=1;i<points.length;i++)length+=Math.hypot(points[i].x-points[i-1].x,points[i].y-points[i-1].y);
+  if(length<1)return;
+  const route=document.createElementNS("http://www.w3.org/2000/svg","polyline");
+  route.dataset.wmhPlayerRouteTrail="";
+  route.setAttribute("class","wmh-player-route-trail");
+  route.setAttribute("points",points.map(point=>point.x+","+point.y).join(" "));
+  route.style.stroke=actorScanColor(actorScanTone(board.querySelector<HTMLElement>("[data-wmh-player-token]")||board));
+  route.style.strokeDasharray=String(length);
+  route.style.strokeDashoffset=String(length);
+  route.style.opacity="0";
+  overlay.append(route);
+  if(window.matchMedia?.("(prefers-reduced-motion: reduce)").matches)return;
+  requestAnimationFrame(()=>{
+    if(!route.isConnected)return;
+    animate(route,{strokeDashoffset:[length,0],opacity:[0,.88],duration:Math.max(235,path.length*235),ease:"linear"});
+  });
+}
+function fadePlayerRouteTrail(board:HTMLElement):void {
+  const route=board.querySelector<SVGPolylineElement>("[data-wmh-player-route-trail]");
+  if(!route)return;
+  if(window.matchMedia?.("(prefers-reduced-motion: reduce)").matches){route.remove();return;}
+  animate(route,{opacity:[.88,0],duration:180,ease:"outQuad",onComplete:()=>route.remove()});
 }
 function stopNpcWander(dialog:HTMLElement):void {
   const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
@@ -2305,8 +2403,10 @@ function startNpcWander(dialog:HTMLElement):void {
       });
       if(!options.length)return;
       const [nx,ny]=options[Math.floor(Math.random()*options.length)];
-      npc.dataset.x=String(nx);npc.dataset.y=String(ny);
-      animateGridMove(npc,()=>{npc.style.setProperty("--token-x",String(nx));npc.style.setProperty("--token-y",String(ny));});npc.dataset.x=String(nx);npc.dataset.y=String(ny);syncIsoDepthAndOcclusion(board);
+      animateGridMove(npc,()=>{
+        npc.dataset.x=String(nx);npc.dataset.y=String(ny);
+        npc.style.setProperty("--token-x",String(nx));npc.style.setProperty("--token-y",String(ny));
+      },mapData);
     });
   },2400);
   board.dataset.npcTimer=String(timer);
@@ -2333,6 +2433,7 @@ function walkToTile(dialog:HTMLElement,targetX:number,targetY:number,surface:str
   const player=board?.querySelector<HTMLElement>("[data-wmh-player-token]");
   if(!board||!player)return;
   const runtime=board as HTMLElement & {__wmhPendingPlayerDestination?:{x:number;y:number;surface:string}};
+  board.querySelector("[data-wmh-player-route-trail]")?.remove();
   const mapData=readIsoMapData(board);
   if(!Number.isInteger(targetX)||!Number.isInteger(targetY)||!isoGridCellExists(mapData,targetX,targetY))return;
   const destination=board.querySelector<HTMLElement>('[data-wmh-tile][data-x="'+targetX+'"][data-y="'+targetY+'"]');
@@ -2369,18 +2470,18 @@ function walkToTile(dialog:HTMLElement,targetX:number,targetY:number,surface:str
     path.unshift([x,y]);cursor=previous.get(cursor)||null;
   }
   path.shift();
+  if(!path.length){delete runtime.__wmhPendingPlayerDestination;return;}
+  emitPlayerRouteTrail(board,[[startX,startY],...path],mapData);
   let step=0;
   const move=()=>{
-    if(step>=path.length){delete player.dataset.moveTimer;delete runtime.__wmhPendingPlayerDestination;return;}
+    if(step>=path.length){delete player.dataset.moveTimer;delete runtime.__wmhPendingPlayerDestination;fadePlayerRouteTrail(board);return;}
     const [x,y]=path[step++];
     const tile=board.querySelector<HTMLElement>('[data-wmh-tile][data-x="'+x+'"][data-y="'+y+'"]');
     animateGridMove(player,()=>{
       player.dataset.x=String(x);player.dataset.y=String(y);
       player.style.setProperty("--token-x",String(x));
       player.style.setProperty("--token-y",String(y));
-    });
-    player.dataset.x=String(x);player.dataset.y=String(y);
-    syncIsoDepthAndOcclusion(board);
+    },mapData);
     const material=tile?.dataset.surface||surface;
     playFootstep(material as "earth"|"wet"|"stone"|"wood"|"tile");
     player.dataset.moveTimer=String(window.setTimeout(move,235));
