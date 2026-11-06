@@ -106,12 +106,12 @@ export function renderPlayerHudMarkup(visualMode:"legacy"|"augusto-pxl"="legacy"
   const currency=[["xc","Xuan Copper","●"],["xs","Xuan Silver","◉"],["xg","Xuan Gold","✦"],["zj","Zun Jade","◆"],["az","Ancient Zun","◇"]] as const;
   const currencyMarkup=currency.map(([key,label,glyph])=>'<div class="wmh-currency-row"><span class="wmh-currency-name"><i '+(visualMode==="augusto-pxl"?'data-pxl-asset-id="ui.currency.'+key+'" ':'')+'aria-hidden="true">'+glyph+'</i>'+label+'</span><b class="wmh-currency-amount" data-hud-currency="'+key+'">'+state.wallet[key]+' '+key+'</b></div>').join("");
   return '<section class="wmh-player-hud" data-wmh-player-hud data-visual-mode="'+visualMode+'" aria-label="Player field status">'+
-    '<article class="wmh-player-card" data-wmh-hud-layout="player-card" '+(visualMode==="augusto-pxl"?'data-pxl-asset-id="ui.hud.player-frame" data-pxl-fit="100% 100%" ':'')+'aria-label="Player status">'+
+    '<article class="wmh-player-card" data-wmh-hud-layout="player-card" aria-label="Player status">'+
       '<div class="wmh-player-topline"><div class="wmh-player-id"><strong data-hud-character-name>'+esc(name)+'</strong></div><div class="wmh-player-satiety-label">SATIETY</div><div class="wmh-player-realm"><b>MORTAL</b></div></div>'+
       '<div class="wmh-player-bottomline"><div class="wmh-player-hp">'+meterMarkup("HP",state.hp,state.maxHp,"hp")+'</div><div class="wmh-player-satiety">'+meterMarkup("",state.satiety,100,"satiety")+'</div><div class="wmh-player-affiliation"><small>AFFILIATION</small><b>NOT LINKED</b></div></div>'+
     '</article>'+
     '<aside class="wmh-spirit-ring-list" aria-label="Absorbed Spirit Rings, maximum nine">'+ringMarkup+'</aside>'+
-    '<section class="wmh-player-dock" data-wmh-hud-layout="skill-dock" '+(visualMode==="augusto-pxl"?'data-pxl-asset-id="ui.hud.skill-dock-frame" data-pxl-fit="100% 100%" ':'')+'aria-label="Tactical skills and bag"><div class="wmh-skill-dock"><header><b>TACTICAL SKILLS</b><small>PLACEHOLDER</small></header><div class="wmh-skill-slots">'+skillMarkup+'</div></div>'+
+    '<section class="wmh-player-dock" data-wmh-hud-layout="skill-dock" aria-label="Tactical skills and bag"><div class="wmh-skill-dock"><header><b>TACTICAL SKILLS</b><small>PLACEHOLDER</small></header><div class="wmh-skill-slots">'+skillMarkup+'</div></div>'+
       '<button type="button" class="wmh-bag-button" data-hud-action="toggle-inventory" aria-label="Open Traveler Satchel" title="Traveler Satchel"><span '+(visualMode==="augusto-pxl"?'data-pxl-asset-id="ui.hud.traveler-satchel" ':'')+'aria-hidden="true"></span></button>'+
     '</section>'+
     '<section class="wmh-inventory-window" data-hud-panel="inventory" data-wmh-scroll-resize '+(visualMode==="augusto-pxl"?'data-pxl-asset-id="ui.hud.satchel-panel" data-pxl-fit="100% 100%" ':'')+'hidden role="dialog" aria-label="Traveler Satchel inventory">'+
