@@ -23,7 +23,7 @@ describe("screen and noticeboard transitions",()=>{
   });
 
   it("fades the incoming shell in while preserving the child panel entrances",()=>{
-    const shell:any={style:{},querySelector:vi.fn(()=>null)};
+    const shell:any={style:{},querySelector:vi.fn(()=>null),querySelectorAll:vi.fn(()=>[])};
     animateAppScreen(shell);
     expect(mocks.animate).toHaveBeenCalledWith(shell,expect.objectContaining({
       opacity:[0,1],duration:480
