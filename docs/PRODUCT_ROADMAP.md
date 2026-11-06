@@ -1115,3 +1115,14 @@ Current source baseline for this workstream: ed5ef007cead9ecf8e6e70662c29ec5cce9
 - Replace eight perpetual Anime.js skill-ring loops with tier-specific CSS transform animations; pause them when the document is hidden and disable them for reduced-motion users. No PixiJS runtime is added: the inspected PR branch currently uses the shared SVG/DOM map renderer.
 
 **Still open:** verify menu navigation after closing the isometric world map; check the compact HUD on the Tecno Spark Go 1 KL4 at portrait and landscape sizes; confirm minimap, skill slots, inventory taps, NPC movement and editor controls remain reachable. Physical-device validation is still required.
+
+
+### 13Q. Build 1348-derived isometric sub-cell, actor-only and camera-focus correction (2026-11-06)
+
+- Keep the Build 1348 DOM/CSS/SVG renderer; no PixiJS dependency. Player targeting and NPC wandering use the eight triangular sectors in each isometric diamond, preserving fractional token positions and the whitelist/blocked half-edge graph.
+- Separate the static world plane (Academy JPG, ground SVG/tiles and foreground canvas) from the actor plane. Movement animation affects only Player/NPC token elements; broad map-sized scanner sweeps and per-step tile-trail redraws are removed from the low-power path.
+- Fix editor focal-point confirmation so saving `cameraCenter` applies the saved Map Base focal point without restoring a stale scroll position or repainting the map.
+- Explicitly separate camera targets: entering Tianhai Academy starts with the camera centered on the Player token's spawn/current position; the editor's CENTER MAP command independently uses the saved `cameraCenter` focal point.
+- AI continuation: [Build 1348 isometric runtime handoff](./AI_HANDOFF_2026-11-06_ISOMETRIC_RUNTIME.md) and [isometric field runtime contract](./offline-game/ISOMETRIC_FIELD_SYSTEM.md).
+
+**Still open:** Android APK packaging/artifact and physical TECNO Spark Go 1 KL4 verification; confirm that the static artwork does not flicker/dim during Player/NPC motion, test several fractional sectors, test CENTER MAP at a non-midpoint focal point, and confirm Academy entry focuses on the Player independently of the editor focal point. An emulator failure must be reported separately from APK build/artifact success.
