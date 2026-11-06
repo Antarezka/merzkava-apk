@@ -35,7 +35,10 @@ async function getInstallKey():Promise<CryptoKey> {
         // SecureStorage uses the Android Keystore and AES-GCM for its own persisted value.
         await SecureStorage.setItem(KEY_NAME,encoded);
       }
-      return crypto.subtle.importKey("raw",fromBase64(encoded),{name:"AES-GCM"},false,["encrypt","decrypt"]);
+      const decoded=fromBase64(encoded);
+      const keyBytes=new Uint8Array(decoded.byteLength);
+      keyBytes.set(decoded);
+      return crypto.subtle.importKey("raw",keyBytes.buffer,{name:"AES-GCM"},false,["encrypt","decrypt"]);
     })();
   }
   return keyPromise;
