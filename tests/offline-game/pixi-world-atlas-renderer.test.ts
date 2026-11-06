@@ -60,10 +60,14 @@ describe("Pixi World Atlas Android input isolation",()=>{
   it("keeps the high-resolution Academy Map Base in the native DOM layer",()=>{
     expect(rendererSource).toContain('const keepMapArtworkInDom=board.classList.contains("has-map-base")');
     expect(rendererSource).toContain("if(image&&!keepMapArtworkInDom)");
+    expect(rendererSource).toContain("if(scene&&!keepMapArtworkInDom)");
     expect(rendererSource).toContain("foregroundLayer&&!keepMapArtworkInDom");
+    expect(rendererSource).toContain("if(overlay&&foregroundLayer&&!keepMapArtworkInDom)");
     expect(rendererSource).toContain("image.offsetLeft,image.offsetTop");
     expect(cssStyles).toContain(".wmh-isometric-board.has-map-base.wmh-pixi-render-active>[data-wmh-map-art]");
+    expect(cssStyles).toContain(".wmh-isometric-board.has-map-base.wmh-pixi-render-active>[data-wmh-scene-svg]");
     expect(cssStyles).toContain(".wmh-isometric-board.has-map-base.wmh-pixi-render-active>[data-wmh-foreground-canvas]");
+    expect(cssStyles).toContain(".wmh-isometric-board.has-map-base.wmh-pixi-render-active>[data-wmh-overlay-svg]");
   });
 
   it("does not switch to Pixi visuals before a non-Academy base image is ready",()=>{
