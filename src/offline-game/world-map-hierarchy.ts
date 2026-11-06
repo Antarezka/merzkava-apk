@@ -2299,7 +2299,7 @@ function syncIsoDepthAndOcclusion(board:HTMLElement):void {
   if(cellsChanged||board.dataset.wmhMinimapDirty==="true"){
     board.dataset.actorCellSignature=actorCellSignature;
     delete board.dataset.wmhMinimapDirty;
-    renderIsometricMinimap(board);
+    if(!isPixiWorldAtlasBoard(board))renderIsometricMinimap(board);
     const dialog=board.closest<HTMLElement>("[data-wmh-dialog]");
     if(dialog)renderIsometricWorldStatus(dialog);
     updateNpcInteractionProximity(board);
@@ -2484,6 +2484,15 @@ function animateGridMove(token:HTMLElement,update:()=>void,sync=true,updateSenso
   const board=token.closest<HTMLElement>("[data-wmh-board]");
   const fromCellX=Number(token.dataset.x||0),fromCellY=Number(token.dataset.y||0);
   const from={x:Number(token.dataset.posX??fromCellX),y:Number(token.dataset.posY??fromCellY)};
+  update();
+  if(board&&sync)syncIsoDepthAndOcclusion(board);
+  const to={x:Number(token.dataset.posX??token.dataset.x??0),y:Number(token.dataset.posY??token.dataset.y??0)};
+  if(board&&isPixiWorldAtlasBoard(board)){
+    // Cell/sub-cell state remains authoritative in the existing engine. Pixi's
+    // MutationObserver sees coordinate attributes before the next paint.
+    if(updateSensors)updateScannerContacts(board,false);
+    return;
+  }
   const mapData=board?readIsoMapData(board):null;
   const grid=mapData?.grid||DEFAULT_ISOMETRIC_GRID;
   const zoom=board?Number.parseFloat(getComputedStyle(board).getPropertyValue("--wmh-camera-zoom"))||1:1;
@@ -2494,15 +2503,6 @@ function animateGridMove(token:HTMLElement,update:()=>void,sync=true,updateSenso
       renderScaleX=(image.clientWidth||image.naturalWidth)/image.naturalWidth;
       renderScaleY=(image.clientHeight||image.naturalHeight)/image.naturalHeight;
     }
-  }
-  update();
-  if(board&&sync)syncIsoDepthAndOcclusion(board);
-  const to={x:Number(token.dataset.posX??token.dataset.x??0),y:Number(token.dataset.posY??token.dataset.y??0)};
-  if(board&&isPixiWorldAtlasBoard(board)){
-    // Keep cell/sub-cell state authoritative in the existing engine. Pixi's
-    // MutationObserver sees these coordinate attributes before the next paint.
-    if(updateSensors)updateScannerContacts(board,false);
-    return;
   }
   const {x:dx,y:dy}=getIsoMovementOffset(from,to,grid,zoom,renderScaleX,renderScaleY);
   const reduceMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches===true;
