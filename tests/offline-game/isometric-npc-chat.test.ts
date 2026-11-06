@@ -20,13 +20,13 @@ describe("isometric NPC conversations", () => {
     expect(html).toContain('data-wmh-npc="test-mechanic"');
   });
 
-  it("docks the choice conversation at the bottom of the isometric map", () => {
+  it("centers the choice conversation over a dimmed map", () => {
     const rules = [...chatStyles.matchAll(/\.wmh-isometric-play-screen \.wmh-chat-panel\{([^}]*)\}/g)];
     const finalRule = rules.filter(rule => rule[1].includes("position:fixed")).at(-1)?.[1] ?? "";
     expect(finalRule).toContain("position:fixed");
-    expect(finalRule).toContain("inset:auto 0 0");
-    expect(finalRule).toContain("align-items:flex-end");
-    expect(finalRule).not.toContain("place-items:center");
+    expect(finalRule).toContain("inset:0");
+    expect(finalRule).toContain("place-items:center");
+    expect(finalRule).toContain("backdrop-filter:blur");
   });
 
   it("renders the shared world HUD and map-tool drawer on the isometric play screen", () => {
@@ -49,7 +49,7 @@ describe("isometric NPC conversations", () => {
     expect(worldMapSource).toContain('{id:"teacher-mei",x:6,y:15,gender:"female",scanTone:"friendly"}');
     expect(worldMapSource).toContain('{id:"groundskeeper",x:22,y:10,gender:"male",scanTone:"friendly"}');
     expect(worldMapSource).toContain('const occupiedNpcs=new Set');
-    expect(worldMapSource).toContain('!occupied.has(nx+","+ny)');
+    expect(worldMapSource).toContain("!occupied.has(key)");
   });
 
   it("does not render editor controls when Developer Mode is disabled", () => {
@@ -93,8 +93,9 @@ describe("isometric NPC conversations", () => {
     expect(worldMapSource).toContain("isNpcInteractionCellReachable(");
     expect(worldMapSource).toContain("dataset.interactionReady");
     expect(chatStyles).toContain(".wmh-npc-proximity-glow");
-    expect(worldMapSource).toContain("translateX:[dx,0]");
-    expect(worldMapSource).toContain("translateY:[dy,0]");
+    expect(worldMapSource).toContain("getIsoMovementOffset(from,to,grid,zoom,renderScaleX,renderScaleY)");
+    expect(worldMapSource).toContain("startNativeMotion(token");
+    expect(worldMapSource).toContain('translate:dx+"px "+dy+"px"');
     expect(worldMapSource).toContain("duration:225");
     expect(worldMapSource).toContain("scanTone:\"friendly\"");
     expect(worldMapSource).toContain("const minimizeWorkbench=()=>");
