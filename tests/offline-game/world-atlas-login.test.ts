@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { APP_LANGUAGES } from "../../src/i18n";
 import { worldAtlasAccessBufferMarkup, worldAtlasLoginPanelMarkup } from "../../src/offline-game/world-atlas-login";
+import { createWorldAtlasProgressPlan, formatAccessDiagnosticFrame } from "../../src/offline-game/world-atlas-login-motion";
 
 describe("World Atlas player login gate",()=>{
   it("renders a modal sign-in and first-password flow in every supported language",()=>{
@@ -153,5 +154,36 @@ describe("Shared Anime.js access buffer profiles",()=>{
     expect(html).toContain("PLAYER SESSION CLOSE...");
     expect(html).toContain("SESSION MARKER CLEAR...");
     expect(html).not.toContain("NETWORK REACHABILITY...");
+  });
+});
+
+
+describe("Confirmation access loading frames",()=>{
+  it("replaces one diagnostic frame with one, two, then three dots",()=>{
+    expect(formatAccessDiagnosticFrame("Blahblah...",1)).toBe("Blahblah.");
+    expect(formatAccessDiagnosticFrame("Blahblah...",2)).toBe("Blahblah..");
+    expect(formatAccessDiagnosticFrame("Blahblah...",3)).toBe("Blahblah...");
+  });
+
+  it("builds one monotonic progress pass with a final 92 percent wait point",()=>{
+    const plan=createWorldAtlasProgressPlan(8,4200,()=>0.5);
+    expect(plan).toHaveLength(8);
+    expect(plan[plan.length-1].target).toBe(92);
+    expect(plan.every(step=>step.target>0&&step.target<=92)).toBe(true);
+    expect(plan.every(step=>step.advanceMs>0&&step.stallMs>0&&step.frameMs===64)).toBe(true);
+    for(let index=1;index<plan.length;index++){
+      expect(plan[index].target).toBeGreaterThan(plan[index-1].target);
+    }
+    const total=plan.reduce((sum,step)=>sum+step.advanceMs+step.stallMs+step.frameMs*3,0);
+    expect(total).toBeCloseTo(4200,5);
+  });
+
+  it("uses varying checkpoints and pauses when the random source changes",()=>{
+    const quick=createWorldAtlasProgressPlan(7,3600,()=>0.15);
+    const slow=createWorldAtlasProgressPlan(7,3600,()=>0.85);
+    expect(quick.map(step=>step.target)).not.toEqual(slow.map(step=>step.target));
+    expect(quick.map(step=>step.stallMs)).not.toEqual(slow.map(step=>step.stallMs));
+    expect(quick.every((step,index)=>index===0||step.target>quick[index-1].target)).toBe(true);
+    expect(slow.every((step,index)=>index===0||step.target>slow[index-1].target)).toBe(true);
   });
 });
