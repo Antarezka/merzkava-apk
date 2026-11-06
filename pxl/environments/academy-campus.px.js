@@ -13,11 +13,26 @@ pal({
 })
 ramps("kKnN","sSpPW","bBcC","gGhH","rRyY","aAyA","vV","nyY")
 
+// Non-exported approved layout reference: helps align the new scene to the existing campus landmarks.
+sprite("_academy-pixel-source", {
+  png: "../maps/references/academy-exterior-source.png",
+  pivot: "center",
+})
+
 const W = 704, H = 384
 const CAM = perspective({ w: W, h: H, pitch: -44, fov: 34, ppm: 18 })
 const Z = CAM.z
 const CAMPUS = model()
-const block = (...args) => surfaces.block(CAMPUS, ...args)
+// Build a simple depth-aware architectural box from the PXL model's native faces API.
+// top is the horizontal cap material; side is used on the two camera-facing walls.
+const block = (top, side, x0, z0, x1, z1, base, height) => {
+  CAMPUS.face(top,
+    [x0,z0,height],[x1,z0,height],[x1,z1,height],[x0,z1,height])
+  CAMPUS.face(side,
+    [x0,z1,base],[x1,z1,base],[x1,z1,height],[x0,z1,height])
+  CAMPUS.face(side,
+    [x1,z0,base],[x1,z1,base],[x1,z1,height],[x1,z0,height])
+}
 const ground = (mat, x1, z1, x2, z2, up = 0) =>
   CAMPUS.face(mat, [x1,z1,up], [x2,z1,up], [x2,z2,up], [x1,z2,up])
 
@@ -251,7 +266,7 @@ const LIGHT = {
   ],
 }
 
-scene("academy-exterior", {
+scene("academy-exterior-render", {
   w:W,h:H,bg:"K",
   sizes:{"academy-exterior":4},
   check:{every:1},

@@ -147,7 +147,7 @@
       "type": "image"
     },
     "map.academy.exterior": {
-      "source": "maps/sprites/academy-exterior.png",
+      "source": "environments/scenes/academy-exterior.png",
       "type": "image",
       "expectedWidth": 2816,
       "expectedHeight": 1536

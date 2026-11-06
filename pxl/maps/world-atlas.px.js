@@ -10,14 +10,8 @@ sprite("world-map-overview", {
   genre: "atlas-art",
 })
 
-// Full-resolution PXL palette treatment of the approved Academy composition.
-// Keep the source's native coordinate space intact: 2816×1536, no scene rescaling or cropping.
-sprite("academy-exterior", {
-  png: "references/academy-exterior-source.png",
-  palettize: true,
-  genre: "atlas-art",
-})
-
+// The PXL 3D-look Academy environment is authored in environments/academy-campus.px.js.
+// Its source illustration is kept as a faint non-exported editor guide only.
 sprite("academy-minimap", {
   png: "references/academy-exterior-source.png",
   shrink: 8,
