@@ -12,7 +12,8 @@
     "cap:sync": "cap sync android && node scripts/patch-android.mjs",
     "typecheck:gateway": "tsc --noEmit -p gateway/tsconfig.json",
     "gateway:dev": "npx wrangler@4 dev --config gateway/wrangler.toml",
-    "gateway:deploy": "npx wrangler@4 deploy --config gateway/wrangler.toml"
+    "gateway:deploy": "npx wrangler@4 deploy --config gateway/wrangler.toml",
+    "pxl:build": "node scripts/pxl-build/build-assets.mjs"
   },
   "dependencies": {
     "@capacitor-community/sqlite": "^7.0.0",
