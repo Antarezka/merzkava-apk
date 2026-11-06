@@ -41,7 +41,7 @@ describe("World Atlas player login gate",()=>{
       expect(html).toContain('data-buffer-stages=');
       expect(html).toContain('AUTHENTICATION SEQUENCE');
       expect(html).toContain('data-atlas-buffer-status');
-      expect(html).toContain('data-atlas-buffer-log');
+      expect(html).toContain('class="atlas-buffer-message"');
       expect(html).toContain('data-atlas-buffer-progress');
       expect(html).toContain('data-password-safety-note');
       expect(html).not.toContain("Kata sandi disimpan secara lokal dalam bentuk hash bersalt.");
@@ -79,6 +79,8 @@ describe("Shared Anime.js access buffer profiles",()=>{
     expect(html).toContain("ACTIVE_SHA VALIDATION...");
     expect(html).toContain("PBKDF2-SHA256 DERIVATION...");
     expect(html).toContain("WORLD ATLAS · ACCOUNT HANDSHAKE");
+    expect(html).toContain('class="atlas-buffer-message"');
+    expect(html).not.toContain('data-atlas-buffer-log');
   });
 
   it("uses registry-fetch diagnostics before any password verification starts",()=>{
