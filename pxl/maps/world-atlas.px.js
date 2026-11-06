@@ -50,6 +50,3 @@ for (const [id,x,y,w,h] of REGIONS) {
     genre: "atlas-art",
   })
 }
-
-// Included last so the Academy scene can use the approved campus art as a faint, non-exported guide.
-include("../environments/academy-campus.px.js")

@@ -13,6 +13,14 @@ pal({
 })
 ramps("kKnN","sSpPW","bBcC","gGhH","rRyY","aAyA","vV","nyY")
 
+// The approved map is imported locally as a non-exported preview guide; it is not the runtime image.
+sprite("_academy-pixel-source", {
+  png: "../maps/references/academy-exterior-source.png",
+  shrink: 4,
+  palettize: true,
+  pivot: "center",
+})
+
 // Non-exported approved layout reference: helps align the new scene to the existing campus landmarks.
 sprite("_academy-pixel-source", {
   png: "../maps/references/academy-exterior-source.png",
