@@ -24,6 +24,9 @@ export function setWorldMapDeveloperMode(enabled: boolean): void {
   document.querySelectorAll<HTMLElement>("[data-wmh-board].wmh-overlay-editing").forEach(board => {
     board.classList.remove("wmh-overlay-editing","wmh-editor-paused");
     board.dataset.editorPaused = "false";
+    if(board.dataset.academyArtworkBoard==="true"){
+      board.querySelectorAll<SVGGElement>("[data-wmh-interaction-grid],[data-wmh-manual-marks],[data-wmh-transition-marks]").forEach(group=>group.replaceChildren());
+    }
   });
 }
 export function isWorldMapDeveloperMode(): boolean { return worldMapDeveloperMode; }
@@ -1808,7 +1811,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     board.addEventListener("click",event=>{
       if(board.classList.contains("wmh-overlay-editing"))return;
       const target=event.target as Element;
-      if(target.closest("[data-wmh-player-token],[data-wmh-npc],[data-wmh-action]"))return;
+      if(target.closest("[data-wmh-player-token],[data-wmh-npc],[data-wmh-action],[data-wmh-map-hit]"))return;
       const image=board.querySelector<HTMLImageElement>("[data-wmh-map-art]");if(!image)return;
       const rect=image.getBoundingClientRect();
       const mapPoint={x:(event.clientX-rect.left)*image.naturalWidth/Math.max(1,rect.width),y:(event.clientY-rect.top)*image.naturalHeight/Math.max(1,rect.height)};
