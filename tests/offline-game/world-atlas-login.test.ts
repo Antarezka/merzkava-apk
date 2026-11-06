@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { APP_LANGUAGES } from "../../src/i18n";
-import { worldAtlasLoginPanelMarkup } from "../../src/offline-game/world-atlas-login";
+import { worldAtlasAccessBufferMarkup, worldAtlasLoginPanelMarkup } from "../../src/offline-game/world-atlas-login";
 
 describe("World Atlas player login gate",()=>{
   it("renders a modal sign-in and first-password flow in every supported language",()=>{
@@ -58,5 +58,42 @@ describe("World Atlas player login gate",()=>{
       };
       expect(warningText).toContain(expectedWarning[language.code]);
     }
+  });
+});
+
+describe("Shared Anime.js access buffer profiles",()=>{
+  it("shows rapid detailed World Atlas diagnostics with ellipsis",()=>{
+    const html=worldAtlasAccessBufferMarkup("id","world-atlas");
+    expect(html).toContain('data-buffer-context="world-atlas"');
+    expect(html).toContain("UNIVERSE SOURCE LINK...");
+    expect(html).toContain("ACTIVE_SHA VALIDATION...");
+    expect(html).toContain("PBKDF2-SHA256 DERIVATION...");
+    expect(html).toContain("WORLD ATLAS · ACCOUNT HANDSHAKE");
+  });
+
+  it("shows actual network steps for Player mode",()=>{
+    const html=worldAtlasAccessBufferMarkup("en","player");
+    expect(html).toContain('data-buffer-context="player"');
+    expect(html).toContain("NETWORK REACHABILITY...");
+    expect(html).toContain("PLAYER REGISTRY FETCH...");
+    expect(html).toContain("PLAYER PROFILE FETCH...");
+    expect(html).toContain("PLAYER SOURCE HANDSHAKE");
+  });
+
+  it("never describes Developer sign-in as a server or network sync",()=>{
+    const html=worldAtlasAccessBufferMarkup("en","developer");
+    expect(html).toContain('data-buffer-context="developer"');
+    expect(html).toContain("LOCAL CREDENTIAL STORE...");
+    expect(html).toContain("PBKDF2-SHA256 DERIVATION...");
+    expect(html).toContain("LOCAL DEVELOPER HANDSHAKE");
+    expect(html).not.toContain("NETWORK REACHABILITY...");
+    expect(html).not.toContain("UNIVERSE SOURCE LINK...");
+  });
+
+  it("uses a local cleanup sequence for Player sign-out",()=>{
+    const html=worldAtlasAccessBufferMarkup("en","player-session");
+    expect(html).toContain("PLAYER SESSION CLOSE...");
+    expect(html).toContain("SESSION MARKER CLEAR...");
+    expect(html).not.toContain("NETWORK REACHABILITY...");
   });
 });
