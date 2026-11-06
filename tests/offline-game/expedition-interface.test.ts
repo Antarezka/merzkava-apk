@@ -17,9 +17,10 @@ describe("Eternal Path live world scene", () => {
     expect(html).toContain('class="pxl-tv-shell"');
     expect(html).toContain('class="pxl-console-box"');
     expect(html).toContain('class="pxl-console-ink">AUGUSTO PXL</small>');
-    expect(html).toContain('<div data-world-map-host>');
-    expect(html).toContain('data-world-map-hierarchy data-visual-mode="legacy"');
-    expect(html).not.toContain('data-world-map-hierarchy data-visual-mode="augusto-pxl"');
+    expect(html).toContain('<div data-world-map-host></div>');
+    // Atlas markup is injected only after choosing a TV, so the inactive mode
+    // creates no hidden map DOM, duplicate IDs, actors, HUD or editor listeners.
+    expect(html).not.toContain('data-world-map-hierarchy');
     expect(html).not.toContain('data-pxl-asset-id="map.world.overview"');
     expect(html).not.toContain('data-augusto-pxl-modal');
   });
