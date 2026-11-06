@@ -164,6 +164,7 @@ export function worldAtlasLoginPanelMarkup(language:AppLanguage):string {
   return '<div class="world-atlas-login-layer" data-world-atlas-gate hidden data-empty-label="'+esc(t.empty)+'" data-select-label="'+esc(s.select)+'" data-loading-label="'+esc(s.checking)+'" data-login-prompt="'+esc(s.loginPrompt)+'" data-signup-prompt="'+esc(s.signupPrompt)+'" data-success-label="'+esc(s.success)+'" data-offline-label="'+esc(offlineCopy[language]||offlineCopy.en)+'" data-password-required-label="'+esc(t.passwordRequired)+'" data-password-policy-label="'+esc(reset.passwordPolicy)+'" data-password-updated-label="'+esc(reset.updated)+'" data-reset-current-invalid="'+esc(reset.wrongCurrent)+'" data-reset-master-invalid="'+esc(reset.wrongMaster)+'" data-reset-mismatch="'+esc(reset.mismatch)+'" data-reset-continue-change-label="'+esc(reset.continueChange)+'" data-reset-continue-master-label="'+esc(reset.continueMaster)+'" data-reset-authorized-label="'+esc(reset.authorized)+'" data-reset-set-password-label="'+esc(reset.setNewPassword)+'" data-password-reset-required-label="'+esc(reset.resetRequired)+'">'+
     '<section class="world-atlas-login-card" role="dialog" aria-modal="true" aria-labelledby="world-atlas-login-title">'+
     '<button type="button" class="world-atlas-login-close" data-world-atlas-gate-back aria-label="'+esc(t.back)+'">×</button>'+
+    '<div class="world-atlas-login-scroll mk-panel-scroll" data-atlas-login-scroll>'+
     '<small class="world-atlas-login-eyebrow">'+esc(t.eyebrow)+'</small><h2 id="world-atlas-login-title">'+esc(t.title)+'</h2><p class="world-atlas-login-intro">'+esc(t.intro)+'</p>'+
     '<form id="world-atlas-login-form" novalidate>'+
     '<label for="world-atlas-player">'+esc(t.player)+'</label><select id="world-atlas-player" name="player" data-world-atlas-player required><option value="">—</option></select>'+
@@ -181,6 +182,7 @@ export function worldAtlasLoginPanelMarkup(language:AppLanguage):string {
     '<small class="atlas-password-policy" data-atlas-reset-policy hidden>'+esc(reset.passwordPolicy)+'</small>'+
     '<label data-atlas-reset-confirm-row hidden>'+esc(reset.confirmNew)+'<input id="atlas-reset-confirm" type="password" minlength="8" maxlength="128" autocomplete="new-password"/></label>'+
     '<p data-atlas-reset-message role="status"></p><div class="atlas-password-reset-actions"><button type="button" data-atlas-reset-cancel>'+esc(reset.cancel)+'</button><button type="button" data-atlas-reset-apply>'+esc(reset.update)+'</button></div></section></form>'+
+    '</div>'+
     worldAtlasAccessBufferMarkup(language,"world-atlas-list")+
     '<small class="world-atlas-login-foot">'+esc(t.foot)+'</small>'+
     '</section></div>';
