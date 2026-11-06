@@ -8,6 +8,7 @@ import { readFileSync } from "node:fs";
 const worldMapSource = readFileSync(new URL("../../src/offline-game/world-map-hierarchy.ts", import.meta.url), "utf8");
 
 const chatStyles = readFileSync(new URL("../../src/offline-game/world-map-hierarchy.css", import.meta.url), "utf8");
+const hudStyles = readFileSync(new URL("../../src/offline-game/player-hud.css", import.meta.url), "utf8");
 
 describe("isometric NPC conversations", () => {
   it("keeps the NPC conversation panel, message thread, and reply choices mounted", () => {

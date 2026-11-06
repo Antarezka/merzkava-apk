@@ -1247,57 +1247,89 @@ function bindArcanistryBackClearance(dialog:HTMLElement):void {
   if(!screen||!back||screen.dataset.machineClearanceBound==="true")return;
   screen.dataset.machineClearanceBound="true";
   const selectors="[data-arcanistry-machine],.wmh-arcanistry-machine,.wmh-archanistry-machine,[data-wmh-arcanistry-machine]";
-  let machine:HTMLElement|null=null,boundMachine:HTMLElement|null=null,frame=0;
+  let machine:HTMLElement|null=null,frame=0,disposed=false;
+  const observer=new MutationObserver(()=>{
+    if(!screen.isConnected){cleanup();return;}
+    sync();follow();
+  });
+  const resizeObserver=typeof ResizeObserver!=="undefined"?new ResizeObserver(()=>sync()):null;
+  const reset=()=>{
+    screen.style.removeProperty("--wmh-machine-back-offset");
+    screen.style.removeProperty("--wmh-machine-back-bottom");
+    screen.classList.remove("has-archanistry-machine");
+  };
+  const machineVisible=(element:HTMLElement)=>{
+    const rect=element.getBoundingClientRect();
+    return !element.hidden&&getComputedStyle(element).display!=="none"&&getComputedStyle(element).visibility!=="hidden"&&
+      rect.width>0&&rect.height>0&&rect.right>0&&rect.left<window.innerWidth&&rect.bottom>0&&rect.top<window.innerHeight;
+  };
   const sync=()=>{
     const found=document.querySelector<HTMLElement>(selectors);
-    if(found&&found!==boundMachine){
-      machine=found;boundMachine=found;
-      observer.observe(machine,{attributes:true,attributeFilter:["class","style","hidden"]});
-      machine.addEventListener("transitionrun",follow);
-      machine.addEventListener("transitionend",sync);
-      machine.addEventListener("animationstart",follow);
-      machine.addEventListener("animationend",sync);
-    }else if(!found){machine=null;}
-    if(!machine){
-      screen.style.removeProperty("--wmh-machine-back-offset");
-      screen.classList.remove("has-archanistry-machine");
-      return;
+    if(found!==machine){
+      if(machine)resizeObserver?.unobserve(machine);
+      machine=found;
+      if(machine){
+        resizeObserver?.observe(machine);
+        let ancestor:HTMLElement|null=machine;
+        while(ancestor&&ancestor!==document.body){
+          observer.observe(ancestor,{attributes:true,attributeFilter:["class","style","hidden"]});
+          ancestor=ancestor.parentElement;
+        }
+      }
     }
-    const rect=machine.getBoundingClientRect(),screenRect=screen.getBoundingClientRect();
-    const visible=!machine.hidden&&getComputedStyle(machine).display!=="none"&&rect.width>0&&rect.height>0&&rect.right>0&&rect.left<window.innerWidth&&rect.bottom>0&&rect.top<window.innerHeight;
-    const nearBack=visible&&rect.bottom>screenRect.bottom-110&&rect.left<screenRect.left+120;
-    if(nearBack){
-      screen.style.setProperty("--wmh-machine-back-offset",Math.max(54,rect.right-screenRect.left+10)+"px");
-      screen.classList.add("has-archanistry-machine");
-    }else{
-      screen.style.removeProperty("--wmh-machine-back-offset");
-      screen.classList.remove("has-archanistry-machine");
+    if(!machine||!machineVisible(machine)){reset();return;}
+    const machineRect=machine.getBoundingClientRect(),backRect=back.getBoundingClientRect(),screenRect=screen.getBoundingClientRect();
+    const pad=10;
+    const overlaps=machineRect.left<backRect.right+pad&&machineRect.right>backRect.left-pad&&
+      machineRect.top<backRect.bottom+pad&&machineRect.bottom>backRect.top-pad;
+    if(!overlaps){reset();return;}
+    const buttonWidth=backRect.width||36;
+    const rightCandidate=machineRect.right-screenRect.left+pad;
+    const leftCandidate=machineRect.left-screenRect.left-buttonWidth-pad;
+    const maxLeft=Math.max(8,screenRect.width-buttonWidth-8);
+    let left=12,bottom=16;
+    if(rightCandidate<=maxLeft){left=Math.max(8,rightCandidate);}
+    else if(leftCandidate>=8){left=Math.min(maxLeft,leftCandidate);}
+    else{
+      // When the machine spans the full bottom edge, lift Back above its top
+      // instead of leaving it underneath the machine's card/ticket animation.
+      bottom=Math.max(16,screenRect.bottom-machineRect.top+pad);
+      left=Math.max(8,Math.min(maxLeft,backRect.left-screenRect.left));
     }
+    screen.style.setProperty("--wmh-machine-back-offset",Math.round(left)+"px");
+    screen.style.setProperty("--wmh-machine-back-bottom",Math.round(bottom)+"px");
+    screen.classList.add("has-archanistry-machine");
   };
   const follow=()=>{
     if(frame)cancelAnimationFrame(frame);
     const tick=()=>{
       sync();
-      const active=machine?.getAnimations().some(animation=>
+      const nodes:HTMLElement[]=[];
+      for(let node:HTMLElement|null=machine;node&&node!==document.body;node=node.parentElement)nodes.push(node);
+      const active=nodes.some(node=>node.getAnimations().some(animation=>
         animation.playState==="running"&&animation.effect?.getComputedTiming().iterations!==Infinity
-      )??false;
+      ));
       if(active)frame=requestAnimationFrame(tick);else frame=0;
     };
     frame=requestAnimationFrame(tick);
   };
-  const observer=new MutationObserver(()=>{
-    if(!screen.isConnected){
-      observer.disconnect();window.removeEventListener("resize",sync);
-      if(frame)cancelAnimationFrame(frame);
-      if(machine){
-        machine.removeEventListener("transitionrun",follow);machine.removeEventListener("transitionend",sync);
-        machine.removeEventListener("animationstart",follow);machine.removeEventListener("animationend",sync);
-      }
-      return;
-    }
-    sync();follow();
-  });
+  const onTransitionStart=()=>follow();
+  const onTransitionEnd=()=>sync();
+  const cleanup=()=>{
+    if(disposed)return;disposed=true;observer.disconnect();resizeObserver?.disconnect();
+    document.removeEventListener("transitionrun",onTransitionStart,true);
+    document.removeEventListener("transitionend",onTransitionEnd,true);
+    document.removeEventListener("animationstart",onTransitionStart,true);
+    document.removeEventListener("animationend",onTransitionEnd,true);
+    window.removeEventListener("resize",sync);
+    if(frame)cancelAnimationFrame(frame);
+    reset();
+  };
   observer.observe(document.body,{childList:true,subtree:true});
+  document.addEventListener("transitionrun",onTransitionStart,true);
+  document.addEventListener("transitionend",onTransitionEnd,true);
+  document.addEventListener("animationstart",onTransitionStart,true);
+  document.addEventListener("animationend",onTransitionEnd,true);
   window.addEventListener("resize",sync,{passive:true});
   sync();
 }
@@ -1396,7 +1428,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
   const importField=panel.querySelector<HTMLTextAreaElement>("[data-wmh-overlay-import-text]");
   const workbench=panel.querySelector<HTMLElement>(".wmh-overlay-tools");
   const dock=dialog.querySelector<HTMLElement>("[data-wmh-editor-dock]");
-  const uiKey="merzkava.iso-editor-ui.v1:"+encodeURIComponent(data.mapId);
+  const uiKey="merzkava.iso-editor-ui.v2:"+encodeURIComponent(data.mapId);
   const grid:IsoMapGridConfig={...data.grid};
   const readUiPrefs=()=>{
     try{return JSON.parse(localStorage.getItem(uiKey)||"{}") as Record<string,any>;}catch{return {};}
@@ -2203,7 +2235,7 @@ function isometricEditorMarkup(): string {
   if (!worldMapDeveloperMode) return "";
   return '<div class="wmh-overlay-editor" data-wmh-editor-dock>'+
     '<button type="button" class="wmh-overlay-float" data-wmh-overlay-toggle aria-label="Open map tools drawer" aria-pressed="false" aria-expanded="false"><i class="wmh-tool-map">☷</i><span>MAP TOOLS</span></button>'+
-    '<div class="wmh-overlay-modal" data-wmh-overlay-tools hidden><section class="wmh-overlay-tools" role="dialog" aria-modal="false" aria-label="Map and isometric editor tools">'+
+    '<div class="wmh-overlay-modal" data-wmh-overlay-tools hidden><section class="wmh-overlay-tools" data-wmh-scroll-resize role="dialog" aria-modal="false" aria-label="Isometric map editor window">'+
     '<button type="button" class="wmh-overlay-drawer-lever" data-wmh-overlay-close aria-label="Close map tools drawer">‹</button>'+
     '<header class="wmh-overlay-modal-head" data-wmh-overlay-drag-handle><div><b>WORLD ARCHIVE · FIELD TOOLS</b><small>MAP GLASS · CAMERA · CELL WORKBENCH</small></div><div class="wmh-overlay-window-actions"><button type="button" data-wmh-overlay-minimize aria-label="Minimize editor panel" title="Minimize">—</button><button type="button" data-wmh-overlay-close aria-label="Close editor mode" title="Close editor mode">×</button></div></header><div class="wmh-drawer-map-controls" aria-label="Map camera controls"><span>CAMERA</span><button type="button" data-wmh-zoom="out" aria-label="Zoom out">−</button><output data-wmh-zoom-level>100%</output><button type="button" data-wmh-zoom="in" aria-label="Zoom in">+</button><button type="button" data-wmh-zoom="reset">FIT</button><button type="button" data-wmh-map-center>⌖ CENTER MAP</button></div>'+
     '<label>EDITING MODE<select data-wmh-overlay-mode><option value="cell-add">＋ ADD CELL</option><option value="cell-delete">－ DELETE CELL</option><option value="cell-merge">⇧ SELECT CELLS TO MERGE</option><option value="cell-unmerge">↔ UNMERGE CELL GROUP</option><option value="foreground">○ Foreground sectors</option><option value="blocked">X Blocked sectors</option><option value="opacity">◌ Character opacity sectors</option><option value="transition">Area transition markers</option></select></label><div class="wmh-cell-layout-tools" data-wmh-cell-tools hidden><b>CELL LAYOUT</b><span data-wmh-cell-selection-count>0 CELLS SELECTED</span><button type="button" data-wmh-merge-apply>MERGE SELECTED CELLS</button><button type="button" data-wmh-merge-clear>CLEAR SELECTION</button><small>Tap adjacent cells to select them. Tap-drag only pans the map.</small></div><label class="wmh-walkable-switch"><input type="checkbox" data-wmh-walkable-enabled/> LIMIT MOVEMENT TO BLUE CELLS</label>'+
@@ -2249,12 +2281,14 @@ function academyCanvasEditorMarkup(): string {
   if (!worldMapDeveloperMode) return "";
   const sides=["top","bottom","left","right"] as const;
   return '<div class="wmh-academy-canvas-editor" data-wmh-academy-editor>'+
-    '<button type="button" data-wmh-academy-editor-toggle aria-expanded="false">▦ CANVAS EDITOR</button>'+
-    '<section data-wmh-academy-editor-panel hidden><b>ACADEMY CANVAS EXPANSION</b><small>Adjust each side independently. Preview updates live; confirm to save.</small>'+
-    '<div class="wmh-canvas-default-gap" aria-label="Read-only automatic default gap"><b>DEFAULT GAP · AUTO (READ ONLY)</b><div><span>TOP</span><output data-wmh-default-gap="top">— px</output><span>BOTTOM</span><output data-wmh-default-gap="bottom">— px</output><span>LEFT</span><output data-wmh-default-gap="left">— px</output><span>RIGHT</span><output data-wmh-default-gap="right">— px</output></div><small>Initial automatic gap before your extra values below.</small></div>'+
-    sides.map(side=>'<label>'+side.toUpperCase()+' <output data-wmh-canvas-value="'+side+'">'+DEFAULT_ISO_CANVAS_EXPANSION[side]+' px</output><input type="range" min="0" max="12000" step="100" value="'+DEFAULT_ISO_CANVAS_EXPANSION[side]+'" data-wmh-canvas-side="'+side+'"/></label>').join("")+
-    '<div class="wmh-academy-canvas-actions"><button type="button" data-wmh-canvas-refresh>↻ REFRESH PREVIEW</button><button type="button" data-wmh-canvas-confirm>✓ CONFIRM & SAVE</button><button type="button" data-wmh-canvas-copy>COPY CONFIG</button></div>'+
-    '<textarea data-wmh-canvas-export readonly aria-label="Copyable Academy canvas configuration" placeholder="Confirmed canvas configuration appears here..."></textarea><small data-wmh-canvas-status>Unconfirmed changes are preview-only.</small></section></div>';
+    '<button type="button" class="wmh-overlay-float wmh-canvas-editor-float" data-wmh-academy-editor-toggle aria-expanded="false" aria-label="Open Academy canvas editor"><i aria-hidden="true">▦</i><span>CANVAS</span></button>'+
+    '<section class="wmh-canvas-editor-window" data-wmh-academy-editor-panel data-wmh-scroll-resize hidden role="dialog" aria-label="Academy canvas editor">'+
+      '<header class="wmh-overlay-modal-head wmh-canvas-editor-header" data-wmh-canvas-drag-handle><div><b>ACADEMY CANVAS EXPANSION</b><small>MAP BASE · CANVAS MARGINS · PREVIEW</small></div><div class="wmh-overlay-window-actions"><button type="button" data-wmh-canvas-minimize aria-label="Minimize canvas editor" title="Minimize">—</button><button type="button" data-wmh-canvas-close aria-label="Close canvas editor" title="Close">×</button></div></header>'+
+      '<div class="wmh-canvas-editor-content"><small>Adjust each side independently. Preview updates live; confirm to save.</small>'+
+      '<div class="wmh-canvas-default-gap" aria-label="Read-only automatic default gap"><b>DEFAULT GAP · AUTO (READ ONLY)</b><div><span>TOP</span><output data-wmh-default-gap="top">— px</output><span>BOTTOM</span><output data-wmh-default-gap="bottom">— px</output><span>LEFT</span><output data-wmh-default-gap="left">— px</output><span>RIGHT</span><output data-wmh-default-gap="right">— px</output></div><small>Initial automatic gap before your extra values below.</small></div>'+
+      sides.map(side=>'<label>'+side.toUpperCase()+' <output data-wmh-canvas-value="'+side+'">'+DEFAULT_ISO_CANVAS_EXPANSION[side]+' px</output><input type="range" min="0" max="12000" step="100" value="'+DEFAULT_ISO_CANVAS_EXPANSION[side]+'" data-wmh-canvas-side="'+side+'"/></label>').join("")+
+      '<div class="wmh-academy-canvas-actions"><button type="button" data-wmh-canvas-refresh>↻ REFRESH PREVIEW</button><button type="button" data-wmh-canvas-confirm>✓ CONFIRM & SAVE</button><button type="button" data-wmh-canvas-copy>COPY CONFIG</button></div>'+
+      '<textarea data-wmh-canvas-export readonly aria-label="Copyable Academy canvas configuration" placeholder="Confirmed canvas configuration appears here..."></textarea><small data-wmh-canvas-status>Unconfirmed changes are preview-only.</small></div></section></div>';
 }
 function bindAcademyCanvasEditor(dialog:HTMLElement):void {
   if (!worldMapDeveloperMode) return;
@@ -2289,7 +2323,53 @@ function bindAcademyCanvasEditor(dialog:HTMLElement):void {
     const saved=normalizeIsoCanvasExpansion(JSON.parse(localStorage.getItem(key)||"{}"));
     controls.forEach(input=>{input.value=String(saved[(input.dataset.wmhCanvasSide||"left") as keyof typeof saved]);});showValues();
   }catch{}
-  toggle.addEventListener("click",()=>{panel.hidden=!panel.hidden;toggle.setAttribute("aria-expanded",String(!panel.hidden));if(!panel.hidden)showDefaultGap();});
+  const closeWindow=()=>{
+    panel.hidden=true;
+    toggle.setAttribute("aria-expanded","false");
+    toggle.setAttribute("aria-label","Open Academy canvas editor");
+  };
+  toggle.addEventListener("click",()=>{
+    panel.hidden=!panel.hidden;
+    toggle.setAttribute("aria-expanded",String(!panel.hidden));
+    toggle.setAttribute("aria-label",panel.hidden?"Open Academy canvas editor":"Minimize Academy canvas editor");
+    if(!panel.hidden)showDefaultGap();
+  });
+  panel.querySelector<HTMLElement>("[data-wmh-canvas-minimize]")?.addEventListener("click",closeWindow);
+  panel.querySelector<HTMLElement>("[data-wmh-canvas-close]")?.addEventListener("click",closeWindow);
+
+  const positionKey="merzkava.academy-canvas-window.v1";
+  const screen=dialog.querySelector<HTMLElement>("[data-wmh-isometric-play-screen]")||editor;
+  try{
+    const saved=JSON.parse(localStorage.getItem(positionKey)||"null");
+    if(saved&&Number.isFinite(saved.left)&&Number.isFinite(saved.top)){
+      panel.style.left=saved.left+"px";panel.style.top=saved.top+"px";
+      panel.style.right="auto";panel.style.bottom="auto";panel.style.transform="none";
+    }
+  }catch{}
+  const dragHandle=panel.querySelector<HTMLElement>("[data-wmh-canvas-drag-handle]");
+  dragHandle?.addEventListener("pointerdown",event=>{
+    if((event.target as Element).closest("button,input,select,textarea"))return;
+    event.preventDefault();
+    const screenRect=screen.getBoundingClientRect(),rect=panel.getBoundingClientRect();
+    const startX=event.clientX,startY=event.clientY;
+    const left=rect.left-screenRect.left,top=rect.top-screenRect.top;
+    const move=(next:PointerEvent)=>{
+      next.preventDefault();
+      const maxLeft=Math.max(0,screen.clientWidth-panel.offsetWidth);
+      const maxTop=Math.max(0,screen.clientHeight-panel.offsetHeight);
+      panel.style.left=Math.max(0,Math.min(maxLeft,left+next.clientX-startX))+"px";
+      panel.style.top=Math.max(0,Math.min(maxTop,top+next.clientY-startY))+"px";
+      panel.style.right="auto";panel.style.bottom="auto";panel.style.transform="none";
+    };
+    const finish=()=>{
+      window.removeEventListener("pointermove",move);window.removeEventListener("pointerup",finish);window.removeEventListener("pointercancel",finish);
+      try{
+        const finalRect=panel.getBoundingClientRect(),parentRect=screen.getBoundingClientRect();
+        localStorage.setItem(positionKey,JSON.stringify({left:Math.round(finalRect.left-parentRect.left),top:Math.round(finalRect.top-parentRect.top)}));
+      }catch{}
+    };
+    window.addEventListener("pointermove",move,{passive:false});window.addEventListener("pointerup",finish);window.addEventListener("pointercancel",finish);
+  });
   controls.forEach(input=>input.addEventListener("input",preview));
   panel.querySelector<HTMLElement>("[data-wmh-canvas-refresh]")?.addEventListener("click",preview);
   panel.querySelector<HTMLElement>("[data-wmh-canvas-confirm]")?.addEventListener("click",()=>{

@@ -9,6 +9,7 @@ const hudStyles=readFileSync(new URL("../../src/offline-game/player-hud.css",imp
 const worldStyles=readFileSync(new URL("../../src/offline-game/world-map-hierarchy.css",import.meta.url),"utf8");
 const hudMotionSource=readFileSync(new URL("../../src/offline-game/player-hud.ts",import.meta.url),"utf8");
 const worldMapSource=readFileSync(new URL("../../src/offline-game/world-map-hierarchy.ts",import.meta.url),"utf8");
+const mainSource=readFileSync(new URL("../../src/main.ts",import.meta.url),"utf8");
 
 describe("in-world player HUD and Traveler Satchel",()=>{
   it("renders text-only character status and the approved 25-slot inventory",()=>{
@@ -61,8 +62,8 @@ describe("in-world player HUD and Traveler Satchel",()=>{
     expect(worldMapSource).toContain("wmh-minimap-window");
     expect(worldMapSource).toContain("data-wmh-minimap-drag-handle");
     expect(worldMapSource).toContain("pointermove");
-    expect(worldStyles).toContain(".wmh-top-info");
-    expect(worldStyles).toContain("rgba(13,17,13,.24)");
+    expect(hudStyles).toContain(".wmh-top-info");
+    expect(hudStyles).toContain("rgba(13,17,13,.24)");
   });
 
   it("applies internal scrolling and touch resizing to long windows",()=>{
@@ -108,8 +109,43 @@ describe("in-world player HUD and Traveler Satchel",()=>{
 
   it("keeps HUD fields transparent and moves Back clear of the Arcanistry machine",()=>{
     expect(hudStyles).toContain("background:transparent!important;border:0!important");
-    expect(worldStyles).toContain(".has-archanistry-machine .wmh-map-back");
+    expect(hudStyles).toContain(".has-archanistry-machine .wmh-map-back");
     expect(worldMapSource).toContain("data-arcanistry-machine");
     expect(worldMapSource).toContain("wmh-machine-back-offset");
   });
+  it("limits resize and internal scrolling to map isometric windows only",()=>{
+    expect(mainSource).not.toContain("bindScrollableResizableWindows(document.body)");
+    expect(mainSource).not.toContain("scrollResizeObserver");
+    expect(hudMotionSource).toContain('root.querySelector<HTMLElement>(".wmh-isometric-play-screen")');
+    expect(hudMotionSource).toContain("if(!screen)return;");
+    expect(hudStyles).toContain(".wmh-isometric-play-screen .wmh-scroll-resize-window");
+    expect(hudStyles).toContain(".wmh-isometric-play-screen .wmh-window-resize-handle");
+    expect(hudStyles).not.toContain("\n.wmh-scroll-resize-window{");
+  });
+
+  it("opens independent draggable Canvas and Isometric editor windows",()=>{
+    expect(worldMapSource).toContain("data-wmh-canvas-drag-handle");
+    expect(worldMapSource).toContain("data-wmh-canvas-minimize");
+    expect(worldMapSource).toContain("data-wmh-canvas-close");
+    expect(worldMapSource).toContain('class="wmh-canvas-editor-window"');
+    expect(worldMapSource).toContain('class="wmh-overlay-tools" data-wmh-scroll-resize');
+    expect(worldMapSource).toContain('data-wmh-overlay-drag-handle');
+    expect(worldMapSource).toContain("merzkava.academy-canvas-window.v1");
+    expect(hudStyles).toContain(".wmh-canvas-editor-float");
+    expect(hudStyles).toContain(".wmh-overlay-modal>.wmh-overlay-tools");
+  });
+
+  it("tucks both editor launchers to the left while the inventory is open",()=>{
+    expect(hudStyles).toContain(":has(.wmh-inventory-window:not([hidden])) .wmh-overlay-float");
+    expect(hudStyles).toContain(":has(.wmh-inventory-window:not([hidden])) .wmh-canvas-editor-float");
+    expect(hudStyles).toContain("translateX(calc(-100vw + 19px))");
+  });
+
+  it("repositions Back using live overlap with the Arcanistry Machine",()=>{
+    expect(worldMapSource).toContain("const overlaps=machineRect.left<backRect.right+pad");
+    expect(worldMapSource).toContain("machineRect.right>backRect.left-pad");
+    expect(worldMapSource).toContain("new ResizeObserver");
+    expect(hudStyles).toContain("--wmh-machine-back-bottom");
+  });
+
 });
