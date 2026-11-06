@@ -453,7 +453,8 @@ function mountPixiBoard(board:HTMLElement,modal:HTMLElement,onFailure:()=>void):
       await app.init({
         width:boardWidth(),height:boardHeight(),backgroundAlpha:0,
         antialias:false,autoDensity:true,
-        resolution:Math.min(window.devicePixelRatio||1,1.25),
+        // Keep the low-end Android GPU buffer at CSS-pixel size; textures retain source detail.
+        resolution:1,
         powerPreference:"low-power",preference:["webgl","canvas"],
         autoStart:false,sharedTicker:false
       });
