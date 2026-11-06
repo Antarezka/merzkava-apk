@@ -8,6 +8,19 @@ import {
 
 describe("Eternal Path live world scene", () => {
   beforeEach(() => resetEternalGame());
+ 
+  it("keeps the legacy Coastal Receiver and adds a CSS-only Pixi CRT console gateway",()=>{
+    const html=renderExpeditionInterface();
+    expect(html).toContain('class="expedition-idle-trigger" data-idle-rpg-open');
+    expect(html).toContain('class="expedition-pixi-trigger" data-idle-pixi-open');
+    expect(html).toContain('class="pixi-tv-shell"');
+    expect(html).toContain('class="pixi-tv-screen"');
+    expect(html).toContain('class="pixi-console-box"');
+    expect(html).toContain('class="pixi-console-stick"');
+    expect(html).toContain('data-drag-position-key="merzkava.eternal-path.floating-pixi-tv-position.v1"');
+    expect(html).not.toContain("<canvas");
+  });
+
 
   it("keeps Journey Manager behind the clerk-emblem dropdown before a journey starts", () => {
     const html=renderExpeditionInterface();
