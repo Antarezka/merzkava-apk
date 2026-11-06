@@ -2765,7 +2765,7 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
   if(action.dataset.wmhAction==="editor-open"){if(!worldMapDeveloperMode)return true;overlay.dataset.level="map-editor";replaceWorldMapDialogMarkup(dialog,panelMarkup("map-editor"));bindWorldMapEditor(dialog);return true;}
   if(action.dataset.wmhAction==="editor-close"){overlay.dataset.level="world";replaceWorldMapDialogMarkup(dialog,panelMarkup("world"));bindWorldMapZoom(dialog);return true;}
   if(action.dataset.wmhAction==="editor-confirm"||action.dataset.wmhAction==="editor-reset")return true;
-  if(action.dataset.wmhAction==="close"){disposePlayerHudMotion(dialog);const outerClose=root.querySelector<HTMLButtonElement>("[data-idle-rpg-close]");if(outerClose)outerClose.click();else overlay.hidden=true;return true;}
+  if(action.dataset.wmhAction==="close"){disposePlayerHudMotion(dialog);overlay.hidden=true;const outerClose=root.querySelector<HTMLButtonElement>("[data-idle-rpg-close]");if(outerClose)outerClose.click();return true;}
   if(action.dataset.wmhAction==="test-isometric"){
     if(!worldMapDeveloperMode)return true;
     stopNpcWander(dialog);
