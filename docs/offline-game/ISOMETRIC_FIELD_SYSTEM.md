@@ -129,11 +129,20 @@ The current NPC chat is scripted, choice-based local UI. It is not yet a free-te
 Interaction sequence:
 
 1. Player taps an NPC token.
-2. The map handler obtains the Player and NPC coordinates and calculates Manhattan distance: abs(playerX - npcX) + abs(playerY - npcY).
-3. The current code rejects only distance < 1 (the Player and NPC occupy the same cell). There is no maximum adjacency/range check in the current handler. Do not describe this as “one cell away” or assume a maximum reach. Confirm the intended rule from owner/official rules before adding a maximum range.
-4. renderChat(dialog, npcId) stops NPC wandering/scanner intervals, cancels a pending Player movement timeout, shows the lower dialogue panel, renders the NPC greeting and authored choices.
-5. Tapping a choice appends the Player's selected line and the corresponding authored NPC reply, then leaves the choice buttons available.
-6. Closing the panel hides it and resumes NPC wandering for the local map.
+2. The map handler obtains the Player and NPC coordinates and checks the supported interaction route.
+3. `renderChat(dialog, npcId)` stops NPC wandering/scanner intervals, cancels a pending Player movement timeout, shows the lower dialogue panel, renders the NPC greeting and authored choices.
+4. Tapping a choice appends the natural Player utterance from `playerLines[index]` and the matching authored NPC reply from `replies[index]`, then leaves the choice buttons available. It must not echo the button label from `choices[index]` into the conversation transcript.
+5. Closing the panel hides it and resumes NPC wandering for the local map.
+
+The scripted dialogue schema deliberately separates presentation and speech:
+
+| Field | Purpose | Example |
+|---|---|---|
+| `choices[]` | Brief button label / user action | `Ask about training` |
+| `playerLines[]` | Natural Player sentence shown in chat after selection | `What kind of footwork are you practicing today?` |
+| `replies[]` | NPC's authored contextual response | Existing paired reply for the selected topic |
+
+Each NPC must keep all three arrays the same length and maintain matching indexes. Player lines should sound curious, polite and context-aware—not like commands, stage directions, or UI labels. Escape Player and NPC text before injecting chat markup. This is still a locally authored dialogue system, not free-text AI conversation.
 
 Chat presentation is a lower-screen dialogue box, not a full-screen centered modal. Keep the NPC bust/name, readable text, choices, close action, and bottom anchoring. The chat panel pauses movement/wandering while open. Do not invent new NPC knowledge, motives, hostility, or a conversation history that has not been recorded.
 
