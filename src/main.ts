@@ -11,7 +11,7 @@ import { initializeIdleTriggerDrag } from "./offline-game/idle-trigger-drag";
 import { initializeArcanistryTransitDrag } from "./offline-game/transit-pull-drag";
 import { animateExpeditionChoiceModal, animateExpeditionPanel, mountExpeditionAnimations } from "./offline-game/expedition-animations";
 import { deleteEternalSave, exportEternalSave, importEternalSave, listEternalSaves, loadEternalSave, renameEternalSave, resetEternalGame, resolveEternalSituationChoice, advanceEternalWorldTime, setEternalLocation, startEternalGame, unloadEternalGame, type EternalRegion } from "./offline-game/expedition-game";
-import { atlasPasswordPolicyError, clearAtlasPassword, hasAtlasPassword, setAtlasPassword, verifyAtlasMasterResetPassword, verifyAtlasPassword, rememberAtlasPlayer, restoreAtlasPlayer } from "./offline-game/world-atlas-account";
+import { atlasPasswordPolicyError, createAtlasMasterResetRequest, completeAtlasMasterReset, hasAtlasPassword, setAtlasPassword, verifyAtlasMasterResetCode, verifyAtlasPassword, rememberAtlasPlayer, restoreAtlasPlayer } from "./offline-game/world-atlas-account";
 import { authenticateDeveloper, restoreDeveloperSession, restoreRememberedDeveloperCredentials, signOutDeveloper, type RememberedDeveloperCredentials } from "./security/developer-access";
 import { getCanonIndex, getCanonStatus, loadCanonModule, loadPlayerRegistry, loadRegisteredPlayerProfile, refreshCanon, refreshLatestPlayerRegistry, verifyCanonSourceConnection, type CanonDocument } from "./convo/canon/canon-loader";
 import { routeCanonActivity } from "./convo/canon/canon-router";
@@ -606,7 +606,7 @@ function render(): void {
   root.innerHTML = `<div class="app-shell ${isControl ? "control-shell" : ""} ${menuRevealPending ? "is-entering" : ""} ${navigationCollapsed ? "is-nav-collapsed" : ""}">
     ${isControl ? "" : `<header class="app-header"><button class="brand" data-screen="home" aria-label="Merzkava home"><span class="brand-mark">M</span><span class="brand-wordmark"><small>MERZKAVA UNIVERSE</small><strong>Merzkava</strong></span></button><div class="header-context"><small>TACTICAL ACADEMY</small><strong>${translateLabel(navigation.find(item => item.id === activeScreen)?.label ?? "Command Hall", currentLanguage)}</strong></div><div class="header-tools"><button class="header-settings header-kitty-trigger" data-floating-action="start-bubble" aria-label="Start Bubble Mode" title="Start Bubble Mode"><span class="header-kitty-mascot" aria-hidden="true"><img class="header-kitty-layer header-kitty-shadow" src="/kitty/shadow/kitty-shadow.png" alt="" /><img class="header-kitty-layer header-kitty-tail" src="/kitty/ekor/kitty-tail.png" alt="" /><img class="header-kitty-layer header-kitty-body" src="/kitty/body/kitty-body.png" alt="" /><img class="header-kitty-layer header-kitty-head" src="/kitty/kepala/kitty-head.png" alt="" /></span></button><button class="header-settings" data-screen="settings" aria-label="Settings">⚙</button></div></header>
     `}${notice ? `<p class="notice" role="status">${escapeHtml(notice)}</p>` : ""}
-    ${isControl ? content : `<main class="main-content">${activeScreen === "settings" ? `<details class="settings-category app-settings-category" open><summary><span>APP SETTINGS</span><small>Appearance · Wallpapers · Language · Sound · Storage</small></summary><div class="settings-category-content">${languagePanelMarkup(currentLanguage)}${content}${accountSettingsPanel(currentLanguage,developerAuthenticated,playerAuthenticated)}</div></details>${developerAuthenticated ? `<details class="settings-category world-settings-category"><summary><span>WORLD & ACCOUNT</span><small>Supabase · AI Gateway · Canon Source</small></summary><div class="settings-category-content">${authPanel()}${canonPanel()}</div></details>` : ""}` : `${content}${activeScreen === "home" ? dustyLetterMarkup(currentLanguage, APP_VERSION) : ""}`}</main>`}
+    ${isControl ? content : `<main class="main-content">${activeScreen === "settings" ? `<details class="settings-category app-settings-category" open><summary><span>APP SETTINGS</span><small>Appearance · Wallpapers · Language · Sound · Storage</small></summary><div class="settings-category-content">${languagePanelMarkup(currentLanguage)}${content}${accountSettingsPanel(currentLanguage,developerAuthenticated,playerAuthenticated,atlasEligiblePlayers().map(player=>player.name))}</div></details>${developerAuthenticated ? `<details class="settings-category world-settings-category"><summary><span>WORLD & ACCOUNT</span><small>Supabase · AI Gateway · Canon Source</small></summary><div class="settings-category-content">${authPanel()}${canonPanel()}</div></details>` : ""}` : `${content}${activeScreen === "home" ? dustyLetterMarkup(currentLanguage, APP_VERSION) : ""}`}</main>`}
     ${isControl ? "" : `<nav class="bottom-nav" aria-label="Academy navigation"><span class="nav-cable nav-cable-left" aria-hidden="true"></span><span class="nav-cable nav-cable-right" aria-hidden="true"></span><div class="nav-roulette-track">${visibleNavigation.map((item, index) => `<button class="nav-item ${activeScreen === item.id ? "active" : ""}" data-screen="${item.id}" ${activeScreen === item.id ? 'aria-current="page"' : ""}><span class="nav-item-motion"><span class="nav-index">${String(index + 1).padStart(2, "0")}</span><span class="nav-rotor" aria-hidden="true"><span class="nav-rotor-mark"></span><span class="nav-rotor-grip" data-nav-rotor="${item.id}"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="21" fill="none" stroke="transparent" stroke-width="7" pointer-events="stroke"/></svg></span><span class="nav-icon-frame nav-icon-frame-${item.id}"><span class="nav-icon"><span class="nav-icon-art">${item.icon}</span></span></span></span><small>${translateLabel(item.label, currentLanguage)}</small></span></button>`).join("")}</div></nav>`}
     ${!isControl ? `<div class="gravity-pull-cord" data-gravity-cord aria-hidden="true"><span class="gravity-cord-anchor"></span><svg class="gravity-cord-line" viewBox="0 0 54 210" aria-hidden="true"><defs><linearGradient id="cord-braid" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#491416"/><stop offset=".28" stop-color="#9d302c"/><stop offset=".52" stop-color="#d26b52"/><stop offset=".72" stop-color="#9d302c"/><stop offset="1" stop-color="#491416"/></linearGradient></defs><path data-cord-line d="M 27 5 C 27 48, 27 76, 27 118"/><path class="cord-thread-highlight" d="M 27 5 C 27 48, 27 76, 27 118"/></svg><button class="gravity-cord-terminal" type="button" data-cord-handle aria-label="${translateLabel(navigationCollapsed ? "Pull upward to show toolbar" : "Pull downward to hide toolbar", currentLanguage)}" title="${translateLabel(navigationCollapsed ? "Show toolbar" : "Hide toolbar", currentLanguage)}"><span class="gravity-cord-jewel" aria-hidden="true"></span></button></div>` : ""}
 
@@ -1313,26 +1313,54 @@ root.addEventListener("click", async (event: MouseEvent) => {
   }
   if(target.closest("[data-atlas-developer-reset-submit]")){
     if(!developerAuthenticated)return;
-    const playerInput=root.querySelector<HTMLInputElement>("#developer-atlas-reset-player");
+    const playerSelect=root.querySelector<HTMLSelectElement>("#developer-atlas-reset-player");
     const proofInput=root.querySelector<HTMLInputElement>("[data-atlas-developer-reset-proof]");
+    const requestField=root.querySelector<HTMLTextAreaElement>("#developer-atlas-reset-request");
+    const copyButton=root.querySelector<HTMLButtonElement>("[data-atlas-reset-copy-request]");
     const resetMessage=root.querySelector<HTMLElement>("[data-developer-atlas-reset-message]");
-    const requestedName=playerInput?.value.trim()??"";
-    if(!requestedName){if(resetMessage)resetMessage.textContent="Enter the registered player name.";return;}
+    const requestedName=playerSelect?.value.trim()??"";
+    if(!requestedName){if(resetMessage)resetMessage.textContent="Select the player account to reset.";return;}
     const eligible=atlasEligiblePlayers().find(player=>player.name.toLocaleLowerCase()===requestedName.toLocaleLowerCase());
     if(!eligible){if(resetMessage)resetMessage.textContent="That player is not present in the current player list.";return;}
-    if(!proofInput?.checked){if(resetMessage)resetMessage.textContent="Confirm that account ownership has been verified through an official channel.";return;}
+    if(!proofInput?.checked){if(resetMessage)resetMessage.textContent="Verify account ownership through an official channel before issuing a reset request.";return;}
     const resetButton=root.querySelector<HTMLButtonElement>("[data-atlas-developer-reset-submit]");
     if(resetButton)resetButton.disabled=true;
-    if(resetMessage)resetMessage.textContent="Preparing the account reset...";
+    if(resetMessage)resetMessage.textContent="Preparing the account-specific reset request...";
     try{
-      await clearAtlasPassword(eligible.name);
-      if(resetMessage)resetMessage.textContent=eligible.name+" is ready to create a new password.";
-      if(playerInput)playerInput.value="";
+      const request=await createAtlasMasterResetRequest(eligible.name);
+      if(requestField){requestField.value=request;requestField.hidden=false;}
+      if(copyButton)copyButton.hidden=false;
+      if(resetMessage)resetMessage.textContent="Request ready. Copy it to the AI to prepare the unique player confirmation code for the next app update. This has not reset the player's password yet.";
       if(proofInput)proofInput.checked=false;
     }catch(error){
-      if(resetMessage)resetMessage.textContent=error instanceof Error?error.message:"Developer reset failed.";
+      if(resetMessage)resetMessage.textContent=error instanceof Error?error.message:"Could not prepare the reset request.";
     }finally{
       if(resetButton)resetButton.disabled=false;
+    }
+    return;
+  }
+  if(target.closest("[data-atlas-reset-copy-request]")){
+    if(!developerAuthenticated)return;
+    const requestField=root.querySelector<HTMLTextAreaElement>("#developer-atlas-reset-request");
+    const copyButton=target.closest<HTMLButtonElement>("[data-atlas-reset-copy-request]");
+    const request=requestField?.value??"";
+    if(!request||!copyButton)return;
+    try{
+      if(navigator.clipboard?.writeText)await navigator.clipboard.writeText(request);
+      else{
+        const field=document.createElement("textarea");
+        field.value=request;field.setAttribute("readonly","");
+        field.style.position="fixed";field.style.opacity="0";
+        document.body.append(field);field.select();
+        const copied=document.execCommand("copy");field.remove();
+        if(!copied)throw new Error("Clipboard is unavailable on this device.");
+      }
+      copyButton.textContent="Copied ✓";
+      const message=root.querySelector<HTMLElement>("[data-developer-atlas-reset-message]");
+      if(message)message.textContent="Request copied. Paste it into the AI handoff. Give the player confirmation code only after the updated APK is available.";
+    }catch(error){
+      const message=root.querySelector<HTMLElement>("[data-developer-atlas-reset-message]");
+      if(message)message.textContent=error instanceof Error?error.message:"Could not copy the reset request.";
     }
     return;
   }
@@ -1894,9 +1922,17 @@ root.addEventListener("click", async event => {
       ?panel.dataset.atlasCurrentAuthorized==="true"
       :panel.dataset.atlasMasterAuthorized==="true";
     if(!authorized){
-      const valid=mode==="change"
-        ?await verifyAtlasPassword(playerName,current)
-        :await verifyAtlasMasterResetPassword(master);
+      let valid=false;
+      if(mode==="change"){
+        valid=await verifyAtlasPassword(playerName,current);
+      }else{
+        const verification=verifyAtlasMasterResetCode(playerName,master);
+        const [,verified]=await Promise.all([
+          playWorldAtlasAccessSequence(gate,4000,verification),
+          verification
+        ]);
+        valid=verified;
+      }
       if(resetAttempt!==worldAtlasResetAttempt)return;
       if(!valid)throw new Error(mode==="change"
         ?(gate.dataset.resetCurrentInvalid||"The current password is incorrect.")
@@ -1922,8 +1958,11 @@ root.addEventListener("click", async event => {
     if(policyError)throw new Error(gate.dataset.passwordPolicyLabel||policyError);
     if(next!==confirmation)throw new Error(gate.dataset.resetMismatch||"The new passwords do not match.");
     if(resetAttempt!==worldAtlasResetAttempt)return;
-    await setAtlasPassword(playerName,next);
+    if(mode==="master")await completeAtlasMasterReset(playerName,master,next);
+    else await setAtlasPassword(playerName,next);
     if(resetAttempt!==worldAtlasResetAttempt)return;
+    const masterCodeInput=gate.querySelector<HTMLInputElement>("#atlas-reset-master");
+    if(masterCodeInput)masterCodeInput.value="";
     await restoreLoginPanel();
     if(message)message.textContent=gate.dataset.passwordUpdatedLabel||"Password updated. Sign in again with your new password.";
     const loginPassword=gate.querySelector<HTMLInputElement>("#world-atlas-password");
@@ -1954,6 +1993,18 @@ root.addEventListener("input", event => {
 
 root.addEventListener("change", event => {
   const target = event.target;
+  if(target instanceof HTMLSelectElement && target.matches("[data-atlas-reset-player-select]")){
+    const requestField=root.querySelector<HTMLTextAreaElement>("#developer-atlas-reset-request");
+    const copyButton=root.querySelector<HTMLButtonElement>("[data-atlas-reset-copy-request]");
+    const proof=root.querySelector<HTMLInputElement>("[data-atlas-developer-reset-proof]");
+    const message=root.querySelector<HTMLElement>("[data-developer-atlas-reset-message]");
+    if(requestField){requestField.value="";requestField.hidden=true;}
+    if(copyButton)copyButton.hidden=true;
+    if(proof)proof.checked=false;
+    if(message)message.textContent="";
+    if(copyButton)copyButton.textContent="Copy request for AI";
+    return;
+  }
   if (target instanceof HTMLSelectElement && target.matches("[data-language-select]")) {
     currentLanguage = setLanguage(target.value);
     languageAnimationPending = true;
