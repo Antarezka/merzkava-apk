@@ -1428,7 +1428,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
   const importField=panel.querySelector<HTMLTextAreaElement>("[data-wmh-overlay-import-text]");
   const workbench=panel.querySelector<HTMLElement>(".wmh-overlay-tools");
   const dock=dialog.querySelector<HTMLElement>("[data-wmh-editor-dock]");
-  const uiKey="merzkava.iso-editor-ui.v1:"+encodeURIComponent(data.mapId);
+  const uiKey="merzkava.iso-editor-ui.v2:"+encodeURIComponent(data.mapId);
   const grid:IsoMapGridConfig={...data.grid};
   const readUiPrefs=()=>{
     try{return JSON.parse(localStorage.getItem(uiKey)||"{}") as Record<string,any>;}catch{return {};}
