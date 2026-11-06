@@ -1103,7 +1103,8 @@ function finishMapTransition(dialog:HTMLElement,accept:boolean):boolean {
     if(!overlay)return true;
     stopNpcWander(dialog);
     overlay.dataset.level="regional";overlay.dataset.region=pending.region;
-    replaceWorldMapDialogMarkup(dialog,renderPanel("regional",pending.region));
+    const visualMode:WorldMapVisualMode=overlay.dataset.visualMode==="augusto-pxl"?"augusto-pxl":"legacy";
+    replaceWorldMapDialogMarkup(dialog,panelMarkup("regional",pending.region,"Tianhai Academy",undefined,visualMode));
     bindIsometricMapArt(dialog);
     return true;
   }
@@ -3100,16 +3101,25 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
   if(action.dataset.wmhTransition){
     const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
     const marker=board?readIsoMapData(board).transitions.find(item=>item.id===action.dataset.wmhTransition):null;
-    const label=marker?.label.trim()||"";
-    if(/^akses ke map golden dragon empire$/i.test(label)){
-      closeTransitionOverlays(dialog);stopNpcWander(dialog);
-      overlay.dataset.level="regional";overlay.dataset.region="golden-dragon-empire";
-      replaceWorldMapDialogMarkup(dialog,renderPanel("regional","golden-dragon-empire"));bindIsometricMapArt(dialog);
+    if(!board||!marker)return true;
+    const player=board.querySelector<HTMLElement>("[data-wmh-player-token]");
+    if(!player)return true;
+    const targetRegion=resolveTransitionRegion(marker);
+    const sameCell=Number(player.dataset.x)===marker.x&&Number(player.dataset.y)===marker.y;
+    if(sameCell&&targetRegion){
+      const safe=findTransitionRetreat(board,player,marker);
+      if(safe)showMapTransitionConfirmation(dialog,marker,targetRegion,safe);
       return true;
     }
-    if(/^dialog box:/i.test(label)){showTransitionDialogue(dialog,"TIANHAI ACADEMY",label.replace(/^dialog box:\\s*/i,""));return true;}
-    if(/^event scene:/i.test(label)){showTransitionNotice(dialog,"An Introduction to Merzkava",label.replace(/^event scene:\\s*/i,""));return true;}
-    showTransitionDialogue(dialog,"WORLD ARCHIVE",label||"The route is not yet identified.");
+    if(sameCell&&/^dialog box:/i.test(marker.label)){
+      showTransitionDialogue(dialog,"TIANHAI ACADEMY",marker.label.replace(/^dialog box:\\s*/i,""));
+      return true;
+    }
+    if(sameCell&&/^event scene:/i.test(marker.label)){
+      showTransitionNotice(dialog,"An Introduction to Merzkava",marker.label.replace(/^event scene:\\s*/i,""));
+      return true;
+    }
+    walkToTile(dialog,marker.x,marker.y,"stone");
     return true;
   }
   if(action.dataset.wmhAction==="chat-close"){
