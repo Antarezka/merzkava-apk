@@ -896,7 +896,6 @@ async function openWorldAtlasFromTv():Promise<void> {
   const gate=modal?.querySelector<HTMLElement>("[data-world-atlas-gate]");
   if(!modal||!gate)return;
   if(!modal.hidden){closeWorldAtlas();return;}
-  setWorldAtlasAccessBufferContext(gate,"world-atlas-list");
   modal.hidden=false;
   root.querySelector(".app-shell")?.classList.add("is-idle-world");
   trigger?.setAttribute("aria-expanded","true");
@@ -915,8 +914,8 @@ async function openWorldAtlasFromTv():Promise<void> {
   if(loginForm)loginForm.inert=false;
   const resetPanel=gate.querySelector<HTMLElement>("[data-atlas-reset-panel]");
   if(resetPanel)resetPanel.hidden=true;
-  if(message)message.textContent=gate.dataset.loadingLabel||"Verifying registered players and local saves…";
-  if(select)select.innerHTML='<option value="">Loading registered players…</option>';
+  if(message)message.textContent="Loading the verified player registry…";
+  if(select)select.innerHTML='<option value="">Loading player records…</option>';
   if(submit)submit.disabled=true;
   const offlineMessage=gate.dataset.offlineLabel||"An active internet connection to the official Universe source is required.";
   if(!navigator.onLine){
@@ -954,25 +953,12 @@ async function openWorldAtlasFromTv():Promise<void> {
           const submitButton=gate.querySelector<HTMLButtonElement>("[data-world-atlas-submit]");
           if(panel)panel.hidden=true;
           if(submitButton)submitButton.disabled=true;
-          setWorldAtlasAccessBufferContext(gate,"world-atlas-list");
           ["#atlas-reset-current","#atlas-reset-master","#atlas-reset-new","#atlas-reset-confirm"].forEach(selector=>{
             const input=gate.querySelector<HTMLInputElement>(selector);if(input)input.value="";
           });
-          const selectionTask=(async()=>{
-            await requireWorldAtlasSourceConnection(gate);
-            await refreshAtlasPasswordMode(gate);
-          })();
-          void Promise.allSettled([
-            selectionTask,
-            playWorldAtlasAccessSequence(gate,1900,selectionTask)
-          ]).then(results=>{
-            if(results[0].status==="rejected"){
-              const status=gate.querySelector<HTMLElement>("[data-world-atlas-message]");
-              if(status)status.textContent=results[0].reason instanceof Error?results[0].reason.message:(gate.dataset.offlineLabel||"The official Universe source is unavailable.");
-              const submit=gate.querySelector<HTMLButtonElement>("[data-world-atlas-submit]");
-              if(submit)submit.disabled=true;
-            }
-          });
+          // Selecting an account only checks its local password mode.
+          // The animated access routine starts after Login/Sign-up/Reset is confirmed.
+          void refreshAtlasPasswordMode(gate);
         });
       }
     }
@@ -985,11 +971,8 @@ async function openWorldAtlasFromTv():Promise<void> {
     requestAnimationFrame(()=>gate.querySelector<HTMLInputElement>("#world-atlas-player")?.focus());
   })();
   try{
-    const results=await Promise.allSettled([
-      loadTask,
-      playWorldAtlasAccessSequence(gate,3600,loadTask)
-    ]);
-    if(results[0].status==="rejected")throw results[0].reason;
+    // Registry loading is ordinary inline feedback, not a confirmation animation.
+    await loadTask;
   }catch(error){
     if(message)message.textContent=error instanceof Error?error.message:offlineMessage;
     if(submit)submit.disabled=true;
