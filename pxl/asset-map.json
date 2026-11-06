@@ -1,0 +1,5 @@
+{
+  "schemaVersion": 1,
+  "note": "Only map an asset ID after its PXL source has generated and validated the named file under public/assets/augusto-pxl/exports/. Sprite metadata is consumed by the existing DOM/Web Animations sprite player.",
+  "assets": {}
+}
