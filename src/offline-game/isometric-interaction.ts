@@ -1,4 +1,4 @@
-import { isoCellCenter, type IsoMapEditorData, type IsoMapGridConfig, type IsoMapPoint } from "./isometric-map-editor";
+import type { IsoMapEditorData } from "./isometric-map-editor";
 
 export type IsoActorCell = { x: number; y: number };
 
@@ -49,24 +49,4 @@ export function isNpcInteractionCellReachable(
 
   return !isIsoQuadrantEdgeFullyBlocked(data, player.x, player.y, edge[0]) &&
     !isIsoQuadrantEdgeFullyBlocked(data, npc.x, npc.y, edge[1]);
-}
-
-/** Resolve an image-space tap to a safe fractional point inside one diamond. */
-export function isoSubcellPositionAtPoint(
-  point: IsoMapPoint,
-  cellX: number,
-  cellY: number,
-  grid: IsoMapGridConfig,
-): { x: number; y: number } | null {
-  if (![point.x, point.y, cellX, cellY, grid.tileW, grid.tileH].every(Number.isFinite) ||
-      grid.tileW <= 0 || grid.tileH <= 0) return null;
-  const center = isoCellCenter(cellX, cellY, grid);
-  const dx = (point.x - center.x) / (grid.tileW / 2);
-  const dy = (point.y - center.y) / (grid.tileH / 2);
-  const offsetX = (dx + dy) / 2;
-  const offsetY = (dy - dx) / 2;
-  const distance = Math.abs(offsetX) + Math.abs(offsetY);
-  if (distance > 1.000001) return null;
-  const inset = distance > 0.86 ? 0.86 / distance : 1;
-  return { x: cellX + offsetX * inset, y: cellY + offsetY * inset };
 }

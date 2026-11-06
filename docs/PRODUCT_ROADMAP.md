@@ -1062,3 +1062,14 @@ Current source baseline for this workstream: ed5ef007cead9ecf8e6e70662c29ec5cce9
 
 - [Web App Validation #2269](https://github.com/Antarezka/merzkava-apk/actions/runs/42023817319)
 - [Android Build #1224](https://github.com/Antarezka/merzkava-apk/actions/runs/42023817359)
+
+
+### 13L. In-world HUD and sub-cell field movement preview (2026-11-06)
+
+**Added on feat/player-hud-subcell-runtime-2026-11-06:**
+- Shared in-world Player HUD preview with name binding where a local save exists, Mortal/affiliation placeholders, HP/Satiety bars, Quest Board and Social Links drawers.
+- Four realm-marked Anime.js ring-framed skill placeholders; combat/time-order execution remains disconnected.
+- Three non-canon test-ration stacks at ×999. Portion Satiety changes use the official SMALL/STANDARD/LARGE 10/34/50 rules and cap at 100. The one-hour LIGHT test uses the official Satiety calculator without advancing world time.
+- Fractional visual Player coordinates inside a validated cell. Integer grid coordinates remain authoritative for BFS, walkability, blocked half-edges, occupancy, and NPC interaction.
+
+**Still open:** connect canonical player profile/affiliation, persistent HP/inventory, actual activity and sleep-aware Satiety ledger, quest/objective resolver, Social Link state, and approved combat/time-turn rules. The HUD is a presentation/test layer, not completion of EP-2/EP-3 simulation contracts. Ring palettes and beast-sigil patterns are UI placeholders, not canon.

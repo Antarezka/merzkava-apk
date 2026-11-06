@@ -204,3 +204,10 @@ Web/CI tests do not certify touch UX. Verify on Android, preferably the owner's 
 - Android back/gesture across modals, screens, repeated Home prompt, reduced motion and memory cleanup.
 
 Do not mark an item device-verified based only on a passing web build or emulator launch.
+
+
+## 10. In-world Player HUD and fractional actor position
+
+The shared in-world HUD contains a marked preview profile, HP/Satiety meters, affiliation placeholder, Quest Board and Social Links drawers, four realm-tier ring-framed skill slots, and a bottom test inventory. The preview profile and relationship/quest content are not canon state. Test-ration portions use the official SMALL/STANDARD/LARGE Satiety values; the one-hour LIGHT test uses the official Mortal formula and does not advance the world clock or simulate meal windows/sleep. Ring colors and beast-sigil patterns are presentation-only placeholders, not canon assignments.
+
+The Player retains integer cell coordinates for collision, whitelist, edge tests, NPC occupancy and BFS; separate fractional visual coordinates determine placement within a walkable diamond. A pointer tap is converted through the overlay SVG viewBox and clamped to a safe interior point. This does not open blocked cells or bypass a closed half-edge.

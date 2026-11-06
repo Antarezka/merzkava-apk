@@ -1496,7 +1496,7 @@ root.addEventListener("click", async (event: MouseEvent) => {
   if (eternalChoice) { if(eternalChoice.disabled) return; const modal=root.querySelector<HTMLElement>("[data-eternal-choice-modal]"); modal?.querySelectorAll<HTMLButtonElement>("[data-eternal-choice]").forEach(button=>{button.disabled=true;}); document.body.classList.remove("eternal-choice-open"); if(history.state?.eternalChoiceModal) history.back(); const choiceId=eternalChoice.dataset.eternalChoice??""; if(modal) animateExpeditionChoiceModal(modal,false,()=>{const result=resolveEternalSituationChoice(choiceId);notice=result? "The moment has been recorded in your journey.": "That response is no longer available.";render();}); else {const result=resolveEternalSituationChoice(choiceId);notice=result? "The moment has been recorded in your journey.": "That response is no longer available.";render();} return; }
   if (target.closest("[data-eternal-open-choices]")) { const modal=root.querySelector<HTMLElement>("[data-eternal-choice-modal]"); if(modal){animateExpeditionChoiceModal(modal,true);document.body.classList.add("eternal-choice-open");history.pushState({eternalChoiceModal:true},"");modal.querySelector<HTMLButtonElement>(".expedition-choice-close")?.focus();} return; }
 
-  if(handleWorldMapHierarchyClick(target, root, minutes => { advanceEternalWorldTime(minutes); })) return;
+  if(handleWorldMapHierarchyClick(target, root, minutes => { advanceEternalWorldTime(minutes); }, {clientX:event.clientX,clientY:event.clientY})) return;
   const idleRegionButton=target.closest<HTMLButtonElement>("[data-idle-region]");
   if(idleRegionButton){
     const regionId=idleRegionButton.dataset.idleRegion;

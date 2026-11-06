@@ -179,7 +179,7 @@ export function worldAtlasLoginPanelMarkup(language:AppLanguage):string {
       '<button type="button" class="world-atlas-login-submit atlas-create-account-link" data-atlas-open-signup hidden>'+esc(t.signUp)+' · '+esc(t.password)+'</button>'+
       '<div class="atlas-password-actions" data-atlas-password-actions hidden><button type="button" data-atlas-change-open hidden>'+esc(reset.change)+'</button><button type="button" data-atlas-master-open>'+esc(reset.masterReset)+'</button></div>'+
     '</section>'+
-    '<section class="atlas-signup-panel" data-atlas-signup-panel hidden><small class="world-atlas-login-eyebrow">'+esc(t.signUp)+'</small><h3>'+esc(t.signupPrompt)+'</h3>'+
+    '<section class="atlas-signup-panel" data-atlas-signup-panel hidden><small class="world-atlas-login-eyebrow">'+esc(t.signUp)+'</small><h3>'+esc(s.signupPrompt)+'</h3>'+
       passwordField("world-atlas-signup-password","signupPassword",t.password,"new-password")+
       passwordField("world-atlas-signup-confirm","signupConfirm",t.confirm,"new-password",true)+
       '<small class="world-atlas-password-safety">'+esc(reset.passwordPolicy)+'</small>'+

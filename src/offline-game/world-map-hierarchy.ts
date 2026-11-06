@@ -7,11 +7,13 @@ import { getEternalSave, getExpeditionAtmosphere } from "./expedition-game";
 import { TIANHAI_ACADEMY_MAP_REFERENCE } from "./tianhai-academy-map-reference";
 import {
   createIsoMapEditorData, DEFAULT_ISOMETRIC_GRID, DEFAULT_ISO_CANVAS_EXPANSION, normalizeIsoCanvasExpansion, isoCellAtPoint, isoCellCenter, isoCellHasLayer,
-  isoCellKey, isoClientToImagePoint, isoMapStorageKey, isoPointerGesture, isoQuadrantAtPoint, isoQuadrantHasParentLayer, mergeIsoWalkableCells, normalizeIsoMapEditorData, removeIsoWalkableCell, toggleIsoQuadrantLayer, unmergeIsoWalkableCell,
+  isoCellKey, isoClientToImagePoint, isoMapStorageKey, isoPointerGesture, isoQuadrantAtPoint, mergeIsoWalkableCells, normalizeIsoMapEditorData, removeIsoWalkableCell, toggleIsoQuadrantLayer, unmergeIsoWalkableCell,
   type IsoMapEditorData, type IsoMapGridConfig, type IsoMapPoint, type IsoQuadrant, type IsoQuadrantLayer,
 } from "./isometric-map-editor";
 import { renderIsometricSvgSceneMarkup, refreshIsometricSvgScene, type IsometricSvgTheme } from "./isometric-svg-board";
-import { isIsoQuadrantEdgeFullyBlocked, isNpcInteractionCellReachable } from "./isometric-interaction";
+import { isIsoQuadrantEdgeFullyBlocked, isNpcInteractionCellReachable, isoSubcellPositionAtPoint } from "./isometric-interaction";
+import { renderPlayerHudMarkup, refreshPlayerHud, handlePlayerHudClick, mountPlayerHudMotion, disposePlayerHudMotion } from "./player-hud";
+import "./player-hud.css";
 
 let worldMapDeveloperMode = false;
 export function setWorldMapDeveloperMode(enabled: boolean): void {
@@ -903,7 +905,9 @@ function renderIsometricWorldStatus(dialog:HTMLElement):void {
   set("[data-wmh-day]","HARI "+String(save?.day??1).padStart(2,"0"));
   set("[data-wmh-time]",hour+":"+minute+" "+meridiem);
   const player=dialog.querySelector<HTMLElement>("[data-wmh-board] [data-wmh-player-token]");
-  set("[data-wmh-player-grid]",player?"GRID X "+String(player.dataset.x||0).padStart(2,"0")+" · Y "+String(player.dataset.y||0).padStart(2,"0"):"GRID X -- · Y --");
+  const px=player?Number(player.dataset.posX??player.dataset.x??0):0,py=player?Number(player.dataset.posY??player.dataset.y??0):0;
+  set("[data-wmh-player-grid]",player?"GRID X "+px.toFixed(1)+" · Y "+py.toFixed(1):"GRID X -- · Y --");
+  refreshPlayerHud(dialog);
   const overlay=dialog.closest<HTMLElement>("[data-world-map-hierarchy]");
   if(overlay){overlay.dataset.wmhCycle=atmosphere.cycle.toLowerCase();overlay.dataset.wmhWeather=atmosphere.weather.toLowerCase();}
 }
@@ -1100,6 +1104,8 @@ function bindIsometricHud(dialog:HTMLElement):void {
   const world=minimap?.querySelector<HTMLElement>("[data-wmh-minimap-world]");
   const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
   if(!hud)return;
+  refreshPlayerHud(dialog);
+  mountPlayerHudMotion(dialog);
   // Academy is an artwork-only view, so bind its dedicated camera controls without an actor board.
   if(!board){
     renderIsometricWorldStatus(dialog);
@@ -1161,7 +1167,7 @@ function relocateActorsFromBlockedCells(board:HTMLElement,data:IsoMapEditorData)
     const {actor,x,y}=placement;
     if(Number(actor.dataset.x||0)===x&&Number(actor.dataset.y||0)===y)continue;
     actor.dataset.x=String(x);actor.dataset.y=String(y);
-    actor.style.setProperty("--token-x",String(x));actor.style.setProperty("--token-y",String(y));
+    actor.dataset.posX=String(x);actor.dataset.posY=String(y);actor.style.setProperty("--token-x",String(x));actor.style.setProperty("--token-y",String(y));
     actor.dataset.relocatedFromBlocked="true";
   }
   syncIsoDepthAndOcclusion(board);
@@ -1844,7 +1850,6 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       blockedQuadrants:[...data.blockedQuadrants],
       opacityQuadrants:[...data.opacityQuadrants],
       transitions:data.transitions.map(marker=>({...marker})),
-      cameraCenter:data.cameraCenter?{...data.cameraCenter}:null,
       notes:{
         cellSectorOrder:["top-left","top-right","bottom-left","bottom-right"],
         quadrantKeys:"x,y:tl-a|tl-b|tr-a|tr-b|bl-a|bl-b|br-a|br-b (legacy tl|tr|bl|br keys expand to both child sectors)",
@@ -2031,7 +2036,7 @@ function isometricHudMarkup(title: string, mapImage: string, showMinimap = true)
     '<div class="wmh-world-status-top"><span class="wmh-status-cycle-icon" data-wmh-cycle-icon>☼</span><div><b data-wmh-cycle-label>PAGI</b><small data-wmh-cycle-caption>WORLD CYCLE</small></div></div>'+
     '<div class="wmh-world-status-bottom"><span class="wmh-status-weather"><i data-wmh-weather-icon>☀</i><b data-wmh-weather-label>CLEAR</b></span><span class="wmh-status-day" data-wmh-day>HARI 01</span><strong data-wmh-time>08:00</strong></div>'+
     '<small class="wmh-status-location">'+escapeMapEditorText(title)+'</small><small class="wmh-status-coordinates" data-wmh-player-grid>GRID X 05 · Y 17</small></section>'+
-    (showMinimap?minimapMarkup:"")+'</div>';
+    renderPlayerHudMarkup() + (showMinimap?minimapMarkup:"")+'</div>';
 }
 function academyCanvasEditorMarkup(): string {
   if (!worldMapDeveloperMode) return "";
@@ -2215,9 +2220,10 @@ function syncIsoDepthAndOcclusion(board:HTMLElement):void {
     tile.style.zIndex=String(1+x+y);
   });
   tokens.forEach(token=>{
-    const x=Number(token.dataset.x||0),y=Number(token.dataset.y||0);
+    const cellX=Number(token.dataset.x||0),cellY=Number(token.dataset.y||0);
+    const x=Number(token.dataset.posX??cellX),y=Number(token.dataset.posY??cellY);
     token.style.setProperty("--character-z",String(20+x+y));
-    const opacity=isoCellHasLayer(data,"opacityCells",x,y)||data.opacityQuadrants.some(key=>key.startsWith(x+","+y+":"))?"0.42":"1";
+    const opacity=isoCellHasLayer(data,"opacityCells",cellX,cellY)||data.opacityQuadrants.some(key=>key.startsWith(cellX+","+cellY+":"))?"0.42":"1";
     token.style.setProperty("--character-opacity",opacity);
     if(board.dataset.academyArtworkBoard==="true"){
       const image=board.querySelector<HTMLImageElement>("[data-wmh-map-art]"),width=image?.naturalWidth||2816,height=image?.naturalHeight||1536,center=isoCellCenter(x,y,data.grid);
@@ -2444,7 +2450,18 @@ function renderChat(dialog:HTMLElement,npcId:string):void {
   thread.innerHTML='<article class="wmh-chat-message npc-message"><div class="wmh-chat-bust '+npc.gender+'"><i></i></div><div class="wmh-chat-copy"><b>'+npc.name+'</b><p>'+npc.greeting+'</p></div></article>';
   replies.innerHTML=npc.choices.map((choice,i)=>'<button type="button" data-wmh-reply="'+i+'" data-npc-id="'+npcId+'">'+choice+'</button>').join("");
 }
-function walkToTile(dialog:HTMLElement,targetX:number,targetY:number,surface:string):void {
+function resolveIsoSubcellTarget(board:HTMLElement,clientX:number,clientY:number,cellX:number,cellY:number,grid:IsoMapGridConfig):{x:number;y:number}|null {
+  const svg=board.querySelector<SVGSVGElement>("[data-wmh-overlay-svg]");
+  const rect=svg?.getBoundingClientRect();
+  if(!svg||!rect||rect.width<=0||rect.height<=0)return null;
+  const viewBox=svg.viewBox?.baseVal;
+  const point=isoClientToImagePoint(clientX,clientY,{
+    left:rect.left,top:rect.top,width:rect.width,height:rect.height,
+    naturalWidth:viewBox?.width||rect.width,naturalHeight:viewBox?.height||rect.height
+  });
+  return point?isoSubcellPositionAtPoint(point,cellX,cellY,grid):null;
+}
+function walkToTile(dialog:HTMLElement,targetX:number,targetY:number,surface:string,targetPosition?:{x:number;y:number}):void {
   const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
   if(board?.dataset.editorPaused==="true"||board?.classList.contains("wmh-overlay-editing"))return;
   const player=board?.querySelector<HTMLElement>("[data-wmh-player-token]");
@@ -2487,17 +2504,26 @@ function walkToTile(dialog:HTMLElement,targetX:number,targetY:number,surface:str
     path.unshift([x,y]);cursor=previous.get(cursor)||null;
   }
   path.shift();
+  const finalPosition=targetPosition??{x:targetX,y:targetY};
+  const currentVisualX=Number(player.dataset.posX??player.dataset.x??startX);
+  const currentVisualY=Number(player.dataset.posY??player.dataset.y??startY);
+  if(path.length===0&&Math.hypot(finalPosition.x-currentVisualX,finalPosition.y-currentVisualY)<0.015){
+    delete runtime.__wmhPendingPlayerDestination;return;
+  }
+  if(path.length===0)path.push([targetX,targetY]);
   let step=0;
   const move=()=>{
     if(step>=path.length){delete player.dataset.moveTimer;delete runtime.__wmhPendingPlayerDestination;return;}
     const [x,y]=path[step++];
+    const isFinal=step===path.length;
+    const visualX=isFinal?finalPosition.x:x,visualY=isFinal?finalPosition.y:y;
     const tile=board.querySelector<HTMLElement>('[data-wmh-tile][data-x="'+x+'"][data-y="'+y+'"]');
     animateGridMove(player,()=>{
       player.dataset.x=String(x);player.dataset.y=String(y);
-      player.style.setProperty("--token-x",String(x));
-      player.style.setProperty("--token-y",String(y));
+      player.dataset.posX=String(visualX);player.dataset.posY=String(visualY);
+      player.style.setProperty("--token-x",String(visualX));
+      player.style.setProperty("--token-y",String(visualY));
     });
-    player.dataset.x=String(x);player.dataset.y=String(y);
     syncIsoDepthAndOcclusion(board);
     const material=tile?.dataset.surface||surface;
     playFootstep(material as "earth"|"wet"|"stone"|"wood"|"tile");
@@ -2533,26 +2559,31 @@ function captureArrivalState():{day:number;minutes:number;cycle:string;weather:s
   const atmosphere=getExpeditionAtmosphere();
   return {day:save.day,minutes:save.hour*60+save.minute,cycle:atmosphere.cycle,weather:atmosphere.weather};
 }
-export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement, onAdvanceTime: (minutes: number) => void): boolean {
+function replaceWorldMapDialogMarkup(dialog:HTMLElement,markup:string):void {
+  disposePlayerHudMotion(dialog);
+  dialog.innerHTML=markup;
+}
+export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement, onAdvanceTime: (minutes: number) => void, pointer?: {clientX:number;clientY:number}): boolean {
   if (!worldMapDeveloperMode && target.closest("[data-wmh-overlay-toggle],[data-wmh-overlay-tools],[data-wmh-overlay-minimize],[data-wmh-overlay-close],[data-wmh-academy-editor],[data-wmh-drag-marker],[data-wmh-coordinate],[data-wmh-editor-canvas]")) return true;
-  const action=target.closest<HTMLElement>("[data-wmh-action],[data-wmh-info],[data-wmh-site],[data-wmh-building],[data-wmh-npc],[data-wmh-plot],[data-wmh-tile],[data-wmh-reply],[data-wmh-transition],[data-wmh-transition-close],[data-wmh-dismiss-layer],[data-wmh-selection-card]");
+  const action=target.closest<HTMLElement>("[data-wmh-action],[data-wmh-info],[data-wmh-site],[data-wmh-building],[data-wmh-npc],[data-wmh-plot],[data-wmh-tile],[data-wmh-reply],[data-wmh-transition],[data-wmh-transition-close],[data-wmh-dismiss-layer],[data-wmh-selection-card],[data-hud-action]");
   if(!action)return false;
   const overlay=root.querySelector<HTMLElement>("[data-world-map-hierarchy]");
   const dialog=overlay?.querySelector<HTMLElement>("[data-wmh-dialog]");
   if(!overlay||!dialog)return false;
+  if(handlePlayerHudClick(target,dialog))return true;
   const current=(overlay.dataset.level as Level)||"world";
   const regionId=(overlay.dataset.region as RegionId)||"golden-dragon-empire";
   const building=overlay.dataset.building||"Tianhai Academy";
-  if(action.dataset.wmhAction==="open"){overlay.hidden=false;overlay.dataset.level="world";dialog.innerHTML=panelMarkup("world");bindWorldMapZoom(dialog);return true;}
-  if(action.dataset.wmhAction==="editor-open"){if(!worldMapDeveloperMode)return true;overlay.dataset.level="map-editor";dialog.innerHTML=panelMarkup("map-editor");bindWorldMapEditor(dialog);return true;}
-  if(action.dataset.wmhAction==="editor-close"){overlay.dataset.level="world";dialog.innerHTML=panelMarkup("world");bindWorldMapZoom(dialog);return true;}
+  if(action.dataset.wmhAction==="open"){overlay.hidden=false;overlay.dataset.level="world";replaceWorldMapDialogMarkup(dialog,panelMarkup("world"));bindWorldMapZoom(dialog);return true;}
+  if(action.dataset.wmhAction==="editor-open"){if(!worldMapDeveloperMode)return true;overlay.dataset.level="map-editor";replaceWorldMapDialogMarkup(dialog,panelMarkup("map-editor"));bindWorldMapEditor(dialog);return true;}
+  if(action.dataset.wmhAction==="editor-close"){overlay.dataset.level="world";replaceWorldMapDialogMarkup(dialog,panelMarkup("world"));bindWorldMapZoom(dialog);return true;}
   if(action.dataset.wmhAction==="editor-confirm"||action.dataset.wmhAction==="editor-reset")return true;
-  if(action.dataset.wmhAction==="close"){const outerClose=root.querySelector<HTMLButtonElement>("[data-idle-rpg-close]");if(outerClose)outerClose.click();else overlay.hidden=true;return true;}
+  if(action.dataset.wmhAction==="close"){disposePlayerHudMotion(dialog);const outerClose=root.querySelector<HTMLButtonElement>("[data-idle-rpg-close]");if(outerClose)outerClose.click();else overlay.hidden=true;return true;}
   if(action.dataset.wmhAction==="test-isometric"){
     if(!worldMapDeveloperMode)return true;
     stopNpcWander(dialog);
     overlay.dataset.level="test";
-    dialog.innerHTML=panelMarkup("test",regionId,"Isometric Render Test");
+    replaceWorldMapDialogMarkup(dialog,panelMarkup("test",regionId,"Isometric Render Test"));
     bindIsoAreaEditor(dialog);bindIsometricCamera(dialog);bindIsometricMapArt(dialog);bindIsometricHud(dialog);startNpcWander(dialog);
     return true;
   }
@@ -2566,7 +2597,7 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
     overlay.dataset.region="golden-dragon-empire";
     overlay.dataset.level="local";
     overlay.dataset.building="Tianhai Academy";
-    dialog.innerHTML=panelMarkup("local","golden-dragon-empire","Tianhai Academy");
+    replaceWorldMapDialogMarkup(dialog,panelMarkup("local","golden-dragon-empire","Tianhai Academy"));
     onAdvanceTime(180);
     bindIsoAreaEditor(dialog);
     bindIsometricCamera(dialog);
@@ -2578,7 +2609,7 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
   }
   if(action.dataset.wmhAction==="back"){
     const next:Level=current==="interior"?"local":current==="local"?"regional":"world";
-    stopNpcWander(dialog);overlay.dataset.level=next;dialog.innerHTML=panelMarkup(next,regionId,building);if(next==="world")bindWorldMapZoom(dialog);if(next==="regional")bindIsometricMapArt(dialog);if(next==="local"){bindIsoAreaEditor(dialog);bindIsometricCamera(dialog);bindIsometricMapArt(dialog);bindIsometricHud(dialog);startNpcWander(dialog);}return true;
+    stopNpcWander(dialog);overlay.dataset.level=next;replaceWorldMapDialogMarkup(dialog,panelMarkup(next,regionId,building));if(next==="world")bindWorldMapZoom(dialog);if(next==="regional")bindIsometricMapArt(dialog);if(next==="local"){bindIsoAreaEditor(dialog);bindIsometricCamera(dialog);bindIsometricMapArt(dialog);bindIsometricHud(dialog);startNpcWander(dialog);}return true;
   }
   if(action.hasAttribute("data-wmh-transition-close")){
     closeTransitionOverlays(dialog);
@@ -2591,7 +2622,7 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
     if(/^akses ke map golden dragon empire$/i.test(label)){
       closeTransitionOverlays(dialog);stopNpcWander(dialog);
       overlay.dataset.level="regional";overlay.dataset.region="golden-dragon-empire";
-      dialog.innerHTML=panelMarkup("regional","golden-dragon-empire");bindIsometricMapArt(dialog);
+      replaceWorldMapDialogMarkup(dialog,panelMarkup("regional","golden-dragon-empire"));bindIsometricMapArt(dialog);
       return true;
     }
     if(/^dialog box:/i.test(label)){showTransitionDialogue(dialog,"TIANHAI ACADEMY",label.replace(/^dialog box:\\s*/i,""));return true;}
@@ -2617,15 +2648,15 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
   if(action.hasAttribute("data-wmh-dismiss-layer")||action.dataset.wmhAction==="selection-no"){dialog.querySelector("[data-wmh-selection-host]")?.replaceChildren();return true;}
   if(action.dataset.wmhAction==="selection-yes"){
     const id=action.dataset.markerId as WorldMarkerId;const info=readWorldMarkers().find(item=>item.id===id);if(!info)return true;
-    if(["golden-dragon-empire","tianhai-yunzhou","beiming-gu"].includes(id)){overlay.dataset.region=id;overlay.dataset.level="regional";dialog.innerHTML=panelMarkup("regional",id as RegionId);}
-    else {overlay.dataset.region="golden-dragon-empire";overlay.dataset.level="regional";dialog.innerHTML=panelMarkup("regional","golden-dragon-empire",info.name,info);}
+    if(["golden-dragon-empire","tianhai-yunzhou","beiming-gu"].includes(id)){overlay.dataset.region=id;overlay.dataset.level="regional";replaceWorldMapDialogMarkup(dialog,panelMarkup("regional",id as RegionId));}
+    else {overlay.dataset.region="golden-dragon-empire";overlay.dataset.level="regional";replaceWorldMapDialogMarkup(dialog,panelMarkup("regional","golden-dragon-empire",info.name,info));}
     bindIsometricMapArt(dialog);
     return true;
   }
   if(action.dataset.wmhSite){
     const arrival=captureArrivalState();
     overlay.dataset.level="local";overlay.dataset.building=action.dataset.wmhSite;
-    dialog.innerHTML=panelMarkup("local",regionId,action.dataset.wmhSite);
+    replaceWorldMapDialogMarkup(dialog,panelMarkup("local",regionId,action.dataset.wmhSite));
     onAdvanceTime(180);
     bindIsoAreaEditor(dialog);bindIsometricCamera(dialog);bindIsometricMapArt(dialog);bindIsometricHud(dialog);startNpcWander(dialog);
     requestAnimationFrame(()=>animateIsometricArrival(dialog,arrival));
@@ -2635,7 +2666,7 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
     const arrival=captureArrivalState();
     stopNpcWander(dialog);
     overlay.dataset.level="interior";overlay.dataset.building=action.dataset.wmhBuilding;
-    dialog.innerHTML=panelMarkup("interior",regionId,action.dataset.wmhBuilding);
+    replaceWorldMapDialogMarkup(dialog,panelMarkup("interior",regionId,action.dataset.wmhBuilding));
     onAdvanceTime(180);
     bindIsoAreaEditor(dialog);bindIsometricCamera(dialog);bindIsometricMapArt(dialog);bindIsometricHud(dialog);
     requestAnimationFrame(()=>animateIsometricArrival(dialog,arrival));
@@ -2643,7 +2674,9 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
   }
   if(action.hasAttribute("data-wmh-tile")){
     if(dialog.querySelector<HTMLElement>("[data-wmh-board]")?.classList.contains("wmh-overlay-editing"))return true;
-    walkToTile(dialog,Number(action.dataset.x),Number(action.dataset.y),action.dataset.surface||"earth");return true;
+    const x=Number(action.dataset.x),y=Number(action.dataset.y),board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
+    const position=pointer&&board?resolveIsoSubcellTarget(board,pointer.clientX,pointer.clientY,x,y,readIsoMapData(board).grid):null;
+    walkToTile(dialog,x,y,action.dataset.surface||"earth",position||undefined);return true;
   }
   if(action.dataset.wmhNpc){
     const npcId=action.dataset.wmhNpc;
@@ -2673,7 +2706,7 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
     replies.innerHTML=npc.choices.map((c,i)=>'<button type="button" data-wmh-reply="'+i+'" data-npc-id="'+npcId+'">'+c+'</button>').join("");
     return true;
   }
-  if(action.dataset.wmhAction==="exit-local"){onAdvanceTime(180);overlay.dataset.level="regional";dialog.innerHTML=panelMarkup("regional",regionId);return true;}
+  if(action.dataset.wmhAction==="exit-local"){onAdvanceTime(180);overlay.dataset.level="regional";replaceWorldMapDialogMarkup(dialog,panelMarkup("regional",regionId));return true;}
   if(action.dataset.wmhPlot){dialog.insertAdjacentHTML("beforeend",'<div class="wmh-toast">'+action.dataset.wmhPlot+' · function details coming soon</div>');return true;}
   return false;
 }

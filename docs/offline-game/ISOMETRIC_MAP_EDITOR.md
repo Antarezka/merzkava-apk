@@ -47,3 +47,10 @@ Use unique stable map IDs for each exterior, interior, or other isometric scene.
 - Academy NPCs are positioned at the owner-marked cells (7,4), (10,9), (6,15), and (22,10). Wandering remains inside the selected walkable whitelist and respects blocked-sector edges; NPCs do not walk into the Player or another NPC. Area-specific greetings, choices and replies remain in world-map-hierarchy.ts. The current code blocks interaction only when Player and NPC occupy the same cell; a maximum interaction radius still needs confirmation against the approved NPC/chat rules. See ISOMETRIC_FIELD_SYSTEM.md.
 
 Academy interior and all non-Academy interiors remain empty Map Base placeholders until their own map artwork is supplied.
+
+
+## Fractional actor position inside a cell
+
+The Player keeps integer data-x/y coordinates for whitelist checks, actor occupancy, NPC interaction and BFS. Separate data-pos-x/y visual coordinates may be fractional inside the selected walkable diamond. A tap is mapped through the isometric overlay SVG viewBox and inset into the diamond so the actor is not forced to stop at its center. This remains a visual sub-cell endpoint; it does not authorize movement through blocked cells or closed half-edges.
+
+For a cardinal transition, an edge is closed only when both child sub-sectors on that same edge are blocked. Blocking one child sector leaves the remaining half of that edge traversable. The same rule applies to Player routing and NPC reachability.

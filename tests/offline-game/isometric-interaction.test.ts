@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { createIsoMapEditorData, DEFAULT_ISOMETRIC_GRID, isoCellCenter } from "../../src/offline-game/isometric-map-editor";
-import { isIsoQuadrantEdgeFullyBlocked, isNpcInteractionCellReachable, isoSubcellPositionAtPoint } from "../../src/offline-game/isometric-interaction";
+import { createIsoMapEditorData } from "../../src/offline-game/isometric-map-editor";
+import { isIsoQuadrantEdgeFullyBlocked, isNpcInteractionCellReachable } from "../../src/offline-game/isometric-interaction";
 
 describe("tile-aware NPC interaction reach",()=>{
   it("allows interaction from one orthogonally adjacent walkable cell",()=>{
@@ -47,24 +47,5 @@ describe("tile-aware NPC interaction reach",()=>{
     const data=createIsoMapEditorData("npc-custom",{cols:8,rows:6});
     data.customGridCells=["8,2","9,2"];
     expect(isNpcInteractionCellReachable(data,{x:8,y:2},{x:9,y:2})).toBe(true);
-  });
-});
-
-describe("fractional isometric actor positions",()=>{
-  it("resolves a tap to a fractional point within the selected diamond",()=>{
-    const center=isoCellCenter(4,6,DEFAULT_ISOMETRIC_GRID);
-    const point={x:center.x+(DEFAULT_ISOMETRIC_GRID.tileW/2)*0.3,y:center.y+(DEFAULT_ISOMETRIC_GRID.tileH/2)*0.1};
-    const resolved=isoSubcellPositionAtPoint(point,4,6,DEFAULT_ISOMETRIC_GRID);
-    expect(resolved?.x).toBeCloseTo(4.2,5);
-    expect(resolved?.y).toBeCloseTo(6.1,5);
-  });
-  it("keeps edge taps inside the actor-safe diamond while rejecting taps outside",()=>{
-    const center=isoCellCenter(2,3,DEFAULT_ISOMETRIC_GRID);
-    const halfW=DEFAULT_ISOMETRIC_GRID.tileW/2,halfH=DEFAULT_ISOMETRIC_GRID.tileH/2;
-    const nearEdge={x:center.x+(halfW*0.9),y:center.y+(halfH*0.1)};
-    const resolved=isoSubcellPositionAtPoint(nearEdge,2,3,DEFAULT_ISOMETRIC_GRID);
-    expect(resolved).not.toBeNull();
-    expect(Math.abs(resolved!.x-2)+Math.abs(resolved!.y-3)).toBeCloseTo(0.86,5);
-    expect(isoSubcellPositionAtPoint({x:center.x+halfW*1.1,y:center.y},2,3,DEFAULT_ISOMETRIC_GRID)).toBeNull();
   });
 });
