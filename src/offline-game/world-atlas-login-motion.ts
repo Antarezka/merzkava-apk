@@ -88,44 +88,119 @@ export async function playWorldAtlasAccessSequence(
   const status=buffer?.querySelector<HTMLElement>("[data-atlas-buffer-status]");
   const progress=buffer?.querySelector<HTMLElement>("[data-atlas-buffer-progress]");
   if(!buffer||!status||!progress)return;
-  const stages=(buffer.dataset.bufferStages||gate.dataset.bufferStages||"Verifying account identity...|Checking credentials...|Preparing access...").split("|");
-  const logs=(buffer.dataset.bufferLogs||gate.dataset.bufferLogs||"ACCOUNT ROUTE...|CREDENTIAL CHECK...|SESSION HANDOFF...").split("|");
+
+  const stages=(buffer.dataset.bufferStages||gate.dataset.bufferStages||"Resolving account identity...|Checking account state...|Verifying credentials...|Preparing access...").split("|");
+  const logs=(buffer.dataset.bufferLogs||gate.dataset.bufferLogs||"ACCOUNT ROUTE...|CREDENTIAL STORE...|VERIFICATION...|SESSION HANDOFF...").split("|");
   const reduced=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches??false;
   if(signal?.aborted)throw abortError();
-  const operationResult=holdUntil?holdUntil.then(value=>({ok:true as const,value}),error=>({ok:false as const,error})):Promise.resolve({ok:true as const,value:undefined});
+
+  const operationResult=holdUntil
+    ?holdUntil.then(
+      value=>({ok:true as const,value}),
+      error=>({ok:false as const,error})
+    )
+    :Promise.resolve({ok:true as const,value:undefined});
+
   buffer.hidden=false;
   buffer.setAttribute("aria-hidden","false");
   gate.dataset.atlasBuffering="true";
   progress.style.transformOrigin="left center";
   progress.style.willChange="transform";
   progress.style.transform="scaleX(0)";
+
   const activeAnimations:Array<ReturnType<typeof animate>>=[];
+  const runAnimation=(target:HTMLElement,parameters:Parameters<typeof animate>[1])=>{
+    const animation=animate(target,parameters);
+    activeAnimations.push(animation);
+    return animation;
+  };
+
   const scope=createScope({root:gate}).add(self=>{
     if(!self)return;
     const orbit=buffer.querySelector<HTMLElement>(".atlas-buffer-orbit");
     const scan=buffer.querySelector<HTMLElement>(".atlas-buffer-scan");
-    const core=buffer.querySelector<HTMLElement>(".atlas-buffer-core");
-    if(orbit&&!reduced)animate(orbit,{rotate:"1turn",duration:7200,ease:"linear",loop:true});
-    if(scan&&!reduced)animate(scan,{translateX:["-55%","55%"],duration:4600,ease:"inOutSine",alternate:true,loop:true});
-    if(core&&!reduced)animate(core,{scale:[.99,1.02],duration:3600,ease:"inOutSine",alternate:true,loop:true});
+    const glow=buffer.querySelector<HTMLElement>(".atlas-buffer-core");
+    if(orbit&&!reduced)animate(orbit,{rotate:"1turn",duration:4200,ease:"linear",loop:true});
+    if(scan&&!reduced)animate(scan,{translateX:["-120%","260%"],duration:1350,ease:"inOutSine",loop:true});
+    if(glow&&!reduced)animate(glow,{scale:[.94,1.06],opacity:[.58,1],duration:1150,ease:"inOutSine",loop:true,alternate:true});
   });
-  const firstStage=stages[0]||"Verifying account access...";
-  const firstLog=logs[0]||"ACCOUNT CHECK";
-  status.textContent=firstStage;
-  status.dataset.technicalStep=firstLog;
-  status.setAttribute("aria-label",firstStage+" · "+firstLog);
+
+  let activeDiagnosticKey="";
+  const transitionDiagnostic=async(element:HTMLElement,nextText:string)=>{
+    if(signal?.aborted)throw abortError();
+    element.textContent=nextText;
+    if(reduced)return;
+    // Replace the line in place with a short Anime.js arrival; never fade it to zero.
+    runAnimation(element,{opacity:[.72,1],translateY:[3,0],duration:72,ease:"outCubic"});
+    await wait(72,signal);
+  };
+  const showFrame=async(stage:string,logLine:string,dots:number)=>{
+    status.dataset.technicalStep=logLine;
+    status.setAttribute("aria-label",stage+" · "+logLine);
+    const nextText=formatAccessDiagnosticFrame(stage,dots);
+    const key=stage+"|"+logLine;
+    if(key!==activeDiagnosticKey){
+      activeDiagnosticKey=key;
+      await transitionDiagnostic(status,nextText);
+    }else{
+      // The punctuation is a live frame, not a new diagnostic line: update it
+      // without a fade so the text and progress rail never appear to blink.
+      status.textContent=nextText;
+    }
+  };
+  const moveProgress=async(from:number,to:number,milliseconds:number)=>{
+    if(signal?.aborted)throw abortError();
+    if(reduced){
+      progress.style.transform="scaleX("+(to/100)+")";
+      await wait(milliseconds,signal);
+      return;
+    }
+    runAnimation(progress,{scaleX:[from/100,to/100],duration:milliseconds,ease:"outSine"});
+    await wait(milliseconds,signal);
+  };
+
   try{
-    const durationMs=Math.max(0,duration);
-    if(reduced)progress.style.transform="scaleX(.92)";
-    else if(durationMs>0)activeAnimations.push(animate(progress,{scaleX:[0,.92],duration:durationMs,ease:"linear"}));
-    const [outcome]=await Promise.all([operationResult,wait(durationMs,signal)]);
+    const plan=createWorldAtlasProgressPlan(Math.max(stages.length,logs.length),duration);
+    let previousProgress=0;
+    for(let index=0;index<plan.length;index++){
+      if(signal?.aborted)throw abortError();
+      const step=plan[index];
+      const stage=stages[index%stages.length]||"Preparing access";
+      const logLine=logs[index%logs.length]||"VERIFYING";
+
+      // The first frame accompanies movement. The next two replace it while
+      // the bar is stopped at this checkpoint, giving the requested stutter.
+      await showFrame(stage,logLine,1);
+      await moveProgress(previousProgress,step.target,step.advanceMs);
+      await showFrame(stage,logLine,2);
+      await wait(step.frameMs,signal);
+      await showFrame(stage,logLine,3);
+      await wait(step.frameMs,signal);
+      await wait(step.stallMs,signal);
+      previousProgress=step.target;
+    }
+
+    // A slow source/credential operation holds the bar near completion while
+    // the same current frame continues its subtle dot animation.
+    let outcome:Awaited<typeof operationResult>|null=null;
+    let dotFrame=1;
+    while(!outcome){
+      outcome=await Promise.race([
+        operationResult,
+        wait(180,signal).then(()=>null)
+      ]);
+      if(!outcome){
+        const stage=stages[stages.length-1]||"Finalizing access";
+        const logLine=logs[logs.length-1]||"FINAL HANDSHAKE";
+        await showFrame(stage,logLine,dotFrame);
+        dotFrame=dotFrame===3?1:dotFrame+1;
+      }
+    }
     if(signal?.aborted)throw abortError();
     if(!outcome.ok)throw outcome.error;
-    if(reduced)progress.style.transform="scaleX(1)";
-    else{activeAnimations.push(animate(progress,{scaleX:[.92,1],duration:200,ease:"outCubic"}));await wait(200,signal);}
-    status.textContent=stages[stages.length-1]||"Access confirmed.";
-    status.dataset.technicalStep=logs[logs.length-1]||"SESSION READY";
-    status.setAttribute("aria-label",status.textContent+" · "+status.dataset.technicalStep);
+
+    await moveProgress(previousProgress,100,reduced?0:220);
+    await showFrame(stages[stages.length-1]||"Access complete",logs[logs.length-1]||"SESSION READY",3);
   }finally{
     for(const animation of activeAnimations)animation.pause();
     scope.revert();
