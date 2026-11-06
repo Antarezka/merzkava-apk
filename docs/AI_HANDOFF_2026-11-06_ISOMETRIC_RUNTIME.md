@@ -107,9 +107,10 @@ These are two distinct camera behaviors and must never be conflated:
 
 ## 6. Verification and build status
 
-- Web validation on source checkpoint `160458486cf7b69400651614252e66942b48ffa6`: **passed** (gameplay tests and TypeScript/Vite production build).
-- The follow-up APK workflow was triggered from the branch after adding the branch to `.github/workflows/build-android.yml`. Check the live Actions page for the newest run:
-  [Android builds for this branch](https://github.com/Antarezka/merzkava-apk/actions/workflows/build-android.yml?query=branch%3Afix%2F1348-token-only-motion-camera-center-subcell)
+- Web validation #2599 on code checkpoint `2be3fee29e56b6bb062bf93acf46ab0e19387928` (later test-only/documentation commits do not change runtime code): **passed** — 39 test files / 290 tests; TypeScript and Vite production build passed. Run: [Web App Validation #2599](https://github.com/Antarezka/merzkava-apk/actions/runs/42206365559).
+- Android Build **#1360** is the APK for the current runtime code checkpoint `2be3fee29e56b6bb062bf93acf46ab0e19387928`. Direct run: [Android Build #1360](https://github.com/Antarezka/merzkava-apk/actions/runs/42206235982). Check the live artifact list/steps on this page; APK upload occurs before the Android 14 emulator step.
+- The current working branch is `fix/1348-token-only-motion-camera-center-subcell`. The Build 1348 parent source is `1a128afe0c0dee753963144c2f4fc71a54b41805`; source/runtime fixes through the APK run are captured at `2be3fee29e56b6bb062bf93acf46ab0e19387928`.
+- Current branch's newest Web validation link: [Actions on this branch](https://github.com/Antarezka/merzkava-apk/actions/workflows/validate.yml?query=branch%3Afix%2F1348-token-only-motion-camera-center-subcell)
 - APK upload is ordered **before** the Android 14 emulator step. An emulator failure must not be mistaken for an APK compile/package failure, and an uploaded artifact remains the installable package even if the emulator smoke-test fails.
 - Do not claim Android emulator or TECNO physical-device QA passed unless the workflow/device result explicitly shows it. The owner expects the emulator step may fail; report it honestly and retain the artifact link.
 - A physical test on TECNO Spark Go 1 KL4 is still the decisive check for map flicker, sub-cell movement feel, center placement, touch gestures and actual performance.
