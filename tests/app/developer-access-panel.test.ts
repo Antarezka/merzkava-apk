@@ -17,6 +17,8 @@ describe("Account controls in Settings",()=>{
       expect(html).toContain("developer-atlas-reset-confirm");
       expect(html).toContain('id="developer-atlas-reset-request"');
       expect(html).toContain("data-atlas-reset-copy-request");
+      expect(html).toContain('data-buffer-context="developer"');
+      expect(html).toContain("LOCAL CREDENTIAL STORE...");
     }
   });
 
@@ -28,6 +30,26 @@ describe("Account controls in Settings",()=>{
       expect(player).not.toContain("data-dev-logout");
       expect(accountSettingsPanel(language.code,false,false)).toBe("");
     }
+  });
+});
+
+describe("Mode-specific animated access sequence",()=>{
+  it("uses a live-source diagnostic sequence for Player login",()=>{
+    const html=developerLoginPanel("en","","",false,"",false,"player");
+    expect(html).toContain('data-offline-label="Player sign-in requires an active internet connection');
+    expect(html).toContain('data-buffer-context="player"');
+    expect(html).toContain("NETWORK REACHABILITY...");
+    expect(html).toContain("PLAYER REGISTRY FETCH...");
+    expect(html).not.toContain("LOCAL CREDENTIAL STORE...");
+  });
+
+  it("keeps Developer access on a local-only diagnostic sequence",()=>{
+    const html=developerLoginPanel("en","",false,false,"",false,"developer");
+    expect(html).toContain('data-buffer-context="developer"');
+    expect(html).toContain("LOCAL CREDENTIAL STORE...");
+    expect(html).toContain("PBKDF2-SHA256 DERIVATION...");
+    expect(html).not.toContain("NETWORK REACHABILITY...");
+    expect(html).not.toContain("UNIVERSE SOURCE ROUTE...");
   });
 });
 
