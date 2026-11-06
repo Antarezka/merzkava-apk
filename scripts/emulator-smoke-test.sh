@@ -85,18 +85,38 @@ if [[ "$ACTIVITY_READY" -ne 1 ]]; then
 fi
 echo "Capturing Kitty splash frames immediately after first app draw..."
 FOCUSED_WINDOW=""
-for attempt in 1 2 3; do
+# Android 14 can surface a transient permission/system sheet after the WebView
+# has already drawn. Give that sheet time to clear, and explicitly bring the
+# existing singleTop activity forward instead of treating the first lost-focus
+# sample as an app launch failure.
+FOCUS_READY=0
+for attempt in $(seq 1 12); do
   FOCUSED_WINDOW="$(timeout 8s adb shell dumpsys window windows 2>/dev/null | grep -E 'mCurrentFocus|mFocusedApp' | head -n 2 || true)"
   if grep -q 'com.antarezka.merzkava' <<< "$FOCUSED_WINDOW"; then
+    FOCUS_READY=1
+    echo "Merzkava regained foreground focus (attempt $attempt/12)."
     break
   fi
-  echo "A system window is temporarily covering Merzkava; dismissing transient dialog (attempt $attempt/3)."
+  APP_PID_CHECK="$(timeout 8s adb shell pidof com.antarezka.merzkava 2>/dev/null | tr -d '\r' || true)"
+  if [[ -z "$APP_PID_CHECK" ]]; then
+    echo "Merzkava process exited while waiting for foreground focus."
+    echo "$FOCUSED_WINDOW"
+    collect_diagnostics
+    exit 1
+  fi
+  echo "A transient system window is above the running app (attempt $attempt/12)."
   echo "$FOCUSED_WINDOW"
   adb shell input keyevent 4 >/dev/null 2>&1 || true
+  sleep 2
+  if (( attempt % 3 == 0 )); then
+    echo "Reasserting the already-installed Merzkava launcher activity..."
+    timeout 20s adb shell am start -W -n "$LAUNCHER_COMPONENT" >/dev/null 2>&1 || true
+  fi
   sleep 3
 done
-if ! grep -q 'com.antarezka.merzkava' <<< "$FOCUSED_WINDOW"; then
-  echo "Merzkava did not regain foreground focus after transient system-dialog dismissal."
+if [[ "$FOCUS_READY" -ne 1 ]]; then
+  echo "Merzkava stayed alive and drew its window but did not regain foreground focus after system-window recovery attempts."
+  echo "$FOCUSED_WINDOW"
   collect_diagnostics
   exit 1
 fi
