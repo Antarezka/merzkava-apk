@@ -77,8 +77,9 @@ For every future Android build that changes animation, canvas, overlays, or inpu
 
 ## 7. Permanent engineering rule
 
-- Do not reintroduce PixiJS into this app's UI/input path.
-- Keep animation on Anime.js and ordinary DOM elements unless a future change has a demonstrated need, a reproducible Android test, and explicit approval.
-- Do not add a second pointer/touch event system over the app's DOM controls casually.
-- Never modify Noticeboard, Floating Control, pull-cord behavior, or unrelated interaction flows as a side effect of an animation repair.
-- If a similar symptom returns, first compare the exact build and dependency changes against the resolved commit. Do not assume that a click sound means the action succeeded.
+- Do not place PixiJS in the shared application UI or input path. Noticeboard, Floating Control, Kitty bubble, pull cord, menus, forms, dialogs and all gameplay controls must remain ordinary DOM controls.
+- Existing DOM animation remains on Anime.js unless a separate, demonstrated need is approved. The owner has explicitly approved a narrowly isolated PixiJS visual-renderer experiment for the Eternal Path World Atlas; this is an exception for world presentation only, not permission to replace the app shell or introduce Pixi-owned input.
+- The approved Pixi experiment must remove PixiJS EventSystem and AccessibilitySystem before renderer initialization, use a non-interactive canvas, retain DOM as the sole owner of pointer/touch/keyboard input, and preserve a working DOM fallback.
+- The experiment remains unapproved for production until automated regression checks and physical Android touch QA pass on the TECNO Spark Go 1 KL4. A successful web build is not device certification.
+- Never modify Noticeboard, Floating Control, pull-cord behavior, or unrelated interaction flows as a side effect of an animation/rendering experiment.
+- If a similar symptom returns, compare the exact build and dependency changes against the resolved repair commit. Do not assume that a click sound means the action succeeded.
