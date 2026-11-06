@@ -759,12 +759,6 @@ function isoGridCellExists(data:IsoMapEditorData,x:number,y:number):boolean {
 function isoCellIsWalkable(data:IsoMapEditorData,x:number,y:number):boolean {
   return isoGridCellExists(data,x,y)&&(!data.walkableAreaEnabled||data.walkableCells.includes(isoCellKey(x,y)))&&!isoCellHasLayer(data,"blockedCells",x,y);
 }
-function isoCanStep(data:IsoMapEditorData,fromX:number,fromY:number,toX:number,toY:number):boolean {
-  if(!isoGridCellExists(data,fromX,fromY)||!isoCellIsWalkable(data,toX,toY))return false;
-  const edges:Record<string,["tl"|"tr"|"bl"|"br","tl"|"tr"|"bl"|"br"]>={"1,0":["br","tl"],"-1,0":["tl","br"],"0,1":["bl","tr"],"0,-1":["tr","bl"]};
-  const edge=edges[(toX-fromX)+","+(toY-fromY)];
-  return !!edge&&!isIsoQuadrantEdgeFullyBlocked(data,fromX,fromY,edge[0])&&!isIsoQuadrantEdgeFullyBlocked(data,toX,toY,edge[1]);
-}
 function isoQuadrantTrianglePoints(x:number,y:number,quadrant:IsoQuadrant,grid:IsoMapGridConfig):string {
   const c=isoCellCenter(x,y,grid),top={x:c.x,y:c.y-grid.tileH/2},right={x:c.x+grid.tileW/2,y:c.y},bottom={x:c.x,y:c.y+grid.tileH/2},left={x:c.x-grid.tileW/2,y:c.y},center={x:c.x,y:c.y};
   const midpoint=(a:{x:number;y:number},b:{x:number;y:number})=>({x:(a.x+b.x)/2,y:(a.y+b.y)/2});
