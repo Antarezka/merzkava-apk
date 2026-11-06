@@ -4,6 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
+      - 03-floating-pixi-world-atlas-tv-console-2026-11-06
       - feature/opening-splash-screen
       - feature/floating-mode-ledger
       - feature/archive-experience
