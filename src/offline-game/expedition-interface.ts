@@ -103,23 +103,6 @@ export function renderExpeditionInterface():string {
       </button>
       ${renderIdleHomeMap(save?{day:save.day,hour:save.hour,minute:save.minute,cycle:atmosphere.cycle==="Morning"?"Day":atmosphere.cycle}:null)}
     </div>
-    <div class="expedition-pxl-modal" data-augusto-pxl-modal hidden>
-      <button type="button" class="expedition-pxl-backdrop" data-augusto-pxl-close aria-label="Close Augusto PXL panel"></button>
-      <section class="expedition-pxl-dialog" role="dialog" aria-modal="true" aria-labelledby="augusto-pxl-title">
-        <header><span>VISUAL ASSET WORKSHOP · NEXT PRIORITY</span><button type="button" data-augusto-pxl-close aria-label="Close panel">×</button></header>
-        <h3 id="augusto-pxl-title">Augusto PXL</h3>
-        <p class="expedition-pxl-lead">Full visual-production pipeline for Merzkava Universe — not a replacement game engine.</p>
-        <ol>
-          <li>Install and validate the PXL authoring/build workflow in GitHub Actions.</li>
-          <li>Create reusable source libraries for characters, environments, tilesets, props, effects, UI artwork and cinematics.</li>
-          <li>Export optimized PNG sheets, animation metadata and Tiled maps.</li>
-          <li>Connect those exports to the existing DOM/CSS/SVG renderer through a small asset adapter.</li>
-          <li>Migrate areas gradually, preserving Academy artwork, movement, NPC logic, HUD, editors and saves.</li>
-        </ol>
-        <p class="expedition-pxl-note">PXL is planned as a development-time asset pipeline. PixiJS is not being reintroduced into the Android runtime or touch/input path.</p>
-        <button type="button" class="expedition-pxl-dismiss" data-augusto-pxl-close>Close</button>
-      </section>
-    </div>
     ${choiceModal}
     <footer class="expedition-footer"><span>ETERNAL PATH · LOCAL JOURNEY</span><span>WORLD ARCHIVE · READ ONLY</span></footer></section>`;
 }
