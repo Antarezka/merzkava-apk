@@ -2165,7 +2165,7 @@
 
 
 /* Pixi World Atlas: visuals move to the transparent canvas; native DOM hit targets remain active. */
-.wmh-pixi-world-canvas{position:absolute!important;inset:0!important;z-index:700!important;pointer-events:none!important;touch-action:auto!important}
+.wmh-pixi-world-canvas{position:absolute!important;inset:0!important;z-index:300!important;pointer-events:none!important;touch-action:auto!important}
 .wmh-pixi-world-canvas[hidden]{display:none!important}
 [data-wmh-board].wmh-pixi-render-active [data-wmh-map-art],
 [data-wmh-board].wmh-pixi-render-active [data-wmh-scene-svg],
