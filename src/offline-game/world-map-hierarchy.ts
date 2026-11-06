@@ -7,7 +7,7 @@ import { getEternalSave, getExpeditionAtmosphere } from "./expedition-game";
 import { TIANHAI_ACADEMY_MAP_REFERENCE } from "./tianhai-academy-map-reference";
 import {
   createIsoMapEditorData, DEFAULT_ISOMETRIC_GRID, DEFAULT_ISO_CANVAS_EXPANSION, normalizeIsoCanvasExpansion, isoCellAtPoint, isoCellCenter, isoCellHasLayer,
-  isoCellKey, isoClientToImagePoint, isoMapStorageKey, isoPointerGesture, isoQuadrantAtPoint, mergeIsoWalkableCells, type IsoQuadrant, normalizeIsoMapEditorData, removeIsoWalkableCell, toggleIsoQuadrantLayer, unmergeIsoWalkableCell,
+  isoCellKey, isoClientToImagePoint, isoMapStorageKey, isoPointerGesture, isoQuadrantAtPoint, mergeIsoWalkableCells, normalizeIsoMapEditorData, removeIsoWalkableCell, toggleIsoQuadrantLayer, unmergeIsoWalkableCell,
   type IsoMapEditorData, type IsoMapGridConfig, type IsoMapPoint, type IsoQuadrant, type IsoQuadrantLayer,
 } from "./isometric-map-editor";
 import { renderIsometricSvgSceneMarkup, refreshIsometricSvgScene, type IsometricSvgTheme } from "./isometric-svg-board";
@@ -2511,13 +2511,13 @@ function walkToTile(
     return;
   }
 
-  const occupiedNpcs=Array.from(board.querySelectorAll<HTMLElement>("[data-wmh-npc]"))
-    .map(npc=>String(npc.dataset.x||0)+","+String(npc.dataset.y||0));
+  const occupiedNpcs=new Set(Array.from(board.querySelectorAll<HTMLElement>("[data-wmh-npc]"))
+    .map(npc=>String(npc.dataset.x||0)+","+String(npc.dataset.y||0)));
   const path=findIsoQuadrantPath(
     mapData,
     {x:startX,y:startY,quadrant:startQuadrant},
     {x:targetX,y:targetY,quadrant:destinationQuadrant},
-    occupiedNpcs,
+    Array.from(occupiedNpcs),
   );
   if(!path){
     delete runtime.__wmhPendingPlayerDestination;

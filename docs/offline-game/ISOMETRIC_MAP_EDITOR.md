@@ -53,4 +53,4 @@ Academy interior and all non-Academy interiors remain empty Map Base placeholder
 
 The Player keeps integer data-x/y coordinates for whitelist checks, actor occupancy, NPC interaction and BFS. Separate data-pos-x/y visual coordinates may be fractional inside the selected walkable diamond. A tap is mapped through the isometric overlay SVG viewBox and inset into the diamond so the actor is not forced to stop at its center. This remains a visual sub-cell endpoint; it does not authorize movement through blocked cells or closed half-edges.
 
-For a cardinal transition, an edge is closed only when both child sub-sectors on that same edge are blocked. Blocking one child sector leaves the remaining half of that edge traversable. The same rule applies to Player routing and NPC reachability.
+For a cardinal transition, each half-edge is checked independently by the sector graph: one blocked child sector leaves the matching open half traversable; blocking both closes the full edge. NPC interaction reachability uses the same full-edge condition.
