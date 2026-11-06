@@ -276,8 +276,8 @@ scene("academy-exterior-render", {
   sizes:{"academy-exterior":4},
   check:{every:1},
 },
-  (c)=>c.mesh(CAM,CAMPUS.faces,MATS,{sprites,...LIGHT}),
-  // A faint guide exists only in the PXL editor/preview; it is excluded from the exported PNG.
+  // The faint guide is editor-only and excluded from the exported PNG.
   layer("approved-layout-reference",{ref:0.12},stamp("_academy-pixel-source",352,192)),
+  (c)=>c.mesh(CAM,CAMPUS.faces,MATS,{sprites,...LIGHT}),
   post({blur:2,focus:[W/2,H*0.54],sharp:2,soft:[2,6],bloom:{levels:4,strength:0.34,above:0.92},vignette:0.14}),
 )
