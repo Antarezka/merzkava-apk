@@ -118,9 +118,9 @@ export async function playWorldAtlasAccessSequence(
     const orbit=buffer.querySelector<HTMLElement>(".atlas-buffer-orbit");
     const scan=buffer.querySelector<HTMLElement>(".atlas-buffer-scan");
     const glow=buffer.querySelector<HTMLElement>(".atlas-buffer-core");
-    if(orbit)animate(orbit,{rotate:"1turn",duration:reduced?9000:4200,ease:"linear",loop:true});
+    if(orbit&&!reduced)animate(orbit,{rotate:"1turn",duration:4200,ease:"linear",loop:true});
     if(scan&&!reduced)animate(scan,{translateX:["-120%","260%"],duration:1350,ease:"inOutSine",loop:true});
-    if(glow)animate(glow,{scale:reduced?[.98,1.02]:[.94,1.06],opacity:reduced?[.78,1]:[.58,1],duration:reduced?2400:1150,ease:"inOutSine",loop:true,alternate:true});
+    if(glow&&!reduced)animate(glow,{scale:[.94,1.06],opacity:[.58,1],duration:1150,ease:"inOutSine",loop:true,alternate:true});
   });
 
   const transitionDiagnostic=async(element:HTMLElement,nextText:string)=>{
