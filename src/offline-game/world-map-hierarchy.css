@@ -1970,3 +1970,35 @@
   .wmh-tile-trail-wave{display:none!important}
   .wmh-sonar-ring{transition:none!important;animation:none!important}
 }
+
+
+/* Token-attached sensing and gentle movement light. These effects live in the
+   actor's own coordinate space, so the camera can pan or zoom without detaching them. */
+.wmh-character-token{isolation:isolate}
+.wmh-character-token>i{position:relative;z-index:2}
+.wmh-sonar-ring{
+  z-index:0!important;left:50%!important;top:50%!important;
+  translate:-50% -50%!important;transform:scale(.08);
+  border:1px solid var(--scan-color,#d8c18b)!important;
+  box-shadow:0 0 9px color-mix(in srgb,var(--scan-color,#d8c18b) 22%,transparent)!important;
+  background:radial-gradient(ellipse,transparent 65%,color-mix(in srgb,var(--scan-color,#d8c18b) 10%,transparent) 100%)!important;
+}
+.wmh-sonar-ring.ring-1{border-style:dashed!important;border-width:.8px!important}
+.wmh-token-movement-glow{
+  position:absolute!important;z-index:1!important;left:calc(50% + var(--move-shift-x,0px))!important;top:calc(50% + var(--move-shift-y,0px))!important;
+  width:135%!important;height:115%!important;translate:-50% -50%!important;border-radius:50%!important;
+  background:radial-gradient(ellipse,#f3d99a55 0%,#d9ad5a2b 43%,transparent 76%)!important;
+  filter:blur(1.5px);pointer-events:none!important;will-change:transform,opacity;
+}
+.wmh-player-tap-glow{
+  position:absolute!important;z-index:7!important;display:block!important;pointer-events:none!important;
+  translate:-50% -50%!important;border-radius:50%!important;
+  background:radial-gradient(ellipse,#fff0bd8a 0%,#edc77b55 35%,#d2a65c22 65%,transparent 78%)!important;
+  filter:blur(1.2px);mix-blend-mode:screen;will-change:transform,opacity;
+}
+.wmh-player-tap-glow:after{
+  position:absolute;content:"";inset:17%;border:1px solid #f5d99699;border-radius:50%;
+  box-shadow:0 0 12px #f1d08a55;
+}
+.wmh-isometric-board .wmh-vector-cells polygon[data-wmh-tile]{transition:filter .14s ease}
+.wmh-isometric-board .wmh-vector-cells polygon[data-wmh-tile]:active{filter:brightness(1.12)!important}

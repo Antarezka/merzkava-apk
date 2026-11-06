@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createIsoMapEditorData } from "../../src/offline-game/isometric-map-editor";
-import { isNpcInteractionCellReachable } from "../../src/offline-game/isometric-interaction";
+import { isIsoQuadrantEdgeFullyBlocked, isNpcInteractionCellReachable } from "../../src/offline-game/isometric-interaction";
 
 describe("tile-aware NPC interaction reach",()=>{
   it("allows interaction from one orthogonally adjacent walkable cell",()=>{
@@ -35,8 +35,11 @@ describe("tile-aware NPC interaction reach",()=>{
     const data=createIsoMapEditorData("npc-edge",{cols:8,rows:6});
     expect(isNpcInteractionCellReachable(data,{x:2,y:2},{x:3,y:2})).toBe(true);
     data.blockedQuadrants=["2,2:br-a"];
+    expect(isNpcInteractionCellReachable(data,{x:2,y:2},{x:3,y:2})).toBe(true);
+    expect(isIsoQuadrantEdgeFullyBlocked(data,2,2,"br")).toBe(false);
+    data.blockedQuadrants=["2,2:br-a","2,2:br-b"];
     expect(isNpcInteractionCellReachable(data,{x:2,y:2},{x:3,y:2})).toBe(false);
-    data.blockedQuadrants=["3,2:tl-b"];
+    data.blockedQuadrants=["3,2:tl-a","3,2:tl-b"];
     expect(isNpcInteractionCellReachable(data,{x:2,y:2},{x:3,y:2})).toBe(false);
   });
 

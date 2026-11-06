@@ -19,7 +19,11 @@ describe("World Atlas player login gate",()=>{
       expect(loadingOverlayIndex).toBeLessThan(fixedFootIndex);
       expect(html).toContain('data-password-required-label=');
       expect(html).toContain('data-world-atlas-player');
-      expect(html).toContain('data-world-atlas-confirm-row');
+      expect(html).toContain('data-atlas-signup-panel');
+      expect(html).toContain('data-atlas-submit-mode="signup"');
+      expect(html).toContain('data-atlas-open-signup');
+      expect(html).toContain('data-atlas-password-visibility');
+      expect(html).toContain('id="world-atlas-signup-confirm"');
       expect(html).toContain('name="remember"');
       expect(html).toContain('data-login-label=');
       expect(html).toContain('data-signup-label=');

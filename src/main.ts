@@ -799,9 +799,12 @@ function lockAtlasBackground(gate:HTMLElement,locked:boolean):void {
 }
 async function refreshAtlasPasswordMode(gate:HTMLElement):Promise<void> {
   const select=gate.querySelector<HTMLSelectElement>("[data-world-atlas-player]");
-  const confirmRow=gate.querySelector<HTMLElement>("[data-world-atlas-confirm-row]");
-  const confirmInput=gate.querySelector<HTMLInputElement>("#world-atlas-password-confirm");
-  const button=gate.querySelector<HTMLButtonElement>("[data-world-atlas-submit]");
+  const loginPanel=gate.querySelector<HTMLElement>("[data-atlas-login-panel]");
+  const signupPanel=gate.querySelector<HTMLElement>("[data-atlas-signup-panel]");
+  const loginBlock=gate.querySelector<HTMLElement>("[data-atlas-login-password-block]");
+  const loginSubmit=gate.querySelector<HTMLButtonElement>("[data-world-atlas-submit]");
+  const signupOpen=gate.querySelector<HTMLButtonElement>("[data-atlas-open-signup]");
+  const loginForm=gate.querySelector<HTMLFormElement>("#world-atlas-login-form");
   const resetActions=gate.querySelector<HTMLElement>("[data-atlas-password-actions]");
   const changeButton=gate.querySelector<HTMLButtonElement>("[data-atlas-change-open]");
   const resetPanel=gate.querySelector<HTMLElement>("[data-atlas-reset-panel]");
@@ -810,14 +813,20 @@ async function refreshAtlasPasswordMode(gate:HTMLElement):Promise<void> {
   const safetyNote=gate.querySelector<HTMLElement>("[data-password-safety-note]");
   const selected=select?.value||"";
   const eligible=atlasEligiblePlayers().some(player=>player.name===selected);
-  if(!button||!confirmRow||!password)return;
+  if(!loginPanel||!signupPanel||!loginBlock||!loginSubmit||!signupOpen||!password)return;
+  loginPanel.hidden=false;signupPanel.hidden=true;
+  if(loginForm)loginForm.dataset.atlasSubmitMode="login";
   if(!eligible){
-    confirmRow.hidden=true;
+    loginBlock.hidden=true;
     if(safetyNote)safetyNote.hidden=true;
+    signupOpen.hidden=true;
+    loginSubmit.hidden=true;
     if(resetActions)resetActions.hidden=true;
     if(resetPanel)resetPanel.hidden=true;
-    button.disabled=true;
-    if(message)message.textContent=atlasEligiblePlayers().length?(gate.dataset.selectLabel||"Select a registered character to continue."):(gate.dataset.emptyLabel||"");
+    loginSubmit.disabled=true;
+    if(message)message.textContent=atlasEligiblePlayers().length
+      ?(gate.dataset.selectLabel||"Select a registered character to continue.")
+      :(gate.dataset.emptyLabel||"");
     return;
   }
   try{
@@ -826,18 +835,17 @@ async function refreshAtlasPasswordMode(gate:HTMLElement):Promise<void> {
     if(resetPanel)resetPanel.hidden=true;
     if(resetActions)resetActions.hidden=false;
     if(changeButton)changeButton.hidden=!exists;
-    confirmRow.hidden=exists;
-    if(safetyNote)safetyNote.hidden=exists;
-    if(confirmInput)confirmInput.required=!exists;
-    password.autocomplete=exists?"current-password":"new-password";
-    button.dataset.atlasMode=exists?"login":"signup";
-    button.textContent=exists?(button.dataset.loginLabel||"Sign in"):(button.dataset.signupLabel||"Sign up");
-    button.disabled=false;
+    loginBlock.hidden=!exists;
+    if(safetyNote)safetyNote.hidden=!exists;
+    signupOpen.hidden=exists;
+    loginSubmit.hidden=!exists;
+    loginSubmit.disabled=false;
+    password.autocomplete="current-password";
     if(message)message.textContent=exists
       ?(gate.dataset.loginPrompt||"Enter this character's password.")
       :(gate.dataset.signupPrompt||"Create a password to continue.");
   }catch(error){
-    button.disabled=true;
+    loginSubmit.disabled=true;
     if(message)message.textContent=error instanceof Error?error.message:"Could not read the account credential.";
   }
 }
@@ -945,7 +953,10 @@ async function openWorldAtlasFromTv():Promise<void> {
         const sourceLabel=player.source==="universe"?" · Universe":player.source==="local-journey"?" · Local Journey":" · Local Profile";
         return '<option value="'+escapeHtml(player.name)+'">'+escapeHtml(player.name+sourceLabel)+'</option>';
       }).join("");
-      if(options.some(player=>player.name===remembered))select.value=remembered;
+      const hasRemembered=options.some(player=>player.name===remembered);
+      if(hasRemembered)select.value=remembered;
+      const rememberCheckbox=gate.querySelector<HTMLInputElement>('input[name="remember"]');
+      if(rememberCheckbox)rememberCheckbox.checked=hasRemembered;
       if(select.dataset.atlasLoginBound!=="true"){
         select.dataset.atlasLoginBound="true";
         select.addEventListener("change",()=>{
@@ -1920,13 +1931,40 @@ root.addEventListener("click", async event => {
   if(!gate)return;
   const panel=gate.querySelector<HTMLElement>("[data-atlas-reset-panel]");
   const actions=gate.querySelector<HTMLElement>("[data-atlas-password-actions]");
-  const loginBlock=gate.querySelector<HTMLElement>("[data-atlas-login-password-block]");
-  const confirmRow=gate.querySelector<HTMLElement>("[data-world-atlas-confirm-row]");
+  const loginPanel=gate.querySelector<HTMLElement>("[data-atlas-login-panel]");
+  const signupPanel=gate.querySelector<HTMLElement>("[data-atlas-signup-panel]");
   const rememberRow=gate.querySelector<HTMLElement>("[data-atlas-remember-row]");
   const safety=gate.querySelector<HTMLElement>("[data-password-safety-note]");
   const submit=gate.querySelector<HTMLButtonElement>("[data-world-atlas-submit]");
   const playerSelect=gate.querySelector<HTMLSelectElement>("[data-world-atlas-player]");
   const message=gate.querySelector<HTMLElement>("[data-world-atlas-message]");
+  const visibilityButton=target.closest<HTMLButtonElement>("[data-atlas-password-visibility]");
+  if(visibilityButton){
+    const fieldId=visibilityButton.dataset.target||"";
+    const field=gate.querySelector<HTMLInputElement>("#"+fieldId);
+    if(field){
+      const reveal=field.type==="password";field.type=reveal?"text":"password";
+      visibilityButton.setAttribute("aria-pressed",String(reveal));
+      visibilityButton.setAttribute("aria-label",reveal?"Hide password":"Show password");
+    }
+    return;
+  }
+  const openSignup=()=>{
+    if(!signupPanel||!loginPanel)return;
+    const form=gate.querySelector<HTMLFormElement>("#world-atlas-login-form");if(form)form.dataset.atlasSubmitMode="signup";
+    loginPanel.hidden=true;signupPanel.hidden=false;
+    if(message)message.textContent=gate.dataset.signupPrompt||"Create a password to continue.";
+    requestAnimationFrame(()=>signupPanel.querySelector<HTMLInputElement>("#world-atlas-signup-password")?.focus());
+  };
+  if(target.closest("[data-atlas-open-signup]")){openSignup();return;}
+  if(target.closest("[data-atlas-signup-back]")){
+    const form=gate.querySelector<HTMLFormElement>("#world-atlas-login-form");if(form)form.dataset.atlasSubmitMode="login";
+    if(signupPanel)signupPanel.hidden=true;
+    if(loginPanel)loginPanel.hidden=false;
+    const signupPassword=gate.querySelector<HTMLInputElement>("#world-atlas-signup-password");if(signupPassword)signupPassword.value="";
+    const signupConfirm=gate.querySelector<HTMLInputElement>("#world-atlas-signup-confirm");if(signupConfirm)signupConfirm.value="";
+    await refreshAtlasPasswordMode(gate);return;
+  }
   const setPanelMode=(mode:"change"|"master")=>{
     if(!panel)return;
     panel.dataset.atlasResetMode=mode;
@@ -1943,8 +1981,8 @@ root.addEventListener("click", async event => {
     if(newRow)newRow.hidden=true;
     if(policyRow)policyRow.hidden=true;
     if(confirmNewRow)confirmNewRow.hidden=true;
-    if(loginBlock)loginBlock.hidden=true;
-    if(confirmRow)confirmRow.hidden=true;
+    if(loginPanel)loginPanel.hidden=true;
+    if(signupPanel)signupPanel.hidden=true;
     if(rememberRow)rememberRow.hidden=true;
     if(safety)safety.hidden=true;
     if(submit)submit.hidden=true;
@@ -1966,7 +2004,8 @@ root.addEventListener("click", async event => {
   };
   const restoreLoginPanel=async()=>{
     if(panel)panel.hidden=true;
-    if(loginBlock)loginBlock.hidden=false;
+    if(loginPanel)loginPanel.hidden=false;
+    if(signupPanel)signupPanel.hidden=true;
     if(playerSelect)playerSelect.disabled=false;
     if(submit)submit.hidden=false;
     if(rememberRow)rememberRow.hidden=false;
@@ -2131,14 +2170,16 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     event.preventDefault();
     if(worldAtlasLoginBusy)return;
     const gate=form.closest<HTMLElement>("[data-world-atlas-gate]");
+    const submitter=(event as SubmitEvent).submitter;
+    const signingUp=(submitter instanceof HTMLButtonElement&&submitter.dataset.atlasSubmitMode==="signup")||form.dataset.atlasSubmitMode==="signup";
     const data=new FormData(form);
     const playerName=String(data.get("player")??"").trim();
-    const password=String(data.get("password")??"");
-    const confirmation=String(data.get("confirm")??"");
+    const password=String(data.get(signingUp?"signupPassword":"password")??"");
+    const confirmation=String(data.get(signingUp?"signupConfirm":"confirm")??"");
     const remember=data.get("remember")==="yes";
     const eligible=atlasEligiblePlayers().some(player=>player.name===playerName);
     const message=gate?.querySelector<HTMLElement>("[data-world-atlas-message]");
-    const button=form.querySelector<HTMLButtonElement>("[data-world-atlas-submit]");
+    const button=signingUp?form.querySelector<HTMLButtonElement>('[data-atlas-submit-mode="signup"]'):form.querySelector<HTMLButtonElement>('[data-atlas-submit-mode="login"]');
     if(!gate)return;
     if(!playerName){if(message)message.textContent=gate.dataset.selectLabel||"Select a registered character to continue.";return;}
     if(!eligible){if(message)message.textContent="This character is not registered in the verified players.md and local Eternal Path account list.";return;}
@@ -2170,10 +2211,13 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       try{passwordExists=await hasAtlasPassword(playerName);}
       catch(error){throw new Error(error instanceof Error?error.message:"Could not read the account credential.");}
       if(loginAttempt!==worldAtlasLoginAttempt||abortController.signal.aborted)return;
-      if(!passwordExists){
+      if(signingUp){
+        if(passwordExists)throw new Error("This character already has a password. Return to the sign-in panel.");
         const policyError=atlasPasswordPolicyError(password);
         if(policyError)throw new Error(gate.dataset.passwordPolicyLabel||policyError);
         if(password!==confirmation)throw new Error("The two passwords do not match.");
+      }else if(!passwordExists){
+        throw new Error("This character has no password yet. Choose Create account to set one.");
       }
       const connectionWork=verifyCanonSourceConnection(activeCanon.commitSha,abortController.signal);
       const credentialWork=(async()=>{
@@ -2203,8 +2247,9 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       }
       if(loginAttempt!==worldAtlasLoginAttempt||abortController.signal.aborted)return;
       if(message)message.textContent=gate.dataset.successLabel||"Access granted.";
-      form.querySelector<HTMLInputElement>("#world-atlas-password")!.value="";
-      const confirm=form.querySelector<HTMLInputElement>("#world-atlas-password-confirm");if(confirm)confirm.value="";
+      const loginPassword=form.querySelector<HTMLInputElement>("#world-atlas-password");if(loginPassword)loginPassword.value="";
+      const signupPassword=form.querySelector<HTMLInputElement>("#world-atlas-signup-password");if(signupPassword)signupPassword.value="";
+      const signupConfirm=form.querySelector<HTMLInputElement>("#world-atlas-signup-confirm");if(signupConfirm)signupConfirm.value="";
       unlockAtlasBackground(gate);
       gate.setAttribute("aria-hidden","true");
     }catch(error){

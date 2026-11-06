@@ -2,7 +2,15 @@ import type { IsoMapEditorData } from "./isometric-map-editor";
 
 export type IsoActorCell = { x: number; y: number };
 
-const EDGE_QUADRANTS: Record<string, readonly [string, string]> = {
+type IsoQuadrantEdge = "tl" | "tr" | "bl" | "br";
+
+/** A narrow X sector blocks only half an edge; the whole edge is closed only when both halves are marked. */
+export function isIsoQuadrantEdgeFullyBlocked(data: IsoMapEditorData, x: number, y: number, edge: IsoQuadrantEdge): boolean {
+  const prefix = x + "," + y + ":" + edge + "-";
+  return data.blockedQuadrants.includes(prefix + "a") && data.blockedQuadrants.includes(prefix + "b");
+}
+
+const EDGE_QUADRANTS: Record<string, readonly [IsoQuadrantEdge, IsoQuadrantEdge]> = {
   "1,0": ["br", "tl"],
   "-1,0": ["tl", "br"],
   "0,1": ["bl", "tr"],
@@ -39,9 +47,6 @@ export function isNpcInteractionCellReachable(
 
   if (!walkableCell(player.x, player.y) || !walkableCell(npc.x, npc.y)) return false;
 
-  const blockedEdge = (x: number, y: number, side: string): boolean =>
-    data.blockedQuadrants.some(key => key.startsWith(x + "," + y + ":" + side + "-"));
-
-  return !blockedEdge(player.x, player.y, edge[0]) &&
-    !blockedEdge(npc.x, npc.y, edge[1]);
+  return !isIsoQuadrantEdgeFullyBlocked(data, player.x, player.y, edge[0]) &&
+    !isIsoQuadrantEdgeFullyBlocked(data, npc.x, npc.y, edge[1]);
 }

@@ -421,6 +421,8 @@ This is a narrowly scoped presentation/navigation layer for the existing isometr
 - [~] Academy entry places the Player at the named Golden Dragon Empire gateway (`12,31`). The four Academy NPCs begin on owner-marked walkable cells; Player pathfinding and NPC wandering use the same walkable whitelist and blocked-sector rules, and actors cannot occupy another actor's cell.
 - [~] NPC conversations and `Dialog box:` map markers use a clickable lower-screen dialogue surface. `Event scene:` markers use a separate dimmed, clickable event notice.
 - [~] Map zoom, centering, and editor tools share one right-edge field drawer. The drawer and arrival motions use Anime.js; editor controls remain separate from the future Player Profile, Inventory, Quest Board, and other player-facing world panels.
+- [~] Map camera calibration now supports a tap-to-pick focal point with a separate confirmation step. The confirmed point is stored as Map Base coordinates in the editor JSON and reused by `CENTER MAP` after zoom/resize; automatic midpoint remains the fallback.
+- [~] Walkable sector edges use half-edge semantics: one blocked child sector leaves the opposite half traversable, while both blocked halves close that crossing. Player/NPC sensing and movement highlights are actor-attached so camera movement cannot detach their visual origin; gameplay grid strokes remain thin and muted gold without changing tile geometry.
 - [ ] Add reviewed map references and deliberate minimap classifications for the remaining isometric areas as their walkable routes and actor placements are supplied.
 - [ ] Complete visual/gesture and time-transition verification on the target Android device. CI checks do not replace device QA.
 

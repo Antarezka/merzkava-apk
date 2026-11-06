@@ -26,6 +26,16 @@ import {
 } from "../../src/offline-game/isometric-map-editor";
 
 describe("shared isometric map editor data", () => {
+  it("preserves a confirmed camera center in portable map data",()=>{
+    const data=normalizeIsoMapEditorData({grid:{cols:8,rows:6},cameraCenter:{x:734.5,y:412}}, "centered-map");
+    expect(data.cameraCenter).toEqual({x:734.5,y:412});
+    const roundTrip=normalizeIsoMapEditorData(JSON.parse(JSON.stringify(data)), "centered-map");
+    expect(roundTrip.cameraCenter).toEqual({x:734.5,y:412});
+    const invalid=normalizeIsoMapEditorData({cameraCenter:{x:"bad",y:20}}, "invalid-center");
+    expect(invalid.cameraCenter).toBeUndefined();
+  });
+
+
   it("provides default gaps for all four canvas sides", () => {
     expect(DEFAULT_ISO_CANVAS_EXPANSION).toEqual({ top: 0, bottom: 0, left: 800, right: 0 });
     expect(normalizeIsoCanvasExpansion({})).toEqual(DEFAULT_ISO_CANVAS_EXPANSION);

@@ -32,6 +32,8 @@ export type IsoMapEditorData = {
   version: 1;
   mapId: string;
   grid: IsoMapGridConfig;
+  /** Optional camera focal point in Map Base pixel coordinates. */
+  cameraCenter?: { x: number; y: number };
   foregroundCells: string[];
   blockedCells: string[];
   opacityCells: string[];
@@ -256,6 +258,14 @@ export function normalizeIsoMapEditorData(
     version: 1,
     mapId,
     grid,
+    ...(source.cameraCenter && typeof source.cameraCenter === "object" &&
+      Number.isFinite(Number((source.cameraCenter as Record<string, unknown>).x)) &&
+      Number.isFinite(Number((source.cameraCenter as Record<string, unknown>).y)) ? {
+        cameraCenter: {
+          x: clamp((source.cameraCenter as Record<string, unknown>).x, 0, 20000, 0),
+          y: clamp((source.cameraCenter as Record<string, unknown>).y, 0, 20000, 0),
+        }
+      } : {}),
     foregroundCells: cleanCells(source.foregroundCells, grid),
     blockedCells: cleanCells(source.blockedCells, grid),
     opacityCells: cleanCells(source.opacityCells, grid),

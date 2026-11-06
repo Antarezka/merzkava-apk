@@ -11,7 +11,7 @@ import {
   type IsoMapEditorData, type IsoMapGridConfig, type IsoMapPoint, type IsoQuadrant, type IsoQuadrantLayer,
 } from "./isometric-map-editor";
 import { renderIsometricSvgSceneMarkup, refreshIsometricSvgScene, type IsometricSvgTheme } from "./isometric-svg-board";
-import { isNpcInteractionCellReachable } from "./isometric-interaction";
+import { isIsoQuadrantEdgeFullyBlocked, isNpcInteractionCellReachable } from "./isometric-interaction";
 
 let worldMapDeveloperMode = false;
 export function setWorldMapDeveloperMode(enabled: boolean): void {
@@ -737,7 +737,7 @@ function isoCanStep(data:IsoMapEditorData,fromX:number,fromY:number,toX:number,t
   if(!isoGridCellExists(data,fromX,fromY)||!isoCellIsWalkable(data,toX,toY))return false;
   const edges:Record<string,["tl"|"tr"|"bl"|"br","tl"|"tr"|"bl"|"br"]>={"1,0":["br","tl"],"-1,0":["tl","br"],"0,1":["bl","tr"],"0,-1":["tr","bl"]};
   const edge=edges[(toX-fromX)+","+(toY-fromY)];
-  return !!edge&&!isoQuadrantHasParentLayer(data,"blockedQuadrants",fromX,fromY,edge[0])&&!isoQuadrantHasParentLayer(data,"blockedQuadrants",toX,toY,edge[1]);
+  return !!edge&&!isIsoQuadrantEdgeFullyBlocked(data,fromX,fromY,edge[0])&&!isIsoQuadrantEdgeFullyBlocked(data,toX,toY,edge[1]);
 }
 function isoQuadrantTrianglePoints(x:number,y:number,quadrant:IsoQuadrant,grid:IsoMapGridConfig):string {
   const c=isoCellCenter(x,y,grid),top={x:c.x,y:c.y-grid.tileH/2},right={x:c.x+grid.tileW/2,y:c.y},bottom={x:c.x,y:c.y+grid.tileH/2},left={x:c.x-grid.tileW/2,y:c.y},center={x:c.x,y:c.y};
@@ -1178,6 +1178,8 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
   board.dataset.overlayEditorBound="true";
   const key=isoOverlayKey(board);board.dataset.overlayStorageKey=key;
   let data=readIsoMapData(board),selectedTransitionId:string|null=null;
+  let centerPickActive=false;
+  let pendingCameraCenter:IsoMapPoint|null=null;
   const history:IsoMapEditorData[]=[];
   const cellGroup=svg.querySelector<SVGGElement>("[data-wmh-manual-marks]");
   let interactionGroup=svg.querySelector<SVGGElement>("[data-wmh-interaction-grid]");
@@ -1194,6 +1196,13 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     svg.insertBefore(hitPlane,svg.firstChild);
   }
   if(!interactionGroup){interactionGroup=document.createElementNS("http://www.w3.org/2000/svg","g");interactionGroup.dataset.wmhInteractionGrid="";svg.insertBefore(interactionGroup,cellGroup||svg.firstChild);}
+  let centerGuide=svg.querySelector<SVGGElement>("[data-wmh-center-preview]");
+  if(!centerGuide){centerGuide=document.createElementNS("http://www.w3.org/2000/svg","g");centerGuide.dataset.wmhCenterPreview="";centerGuide.setAttribute("class","wmh-map-center-guide");svg.append(centerGuide);}
+  const renderCameraCenterGuide=()=>{
+    const focus=pendingCameraCenter||data.cameraCenter;
+    centerGuide!.style.display=board.classList.contains("wmh-overlay-editing")&&focus?"":"none";
+    centerGuide!.innerHTML=focus?'<circle cx="'+focus.x+'" cy="'+focus.y+'" r="22"/><path d="M'+(focus.x-31)+" "+focus.y+" H"+(focus.x+31)+" M"+focus.x+" "+(focus.y-31)+" V"+(focus.y+31)+'"/><circle cx="'+focus.x+'" cy="'+focus.y+'" r="4"/>':"";
+  };
   const transitionGroup=svg.querySelector<SVGGElement>("[data-wmh-transition-marks]");
   const cellTools=panel.querySelector<HTMLElement>("[data-wmh-cell-tools]");
   const selectionCount=panel.querySelector<HTMLElement>("[data-wmh-cell-selection-count]");
@@ -1307,6 +1316,11 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       return '<g class="wmh-transition-marker '+(marker.label.trim()?"is-named":"is-unlabelled")+(selectedTransitionId===marker.id?" is-selected":"")+'" data-transition-id="'+escapeMapEditorText(marker.id)+'" transform="translate('+c.x+" "+c.y+')"><polygon class="wmh-transition-cell-highlight" points="0 '+(-hh)+' '+hw+' 0 0 '+hh+' '+(-hw)+' 0"/><circle r="11"></circle><text text-anchor="middle" dominant-baseline="central">'+(marker.label.trim()?"↗":"?")+'</text><title>'+(label||"UNLABELLED TRANSITION")+'</title></g>';
     }).join("");
     if(walkableToggle)walkableToggle.checked=data.walkableAreaEnabled;
+    renderCameraCenterGuide();
+    const centerStatus=panel.querySelector<HTMLElement>("[data-wmh-center-status]");
+    if(centerStatus&&!pendingCameraCenter)centerStatus.textContent=data.cameraCenter
+      ?"Saved · X "+Math.round(data.cameraCenter.x)+" / Y "+Math.round(data.cameraCenter.y)
+      :"No custom camera center saved · map midpoint is used";
   };
   const persist=()=>{
     const cameraViewport=board.closest<HTMLElement>("[data-wmh-map-viewport],[data-wmh-iso-viewport]");
@@ -1420,6 +1434,11 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       if(!relocateActorsFromBlockedCells(board,data))setStatus("Warning: this map has no free cell for one or more characters. Clear some X cells before resuming play.");
       panel.hidden=false;toggle.hidden=true;
     }else{
+      centerPickActive=false;pendingCameraCenter=null;
+      const pickCenterButton=panel.querySelector<HTMLButtonElement>("[data-wmh-center-pick]");
+      if(pickCenterButton){pickCenterButton.setAttribute("aria-pressed","false");pickCenterButton.textContent="SELECT CENTER ON MAP";}
+      const confirmCenterButton=panel.querySelector<HTMLButtonElement>("[data-wmh-center-confirm]");if(confirmCenterButton)confirmCenterButton.disabled=true;
+      renderCameraCenterGuide();
       board.dataset.editorPaused="false";
       board.classList.remove("wmh-overlay-editing","wmh-editor-paused");
       board.querySelectorAll<HTMLElement>("[data-wmh-player-token],[data-wmh-npc]").forEach(token=>token.getAnimations().forEach(animation=>animation.play()));
@@ -1543,7 +1562,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       :mode()==="cell-merge"?"SELECT & MERGE: tap two or more adjacent blue cells, including bends, then press MERGE SELECTED CELLS to make one flexible logical area."
       :mode()==="cell-unmerge"?"UNMERGE: tap any cell inside a merged region to split that group back into its individual cells."
       :mode()==="foreground"?"Tap one of the 4 small sectors: ○ redraws that part of the same Map Base above characters."
-      :mode()==="blocked"?"Tap one of the 4 small sectors: X blocks movement across that sector's edge."
+      :mode()==="blocked"?"Tap one of the 8 small sectors: each X marks half an edge; mark both halves of the same side to close that full crossing. A remaining open half stays traversable."
       :mode()==="opacity"?"Tap one of the 4 small sectors: ◌ makes characters translucent in that image area."
       :"Tap a cell to add/select a transition. Red is unnamed; blue is named.");
   };
@@ -1607,7 +1626,16 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     }
   };
   const applyCellTap=(event:PointerEvent,transitionId:string|null)=>{
-    const mapPoint=point(event);if(!mapPoint)return;const cell=isoCellAtPoint(mapPoint,grid,true);if(!cell)return;
+    const mapPoint=point(event);if(!mapPoint)return;
+    if(centerPickActive){
+      pendingCameraCenter={x:Math.max(0,Math.min(20000,Math.round(mapPoint.x*100)/100)),y:Math.max(0,Math.min(20000,Math.round(mapPoint.y*100)/100))};
+      renderCameraCenterGuide();
+      const confirmCenter=panel.querySelector<HTMLButtonElement>("[data-wmh-center-confirm]");if(confirmCenter)confirmCenter.disabled=false;
+      const centerStatus=panel.querySelector<HTMLElement>("[data-wmh-center-status]");if(centerStatus)centerStatus.textContent="Preview · X "+Math.round(pendingCameraCenter.x)+" / Y "+Math.round(pendingCameraCenter.y)+" · confirm to save";
+      setStatus("Camera center preview placed. Confirm it to include these coordinates in the saved map data.");
+      return;
+    }
+    const cell=isoCellAtPoint(mapPoint,grid,true);if(!cell)return;
     if(mode()!=="cell-add"&&!isoGridCellExists(data,cell.x,cell.y)){setStatus("No grid cell exists here yet. Switch to ADD CELL and tap this Map Base area first.");return;}
     if(mode()==="cell-add"){
       const key=isoCellKey(cell.x,cell.y),isBase=cell.x>=0&&cell.y>=0&&cell.x<grid.cols&&cell.y<grid.rows;
@@ -1711,6 +1739,24 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     event.preventDefault();
     if(!academyArtwork)try{svg.setPointerCapture(event.pointerId);}catch{/* dialog-level pointer listeners remain the fallback */}
   });
+  panel.querySelector<HTMLButtonElement>("[data-wmh-center-pick]")?.addEventListener("click",event=>{
+    centerPickActive=!centerPickActive;
+    pendingCameraCenter=null;
+    const button=event.currentTarget as HTMLButtonElement;
+    button.setAttribute("aria-pressed",String(centerPickActive));
+    button.textContent=centerPickActive?"CANCEL CENTER PICK":"SELECT CENTER ON MAP";
+    const confirm=panel.querySelector<HTMLButtonElement>("[data-wmh-center-confirm]");if(confirm)confirm.disabled=true;
+    renderCameraCenterGuide();
+    const centerStatus=panel.querySelector<HTMLElement>("[data-wmh-center-status]");if(centerStatus)centerStatus.textContent=centerPickActive?"Tap the exact point that should appear at the center of the gameplay camera.":data.cameraCenter?"Saved center retained · preview cancelled":"Automatic map midpoint";
+    setStatus(centerPickActive?"Center selection armed. Tap one point on the Map Base, then confirm it.":"Center selection cancelled; saved data is unchanged.");
+  });
+  panel.querySelector<HTMLButtonElement>("[data-wmh-center-confirm]")?.addEventListener("click",()=>{
+    if(!pendingCameraCenter){setStatus("Select a map point before confirming the camera center.");return;}
+    remember();data.cameraCenter={...pendingCameraCenter};pendingCameraCenter=null;centerPickActive=false;
+    const pick=panel.querySelector<HTMLButtonElement>("[data-wmh-center-pick]");if(pick){pick.setAttribute("aria-pressed","false");pick.textContent="SELECT CENTER ON MAP";}
+    const confirm=panel.querySelector<HTMLButtonElement>("[data-wmh-center-confirm]");if(confirm)confirm.disabled=true;
+    persist();setStatus("✓ Map camera center confirmed and saved. It is now part of COPY DATA FOR AI.");
+  });
   panel.querySelector<HTMLElement>("[data-wmh-merge-apply]")?.addEventListener("click",()=>{
     if(selectedMergeCells.size<2){setStatus("Select at least two adjacent blue cells first.");return;}
     const cells=[...selectedMergeCells];
@@ -1786,6 +1832,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       confirmed:data.confirmed===true,
       confirmedAt:data.confirmedAt||"",
       grid:{...grid},
+      cameraCenter:data.cameraCenter?{...data.cameraCenter}:null,
       walkableAreaEnabled:data.walkableAreaEnabled,
       walkableCells:[...data.walkableCells],
       customGridCells:[...data.customGridCells],
@@ -1797,6 +1844,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       blockedQuadrants:[...data.blockedQuadrants],
       opacityQuadrants:[...data.opacityQuadrants],
       transitions:data.transitions.map(marker=>({...marker})),
+      cameraCenter:data.cameraCenter?{...data.cameraCenter}:null,
       notes:{
         cellSectorOrder:["top-left","top-right","bottom-left","bottom-right"],
         quadrantKeys:"x,y:tl-a|tl-b|tr-a|tr-b|bl-a|bl-b|br-a|br-b (legacy tl|tr|bl|br keys expand to both child sectors)",
@@ -1823,6 +1871,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       "\nForeground sectors: "+data.foregroundQuadrants.length+
       "\nOpacity sectors: "+data.opacityQuadrants.length+
       "\nTransitions: "+data.transitions.length+
+      "\nCamera center: "+(data.cameraCenter?"X "+Math.round(data.cameraCenter.x)+" / Y "+Math.round(data.cameraCenter.y):"automatic midpoint")+
       "\nConfirm this exact grid configuration and save it on this device?";
     if(!window.confirm(summary)){setStatus("Confirmation cancelled. Your draft remains available.");return;}
     try{
@@ -1901,8 +1950,10 @@ function bindIsometricCamera(dialog:HTMLElement):void {
   };
   const centerMap=()=>{
     if(!baseW||!baseH)measure();
-    viewport.scrollLeft=padX()+baseW*zoom/2-viewport.clientWidth/2;
-    viewport.scrollTop=padY()+baseH*zoom/2-viewport.clientHeight/2;
+    const saved=readIsoMapData(board).cameraCenter;
+    const focus=saved?{x:Math.max(0,Math.min(baseW,saved.x)),y:Math.max(0,Math.min(baseH,saved.y))}:{x:baseW/2,y:baseH/2};
+    viewport.scrollLeft=padX()+focus.x*zoom-viewport.clientWidth/2;
+    viewport.scrollTop=padY()+focus.y*zoom-viewport.clientHeight/2;
   };
   const apply=(next:number,focusX?:number,focusY?:number)=>{
     if(!baseW||!baseH)measure();
@@ -1951,7 +2002,7 @@ function isometricEditorMarkup(): string {
     '<button type="button" class="wmh-overlay-drawer-lever" data-wmh-overlay-close aria-label="Close map tools drawer">‹</button>'+
     '<header class="wmh-overlay-modal-head" data-wmh-overlay-drag-handle><div><b>WORLD ARCHIVE · FIELD TOOLS</b><small>MAP GLASS · CAMERA · CELL WORKBENCH</small></div><div class="wmh-overlay-window-actions"><button type="button" data-wmh-overlay-minimize aria-label="Minimize editor panel" title="Minimize">—</button><button type="button" data-wmh-overlay-close aria-label="Close editor mode" title="Close editor mode">×</button></div></header><div class="wmh-drawer-map-controls" aria-label="Map camera controls"><span>CAMERA</span><button type="button" data-wmh-zoom="out" aria-label="Zoom out">−</button><output data-wmh-zoom-level>100%</output><button type="button" data-wmh-zoom="in" aria-label="Zoom in">+</button><button type="button" data-wmh-zoom="reset">FIT</button><button type="button" data-wmh-map-center>⌖ CENTER MAP</button></div>'+
     '<label>EDITING MODE<select data-wmh-overlay-mode><option value="cell-add">＋ ADD CELL</option><option value="cell-delete">－ DELETE CELL</option><option value="cell-merge">⇧ SELECT CELLS TO MERGE</option><option value="cell-unmerge">↔ UNMERGE CELL GROUP</option><option value="foreground">○ Foreground sectors</option><option value="blocked">X Blocked sectors</option><option value="opacity">◌ Character opacity sectors</option><option value="transition">Area transition markers</option></select></label><div class="wmh-cell-layout-tools" data-wmh-cell-tools hidden><b>CELL LAYOUT</b><span data-wmh-cell-selection-count>0 CELLS SELECTED</span><button type="button" data-wmh-merge-apply>MERGE SELECTED CELLS</button><button type="button" data-wmh-merge-clear>CLEAR SELECTION</button><small>Tap adjacent cells to select them. Tap-drag only pans the map.</small></div><label class="wmh-walkable-switch"><input type="checkbox" data-wmh-walkable-enabled/> LIMIT MOVEMENT TO BLUE CELLS</label>'+
-    '<p class="wmh-editor-mode-note">Paint only the image area that should be used. Each main diamond has 8 smaller sectors: two inside each of the four former quadrants. X blocks a sector edge, ○ redraws that image sector above characters, and ◌ makes characters translucent. The source image and canvas gaps are never resized by grid calibration.</p>'+
+    '<p class="wmh-editor-mode-note">Paint only the image area that should be used. Each main diamond has 8 smaller sectors: two inside each of the four former quadrants. X marks one half of a crossing; mark both halves of the same side to close that full passage. If one half remains open, movement can still pass through it. ○ redraws that sector above characters, and ◌ makes characters translucent. The source image and canvas gaps are never resized by grid calibration.</p>'+
     '<div data-wmh-transition-tools hidden><label>DESTINATION LABEL<input type="text" maxlength="80" data-wmh-transition-label placeholder="e.g. Academy · Main Hall"/></label><button type="button" data-wmh-transition-apply>APPLY LABEL</button><button type="button" data-wmh-transition-delete>DELETE SELECTED</button><p>Red = unnamed. Blue = named. Tap a marker to select it.</p></div>'+
     '<div class="wmh-grid-calibration"><b>GRID CALIBRATION</b>'+
     '<div data-wmh-grid-row><label>Columns <output data-wmh-grid-value="cols">24</output></label><button type="button" data-wmh-grid-dir="minus" data-wmh-grid-step="1">−</button><input type="range" min="1" max="128" step="1" value="24" data-wmh-grid-control="cols"/><button type="button" data-wmh-grid-dir="plus" data-wmh-grid-step="1">+</button></div>'+
@@ -1962,6 +2013,7 @@ function isometricEditorMarkup(): string {
     '<div data-wmh-grid-row><label>Offset Y <output data-wmh-grid-value="offsetY">0</output></label><button type="button" data-wmh-grid-dir="minus" data-wmh-grid-step="2">−</button><input type="range" min="-600" max="600" step="2" value="0" data-wmh-grid-control="offsetY"/><button type="button" data-wmh-grid-dir="plus" data-wmh-grid-step="2">+</button></div>'+
     '<div data-wmh-grid-row><label>Player scale <output data-wmh-grid-value="playerScale">1</output></label><button type="button" data-wmh-grid-dir="minus" data-wmh-grid-step="0.05">−</button><input type="range" min="0.4" max="2" step="0.05" value="1" data-wmh-grid-control="playerScale"/><button type="button" data-wmh-grid-dir="plus" data-wmh-grid-step="0.05">+</button></div>'+
     '<div data-wmh-grid-row><label>NPC scale <output data-wmh-grid-value="npcScale">1</output></label><button type="button" data-wmh-grid-dir="minus" data-wmh-grid-step="0.05">−</button><input type="range" min="0.4" max="2" step="0.05" value="1" data-wmh-grid-control="npcScale"/><button type="button" data-wmh-grid-dir="plus" data-wmh-grid-step="0.05">+</button></div></div>'+
+    '<div class="wmh-center-calibration"><b>MAP CAMERA CENTER</b><small>Choose the true map focal point. It will be stored in the confirmed map data and reused by CENTER MAP.</small><div><button type="button" data-wmh-center-pick>SELECT CENTER ON MAP</button><button type="button" data-wmh-center-confirm disabled>CONFIRM CENTER</button></div><output data-wmh-center-status>Automatic map midpoint</output></div>'+
     '<div class="wmh-overlay-tool-actions"><button type="button" data-wmh-overlay-undo>UNDO</button><button type="button" data-wmh-overlay-clear>CLEAR MAP</button><button type="button" data-wmh-overlay-save>SAVE DRAFT</button><button type="button" data-wmh-overlay-confirm>✓ CONFIRM &amp; SAVE</button><button type="button" data-wmh-overlay-copy>COPY DATA FOR AI</button></div>'+
     '<label class="wmh-ai-export" data-wmh-overlay-export-wrap hidden>AI-READY MAP DATA · JSON<textarea data-wmh-overlay-export readonly spellcheck="false" placeholder="Use COPY DATA FOR AI to generate the complete map reference..."></textarea><small>Copy this complete JSON and paste it into your next AI update request. It includes the grid, selected walkable cells, all four-sector flags, and transition labels.</small></label><label>IMPORT MAP DATA<textarea data-wmh-overlay-import-text placeholder="Paste a saved isometric-map JSON reference..."></textarea></label><button type="button" data-wmh-overlay-import>IMPORT MAP DATA</button>'+
     '<small data-wmh-overlay-status>Choose a tool, then tap individual diamond cells. The world pauses while the editor is open.</small></section></div></div>';
@@ -2235,20 +2287,26 @@ function updateNpcInteractionProximity(board:HTMLElement):void {
   });
 }
 
-function emitTileTrailWave(board:HTMLElement,actor:HTMLElement):void {
-  const x=Number(actor.dataset.x||0),y=Number(actor.dataset.y||0);
-  const tile=board.querySelector<HTMLElement>('[data-wmh-tile][data-x="'+x+'"][data-y="'+y+'"]');
-  if(!tile)return;
-  const boardRect=board.getBoundingClientRect(),tileRect=tile.getBoundingClientRect();
-  const wave=document.createElement("span"),tone=actorScanTone(actor);
-  wave.className="wmh-tile-trail-wave tone-"+tone;
-  wave.style.left=(tileRect.left+tileRect.width/2-boardRect.left)+"px";
-  wave.style.top=(tileRect.top+tileRect.height/2-boardRect.top)+"px";
-  wave.style.setProperty("--scan-color",actorScanColor(tone));
-  board.append(wave);
-  const reduceMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches===true;
-  if(reduceMotion){wave.remove();return;}
-  animate(wave,{scale:[.2,1.65],opacity:[.42,0],duration:760,ease:"outQuad",onComplete:()=>wave.remove()});
+function emitTileTrailWave(_board:HTMLElement,actor:HTMLElement,dx=0,dy=0):void {
+  actor.querySelectorAll(":scope > .wmh-token-movement-glow").forEach(node=>node.remove());
+  const glow=document.createElement("span");
+  glow.className="wmh-token-movement-glow";glow.setAttribute("aria-hidden","true");
+  // The glow is a child of the actor, so it follows the actor and its local movement direction under every camera pan/zoom.
+  glow.style.setProperty("--move-shift-x",(-Math.sign(dx)*5)+"px");
+  glow.style.setProperty("--move-shift-y",(-Math.sign(dy)*4)+"px");
+  actor.append(glow);
+  if(window.matchMedia?.("(prefers-reduced-motion: reduce)").matches){glow.remove();return;}
+  animate(glow,{scale:[.62,1.5],opacity:[0,.42,0],duration:540,ease:"outCubic",onComplete:()=>glow.remove()});
+}
+function emitPlayerTapGlow(board:HTMLElement,x:number,y:number,grid:IsoMapGridConfig):void {
+  board.querySelectorAll(":scope > .wmh-player-tap-glow").forEach(node=>node.remove());
+  const center=isoCellCenter(x,y,grid),glow=document.createElement("span");
+  glow.className="wmh-player-tap-glow";glow.setAttribute("aria-hidden","true");
+  glow.style.left=center.x+"px";glow.style.top=center.y+"px";
+  glow.style.width=(grid.tileW*.94)+"px";glow.style.height=(grid.tileH*.94)+"px";
+  board.append(glow);
+  if(window.matchMedia?.("(prefers-reduced-motion: reduce)").matches){glow.remove();return;}
+  animate(glow,{scale:[.58,1.16],opacity:[0,.48,.24,0],duration:680,ease:"outCubic",onComplete:()=>glow.remove()});
 }
 function updateScannerContacts(board:HTMLElement):void {
   const actors=Array.from(board.querySelectorAll<HTMLElement>("[data-wmh-player-token],[data-wmh-npc]"));
@@ -2295,7 +2353,7 @@ function pulseActorScanner(actor:HTMLElement,index:number):void {
     ring.style.borderColor=color;
     ring.style.background="radial-gradient(ellipse,transparent 58%,"+color+"12 100%)";
     if(window.matchMedia?.("(prefers-reduced-motion: reduce)").matches){
-      ring.style.opacity=".1";ring.style.transform="translate(-50%,-50%) scale(1)";
+      ring.style.opacity=".1";ring.style.transform="scale(1)";
     }else{
       animate(ring,{scale:[.08,1],opacity:[.44,0],duration:1800,ease:"outQuad",delay:index*65+n*820});
     }
@@ -2318,26 +2376,22 @@ function startActorScanners(board:HTMLElement):void {
   board.dataset.scannerTimer=String(window.setInterval(pulse,2450));
 }
 function animateGridMove(token:HTMLElement,update:()=>void):void {
+  const board=token.closest<HTMLElement>("[data-wmh-board]");
+  const fromX=Number(token.dataset.x||0),fromY=Number(token.dataset.y||0);
   const before=token.getBoundingClientRect();
   update();
-  const board=token.closest<HTMLElement>("[data-wmh-board]");
   if(board)syncIsoDepthAndOcclusion(board);
   const reduceMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches===true;
   const suspendNpcIdle=!reduceMotion&&token.matches(".wmh-character-token:not(.wmh-player-token)");
-  // The CSS idle bob and this Anime.js step both use transform. Suspend the
-  // bob only for the 225ms walk so the two animation engines never fight.
   if(suspendNpcIdle)token.classList.add("wmh-npc-moving");
   const after=token.getBoundingClientRect();
-  const dx=before.left-after.left,dy=before.top-after.top;
+  const zoom=board?Number.parseFloat(getComputedStyle(board).getPropertyValue("--wmh-camera-zoom"))||1:1;
+  const dx=(before.left-after.left)/zoom,dy=(before.top-after.top)/zoom;
   if(reduceMotion)token.style.transform="";
-  else animate(token,{
-    translateX:[dx,0],
-    translateY:[dy,0],
-    duration:225,
-    ease:"outCubic",
+  else animate(token,{translateX:[dx,0],translateY:[dy,0],duration:225,ease:"outCubic",
     onComplete:()=>{if(suspendNpcIdle)token.classList.remove("wmh-npc-moving");}
   });
-  if(board){emitTileTrailWave(board,token);updateScannerContacts(board);}
+  if(board){emitTileTrailWave(board,token,Number(token.dataset.x||0)-fromX,Number(token.dataset.y||0)-fromY);updateScannerContacts(board);}
 }
 function stopNpcWander(dialog:HTMLElement):void {
   const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
@@ -2400,6 +2454,7 @@ function walkToTile(dialog:HTMLElement,targetX:number,targetY:number,surface:str
   if(!Number.isInteger(targetX)||!Number.isInteger(targetY)||!isoGridCellExists(mapData,targetX,targetY))return;
   const destination=board.querySelector<HTMLElement>('[data-wmh-tile][data-x="'+targetX+'"][data-y="'+targetY+'"]');
   if(!destination||!isoCanWalkTile(board,destination,targetX,targetY)){delete runtime.__wmhPendingPlayerDestination;return;}
+  emitPlayerTapGlow(board,targetX,targetY,mapData.grid);
   runtime.__wmhPendingPlayerDestination={x:targetX,y:targetY,surface};
   const oldTimer=Number(player.dataset.moveTimer||0);
   if(oldTimer)window.clearTimeout(oldTimer);

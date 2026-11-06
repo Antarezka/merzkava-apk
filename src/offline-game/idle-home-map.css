@@ -863,3 +863,91 @@ html.soft-keyboard-open .idle-home-footer { padding-top:6px !important; }
   .world-atlas-login-card{max-height:calc(100dvh - 24px)!important;padding-top:16px!important;padding-bottom:10px!important}
   .world-atlas-login-foot{margin-top:7px!important;padding-top:6px!important}
 }
+
+/* World Atlas loading: restore the earlier soft orbital glass presentation.
+   The new single-line status and real-task progress routine remain unchanged. */
+.atlas-access-buffer{
+  gap:15px!important;padding:24px 22px 20px!important;border:1px solid #d6b97b!important;border-radius:12px!important;
+  background:radial-gradient(ellipse at 50% 37%,#30483b 0%,#17281f 43%,#0d1712 100%)!important;
+  box-shadow:inset 0 0 0 5px #d4bd7a0e,0 12px 45px #060b08a8!important;
+}
+.atlas-access-buffer:before{display:none!important}
+.atlas-buffer-head{padding-bottom:10px!important;border-bottom:1px solid #bfa66a55!important;letter-spacing:.16em!important}
+.atlas-buffer-lamp{width:7px!important;height:7px!important;flex-basis:7px!important;border:0!important;background:#d6bd83!important;box-shadow:0 0 10px #e8ca83,0 0 18px #e8ca8366!important}
+.atlas-buffer-visual{
+  width:104px!important;height:104px!important;margin:3px 0 1px!important;border:1px solid #bba36b45!important;
+  background:radial-gradient(circle,#d5ba7920 0 24%,transparent 25% 100%)!important;
+  box-shadow:0 0 35px #c5a26413,inset 0 0 18px #c5a26412!important;
+}
+.atlas-buffer-visual:before,.atlas-buffer-visual:after{inset:8px!important;border-color:#c6ae7652!important}
+.atlas-buffer-visual:after{inset:18px!important;border-style:dashed!important;border-color:#c7af744d!important}
+.atlas-buffer-orbit{inset:2px!important;border:1px dashed #ddc58a!important;border-left-color:transparent!important;border-bottom-color:#ddc58a33!important;filter:drop-shadow(0 0 5px #dfc78355)!important}
+.atlas-buffer-orbit:before{right:12px!important;top:11px!important;width:5px!important;height:5px!important;border:0!important;background:#f4dfaa!important;box-shadow:0 0 9px #f4dfaa!important}
+.atlas-buffer-core{width:21px!important;height:21px!important;border:1px solid #d9c184!important;background:radial-gradient(circle at 35% 30%,#f3e1b0,#ab8c4e 70%,#56674e)!important;box-shadow:0 0 15px #e1c17b77,0 0 35px #e1c17b2b!important}
+.atlas-buffer-core:after{content:none!important}
+.atlas-buffer-scan{background:linear-gradient(90deg,transparent,#e5d49b,#e5d49b,transparent)!important;box-shadow:0 0 8px #e5d49b!important}
+.atlas-buffer-status{min-height:0!important;gap:7px!important}
+.atlas-buffer-status small{color:#b7a577!important;letter-spacing:.2em!important}
+.atlas-buffer-message{min-height:24px!important;gap:0!important;padding:0!important}
+.atlas-buffer-status strong{
+  max-width:100%!important;color:#f0e4c6!important;font:500 clamp(15px,4.4vw,18px)/1.25 "Cormorant Garamond",Georgia,serif!important;
+  letter-spacing:0!important;text-shadow:none!important;mask-image:linear-gradient(90deg,#000 0%,#000 77%,transparent 100%)!important;
+}
+.atlas-buffer-caret{width:5px!important;height:10px!important;border-radius:0!important;background:#d7c184!important;box-shadow:0 0 8px #d7c184!important}
+.atlas-buffer-track{
+  height:2px!important;max-width:none!important;padding:0!important;border:0!important;border-radius:0!important;
+  background:#9a87564d!important;box-shadow:none!important;
+}
+.atlas-buffer-track span{height:100%!important;border-radius:0!important;background:linear-gradient(90deg,#9b8855,#f1dfac)!important;box-shadow:0 0 8px #dfc783!important}
+.atlas-buffer-track span:after{display:none!important}
+.atlas-buffer-foot{color:#9e9679!important;font-size:7px!important;letter-spacing:.17em!important}
+@media(max-width:390px){.atlas-access-buffer{padding:19px 16px 16px!important;gap:13px!important}.atlas-buffer-status strong{font-size:16px!important}.atlas-buffer-visual{width:92px!important;height:92px!important}}
+:root[data-theme="light"] .atlas-access-buffer{
+  border-color:#a88f60!important;background:radial-gradient(ellipse at 50% 37%,#f0e8d8 0%,#e6dcc8 54%,#d9ceb8 100%)!important;
+  color:#394b3f!important;box-shadow:inset 0 0 0 5px #a88f6013,0 12px 45px #1c241c55!important;
+}
+:root[data-theme="light"] .atlas-buffer-head{border-bottom-color:#aa956d99!important;color:#806b43!important}
+:root[data-theme="light"] .atlas-buffer-lamp{background:#b18d4d!important;box-shadow:0 0 8px #b18d4d77!important}
+:root[data-theme="light"] .atlas-buffer-visual{border-color:#a88f60!important;background:radial-gradient(circle,#92774d12 0 24%,transparent 25% 100%)!important;box-shadow:0 0 25px #8a75451c,inset 0 0 20px #8a75451c!important}
+:root[data-theme="light"] .atlas-buffer-visual:before,:root[data-theme="light"] .atlas-buffer-visual:after{border-color:#a88f6088!important}
+:root[data-theme="light"] .atlas-buffer-orbit{border-color:#947a4a!important;border-left-color:transparent!important;border-bottom-color:#947a4a44!important}
+:root[data-theme="light"] .atlas-buffer-core{border-color:#987b48!important;background:radial-gradient(circle at 35% 30%,#fff4d2 0%,#d5b673 44%,#a88b54 74%,#75846b 100%)!important}
+:root[data-theme="light"] .atlas-buffer-scan{background:linear-gradient(90deg,transparent,#9c8250,#f8e9bd,#9c8250,transparent)!important}
+:root[data-theme="light"] .atlas-buffer-status small{color:#8c754a!important}
+:root[data-theme="light"] .atlas-buffer-status strong{color:#33483d!important}
+:root[data-theme="light"] .atlas-buffer-caret{background:#927a4d!important;box-shadow:0 0 7px #927a4d!important}
+:root[data-theme="light"] .atlas-buffer-track{background:#cfc4ad!important}
+:root[data-theme="light"] .atlas-buffer-track span{background:linear-gradient(90deg,#637b65 0%,#a88b54 48%,#e2c98e 100%)!important;box-shadow:0 0 8px #a88b5488!important}
+:root[data-theme="light"] .atlas-buffer-foot{color:#8a7958!important}
+
+/* Dedicated World Atlas sign-up panel and password visibility controls. */
+.world-atlas-login-card form{gap:9px!important}
+.atlas-login-panel,.atlas-signup-panel{display:grid;gap:9px;min-width:0}
+.atlas-login-panel[hidden],.atlas-signup-panel[hidden]{display:none!important}
+.atlas-password-field{display:grid!important;gap:6px!important;margin-top:3px!important}
+.atlas-password-input-wrap{position:relative;display:block;min-width:0}
+.atlas-password-input-wrap input{padding-right:48px!important}
+.atlas-password-visibility{
+  position:absolute!important;right:5px!important;top:50%!important;transform:translateY(-50%)!important;
+  display:grid!important;place-items:center!important;width:36px!important;height:34px!important;min-height:34px!important;
+  padding:0!important;border:1px solid #9b895f66!important;border-radius:5px!important;
+  background:#26352b!important;color:#e8d3a4!important;font:18px/1 Arial,sans-serif!important;
+}
+.atlas-password-visibility:active{background:#715d3c!important}
+.atlas-create-account-link{background:linear-gradient(145deg,#806b46,#3d4935)!important}
+.atlas-signup-panel{padding:12px 10px;border:1px solid #b99a6655;border-radius:8px;background:linear-gradient(145deg,#17271d88,#0d171288)}
+.atlas-signup-panel h3{margin:0 0 4px;color:#f1e4c7;font:500 18px/1.2 Georgia,serif}
+.atlas-signup-back{min-height:38px;padding:8px 11px;border:1px solid #8c7955;border-radius:5px;background:#17251d;color:#e4d3b0;font:700 9px/1.15 Cinzel,Georgia,serif;letter-spacing:.08em}
+:root[data-theme="light"] .atlas-password-visibility{border-color:#b6a176!important;background:#e9dfcc!important;color:#53664f!important}
+:root[data-theme="light"] .atlas-signup-panel{border-color:#b6a176;background:linear-gradient(145deg,#eee5d3,#e3d8c4)}
+:root[data-theme="light"] .atlas-signup-panel h3{color:#34483d}
+:root[data-theme="light"] .atlas-signup-back{border-color:#b6a176;background:#eee5d3;color:#596456}
+
+.atlas-password-field>span:first-child{color:#d9c393!important;font:800 8px/1.3 Arial,sans-serif!important;letter-spacing:.1em!important;text-transform:uppercase!important}
+.atlas-password-field .atlas-password-input-wrap input{margin:0!important}
+.atlas-password-visibility:focus-visible{outline:2px solid #efd39a!important;outline-offset:2px!important}
+.atlas-password-field[hidden]{display:none!important}
+:root[data-theme="light"] .atlas-password-field>span:first-child{color:#786543!important}
+
+.atlas-password-field>label{margin:0!important;color:#d9c393!important;font:800 8px/1.3 Arial,sans-serif!important;letter-spacing:.1em!important;text-transform:uppercase!important}
+:root[data-theme="light"] .atlas-password-field>label{color:#786543!important}
