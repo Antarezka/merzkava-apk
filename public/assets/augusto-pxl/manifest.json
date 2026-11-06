@@ -475,6 +475,22 @@
     "map.region.longchao-port": {
       "status": "pending",
       "type": "image"
+    },
+    "character.npc.teacher-master.idle": {
+      "status": "pending",
+      "type": "sprite-sheet"
+    },
+    "character.npc.bg-guide.idle": {
+      "status": "pending",
+      "type": "sprite-sheet"
+    },
+    "character.npc.bg-trainee.idle": {
+      "status": "pending",
+      "type": "sprite-sheet"
+    },
+    "character.npc.bg-attendant.idle": {
+      "status": "pending",
+      "type": "sprite-sheet"
     }
   }
 }

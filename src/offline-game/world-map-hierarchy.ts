@@ -39,7 +39,14 @@ function pxlActorMarkup(assetId:string,mode:WorldMapVisualMode):string {
     ? '<i class="wmh-pxl-actor-sprite" data-pxl-actor-sprite data-pxl-asset-id="'+escapeMapEditorText(assetId)+'" data-pxl-motion="idle" data-pxl-direction="south" aria-hidden="true"></i>'
     : '<i></i>';
 }
-function pxlNpcAssetId(npcId:string):string {return "character.npc."+npcId+".idle";}
+function pxlNpcAssetId(npcId:string):string {
+  const aliases:Record<string,string>={
+    teacher:"teacher-master",
+    "bg-guide":"bg-guide","bg-trainee":"bg-trainee","bg-attendant":"bg-attendant",
+    "test-guide":"bg-guide","test-scholar":"bg-trainee","test-mechanic":"bg-attendant",
+  };
+  return "character.npc."+(aliases[npcId]||npcId)+".idle";
+}
 
 type RegionId = "golden-dragon-empire" | "tianhai-yunzhou" | "beiming-gu";
 const regionData: Record<RegionId, { name: string; subtitle: string; image: string; sites: string[] }> = {

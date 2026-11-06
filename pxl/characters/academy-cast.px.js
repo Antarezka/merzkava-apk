@@ -27,6 +27,10 @@ const CAST=[
 ["student-lin-idle",{robe:"w",trim:"Y",sash:"r",hair:"k"}],
 ["student-wei-idle",{robe:"b",trim:"G",sash:"y",hair:"n"}],
 ["teacher-mei-idle",{robe:"p",trim:"Y",sash:"r",hair:"k",longHair:true}],
-["groundskeeper-idle",{robe:"g",trim:"Y",sash:"n",hair:"n",hat:"t",skin:"S"}]
+["groundskeeper-idle",{robe:"g",trim:"Y",sash:"n",hair:"n",hat:"t",skin:"S"}],
+["teacher-master-idle",{robe:"p",trim:"Y",sash:"r",hair:"n",longHair:true}],
+["bg-guide-idle",{robe:"g",trim:"Y",sash:"n",hair:"n",hat:"t"}],
+["bg-trainee-idle",{robe:"w",trim:"R",sash:"b",hair:"n"}],
+["bg-attendant-idle",{robe:"b",trim:"G",sash:"y",hair:"n"}]
 ]
 for(const [name,look] of CAST)anim(name,{w:32,h:48,frames:32,fps:8,pivot:[16,46]},c=>drawAcademyCharacter(c,look))
