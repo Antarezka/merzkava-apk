@@ -35,7 +35,10 @@ describe("World Atlas player login gate",()=>{
       expect(html).toContain('data-atlas-buffer-progress');
       expect(html).toContain('data-password-safety-note');
       expect(html).toContain('data-password-recovery-note');
-      expect(html).toContain('data-password-reset-required-label=');
+      expect(html).toContain('data-password-reset-required-label=');\n      expect(html).toContain('data-password-policy-label=');
+      const policyStart=html.indexOf('data-password-policy-label="')+'data-password-policy-label="'.length;
+      const policyEnd=html.indexOf('"',policyStart);
+      expect(html.slice(policyStart,policyEnd)).toBe({"id":"Minimal 8 karakter: huruf besar, huruf kecil, angka, dan simbol.","en":"At least 8 characters: uppercase, lowercase, a number, and a symbol.","pt":"Mínimo de 8 caracteres: maiúscula, minúscula, número e símbolo.","fr":"8 caractères minimum : majuscule, minuscule, chiffre et symbole.","ru":"Не менее 8 символов: заглавная и строчная буквы, цифра и символ.","ja":"8文字以上。大文字、小文字、数字、記号を含めてください。","zh-CN":"至少 8 个字符：包含大写字母、小写字母、数字和符号。","ko":"8자 이상: 대문자, 소문자, 숫자 및 기호를 포함하세요."}[language.code]);
       expect(html).toContain('data-reset-continue-change-label=');
       expect(html).toContain('data-reset-continue-master-label=');
       expect(html).toContain('data-reset-authorized-label=');

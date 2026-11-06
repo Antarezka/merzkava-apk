@@ -36,9 +36,9 @@ describe("World Atlas account credentials",()=>{
     expect(atlasPasswordPolicyError("lowercase123!")).toMatch(/uppercase/i);
     expect(atlasPasswordPolicyError("UPPERCASE123!")).toMatch(/lowercase/i);
     expect(atlasPasswordPolicyError("NoDigitsHere!")).toMatch(/number/i);
-    expect(atlasPasswordPolicyError("NoSymbols123")).toMatch(/symbol/i);
+    expect(atlasPasswordPolicyError("NoSymbols123")).toMatch(/symbol/i);\n    expect(atlasPasswordPolicyError("Abcdef1 ")).toMatch(/symbol/i);
     expect(atlasPasswordPolicyError("A".repeat(129)+"a1!")).toMatch(/128/);
-    expect(atlasPasswordPolicyError("Valid-Pass-123!")).toBeNull();
+    expect(atlasPasswordPolicyError("Valid-Pass-123!")).toBeNull();\n    expect(atlasPasswordPolicyError("Abcdef1!")).toBeNull();
   });
   it("rejects an incorrect Master Reset credential",async()=>{
     expect(await verifyAtlasMasterResetPassword("incorrect-master-value")).toBe(false);
