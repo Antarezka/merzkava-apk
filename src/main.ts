@@ -1360,10 +1360,17 @@ root.addEventListener("click", async (event: MouseEvent) => {
     if(!eligible){if(resetMessage)resetMessage.textContent="That player is not present in the current player list.";return;}
     if(!proofInput?.checked){if(resetMessage)resetMessage.textContent="Verify account ownership through an official channel before issuing a reset request.";return;}
     const resetButton=root.querySelector<HTMLButtonElement>("[data-atlas-developer-reset-submit]");
+    const resetSection=root.querySelector<HTMLElement>("[data-developer-atlas-reset]");
     if(resetButton)resetButton.disabled=true;
     if(resetMessage)resetMessage.textContent="Preparing the account-specific reset request...";
     try{
-      const request=await createAtlasMasterResetRequest(eligible.name);
+      const requestTask=createAtlasMasterResetRequest(eligible.name);
+      const requestResults=await Promise.allSettled([
+        requestTask,
+        resetSection?playWorldAtlasAccessSequence(resetSection,3600,requestTask):requestTask.then(()=>undefined)
+      ]);
+      if(requestResults[0].status==="rejected")throw requestResults[0].reason;
+      const request=requestResults[0].value;
       if(requestField){requestField.value=request;requestField.hidden=false;}
       if(copyButton)copyButton.hidden=false;
       if(resetMessage)resetMessage.textContent="Request ready. Copy it to the AI to prepare the unique player confirmation code for the next app update. This has not reset the player's password yet.";
@@ -1382,15 +1389,23 @@ root.addEventListener("click", async (event: MouseEvent) => {
     const request=requestField?.value??"";
     if(!request||!copyButton)return;
     try{
-      if(navigator.clipboard?.writeText)await navigator.clipboard.writeText(request);
-      else{
-        const field=document.createElement("textarea");
-        field.value=request;field.setAttribute("readonly","");
-        field.style.position="fixed";field.style.opacity="0";
-        document.body.append(field);field.select();
-        const copied=document.execCommand("copy");field.remove();
-        if(!copied)throw new Error("Clipboard is unavailable on this device.");
-      }
+      const resetSection=root.querySelector<HTMLElement>("[data-developer-atlas-reset]");
+      const copyTask=(async()=>{
+        if(navigator.clipboard?.writeText)await navigator.clipboard.writeText(request);
+        else{
+          const field=document.createElement("textarea");
+          field.value=request;field.setAttribute("readonly","");
+          field.style.position="fixed";field.style.opacity="0";
+          document.body.append(field);field.select();
+          const copied=document.execCommand("copy");field.remove();
+          if(!copied)throw new Error("Clipboard is unavailable on this device.");
+        }
+      })();
+      const copyResults=await Promise.allSettled([
+        copyTask,
+        resetSection?playWorldAtlasAccessSequence(resetSection,2500,copyTask):copyTask.then(()=>undefined)
+      ]);
+      if(copyResults[0].status==="rejected")throw copyResults[0].reason;
       copyButton.textContent="Copied ✓";
       const message=root.querySelector<HTMLElement>("[data-developer-atlas-reset-message]");
       if(message)message.textContent="Request copied. Paste it into the AI handoff. Give the player confirmation code only after the updated APK is available.";
