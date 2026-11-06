@@ -1129,3 +1129,16 @@ Current source baseline for this workstream: ed5ef007cead9ecf8e6e70662c29ec5cce9
 **Build checkpoint:** Android Build #1360 (`v.1.01.1360-2be`, source `2be3fee29e56b6bb062bf93acf46ab0e19387928`) passed APK build, package/version, alignment and signature checks; artifact `merzkava-build-1360` containing `Merzkava.apk` + `BUILD_NOTES.md` was uploaded successfully before the Android 14 emulator step. [Download artifact](https://api.github.com/repos/Antarezka/merzkava-apk/actions/artifacts/13496308367/zip) · [Actions run](https://github.com/Antarezka/merzkava-apk/actions/runs/42206235982). Emulator outcome is not required to retrieve the uploaded APK and must be reported separately.
 
 **Still open:** physical TECNO Spark Go 1 KL4 verification; confirm that the static artwork does not flicker/dim during Player/NPC motion, test several fractional sectors, test CENTER MAP at a non-midpoint focal point, verify Academy entry follows the Player token independently of the saved editor focal point, and review natural Player/NPC dialogue in chat.
+
+
+## 16. Augusto PXL — full visual asset pipeline (next priority)
+
+- [x] Add a separate pink 54 × 54 px CRT/console launcher in Eternal Path for the Augusto PXL workstream; keep the existing green World Atlas TV gateway and its behavior intact.
+- [x] Record the owner-approved full visual-production scope and phased integration contract in [AUGUSTO_PXL_INTEGRATION_PLAN.md](./AUGUSTO_PXL_INTEGRATION_PLAN.md).
+- [ ] Pin and validate the PXL toolchain in GitHub Actions; establish editable PXL sources, reproducible exports, validation and license preservation.
+- [ ] Build a manifest/TypeScript adapter for PXL outputs into the existing DOM/CSS/SVG runtime. Do not reintroduce PixiJS or replace the current game engine/input path.
+- [ ] Integrate a representative character, environment, object and effect slice; then expand to World Atlas maps, tilesets, Spirit Realm/Martial Soul/Spirit Ring/Arcanistry effects, UI artwork and cinematics.
+- [ ] Preserve the existing Academy map, movement, NPC logic, minimap, map editor, HUD, inventory, menu, save data and floating TV gateway throughout gradual migration.
+- [ ] Profile asset size, decoding, memory, frame pacing and touch reliability on TECNO Spark Go 1 KL4 before broad rollout.
+
+**Baseline note:** Android Build #1374 points to source commit `5a1532acb526539315a3f92d2ab3b273bc9c9dc9` on `feat/player-hud-inventory-2026-11-06`; that workflow run failed. The baseline is retained for source continuity, not described as a successful APK.
