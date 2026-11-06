@@ -941,7 +941,9 @@ async function openWorldAtlasFromTv():Promise<void> {
         select.dataset.atlasLoginBound="true";
         select.addEventListener("change",()=>{
           const panel=gate.querySelector<HTMLElement>("[data-atlas-reset-panel]");
+          const submitButton=gate.querySelector<HTMLButtonElement>("[data-world-atlas-submit]");
           if(panel)panel.hidden=true;
+          if(submitButton)submitButton.disabled=true;
           ["#atlas-reset-current","#atlas-reset-master","#atlas-reset-new","#atlas-reset-confirm"].forEach(selector=>{
             const input=gate.querySelector<HTMLInputElement>(selector);if(input)input.value="";
           });
