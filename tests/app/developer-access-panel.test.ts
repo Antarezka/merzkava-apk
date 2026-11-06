@@ -17,8 +17,11 @@ describe("Account controls in Settings",()=>{
       expect(html).toContain("developer-atlas-reset-confirm");
       expect(html).toContain('id="developer-atlas-reset-request"');
       expect(html).toContain("data-atlas-reset-copy-request");
-      expect(html).toContain('data-buffer-context="developer"');
-      expect(html).toContain("LOCAL CREDENTIAL STORE...");
+      expect(html).toContain('data-buffer-context="developer-reset"');
+      expect(html).toContain("PLAYER ACCOUNT BINDING...");
+      expect(html).toContain('data-atlas-reset-copy-buffer');
+      expect(html).toContain('data-buffer-context="clipboard"');
+      expect(html).toContain("SYSTEM CLIPBOARD WRITE...");
     }
   });
 
