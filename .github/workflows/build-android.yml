@@ -24,6 +24,7 @@ on:
       - fix/1348-token-only-motion-camera-center-subcell
       - feat/player-hud-subcell-runtime-2026-11-06
       - feat/player-hud-inventory-2026-11-06
+      - feat/augusto-pxl-floating-tv-2026-11-06
     paths:
       - "src/**"
       - "public/**"
