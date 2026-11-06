@@ -2499,13 +2499,9 @@ function animateGridMove(token:HTMLElement,update:()=>void,sync=true,updateSenso
   if(board&&sync)syncIsoDepthAndOcclusion(board);
   const to={x:Number(token.dataset.posX??token.dataset.x??0),y:Number(token.dataset.posY??token.dataset.y??0)};
   if(board&&isPixiWorldAtlasBoard(board)){
-    // Keep cell/sub-cell state authoritative in the existing engine. Pixi
-    // observes these DOM attributes and animates its separate visual actor.
+    // Keep cell/sub-cell state authoritative in the existing engine. Pixi's
+    // MutationObserver sees these coordinate attributes before the next paint.
     if(updateSensors)updateScannerContacts(board,false);
-    board.dispatchEvent(new CustomEvent("merzkava:actor-moved",{
-      bubbles:true,
-      detail:{actor:token.dataset.wmhNpc||"player",from,to}
-    }));
     return;
   }
   const {x:dx,y:dy}=getIsoMovementOffset(from,to,grid,zoom,renderScaleX,renderScaleY);
