@@ -92,27 +92,27 @@ function meterMarkup(label:string,value:number,max:number,kind:"hp"|"satiety"):s
   const percentage=Math.max(0,Math.min(100,value/Math.max(1,max)*100));
   return '<div class="wmh-player-meter wmh-player-meter-'+kind+'"><div class="wmh-player-meter-copy"><b>'+label+'</b><strong data-hud-'+kind+'-value>'+value.toFixed(1).replace(/\.0$/,"")+'<small> / '+max+'</small></strong></div><div class="wmh-player-meter-track" role="progressbar" aria-label="'+label+'" aria-valuemin="0" aria-valuemax="'+max+'" aria-valuenow="'+value+'"><span data-hud-'+kind+'-bar style="width:'+percentage+'%"></span></div></div>';
 }
-export function renderPlayerHudMarkup():string {
+export function renderPlayerHudMarkup(visualMode:"legacy"|"augusto-pxl"="legacy"):string {
   const state=readPlayerHudPreviewState();
   const name=getEternalSave()?.character.name?.trim()||"PLAYER";
-  const ringMarkup=[1,2,3,4].map(index=>'<div class="wmh-spirit-ring" data-realm-tier="'+index+'" aria-label="Spirit Ring preview slot '+index+'"><span class="wmh-spirit-ring-orbit"><i></i></span><b>SR'+index+'</b></div>').join("");
+  const ringMarkup=[1,2,3,4].map(index=>'<div class="wmh-spirit-ring" data-realm-tier="'+index+'" aria-label="Spirit Ring preview slot '+index+'"><span class="wmh-spirit-ring-orbit"><i '+(visualMode==="augusto-pxl"?'data-pxl-asset-id="effect.spirit-ring.tier-'+index+'" ':'')+'></i></span><b>SR'+index+'</b></div>').join("");
   const skills=["Technique","Guard","Movement","Spirit Art"],realms=["SPIRIT INITIATE","SPIRIT ADEPT","SPIRIT ELDER","SPIRIT MONARCH"];
-  const skillMarkup=skills.map((skill,index)=>'<button type="button" class="wmh-skill-slot" data-hud-action="skill" data-skill-slot="'+(index+1)+'" data-realm-tier="'+(index+1)+'" aria-label="Skill slot '+(index+1)+' placeholder"><span class="wmh-skill-ring" aria-hidden="true"><i></i><b></b></span><small class="wmh-skill-realm">SR '+(index+1)+' · '+realms[index]+'</small><strong>'+skill+'</strong></button>').join("");
+  const skillMarkup=skills.map((skill,index)=>'<button type="button" class="wmh-skill-slot" data-hud-action="skill" data-skill-slot="'+(index+1)+'" data-realm-tier="'+(index+1)+'" aria-label="Skill slot '+(index+1)+' placeholder"><span class="wmh-skill-ring" aria-hidden="true"><i '+(visualMode==="augusto-pxl"?'data-pxl-asset-id="ui.skill.'+skill.toLowerCase().replace(/\s+/g,"-")+'" ':'')+'></i><b></b></span><small class="wmh-skill-realm">SR '+(index+1)+' · '+realms[index]+'</small><strong>'+skill+'</strong></button>').join("");
   const itemsMarkup=Array.from({length:25},(_,index)=>{
     const item=TEST_ITEMS[index];
     if(!item)return '<div class="wmh-inventory-slot is-empty" data-slot="'+String(index+1).padStart(2,"0")+'" aria-label="Empty inventory slot '+(index+1)+'"><span>'+String(index+1).padStart(2,"0")+'</span></div>';
-    return '<button type="button" class="wmh-inventory-slot wmh-inventory-item" data-hud-action="inventory-item" data-hud-item-id="'+item.id+'" data-item-kind="'+item.kind+'" aria-label="'+esc(item.label)+' · quantity '+state.items[item.id]+'"><span class="wmh-item-tier-frame" data-tier="'+item.tier+'"><span class="wmh-item-icon" aria-hidden="true">'+item.glyph+'</span></span><strong class="wmh-item-quantity" data-hud-item-count="'+item.id+'">×'+state.items[item.id]+'</strong></button>';
+    return '<button type="button" class="wmh-inventory-slot wmh-inventory-item" data-hud-action="inventory-item" data-hud-item-id="'+item.id+'" data-item-kind="'+item.kind+'" aria-label="'+esc(item.label)+' · quantity '+state.items[item.id]+'"><span class="wmh-item-tier-frame" data-tier="'+item.tier+'"><span class="wmh-item-icon" '+(visualMode==="augusto-pxl"?'data-pxl-asset-id="ui.item.'+item.id+'" ':'')+'aria-hidden="true">'+item.glyph+'</span></span><strong class="wmh-item-quantity" data-hud-item-count="'+item.id+'">×'+state.items[item.id]+'</strong></button>';
   }).join("");
   const currency=[["xc","Xuan Copper","●"],["xs","Xuan Silver","◉"],["xg","Xuan Gold","✦"],["zj","Zun Jade","◆"],["az","Ancient Zun","◇"]] as const;
-  const currencyMarkup=currency.map(([key,label,glyph])=>'<div class="wmh-currency-row"><span class="wmh-currency-name"><i aria-hidden="true">'+glyph+'</i>'+label+'</span><b class="wmh-currency-amount" data-hud-currency="'+key+'">'+state.wallet[key]+' '+key+'</b></div>').join("");
-  return '<section class="wmh-player-hud" data-wmh-player-hud aria-label="Player field status">'+
+  const currencyMarkup=currency.map(([key,label,glyph])=>'<div class="wmh-currency-row"><span class="wmh-currency-name"><i '+(visualMode==="augusto-pxl"?'data-pxl-asset-id="ui.currency.'+key+'" ':'')+'aria-hidden="true">'+glyph+'</i>'+label+'</span><b class="wmh-currency-amount" data-hud-currency="'+key+'">'+state.wallet[key]+' '+key+'</b></div>').join("");
+  return '<section class="wmh-player-hud" data-wmh-player-hud data-visual-mode="'+visualMode+'" aria-label="Player field status">'+
     '<article class="wmh-player-card" data-wmh-hud-layout="player-card" aria-label="Player status">'+
       '<div class="wmh-player-topline"><div class="wmh-player-id"><strong data-hud-character-name>'+esc(name)+'</strong></div><div class="wmh-player-satiety-label">SATIETY</div><div class="wmh-player-realm"><b>MORTAL</b></div></div>'+
       '<div class="wmh-player-bottomline"><div class="wmh-player-hp">'+meterMarkup("HP",state.hp,state.maxHp,"hp")+'</div><div class="wmh-player-satiety">'+meterMarkup("",state.satiety,100,"satiety")+'</div><div class="wmh-player-affiliation"><small>AFFILIATION</small><b>NOT LINKED</b></div></div>'+
     '</article>'+
     '<aside class="wmh-spirit-ring-list" aria-label="Absorbed Spirit Rings, maximum nine">'+ringMarkup+'</aside>'+
     '<section class="wmh-player-dock" data-wmh-hud-layout="skill-dock" aria-label="Tactical skills and bag"><div class="wmh-skill-dock"><header><b>TACTICAL SKILLS</b><small>PLACEHOLDER</small></header><div class="wmh-skill-slots">'+skillMarkup+'</div></div>'+
-      '<button type="button" class="wmh-bag-button" data-hud-action="toggle-inventory" aria-label="Open Traveler Satchel" title="Traveler Satchel"><span aria-hidden="true"></span></button>'+
+      '<button type="button" class="wmh-bag-button" data-hud-action="toggle-inventory" aria-label="Open Traveler Satchel" title="Traveler Satchel"><span '+(visualMode==="augusto-pxl"?'data-pxl-asset-id="ui.hud.traveler-satchel" ':'')+'aria-hidden="true"></span></button>'+
     '</section>'+
     '<section class="wmh-inventory-window" data-hud-panel="inventory" data-wmh-scroll-resize hidden role="dialog" aria-label="Traveler Satchel inventory">'+
       '<header class="wmh-inventory-header"><div><b>TRAVELER\'S SATCHEL</b><small>PERSONAL INVENTORY · <span data-hud-capacity>9 / 25</span></small></div><button type="button" data-hud-action="close-inventory" aria-label="Close inventory">×</button></header>'+
