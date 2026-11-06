@@ -95,21 +95,11 @@ export function renderExpeditionInterface():string {
         </svg>
       </button>
       <button type="button" class="expedition-pxl-trigger" data-augusto-pxl-open data-drag-position-key="merzkava.eternal-path.augusto-pxl-position.v1" aria-label="Open Augusto PXL integration panel" aria-haspopup="dialog" aria-expanded="false" title="Augusto PXL · Visual Asset Workshop">
-        <svg class="expedition-pxl-emblem" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
-          <path d="M24 10 17 3M40 10 47 3" fill="none" stroke="#f7c6dc" stroke-width="2.4" stroke-linecap="round"/>
-          <path d="M24 10 25 15M40 10 39 15" fill="none" stroke="#b84f82" stroke-width="2" stroke-linecap="round"/>
-          <rect x="8" y="13" width="48" height="34" rx="7" fill="#ef8fba" stroke="#ffd8e8" stroke-width="1.8"/>
-          <rect x="12" y="17" width="32" height="25" rx="3.5" fill="#29212b" stroke="#a84d78" stroke-width="1.4"/>
-          <rect x="15" y="20" width="26" height="19" rx="2" fill="#34283a"/>
-          <path d="m19 33 5-6 4 4 4-7 5 9" fill="none" stroke="#ffb8d7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          <circle cx="49" cy="23" r="2.4" fill="#fff0f6" stroke="#a84d78" stroke-width="1"/>
-          <circle cx="49" cy="32" r="2.4" fill="#fff0f6" stroke="#a84d78" stroke-width="1"/>
-          <path d="M15 48v3m34-3v3" stroke="#f7c6dc" stroke-width="2" stroke-linecap="round"/>
-          <rect x="17" y="52" width="30" height="8" rx="2" fill="#d86e9e" stroke="#ffd8e8" stroke-width="1.2"/>
-          <path d="M24 54v4m-2-2h4" stroke="#fff0f6" stroke-width="1.1" stroke-linecap="round"/>
-          <circle cx="38" cy="56" r="1.2" fill="#fff0f6"/>
-          <text x="32" y="46" fill="#fff7fb" font-size="3.7" font-family="Arial,sans-serif" font-weight="700" text-anchor="middle" letter-spacing=".45">AUGUSTO PXL</text>
-        </svg>
+        <span class="pxl-tv-art" aria-hidden="true">
+          <span class="pxl-tv-antenna"><i></i><b></b></span>
+          <span class="pxl-tv-shell"><i class="pxl-tv-screen"></i><i class="pxl-tv-knobs"><b></b><b></b></i></span>
+          <span class="pxl-console-box"><i class="pxl-console-dpad"></i><i class="pxl-console-stick"><b></b></i><i class="pxl-console-lamp"></i><small class="pxl-console-ink">AUGUSTO PXL</small></span>
+        </span>
       </button>
       ${renderIdleHomeMap(save?{day:save.day,hour:save.hour,minute:save.minute,cycle:atmosphere.cycle==="Morning"?"Day":atmosphere.cycle}:null)}
     </div>
