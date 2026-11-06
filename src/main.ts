@@ -908,7 +908,13 @@ async function openWorldAtlasFromTv():Promise<void> {
   if(message)message.textContent=gate.dataset.loadingLabel||"Verifying registered players and local saves…";
   if(select)select.innerHTML='<option value="">Loading registered players…</option>';
   if(submit)submit.disabled=true;
-  try{
+  const offlineMessage=gate.dataset.offlineLabel||"An active internet connection to the official Universe source is required.";
+  if(!navigator.onLine){
+    if(message)message.textContent=offlineMessage;
+    if(select)select.innerHTML='<option value="">—</option>';
+    return;
+  }
+  const loadTask=(async()=>{
     await refreshCharacters();
     let canon=getCanonStatus();
     if(!canon.commitSha||canon.status==="error"){
@@ -916,10 +922,11 @@ async function openWorldAtlasFromTv():Promise<void> {
       canonMessage=status.message;
       canon=getCanonStatus();
     }
-    if(!canon.commitSha||canon.status==="error")throw new Error("The verified players.md snapshot is unavailable. Refresh the World Archive source and try again.");
+    if(!canon.commitSha||canon.status==="error")throw new Error(offlineMessage);
     while(playerRegistryBusy)await new Promise<void>(resolve=>window.setTimeout(resolve,60));
     const registry=await refreshLatestPlayerRegistry(canon.commitSha);
     if(registry.commitSha!==canon.commitSha)throw new Error("The player registry does not match the verified active Universe snapshot.");
+    await verifyCanonSourceConnection(canon.commitSha);
     registeredCharacters=mapRegistryCharacters(registry);
     playerRegistryMessage=registeredCharacters.length+" Universe players · snapshot "+registry.commitSha;
     const options=atlasEligiblePlayers();
@@ -949,8 +956,15 @@ async function openWorldAtlasFromTv():Promise<void> {
       await refreshAtlasPasswordMode(gate);
     }
     requestAnimationFrame(()=>gate.querySelector<HTMLInputElement>("#world-atlas-player")?.focus());
+  })();
+  try{
+    const results=await Promise.allSettled([
+      loadTask,
+      playWorldAtlasAccessSequence(gate,3600,loadTask)
+    ]);
+    if(results[0].status==="rejected")throw results[0].reason;
   }catch(error){
-    if(message)message.textContent=error instanceof Error?error.message:"Could not load registered player accounts.";
+    if(message)message.textContent=error instanceof Error?error.message:offlineMessage;
     if(submit)submit.disabled=true;
   }
 }
