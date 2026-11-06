@@ -1,5 +1,5 @@
 import type { WorldMapVisualMode } from "./world-map-hierarchy";
-import { cacheBundledAugustoPxlAsset, createCachedAugustoPxlObjectUrl } from "./augusto-pxl-vault";
+import { cacheBundledAugustoPxlAsset, readCachedAugustoPxlAsset } from "./augusto-pxl-vault";
 
 type PxlAnimation = { frames:number[]; fps?:number };
 type PxlAsset = {
@@ -18,7 +18,7 @@ const MANIFEST_URL="/assets/augusto-pxl/manifest.json";
 const observers=new WeakMap<HTMLElement,MutationObserver>();
 const runningAnimations=new WeakMap<HTMLElement,Animation>();
 const objectUrls=new WeakMap<HTMLElement,string>();
-const resolvedSourcePromises=new Map<string,Promise<string>>();
+const cachedBlobPromises=new Map<string,Promise<Blob|null>>();
 let manifestPromise:Promise<PxlManifest|null>|null=null;
 
 function isBundledAssetPath(value:string):boolean {
@@ -39,23 +39,28 @@ async function loadManifest():Promise<PxlManifest|null> {
   }
   return manifestPromise;
 }
-async function resolveBundledSource(id:string,src:string):Promise<string> {
+async function resolveBundledSource(element:HTMLElement,id:string,src:string):Promise<string> {
   if(!isBundledAssetPath(src))return src;
+  const ownUrl=objectUrls.get(element);
+  if(ownUrl&&element.dataset.pxlSource===src)return ownUrl;
   const cacheId=id+"@"+src;
-  const existing=resolvedSourcePromises.get(cacheId);
-  if(existing)return existing;
-  const task=(async()=>{
-    try{
-      // Prefer a previously encrypted per-install copy. The APK-bundled file is
-      // always the offline fallback, so vault failures never block the map.
-      const cached=await createCachedAugustoPxlObjectUrl(cacheId);
-      if(cached)return cached;
-    }catch{/* IndexedDB/Keystore unavailability must not prevent offline play. */}
-    void cacheBundledAugustoPxlAsset(cacheId,src).catch(()=>{});
-    return src;
-  })();
-  resolvedSourcePromises.set(cacheId,task);
-  return task;
+  let cachedPromise=cachedBlobPromises.get(cacheId);
+  if(!cachedPromise){
+    cachedPromise=readCachedAugustoPxlAsset(cacheId).catch(()=>null);
+    cachedBlobPromises.set(cacheId,cachedPromise);
+  }
+  const cached=await cachedPromise;
+  if(cached){
+    const url=URL.createObjectURL(cached);
+    objectUrls.set(element,url);
+    element.dataset.pxlSource=src;
+    return url;
+  }
+  // Copy the packaged file to the Android Keystore-backed encrypted cache in
+  // the background. The current view uses the APK-bundled file immediately.
+  void cacheBundledAugustoPxlAsset(cacheId,src).catch(()=>{});
+  element.dataset.pxlSource=src;
+  return src;
 }
 function setImageSource(element:HTMLElement,asset:PxlAsset,src:string):void {
   const image=element instanceof HTMLImageElement?element:element.querySelector<HTMLImageElement>("img");
@@ -113,8 +118,13 @@ async function applyAsset(element:HTMLElement,manifest:PxlManifest):Promise<void
   if(!id)return;
   const asset=manifest.assets[id];
   if(!asset||asset.status!=="ready"||!asset.src||!isBundledAssetPath(asset.src))return;
-  const src=await resolveBundledSource(id,asset.src);
-  if(!element.isConnected)return;
+  const src=await resolveBundledSource(element,id,asset.src);
+  const overlay=element.closest<HTMLElement>("[data-world-map-hierarchy]");
+  if(!element.isConnected||!overlay||overlay.hidden){
+    if(src.startsWith("blob:"))URL.revokeObjectURL(src);
+    objectUrls.delete(element);
+    return;
+  }
   if(asset.type==="sprite-sheet")applySpriteSheet(element,asset,src);
   else setImageSource(element,asset,src);
 }
