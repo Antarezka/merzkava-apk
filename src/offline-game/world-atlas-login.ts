@@ -131,8 +131,7 @@ export function worldAtlasAccessBufferMarkup(language:AppLanguage,context:Access
   return '<div class="atlas-access-buffer" data-world-atlas-buffer hidden aria-hidden="true" data-buffer-context="'+context+'" data-buffer-stages="'+esc(loading.stages.join("|"))+'" data-buffer-logs="'+esc(loading.logs.join("|"))+'">'+
     '<div class="atlas-buffer-head"><span>MERZKAVA ACCESS ROUTINE</span><i class="atlas-buffer-lamp"></i></div>'+
     '<div class="atlas-buffer-visual"><span class="atlas-buffer-orbit"></span><span class="atlas-buffer-core"></span><span class="atlas-buffer-scan"></span></div>'+
-    '<div class="atlas-buffer-status"><small>AUTHENTICATION SEQUENCE</small><strong data-atlas-buffer-status>Resolving account identity...</strong></div>'+
-    '<div class="atlas-buffer-console"><span class="atlas-buffer-prompt">›</span><span data-atlas-buffer-log>ACCOUNT IDENTITY...</span><i class="atlas-buffer-caret"></i></div>'+
+    '<div class="atlas-buffer-status"><small>AUTHENTICATION SEQUENCE</small><div class="atlas-buffer-message"><strong data-atlas-buffer-status>Resolving account identity...</strong><i class="atlas-buffer-caret"></i></div></div>'+
     '<div class="atlas-buffer-track"><span data-atlas-buffer-progress></span></div>'+
     '<small class="atlas-buffer-foot">'+footer+'</small></div>';
 }
