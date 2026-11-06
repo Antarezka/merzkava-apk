@@ -5,6 +5,7 @@ import { ATLAS_RESET_GRANTS } from "./atlas-reset-grants.generated";
 const ITERATIONS = 310_000;
 const KEY_PREFIX = "merzkava.world-atlas.account.";
 const REMEMBER_KEY = "merzkava.world-atlas.remembered-player.v1";
+const REMEMBERED_PASSWORD_PREFIX = "merzkava.world-atlas.remembered-password.v1:";
 let activePlayer = "";
 
 type StoredCredential = {
@@ -209,11 +210,41 @@ export async function verifyAtlasPassword(playerName: string, password: string):
     return constantTimeEqual(actual, base64ToBytes(stored.hash));
   } catch { return false; }
 }
-export async function rememberAtlasPlayer(playerName: string, remember: boolean): Promise<void> {
-  const name = validPlayerName(playerName);
-  if (!remember) { await writeStored(REMEMBER_KEY, null); activePlayer = name; return; }
-  await writeStored(REMEMBER_KEY, name);
-  activePlayer = name;
+async function rememberedPasswordKey(playerName:string):Promise<string> {
+  return REMEMBERED_PASSWORD_PREFIX+await digest(validPlayerName(playerName));
+}
+
+/** Keeps one remembered World Atlas identity; passwords are retained only in native SecureStorage. */
+export async function rememberAtlasCredentials(playerName:string,password:string,remember:boolean):Promise<void> {
+  const name=validPlayerName(playerName);
+  const previous=(await readStored(REMEMBER_KEY).catch(()=>null))||"";
+  if(!remember){
+    if(previous)await writeStored(await rememberedPasswordKey(previous),null);
+    await writeStored(await rememberedPasswordKey(name),null);
+    await writeStored(REMEMBER_KEY,null);
+    activePlayer=name;
+    return;
+  }
+  if(previous&&previous!==name)await writeStored(await rememberedPasswordKey(previous),null);
+  await writeStored(REMEMBER_KEY,name);
+  if(Capacitor.isNativePlatform()&&password)await writeStored(await rememberedPasswordKey(name),password);
+  else await writeStored(await rememberedPasswordKey(name),null);
+  activePlayer=name;
+}
+
+/** Returns an account-bound saved password only on native devices and only while it still verifies. */
+export async function restoreRememberedAtlasPassword(playerName:string):Promise<string> {
+  const name=validPlayerName(playerName);
+  if(!Capacitor.isNativePlatform())return "";
+  const stored=await readStored(await rememberedPasswordKey(name)).catch(()=>null);
+  if(!stored)return "";
+  if(await verifyAtlasPassword(name,stored))return stored;
+  await writeStored(await rememberedPasswordKey(name),null).catch(()=>undefined);
+  return "";
+}
+
+export async function rememberAtlasPlayer(playerName:string,remember:boolean):Promise<void> {
+  await rememberAtlasCredentials(playerName,"",remember);
 }
 export async function restoreAtlasPlayer(): Promise<string> {
   try { activePlayer = (await readStored(REMEMBER_KEY)) ?? ""; } catch { activePlayer = ""; }
@@ -223,6 +254,8 @@ export async function getActiveAtlasPlayer(): Promise<string> {
   return activePlayer || await restoreAtlasPlayer();
 }
 export async function clearAtlasPlayer(): Promise<void> {
+  const remembered=(await readStored(REMEMBER_KEY).catch(()=>null))||"";
   activePlayer = "";
+  if(remembered)await writeStored(await rememberedPasswordKey(remembered),null);
   await writeStored(REMEMBER_KEY, null);
 }

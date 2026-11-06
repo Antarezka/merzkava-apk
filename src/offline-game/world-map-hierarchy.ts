@@ -12,7 +12,7 @@ import {
 } from "./isometric-map-editor";
 import { renderIsometricSvgSceneMarkup, refreshIsometricSvgScene, type IsometricSvgTheme } from "./isometric-svg-board";
 import { findIsoQuadrantPath, isIsoQuadrantEdgeFullyBlocked, isIsoQuadrantWalkable, isNpcInteractionCellReachable, isoQuadrantCenterGridPosition, isoSubcellPositionAtPoint, nearestWalkableIsoQuadrant } from "./isometric-interaction";
-import { renderPlayerHudMarkup, refreshPlayerHud, handlePlayerHudClick, mountPlayerHudMotion, disposePlayerHudMotion } from "./player-hud";
+import { renderPlayerHudMarkup, refreshPlayerHud, handlePlayerHudClick, mountPlayerHudMotion, disposePlayerHudMotion, bindPlayerHudLayoutEditor } from "./player-hud";
 import "./player-hud.css";
 
 let worldMapDeveloperMode = false;
@@ -585,7 +585,22 @@ function bindIsometricMapArt(dialog: HTMLElement): void {
       image.style.opacity = "1";
       image.style.visibility = "visible";
       image.style.display = "block";
-      if (board) drawIsometricForeground(board);
+      if(board){
+        if(board.dataset.academyArtworkBoard==="true"){
+          const svg=board.querySelector<SVGSVGElement>("[data-wmh-overlay-svg]");
+          let interaction=svg?.querySelector<SVGGElement>("[data-wmh-interaction-grid]");
+          if(svg&&!interaction){
+            interaction=document.createElementNS("http://www.w3.org/2000/svg","g");
+            interaction.dataset.wmhInteractionGrid="";
+            svg.insertBefore(interaction,svg.firstChild);
+          }
+          if(interaction){
+            const mapData=readIsoMapData(board);
+            interaction.innerHTML=academyInteractionGridMarkup(mapData.grid,mapData);
+          }
+        }
+        drawIsometricForeground(board);
+      }
     };
     if (image.complete && image.naturalWidth) ready();
     else if (image.complete && image.naturalWidth === 0) image.dispatchEvent(new Event("error"));
@@ -1106,6 +1121,7 @@ function bindIsometricHud(dialog:HTMLElement):void {
   if(!hud)return;
   refreshPlayerHud(dialog);
   mountPlayerHudMotion(dialog);
+  bindPlayerHudLayoutEditor(dialog);
   // Academy is an artwork-only view, so bind its dedicated camera controls without an actor board.
   if(!board){
     renderIsometricWorldStatus(dialog);
@@ -1334,6 +1350,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     data.grid={...grid};
     // Any subsequent edit invalidates the last explicit confirmation.
     data.confirmed=false;data.confirmedAt="";
+    board.dataset.wmhMinimapDirty="true";
     if(exportWrap)exportWrap.hidden=true;
     try{localStorage.setItem(key,JSON.stringify(data));setStatus("Draft auto-saved on this device. Confirm & Save when the image grid is final.");}
     catch{setStatus("Local storage is unavailable. Use COPY DATA FOR AI to create a portable backup.");}
@@ -1386,6 +1403,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       const property=input.dataset.wmhGridControl as keyof IsoMapGridConfig;input.value=String(grid[property]);
       const output=panel.querySelector<HTMLElement>('[data-wmh-grid-value="'+property+'"]');if(output)output.textContent=String(grid[property]);
     });
+    board.dataset.wmhMinimapDirty="true";
     redraw();drawIsometricForeground(board,data);syncIsoDepthAndOcclusion(board);
   };
   let editorModeActive=false;
@@ -1922,7 +1940,7 @@ function bindIsometricCamera(dialog:HTMLElement):void {
   if(!viewport||!camera||!board||viewport.dataset.cameraBound==="true")return;
   viewport.dataset.cameraBound="true";
   syncIsoDepthAndOcclusion(board);
-  let zoom=1,baseW=0,baseH=0,initialFitApplied=false;
+  let zoom=1,baseW=0,baseH=0,initialFitApplied=false,lastViewportWidth=0,lastViewportHeight=0,resizeFrame=0;
   const padX=()=>Math.max(1,viewport.clientWidth)*4;
   const padY=()=>Math.max(1,viewport.clientHeight)*4;
   const measure=()=>{
@@ -1991,10 +2009,29 @@ function bindIsometricCamera(dialog:HTMLElement):void {
   const finish=(e:PointerEvent)=>{pts.delete(e.pointerId);if(pts.size<2)pinch=null;};
   viewport.addEventListener("pointerup",finish);viewport.addEventListener("pointercancel",finish);
   // Wait until the map view is visible; hidden-parent measurements can be zero.
-  const initialize=()=>{measure();centerMap();};
+  const initialize=()=>{
+    measure();centerMap();
+    lastViewportWidth=viewport.clientWidth;lastViewportHeight=viewport.clientHeight;
+  };
   requestAnimationFrame(()=>requestAnimationFrame(initialize));
   if(typeof ResizeObserver!=="undefined"){
-    const observer=new ResizeObserver(()=>{measure();centerMap();});
+    const observer=new ResizeObserver(()=>{
+      const width=viewport.clientWidth,height=viewport.clientHeight;
+      if(width<=0||height<=0)return;
+      if(!initialFitApplied){measure();return;}
+      if(resizeFrame)cancelAnimationFrame(resizeFrame);
+      resizeFrame=requestAnimationFrame(()=>{
+        resizeFrame=0;
+        const previousWidth=Math.max(1,lastViewportWidth||width),previousHeight=Math.max(1,lastViewportHeight||height);
+        // Preserve the map coordinate under the old viewport center instead of jumping back to CENTER MAP.
+        const anchorX=(viewport.scrollLeft+previousWidth/2-previousWidth*4)/Math.max(.08,zoom);
+        const anchorY=(viewport.scrollTop+previousHeight/2-previousHeight*4)/Math.max(.08,zoom);
+        measure();
+        viewport.scrollLeft=padX()+Math.max(0,Math.min(baseW,anchorX))*zoom-width/2;
+        viewport.scrollTop=padY()+Math.max(0,Math.min(baseH,anchorY))*zoom-height/2;
+        lastViewportWidth=width;lastViewportHeight=height;
+      });
+    });
     observer.observe(viewport);
   }
 }
@@ -2019,6 +2056,7 @@ function isometricEditorMarkup(): string {
     '<div data-wmh-grid-row><label>Player scale <output data-wmh-grid-value="playerScale">1</output></label><button type="button" data-wmh-grid-dir="minus" data-wmh-grid-step="0.05">−</button><input type="range" min="0.4" max="2" step="0.05" value="1" data-wmh-grid-control="playerScale"/><button type="button" data-wmh-grid-dir="plus" data-wmh-grid-step="0.05">+</button></div>'+
     '<div data-wmh-grid-row><label>NPC scale <output data-wmh-grid-value="npcScale">1</output></label><button type="button" data-wmh-grid-dir="minus" data-wmh-grid-step="0.05">−</button><input type="range" min="0.4" max="2" step="0.05" value="1" data-wmh-grid-control="npcScale"/><button type="button" data-wmh-grid-dir="plus" data-wmh-grid-step="0.05">+</button></div></div>'+
     '<div class="wmh-center-calibration"><b>MAP CAMERA CENTER</b><small>Choose the true map focal point. It will be stored in the confirmed map data and reused by CENTER MAP.</small><div><button type="button" data-wmh-center-pick>SELECT CENTER ON MAP</button><button type="button" data-wmh-center-confirm disabled>CONFIRM CENTER</button></div><output data-wmh-center-status>Automatic map midpoint</output></div>'+
+    '<section class="wmh-hud-layout-tools" data-wmh-hud-layout-editor><b>RPG HUD LAYOUT</b><small>Select one layer, then drag it on the field. Use its corner grip or two fingers to resize. Layout is saved separately for this map.</small><label>SELECT HUD LAYER<select data-wmh-hud-layout-select><option value="player-card">PLAYER NAME · REALM · VITALS</option><option value="skill-dock">SKILL · INVENTORY SLOTS</option><option value="world-status">WORLD TIME · WEATHER</option></select></label><div><button type="button" data-wmh-hud-layout-save>✓ SAVE HUD POSITIONS</button><button type="button" data-wmh-hud-layout-reset>RESET SELECTED</button></div><output data-wmh-hud-layout-status>Saved positions load automatically for this map.</output></section>'+
     '<div class="wmh-overlay-tool-actions"><button type="button" data-wmh-overlay-undo>UNDO</button><button type="button" data-wmh-overlay-clear>CLEAR MAP</button><button type="button" data-wmh-overlay-save>SAVE DRAFT</button><button type="button" data-wmh-overlay-confirm>✓ CONFIRM &amp; SAVE</button><button type="button" data-wmh-overlay-copy>COPY DATA FOR AI</button></div>'+
     '<label class="wmh-ai-export" data-wmh-overlay-export-wrap hidden>AI-READY MAP DATA · JSON<textarea data-wmh-overlay-export readonly spellcheck="false" placeholder="Use COPY DATA FOR AI to generate the complete map reference..."></textarea><small>Copy this complete JSON and paste it into your next AI update request. It includes the grid, selected walkable cells, all four-sector flags, and transition labels.</small></label><label>IMPORT MAP DATA<textarea data-wmh-overlay-import-text placeholder="Paste a saved isometric-map JSON reference..."></textarea></label><button type="button" data-wmh-overlay-import>IMPORT MAP DATA</button>'+
     '<small data-wmh-overlay-status>Choose a tool, then tap individual diamond cells. The world pauses while the editor is open.</small></section></div></div>';
@@ -2032,7 +2070,7 @@ function isometricHudMarkup(title: string, mapImage: string, showMinimap = true)
     '<svg class="wmh-minimap-grid" data-wmh-minimap-grid viewBox="0 0 2816 1536" preserveAspectRatio="none" aria-hidden="true"></svg><span class="wmh-minimap-actors" data-wmh-minimap-actors></span></span>'+
     '<span class="wmh-minimap-footer" data-wmh-minimap-footer>YOU · X 05 / Y 17 · TAP TO MOVE</span></button>';
   return '<div class="wmh-isometric-hud" data-wmh-isometric-hud>'+
-    '<section class="wmh-world-status" aria-label="World conditions">'+
+    '<section class="wmh-world-status" data-wmh-hud-layout="world-status" aria-label="World conditions">'+
     '<div class="wmh-world-status-top"><span class="wmh-status-cycle-icon" data-wmh-cycle-icon>☼</span><div><b data-wmh-cycle-label>PAGI</b><small data-wmh-cycle-caption>WORLD CYCLE</small></div></div>'+
     '<div class="wmh-world-status-bottom"><span class="wmh-status-weather"><i data-wmh-weather-icon>☀</i><b data-wmh-weather-label>CLEAR</b></span><span class="wmh-status-day" data-wmh-day>HARI 01</span><strong data-wmh-time>08:00</strong></div>'+
     '<small class="wmh-status-location">'+escapeMapEditorText(title)+'</small><small class="wmh-status-coordinates" data-wmh-player-grid>GRID X 05 · Y 17</small></section>'+
@@ -2216,24 +2254,36 @@ function syncIsoDepthAndOcclusion(board:HTMLElement):void {
   const data=readIsoMapData(board);
   const tokens=Array.from(board.querySelectorAll<HTMLElement>("[data-wmh-player-token],[data-wmh-npc]"));
   board.querySelectorAll<HTMLElement>("[data-wmh-tile]").forEach(tile=>{
+    if(tile.dataset.depthSynced==="true")return;
     const x=Number(tile.dataset.x||0),y=Number(tile.dataset.y||0);
     tile.style.zIndex=String(1+x+y);
+    tile.dataset.depthSynced="true";
   });
+  const actorCellSignature=tokens.map(token=>(token.dataset.wmhNpc||"player")+":"+String(token.dataset.x||0)+","+String(token.dataset.y||0)).join("|");
+  const cellsChanged=board.dataset.actorCellSignature!==actorCellSignature;
   tokens.forEach(token=>{
     const cellX=Number(token.dataset.x||0),cellY=Number(token.dataset.y||0);
     const x=Number(token.dataset.posX??cellX),y=Number(token.dataset.posY??cellY);
-    token.style.setProperty("--character-z",String(20+x+y));
+    const z=String(20+x+y);
+    if(token.style.getPropertyValue("--character-z")!==z)token.style.setProperty("--character-z",z);
     const opacity=isoCellHasLayer(data,"opacityCells",cellX,cellY)||data.opacityQuadrants.some(key=>key.startsWith(cellX+","+cellY+":"))?"0.42":"1";
-    token.style.setProperty("--character-opacity",opacity);
+    if(token.style.getPropertyValue("--character-opacity")!==opacity)token.style.setProperty("--character-opacity",opacity);
     if(board.dataset.academyArtworkBoard==="true"){
       const image=board.querySelector<HTMLImageElement>("[data-wmh-map-art]"),width=image?.naturalWidth||2816,height=image?.naturalHeight||1536,center=isoCellCenter(x,y,data.grid);
-      token.style.left=(center.x/width*100)+"%";token.style.top=(center.y/height*100)+"%";token.style.zIndex=String(20+x+y);token.style.opacity=opacity;
+      const left=(center.x/width*100)+"%",top=(center.y/height*100)+"%";
+      if(token.style.left!==left)token.style.left=left;
+      if(token.style.top!==top)token.style.top=top;
+      token.style.zIndex=z;token.style.opacity=opacity;
     }
   });
-  renderIsometricMinimap(board);
-  const dialog=board.closest<HTMLElement>("[data-wmh-dialog]");
-  if(dialog)renderIsometricWorldStatus(dialog);
-  updateNpcInteractionProximity(board);
+  if(cellsChanged||board.dataset.wmhMinimapDirty==="true"){
+    board.dataset.actorCellSignature=actorCellSignature;
+    delete board.dataset.wmhMinimapDirty;
+    renderIsometricMinimap(board);
+    const dialog=board.closest<HTMLElement>("[data-wmh-dialog]");
+    if(dialog)renderIsometricWorldStatus(dialog);
+    updateNpcInteractionProximity(board);
+  }
 }
 
 type ActorScanTone="friendly"|"hostile"|"spirit-expert"|"unknown";
@@ -2265,8 +2315,8 @@ function updateNpcInteractionProximity(board:HTMLElement):void {
     const ready=isNpcInteractionReady(board,npc,data);
     if(npc.dataset.interactionReady===String(ready))return;
     npc.dataset.interactionReady=String(ready);
-    npc.setAttribute("aria-disabled",String(!ready));
-    npc.title=ready?"Within reach · interact":"Move to an adjacent open tile to interact";
+    npc.setAttribute("aria-disabled","false");
+    npc.title=ready?"Within reach · interact":"Tap to approach and interact";
     let glow=npc.querySelector<HTMLElement>(":scope > .wmh-npc-proximity-glow");
     if(!glow){
       glow=document.createElement("span");
@@ -2304,17 +2354,8 @@ function emitTileTrailWave(_board:HTMLElement,actor:HTMLElement,dx=0,dy=0):void 
   if(window.matchMedia?.("(prefers-reduced-motion: reduce)").matches){glow.remove();return;}
   animate(glow,{scale:[.62,1.5],opacity:[0,.42,0],duration:540,ease:"outCubic",onComplete:()=>glow.remove()});
 }
-function emitPlayerTapGlow(board:HTMLElement,x:number,y:number,grid:IsoMapGridConfig):void {
-  board.querySelectorAll(":scope > .wmh-player-tap-glow").forEach(node=>node.remove());
-  const center=isoCellCenter(x,y,grid),glow=document.createElement("span");
-  glow.className="wmh-player-tap-glow";glow.setAttribute("aria-hidden","true");
-  glow.style.left=center.x+"px";glow.style.top=center.y+"px";
-  glow.style.width=(grid.tileW*.94)+"px";glow.style.height=(grid.tileH*.94)+"px";
-  board.append(glow);
-  if(window.matchMedia?.("(prefers-reduced-motion: reduce)").matches){glow.remove();return;}
-  animate(glow,{scale:[.58,1.16],opacity:[0,.48,.24,0],duration:680,ease:"outCubic",onComplete:()=>glow.remove()});
-}
-function updateScannerContacts(board:HTMLElement):void {
+
+function updateScannerContacts(board:HTMLElement,refreshProximity=true):void {
   const actors=Array.from(board.querySelectorAll<HTMLElement>("[data-wmh-player-token],[data-wmh-npc]"));
   const previous=scannerContacts.get(board)||new Set<string>(),next=new Set<string>();
   for(let i=0;i<actors.length;i++)for(let j=i+1;j<actors.length;j++){
@@ -2341,7 +2382,7 @@ function updateScannerContacts(board:HTMLElement):void {
     board.dispatchEvent(new CustomEvent("merzkava:field-scanner-clear",{bubbles:true,detail:{actor,target}}));
   }
   scannerContacts.set(board,next);
-  updateNpcInteractionProximity(board);
+  if(refreshProximity)updateNpcInteractionProximity(board);
 }
 function pulseActorScanner(actor:HTMLElement,index:number):void {
   const tone=actorScanTone(actor),color=actorScanColor(tone);
@@ -2381,12 +2422,12 @@ function startActorScanners(board:HTMLElement):void {
   pulse();
   board.dataset.scannerTimer=String(window.setInterval(pulse,2450));
 }
-function animateGridMove(token:HTMLElement,update:()=>void):void {
+function animateGridMove(token:HTMLElement,update:()=>void,sync=true,updateSensors=true):void {
   const board=token.closest<HTMLElement>("[data-wmh-board]");
   const fromX=Number(token.dataset.x||0),fromY=Number(token.dataset.y||0);
   const before=token.getBoundingClientRect();
   update();
-  if(board)syncIsoDepthAndOcclusion(board);
+  if(board&&sync)syncIsoDepthAndOcclusion(board);
   const reduceMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches===true;
   const suspendNpcIdle=!reduceMotion&&token.matches(".wmh-character-token:not(.wmh-player-token)");
   if(suspendNpcIdle)token.classList.add("wmh-npc-moving");
@@ -2397,7 +2438,10 @@ function animateGridMove(token:HTMLElement,update:()=>void):void {
   else animate(token,{translateX:[dx,0],translateY:[dy,0],duration:225,ease:"outCubic",
     onComplete:()=>{if(suspendNpcIdle)token.classList.remove("wmh-npc-moving");}
   });
-  if(board){emitTileTrailWave(board,token,Number(token.dataset.x||0)-fromX,Number(token.dataset.y||0)-fromY);updateScannerContacts(board);}
+  if(board){
+    emitTileTrailWave(board,token,Number(token.dataset.x||0)-fromX,Number(token.dataset.y||0)-fromY);
+    if(updateSensors)updateScannerContacts(board,false);
+  }
 }
 function stopNpcWander(dialog:HTMLElement):void {
   const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
@@ -2413,6 +2457,7 @@ function startNpcWander(dialog:HTMLElement):void {
   startActorScanners(board);
   const timer=window.setInterval(()=>{
     const mapData=readIsoMapData(board);
+    let actorsMoved=false;
     board.querySelectorAll<HTMLElement>("[data-wmh-npc]").forEach(npc=>{
       if(Math.random()>.48)return;
       const x=Number(npc.dataset.x||0),y=Number(npc.dataset.y||0);
@@ -2427,9 +2472,13 @@ function startNpcWander(dialog:HTMLElement):void {
       });
       if(!options.length)return;
       const [nx,ny]=options[Math.floor(Math.random()*options.length)];
-      npc.dataset.x=String(nx);npc.dataset.y=String(ny);
-      animateGridMove(npc,()=>{npc.style.setProperty("--token-x",String(nx));npc.style.setProperty("--token-y",String(ny));});npc.dataset.x=String(nx);npc.dataset.y=String(ny);syncIsoDepthAndOcclusion(board);
+      animateGridMove(npc,()=>{
+        npc.dataset.x=String(nx);npc.dataset.y=String(ny);
+        npc.style.setProperty("--token-x",String(nx));npc.style.setProperty("--token-y",String(ny));
+      },false,false);
+      actorsMoved=true;
     });
+    if(actorsMoved){syncIsoDepthAndOcclusion(board);updateScannerContacts(board,false);}
   },2400);
   board.dataset.npcTimer=String(timer);
 }
@@ -2473,12 +2522,11 @@ function walkToTile(
   if(board?.dataset.editorPaused==="true"||board?.classList.contains("wmh-overlay-editing"))return;
   const player=board?.querySelector<HTMLElement>("[data-wmh-player-token]");
   if(!board||!player)return;
-  const runtime=board as HTMLElement & {__wmhPendingPlayerDestination?:{x:number;y:number;surface:string}};
+  const runtime=board as HTMLElement & {__wmhPendingPlayerDestination?:{x:number;y:number;surface:string};__wmhPendingNpcInteraction?:string};
   const mapData=readIsoMapData(board);
   if(!Number.isInteger(targetX)||!Number.isInteger(targetY)||!isoGridCellExists(mapData,targetX,targetY))return;
   const destination=board.querySelector<HTMLElement>('[data-wmh-tile][data-x="'+targetX+'"][data-y="'+targetY+'"]');
-  if(!destination||!isoCanWalkTile(board,destination,targetX,targetY,mapData)){delete runtime.__wmhPendingPlayerDestination;return;}
-  emitPlayerTapGlow(board,targetX,targetY,mapData.grid);
+  if(!destination||!isoCanWalkTile(board,destination,targetX,targetY,mapData)){delete runtime.__wmhPendingPlayerDestination;delete runtime.__wmhPendingNpcInteraction;return;}
   runtime.__wmhPendingPlayerDestination={x:targetX,y:targetY,surface};
 
   const oldTimer=Number(player.dataset.moveTimer||0);
@@ -2490,7 +2538,7 @@ function walkToTile(
     mapData,startX,startY,{x:currentVisualX,y:currentVisualY}
   );
   if(!startQuadrant||!isIsoQuadrantWalkable(mapData,startX,startY,startQuadrant)){
-    delete runtime.__wmhPendingPlayerDestination;
+    delete runtime.__wmhPendingPlayerDestination;delete runtime.__wmhPendingNpcInteraction;
     refreshPlayerHud(dialog,"The current tile has no open quadrant for movement.");
     return;
   }
@@ -2499,14 +2547,14 @@ function walkToTile(
   if(!destinationQuadrant||!isIsoQuadrantWalkable(mapData,targetX,targetY,destinationQuadrant)){
     const nearCellCenter=!target||Math.abs(target.position.x-targetX)+Math.abs(target.position.y-targetY)<0.035;
     if(!nearCellCenter){
-      delete runtime.__wmhPendingPlayerDestination;
+      delete runtime.__wmhPendingPlayerDestination;delete runtime.__wmhPendingNpcInteraction;
       refreshPlayerHud(dialog,"That quadrant is blocked. Choose an open part of the diamond.");
       return;
     }
     destinationQuadrant=nearestWalkableIsoQuadrant(mapData,targetX,targetY,{x:targetX,y:targetY})||undefined;
   }
   if(!destinationQuadrant){
-    delete runtime.__wmhPendingPlayerDestination;
+    delete runtime.__wmhPendingPlayerDestination;delete runtime.__wmhPendingNpcInteraction;
     refreshPlayerHud(dialog,"That cell has no walkable quadrant.");
     return;
   }
@@ -2520,7 +2568,7 @@ function walkToTile(
     Array.from(occupiedNpcs),
   );
   if(!path){
-    delete runtime.__wmhPendingPlayerDestination;
+    delete runtime.__wmhPendingPlayerDestination;delete runtime.__wmhPendingNpcInteraction;
     refreshPlayerHud(dialog,"No open quadrant route reaches that point.");
     return;
   }
@@ -2531,16 +2579,35 @@ function walkToTile(
   const steps=path.slice(1);
   if(steps.length===0&&Math.hypot(finalPosition.x-currentVisualX,finalPosition.y-currentVisualY)<0.015){
     delete runtime.__wmhPendingPlayerDestination;
+    const pendingNpcId=runtime.__wmhPendingNpcInteraction;
+    delete runtime.__wmhPendingNpcInteraction;
+    if(pendingNpcId)renderChat(dialog,pendingNpcId);
     return;
   }
   if(steps.length===0)steps.push(path[0]);
   let step=0;
-  const move=()=>{
-    if(step>=steps.length){
-      delete player.dataset.moveTimer;
-      delete runtime.__wmhPendingPlayerDestination;
-      return;
+  const finishMovement=()=>{
+    delete player.dataset.moveTimer;
+    delete runtime.__wmhPendingPlayerDestination;
+    const pendingNpcId=runtime.__wmhPendingNpcInteraction;
+    delete runtime.__wmhPendingNpcInteraction;
+    if(!pendingNpcId)return;
+    const npc=Array.from(board.querySelectorAll<HTMLElement>("[data-wmh-npc]")).find(item=>item.dataset.wmhNpc===pendingNpcId);
+    if(!npc)return;
+    const currentData=readIsoMapData(board);
+    const reachable=isNpcInteractionCellReachable(currentData,
+      {x:Number(player.dataset.x||0),y:Number(player.dataset.y||0)},
+      {x:Number(npc.dataset.x||0),y:Number(npc.dataset.y||0)}
+    );
+    if(reachable)renderChat(dialog,pendingNpcId);
+    else {
+      refreshPlayerHud(dialog,"You reached a nearby route. Choose another open approach to speak with this character.");
+      startNpcWander(dialog);
     }
+  };
+  const move=()=>{
+    if(step>=steps.length){finishMovement();return;}
+
     const node=steps[step++];
     const isFinal=step===steps.length;
     const visual=isFinal?finalPosition:isoQuadrantCenterGridPosition(node.x,node.y,node.quadrant);
@@ -2553,7 +2620,6 @@ function walkToTile(
       player.style.setProperty("--token-x",String(visual.x));
       player.style.setProperty("--token-y",String(visual.y));
     });
-    syncIsoDepthAndOcclusion(board);
     if(node.x!==previousCellX||node.y!==previousCellY){
       const material=tile?.dataset.surface||surface;
       playFootstep(material as "earth"|"wet"|"stone"|"wood"|"tile");
@@ -2561,6 +2627,56 @@ function walkToTile(
     player.dataset.moveTimer=String(window.setTimeout(move,235));
   };
   move();
+}
+
+function walkToNpcAndInteract(dialog:HTMLElement,npcId:string):void {
+  const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
+  const player=board?.querySelector<HTMLElement>("[data-wmh-player-token]");
+  const npc=Array.from(board?.querySelectorAll<HTMLElement>("[data-wmh-npc]")||[]).find(item=>item.dataset.wmhNpc===npcId);
+  if(!board||!player||!npc||board.dataset.editorPaused==="true"||board.classList.contains("wmh-overlay-editing"))return;
+  const data=readIsoMapData(board);
+  const playerCell={x:Number(player.dataset.x||5),y:Number(player.dataset.y||8)};
+  const npcCell={x:Number(npc.dataset.x||0),y:Number(npc.dataset.y||0)};
+  if(isNpcInteractionCellReachable(data,playerCell,npcCell)){renderChat(dialog,npcId);return;}
+  const currentX=Number(player.dataset.posX??playerCell.x),currentY=Number(player.dataset.posY??playerCell.y);
+  const startQuadrant=(player.dataset.quadrant as IsoQuadrant)||nearestWalkableIsoQuadrant(data,playerCell.x,playerCell.y,{x:currentX,y:currentY});
+  if(!startQuadrant){refreshPlayerHud(dialog,"There is no safe open sector from which to approach this character.");return;}
+  const occupied=Array.from(board.querySelectorAll<HTMLElement>("[data-wmh-npc]"))
+    .map(item=>String(item.dataset.x||0)+","+String(item.dataset.y||0));
+  const approachCells=[
+    {x:npcCell.x+1,y:npcCell.y},
+    {x:npcCell.x-1,y:npcCell.y},
+    {x:npcCell.x,y:npcCell.y+1},
+    {x:npcCell.x,y:npcCell.y-1}
+  ];
+  const candidates:Array<{x:number;y:number;quadrant:IsoQuadrant;length:number}>=[];
+  for(const cell of approachCells){
+    if(!isNpcInteractionCellReachable(data,cell,npcCell))continue;
+    const tile=board.querySelector<HTMLElement>('[data-wmh-tile][data-x="'+cell.x+'"][data-y="'+cell.y+'"]');
+    if(!tile||!isoCanWalkTile(board,tile,cell.x,cell.y,data))continue;
+    const quadrant=nearestWalkableIsoQuadrant(data,cell.x,cell.y,{x:currentX,y:currentY});
+    if(!quadrant)continue;
+    const path=findIsoQuadrantPath(data,
+      {x:playerCell.x,y:playerCell.y,quadrant:startQuadrant},
+      {x:cell.x,y:cell.y,quadrant},
+      occupied
+    );
+    if(path)candidates.push({x:cell.x,y:cell.y,quadrant,length:path.length});
+  }
+  candidates.sort((a,b)=>a.length-b.length||a.y-b.y||a.x-b.x);
+  const best=candidates[0];
+  if(!best){
+    dialog.insertAdjacentHTML("beforeend",'<div class="wmh-toast">No safe open approach is available. The marked cells and blocked half-edges are still respected.</div>');
+    return;
+  }
+  stopNpcWander(dialog);
+  const runtime=board as HTMLElement & {__wmhPendingNpcInteraction?:string};
+  runtime.__wmhPendingNpcInteraction=npcId;
+  refreshPlayerHud(dialog,"Approaching "+(npc.dataset.tokenLabel||"the character")+"…");
+  walkToTile(dialog,best.x,best.y,"earth",{
+    position:isoQuadrantCenterGridPosition(best.x,best.y,best.quadrant),
+    quadrant:best.quadrant
+  });
 }
 
 function closeTransitionOverlays(dialog:HTMLElement):void {
@@ -2711,21 +2827,8 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
     walkToTile(dialog,x,y,action.dataset.surface||"earth",target||undefined);return true;
   }
   if(action.dataset.wmhNpc){
-    const npcId=action.dataset.wmhNpc;
-    const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
-    const player=board?.querySelector<HTMLElement>("[data-wmh-player-token]");
-    const px=Number(player?.dataset.x||5),py=Number(player?.dataset.y||8);
-    const nx=Number(action.dataset.x||0),ny=Number(action.dataset.y||0);
-    const ready=!!board&&!!player&&isNpcInteractionCellReachable(
-      readIsoMapData(board),
-      {x:px,y:py},
-      {x:nx,y:ny}
-    );
-    if(!ready){
-      dialog.insertAdjacentHTML("beforeend",'<div class="wmh-toast">Move to an adjacent open tile to interact. Blocked cells and closed tile edges cannot be crossed.</div>');
-      return true;
-    }
-    renderChat(dialog,npcId);return true;
+    walkToNpcAndInteract(dialog,action.dataset.wmhNpc);
+    return true;
   }
   if(action.dataset.wmhReply!==undefined){
     const npcId=action.dataset.npcId||"",npc=npcData[npcId],index=Number(action.dataset.wmhReply);

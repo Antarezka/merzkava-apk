@@ -22,6 +22,13 @@ describe("in-world player HUD preview",()=>{
     expect(html).toContain("NON-CANON FIXTURE");
     expect(html).toContain("×999");
   });
+  it("renders independent movable HUD layers with default placement keys",()=>{
+    const html=renderPlayerHudMarkup();
+    expect(html).toContain('data-wmh-hud-layout="player-card"');
+    expect(html).toContain('data-wmh-hud-layout="skill-dock"');
+    expect(html).toContain('class="wmh-player-dock"');
+    expect(html).not.toContain('background:linear-gradient(145deg,#111d17f2');
+  });
   it("decreases Mortal Satiety by the official one-hour awake LIGHT interval",()=>{
     const initial=createDefaultPlayerHudPreviewState(),result=simulatePlayerHudPreviewAwakeHour(initial);
     expect(result.valid).toBe(true);

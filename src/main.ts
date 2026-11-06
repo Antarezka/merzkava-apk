@@ -12,7 +12,7 @@ import { initializeIdleTriggerDrag } from "./offline-game/idle-trigger-drag";
 import { initializeArcanistryTransitDrag } from "./offline-game/transit-pull-drag";
 import { animateExpeditionChoiceModal, animateExpeditionPanel, mountExpeditionAnimations } from "./offline-game/expedition-animations";
 import { deleteEternalSave, exportEternalSave, importEternalSave, listEternalSaves, loadEternalSave, renameEternalSave, resetEternalGame, resolveEternalSituationChoice, advanceEternalWorldTime, setEternalLocation, startEternalGame, unloadEternalGame, type EternalRegion } from "./offline-game/expedition-game";
-import { atlasPasswordPolicyError, createAtlasMasterResetRequest, completeAtlasMasterReset, hasAtlasPassword, setAtlasPassword, verifyAtlasMasterResetCode, verifyAtlasPassword, rememberAtlasPlayer, restoreAtlasPlayer } from "./offline-game/world-atlas-account";
+import { atlasPasswordPolicyError, createAtlasMasterResetRequest, completeAtlasMasterReset, hasAtlasPassword, setAtlasPassword, verifyAtlasMasterResetCode, verifyAtlasPassword, rememberAtlasCredentials, restoreAtlasPlayer, restoreRememberedAtlasPassword } from "./offline-game/world-atlas-account";
 import { authenticateDeveloper, restoreDeveloperSession, restoreRememberedDeveloperCredentials, signOutDeveloper, type RememberedDeveloperCredentials } from "./security/developer-access";
 import { getCanonIndex, getCanonStatus, loadCanonModule, loadPlayerRegistry, loadRegisteredPlayerProfile, refreshCanon, refreshLatestPlayerRegistry, verifyCanonSourceConnection, type CanonDocument } from "./convo/canon/canon-loader";
 import { routeCanonActivity } from "./convo/canon/canon-router";
@@ -957,18 +957,38 @@ async function openWorldAtlasFromTv():Promise<void> {
       if(hasRemembered)select.value=remembered;
       const rememberCheckbox=gate.querySelector<HTMLInputElement>('input[name="remember"]');
       if(rememberCheckbox)rememberCheckbox.checked=hasRemembered;
+      const loginPassword=gate.querySelector<HTMLInputElement>("#world-atlas-password");
+      if(loginPassword)loginPassword.value=hasRemembered?await restoreRememberedAtlasPassword(remembered):"";
+      if(rememberCheckbox&&rememberCheckbox.dataset.restoreBound!=="true"){
+        rememberCheckbox.dataset.restoreBound="true";
+        rememberCheckbox.addEventListener("change",()=>{
+          if(!rememberCheckbox.checked){
+            const passwordInput=gate.querySelector<HTMLInputElement>("#world-atlas-password");
+            if(passwordInput)passwordInput.value="";
+            const selectedName=select?.value||remembered;
+            if(selectedName)void rememberAtlasCredentials(selectedName,"",false).catch(()=>{});
+          }
+        });
+      }
       if(select.dataset.atlasLoginBound!=="true"){
         select.dataset.atlasLoginBound="true";
         select.addEventListener("change",()=>{
           const panel=gate.querySelector<HTMLElement>("[data-atlas-reset-panel]");
           const submitButton=gate.querySelector<HTMLButtonElement>("[data-world-atlas-submit]");
+          const passwordInput=gate.querySelector<HTMLInputElement>("#world-atlas-password");
           if(panel)panel.hidden=true;
           if(submitButton)submitButton.disabled=true;
+          if(passwordInput)passwordInput.value="";
           ["#atlas-reset-current","#atlas-reset-master","#atlas-reset-new","#atlas-reset-confirm"].forEach(selector=>{
             const input=gate.querySelector<HTMLInputElement>(selector);if(input)input.value="";
           });
-          // Selecting an account only checks its local password mode.
-          // The animated access routine starts after Login/Sign-up/Reset is confirmed.
+          const selectedName=select.value;
+          // A remembered credential is restored only for the matching selected account.
+          if(selectedName&&rememberCheckbox?.checked){
+            void restoreRememberedAtlasPassword(selectedName).then(savedPassword=>{
+              if(select.value===selectedName&&rememberCheckbox.checked&&passwordInput)passwordInput.value=savedPassword;
+            }).catch(()=>{});
+          }
           void refreshAtlasPasswordMode(gate);
         });
       }
@@ -1483,8 +1503,9 @@ root.addEventListener("click", async (event: MouseEvent) => {
   const activeEternalModal=root.querySelector<HTMLElement>(".expedition-choice-modal:not([hidden])");
   if(activeEternalModal && !target.closest(".expedition-choice-modal")) return;
   if (event.detail !== 0 && suppressNextPointerClick) {
+    const mapActorTap=!!target.closest("[data-wmh-npc],[data-wmh-reply]");
     suppressNextPointerClick = false;
-    return;
+    if(!mapActorTap)return;
   }
   const interactive = target.closest(
     "button:not(:disabled), a[href], [role='button'], [role='tab'], [role='menuitem'], input:not([type='hidden']):not(:disabled), select:not(:disabled), textarea:not(:disabled), summary"
@@ -2233,7 +2254,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
         if(verificationResults[0].status==="rejected")throw verificationResults[0].reason;
         if(verificationResults[1].status==="rejected")throw verificationResults[1].reason;
         if(!passwordExists)await setAtlasPassword(playerName,password);
-        await rememberAtlasPlayer(playerName,remember);
+        await rememberAtlasCredentials(playerName,password,remember);
       })();
       const results=await Promise.allSettled([
         accountWork,

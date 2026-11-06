@@ -2002,3 +2002,162 @@
 }
 .wmh-isometric-board .wmh-vector-cells polygon[data-wmh-tile]{transition:filter .14s ease}
 .wmh-isometric-board .wmh-vector-cells polygon[data-wmh-tile]:active{filter:brightness(1.12)!important}
+
+
+/* Runtime presentation repair: a fine gold diamond grid, no visible center pin,
+   and one compact centered dialogue surface over a softly blurred world. */
+.wmh-isometric-play-screen .wmh-minimap-grid{opacity:.7!important}
+.wmh-isometric-play-screen .wmh-minimap-grid .wmh-minimap-cell{
+  fill:none!important;stroke:#d8c28c!important;stroke-width:2.4!important;opacity:.34!important;
+  vector-effect:non-scaling-stroke!important;stroke-linejoin:round!important;shape-rendering:geometricPrecision!important;
+}
+.wmh-isometric-play-screen .wmh-minimap-grid .wmh-minimap-cell.is-walkable{stroke:#e0c989!important;opacity:.46!important}
+.wmh-isometric-play-screen .wmh-minimap-grid .wmh-minimap-cell.is-foreground{stroke:#d9c28d!important;opacity:.4!important}
+.wmh-isometric-play-screen .wmh-academy-grid-overlay .wmh-quadrant-divider{
+  fill:none!important;stroke:#d6bf88!important;stroke-width:1.4!important;opacity:.28!important;
+  vector-effect:non-scaling-stroke!important;stroke-linecap:round!important;
+}
+.wmh-isometric-play-screen .wmh-isometric-board .wmh-character-token[data-wmh-npc]{
+  pointer-events:auto!important;cursor:pointer!important;touch-action:manipulation!important;
+}
+.wmh-isometric-play-screen .wmh-map-center-guide{display:none!important}
+.wmh-isometric-play-screen .wmh-isometric-board.wmh-overlay-editing .wmh-map-center-guide{display:block!important}
+.wmh-isometric-play-screen .wmh-player-tap-glow{display:none!important}
+
+/* Compact centered dialogue: the map stays visible as a blurred backdrop. */
+.wmh-isometric-play-screen .wmh-chat-panel{
+  position:fixed!important;z-index:10000!important;inset:0!important;width:100vw!important;height:100dvh!important;
+  max-height:none!important;display:grid!important;place-items:center!important;box-sizing:border-box!important;
+  padding:max(14px,env(safe-area-inset-top)) 14px max(14px,env(safe-area-inset-bottom))!important;
+  overflow:hidden!important;border:0!important;background:rgba(3,8,6,.25)!important;
+  backdrop-filter:blur(6px) brightness(.58) saturate(.82)!important;
+  -webkit-backdrop-filter:blur(6px) brightness(.58) saturate(.82)!important;
+  pointer-events:auto!important;touch-action:pan-y!important;
+}
+.wmh-isometric-play-screen .wmh-chat-panel[hidden]{display:none!important}
+.wmh-isometric-play-screen .wmh-chat-card{
+  position:relative!important;width:min(420px,calc(100vw - 34px))!important;
+  max-height:min(58dvh,480px)!important;overflow:auto!important;
+  padding:17px 13px 12px!important;margin:0!important;
+  border:1px solid #c7aa72!important;border-radius:11px!important;
+  background:rgba(20,31,24,.62)!important;color:#f1e5c8!important;
+  box-shadow:0 16px 40px #0009,inset 0 1px #fff2!important;
+  backdrop-filter:blur(16px) saturate(1.18)!important;
+  -webkit-backdrop-filter:blur(16px) saturate(1.18)!important;
+  pointer-events:auto!important;
+}
+.wmh-isometric-play-screen .wmh-chat-close{
+  position:sticky!important;float:right!important;top:0!important;right:0!important;
+  width:27px!important;height:27px!important;margin:-7px -5px 2px 8px!important;
+  border:1px solid #c8ad76!important;border-radius:50%!important;background:rgba(15,26,20,.35)!important;
+  color:#f5e8c9!important;z-index:4!important;
+}
+.wmh-isometric-play-screen .wmh-chat-thread{gap:7px!important}
+.wmh-isometric-play-screen .wmh-chat-bust{width:38px!important;height:46px!important}
+.wmh-isometric-play-screen .wmh-chat-copy{
+  max-width:min(75vw,340px)!important;padding:7px 9px!important;
+  border:1px solid #c9ab7155!important;border-radius:7px!important;background:rgba(10,18,13,.2)!important;
+}
+.wmh-isometric-play-screen .wmh-chat-copy p{margin:3px 0 0!important;color:#f2e5c7!important;font:13px/1.42 Georgia,serif!important}
+.wmh-isometric-play-screen .wmh-chat-input-row{margin-top:10px!important;padding-top:8px!important;border-top:1px solid #c9ab7155!important}
+.wmh-isometric-play-screen .wmh-chat-input-row>span{color:#cbb483!important;font:800 7px Arial,sans-serif!important;letter-spacing:.16em!important}
+.wmh-isometric-play-screen .wmh-chat-input-row [data-wmh-replies]{gap:6px!important}
+.wmh-isometric-play-screen .wmh-chat-input-row [data-wmh-replies] button{
+  border:1px solid #c8ad7899!important;border-radius:6px!important;
+  background:rgba(29,48,37,.32)!important;color:#f4e5c4!important;pointer-events:auto!important;
+}
+
+/* The time ticket is now a transparent instrument; its symbols are engraved,
+   layered ornaments rather than bright filled tiles. */
+.wmh-isometric-play-screen .wmh-world-status{
+  top:var(--hud-layout-top,max(10px,env(safe-area-inset-top)))!important;
+  left:var(--hud-layout-left,max(10px,env(safe-area-inset-left)))!important;
+  right:var(--hud-layout-right,auto)!important;
+  bottom:var(--hud-layout-bottom,auto)!important;
+  transform:var(--hud-layout-transform,none)!important;transform-origin:top left!important;
+  border:1px solid #d0b47c99!important;border-radius:7px!important;
+  color:#f1e5c8!important;background:rgba(8,15,11,.12)!important;
+  box-shadow:inset 0 0 0 1px #fff1,0 4px 14px #0003!important;
+  clip-path:none!important;backdrop-filter:blur(6px) saturate(1.12)!important;
+  -webkit-backdrop-filter:blur(6px) saturate(1.12)!important;overflow:visible!important;
+}
+.wmh-isometric-play-screen .wmh-world-status:before{
+  content:"";position:absolute!important;top:6px!important;right:6px!important;
+  width:4px!important;height:calc(100% - 12px)!important;border:0!important;
+  background:linear-gradient(180deg,#e4cf9c,#a88a58 48%,#e4cf9c)!important;opacity:.8!important;
+}
+.wmh-isometric-play-screen .wmh-world-status-top{
+  gap:8px!important;min-height:30px!important;padding-bottom:5px!important;
+  border-bottom:1px solid #d0b47c77!important;
+}
+.wmh-isometric-play-screen .wmh-status-cycle-icon{
+  position:relative!important;display:grid!important;place-items:center!important;
+  width:30px!important;height:30px!important;border:1px solid #d7bd80!important;border-radius:50%!important;
+  color:#f7e6bc!important;background:radial-gradient(circle,rgba(210,184,126,.16),transparent 70%)!important;
+  font:700 20px/1 Georgia,serif!important;box-shadow:0 0 0 3px #d8be7a14,inset 0 0 0 3px #fff1!important;
+}
+.wmh-isometric-play-screen .wmh-status-cycle-icon:before{
+  position:absolute;content:"";inset:-4px;border:1px dashed #d8c18a88;border-radius:50%;transform:rotate(18deg);
+}
+.wmh-isometric-play-screen .wmh-status-cycle-icon:after{
+  position:absolute;content:"";right:-2px;top:3px;width:4px;height:4px;border-radius:50%;
+  background:#f0d79a;box-shadow:0 0 6px #efd18b;
+}
+.wmh-isometric-play-screen .wmh-world-status-top b{
+  color:#f4e5c2!important;font:800 14px/.98 Georgia,serif!important;letter-spacing:.07em!important;
+  text-shadow:0 1px 8px #e9d18b22!important;transform:none!important;
+}
+.wmh-isometric-play-screen .wmh-world-status-top small,
+.wmh-isometric-play-screen .wmh-status-location{color:#cdb98d!important}
+.wmh-isometric-play-screen .wmh-status-weather{gap:5px!important}
+.wmh-isometric-play-screen .wmh-status-weather i{
+  display:grid!important;place-items:center!important;flex:none!important;width:20px!important;height:20px!important;
+  border:1px solid #cdb47b99!important;border-radius:50%!important;color:#ead49b!important;
+  background:rgba(255,255,255,.025)!important;font:700 12px/1 Georgia,serif!important;
+}
+.wmh-isometric-play-screen .wmh-status-weather b{color:#e8d6ad!important}
+.wmh-isometric-play-screen .wmh-world-status-bottom strong{
+  color:#fff0ce!important;font:800 13px/1 ui-monospace,monospace!important;min-width:58px!important;
+  letter-spacing:-.04em!important;text-shadow:0 1px 5px #0008!important;
+}
+.wmh-isometric-play-screen .wmh-status-day{
+  border:1px solid #c3a46e88!important;background:transparent!important;color:#efdfba!important;
+}
+.wmh-isometric-play-screen .wmh-status-coordinates{color:#bda879!important}
+
+/* Map-scoped HUD editor controls and draggable/resizeable layer affordances. */
+.wmh-hud-layout-tools{
+  display:grid!important;gap:7px!important;margin:12px 0!important;padding:9px!important;
+  border:1px solid #c7a86c99!important;border-radius:6px!important;background:rgba(8,15,11,.12)!important;
+}
+.wmh-hud-layout-tools>b{color:#f0d39e!important;font:800 9px/1 Arial,sans-serif!important;letter-spacing:.14em!important}
+.wmh-hud-layout-tools>small,.wmh-hud-layout-tools>output{color:#c9bd9f!important;font:8px/1.45 Arial,sans-serif!important}
+.wmh-hud-layout-tools label{display:grid!important;gap:4px!important;color:#ead8b4!important;font:700 8px Arial,sans-serif!important}
+.wmh-hud-layout-tools select{
+  width:100%!important;min-height:34px!important;padding:5px 7px!important;
+  border:1px solid #b99761!important;border-radius:4px!important;background:#19261f!important;color:#f2dfbb!important;
+  font:700 8px Arial,sans-serif!important;
+}
+.wmh-hud-layout-tools>div{display:grid!important;grid-template-columns:1fr 1fr!important;gap:6px!important}
+.wmh-hud-layout-tools button{
+  min-height:34px!important;padding:6px!important;border:1px solid #b99761!important;border-radius:4px!important;
+  background:rgba(41,55,46,.5)!important;color:#f2dfbb!important;font:800 7px Arial,sans-serif!important;letter-spacing:.05em!important;
+}
+
+
+/* Academy gameplay grid uses the same calibrated diamonds as the editor, but
+   remains a thin gold guide under the movable actors. */
+.wmh-academy-map-surface:not(.wmh-overlay-editing) .wmh-area-overlay-svg.wmh-academy-grid-overlay{
+  z-index:320!important;pointer-events:none!important;
+}
+.wmh-academy-map-surface:not(.wmh-overlay-editing) .wmh-academy-grid-overlay .wmh-academy-hit-cell{
+  fill:transparent!important;stroke:rgba(220,197,148,.42)!important;stroke-width:1.15!important;
+  vector-effect:non-scaling-stroke!important;pointer-events:all!important;
+}
+.wmh-academy-map-surface:not(.wmh-overlay-editing) .wmh-academy-grid-overlay .wmh-academy-hit-cell.is-walkable{
+  fill:rgba(183,154,99,.035)!important;stroke:rgba(233,212,169,.55)!important;stroke-width:1.25!important;
+}
+.wmh-academy-map-surface:not(.wmh-overlay-editing) .wmh-academy-grid-overlay .wmh-quadrant-divider{
+  fill:none!important;stroke:rgba(220,197,148,.22)!important;stroke-width:.8!important;
+  vector-effect:non-scaling-stroke!important;pointer-events:none!important;
+}

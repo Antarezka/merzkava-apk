@@ -104,6 +104,8 @@ export async function playWorldAtlasAccessSequence(
   buffer.hidden=false;
   buffer.setAttribute("aria-hidden","false");
   gate.dataset.atlasBuffering="true";
+  progress.style.transformOrigin="left center";
+  progress.style.willChange="transform";
   progress.style.transform="scaleX(0)";
 
   const activeAnimations:Array<ReturnType<typeof animate>>=[];
@@ -123,22 +125,28 @@ export async function playWorldAtlasAccessSequence(
     if(glow&&!reduced)animate(glow,{scale:[.94,1.06],opacity:[.58,1],duration:1150,ease:"inOutSine",loop:true,alternate:true});
   });
 
+  let activeDiagnosticKey="";
   const transitionDiagnostic=async(element:HTMLElement,nextText:string)=>{
     if(signal?.aborted)throw abortError();
-    if(reduced){
-      element.textContent=nextText;
-      return;
-    }
-    runAnimation(element,{opacity:[1,0],translateY:[0,-3],duration:24,ease:"inQuad"});
-    await wait(24,signal);
     element.textContent=nextText;
-    runAnimation(element,{opacity:[0,1],translateY:[3,0],duration:40,ease:"outQuad"});
-    await wait(40,signal);
+    if(reduced)return;
+    // Replace the line in place with a short Anime.js arrival; never fade it to zero.
+    runAnimation(element,{opacity:[.72,1],translateY:[3,0],duration:72,ease:"outCubic"});
+    await wait(72,signal);
   };
   const showFrame=async(stage:string,logLine:string,dots:number)=>{
     status.dataset.technicalStep=logLine;
     status.setAttribute("aria-label",stage+" · "+logLine);
-    await transitionDiagnostic(status,formatAccessDiagnosticFrame(stage,dots));
+    const nextText=formatAccessDiagnosticFrame(stage,dots);
+    const key=stage+"|"+logLine;
+    if(key!==activeDiagnosticKey){
+      activeDiagnosticKey=key;
+      await transitionDiagnostic(status,nextText);
+    }else{
+      // The punctuation is a live frame, not a new diagnostic line: update it
+      // without a fade so the text and progress rail never appear to blink.
+      status.textContent=nextText;
+    }
   };
   const moveProgress=async(from:number,to:number,milliseconds:number)=>{
     if(signal?.aborted)throw abortError();
@@ -165,7 +173,9 @@ export async function playWorldAtlasAccessSequence(
       await showFrame(stage,logLine,1);
       await moveProgress(previousProgress,step.target,step.advanceMs);
       await showFrame(stage,logLine,2);
+      await wait(step.frameMs,signal);
       await showFrame(stage,logLine,3);
+      await wait(step.frameMs,signal);
       await wait(step.stallMs,signal);
       previousProgress=step.target;
     }
@@ -198,6 +208,8 @@ export async function playWorldAtlasAccessSequence(
     buffer.hidden=true;
     buffer.setAttribute("aria-hidden","true");
     progress.style.transform="scaleX(0)";
+    progress.style.willChange="";
+    progress.style.transformOrigin="";
     status.style.opacity="";
     status.style.transform="";
     delete status.dataset.technicalStep;

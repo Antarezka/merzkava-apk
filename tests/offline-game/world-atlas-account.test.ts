@@ -1,5 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+const nativeState=vi.hoisted(()=>({enabled:false}));
+const secureValues=vi.hoisted(()=>new Map<string,string>());
+vi.mock("@capacitor/core",()=>({Capacitor:{isNativePlatform:()=>nativeState.enabled}}));
+vi.mock("@aparajita/capacitor-secure-storage",()=>({SecureStorage:{
+  getItem:async(key:string)=>secureValues.get(key)??null,
+  setItem:async(key:string,value:string)=>{secureValues.set(key,String(value));},
+  removeItem:async(key:string)=>{secureValues.delete(key);}
+}}));
+
 vi.mock("../../src/offline-game/atlas-reset-grants.generated",()=>({
   ATLAS_RESET_GRANTS:[{
     requestId:"test-nafila-master-reset-001",
@@ -23,7 +32,7 @@ const storage={
 };
 const resetCode="MZK1-01234567-89ABCDEF-01234567-89ABCDEF-01234567-89ABCDEF-01234567-89ABCDEF";
 
-beforeEach(()=>{values.clear();vi.stubGlobal("localStorage",storage);});
+beforeEach(()=>{values.clear();secureValues.clear();nativeState.enabled=false;vi.stubGlobal("localStorage",storage);});
 afterEach(()=>{vi.unstubAllGlobals();});
 
 describe("World Atlas account credentials",()=>{
@@ -47,6 +56,35 @@ describe("World Atlas account credentials",()=>{
     await rememberAtlasPlayer("Nafila",false);
     expect(await restoreAtlasPlayer()).toBe("");
     expect(await hasAtlasPassword("Nafila")).toBe(true);
+  });
+
+  it("restores Remember Me passwords only from native SecureStorage",async()=>{
+    const password="Remembered-Nafila-Password-123!";
+    nativeState.enabled=true;
+    await setAtlasPassword("Nafila",password);
+    await rememberAtlasCredentials("Nafila",password,true);
+    expect(await restoreAtlasPlayer()).toBe("Nafila");
+    expect(await restoreRememberedAtlasPassword("Nafila")).toBe(password);
+    expect([...values.values()].some(value=>value===password)).toBe(false);
+    expect([...secureValues.values()]).toContain(password);
+  });
+
+  it("clears the remembered device password when Remember Me is unchecked",async()=>{
+    const password="Remembered-Nafila-Password-456!";
+    nativeState.enabled=true;
+    await setAtlasPassword("Nafila",password);
+    await rememberAtlasCredentials("Nafila",password,true);
+    await rememberAtlasCredentials("Nafila",password,false);
+    expect(await restoreAtlasPlayer()).toBe("");
+    expect(await restoreRememberedAtlasPassword("Nafila")).toBe("");
+  });
+
+  it("does not persist remembered passwords in browser localStorage",async()=>{
+    const password="Browser-Nafila-Password-789!";
+    await setAtlasPassword("Nafila",password);
+    await rememberAtlasCredentials("Nafila",password,true);
+    expect(await restoreRememberedAtlasPassword("Nafila")).toBe("");
+    expect([...values.values()].some(value=>value===password)).toBe(false);
   });
 
   it("requires 8–128 characters plus uppercase, lowercase, digit, and punctuation symbol",async()=>{

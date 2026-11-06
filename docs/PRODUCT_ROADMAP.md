@@ -1073,3 +1073,18 @@ Current source baseline for this workstream: ed5ef007cead9ecf8e6e70662c29ec5cce9
 - Eight-sector BFS with fractional visual Player coordinates inside each cell. Integer grid coordinates remain authoritative for cell whitelist, occupancy, and NPC interaction; individual blocked sectors and matching half-edges govern the movement route.
 
 **Still open:** connect canonical player profile/affiliation, persistent HP/inventory, actual activity and sleep-aware Satiety ledger, quest/objective resolver, Social Link state, and approved combat/time-turn rules. The HUD is a presentation/test layer, not completion of EP-2/EP-3 simulation contracts. Ring palettes and beast-sigil patterns are UI placeholders, not canon.
+
+
+### 13M. Build #1340 field map, HUD layout, and access polish (2026-11-06)
+
+**Owner test baseline:** Android Build #1340 on `feat/player-hud-subcell-runtime-2026-11-06` compiled, signed, and installed its APK; the emulator smoke-test launch stage failed after ADB initially reported the emulator offline. Treat this as an emulator/runtime smoke-test blocker, not a compilation failure. Preserve the working build's game flow, screen layout, sub-cell movement, walkable-cell whitelist, half-edge routing, existing map editor, and confirmed camera focal point.
+
+- [ ] Stop camera recentering on ordinary ResizeObserver changes; preserve the map-space focal position while the viewport changes size.
+- [ ] Keep gameplay grid diamonds thin and muted gold, hide the editor's center-pick marker outside edit mode, and remove the persistent tap-center marker from normal movement.
+- [ ] Make NPC actor taps reliable despite page gesture suppression; route the Player to a safe reachable adjacent cell before opening the compact centered conversation over a blurred map.
+- [ ] Reduce per-frame/per-NPC DOM, SVG, minimap, status, and proximity work; batch actor-layer refreshes without changing movement or sensing rules.
+- [ ] Smooth the existing confirmation-only Anime.js access diagnostic and progress rail. Preserve its technical sequence, real-operation wait, monotonic progress, success-only 100%, and reduced-motion behavior.
+- [ ] Implement native-only Remember Me password restore via SecureStorage; never persist a reversible password in browser localStorage. Unchecking Remember Me or signing out clears its remembered password.
+- [ ] Replace filled RPG HUD panels with transparent instrument frames; separate Player identity/status, skill/inventory dock, and world-time ticket into independently movable layers.
+- [ ] Add per-map HUD layout editor controls for drag, corner resize, two-finger pinch, save, and reset. Persist coordinates and scale separately from map walkability and grid data.
+- [ ] Verify NPC dialogue, movement, editor save/undo/import, camera gestures, HUD layout restore, World Atlas password flow, and emulator startup on a fresh Android build. Physical device QA remains separate.
