@@ -44,6 +44,30 @@ const bufferCopy:Record<AppLanguage,BufferCopy> = {
   ko:{stages:["플레이어 신원 확인 중...","월드 데이터 스냅샷 확인 중...","비밀번호 검증 중...","World Atlas 접근 준비 중..."],logs:["신원 경로 ...","소스 스냅샷 ...","로컬 검증기 ...","세션 전환 ..."]}
 };
 
+const accountBufferCopy:Record<AppLanguage,BufferCopy> = {
+  id:{stages:["Memeriksa identitas akun...","Memverifikasi kredensial perangkat...","Mengamankan status sesi...","Menyiapkan akses Merzkava..."],logs:["IDENTITAS AKUN ...","VERIFIKASI PERANGKAT ...","STATUS SESI ...","PENGALIHAN AKSES ..."]},
+  en:{stages:["Resolving account identity...","Verifying device credentials...","Securing the session state...","Preparing Merzkava access..."],logs:["ACCOUNT IDENTITY ...","DEVICE VERIFIER ...","SESSION STATUS ...","ACCESS HANDOFF ..."]},
+  pt:{stages:["Identificando a conta...","Verificando as credenciais do dispositivo...","Protegendo a sessão...","Preparando o acesso ao Merzkava..."],logs:["IDENTIDADE DA CONTA ...","VERIFICADOR DO DISPOSITIVO ...","STATUS DA SESSÃO ...","TRANSFERÊNCIA DE ACESSO ..."]},
+  fr:{stages:["Identification du compte...","Vérification des identifiants de l’appareil...","Sécurisation de la session...","Préparation de l’accès à Merzkava..."],logs:["IDENTITÉ DU COMPTE ...","VÉRIFICATEUR APPAREIL ...","ÉTAT DE SESSION ...","TRANSFERT D’ACCÈS ..."]},
+  ru:{stages:["Определение аккаунта...","Проверка данных устройства...","Защита состояния сеанса...","Подготовка доступа к Merzkava..."],logs:["ИДЕНТИФИКАТОР АККАУНТА ...","ПРОВЕРКА УСТРОЙСТВА ...","СОСТОЯНИЕ СЕАНСА ...","ПЕРЕДАЧА ДОСТУПА ..."]},
+  ja:{stages:["アカウントを確認中...","端末の認証情報を検証中...","セッション状態を保護中...","Merzkava へのアクセスを準備中..."],logs:["ACCOUNT IDENTITY ...","DEVICE VERIFIER ...","SESSION STATUS ...","ACCESS HANDOFF ..."]},
+  "zh-CN":{stages:["正在识别账户...","正在验证设备凭据...","正在保护会话状态...","正在准备 Merzkava 访问..."],logs:["账户身份 ...","设备验证 ...","会话状态 ...","访问交接 ..."]},
+  ko:{stages:["계정 신원 확인 중...","기기 자격 증명 검증 중...","세션 상태 보호 중...","Merzkava 접근 준비 중..."],logs:["계정 신원 ...","기기 검증기 ...","세션 상태 ...","접근 전환 ..."]}
+};
+
+export function worldAtlasAccessBufferMarkup(language:AppLanguage,context:"world-atlas"|"account"="world-atlas"):string {
+  const source=context==="account"?accountBufferCopy:bufferCopy;
+  const loading=source[language]||source.en;
+  const footer=context==="account"?"MERZKAVA · ACCOUNT HANDSHAKE":"WORLD ATLAS · ACCOUNT HANDSHAKE";
+  return '<div class="atlas-access-buffer" data-world-atlas-buffer hidden aria-hidden="true" data-buffer-stages="'+esc(loading.stages.join("|"))+'" data-buffer-logs="'+esc(loading.logs.join("|"))+'">'+
+    '<div class="atlas-buffer-head"><span>MERZKAVA ACCESS ROUTINE</span><i class="atlas-buffer-lamp"></i></div>'+
+    '<div class="atlas-buffer-visual"><span class="atlas-buffer-orbit"></span><span class="atlas-buffer-core"></span><span class="atlas-buffer-scan"></span></div>'+
+    '<div class="atlas-buffer-status"><small>AUTHENTICATION SEQUENCE</small><strong data-atlas-buffer-status>Resolving account identity...</strong></div>'+
+    '<div class="atlas-buffer-console"><span class="atlas-buffer-prompt">›</span><span data-atlas-buffer-log>ACCOUNT IDENTITY ...</span><i class="atlas-buffer-caret"></i></div>'+
+    '<div class="atlas-buffer-track"><span data-atlas-buffer-progress></span></div>'+
+    '<small class="atlas-buffer-foot">'+footer+'</small></div>';
+}
+
 type AtlasResetCopy = {
   change:string; masterReset:string; current:string; masterPassword:string; newPassword:string;
   confirmNew:string; update:string; cancel:string; passwordPolicy:string;
@@ -89,7 +113,7 @@ export function worldAtlasLoginPanelMarkup(language:AppLanguage):string {
     '<small class="atlas-password-policy" data-atlas-reset-policy hidden>'+esc(reset.passwordPolicy)+'</small>'+
     '<label data-atlas-reset-confirm-row hidden>'+esc(reset.confirmNew)+'<input id="atlas-reset-confirm" type="password" minlength="8" maxlength="128" autocomplete="new-password"/></label>'+
     '<p data-atlas-reset-message role="status"></p><div class="atlas-password-reset-actions"><button type="button" data-atlas-reset-cancel>'+esc(reset.cancel)+'</button><button type="button" data-atlas-reset-apply>'+esc(reset.update)+'</button></div></section></form>'+
-    '<div class="atlas-access-buffer" data-world-atlas-buffer hidden aria-hidden="true"><div class="atlas-buffer-head"><span>MERZKAVA ACCESS ROUTINE</span><i class="atlas-buffer-lamp"></i></div><div class="atlas-buffer-visual"><span class="atlas-buffer-orbit"></span><span class="atlas-buffer-core"></span><span class="atlas-buffer-scan"></span></div><div class="atlas-buffer-status"><small>AUTHENTICATION SEQUENCE</small><strong data-atlas-buffer-status>Resolving player identity...</strong></div><div class="atlas-buffer-console"><span class="atlas-buffer-prompt">›</span><span data-atlas-buffer-log>IDENTITY ROUTE ...</span><i class="atlas-buffer-caret"></i></div><div class="atlas-buffer-track"><span data-atlas-buffer-progress></span></div><small class="atlas-buffer-foot">WORLD ATLAS · ACCOUNT HANDSHAKE</small></div>'+
+    worldAtlasAccessBufferMarkup(language,"world-atlas")+
     '<small class="world-atlas-login-foot">'+esc(t.foot)+'</small>'+
     '</section></div>';
 }
