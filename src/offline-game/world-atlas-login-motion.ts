@@ -200,7 +200,7 @@ export async function playWorldAtlasAccessSequence(
     progress.style.transform="scaleX(0)";
     status.style.opacity="";
     status.style.transform="";
-    log.style.opacity="";
-    log.style.transform="";
+    delete status.dataset.technicalStep;
+    status.removeAttribute("aria-label");
   }
 }
