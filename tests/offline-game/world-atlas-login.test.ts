@@ -90,6 +90,30 @@ describe("Shared Anime.js access buffer profiles",()=>{
     expect(html).not.toContain("UNIVERSE SOURCE LINK...");
   });
 
+
+  it("describes Developer reset request generation without network claims",()=>{
+    const html=worldAtlasAccessBufferMarkup("en","developer-reset");
+    expect(html).toContain("PLAYER ACCOUNT BINDING...");
+    expect(html).toContain("RANDOM REQUEST ID...");
+    expect(html).toContain("CRYPTOGRAPHIC CHALLENGE...");
+    expect(html).toContain("PLAYER KEY SHA-256...");
+    expect(html).not.toContain("NETWORK REACHABILITY...");
+  });
+
+  it("describes clipboard writing as a device operation",()=>{
+    const html=worldAtlasAccessBufferMarkup("en","clipboard");
+    expect(html).toContain("CLIPBOARD CAPABILITY...");
+    expect(html).toContain("SYSTEM CLIPBOARD WRITE...");
+    expect(html).not.toContain("PBKDF2-SHA256 DERIVATION...");
+  });
+
+  it("describes Developer sign-out as local session revocation",()=>{
+    const html=worldAtlasAccessBufferMarkup("en","developer-session");
+    expect(html).toContain("DEVELOPER SESSION REVOKE...");
+    expect(html).toContain("SECURE STORAGE CLEANUP...");
+    expect(html).not.toContain("NETWORK REACHABILITY...");
+  });
+
   it("uses a local cleanup sequence for Player sign-out",()=>{
     const html=worldAtlasAccessBufferMarkup("en","player-session");
     expect(html).toContain("PLAYER SESSION CLOSE...");
