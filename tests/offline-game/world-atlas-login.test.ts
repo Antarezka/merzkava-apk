@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { APP_LANGUAGES } from "../../src/i18n";
 import { worldAtlasAccessBufferMarkup, worldAtlasLoginPanelMarkup } from "../../src/offline-game/world-atlas-login";
@@ -191,5 +192,32 @@ describe("Confirmation access loading frames",()=>{
     expect(quick.map(step=>step.stallMs)).not.toEqual(slow.map(step=>step.stallMs));
     expect(quick.every((step,index)=>index===0||step.target>quick[index-1].target)).toBe(true);
     expect(slow.every((step,index)=>index===0||step.target>slow[index-1].target)).toBe(true);
+  });
+});
+
+
+describe("Stable loading and Arcanistry machine indicators",()=>{
+  it("keeps the fake Atlas access scene from cycling its status or blinking its lamps",()=>{
+    const motion=readFileSync(new URL("../../src/offline-game/world-atlas-login-motion.ts",import.meta.url),"utf8");
+    const css=readFileSync(new URL("../../src/offline-game/idle-home-map.css",import.meta.url),"utf8");
+    expect(motion).not.toContain("dotFrame");
+    expect(motion).not.toContain("createWorldAtlasProgressPlan(Math.max");
+    expect(css).toContain("opacity:1;animation:none;will-change:auto;");
+    expect(css).toContain("background:#d7c184;box-shadow:0 0 8px #d7c184;opacity:.9;animation:none;");
+  });
+
+  it("uses steady Transit Machine indicator lights instead of random flicker",()=>{
+    const css=readFileSync(new URL("../../src/offline-game/idle-home-map.css",import.meta.url),"utf8");
+    const machine=readFileSync(new URL("../../src/offline-game/arcanistry-ticket-machine.ts",import.meta.url),"utf8");
+    expect(css).toContain(".arcanist-card-warning-lamp.is-lit{background:#ff9b32;box-shadow:0 0 5px 2px #ff8a27,0 0 12px #ff9d3caa;opacity:1;will-change:auto;animation:none}");
+    expect(css).toContain("animation:arcanist-master-breathe 2.2s ease-in-out infinite");
+    expect(machine).not.toContain("--lamp-flicker-duration");
+  });
+
+  it("loads pink Atlas player names from the verified Universe registry when online",()=>{
+    const main=readFileSync(new URL("../../src/main.ts",import.meta.url),"utf8");
+    expect(main).not.toContain("atlasOfflinePxlPlayers");
+    expect(main).toContain("refreshLatestPlayerRegistry(canon.commitSha)");
+    expect(main).toContain("const options=atlasEligiblePlayers();");
   });
 });

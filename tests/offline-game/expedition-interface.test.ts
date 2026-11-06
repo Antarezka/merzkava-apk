@@ -12,11 +12,12 @@ describe("Eternal Path live world scene", () => {
   it("opens an independent Augusto PXL World Atlas from the pink CRT console", () => {
     const html=renderExpeditionInterface();
     expect(html).toContain('class="expedition-pxl-trigger" data-augusto-pxl-open');
-    expect(html).toContain('aria-label="Open Augusto PXL World Atlas"');
+    expect(html).toContain('aria-label="Open World Atlas"');
     expect(html).toContain('class="pxl-tv-art" aria-hidden="true"');
     expect(html).toContain('class="pxl-tv-shell"');
     expect(html).toContain('class="pxl-console-box"');
-    expect(html).toContain('class="pxl-console-ink">AUGUSTO PXL</small>');
+    expect(html).not.toContain("AUGUSTO PXL");
+    expect(html).not.toContain('title="Augusto PXL · World Atlas"');
     expect(html).toContain('<div data-world-map-host></div>');
     // Atlas markup is injected only after choosing a TV, so the inactive mode
     // creates no hidden map DOM, duplicate IDs, actors, HUD or editor listeners.
