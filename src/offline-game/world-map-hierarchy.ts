@@ -141,7 +141,7 @@ function worldMapMarkerMarkup(marker: WorldMarker, editor = false,visualMode:Wor
   return '<button class="wmh-power wmh-marker-' + marker.category + powerClass + (editor ? ' wmh-editor-marker' : '') +
     '" style="left:' + marker.x + '%;top:' + marker.y + '%" ' +
     (editor ? 'type="button" data-wmh-drag-marker="' + marker.id + '" aria-label="Drag ' + marker.name + '"' : 'data-wmh-info="' + marker.id + '"') +
-    provisional + '><b>' + number + '</b><span>' + marker.name + '</span></button>';
+    provisional + '>'+(visualMode==="augusto-pxl"?'<i data-pxl-asset-id="ui.map-marker.'+marker.category+'" aria-hidden="true"></i>':'')+'<b>' + number + '</b><span>' + marker.name + '</span></button>';
 }
 function selectionImage(info: WorldMarker): string {
   const power=regionData[info.id as RegionId];
