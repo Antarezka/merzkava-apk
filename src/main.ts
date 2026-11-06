@@ -1,4 +1,5 @@
 import "./style.css";
+import "./offline-game/idle-home-map.css";
 import "./ui/floating-ledger.css";
 import "./ui/floating-control.css";
 import "./ui/gravity-pull-cord.css";
