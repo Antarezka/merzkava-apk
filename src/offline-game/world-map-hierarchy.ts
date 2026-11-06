@@ -936,13 +936,6 @@ function renderIsometricWorldStatus(dialog:HTMLElement):void {
   if(!hud)return;
   const save=getEternalSave();
   const atmosphere=getExpeditionAtmosphere();
-  const cycle:Record<string,{label:string;icon:string;caption:string}>={
-    Dawn:{label:"SUBUH",icon:"◔",caption:"FIRST LIGHT"},
-    Morning:{label:"PAGI",icon:"☀",caption:"MORNING"},
-    Day:{label:"SIANG",icon:"☼",caption:"DAYLIGHT"},
-    Dusk:{label:"SENJA",icon:"◒",caption:"SUNSET"},
-    Night:{label:"MALAM",icon:"☾",caption:"NIGHTFALL"},
-  };
   const weather:Record<string,{label:string;icon:string}>={
     Clear:{label:"CERAH",icon:"☀"},Cloudy:{label:"BERAWAN",icon:"☁"},
     Fog:{label:"KABUT",icon:"≋"},Rain:{label:"HUJAN",icon:"☂"},Snow:{label:"SALJU",icon:"❄"},
