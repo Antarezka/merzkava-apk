@@ -14,7 +14,7 @@ const MANIFEST_PATH = path.join(ROOT, "public", "assets", "augusto-pxl", "manife
 const ASSET_MAP_PATH = path.join(SOURCE_DIR, "asset-map.json");
 const LICENSE_DEST = path.join(ROOT, "public", "assets", "augusto-pxl", "licenses", "claude-pxl-MIT.txt");
 const REFERENCE_DIR = path.join(SOURCE_DIR, "maps", "references");
-const ALLOWED_OUTPUT_EXTENSIONS = new Set([".png", ".json", ".gif", ".tmj", ".ase"]);
+const ALLOWED_OUTPUT_EXTENSIONS = new Set([".png", ".json", ".tmj", ".ase"]);
 
 function run(command, args, options = {}) {
   execFileSync(command, args, { stdio: "inherit", ...options });
@@ -52,18 +52,19 @@ async function ensurePinnedPxl() {
 async function ensurePxlReferences() {
   await fs.mkdir(REFERENCE_DIR, { recursive: true });
   const sources = [
-    ["public/world/Untitled77_20261029054536.png", "world-map-source.png"],
+    ["public/world/Untitled77_20261029054536.png", "world-map-source.png", "scale=2752:1640"],
     ["assets/maps/academy/full-map/1_academy.jpg", "academy-exterior-source.png"],
     ["public/game/scenery/tianhai-yunzhou/ty-05-academy-environment.png", "local-default-source.png"],
   ];
-  for (const [relativeInput, outputName] of sources) {
+  for (const [relativeInput, outputName, scaleFilter] of sources) {
     const input = path.join(ROOT, relativeInput);
     const output = path.join(REFERENCE_DIR, outputName);
     await fs.access(input);
     run("ffmpeg", [
       "-hide_banner", "-loglevel", "error", "-y",
-      "-f", "mjpeg", "-i", input, "-frames:v", "1", "-update", "1",
-      "-pix_fmt", "rgba", output,
+      "-f", "mjpeg", "-i", input,
+      ...(scaleFilter ? ["-vf", scaleFilter] : []),
+      "-frames:v", "1", "-update", "1", "-pix_fmt", "rgba", output,
     ]);
     const png = await fs.readFile(output);
     const signature = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
