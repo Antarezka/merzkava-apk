@@ -534,21 +534,85 @@ body.eternal-choice-open{overflow:hidden}
 }
 
 
-/* Augusto PXL launcher — paired with the existing 54px Eternal Path TV control. */
+/* Augusto PXL second gateway: the former CSS CRT/console silhouette, recolored pink.
+   The artwork is internally scaled to fit the existing TV gateway's 54 × 54 px footprint. */
 .expedition-pxl-trigger{
-  position:fixed;z-index:80;right:max(14px,env(safe-area-inset-right));bottom:calc(174px + env(safe-area-inset-bottom));left:auto;top:auto;
-  display:grid;place-items:center;width:54px;height:54px;padding:3px;
-  border:1px solid #f3a6c8;border-radius:50%;
-  background:radial-gradient(circle at 34% 24%,#8d476b,#552b47 70%,#321d30);
-  color:#ffe0ed;box-shadow:0 5px 19px #0009,inset 0 1px 2px #fff5,0 0 0 3px #f3a6c822;
-  cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;will-change:left,top;
+  position:fixed;z-index:80;right:max(14px,env(safe-area-inset-right));
+  bottom:calc(174px + env(safe-area-inset-bottom));left:auto;top:auto;
+  display:block;width:54px;height:54px;padding:0;border:0;border-radius:11px;
+  background:radial-gradient(circle at 40% 25%,#f4a9cb55,transparent 72%);
+  color:#f4a9cb;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;
+  -webkit-tap-highlight-color:transparent;filter:drop-shadow(0 4px 7px #0009);will-change:left,top;
 }
-.expedition-pxl-emblem{display:block;width:47px;height:47px;overflow:visible;pointer-events:none}
+.pxl-tv-art{position:absolute;left:50%;top:50%;display:block;width:72px;height:72px;transform:translate(-50%,-50%) scale(.75);transform-origin:center}
+.pxl-tv-art:before{
+  content:"";position:absolute;inset:4px 3px 6px;border:1px solid #f1a5c6aa;
+  border-radius:13px;background:linear-gradient(145deg,#6b345099,#28162255 68%,#71364f66);
+  box-shadow:inset 0 1px 0 #fff3,0 0 0 2px #160b1288;
+}
+.pxl-tv-antenna{position:absolute;z-index:1;left:24px;top:1px;width:26px;height:15px}
+.pxl-tv-antenna:before,.pxl-tv-antenna:after{
+  content:"";position:absolute;bottom:1px;left:12px;width:1.5px;height:14px;
+  background:linear-gradient(#ffe3ef,#ad547d);transform-origin:bottom center;box-shadow:0 0 2px #ffb8d766;
+}
+.pxl-tv-antenna:before{transform:rotate(-34deg)}.pxl-tv-antenna:after{transform:rotate(34deg)}
+.pxl-tv-antenna i,.pxl-tv-antenna b{
+  position:absolute;top:0;width:4px;height:4px;border-radius:50%;border:1px solid #ffe1ee;
+  background:#a84f77;box-shadow:0 0 5px #ffb8d788;
+}
+.pxl-tv-antenna i{left:2px}.pxl-tv-antenna b{right:2px}
+.pxl-tv-shell{
+  position:absolute;z-index:2;left:7px;top:12px;width:51px;height:37px;
+  border:2px solid #f0a0c2;border-radius:8px 8px 7px 7px;
+  background:linear-gradient(145deg,#a84f78,#54283f 74%);
+  box-shadow:inset 0 1px 2px #fff5,inset 0 -5px 8px #210d18aa,0 3px 5px #0008;
+}
+.pxl-tv-shell:after{
+  content:"";position:absolute;left:5px;right:5px;bottom:2px;height:2px;
+  background:linear-gradient(90deg,transparent,#ffe1eeaa,transparent);opacity:.8;
+}
+.pxl-tv-screen{
+  position:absolute;left:5px;top:5px;width:31px;height:23px;overflow:hidden;
+  border:1px solid #e6a3c1;border-radius:4px;
+  background:repeating-linear-gradient(0deg,#f2b4d010 0 1px,transparent 1px 3px),
+    radial-gradient(ellipse at 52% 40%,#92718b 0%,#4c334d 46%,#1a1722 100%);
+  box-shadow:inset 0 0 7px #000c,0 0 5px #f6bad744;
+}
+.pxl-tv-screen:before{
+  content:"";position:absolute;inset:2px 4px;border-left:1px solid #f8d5e666;
+  border-right:1px solid #f8d5e633;transform:skewY(-9deg);opacity:.5;
+}
+.pxl-tv-screen:after{
+  content:"";position:absolute;left:3px;right:3px;bottom:4px;height:1px;
+  background:#ffe0ee88;box-shadow:0 -5px #f4c2db22,0 -9px #f4c2db18;
+}
+.pxl-tv-knobs{position:absolute;right:3px;top:7px;display:grid;gap:4px}
+.pxl-tv-knobs b{display:block;width:5px;height:5px;border:1px solid #ffd9e8;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#fff0f6,#8b3d62 75%);box-shadow:0 1px 2px #000}
+.pxl-console-box{
+  position:absolute;z-index:3;right:1px;bottom:6px;width:42px;height:18px;
+  border:1px solid #e9a0c0;border-radius:4px;background:linear-gradient(155deg,#a9537a,#48273a 72%);
+  box-shadow:inset 0 1px #fff4,0 3px 5px #0009;transform:rotate(-5deg);
+}
+.pxl-console-box:before{
+  content:"";position:absolute;left:5px;right:5px;top:3px;height:1px;
+  background:linear-gradient(90deg,transparent,#ffe0eeaa,transparent);
+}
+.pxl-console-dpad{position:absolute;left:8px;top:6px;width:8px;height:2px;border-radius:1px;background:#ffd4e5;
+  box-shadow:3px -3px #ffd4e5,3px 3px #ffd4e5}
+.pxl-console-stick{position:absolute;right:8px;top:-5px;width:7px;height:7px;border:1px solid #ffe0ed;
+  border-radius:50%;background:radial-gradient(circle at 30% 25%,#fff0f6,#8c3e63 70%);box-shadow:0 0 5px #ffb8d766}
+.pxl-console-stick b{position:absolute;left:2px;top:5px;width:2px;height:7px;border-radius:2px;background:#d58bab;
+  transform:rotate(15deg);transform-origin:top center}
+.pxl-console-lamp{position:absolute;left:23px;bottom:3px;width:3px;height:3px;border-radius:50%;
+  background:#ffe0ee;box-shadow:0 0 5px #ffb8d7}
+.pxl-console-ink{position:absolute;left:5px;top:-7px;color:#ffd4e5aa;font:italic 5px/1 Georgia,serif;
+  letter-spacing:.08em;white-space:nowrap;transform:rotate(-4deg);text-shadow:0 0 1px #fff5;pointer-events:none}
 .expedition-pxl-trigger:active{cursor:grabbing}
-.expedition-pxl-trigger.is-dragging{cursor:grabbing;transform:none!important;transition:none!important;box-shadow:0 7px 22px #000b,inset 0 1px 2px #fff6,0 0 0 4px #f3a6c855}
+.expedition-pxl-trigger.is-dragging{cursor:grabbing;transform:scale(1.04);filter:brightness(1.15) drop-shadow(0 7px 10px #000b)}
 .expedition-pxl-trigger:focus-visible{outline:2px solid #ffd0e2;outline-offset:4px}
 .expedition-pxl-modal[hidden]{display:none!important}
-.expedition-pxl-modal{position:fixed;z-index:120;inset:0;display:grid;place-items:center;padding:18px max(16px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));}
+.expedition-pxl-modal{position:fixed;z-index:120;inset:0;display:grid;place-items:center;padding:18px max(16px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
 .expedition-pxl-backdrop{position:absolute;inset:0;width:100%;height:100%;border:0;background:#120b12d9;backdrop-filter:blur(6px)}
 .expedition-pxl-dialog{position:relative;z-index:1;width:min(100%,390px);max-height:min(82dvh,620px);overflow:auto;padding:17px;border:1px solid #df8fb4;border-radius:7px;background:linear-gradient(150deg,#f8e8ef,#ead5e1);color:#352632;box-shadow:0 20px 70px #000b,inset 0 0 0 4px #d77ca21a}
 .expedition-pxl-dialog header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:9px;border-bottom:1px solid #d9b4c6;color:#995274;font-size:7px;font-weight:800;letter-spacing:.12em}
@@ -558,4 +622,4 @@ body.eternal-choice-open{overflow:hidden}
 .expedition-pxl-dialog ol{display:grid;gap:8px;margin:15px 0;padding-left:20px;color:#513b49;font-size:10px;line-height:1.5}
 .expedition-pxl-note{margin:0;padding:10px;border:1px solid #d9b4c6;background:#f3e1e9;color:#75445e;font-size:9px;line-height:1.55}
 .expedition-pxl-dismiss{width:100%;min-height:38px;margin-top:12px;border:1px solid #a85b7d;background:#773e5c;color:#fff0f6;font-size:10px}
-@media(prefers-reduced-motion:reduce){.expedition-pxl-trigger,.expedition-pxl-dialog{scroll-behavior:auto}}
+@media(prefers-reduced-motion:reduce){.expedition-pxl-trigger{transition:none}}
