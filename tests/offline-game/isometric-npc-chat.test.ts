@@ -66,10 +66,15 @@ describe("isometric NPC conversations", () => {
     expect(chatStyles).toContain(".wmh-transition-notice{align-items:center!important;justify-content:center!important;background:#030806d9!important}");
     expect(chatStyles).toContain(".wmh-isometric-play-screen .wmh-overlay-float span{writing-mode:vertical-rl");
     expect(chatStyles).toContain(".wmh-sonar-ring{");
-    expect(chatStyles).toContain(".wmh-tile-trail-wave{");
+    expect(chatStyles).toContain(".wmh-player-route-trail{");
     expect(worldMapSource).toContain("merzkava:field-scanner-overlap");
-    expect(worldMapSource).toContain("function emitTileTrailWave");
+    expect(worldMapSource).toContain("function emitPlayerRouteTrail");
     expect(worldMapSource).toContain("function startActorScanners");
+    expect(worldMapSource).toContain("if(distance>2)continue;");
+    expect(worldMapSource).toContain("function syncActorDepthAndOcclusion");
+    expect(worldMapSource).toContain("function updateIsometricMinimapActors");
+    expect(worldMapSource).toContain("requestAnimationFrame(()=>{");
+    expect(chatStyles).toContain("width:calc(var(--tile-w,64px)*3)!important");
     expect(worldMapSource).toContain("animate(token,{translateX:[dx,0],translateY:[dy,0]");
     expect(worldMapSource).toContain("scanTone:\"friendly\"");
     expect(worldMapSource).toContain("const minimizeWorkbench=()=>");
