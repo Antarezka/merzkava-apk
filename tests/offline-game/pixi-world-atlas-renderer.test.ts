@@ -74,6 +74,12 @@ describe("Pixi World Atlas Android input isolation",()=>{
     expect(geometryRead).toBeGreaterThan(pixiBranch);
   });
 
+  it("suspends hidden DOM actor idle motion while Pixi draws the actor layer",()=>{
+    expect(cssStyles).toContain("animation:none!important;transition:none!important;will-change:auto!important");
+    expect(cssStyles).toContain("[data-wmh-board].wmh-pixi-render-active.wmh-pixi-render-paused .wmh-character-token{");
+    expect(cssStyles).toContain("opacity:1!important");
+  });
+
   it("keeps DOM transition markers above the Pixi world canvas",()=>{
     expect(rendererSource).toContain('canvas.style.zIndex="300"');
     expect(cssStyles).toContain(".wmh-isometric-play-screen [data-wmh-transition-layer]{position:absolute;inset:0;z-index:380");
