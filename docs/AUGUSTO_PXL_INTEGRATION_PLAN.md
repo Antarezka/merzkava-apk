@@ -157,3 +157,35 @@ Never add PixiJS as a shortcut for displaying PXL exports. PXL is the asset pipe
 The separate pink Augusto PXL CRT/console launcher is placed in Eternal Path beside the existing green TV gateway. Both controls use a 54 × 54 px outer footprint and have independent drag-position storage. The new launcher opens this plan summary; it does not pretend that PXL has already been installed or integrated.
 
 The full pipeline described above is the next major visual-production priority after this launcher and plan record.
+
+
+## 10. Pink PXL World Atlas — separate visual mode, same gameplay structure
+
+The pink floating CRT console opens the **same World Atlas modal and map hierarchy**, but activates a second visual-mode instance:
+
+- The green TV selects `data-visual-mode="legacy"` and continues to display the original DOM/SVG World Atlas.
+- The pink TV selects `data-visual-mode="augusto-pxl"` and displays a separate, initially hidden map hierarchy inside the same modal.
+- Only one map hierarchy is visible at a time. Both keep the same World Atlas levels, marker IDs, region navigation, Academy entry, isometric map structure, grid geometry, eight-sector movement, blocked half-edge rules, camera operations, minimap, NPC positions, NPC decisions, dialogue and map interaction handlers.
+- PXL-mode editor/map-layout persistence is namespaced separately. Opening or editing the pink Atlas must not run the legacy map migration/reset or overwrite the green Atlas's Academy canvas-expansion and map-editor preferences.
+- Player and NPC map hit targets remain ordinary HTML buttons. Their visible children become PXL-produced 2D character sprites. The current movement code changes the sprite's directional/motion state (idle/walk); PXL supplies the frame art, directional animation sheets and metadata.
+- Tianhai Academy keeps the authoritative 2816 × 1536 artwork coordinate space, 24 × 20 map grid, 128 × 69.5 tile geometry, player/NPC grid positions and the current walkability/editor rules. PXL supplies the new 3D-look HD-2D/isometric environment artwork and separate 2D characters. The editable Academy artwork itself must not alter the coordinate/collision authority.
+- Player HUD, satchel/bag, skill icons, item icons, currency marks and Spirit Ring artwork have PXL asset IDs in the pink mode. Their existing HTML buttons, inventory state, currency data, accessibility and click behavior remain the game implementation's responsibility.
+
+### Offline access and package storage
+
+- The pink Atlas login selector contains local profiles and locally saved Eternal Path journeys only. Sign-in/sign-up/password checks use the existing local Atlas credential store; it does not fetch `players.md`, `ACTIVE_SHA` or another remote endpoint. It does not grant access to a Universe identity that has never been stored locally.
+- PXL assets are packaged under `public/assets/augusto-pxl/` and referenced by the local `manifest.json`. The runtime resolves only `/assets/augusto-pxl/...` paths. No CDN, external image URL, PXL browser viewer or remote renderer is used in gameplay.
+- The APK-bundled package is the first offline source. On Android, the runtime also attempts to create a per-install encrypted cache: a random AES-256-GCM key is stored through the Android Keystore-backed SecureStorage plugin, and copied asset blobs are stored in local IndexedDB. Cache failure falls back to the APK copy and does not block entry.
+- Static APK assets are local and offline, but are not confidential: anyone able to extract the APK can inspect bundled files. Encryption applies to the optional mutable local cache, not to the packaged static artwork.
+- Web preview does not claim Keystore protection; the encrypted cache is Android-native only.
+
+### PXL source-to-APK pipeline
+
+- `pxl/` is the editable PXL workspace. `pxl/asset-map.json` maps a stable app asset ID to an already-generated PXL export and its animation metadata.
+- GitHub Actions checks out the pinned PXL commit, validates and builds each `.px.js`, copies PXL outputs to `public/assets/augusto-pxl/exports/`, preserves the upstream MIT license, and updates asset status in the manifest from `pending` to `ready` only for explicitly mapped, existing output files.
+- The Android build runs that asset step before Vite packaging. The APK therefore contains the asset manifest and exports needed by the PXL Atlas while offline.
+- Sprite-sheet frame dimensions, columns, directions and idle/walk frame sequences are declared in `pxl/asset-map.json`. PXL authors the actual visual frames; the app's lightweight DOM/Web Animations player displays them. PXL is not a runtime engine.
+
+### Current delivery boundary
+
+The dual Atlas structure, visual-mode hooks, local-only pink login path, offline manifest/asset folders, encrypted Android cache code and pinned PXL CI pipeline are now in the branch. The manifest intentionally keeps production map/character/HUD/effect entries at `pending` until actual visual exports are authored and mapped. The checked-in Academy SVG is a labelled placeholder, not the final 3D-look Academy environment. The initial PXL smoke asset validates the toolchain; it is not a playable art pack.
