@@ -1416,7 +1416,8 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
   const importField=panel.querySelector<HTMLTextAreaElement>("[data-wmh-overlay-import-text]");
   const workbench=panel.querySelector<HTMLElement>(".wmh-overlay-tools");
   const dock=dialog.querySelector<HTMLElement>("[data-wmh-editor-dock]");
-  const uiKey="merzkava.iso-editor-ui.v1:"+encodeURIComponent(data.mapId);
+  const pxlMode=dialog.closest<HTMLElement>("[data-world-map-hierarchy]")?.dataset.visualMode==="augusto-pxl";
+  const uiKey=(pxlMode?"merzkava.augusto-pxl.":"")+"merzkava.iso-editor-ui.v1:"+encodeURIComponent(data.mapId);
   const grid:IsoMapGridConfig={...data.grid};
   const readUiPrefs=()=>{
     try{return JSON.parse(localStorage.getItem(uiKey)||"{}") as Record<string,any>;}catch{return {};}
@@ -2618,6 +2619,13 @@ function stopNpcWander(dialog:HTMLElement):void {
   const timer=Number(board?.dataset.npcTimer||0);
   if(timer)window.clearInterval(timer);
   if(board){delete board.dataset.npcTimer;stopActorScanners(board);}
+}
+export function disposeWorldMapHierarchy(root:HTMLElement):void {
+  root.querySelectorAll<HTMLElement>("[data-world-map-hierarchy]").forEach(overlay=>{
+    const dialog=overlay.querySelector<HTMLElement>("[data-wmh-dialog]");
+    if(dialog)stopNpcWander(dialog);
+    disposeAugustoPxlAssets(overlay);
+  });
 }
 function startNpcWander(dialog:HTMLElement):void {
   const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
