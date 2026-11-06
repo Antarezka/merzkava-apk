@@ -70,7 +70,7 @@ export function projectPixiActorPosition(
   if(board.dataset.academyArtworkBoard==="true"&&image?.naturalWidth&&image.naturalHeight){
     const scaleX=(image.clientWidth||image.naturalWidth)/image.naturalWidth;
     const scaleY=(image.clientHeight||image.naturalHeight)/image.naturalHeight;
-    return {x:centerX*scaleX,y:centerY*scaleY-15};
+    return {x:centerX*scaleX,y:centerY*scaleY-22};
   }
   const halfW=readCssNumber(style,"--iso-half-w",grid.tileW/2);
   const halfH=readCssNumber(style,"--iso-half-h",grid.tileH/2);
@@ -78,7 +78,7 @@ export function projectPixiActorPosition(
   const offsetY=readCssNumber(style,"--iso-offset-y",grid.offsetY);
   return {
     x:(actor.x-actor.y)*halfW+isoCenterX,
-    y:(actor.x+actor.y)*halfH+offsetY+halfH-15
+    y:(actor.x+actor.y)*halfH+offsetY+halfH-22
   };
 }
 
