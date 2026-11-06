@@ -59,6 +59,25 @@ describe("isometric NPC conversations", () => {
     expect(html).not.toContain("data-wmh-academy-editor");
   });
 
+
+  it("keeps recurring sonar pulses presentation-only and updates contacts at startup", () => {
+    const start = worldMapSource.indexOf("function startActorScanners");
+    const end = worldMapSource.indexOf("function animateGridMove", start);
+    const scannerBlock = worldMapSource.slice(start, end);
+    const pulseBlock = scannerBlock.slice(scannerBlock.indexOf("const pulse=()=>"), scannerBlock.indexOf("  pulse();"));
+    expect(scannerBlock).toContain("updateScannerContacts(board);");
+    expect(pulseBlock).not.toContain("updateScannerContacts(board)");
+  });
+
+  it("uses a shared tile/actor snapshot for NPC wandering instead of per-NPC DOM queries", () => {
+    const start = worldMapSource.indexOf("function startNpcWander");
+    const end = worldMapSource.indexOf("function renderChat", start);
+    const wanderBlock = worldMapSource.slice(start, end);
+    expect(wanderBlock).toContain('const actors=Array.from(board.querySelectorAll<HTMLElement>("[data-wmh-player-token],[data-wmh-npc]"))');
+    expect(wanderBlock).toContain("const tilesByCell=new Map<string,HTMLElement>()");
+    expect(wanderBlock).not.toContain("board.querySelector<HTMLElement>('[data-wmh-tile]");
+  });
+
   it("keeps the hidden state intact until a player taps an NPC", () => {
     const html = renderIsometricMapTestArea();
     expect(html).toContain('data-wmh-chat hidden');
