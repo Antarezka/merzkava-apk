@@ -18,6 +18,7 @@ on:
       - fix/player-name-access-gate-2026-11-06
       - fix/account-settings-atlas-remember-2026-11-06
       - feat/secure-atlas-reset-transitions-2026-11-06
+      - feat/developer-issued-atlas-reset-2026-11-06
     paths:
       - "src/**"
       - "public/**"
