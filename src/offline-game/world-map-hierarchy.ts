@@ -1253,10 +1253,21 @@ function bindArcanistryBackClearance(dialog:HTMLElement):void {
   if(!screen||!back||screen.dataset.machineClearanceBound==="true")return;
   screen.dataset.machineClearanceBound="true";
   const selectors="[data-arcanistry-machine],.wmh-arcanistry-machine,.wmh-archanistry-machine,[data-wmh-arcanistry-machine]";
-  const machine=document.querySelector<HTMLElement>(selectors);
-  if(!machine)return;
-  let frame=0;
+  let machine:HTMLElement|null=null,boundMachine:HTMLElement|null=null,frame=0;
   const sync=()=>{
+    const found=document.querySelector<HTMLElement>(selectors);
+    if(found&&found!==boundMachine){
+      machine=found;boundMachine=found;
+      machine.addEventListener("transitionrun",follow);
+      machine.addEventListener("transitionend",sync);
+      machine.addEventListener("animationstart",follow);
+      machine.addEventListener("animationend",sync);
+    }else if(!found){machine=null;}
+    if(!machine){
+      screen.style.removeProperty("--wmh-machine-back-offset");
+      screen.classList.remove("has-archanistry-machine");
+      return;
+    }
     const rect=machine.getBoundingClientRect(),screenRect=screen.getBoundingClientRect();
     const visible=!machine.hidden&&getComputedStyle(machine).display!=="none"&&rect.width>0&&rect.height>0&&rect.right>0&&rect.left<window.innerWidth&&rect.bottom>0&&rect.top<window.innerHeight;
     const nearBack=visible&&rect.bottom>screenRect.bottom-110&&rect.left<screenRect.left+120;
@@ -1272,17 +1283,15 @@ function bindArcanistryBackClearance(dialog:HTMLElement):void {
     if(frame)cancelAnimationFrame(frame);
     const tick=()=>{
       sync();
-      if(machine.getAnimations().some(animation=>animation.playState==="running"))frame=requestAnimationFrame(tick);
-      else frame=0;
+      const active=machine?.getAnimations().some(animation=>
+        animation.playState==="running"&&animation.effect?.getComputedTiming().iterations!==Infinity
+      )??false;
+      if(active)frame=requestAnimationFrame(tick);else frame=0;
     };
     frame=requestAnimationFrame(tick);
   };
   const observer=new MutationObserver(()=>{sync();follow();});
-  observer.observe(machine,{attributes:true,attributeFilter:["class","style","hidden"]});
-  machine.addEventListener("transitionrun",follow);
-  machine.addEventListener("transitionend",sync);
-  machine.addEventListener("animationstart",follow);
-  machine.addEventListener("animationend",sync);
+  observer.observe(document.body,{childList:true,subtree:true});
   window.addEventListener("resize",sync,{passive:true});
   sync();
 }
