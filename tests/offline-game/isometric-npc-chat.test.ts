@@ -132,6 +132,19 @@ describe("isometric NPC conversations", () => {
     expect(hiddenGuard).toContain("pointer-events:none!important");
   });
 
+  it("shows contextual Player dialogue instead of repeating the action-button label",()=>{
+    expect(worldMapSource).toContain('playerLines:string[]');
+    expect(worldMapSource).toContain('"student-wei":{name:"Shen Wei"');
+    expect(worldMapSource).toContain('"What kind of footwork are you practicing today?"');
+    const replyStart=worldMapSource.indexOf('if(action.dataset.wmhReply!==undefined)');
+    const replyEnd=worldMapSource.indexOf('if(action.dataset.wmhAction==="exit-local")',replyStart);
+    const replyHandler=replyStart>=0&&replyEnd>=0?worldMapSource.slice(replyStart,replyEnd):"";
+    expect(replyHandler).toContain('const playerLine=npc.playerLines[index]');
+    expect(replyHandler).toContain("escapeMapEditorText(playerLine)");
+    expect(replyHandler).not.toContain('const choice=npc.choices[index]');
+    expect(replyHandler).not.toContain("+choice+");
+  });
+
   it("keeps the hidden state intact until a player taps an NPC", () => {
     const html = renderIsometricMapTestArea();
     expect(html).toContain('data-wmh-chat hidden');
