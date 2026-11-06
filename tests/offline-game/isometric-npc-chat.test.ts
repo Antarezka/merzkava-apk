@@ -114,6 +114,7 @@ describe("isometric NPC conversations", () => {
     expect(chatStyles).toContain(".wmh-isometric-play-screen .wmh-character-token.wmh-scanner-active::before");
     expect(chatStyles).toContain("@keyframes wmh-field-sonar");
     expect(worldMapSource).toContain("merzkava:field-scanner-overlap");
+    expect(worldMapSource).toContain('if(action.dataset.wmhAction==="close"){disposePlayerHudMotion(dialog);overlay.hidden=true;');
     expect(worldMapSource).toContain("function startActorScanners");
     expect(worldMapSource).toContain("function emitTileTrailWave");
     expect(worldMapSource).toContain("animationend");
