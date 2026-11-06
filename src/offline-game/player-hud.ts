@@ -1,4 +1,3 @@
-import { animate, createScope } from "animejs";
 import { getEternalSave } from "./expedition-game";
 import { applySatietyIntake, calculateSatietyInterval, getPortionSatietyGain, type SatietyPortion } from "./mechanics/satiety";
 
@@ -142,29 +141,25 @@ export function handlePlayerHudClick(target:Element,dialog:HTMLElement):boolean 
   }
   return false;
 }
-const motionScopes=new WeakMap<HTMLElement,{revert:()=>void}>();
+const motionScopes=new WeakMap<HTMLElement,{reveconst motionScopes=new WeakMap<HTMLElement,()=>void>();
 export function mountPlayerHudMotion(root:HTMLElement):void {
   const hud=root.matches("[data-wmh-player-hud]")?root:root.querySelector<HTMLElement>("[data-wmh-player-hud]");
-  if(!hud||motionScopes.has(hud)||(typeof window!=="undefined"&&window.matchMedia?.("(prefers-reduced-motion: reduce)").matches))return;
-  const scope=createScope({root:hud,mediaQueries:{reduceMotion:"(prefers-reduced-motion: reduce)"}}).add(self=>{
-    if(!self||self.matches.reduceMotion)return;
-    hud.querySelectorAll<HTMLElement>("[data-hud-ring]").forEach((ring,index)=>{
-      const inner=ring.querySelector<HTMLElement>("[data-hud-ring-inner]");
-      animate(ring,{rotate:360,duration:34000+index*4200,ease:"linear",loop:true});
-      if(inner)animate(inner,{rotate:-360,duration:26000+index*3600,ease:"linear",loop:true});
-    });
+  if(!hud||motionScopes.has(hud)||typeof document==="undefined")return;
+  const sync=()=>hud.classList.toggle("wmh-hud-motion-paused",document.hidden);
+  sync();
+  document.addEventListener("visibilitychange",sync,{passive:true});
+  motionScopes.set(hud,()=>{
+    document.removeEventListener("visibilitychange",sync);
+    hud.classList.remove("wmh-hud-motion-paused");
   });
-  motionScopes.set(hud,scope);
 }
 export function disposePlayerHudMotion(root:HTMLElement):void {
   const hud=root.matches("[data-wmh-player-hud]")?root:root.querySelector<HTMLElement>("[data-wmh-player-hud]");
   if(!hud)return;
-  motionScopes.get(hud)?.revert();motionScopes.delete(hud);
+  motionScopes.get(hud)?.();
+  motionScopes.delete(hud);
 }
-
-
-
-type PlayerHudLayoutPoint={x:number;y:number;scale:number};
+le:number};
 type PlayerHudLayoutGesture={
   element:HTMLElement;
   mode:"drag"|"resize"|"pinch";
