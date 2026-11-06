@@ -490,8 +490,9 @@ function mountPixiBoard(board:HTMLElement,modal:HTMLElement,onFailure:()=>void):
         );
         if(actorChanged)syncActors(true);
         const modeChanged=records.some(record=>
-          (record.target===board&&record.attributeName==="class")||
-          (record.target instanceof HTMLElement&&record.target.matches("[data-wmh-chat],[data-world-atlas-gate]")&&record.attributeName==="hidden")
+          record.target instanceof HTMLElement&&
+          record.target.matches("[data-wmh-chat],[data-world-atlas-gate]")&&
+          record.attributeName==="hidden"
         );
         const editorNow=board.classList.contains("wmh-overlay-editing");
         const editorChanged=editorNow!==editorWasActive;
