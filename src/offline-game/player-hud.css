@@ -346,7 +346,7 @@ button.wmh-inventory-slot{cursor:pointer!important;touch-action:manipulation!imp
 .wmh-item-tier-frame[data-tier="2"]{--item-tier-color:#9c9c80}
 .wmh-item-tier-frame[data-tier="3"]{--item-tier-color:#b68dd1}
 .wmh-item-tier-frame[data-tier="4"]{--item-tier-color:#78a9b4}
-.wmh-item-icon{display:block;font-size:9px!important;line-height:1!important;transform:scale(.52)!important;transform-origin:center!important}
+.wmh-item-icon{display:block;font-size:18px!important;line-height:1!important;transform:scale(.52)!important;transform-origin:center!important}
 .wmh-item-quantity{position:absolute!important;right:2px!important;bottom:2px!important;color:#f0d9ad!important;font:800 7px/1 ui-monospace,monospace!important;text-shadow:0 1px 2px #21170f!important}
 .wmh-inventory-slot.is-empty{background:#30251c!important;border-color:#705438!important}
 .wmh-inventory-slot.is-empty>span{color:#755d42!important;font:600 6px/1 Arial,sans-serif!important}
@@ -411,7 +411,7 @@ button.wmh-inventory-slot{cursor:pointer!important;touch-action:manipulation!imp
   .wmh-spirit-ring{width:25px!important;height:25px!important}
   .wmh-inventory-window{width:min(238px,78vw)!important;padding:8px!important}
   .wmh-inventory-grid{gap:3px!important}
-  .wmh-item-icon{font-size:8px!important}
+  .wmh-item-icon{font-size:16px!important}
 }
 
 /* Machine visibility pushes Back clear of its slide path, then returns it. */
