@@ -929,14 +929,16 @@ async function openWorldAtlasFromTv(renderer:"dom"|"pixi"="dom"):Promise<void> {
     finally{cleanupPixiWorldAtlas=undefined;}
   }
   if(isPixi){
-    try{
-      const {mountPixiWorldAtlas}=await import("./offline-game/pixi-world-atlas-renderer");
+    // Keep the verified Atlas login surface responsive while the Pixi chunk loads.
+    void import("./offline-game/pixi-world-atlas-renderer").then(({mountPixiWorldAtlas})=>{
       if(modal.hidden||modal.dataset.renderer!=="pixi")return;
+      cleanupPixiWorldAtlas?.();
       cleanupPixiWorldAtlas=mountPixiWorldAtlas(modal);
-    }catch(error){
+    }).catch(error=>{
+      if(modal.hidden||modal.dataset.renderer!=="pixi")return;
       modal.dataset.pixiRendererStatus="dom-fallback";
       recordBug(error,"Initialize Pixi World Atlas renderer","Pixi World Atlas");
-    }
+    });
   }
   history.pushState({idleRpgNotice:true,worldAtlasFromTv:true},"");
   gate.hidden=false;
