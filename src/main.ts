@@ -1419,25 +1419,27 @@ root.addEventListener("click", async (event: MouseEvent) => {
     if(!developerAuthenticated)return;activeScreen="control";notice="";render();return;
   }
   if(target.closest("[data-player-logout]")){
-    // Revoke visible/in-memory permissions before awaiting secure-storage or network cleanup.
-    developerAuthenticated=false;playerAuthenticated=false;playerLoginName="";activeCharacterId="";activeProfileMarkdown="";activeChat={messages:[],started:false,showOptions:activeChat.showOptions};
-    authMessage="";setWorldMapDeveloperMode(false);activeScreen="control";accessLoginMode="player";notice="";
-    history.pushState({merzkavaScreen:"control",merzkavaHome:false},"");render();
-    try{await signOutDeveloper();}catch(error){recordBug(error,"Revoke developer marker after player logout","Developer access");}
-    try{if(getAuthSession())await signOut();}catch(error){recordBug(error,"Clear cloud session after player logout","Authentication");}
+    await runAccountAccessTransition("player",async()=>{
+      // Keep logout available even offline; this sequence presents local session cleanup.
+      developerAuthenticated=false;playerAuthenticated=false;playerLoginName="";activeCharacterId="";activeProfileMarkdown="";activeChat={messages:[],started:false,showOptions:activeChat.showOptions};
+      authMessage="";setWorldMapDeveloperMode(false);activeScreen="control";accessLoginMode="player";notice="";
+      history.pushState({merzkavaScreen:"control",merzkavaHome:false},"");render();
+      try{await signOutDeveloper();}catch(error){recordBug(error,"Revoke developer marker after player logout","Developer access");}
+      try{if(getAuthSession())await signOut();}catch(error){recordBug(error,"Clear cloud session after player logout","Authentication");}
+    });
     return;
   }
   if(target.closest("[data-dev-logout]")){
-    // Fail closed immediately; storage cleanup must never leave Developer Mode visible.
-    developerAuthenticated=false;playerAuthenticated=false;playerLoginName="";activeCharacterId="";activeProfileMarkdown="";activeChat={messages:[],started:false,showOptions:activeChat.showOptions};
-    authMessage="";setWorldMapDeveloperMode(false);activeScreen="control";accessLoginMode="developer";notice="";render();
-    try{await signOutDeveloper();}catch(error){
-      developerLoginMessage=error instanceof Error?error.message:"Could not securely lock the Developer session.";
-      recordBug(error,"Revoke developer marker after logout","Developer access");
-      const message=root.querySelector<HTMLElement>("[data-dev-login-message]");
-      if(message)message.textContent=developerLoginMessage;
-    }
-    try{if(getAuthSession())await signOut();}catch(error){recordBug(error,"Clear cloud session after developer logout","Authentication");}
+    await runAccountAccessTransition("developer",async()=>{
+      // Revoke access immediately; the remaining visual sequence is local-only.
+      developerAuthenticated=false;playerAuthenticated=false;playerLoginName="";activeCharacterId="";activeProfileMarkdown="";activeChat={messages:[],started:false,showOptions:activeChat.showOptions};
+      authMessage="";setWorldMapDeveloperMode(false);activeScreen="control";accessLoginMode="developer";notice="";render();
+      try{await signOutDeveloper();}catch(error){
+        developerLoginMessage=error instanceof Error?error.message:"Could not securely lock the Developer session.";
+        recordBug(error,"Revoke developer marker after logout","Developer access");
+      }
+      try{if(getAuthSession())await signOut();}catch(error){recordBug(error,"Clear cloud session after developer logout","Authentication");}
+    });
     return;
   }
   if(!hasAppAccess()&&target.closest("[data-floating-action]"))return;
