@@ -3,17 +3,20 @@ import { APP_LANGUAGES } from "../../src/i18n";
 import { accountSettingsPanel, developerLoginPanel } from "../../src/app/developer-access-panel";
 
 describe("Account controls in Settings",()=>{
-  it("keeps developer Floating Control and Lock controls in the account panel for every language",()=>{
+  it("keeps developer Floating Control, Lock and the guided Master Reset request in the account panel for every language",()=>{
     for(const language of APP_LANGUAGES){
-      const html=accountSettingsPanel(language.code,true,false);
+      const html=accountSettingsPanel(language.code,true,false,["Nafila","Ilya"]);
       expect(html).toContain("data-dev-open-control");
       expect(html).toContain("data-dev-logout");
       expect(html).toContain("account-access-icon icon-floating");
       expect(html).toContain("account-access-icon icon-lock");
       expect(html).toContain("data-atlas-developer-reset-submit");
-      expect(html).toContain("developer-atlas-reset-player");
+      expect(html).toContain('id="developer-atlas-reset-player"');
+      expect(html).toContain("<option value=\"Nafila\">Nafila</option>");
       expect(html).toContain("data-atlas-developer-reset-proof");
       expect(html).toContain("developer-atlas-reset-confirm");
+      expect(html).toContain('id="developer-atlas-reset-request"');
+      expect(html).toContain("data-atlas-reset-copy-request");
     }
   });
 
