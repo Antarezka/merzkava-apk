@@ -49,7 +49,7 @@ if (!app) throw new Error("App root element was not found.");
 const root = app;
 
 async function runAccountAccessTransition<T>(
-  context:"player"|"developer"|"player-session",
+  context:"player"|"developer"|"player-session"|"developer-session",
   action:()=>Promise<T>,
   duration=3600
 ):Promise<T> {
@@ -1404,7 +1404,7 @@ root.addEventListener("click", async (event: MouseEvent) => {
     const request=requestField?.value??"";
     if(!request||!copyButton)return;
     try{
-      const resetSection=root.querySelector<HTMLElement>("[data-developer-atlas-reset]");
+      const copyHost=root.querySelector<HTMLElement>("[data-atlas-reset-copy-buffer]");
       const copyTask=(async()=>{
         if(navigator.clipboard?.writeText)await navigator.clipboard.writeText(request);
         else{
@@ -1418,7 +1418,7 @@ root.addEventListener("click", async (event: MouseEvent) => {
       })();
       const copyResults=await Promise.allSettled([
         copyTask,
-        resetSection?playWorldAtlasAccessSequence(resetSection,2500,copyTask):copyTask.then(()=>undefined)
+        copyHost?playWorldAtlasAccessSequence(copyHost,2500,copyTask):copyTask.then(()=>undefined)
       ]);
       if(copyResults[0].status==="rejected")throw copyResults[0].reason;
       copyButton.textContent="Copied ✓";
@@ -1445,7 +1445,7 @@ root.addEventListener("click", async (event: MouseEvent) => {
     return;
   }
   if(target.closest("[data-dev-logout]")){
-    await runAccountAccessTransition("developer",async()=>{
+    await runAccountAccessTransition("developer-session",async()=>{
       // Revoke access immediately; the remaining visual sequence is local-only.
       developerAuthenticated=false;playerAuthenticated=false;playerLoginName="";activeCharacterId="";activeProfileMarkdown="";activeChat={messages:[],started:false,showOptions:activeChat.showOptions};
       authMessage="";setWorldMapDeveloperMode(false);activeScreen="control";accessLoginMode="developer";notice="";render();
