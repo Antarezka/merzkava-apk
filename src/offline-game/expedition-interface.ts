@@ -94,6 +94,11 @@ export function renderExpeditionInterface():string {
           <path d="M14 45v2m24-2v2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
         </svg>
       </button>
+      <button type="button" class="expedition-pixi-trigger" data-idle-pixi-open data-drag-position-key="merzkava.eternal-path.floating-pixi-tv-position.v1" aria-label="Open Pixi World Atlas" aria-haspopup="dialog" aria-expanded="false" title="World Atlas · Pixi Console">
+        <span class="pixi-tv-antenna" aria-hidden="true"><i></i><b></b></span>
+        <span class="pixi-tv-shell" aria-hidden="true"><i class="pixi-tv-screen"></i><i class="pixi-tv-knobs"><b></b><b></b></i></span>
+        <span class="pixi-console-box" aria-hidden="true"><i class="pixi-console-dpad"></i><i class="pixi-console-stick"><b></b></i><i class="pixi-console-lamp"></i></span>
+      </button>
       ${renderIdleHomeMap(save?{day:save.day,hour:save.hour,minute:save.minute,cycle:atmosphere.cycle==="Morning"?"Day":atmosphere.cycle}:null)}
     </div>
     ${choiceModal}
