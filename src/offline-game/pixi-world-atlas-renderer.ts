@@ -200,7 +200,6 @@ function positionCanvas(canvas:HTMLCanvasElement,board:HTMLElement):void {
   canvas.style.inset="0";
   canvas.style.width="100%";
   canvas.style.height="100%";
-  canvas.style.display="block";
   canvas.style.pointerEvents="none";
   canvas.style.zIndex="700";
   board.append(canvas);
@@ -490,9 +489,7 @@ function mountPixiBoard(board:HTMLElement,modal:HTMLElement,onFailure:()=>void):
       resizeObserver.observe(board);
       document.addEventListener("visibilitychange",onVisibility);
     }catch{
-      if(app){releaseApplication(app);app=null;}
-      board.classList.remove("wmh-pixi-render-active","wmh-pixi-render-paused");
-      delete modal.dataset.pixiRendererStatus;
+      cleanup();
       onFailure();
     }
   })();
