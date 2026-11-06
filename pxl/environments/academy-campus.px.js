@@ -10,7 +10,7 @@ pal({
   r:"#603941", R:"#965451", y:"#ad8247", Y:"#e4c37b",
   a:"#8d6f56", A:"#b59a73", v:"#8c7897", V:"#c3a4ca",
 })
-ramps("kKnN","sSpPW","bBcC","gGhH","rRyY","aAyA","vV","nyY")
+ramps("kKnN","sSpPW","bBcC","gGhH","rRyY","ayAY","vV","nyY")
 
 // The approved map is a faint editor-only layout guide, never baked into the runtime scene.
 genre("academy-reference", { mix: true })
@@ -237,6 +237,7 @@ sprite("_academy-lantern", { w:20, h:42, pivot:"bottom", height:1.75 }, c => {
 sprite("_academy-stone-lantern", { w:24, h:38, pivot:"bottom", height:1.6 }, c => {
   c.rect(4,29,16,6,"s");c.rect(6,19,12,11,"S");c.rect(3,16,18,4,"n")
   c.rect(5,8,14,8,"s");c.rect(2,6,20,3,"S");c.px(12,11,"Y")
+  c.rect(4,35,16,3,"s");c.hline(4,35,16,"S")
 })
 
 const treePlaces = [
