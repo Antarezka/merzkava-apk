@@ -38,6 +38,7 @@ describe("Pixi World Atlas Android input isolation",()=>{
   const atlasSource=readFileSync(new URL("../../src/offline-game/idle-home-map.ts",import.meta.url),"utf8");
   const atlasCss=readFileSync(new URL("../../src/offline-game/idle-home-map.css",import.meta.url),"utf8");
   const cssStyles=readFileSync(new URL("../../src/offline-game/world-map-hierarchy.css",import.meta.url),"utf8");
+  const gameplaySource=readFileSync(new URL("../../src/offline-game/world-map-hierarchy.ts",import.meta.url),"utf8");
 
   it("removes Pixi pointer and accessibility extensions before renderer initialization",()=>{
     const removal=rendererSource.indexOf("PIXI.extensions.remove(EventSystem, AccessibilitySystem)");
@@ -62,6 +63,15 @@ describe("Pixi World Atlas Android input isolation",()=>{
     expect(mainSource).toContain('target.closest("[data-idle-pixi-open]")');
     expect(mainSource).toContain('openWorldAtlasFromTv("pixi")');
     expect(mainSource).toContain('import("./offline-game/pixi-world-atlas-renderer")');
+  });
+
+  it("uses the Pixi actor fast path without repeated DOM geometry reads or minimap redraws",()=>{
+    const moveStart=gameplaySource.indexOf("function animateGridMove");
+    const pixiBranch=gameplaySource.indexOf("if(board&&isPixiWorldAtlasBoard(board))",moveStart);
+    const geometryRead=gameplaySource.indexOf("getComputedStyle(board)",moveStart);
+    expect(gameplaySource).toContain("if(!isPixiWorldAtlasBoard(board))renderIsometricMinimap(board)");
+    expect(pixiBranch).toBeGreaterThan(moveStart);
+    expect(geometryRead).toBeGreaterThan(pixiBranch);
   });
 
   it("keeps DOM transition markers above the Pixi world canvas",()=>{
