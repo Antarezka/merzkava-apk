@@ -14,7 +14,7 @@ const DEFAULT_POSITION_KEY = "merzkava.eternal-path.augusto-pxl-position.v1";
 const DRAG_SELECTOR = ".expedition-page .expedition-idle-trigger, .expedition-page .expedition-pxl-trigger";
 const DRAG_THRESHOLD = 5;
 const EDGE_GAP = 8;
-const savedPositions = new Map<string, { x: number; y: number }>();
+const savedPositions = new Map<string, { x: number; y: number } | null>();
 let drag: IdleDragState | null = null;
 let installed = false;
 let suppressNextClick = false;
@@ -38,7 +38,7 @@ function readPosition(key: string): { x: number; y: number } | null {
 }
 
 function getSavedPosition(key: string): { x: number; y: number } | null {
-  if (!savedPositions.has(key)) savedPositions.set(key, readPosition(key) ?? null as never);
+  if (!savedPositions.has(key)) savedPositions.set(key, readPosition(key));
   return savedPositions.get(key) ?? null;
 }
 
