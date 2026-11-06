@@ -132,7 +132,7 @@ function readWorldMarkers(): WorldMarker[] {
   } catch { /* use built-in positions when storage is unavailable or invalid */ }
   return defaultWorldMarkers.map(item => ({ ...item }));
 }
-function worldMapMarkerMarkup(marker: WorldMarker, editor = false): string {
+function worldMapMarkerMarkup(marker: WorldMarker, editor = false,visualMode:WorldMapVisualMode="legacy"): string {
   // Unplaced additions stay off the canonical world view until the owner assigns coordinates.
   if (!editor && marker.placementStatus === "provisional") return "";
   const number = String(defaultWorldMarkers.findIndex(item => item.id === marker.id) + 1).padStart(2, "0");
@@ -2372,7 +2372,7 @@ function panelMarkup(level: Level, regionId: RegionId = "golden-dragon-empire", 
     '<header class="wmh-level-header"><div><span class="wmh-level-tag">'+kind+'</span><h3>'+title+'</h3><p>'+subtitle+'</p></div><button type="button" class="wmh-close" data-wmh-action="close" aria-label="Close map">×</button></header>';
   if (level === "world") return header("WORLD MAP","Merzkava Universe","THREE GREAT POWERS · EXTERNAL TERRITORIES · SEAS")+
     '<div class="wmh-map-zoom"><button type="button" data-wmh-zoom="out">−</button><span data-wmh-zoom-level>100%</span><button type="button" data-wmh-zoom="in">+</button><button type="button" data-wmh-zoom="reset">RESET</button></div>'+
-    '<div class="wmh-world-map" data-wmh-map-viewport><div class="wmh-world-map-image" data-wmh-map-surface><img '+(visualMode==="augusto-pxl"?'data-pxl-asset-id="map.world.overview" ':'')+'src="'+(visualMode==="augusto-pxl"?PXL_WORLD_MAP_PLACEHOLDER:"/world/Untitled77_20261029054536.png")+'" alt="Merzkava Universe world map"/>'+readWorldMarkers().map(marker=>worldMapMarkerMarkup(marker)).join("")+'</div><div data-wmh-selection-host></div></div>'+
+    '<div class="wmh-world-map" data-wmh-map-viewport><div class="wmh-world-map-image" data-wmh-map-surface><img '+(visualMode==="augusto-pxl"?'data-pxl-asset-id="map.world.overview" ':'')+'src="'+(visualMode==="augusto-pxl"?PXL_WORLD_MAP_PLACEHOLDER:"/world/Untitled77_20261029054536.png")+'" alt="Merzkava Universe world map"/>'+readWorldMarkers().map(marker=>worldMapMarkerMarkup(marker,false,visualMode)).join("")+'</div><div data-wmh-selection-host></div></div>'+
     '<div class="wmh-bottom-actions"><span>SELECT A POWER TO OPEN ITS REGIONAL MAP</span>'+(worldMapDeveloperMode?'<button type="button" data-wmh-action="test-isometric">▦ ISOMETRIC TEST AREA</button><button data-wmh-action="editor-open">⊞ MAP EDITOR</button>':"")+'</div>';
   if (level === "map-editor") return worldMapDeveloperMode ? header("WORLD MAP TOOLS","Map Editor","FLAT WORLD MAP · NORMALIZED COORDINATES")+mapEditorMarkup() : header("WORLD MAP","Merzkava Universe","THREE GREAT POWERS · EXTERNAL TERRITORIES · SEAS")+'<div class="wmh-bottom-actions"><span>SELECT A POWER TO OPEN ITS REGIONAL MAP</span></div>';
   if (level === "test") return renderIsometricMapTestArea();
