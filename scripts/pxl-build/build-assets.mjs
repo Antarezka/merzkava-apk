@@ -85,6 +85,15 @@ async function applyAssetMap() {
   if (manifest.schemaVersion !== 1 || mapping.schemaVersion !== 1 || !mapping.assets || typeof mapping.assets !== "object") {
     throw new Error("Unsupported Augusto PXL manifest or asset-map schema.");
   }
+  for (const asset of Object.values(manifest.assets)) {
+    delete asset.src;
+    delete asset.frameWidth;
+    delete asset.frameHeight;
+    delete asset.columns;
+    delete asset.animations;
+    delete asset.directions;
+    asset.status = "pending";
+  }
   for (const [assetId, entry] of Object.entries(mapping.assets)) {
     if (!manifest.assets[assetId]) throw new Error(`Asset map references an unknown manifest ID: ${assetId}`);
     const source = safeRelative(entry.source, `asset ${assetId}`);
