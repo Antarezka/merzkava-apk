@@ -1,5 +1,1489 @@
 {
   "schemaVersion": 1,
-  "note": "Only map an asset ID after its PXL source has generated and validated the named file under public/assets/augusto-pxl/exports/. Sprite metadata is consumed by the existing DOM/Web Animations sprite player.",
-  "assets": {}
+  "note": "Every manifest ID must map to a validated PXL-generated app-local PNG. Sprite strips use horizontal frames and zero-based animation metadata.",
+  "assets": {
+    "map.world.overview": {
+      "source": "maps/sprites/world-map-overview.png",
+      "type": "image"
+    },
+    "map.region.golden-dragon-empire": {
+      "source": "maps/sprites/region-golden-dragon-empire.png",
+      "type": "image"
+    },
+    "map.region.tianhai-yunzhou": {
+      "source": "maps/sprites/region-tianhai-yunzhou.png",
+      "type": "image"
+    },
+    "map.region.beiming-gu": {
+      "source": "maps/sprites/region-beiming-gu.png",
+      "type": "image"
+    },
+    "map.region.lawless-territories": {
+      "source": "maps/sprites/region-lawless-territories.png",
+      "type": "image"
+    },
+    "map.region.ashen-borderlands": {
+      "source": "maps/sprites/region-ashen-borderlands.png",
+      "type": "image"
+    },
+    "map.region.black-tide-expanse": {
+      "source": "maps/sprites/region-black-tide-expanse.png",
+      "type": "image"
+    },
+    "map.region.nine-frost-wastes": {
+      "source": "maps/sprites/region-nine-frost-wastes.png",
+      "type": "image"
+    },
+    "map.region.wanluo-sacred-expanse": {
+      "source": "maps/sprites/region-wanluo-sacred-expanse.png",
+      "type": "image"
+    },
+    "map.region.azerion-forest": {
+      "source": "maps/sprites/region-azerion-forest.png",
+      "type": "image"
+    },
+    "map.region.dead-zone": {
+      "source": "maps/sprites/region-dead-zone.png",
+      "type": "image"
+    },
+    "map.region.inner-azerion": {
+      "source": "maps/sprites/region-inner-azerion.png",
+      "type": "image"
+    },
+    "map.region.mega-colossal-labyrinth": {
+      "source": "maps/sprites/region-mega-colossal-labyrinth.png",
+      "type": "image"
+    },
+    "map.region.high-cloud-sea-mountains": {
+      "source": "maps/sprites/region-high-cloud-sea-mountains.png",
+      "type": "image"
+    },
+    "map.region.silverpine-wilds": {
+      "source": "maps/sprites/region-silverpine-wilds.png",
+      "type": "image"
+    },
+    "map.region.frostmirror-sea": {
+      "source": "maps/sprites/region-frostmirror-sea.png",
+      "type": "image"
+    },
+    "map.region.eastern-azure-sea": {
+      "source": "maps/sprites/region-eastern-azure-sea.png",
+      "type": "image"
+    },
+    "map.region.yunmeng-sea": {
+      "source": "maps/sprites/region-yunmeng-sea.png",
+      "type": "image"
+    },
+    "map.region.wufeng-sea": {
+      "source": "maps/sprites/region-wufeng-sea.png",
+      "type": "image"
+    },
+    "map.region.black-tide-sea": {
+      "source": "maps/sprites/region-black-tide-sea.png",
+      "type": "image"
+    },
+    "map.region.guixu-canghai": {
+      "source": "maps/sprites/region-guixu-canghai.png",
+      "type": "image"
+    },
+    "map.region.lanternhook-isles": {
+      "source": "maps/sprites/region-lanternhook-isles.png",
+      "type": "image"
+    },
+    "map.region.mega-colossal-labyrinth-exit": {
+      "source": "maps/sprites/region-mega-colossal-labyrinth-exit.png",
+      "type": "image"
+    },
+    "map.region.lantern-passage": {
+      "source": "maps/sprites/region-lantern-passage.png",
+      "type": "image"
+    },
+    "map.region.changqion-harbour": {
+      "source": "maps/sprites/region-changqion-harbour.png",
+      "type": "image"
+    },
+    "map.region.three-lantern-passage": {
+      "source": "maps/sprites/region-three-lantern-passage.png",
+      "type": "image"
+    },
+    "map.region.southwake-port": {
+      "source": "maps/sprites/region-southwake-port.png",
+      "type": "image"
+    },
+    "map.region.bitterglass-isle": {
+      "source": "maps/sprites/region-bitterglass-isle.png",
+      "type": "image"
+    },
+    "map.region.dicewake-isle": {
+      "source": "maps/sprites/region-dicewake-isle.png",
+      "type": "image"
+    },
+    "map.region.dongxing-port": {
+      "source": "maps/sprites/region-dongxing-port.png",
+      "type": "image"
+    },
+    "map.region.mingzhu-port": {
+      "source": "maps/sprites/region-mingzhu-port.png",
+      "type": "image"
+    },
+    "map.region.lanfan-port": {
+      "source": "maps/sprites/region-lanfan-port.png",
+      "type": "image"
+    },
+    "map.region.chaoguan-port": {
+      "source": "maps/sprites/region-chaoguan-port.png",
+      "type": "image"
+    },
+    "map.region.yuhai-port": {
+      "source": "maps/sprites/region-yuhai-port.png",
+      "type": "image"
+    },
+    "map.region.yuandeng-port": {
+      "source": "maps/sprites/region-yuandeng-port.png",
+      "type": "image"
+    },
+    "map.region.longchao-port": {
+      "source": "maps/sprites/region-longchao-port.png",
+      "type": "image"
+    },
+    "map.academy.exterior": {
+      "source": "maps/sprites/academy-exterior.png",
+      "type": "image",
+      "expectedWidth": 2816,
+      "expectedHeight": 1536
+    },
+    "map.academy.minimap": {
+      "source": "maps/sprites/academy-minimap.png",
+      "type": "image",
+      "expectedWidth": 352,
+      "expectedHeight": 192
+    },
+    "map.local.default": {
+      "source": "maps/sprites/local-default.png",
+      "type": "image"
+    },
+    "character.player.idle": {
+      "source": "characters/anims/player-idle.png",
+      "type": "sprite-sheet",
+      "frameWidth": 32,
+      "frameHeight": 48,
+      "columns": 32,
+      "directions": {
+        "south": {
+          "idle": {
+            "frames": [
+              0,
+              1
+            ],
+            "fps": 3
+          },
+          "walk": {
+            "frames": [
+              2,
+              3
+            ],
+            "fps": 7
+          }
+        },
+        "south-east": {
+          "idle": {
+            "frames": [
+              4,
+              5
+            ],
+            "fps": 3
+          },
+          "walk": {
+            "frames": [
+              6,
+              7
+            ],
+            "fps": 7
+          }
+        },
+        "east": {
+          "idle": {
+            "frames": [
+              8,
+              9
+            ],
+            "fps": 3
+          },
+          "walk": {
+            "frames": [
+              10,
+              11
+            ],
+            "fps": 7
+          }
+        },
+        "north-east": {
+          "idle": {
+            "frames": [
+              12,
+              13
+            ],
+            "fps": 3
+          },
+          "walk": {
+            "frames": [
+              14,
+              15
+            ],
+            "fps": 7
+          }
+        },
+        "north": {
+          "idle": {
+            "frames": [
+              16,
+              17
+            ],
+            "fps": 3
+          },
+          "walk": {
+            "frames": [
+              18,
+              19
+            ],
+            "fps": 7
+          }
+        },
+        "north-west": {
+          "idle": {
+            "frames": [
+              20,
+              21
+            ],
+            "fps": 3
+          },
+          "walk": {
+            "frames": [
+              22,
+              23
+            ],
+            "fps": 7
+          }
+        },
+        "west": {
+          "idle": {
+            "frames": [
+              24,
+              25
+            ],
+            "fps": 3
+          },
+          "walk": {
+            "frames": [
+              26,
+              27
+            ],
+            "fps": 7
+          }
+        },
+        "south-west": {
+          "idle": {
+            "frames": [
+              28,
+              29
+            ],
+            "fps": 3
+          },
+          "walk": {
+            "frames": [
+              30,
+              31
+            ],
+            "fps": 7
+          }
+        }
+      },
+      "expectedWidth": 1024,
+      "expectedHeight": 48
+    },
+    "character.npc.student-lin.idle": {
+      "source": "characters/anims/student-lin-idle.png",
+      "type": "sprite-sheet",
+      "frameWidth": 32,
+      "frameHeight": 48,
+      "columns": 32,
+      "directions": {
+        "south": {
+          "idle": {
+            "frames": [
+              0,
+              1
+            ],
+            "fps": 3
+          },
+          "walk": {
+            "frames": [
+              2,
+              3
+            ],
+            "fps": 7
+          }
+        },
+        "south-east": {
+          "idle": {
+            "frames": [
+              4,
+              5
+            ],
+            "fps": 3
+          },
+          "walk": {
+            "frames": [
+              6,
+              7
+            ],
+            "fps": 7
+          }
+        },
+        "east": {
+          "idle": {
+            "frames": [
+              8,
+              9
+            ],
+            "fps": 3
+          },
+          "walk": {
+            "frames": [
+              10,
+              11
+            ],
+            "fps": 7
+          }
+        },
+        "north-east": {
+          "idle": {
+            "frames": [
+              12,
+              13
+            ],
+            "fps": 3
+          },
+          "walk": {
+            "frames": [
+              14,
+              15
+            ],
+            "fps": 7
+          }
+        },
+        "north": {
+          "idle": {
+            "frames": [
+              16,
+              17
+            ],
+            "fps": 3
+          },
+          "walk": {
+            "frames": [
+              18,
+              19
+            ],
+            "fps": 7
+          }
+        },
+        "north-west": {
+          "idle": {
+            "frames": [
+              20,
+              21
+            ],
+            "fps": 3
+          },
+          "walk": {
+            "frames": [
+              22,
+              23
+            ],
+            "fps": 7
+          }
+        },
+        "west": {
+          "idle": {
+            "frames": [
+              24,
+              25
+            ],
+            "fps": 3
+          },
+          "walk": {
+            "frames": [
+              26,
+              27
+            ],
+            "fps": 7
+          }
+        },
+        "south-west": {
+          "idle": {
+            "frames": [
+              28,
+              29
+            ],
+            "fps": 3
+          },
+          "walk": {
+            "frames": [
+              30,
+              31
+            ],
+            "fps": 7
+          }
+        }
+      },
+      "expectedWidth": 1024,
+      "expectedHeight": 48
+    },
+    "character.npc.student-wei.idle": {
+      "source": "characters/anims/student-wei-idle.png",
+      "type": "sprite-sheet",
+      "frameWidth": 32,
+      "frameHeight": 48,
+      "columns": 32,
+      "directions": {
+        "south": {
+          "idle": {
+            "frames": [
+              0,
+              1
+            ],
+            "fps": 3
+          },
+          "walk": {
+            "frames": [
+              2,
+              3
+            ],
+            "fps": 7
+          }
+        },
+        "south-east": {
+          "idle": {
+            "frames": [
+              4,
+              5
+            ],
+            "fps": 3
+          },
+          "walk": {
+            "frames": [
+              6,
+              7
+            ],
+            "fps": 7
+          }
+        },
+        "east": {
+          "idle": {
+            "frames": [
+              8,
+              9
+            ],
+            "fps": 3
+          },
+          "walk": {
+            "frames": [
+              10,
+              11
+            ],
+            "fps": 7
+          }
+        },
+        "north-east": {
+          "idle": {
+            "frames": [
+              12,
+              13
+            ],
+            "fps": 3
+          },
+          "walk": {
+            "frames": [
+              14,
+              15
+            ],
+            "fps": 7
+          }
+        },
+        "north": {
+          "idle": {
+            "frames": [
+              16,
+              17
+            ],
+            "fps": 3
+          },
+          "walk": {
+            "frames": [
+              18,
+              19
+            ],
+            "fps": 7
+          }
+        },
+        "north-west": {
+          "idle": {
+            "frames": [
+              20,
+              21
+            ],
+            "fps": 3
+          },
+          "walk": {
+            "frames": [
+              22,
+              23
+            ],
+            "fps": 7
+          }
+        },
+        "west": {
+          "idle": {
+            "frames": [
+              24,
+              25
+            ],
+            "fps": 3
+          },
+          "walk": {
+            "frames": [
+              26,
+              27
+            ],
+            "fps": 7
+          }
+        },
+        "south-west": {
+          "idle": {
+            "frames": [
+              28,
+              29
+            ],
+            "fps": 3
+          },
+          "walk": {
+            "frames": [
+              30,
+              31
+            ],
+            "fps": 7
+          }
+        }
+      },
+      "expectedWidth": 1024,
+      "expectedHeight": 48
+    },
+    "character.npc.teacher-mei.idle": {
+      "source": "characters/anims/teacher-mei-idle.png",
+      "type": "sprite-sheet",
+      "frameWidth": 32,
+      "frameHeight": 48,
+      "columns": 32,
+      "directions": {
+        "south": {
+          "idle": {
+            "frames": [
+              0,
+              1
+            ],
+            "fps": 3
+          },
+          "walk": {
+            "frames": [
+              2,
+              3
+            ],
+            "fps": 7
+          }
+        },
+        "south-east": {
+          "idle": {
+            "frames": [
+              4,
+              5
+            ],
+            "fps": 3
+          },
+          "walk": {
+            "frames": [
+              6,
+              7
+            ],
+            "fps": 7
+          }
+        },
+        "east": {
+          "idle": {
+            "frames": [
+              8,
+              9
+            ],
+            "fps": 3
+          },
+          "walk": {
+            "frames": [
+              10,
+              11
+            ],
+            "fps": 7
+          }
+        },
+        "north-east": {
+          "idle": {
+            "frames": [
+              12,
+              13
+            ],
+            "fps": 3
+          },
+          "walk": {
+            "frames": [
+              14,
+              15
+            ],
+            "fps": 7
+          }
+        },
+        "north": {
+          "idle": {
+            "frames": [
+              16,
+              17
+            ],
+            "fps": 3
+          },
+          "walk": {
+            "frames": [
+              18,
+              19
+            ],
+            "fps": 7
+          }
+        },
+        "north-west": {
+          "idle": {
+            "frames": [
+              20,
+              21
+            ],
+            "fps": 3
+          },
+          "walk": {
+            "frames": [
+              22,
+              23
+            ],
+            "fps": 7
+          }
+        },
+        "west": {
+          "idle": {
+            "frames": [
+              24,
+              25
+            ],
+            "fps": 3
+          },
+          "walk": {
+            "frames": [
+              26,
+              27
+            ],
+            "fps": 7
+          }
+        },
+        "south-west": {
+          "idle": {
+            "frames": [
+              28,
+              29
+            ],
+            "fps": 3
+          },
+          "walk": {
+            "frames": [
+              30,
+              31
+            ],
+            "fps": 7
+          }
+        }
+      },
+      "expectedWidth": 1024,
+      "expectedHeight": 48
+    },
+    "character.npc.groundskeeper.idle": {
+      "source": "characters/anims/groundskeeper-idle.png",
+      "type": "sprite-sheet",
+      "frameWidth": 32,
+      "frameHeight": 48,
+      "columns": 32,
+      "directions": {
+        "south": {
+          "idle": {
+            "frames": [
+              0,
+              1
+            ],
+            "fps": 3
+          },
+          "walk": {
+            "frames": [
+              2,
+              3
+            ],
+            "fps": 7
+          }
+        },
+        "south-east": {
+          "idle": {
+            "frames": [
+              4,
+              5
+            ],
+            "fps": 3
+          },
+          "walk": {
+            "frames": [
+              6,
+              7
+            ],
+            "fps": 7
+          }
+        },
+        "east": {
+          "idle": {
+            "frames": [
+              8,
+              9
+            ],
+            "fps": 3
+          },
+          "walk": {
+            "frames": [
+              10,
+              11
+            ],
+            "fps": 7
+          }
+        },
+        "north-east": {
+          "idle": {
+            "frames": [
+              12,
+              13
+            ],
+            "fps": 3
+          },
+          "walk": {
+            "frames": [
+              14,
+              15
+            ],
+            "fps": 7
+          }
+        },
+        "north": {
+          "idle": {
+            "frames": [
+              16,
+              17
+            ],
+            "fps": 3
+          },
+          "walk": {
+            "frames": [
+              18,
+              19
+            ],
+            "fps": 7
+          }
+        },
+        "north-west": {
+          "idle": {
+            "frames": [
+              20,
+              21
+            ],
+            "fps": 3
+          },
+          "walk": {
+            "frames": [
+              22,
+              23
+            ],
+            "fps": 7
+          }
+        },
+        "west": {
+          "idle": {
+            "frames": [
+              24,
+              25
+            ],
+            "fps": 3
+          },
+          "walk": {
+            "frames": [
+              26,
+              27
+            ],
+            "fps": 7
+          }
+        },
+        "south-west": {
+          "idle": {
+            "frames": [
+              28,
+              29
+            ],
+            "fps": 3
+          },
+          "walk": {
+            "frames": [
+              30,
+              31
+            ],
+            "fps": 7
+          }
+        }
+      },
+      "expectedWidth": 1024,
+      "expectedHeight": 48
+    },
+    "ui.hud.traveler-satchel": {
+      "source": "ui/sprites/traveler-satchel.png",
+      "type": "image"
+    },
+    "ui.skill.technique": {
+      "source": "ui/sprites/skill-technique.png",
+      "type": "image"
+    },
+    "ui.skill.guard": {
+      "source": "ui/sprites/skill-guard.png",
+      "type": "image"
+    },
+    "ui.skill.movement": {
+      "source": "ui/sprites/skill-movement.png",
+      "type": "image"
+    },
+    "ui.skill.spirit-art": {
+      "source": "ui/sprites/skill-spirit-art.png",
+      "type": "image"
+    },
+    "ui.item.ration-small": {
+      "source": "ui/sprites/ration-small.png",
+      "type": "image"
+    },
+    "ui.item.ration-standard": {
+      "source": "ui/sprites/ration-standard.png",
+      "type": "image"
+    },
+    "ui.item.ration-large": {
+      "source": "ui/sprites/ration-large.png",
+      "type": "image"
+    },
+    "ui.item.bread": {
+      "source": "ui/sprites/bread.png",
+      "type": "image"
+    },
+    "ui.item.apple": {
+      "source": "ui/sprites/apple.png",
+      "type": "image"
+    },
+    "ui.item.wood": {
+      "source": "ui/sprites/wood.png",
+      "type": "image"
+    },
+    "ui.item.stone": {
+      "source": "ui/sprites/stone.png",
+      "type": "image"
+    },
+    "ui.item.herb": {
+      "source": "ui/sprites/herb.png",
+      "type": "image"
+    },
+    "ui.item.potion": {
+      "source": "ui/sprites/potion.png",
+      "type": "image"
+    },
+    "ui.currency.xc": {
+      "source": "ui/sprites/currency-xc.png",
+      "type": "image"
+    },
+    "ui.currency.xs": {
+      "source": "ui/sprites/currency-xs.png",
+      "type": "image"
+    },
+    "ui.currency.xg": {
+      "source": "ui/sprites/currency-xg.png",
+      "type": "image"
+    },
+    "ui.currency.zj": {
+      "source": "ui/sprites/currency-zj.png",
+      "type": "image"
+    },
+    "ui.currency.az": {
+      "source": "ui/sprites/currency-az.png",
+      "type": "image"
+    },
+    "ui.hud.player-frame": {
+      "source": "ui/sprites/player-frame.png",
+      "type": "image"
+    },
+    "ui.hud.skill-dock-frame": {
+      "source": "ui/sprites/skill-dock-frame.png",
+      "type": "image"
+    },
+    "ui.hud.satchel-panel": {
+      "source": "ui/sprites/satchel-panel.png",
+      "type": "image"
+    },
+    "ui.hud.currency-purse": {
+      "source": "ui/sprites/currency-purse.png",
+      "type": "image"
+    },
+    "ui.hud.world-strip": {
+      "source": "ui/sprites/world-strip.png",
+      "type": "image"
+    },
+    "ui.hud.weather-icon": {
+      "source": "ui/sprites/weather-icon.png",
+      "type": "image"
+    },
+    "ui.hud.minimap-frame": {
+      "source": "ui/sprites/minimap-frame.png",
+      "type": "image"
+    },
+    "ui.hud.minimap-toggle": {
+      "source": "ui/sprites/minimap-toggle.png",
+      "type": "image"
+    },
+    "ui.item-frame.tier-1": {
+      "source": "ui/sprites/item-frame-tier-1.png",
+      "type": "image"
+    },
+    "ui.item-frame.tier-2": {
+      "source": "ui/sprites/item-frame-tier-2.png",
+      "type": "image"
+    },
+    "ui.map-marker.power": {
+      "source": "ui/sprites/marker-power.png",
+      "type": "image"
+    },
+    "ui.map-marker.territory": {
+      "source": "ui/sprites/marker-territory.png",
+      "type": "image"
+    },
+    "ui.map-marker.forest": {
+      "source": "ui/sprites/marker-forest.png",
+      "type": "image"
+    },
+    "ui.map-marker.sea": {
+      "source": "ui/sprites/marker-sea.png",
+      "type": "image"
+    },
+    "ui.map-marker.landmark": {
+      "source": "ui/sprites/marker-landmark.png",
+      "type": "image"
+    },
+    "ui.map-marker.mountains": {
+      "source": "ui/sprites/marker-mountains.png",
+      "type": "image"
+    },
+    "ui.map-site.0": {
+      "source": "ui/sprites/map-site-0.png",
+      "type": "image"
+    },
+    "ui.map-site.1": {
+      "source": "ui/sprites/map-site-1.png",
+      "type": "image"
+    },
+    "ui.map-site.2": {
+      "source": "ui/sprites/map-site-2.png",
+      "type": "image"
+    },
+    "ui.map-site.3": {
+      "source": "ui/sprites/map-site-3.png",
+      "type": "image"
+    },
+    "ui.map-site.4": {
+      "source": "ui/sprites/map-site-4.png",
+      "type": "image"
+    },
+    "ui.map-site.5": {
+      "source": "ui/sprites/map-site-5.png",
+      "type": "image"
+    },
+    "effect.spirit-ring.tier-1": {
+      "source": "effects/anims/spirit-ring-tier-1.png",
+      "type": "sprite-sheet",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "columns": 8,
+      "animations": {
+        "idle": {
+          "frames": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "fps": 8
+        }
+      },
+      "expectedWidth": 384,
+      "expectedHeight": 48
+    },
+    "effect.spirit-ring.tier-2": {
+      "source": "effects/anims/spirit-ring-tier-2.png",
+      "type": "sprite-sheet",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "columns": 8,
+      "animations": {
+        "idle": {
+          "frames": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "fps": 8
+        }
+      },
+      "expectedWidth": 384,
+      "expectedHeight": 48
+    },
+    "effect.spirit-ring.tier-3": {
+      "source": "effects/anims/spirit-ring-tier-3.png",
+      "type": "sprite-sheet",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "columns": 8,
+      "animations": {
+        "idle": {
+          "frames": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "fps": 8
+        }
+      },
+      "expectedWidth": 384,
+      "expectedHeight": 48
+    },
+    "effect.spirit-ring.tier-4": {
+      "source": "effects/anims/spirit-ring-tier-4.png",
+      "type": "sprite-sheet",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "columns": 8,
+      "animations": {
+        "idle": {
+          "frames": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "fps": 8
+        }
+      },
+      "expectedWidth": 384,
+      "expectedHeight": 48
+    },
+    "environment.academy.water-shimmer": {
+      "source": "effects/anims/water-shimmer.png",
+      "type": "sprite-sheet",
+      "frameWidth": 64,
+      "frameHeight": 32,
+      "columns": 8,
+      "animations": {
+        "idle": {
+          "frames": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "fps": 8
+        }
+      },
+      "expectedWidth": 512,
+      "expectedHeight": 32
+    },
+    "environment.academy.foliage-idle": {
+      "source": "effects/anims/foliage-idle.png",
+      "type": "sprite-sheet",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "columns": 8,
+      "animations": {
+        "idle": {
+          "frames": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "fps": 8
+        }
+      },
+      "expectedWidth": 384,
+      "expectedHeight": 48
+    },
+    "environment.academy.foliage-wind": {
+      "source": "effects/anims/foliage-wind.png",
+      "type": "sprite-sheet",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "columns": 8,
+      "animations": {
+        "idle": {
+          "frames": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "fps": 8
+        }
+      },
+      "expectedWidth": 384,
+      "expectedHeight": 48
+    },
+    "environment.academy.cloud-motion": {
+      "source": "effects/anims/cloud-motion.png",
+      "type": "sprite-sheet",
+      "frameWidth": 64,
+      "frameHeight": 32,
+      "columns": 8,
+      "animations": {
+        "idle": {
+          "frames": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "fps": 8
+        }
+      },
+      "expectedWidth": 512,
+      "expectedHeight": 32
+    },
+    "environment.academy.weather-rain": {
+      "source": "effects/anims/weather-rain.png",
+      "type": "sprite-sheet",
+      "frameWidth": 32,
+      "frameHeight": 48,
+      "columns": 8,
+      "animations": {
+        "idle": {
+          "frames": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "fps": 8
+        }
+      },
+      "expectedWidth": 256,
+      "expectedHeight": 48
+    },
+    "environment.academy.weather-snow": {
+      "source": "effects/anims/weather-snow.png",
+      "type": "sprite-sheet",
+      "frameWidth": 32,
+      "frameHeight": 48,
+      "columns": 8,
+      "animations": {
+        "idle": {
+          "frames": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "fps": 8
+        }
+      },
+      "expectedWidth": 256,
+      "expectedHeight": 48
+    },
+    "environment.academy.weather-petals": {
+      "source": "effects/anims/weather-petals.png",
+      "type": "sprite-sheet",
+      "frameWidth": 32,
+      "frameHeight": 48,
+      "columns": 8,
+      "animations": {
+        "idle": {
+          "frames": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "fps": 8
+        }
+      },
+      "expectedWidth": 256,
+      "expectedHeight": 48
+    },
+    "effect.martial-soul.activation": {
+      "source": "effects/anims/martial-soul-activation.png",
+      "type": "sprite-sheet",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "columns": 8,
+      "animations": {
+        "idle": {
+          "frames": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "fps": 8
+        }
+      },
+      "expectedWidth": 384,
+      "expectedHeight": 48
+    },
+    "effect.martial-soul.aura": {
+      "source": "effects/anims/martial-soul-aura.png",
+      "type": "sprite-sheet",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "columns": 8,
+      "animations": {
+        "idle": {
+          "frames": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "fps": 8
+        }
+      },
+      "expectedWidth": 384,
+      "expectedHeight": 48
+    },
+    "effect.arcanistry.cast": {
+      "source": "effects/anims/arcanistry-cast.png",
+      "type": "sprite-sheet",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "columns": 8,
+      "animations": {
+        "idle": {
+          "frames": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "fps": 8
+        }
+      },
+      "expectedWidth": 384,
+      "expectedHeight": 48
+    },
+    "effect.arcanistry.artifact-pulse": {
+      "source": "effects/anims/artifact-pulse.png",
+      "type": "sprite-sheet",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "columns": 8,
+      "animations": {
+        "idle": {
+          "frames": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "fps": 8
+        }
+      },
+      "expectedWidth": 384,
+      "expectedHeight": 48
+    },
+    "effect.spirit-beast.appearance": {
+      "source": "effects/anims/spirit-beast-appearance.png",
+      "type": "sprite-sheet",
+      "frameWidth": 64,
+      "frameHeight": 48,
+      "columns": 8,
+      "animations": {
+        "idle": {
+          "frames": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "fps": 8
+        }
+      },
+      "expectedWidth": 512,
+      "expectedHeight": 48
+    },
+    "effect.spirit-beast.movement": {
+      "source": "effects/anims/spirit-beast-movement.png",
+      "type": "sprite-sheet",
+      "frameWidth": 64,
+      "frameHeight": 48,
+      "columns": 8,
+      "animations": {
+        "idle": {
+          "frames": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ],
+          "fps": 8
+        }
+      },
+      "expectedWidth": 512,
+      "expectedHeight": 48
+    },
+    "environment.academy.lighting-day": {
+      "source": "effects/sprites/lighting-day.png",
+      "type": "image"
+    },
+    "environment.academy.lighting-dusk": {
+      "source": "effects/sprites/lighting-dusk.png",
+      "type": "image"
+    },
+    "environment.academy.lighting-night": {
+      "source": "effects/sprites/lighting-night.png",
+      "type": "image"
+    },
+    "object.academy.gate": {
+      "source": "objects/sprites/academy-gate.png",
+      "type": "image"
+    },
+    "object.academy.roof": {
+      "source": "objects/sprites/academy-roof.png",
+      "type": "image"
+    },
+    "object.academy.stairs": {
+      "source": "objects/sprites/academy-stairs.png",
+      "type": "image"
+    },
+    "object.academy.bridge": {
+      "source": "objects/sprites/academy-bridge.png",
+      "type": "image"
+    },
+    "object.academy.trees": {
+      "source": "objects/sprites/academy-trees.png",
+      "type": "image"
+    },
+    "object.academy.pond": {
+      "source": "objects/sprites/academy-pond.png",
+      "type": "image"
+    },
+    "object.academy.training-yard": {
+      "source": "objects/sprites/academy-training-yard.png",
+      "type": "image"
+    },
+    "object.academy.lanterns": {
+      "source": "objects/sprites/academy-lanterns.png",
+      "type": "image"
+    },
+    "cinematic.academy.arrival": {
+      "source": "cinematics/sprites/academy-arrival.png",
+      "type": "image"
+    },
+    "cinematic.spirit-awakening": {
+      "source": "cinematics/sprites/spirit-awakening.png",
+      "type": "image"
+    },
+    "ui.cinematic.transition-frame": {
+      "source": "cinematics/sprites/transition-frame.png",
+      "type": "image"
+    }
+  }
 }

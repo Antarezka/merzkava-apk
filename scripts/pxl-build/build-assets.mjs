@@ -13,6 +13,7 @@ const EXPORT_DIR = path.join(ROOT, "public", "assets", "augusto-pxl", "exports")
 const MANIFEST_PATH = path.join(ROOT, "public", "assets", "augusto-pxl", "manifest.json");
 const ASSET_MAP_PATH = path.join(SOURCE_DIR, "asset-map.json");
 const LICENSE_DEST = path.join(ROOT, "public", "assets", "augusto-pxl", "licenses", "claude-pxl-MIT.txt");
+const REFERENCE_DIR = path.join(SOURCE_DIR, "maps", "references");
 const ALLOWED_OUTPUT_EXTENSIONS = new Set([".png", ".json", ".gif", ".tmj", ".ase"]);
 
 function run(command, args, options = {}) {
@@ -48,6 +49,31 @@ async function ensurePinnedPxl() {
   await fs.copyFile(path.join(TOOL_DIR, "LICENSE"), LICENSE_DEST);
   return cli;
 }
+async function ensurePxlReferences() {
+  await fs.mkdir(REFERENCE_DIR, { recursive: true });
+  const sources = [
+    ["public/world/Untitled77_20261029054536.png", "world-map-source.png"],
+    ["assets/maps/academy/full-map/1_academy.jpg", "academy-exterior-source.png"],
+    ["public/game/scenery/tianhai-yunzhou/ty-05-academy-environment.png", "local-default-source.png"],
+  ];
+  for (const [relativeInput, outputName] of sources) {
+    const input = path.join(ROOT, relativeInput);
+    const output = path.join(REFERENCE_DIR, outputName);
+    await fs.access(input);
+    run("ffmpeg", [
+      "-hide_banner", "-loglevel", "error", "-y",
+      "-f", "mjpeg", "-i", input, "-frames:v", "1", "-update", "1",
+      "-pix_fmt", "rgba", output,
+    ]);
+    const png = await fs.readFile(output);
+    const signature = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
+    if (png.length < 24 || !png.subarray(0, 8).equals(signature)) {
+      throw new Error("Reference conversion did not produce a valid PNG: " + relativeInput);
+    }
+    console.log("Prepared PXL reference: " + outputName + " (" + png.readUInt32BE(16) + "×" + png.readUInt32BE(20) + ")");
+  }
+}
+
 function safeRelative(value, label) {
   if (typeof value !== "string" || !value || path.isAbsolute(value) || value.split(/[\\/]/).includes("..")) {
     throw new Error(`Invalid ${label} path: ${String(value)}`);
@@ -85,6 +111,8 @@ async function applyAssetMap() {
   if (manifest.schemaVersion !== 1 || mapping.schemaVersion !== 1 || !mapping.assets || typeof mapping.assets !== "object") {
     throw new Error("Unsupported Augusto PXL manifest or asset-map schema.");
   }
+  const unmapped = Object.keys(manifest.assets).filter((assetId) => !mapping.assets[assetId]);
+  if (unmapped.length) throw new Error("Unmapped manifest assets (" + unmapped.length + "): " + unmapped.join(", "));
   for (const asset of Object.values(manifest.assets)) {
     delete asset.src;
     delete asset.frameWidth;
@@ -103,6 +131,19 @@ async function applyAssetMap() {
     const extension = path.extname(source).toLowerCase();
     if (!ALLOWED_OUTPUT_EXTENSIONS.has(extension)) throw new Error(`Unsupported exported asset extension: ${source}`);
     if (entry.type !== "image" && entry.type !== "sprite-sheet") throw new Error(`Asset ${assetId} must be image or sprite-sheet.`);
+    const image = await fs.readFile(absolute);
+    const pngSignature = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
+    if (image.length < 24 || !image.subarray(0, 8).equals(pngSignature)) {
+      throw new Error(`Asset ${assetId} is not a valid PNG: ${source}`);
+    }
+    const width = image.readUInt32BE(16);
+    const height = image.readUInt32BE(20);
+    if (entry.expectedWidth !== undefined && width !== entry.expectedWidth) {
+      throw new Error(`Asset ${assetId} width mismatch: expected ${entry.expectedWidth}, got ${width}`);
+    }
+    if (entry.expectedHeight !== undefined && height !== entry.expectedHeight) {
+      throw new Error(`Asset ${assetId} height mismatch: expected ${entry.expectedHeight}, got ${height}`);
+    }
     const result = {
       status: "ready",
       type: entry.type,
@@ -114,6 +155,24 @@ async function applyAssetMap() {
       }
       result.frameWidth = entry.frameWidth;
       result.frameHeight = entry.frameHeight;
+      if (width % entry.frameWidth !== 0 || height % entry.frameHeight !== 0 || width / entry.frameWidth !== entry.columns) {
+        throw new Error(`Sprite sheet ${assetId} layout mismatch: ${width}×${height}, frame ${entry.frameWidth}×${entry.frameHeight}, columns ${entry.columns}`);
+      }
+      const frameCount = (width / entry.frameWidth) * (height / entry.frameHeight);
+      const validateFrames = (label, animation) => {
+        if (!animation || !Array.isArray(animation.frames) || animation.frames.length === 0) {
+          throw new Error(`Sprite sheet ${assetId} has an empty animation: ${label}`);
+        }
+        for (const frame of animation.frames) {
+          if (!Number.isInteger(frame) || frame < 0 || frame >= frameCount) {
+            throw new Error(`Sprite sheet ${assetId} animation ${label} references invalid frame ${frame} (count ${frameCount})`);
+          }
+        }
+      };
+      for (const [name, animation] of Object.entries(entry.animations ?? {})) validateFrames(name, animation);
+      for (const [direction, motions] of Object.entries(entry.directions ?? {})) {
+        for (const [motion, animation] of Object.entries(motions)) validateFrames(direction + "." + motion, animation);
+      }
       result.columns = entry.columns;
       if (entry.animations) result.animations = entry.animations;
       if (entry.directions) result.directions = entry.directions;
@@ -127,6 +186,7 @@ async function applyAssetMap() {
 async function main() {
   checkNodeVersion();
   for (const directory of [SOURCE_DIR, EXPORT_DIR]) await fs.access(directory);
+  await ensurePxlReferences();
   const cli = await ensurePinnedPxl();
   const sources = await walk(SOURCE_DIR);
   if (!sources.length) throw new Error("No .px.js sources were found under pxl/.");

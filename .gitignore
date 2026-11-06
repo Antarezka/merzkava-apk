@@ -31,3 +31,6 @@ android/**/*.keystore
 # PXL authoring tool checkout and generated source-local scratch outputs
 .tools/
 pxl/**/out/
+
+# Generated, normalized PXL reference images (recreated during CI)
+/pxl/maps/references/
