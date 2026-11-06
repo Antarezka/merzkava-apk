@@ -56,3 +56,54 @@ Future isometric maps must declare their own image dimensions, grid dimensions, 
 ## Known source edge cases retained without alteration
 
 Five custom diamonds in the current owner reference cross the Map Base boundary: `10,30`, `11,31`, `12,31`, `7,27`, and `8,28`. The generator records these in `coverage.edgeClippedCustomCells` and clips only the preview guide at the image edge. Their cell coordinates, transitions, walkability and grid offsets are intentionally left untouched until visual review against the original map.
+
+
+## Change record — Build #1388 continuation
+
+### Baseline
+
+This work continues from Android **Build #1388**, whose source commit was `ca214968`. The Android build compiled, signed, passed package/signature verification and uploaded an APK, but its emulator smoke test exited during launch. That result did not establish whether the APK would fail on the target phone.
+
+The feature branch already contained later source changes when this work began. The code baseline inspected for this implementation was `8069b944`; the first full quadrant/runtime implementation was committed at `99d9629`. The transition confirmation and label-arrival work was added at `70bfe571`. These are source commits, not Android APK build numbers.
+
+### Added and changed
+
+1. **Full-map coordinate reference:** generated a transparent authoring guide and JSON from the Academy owner map reference. It covers 480 base diamonds plus 105 existing custom diamonds, each divided into eight sectors: 585 cells / 4,680 sectors in total. Existing O/X/opacity assignments and the separate walkability whitelist are retained.
+2. **PXL authoring calibration:** the Academy PXL preview now has a quadrant guide as a reference-only layer. Scene landmarks pass through the calibrated fractional isometric cell projection. The guide is not baked into the exported 2816 × 1536 runtime map.
+3. **Lighter Academy runtime:** removed the need to mount hundreds of per-cell SVG polygons while playing. A single transparent Map Base hit plane converts taps into the same cell/quadrant coordinates. The existing map editor reconstructs the complete editable grid and the three marker layers only while editor mode is open.
+4. **Area-label behaviour:** entering a labelled gate cell now opens a confirmation panel. YES travels to Golden Dragon Empire; NO returns the Player to the previous position. Dialogue and event labels also trigger when the Player reaches their marked cells. Manually tapping a gate marker opens the same confirmation rather than skipping it.
+5. **Editor safety:** editor-only map geometry is cleared when editor mode closes or developer mode is shut down. The transparent runtime hit target does not double-handle clicks.
+
+### Removed or replaced
+
+- Replaced the Academy runtime's per-cell polygon hit layer with one transparent image-space hit plane. The editable polygons remain available in map-editor mode.
+- Replaced the prior PXL screen-only anchor projection with a projection that first converts the approved preview anchors through the Academy's fractional isometric grid.
+- Replaced immediate gate-marker navigation with an explicit YES/NO confirmation, and added arrival-triggered label behaviour.
+
+### Source files changed
+
+- `src/offline-game/world-map-hierarchy.ts`
+- `src/offline-game/world-map-hierarchy.css`
+- `pxl/environments/academy-campus.px.js`
+- `scripts/pxl-build/build-assets.mjs`
+- `scripts/pxl-build/build-academy-quadrant-guide.mjs`
+- `pxl/briefs/ACADEMY_HD2D_BRIEF.md`
+- `tests/offline-game/tianhai-academy-map-reference.test.ts`
+- `docs/offline-game/ISOMETRIC_MAP_EDITOR.md`
+- `docs/offline-game/ACADEMY_PXL_QUADRANT_MAPPING.md`
+
+### Verified versus not yet claimed
+
+- Augusto PXL run **#63** at commit `9e24cd2`: PXL export, TypeScript/production bundle validation and regression suite succeeded; 40 test files and 304 tests passed.
+- Augusto PXL run **#64** at commit `566d584`: succeeded after the PXL anchors were routed through the calibrated grid projection.
+- The PXL export inspected from the earlier successful package contained a 2816 × 1536 Academy scene with no baked-in grid overlay.
+- A passing PXL pipeline verifies export and tests; it does not by itself prove the Android APK has passed device/emulator launch testing.
+- The latest gate-transition source revision is `70bfe571`. Its matching APK build and emulator result must be taken from the Android workflow/build record, not inferred from the workflow run number.
+- The five custom cells crossing the Map Base boundary remain an explicit visual-review item; their coordinates were not shifted.
+
+### Commit sequence
+
+- `99d9629` — full quadrant map generation, PXL reference guide, single hit plane and editor-only grid.
+- `9e24cd2` — prevent duplicate hit handling and clear editor-only geometry on shutdown.
+- `566d584` — route PXL Academy landmarks through the calibrated fractional grid.
+- `70bfe57` — arrival-triggered gate, dialogue and event label behaviour.

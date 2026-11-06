@@ -35,7 +35,7 @@ See [PROJECT_DIRECTIVES.md](./PROJECT_DIRECTIVES.md) for the working contract, [
 - **Convo / AI GM:** `src/convo/` — connected canon, character, auth, and GM runtime.
 - **World Archive:** [content manifest](./docs/world-archive/CONTENT_MANIFEST.md) and [coverage matrix](./docs/world-archive/COVERAGE_MATRIX.md).
 - **Merzkava: Eternal Path:** [content provenance contract](./docs/offline-game/CONTENT_PROVENANCE.md), [canonical formula snapshot](./docs/offline-game/CANON_FORMULA_SNAPSHOT.md), and [isometric field-system handoff](./docs/offline-game/ISOMETRIC_FIELD_SYSTEM.md); implementation lives in `src/offline-game/`.
-- **AI continuation:** [2026-11-06 Build 1348 isometric runtime handoff](./docs/AI_HANDOFF_2026-11-06_ISOMETRIC_RUNTIME.md) is the current map/movement continuation point; [developer access / World Atlas / Back navigation](./docs/APP_ACCESS_AND_NAVIGATION.md) remains authoritative for access/navigation. The [2026-11-05 handoff](./docs/AI_HANDOFF_2026-11-05.md) is historical.
+- **AI continuation:** [Tianhai Academy PXL quadrant mapping and Build #1388 continuation](./docs/offline-game/ACADEMY_PXL_QUADRANT_MAPPING.md) records the complete map-cell standard, PXL authoring guide, runtime/editor split, transition labels and verification status. The [2026-11-06 Build 1348 isometric runtime handoff](./docs/AI_HANDOFF_2026-11-06_ISOMETRIC_RUNTIME.md) remains the broader movement/editor reference; [developer access / World Atlas / Back navigation](./docs/APP_ACCESS_AND_NAVIGATION.md) remains authoritative for access/navigation.
 - **Shared infrastructure:** `src/shared/`; app composition: `src/app/`.
 - **Tests:** grouped by system under `tests/`.
 
