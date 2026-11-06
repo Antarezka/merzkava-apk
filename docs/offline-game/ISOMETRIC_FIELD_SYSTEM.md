@@ -20,7 +20,8 @@ This is the implementation contract for isometric maps, the field-tool editor, a
 | Player registry and canonical profiles | **src/convo/canon/canon-loader.ts**, consumed by **src/main.ts** |
 | Eternal Path local saves, clock and world state | **src/offline-game/expedition-game.ts** |
 | Standalone combat formulas | **src/offline-game/mechanics/combat.ts** |
-| Anime.js for Eternal Path scenes | **src/offline-game/expedition-animations.ts** and **docs/offline-game/ANIMATION_SYSTEM.md** |
+| Anime.js for Eternal Path cinematic scenes | **src/offline-game/expedition-animations.ts** and **docs/offline-game/ANIMATION_SYSTEM.md** |
+| PixiJS World Atlas visual renderer | **src/offline-game/pixi-world-atlas-renderer.ts**; separate second floating entry only, with DOM gameplay/input retained |
 
 Do not make an Academy-only grid implementation. The editor/runtime contract is shared by each isometric board and every exterior/interior map must retain its own stable map ID.
 
@@ -172,21 +173,23 @@ Do not implement chase, automatic battle, ambush, stealth detection, hiding, esc
 
 When the owner supplies the approved system, integrate the scanner as a detector feeding a separate deterministic encounter resolver. Read the verified official combat/HP/injury/time/Satiety/travel-ambush sources at one consistent Universe commit. Preserve unknown stats as unknown and add deterministic tests before persisting combat results.
 
-## 8. Anime.js ownership and cleanup
+## 8. Animation, DOM and Pixi renderer ownership
 
-Anime.js ^4.5.0 is already installed. Isometric code imports animate (and shared helpers where required) directly in world-map-hierarchy.ts. Eternal Path scene FX and transitions are owned by src/offline-game/expedition-animations.ts, which mounts a scoped Anime.js lifecycle and reverts it before Eternal Path DOM replacement.
+Anime.js ^4.5.0 remains installed for the Eternal Path cinematic Scene Window and scoped page transitions. The original World Atlas / Coastal Receiver continues on the DOM/SVG renderer. The second Pixi CRT-console entry uses `src/offline-game/pixi-world-atlas-renderer.ts` for visual presentation only.
 
 Rules:
 
 - Animation is presentation, never the authority for game state.
 - Do not use animation frames/duration to decide cell movement, hit resolution, contact, damage or time.
-- Keep isometric timers per board, not global across hidden maps.
-- Clean up intervals, animations and listeners when board is hidden/detached or editor/chat pauses live play.
-- Respect prefers-reduced-motion; keep a static visual fallback.
+- Keep isometric timers per board, not global across hidden maps; stop Pixi frame work and pulse timers when the modal, login gate, chat, editor or app is inactive.
+- Clean up intervals, animations, listeners, canvas and textures when a board is hidden/detached or the user changes Atlas mode.
+- Pixi stage/display objects remain non-interactive; remove PixiJS EventSystem and AccessibilitySystem before renderer initialization.
+- Every real tap, map gesture, editor action, NPC interaction and DOM button must continue through existing DOM handlers and deterministic gameplay APIs.
+- Keep the existing DOM/SVG fallback visible while Pixi is paused or fails to initialize.
+- Respect prefers-reduced-motion; keep static visuals when motion is disabled.
 - Prefer opacity/transform and avoid heavy layout animation on low-end Android.
-- Do not use PixiJS for this project.
 
-Read docs/offline-game/ANIMATION_SYSTEM.md for the existing Eternal Path scene animation and lifecycle contract.
+Read docs/offline-game/ANIMATION_SYSTEM.md for the cinematic Scene Window, and docs/offline-game/PIXIJ_GAME_MODE_RENDERER_EVALUATION.md for the separate World Atlas renderer.
 
 ## 9. Required follow-up / device QA
 
