@@ -2570,9 +2570,10 @@ function startNpcWander(dialog:HTMLElement):void {
     npcs.forEach(npc=>{
       if(Math.random()>.48)return;
       const x=Number(npc.dataset.x||0),y=Number(npc.dataset.y||0);
-      const options:[number,number][]=[
+      const candidates:[number,number][]=[
         [x+1,y],[x-1,y],[x,y+1],[x,y-1]
-      ].filter(([nx,ny])=>{
+      ];
+      const options=candidates.filter(([nx,ny])=>{
         const key=isoCellKey(nx,ny),tile=tilesByCell.get(key);
         return isoGridCellExists(mapData,nx,ny)&&
           !!tile&&isoCanStep(mapData,x,y,nx,ny)&&
