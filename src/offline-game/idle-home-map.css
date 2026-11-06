@@ -485,12 +485,15 @@
 }
 .world-atlas-login-layer[hidden]{display:none!important}
 .world-atlas-login-card{
-  position:relative!important;width:min(100%,370px)!important;max-height:calc(100dvh - 36px)!important;overflow:auto!important;
-  padding:24px 20px 18px!important;border:1px solid #d6b97b!important;border-radius:13px!important;
+  position:relative!important;display:flex!important;flex-direction:column!important;
+  width:min(100%,370px)!important;max-height:min(84dvh,620px)!important;min-height:0!important;
+  overflow:hidden!important;padding:24px 20px 15px!important;border:1px solid #d6b97b!important;border-radius:13px!important;
   background:linear-gradient(145deg,#263a30f7,#111a14fa 78%)!important;color:#f2e5c6!important;
   box-shadow:0 20px 54px #000d,inset 0 1px #fff2,0 0 0 4px #cfad6e1c!important;
-  overscroll-behavior:contain!important;
+  touch-action:pan-y!important;
 }
+.world-atlas-login-scroll{flex:1 1 auto!important;min-height:0!important;padding:0 3px 5px 0!important;}
+.world-atlas-login-foot{flex:0 0 auto!important;margin-top:10px!important;padding-top:9px!important;border-top:1px solid #bba06c55!important;}
 .world-atlas-login-close{
   position:absolute!important;top:8px!important;right:9px!important;width:34px!important;height:34px!important;min-height:34px!important;
   display:grid!important;place-items:center!important;border:1px solid #bba06c!important;border-radius:50%!important;
@@ -696,4 +699,35 @@ html.soft-keyboard-open .idle-home-footer { padding-top:6px !important; }
 .atlas-buffer-console [data-atlas-buffer-log]{
   transition:opacity .12s ease,transform .12s ease;
   will-change:opacity,transform;
+}
+
+
+/* Shared touch-safe scrolling for every long modal, drawer and panel.
+   Keep a bounded outer frame; scroll only the content surface inside it. */
+.mk-panel-scroll,
+.developer-login-card,
+.bug-report-panel,
+.noticeboard-feed,
+.expedition-choice-sheet,
+.expedition-manager-content,
+.wmh-overlay-tools,
+.wmh-chat-card,
+.wmh-transition-dialog-card,
+.wmh-transition-notice-card,
+.wmh-academy-canvas-editor [data-wmh-academy-editor-panel]{
+  min-height:0!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  overscroll-behavior-y:contain!important;
+  -webkit-overflow-scrolling:touch!important;
+  touch-action:pan-y!important;
+  scrollbar-width:thin;
+}
+.wmh-transition-dialog-card,
+.wmh-transition-notice-card{
+  max-height:min(72dvh,560px)!important;
+}
+@media(max-height:520px){
+  .world-atlas-login-card{max-height:calc(100dvh - 24px)!important;padding-top:16px!important;padding-bottom:10px!important}
+  .world-atlas-login-foot{margin-top:7px!important;padding-top:6px!important}
 }
