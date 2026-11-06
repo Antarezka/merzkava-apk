@@ -14,6 +14,7 @@ import { renderIsometricSvgSceneMarkup, refreshIsometricSvgScene, type Isometric
 import { findIsoQuadrantPath, isIsoQuadrantWalkable, isNpcInteractionCellReachable, isoQuadrantCenterGridPosition, isoSubcellPositionAtPoint, nearestWalkableIsoQuadrant } from "./isometric-interaction";
 import { renderPlayerHudMarkup, refreshPlayerHud, handlePlayerHudClick, mountPlayerHudMotion, disposePlayerHudMotion, bindPlayerHudLayoutEditor, bindScrollableResizableWindows } from "./player-hud";
 import "./player-hud.css";
+import { mountAugustoPxlAssets } from "./augusto-pxl-runtime";
 
 let worldMapDeveloperMode = false;
 export function setWorldMapDeveloperMode(enabled: boolean): void {
@@ -28,6 +29,18 @@ export function setWorldMapDeveloperMode(enabled: boolean): void {
 export function isWorldMapDeveloperMode(): boolean { return worldMapDeveloperMode; }
 
 type Level = "world" | "regional" | "local" | "interior" | "home" | "map-editor" | "test";
+export type WorldMapVisualMode = "legacy" | "augusto-pxl";
+const PXL_WORLD_MAP_PLACEHOLDER="/assets/augusto-pxl/placeholders/world-map-pending.svg";
+const PXL_REGION_MAP_PLACEHOLDER="/assets/augusto-pxl/placeholders/region-map-pending.svg";
+const PXL_ACADEMY_MAP_PLACEHOLDER="/assets/augusto-pxl/placeholders/academy-map-pending.svg";
+const PXL_LOCAL_MAP_PLACEHOLDER="/assets/augusto-pxl/placeholders/local-map-pending.svg";
+function pxlActorMarkup(assetId:string,mode:WorldMapVisualMode):string {
+  return mode==="augusto-pxl"
+    ? '<i class="wmh-pxl-actor-sprite" data-pxl-actor-sprite data-pxl-asset-id="'+escapeMapEditorText(assetId)+'" aria-hidden="true"></i>'
+    : '<i></i>';
+}
+function pxlNpcAssetId(npcId:string):string {return "character.npc."+npcId+".idle";}
+
 type RegionId = "golden-dragon-empire" | "tianhai-yunzhou" | "beiming-gu";
 const regionData: Record<RegionId, { name: string; subtitle: string; image: string; sites: string[] }> = {
   "golden-dragon-empire": {
@@ -643,7 +656,7 @@ function bindIsometricMapArt(dialog: HTMLElement): void {
   });
 }
 
-function isometricNpcTokensMarkup(mapId:string,interior:boolean):string {
+function isometricNpcTokensMarkup(mapId:string,interior:boolean,visualMode:WorldMapVisualMode="legacy"):string {
   const maps:Record<string,Array<{id:string;x:number;y:number;gender:"male"|"female";scanTone?:"friendly"|"hostile"|"spirit-expert"|"unknown"}>>={
     "golden-dragon-empire:tianhai-academy:exterior":[
       {id:"student-lin",x:7,y:4,gender:"female",scanTone:"friendly"},{id:"student-wei",x:10,y:9,gender:"male",scanTone:"friendly"},
@@ -675,7 +688,7 @@ function isometricNpcTokensMarkup(mapId:string,interior:boolean):string {
           ? [{id:"bg-guide",x:4,y:4,gender:"male" as const},{id:"bg-trainee",x:12,y:9,gender:"female" as const},{id:"bg-attendant",x:20,y:5,gender:"male" as const}]
           : [{id:"gde-warden",x:3,y:4,gender:"male" as const},{id:"gde-herbalist",x:12,y:9,gender:"female" as const}];
   return (maps[mapId]||fallback).map(npc =>
-    '<button type="button" class="wmh-character-token wmh-npc-token '+(npc.gender==="female"?"is-female":"is-male")+'" data-wmh-npc="'+npc.id+'" data-scan-tone="'+(npc.scanTone||"unknown")+'" data-token-label="'+(mapId.startsWith("isometric-render-test:")?(npc.id==="test-guide"?"GUIDE":npc.id==="test-scholar"?"SCHOLAR":"ARTIFICER"):"")+'" data-x="'+npc.x+'" data-y="'+npc.y+'" style="--token-x:'+npc.x+';--token-y:'+npc.y+'" aria-label="Talk to '+npc.id+'"><i></i></button>'
+    '<button type="button" class="wmh-character-token wmh-npc-token '+(npc.gender==="female"?"is-female":"is-male")+'" data-wmh-npc="'+npc.id+'" data-scan-tone="'+(npc.scanTone||"unknown")+'" data-token-label="'+(mapId.startsWith("isometric-render-test:")?(npc.id==="test-guide"?"GUIDE":npc.id==="test-scholar"?"SCHOLAR":"ARTIFICER"):"")+'" data-x="'+npc.x+'" data-y="'+npc.y+'" style="--token-x:'+npc.x+';--token-y:'+npc.y+'" aria-label="Talk to '+npc.id+'">'+pxlActorMarkup(pxlNpcAssetId(npc.id),visualMode)+'</button>'
   ).join("");
 }
 
@@ -685,6 +698,7 @@ function tileMapMarkup(
   mapImage = "",
   regionId: RegionId = "golden-dragon-empire",
   selectedBuilding = "Tianhai Academy",
+  visualMode:WorldMapVisualMode="legacy",
 ): string {
   // The live Atlas test yard remains mounted by its untouched SVG interceptor.
   // Retain this dormant fallback only for the legacy test route.
@@ -708,13 +722,13 @@ function tileMapMarkup(
         '" data-wmh-tile data-x="'+x+'" data-y="'+y+'" data-z="0" data-tile-id="tile-'+x+'-'+y+
         '" data-surface="'+surface+'" style="--tile-x:'+x+';--tile-y:'+y+'" aria-label="Test tile '+x+', '+y+'"></button>';
     }).join("")).join("");
-    const npcTokens=isometricNpcTokensMarkup(mapId,interior);
+    const npcTokens=isometricNpcTokensMarkup(mapId,interior,visualMode);
     return '<div class="wmh-isometric-wrap" data-wmh-iso-viewport><div class="wmh-isometric-camera" data-wmh-iso-camera><div class="wmh-isometric-board is-exterior is-render-test is-placeholder" data-wmh-board style="--tile-cols:'+cols+';--tile-rows:'+rows+
       ';--iso-center-x:'+(rows*tileW/2)+'px;--iso-board-width:'+projectedWidth+'px;--iso-board-height:'+projectedHeight+'px;--tile-w:'+tileW+'px;--tile-h:'+tileH+
       'px;--iso-half-w:'+(tileW/2)+'px;--iso-half-h:'+(tileH/2)+'px;--iso-offset-y:0px;--slab-depth:7px" data-cols="'+cols+'" data-rows="'+rows+
       '" data-tile-w="'+tileW+'" data-tile-h="'+tileH+'" data-offset-x="0" data-offset-y="0" data-map-id="'+escapeMapEditorText(mapId)+'">'+tiles+
       '<svg class="wmh-area-overlay-svg" data-wmh-overlay-svg viewBox="0 0 '+projectedWidth+' '+projectedHeight+'" preserveAspectRatio="none"><g data-wmh-interaction-grid></g><g data-wmh-overlay-marks></g><g data-wmh-manual-marks></g><g data-wmh-transition-marks></g><path data-wmh-overlay-preview class="wmh-area-mark-preview" d=""></path></svg>'+
-      '<div class="wmh-isometric-actor-layer" data-wmh-actor-layer><button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token data-scan-tone="unknown" data-token-label="YOU" data-x="5" data-y="10" style="--token-x:5;--token-y:10" aria-label="Player character"><i></i></button>'+npcTokens+'<div data-wmh-transition-layer></div></div>'+
+      '<div class="wmh-isometric-actor-layer" data-wmh-actor-layer><button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token data-pxl-actor-id="player" data-scan-tone="unknown" data-token-label="YOU" data-x="5" data-y="10" style="--token-x:5;--token-y:10" aria-label="Player character">'+pxlActorMarkup("character.player.idle",visualMode)+'</button>'+npcTokens+'<div data-wmh-transition-layer></div></div>'+
       '</div></div></div>';
   }
 
@@ -734,13 +748,14 @@ function tileMapMarkup(
   const boardHeight=Math.max(projectedHeight,baseHeight);
   const theme:IsometricSvgTheme=interior?"interior":regionId;
   const title=selectedBuilding+(interior?" · INTERIOR":"");
+  const pxlMapAssetId=mapId==="golden-dragon-empire:tianhai-academy:exterior"?"map.academy.exterior":"map.area."+mapId.replace(/[^a-z0-9]+/gi,".").toLowerCase();
   const imageMarkup=mapImage
-    ? '<img class="wmh-isometric-map-base" data-wmh-map-art src="'+mapImage+'" alt="Tianhai Academy map base" draggable="false" loading="eager" decoding="async"/><canvas class="wmh-isometric-foreground" data-wmh-foreground-canvas aria-hidden="true"></canvas>'
+    ? '<img class="wmh-isometric-map-base" data-wmh-map-art '+(visualMode==="augusto-pxl"?'data-pxl-asset-id="'+pxlMapAssetId+'" ':'')+'src="'+mapImage+'" alt="'+(visualMode==="augusto-pxl"?"Augusto PXL isometric environment":"Tianhai Academy map base")+'" draggable="false" loading="eager" decoding="async"/><canvas class="wmh-isometric-foreground" data-wmh-foreground-canvas aria-hidden="true"></canvas>'
     : "";
-  const sceneMarkup=renderIsometricSvgSceneMarkup({
+  const sceneMarkup=visualMode==="augusto-pxl"?"":renderIsometricSvgSceneMarkup({
     mapId,grid,theme,title,baseImage:!!mapImage,width:boardWidth,height:boardHeight
   });
-  const npcTokens=isometricNpcTokensMarkup(mapId,interior);
+  const npcTokens=isometricNpcTokensMarkup(mapId,interior,visualMode);
   const boardClass='wmh-isometric-board wmh-svg-ground-map '+(interior?'is-interior':'is-exterior')+
     (mapImage?' has-map-base is-minimap-style':' is-placeholder')+
     '';
@@ -751,10 +766,11 @@ function tileMapMarkup(
     '" data-map-theme="'+theme+'" data-map-title="'+escapeMapEditorText(title)+'" data-map-interior="'+String(interior)+'">'+
     imageMarkup+sceneMarkup+
     '<svg class="wmh-area-overlay-svg" data-wmh-overlay-svg viewBox="0 0 '+boardWidth+' '+boardHeight+'" preserveAspectRatio="none"><g data-wmh-overlay-marks></g><g data-wmh-manual-marks></g><g data-wmh-transition-marks></g><path data-wmh-overlay-preview class="wmh-area-mark-preview" d=""></path></svg>'+
-    '<div class="wmh-isometric-actor-layer" data-wmh-actor-layer><button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token data-scan-tone="unknown" data-token-label="" data-x="5" data-y="'+(interior?8:17)+'" style="--token-x:5;--token-y:'+(interior?8:17)+'" aria-label="Player character"><i></i></button>'+npcTokens+'<div data-wmh-transition-layer></div></div>'+
+    '<div class="wmh-isometric-actor-layer" data-wmh-actor-layer><button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token data-pxl-actor-id="player" data-scan-tone="unknown" data-token-label="" data-x="5" data-y="'+(interior?8:17)+'" style="--token-x:5;--token-y:'+(interior?8:17)+'" aria-label="Player character">'+pxlActorMarkup("character.player.idle",visualMode)+'</button>'+npcTokens+'<div data-wmh-transition-layer></div></div>'+
     '</div></div></div>';
 }
-function isometricMapBaseFor(regionId: RegionId, selectedBuilding: string, interior: boolean): string {
+function isometricMapBaseFor(regionId: RegionId, selectedBuilding: string, interior: boolean,visualMode:WorldMapVisualMode="legacy"): string {
+  if(visualMode==="augusto-pxl")return PXL_LOCAL_MAP_PLACEHOLDER;
   if (interior) return "";
   const place = selectedBuilding.trim().toLowerCase().replace(/\s+/g, " ");
   if (regionId === "golden-dragon-empire" && (place === "tianhai academy" || place === "academy")) return "/maps/academy/full-map/1_academy.jpg";
@@ -2224,7 +2240,7 @@ function isometricEditorMarkup(): string {
     '<label class="wmh-ai-export" data-wmh-overlay-export-wrap hidden>AI-READY MAP DATA · JSON<textarea data-wmh-overlay-export readonly spellcheck="false" placeholder="Use COPY DATA FOR AI to generate the complete map reference..."></textarea><small>Copy this complete JSON and paste it into your next AI update request. It includes the grid, selected walkable cells, all four-sector flags, and transition labels.</small></label><label>IMPORT MAP DATA<textarea data-wmh-overlay-import-text placeholder="Paste a saved isometric-map JSON reference..."></textarea></label><button type="button" data-wmh-overlay-import>IMPORT MAP DATA</button>'+
     '<small data-wmh-overlay-status>Choose a tool, then tap individual diamond cells. The world pauses while the editor is open.</small></section></div></div>';
 }
-function isometricHudMarkup(title: string, mapImage: string, showMinimap = true): string {
+function isometricHudMarkup(title: string, mapImage: string, showMinimap = true,visualMode:WorldMapVisualMode="legacy"): string {
   const minimapMarkup=
     '<button type="button" class="wmh-minimap-toggle" data-wmh-minimap-toggle aria-label="Open draggable field minimap" aria-expanded="false" title="Open minimap"><span aria-hidden="true">⌖</span></button>'+
     '<section class="wmh-minimap-window" data-wmh-minimap data-wmh-scroll-resize hidden role="dialog" aria-label="Draggable field minimap">'+
@@ -2234,7 +2250,7 @@ function isometricHudMarkup(title: string, mapImage: string, showMinimap = true)
         '<svg class="wmh-minimap-grid" data-wmh-minimap-grid viewBox="0 0 2816 1536" preserveAspectRatio="none" aria-hidden="true"></svg><span class="wmh-minimap-actors" data-wmh-minimap-actors></span>'+
       '</div><small class="wmh-minimap-footer" data-wmh-minimap-footer>YOU · X 05 / Y 17 · TAP TO MOVE</small>'+
     '</section>';
-  return '<div class="wmh-isometric-hud" data-wmh-isometric-hud>'+
+  return '<div class="wmh-isometric-hud" data-wmh-isometric-hud data-visual-mode="'+visualMode+'">'+
     '<section class="wmh-top-info" data-wmh-hud-layout="world-status" aria-label="World conditions">'+
       '<span class="wmh-top-weather"><i data-wmh-weather-icon>☀</i><b data-wmh-weather-label>CERAH</b></span>'+
       '<span class="wmh-top-location" data-wmh-status-location>'+escapeMapEditorText(title)+'</span>'+
@@ -2242,7 +2258,7 @@ function isometricHudMarkup(title: string, mapImage: string, showMinimap = true)
       '<span class="wmh-top-coordinates" data-wmh-player-grid>(X: -- · Y: --)</span>'+
       (showMinimap?minimapMarkup:"")+
     '</section>'+
-    renderPlayerHudMarkup()+
+    renderPlayerHudMarkup(visualMode)+
   '</div>';
 }
 function academyCanvasEditorMarkup(): string {
@@ -2303,31 +2319,31 @@ function bindAcademyCanvasEditor(dialog:HTMLElement):void {
     catch{output?.focus();output?.select();if(status)status.textContent="Clipboard unavailable. Select and copy the JSON shown above.";}
   });
 }
-function isometricPlayMarkup(regionId: RegionId, selectedBuilding: string, interior: boolean): string {
+function isometricPlayMarkup(regionId: RegionId, selectedBuilding: string, interior: boolean,visualMode:WorldMapVisualMode="legacy"): string {
   const isEmptyAcademy = !interior && regionId === "golden-dragon-empire" &&
     selectedBuilding.trim().toLowerCase() === "tianhai academy";
   if (isEmptyAcademy) {
-    const academyMapImage="/maps/academy/full-map/1_academy.jpg";
+    const academyMapImage=visualMode==="augusto-pxl"?PXL_ACADEMY_MAP_PLACEHOLDER:"/maps/academy/full-map/1_academy.jpg";
     const academyMapId="golden-dragon-empire:tianhai-academy:exterior";
     return '<div class="wmh-isometric-play-screen wmh-academy-map-screen" data-wmh-isometric-play-screen>'+
       ''+
       '<div class="wmh-academy-map-viewport" data-wmh-map-viewport><div class="wmh-academy-map-surface" data-wmh-map-surface data-wmh-academy-canvas data-wmh-board data-academy-artwork-board="true" data-map-id="'+academyMapId+'" data-cols="24" data-rows="20" data-tile-w="128" data-tile-h="69.5" data-offset-x="0" data-offset-y="0" data-map-theme="golden-dragon-empire" data-map-title="Tianhai Academy" data-map-interior="false">'+
       '<svg class="wmh-academy-margin-grid" data-wmh-academy-margin-grid preserveAspectRatio="none" aria-hidden="true"></svg>'+
-      '<img class="wmh-academy-map-art" data-wmh-academy-map-art data-wmh-map-art src="'+academyMapImage+'" alt="Tianhai Academy full map" draggable="false" loading="eager" decoding="async"/>'+
+      '<img class="wmh-academy-map-art" data-wmh-academy-map-art data-wmh-map-art '+(visualMode==="augusto-pxl"?'data-pxl-asset-id="map.academy.exterior" ':'')+'src="'+academyMapImage+'" alt="Tianhai Academy full map" draggable="false" loading="eager" decoding="async"/>'+
       '<canvas class="wmh-isometric-foreground" data-wmh-foreground-canvas aria-hidden="true"></canvas>'+
       '<svg class="wmh-area-overlay-svg wmh-academy-grid-overlay" data-wmh-overlay-svg viewBox="0 0 2816 1536" preserveAspectRatio="none" aria-label="Editable isometric interaction grid"><g data-wmh-interaction-grid></g><g data-wmh-overlay-marks></g><g data-wmh-manual-marks></g><g data-wmh-transition-marks></g><path data-wmh-overlay-preview class="wmh-area-mark-preview" d=""></path></svg>'+
-      '<div class="wmh-academy-actor-layer" data-wmh-actor-layer><button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token data-scan-tone="unknown" data-token-label="" data-x="12" data-y="31" aria-label="Player character"><i></i></button>'+isometricNpcTokensMarkup(academyMapId,false)+'<div data-wmh-transition-layer></div></div>'+
-      '</div></div>'+isometricHudMarkup("Tianhai Academy",academyMapImage,true)+academyCanvasEditorMarkup()+isometricEditorMarkup()+
+      '<div class="wmh-academy-actor-layer" data-wmh-actor-layer><button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token data-pxl-actor-id="player" data-scan-tone="unknown" data-token-label="" data-x="12" data-y="31" aria-label="Player character">'+pxlActorMarkup("character.player.idle",visualMode)+'</button>'+isometricNpcTokensMarkup(academyMapId,false,visualMode)+'<div data-wmh-transition-layer></div></div>'+
+      '</div></div>'+isometricHudMarkup("Tianhai Academy",academyMapImage,true,visualMode)+academyCanvasEditorMarkup()+isometricEditorMarkup()+
       '<button type="button" class="wmh-map-back wmh-academy-map-back" data-wmh-action="back" aria-label="Return to Golden Dragon Empire map"><i class="wmh-academy-back-icon" aria-hidden="true"></i><b>GOLDEN DRAGON EMPIRE</b></button>'+
       '<section class="wmh-chat-panel" data-wmh-chat hidden role="dialog" aria-label="Character conversation"><div class="wmh-chat-card" data-wmh-scroll-resize><button type="button" class="wmh-chat-close" data-wmh-action="chat-close" aria-label="Close conversation">×</button><div class="wmh-chat-thread" data-wmh-thread></div><div class="wmh-chat-input-row"><span>YOUR RESPONSE</span><div data-wmh-replies></div></div></div></section><section class="wmh-transition-dialog" data-wmh-transition-dialog hidden role="dialog" aria-label="World dialogue"><div class="wmh-transition-dialog-card" data-wmh-scroll-resize><small data-wmh-transition-speaker>WORLD ARCHIVE</small><p data-wmh-transition-dialog-text></p><button type="button" data-wmh-transition-close>CONTINUE</button></div></section><section class="wmh-transition-notice" data-wmh-transition-notice hidden role="dialog" aria-label="World event notification"><div class="wmh-transition-notice-card" data-wmh-scroll-resize><small>WORLD EVENT · ARCHIVE NOTICE</small><h3 data-wmh-transition-notice-title></h3><p data-wmh-transition-notice-text></p><button type="button" data-wmh-transition-close>CONTINUE</button></div></section>'+
       '</div>';
   }
   const mapId=makeIsometricMapId(regionId,selectedBuilding,interior);
-  const mapImage=isometricMapBaseFor(regionId,selectedBuilding,interior);
+  const mapImage=isometricMapBaseFor(regionId,selectedBuilding,interior,visualMode);
   const title=selectedBuilding+(interior?" · INTERIOR":"");
   return '<div class="wmh-isometric-play-screen" data-wmh-isometric-play-screen>'+
-    tileMapMarkup(interior,mapId,mapImage,regionId,selectedBuilding)+
-    isometricHudMarkup(title,mapImage,shouldShowIsometricMinimap(makeIsometricMapId(regionId,selectedBuilding,interior),title))+
+    tileMapMarkup(interior,mapId,mapImage,regionId,selectedBuilding,visualMode)+
+    isometricHudMarkup(title,mapImage,shouldShowIsometricMinimap(makeIsometricMapId(regionId,selectedBuilding,interior),title),visualMode)+
     isometricEditorMarkup()+
     '<button type="button" class="wmh-map-back" data-wmh-action="back" aria-label="Leave isometric area"><span>‹</span><b>BACK</b></button>'+
     '<section class="wmh-chat-panel" data-wmh-chat hidden role="dialog" aria-label="Character conversation"><div class="wmh-chat-card"><button type="button" class="wmh-chat-close" data-wmh-action="chat-close" aria-label="Close conversation">×</button><div class="wmh-chat-thread" data-wmh-thread></div><div class="wmh-chat-input-row"><span>YOUR RESPONSE</span><div data-wmh-replies></div></div></div></section><section class="wmh-transition-dialog" data-wmh-transition-dialog hidden role="dialog" aria-label="World dialogue"><div class="wmh-transition-dialog-card"><small data-wmh-transition-speaker>WORLD ARCHIVE</small><p data-wmh-transition-dialog-text></p><button type="button" data-wmh-transition-close>CONTINUE</button></div></section><section class="wmh-transition-notice" data-wmh-transition-notice hidden role="dialog" aria-label="World event notification"><div class="wmh-transition-notice-card"><small>WORLD EVENT · ARCHIVE NOTICE</small><h3 data-wmh-transition-notice-title></h3><p data-wmh-transition-notice-text></p><button type="button" data-wmh-transition-close>CONTINUE</button></div></section>'+
@@ -2343,27 +2359,27 @@ export function renderIsometricMapTestArea(): string {
     '<section class="wmh-chat-panel" data-wmh-chat hidden role="dialog" aria-label="Character conversation"><div class="wmh-chat-card"><button type="button" class="wmh-chat-close" data-wmh-action="chat-close" aria-label="Close conversation">×</button><div class="wmh-chat-thread" data-wmh-thread></div><div class="wmh-chat-input-row"><span>YOUR RESPONSE</span><div data-wmh-replies></div></div></div></section><section class="wmh-transition-dialog" data-wmh-transition-dialog hidden role="dialog" aria-label="World dialogue"><div class="wmh-transition-dialog-card"><small data-wmh-transition-speaker>WORLD ARCHIVE</small><p data-wmh-transition-dialog-text></p><button type="button" data-wmh-transition-close>CONTINUE</button></div></section><section class="wmh-transition-notice" data-wmh-transition-notice hidden role="dialog" aria-label="World event notification"><div class="wmh-transition-notice-card"><small>WORLD EVENT · ARCHIVE NOTICE</small><h3 data-wmh-transition-notice-title></h3><p data-wmh-transition-notice-text></p><button type="button" data-wmh-transition-close>CONTINUE</button></div></section></div>';
 }
 
-function panelMarkup(level: Level, regionId: RegionId = "golden-dragon-empire", selectedBuilding = "Tianhai Academy", selectedArea?: WorldMarker): string {
+function panelMarkup(level: Level, regionId: RegionId = "golden-dragon-empire", selectedBuilding = "Tianhai Academy", selectedArea?: WorldMarker,visualMode:WorldMapVisualMode="legacy"): string {
   const region = regionData[regionId];
   const header = (kind: string, title: string, subtitle: string) =>
     '<header class="wmh-level-header"><div><span class="wmh-level-tag">'+kind+'</span><h3>'+title+'</h3><p>'+subtitle+'</p></div><button type="button" class="wmh-close" data-wmh-action="close" aria-label="Close map">×</button></header>';
   if (level === "world") return header("WORLD MAP","Merzkava Universe","THREE GREAT POWERS · EXTERNAL TERRITORIES · SEAS")+
     '<div class="wmh-map-zoom"><button type="button" data-wmh-zoom="out">−</button><span data-wmh-zoom-level>100%</span><button type="button" data-wmh-zoom="in">+</button><button type="button" data-wmh-zoom="reset">RESET</button></div>'+
-    '<div class="wmh-world-map" data-wmh-map-viewport><div class="wmh-world-map-image" data-wmh-map-surface><img src="/world/Untitled77_20261029054536.png" alt="Merzkava Universe world map"/>'+readWorldMarkers().map(marker=>worldMapMarkerMarkup(marker)).join("")+'</div><div data-wmh-selection-host></div></div>'+
+    '<div class="wmh-world-map" data-wmh-map-viewport><div class="wmh-world-map-image" data-wmh-map-surface><img '+(visualMode==="augusto-pxl"?'data-pxl-asset-id="map.world.overview" ':'')+'src="'+(visualMode==="augusto-pxl"?PXL_WORLD_MAP_PLACEHOLDER:"/world/Untitled77_20261029054536.png")+'" alt="Merzkava Universe world map"/>'+readWorldMarkers().map(marker=>worldMapMarkerMarkup(marker)).join("")+'</div><div data-wmh-selection-host></div></div>'+
     '<div class="wmh-bottom-actions"><span>SELECT A POWER TO OPEN ITS REGIONAL MAP</span>'+(worldMapDeveloperMode?'<button type="button" data-wmh-action="test-isometric">▦ ISOMETRIC TEST AREA</button><button data-wmh-action="editor-open">⊞ MAP EDITOR</button>':"")+'</div>';
   if (level === "map-editor") return worldMapDeveloperMode ? header("WORLD MAP TOOLS","Map Editor","FLAT WORLD MAP · NORMALIZED COORDINATES")+mapEditorMarkup() : header("WORLD MAP","Merzkava Universe","THREE GREAT POWERS · EXTERNAL TERRITORIES · SEAS")+'<div class="wmh-bottom-actions"><span>SELECT A POWER TO OPEN ITS REGIONAL MAP</span></div>';
   if (level === "test") return renderIsometricMapTestArea();
   if (level === "regional") return header("REGIONAL MAP",selectedArea?.name||region.name,selectedArea?.subtitle||region.subtitle)+
-    '<div class="wmh-regional-placeholder"><div class="wmh-regional-land"><span class="wmh-regional-river"></span><span class="wmh-regional-road road-one"></span><span class="wmh-regional-road road-two"></span><span class="wmh-regional-road road-three"></span><span class="wmh-regional-label">'+(selectedArea?selectedArea.name.toUpperCase():"REGIONAL MAP ART · PLACEHOLDER")+'</span>'+
+    '<div class="wmh-regional-placeholder"><div class="wmh-regional-land">'+(visualMode==="augusto-pxl"?'<img class="wmh-pxl-regional-base" data-pxl-asset-id="map.region.'+regionId+'" src="'+PXL_REGION_MAP_PLACEHOLDER+'" alt="Augusto PXL regional environment"/>':'<span class="wmh-regional-river"></span><span class="wmh-regional-road road-one"></span><span class="wmh-regional-road road-two"></span><span class="wmh-regional-road road-three"></span>')+'<span class="wmh-regional-label">'+(selectedArea?selectedArea.name.toUpperCase():(visualMode==="augusto-pxl"?"PXL REGIONAL ART SLOT":"REGIONAL MAP ART · PLACEHOLDER"))+'</span>'+
     (selectedArea?["Central District","Local Settlement","Market Quarter","Public Grounds","Transport Gate","Nearby Landmark"]:region.sites).map((site,i)=>'<button type="button" class="wmh-regional-site site-'+i+'" data-wmh-site="'+site+'" data-wmh-region-id="'+regionId+'"><i>'+["♜","⌘","▤","⚓","⌑","⚔"][i%6]+'</i><b>'+site+'</b></button>').join("")+'</div></div>'+
     '<div class="wmh-bottom-actions"><button data-wmh-action="back">← WORLD MAP</button><span>SELECT A PLACE · LOCAL MAPS OPEN HERE</span></div>';
-  if (level === "local") return isometricPlayMarkup(regionId, selectedBuilding, false);
-  if (level === "interior") return isometricPlayMarkup(regionId, selectedBuilding, true);
+  if (level === "local") return isometricPlayMarkup(regionId, selectedBuilding, false,visualMode);
+  if (level === "interior") return isometricPlayMarkup(regionId, selectedBuilding, true,visualMode);
   return header("PERSONAL GROUNDS","Personal Grounds","ISOMETRIC HOME · PLOTS & FACILITIES")+
     '<div class="wmh-home-grid">'+[["Farmland","▧"],["Building Plot","⌂"],["Training Area","⚔"],["Warehouse","▤"],["Fish Pond","◉"],["Lumber Area","♧"]].map(([name,icon])=>'<button data-wmh-plot="'+name+'"><span>'+icon+'</span><b>'+name+'</b><small>VIEW FUNCTION</small></button>').join("")+'</div><div class="wmh-bottom-actions"><button data-wmh-action="back">← WORLD MAP</button><span>PERSONAL DEVELOPMENT AREA</span></div>';
 }
-export function renderWorldMapHierarchy(): string {
-  return '<section class="wmh-overlay" data-world-map-hierarchy aria-label="Map Navigation"><div class="wmh-dialog" data-wmh-dialog>'+panelMarkup("world")+'</div></section>';
+export function renderWorldMapHierarchy(visualMode:WorldMapVisualMode="legacy",hidden=false): string {
+  return '<section class="wmh-overlay" data-world-map-hierarchy data-visual-mode="'+visualMode+'" aria-label="Map Navigation" '+(hidden?'hidden':'')+'><div class="wmh-dialog" data-wmh-dialog>'+panelMarkup("world","golden-dragon-empire","Tianhai Academy",undefined,visualMode)+'</div></section>';
 }
 function resetLegacyIsometricMapLayouts(): void {
   // Clear only Tianhai Academy exterior once; other regions keep their saved editor data.
@@ -2393,9 +2409,12 @@ function resetLegacyIsometricMapLayouts(): void {
 
 export function initializeWorldMapHierarchy(root: HTMLElement): void {
   resetLegacyIsometricMapLayouts();
-  const overlay=root.querySelector<HTMLElement>("[data-world-map-hierarchy]");
-  const dialog=overlay?.querySelector<HTMLElement>("[data-wmh-dialog]");
-  if(overlay&&dialog&&!overlay.hidden)bindWorldMapZoom(dialog);
+  root.querySelectorAll<HTMLElement>("[data-world-map-hierarchy]").forEach(overlay=>{
+    const dialog=overlay.querySelector<HTMLElement>("[data-wmh-dialog]");
+    if(!dialog||overlay.hidden)return;
+    if(overlay.dataset.visualMode==="augusto-pxl")mountAugustoPxlAssets(overlay);
+    bindWorldMapZoom(dialog);
+  });
 }
 const npcData: Record<string,{name:string;gender:string;greeting:string;choices:string[];playerLines:string[];replies:string[];scanTone?:"friendly"|"hostile"|"spirit-expert"|"unknown"}> = {
   "student-lin":{name:"Lin Yue",gender:"female",greeting:"The academy garden is peaceful this early. I come here whenever the study halls get too noisy.",choices:["Ask about the academy","Ask about the pond","Wish her a good day"],playerLines:["I've heard the academy has several study halls. How are lessons arranged?","Is there something special about the pond? It sounds peaceful.","Thank you. I hope the rest of your day is just as pleasant."],replies:["The instructors rotate lessons between the eastern and western study halls.","The pond is fed by a spring beneath the old cedar. The fish are surprisingly tame.","You too! May your studies go smoothly."]},
