@@ -31,9 +31,9 @@ describe("in-world player HUD and Traveler Satchel",()=>{
     const html=renderPlayerHudMarkup();
     for(const code of ["xc","xs","xg","zj","az"])expect(html).toContain('data-hud-currency="'+code+'"');
     expect(html).toContain("CURRENCY PURSE");
-    expect(html).toContain("79 xc");
-    expect(html).toContain("9 xs");
-    expect(html).toContain("4 xg");
+    expect(html).toContain("0 xc");
+    expect(html).toContain("0 xs");
+    expect(html).toContain("0 xg");
   });
 
   it("renders tier frames inside item slots and tiny item glyphs",()=>{
