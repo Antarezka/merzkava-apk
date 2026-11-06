@@ -910,9 +910,9 @@ async function refreshAtlasPasswordMode(gate:HTMLElement):Promise<void> {
     if(resetActions)resetActions.hidden=true;
     if(resetPanel)resetPanel.hidden=true;
     loginSubmit.disabled=true;
-    if(message)message.textContent=atlasEligiblePlayers().length
+    if(message)message.textContent=(pxlOffline?atlasOfflinePxlPlayers().length:atlasEligiblePlayers().length)
       ?(gate.dataset.selectLabel||"Select a registered character to continue.")
-      :(gate.dataset.emptyLabel||"");
+      :(pxlOffline?"PXL OFFLINE · No local profile or saved journey is available. Create one inside the app first.":(gate.dataset.emptyLabel||""));
     return;
   }
   try{
@@ -2333,7 +2333,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     const button=signingUp?form.querySelector<HTMLButtonElement>('[data-atlas-submit-mode="signup"]'):form.querySelector<HTMLButtonElement>('[data-atlas-submit-mode="login"]');
     if(!gate)return;
     if(!playerName){if(message)message.textContent=gate.dataset.selectLabel||"Select a registered character to continue.";return;}
-    if(!eligible){if(message)message.textContent="This character is not registered in the verified players.md and local Eternal Path account list.";return;}
+    if(!eligible){if(message)message.textContent=pxlOffline?"This character is not stored locally on this device. PXL Offline accepts local profiles and saved journeys only.":"This character is not registered in the verified players.md and local Eternal Path account list.";return;}
     if(!password){if(message)message.textContent=gate.dataset.passwordRequiredLabel||"Enter a password to continue.";return;}
     if(password.length<8||password.length>128){if(message)message.textContent="Use a password between 8 and 128 characters.";return;}
     const offlineMessage=gate.dataset.offlineLabel||"No internet connection or the official Universe source is unavailable. Check your connection and try again.";
