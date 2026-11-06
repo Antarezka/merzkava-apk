@@ -297,6 +297,7 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
     const level = dialog.querySelector<HTMLElement>("[data-wmh-zoom-level]");
     if (level) level.textContent = "100%";
   };
+  viewport.addEventListener("merzkava:center-isometric-map",centerMap);
   // World-map markers are fixed map anchors: their pointer gestures must never
   // enter the viewport pan/pinch tracker. Keep click bubbling for the preview handler.
   viewport.querySelectorAll<HTMLElement>(".wmh-power:not(.wmh-editor-marker)").forEach(marker => {
@@ -687,7 +688,7 @@ function tileMapMarkup(
       'px;--iso-half-w:'+(tileW/2)+'px;--iso-half-h:'+(tileH/2)+'px;--iso-offset-y:0px;--slab-depth:7px" data-cols="'+cols+'" data-rows="'+rows+
       '" data-tile-w="'+tileW+'" data-tile-h="'+tileH+'" data-offset-x="0" data-offset-y="0" data-map-id="'+escapeMapEditorText(mapId)+'">'+tiles+
       '<svg class="wmh-area-overlay-svg" data-wmh-overlay-svg viewBox="0 0 '+projectedWidth+' '+projectedHeight+'" preserveAspectRatio="none"><g data-wmh-interaction-grid></g><g data-wmh-overlay-marks></g><g data-wmh-manual-marks></g><g data-wmh-transition-marks></g><path data-wmh-overlay-preview class="wmh-area-mark-preview" d=""></path></svg>'+
-      '<button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token data-scan-tone="unknown" data-token-label="YOU" data-x="5" data-y="10" style="--token-x:5;--token-y:10" aria-label="Player character"><i></i></button>'+npcTokens+
+      '<div class="wmh-isometric-actor-layer" data-wmh-actor-layer><button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token data-scan-tone="unknown" data-token-label="YOU" data-x="5" data-y="10" style="--token-x:5;--token-y:10" aria-label="Player character"><i></i></button>'+npcTokens+'<div data-wmh-transition-layer></div></div>'+
       '</div></div></div>';
   }
 
@@ -724,7 +725,7 @@ function tileMapMarkup(
     '" data-map-theme="'+theme+'" data-map-title="'+escapeMapEditorText(title)+'" data-map-interior="'+String(interior)+'">'+
     imageMarkup+sceneMarkup+
     '<svg class="wmh-area-overlay-svg" data-wmh-overlay-svg viewBox="0 0 '+boardWidth+' '+boardHeight+'" preserveAspectRatio="none"><g data-wmh-overlay-marks></g><g data-wmh-manual-marks></g><g data-wmh-transition-marks></g><path data-wmh-overlay-preview class="wmh-area-mark-preview" d=""></path></svg>'+
-    '<button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token data-scan-tone="unknown" data-token-label="" data-x="5" data-y="'+(interior?8:17)+'" style="--token-x:5;--token-y:'+(interior?8:17)+'" aria-label="Player character"><i></i></button>'+npcTokens+
+    '<div class="wmh-isometric-actor-layer" data-wmh-actor-layer><button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token data-scan-tone="unknown" data-token-label="" data-x="5" data-y="'+(interior?8:17)+'" style="--token-x:5;--token-y:'+(interior?8:17)+'" aria-label="Player character"><i></i></button>'+npcTokens+'<div data-wmh-transition-layer></div></div>'+
     '</div></div></div>';
 }
 function isometricMapBaseFor(regionId: RegionId, selectedBuilding: string, interior: boolean): string {
@@ -1392,7 +1393,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       ?"Saved · X "+Math.round(data.cameraCenter.x)+" / Y "+Math.round(data.cameraCenter.y)
       :"No custom camera center saved · map midpoint is used";
   };
-  const persist=()=>{
+  const persist=(restoreCamera=true)=>{
     const cameraViewport=board.closest<HTMLElement>("[data-wmh-map-viewport],[data-wmh-iso-viewport]");
     const cameraAnchor=cameraViewport?{left:cameraViewport.scrollLeft,top:cameraViewport.scrollTop}:null;
     data.grid={...grid};
@@ -1406,7 +1407,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     catch{setStatus("Local storage is unavailable. Use COPY DATA FOR AI to create a portable backup.");}
     redraw();drawIsometricForeground(board,data);syncIsoDepthAndOcclusion(board);renderIsometricTransitions(board);
     // DOM/canvas redraws must not let browser scroll anchoring move the camera.
-    if(cameraViewport&&cameraAnchor)requestAnimationFrame(()=>{
+    if(restoreCamera&&cameraViewport&&cameraAnchor)requestAnimationFrame(()=>{
       cameraViewport.scrollLeft=cameraAnchor.left;
       cameraViewport.scrollTop=cameraAnchor.top;
     });
@@ -1829,7 +1830,10 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     remember();data.cameraCenter={...pendingCameraCenter};pendingCameraCenter=null;centerPickActive=false;
     const pick=panel.querySelector<HTMLButtonElement>("[data-wmh-center-pick]");if(pick){pick.setAttribute("aria-pressed","false");pick.textContent="SELECT CENTER ON MAP";}
     const confirm=panel.querySelector<HTMLButtonElement>("[data-wmh-center-confirm]");if(confirm)confirm.disabled=true;
-    persist();setStatus("✓ Map camera center confirmed and saved. It is now part of COPY DATA FOR AI.");
+    persist(false);
+    board.closest<HTMLElement>("[data-wmh-map-viewport],[data-wmh-iso-viewport]")
+      ?.dispatchEvent(new CustomEvent("merzkava:center-isometric-map"));
+    setStatus("✓ Map camera center confirmed, saved, and applied to the current view. It is now part of COPY DATA FOR AI.");
   });
   panel.querySelector<HTMLElement>("[data-wmh-merge-apply]")?.addEventListener("click",()=>{
     if(selectedMergeCells.size<2){setStatus("Select at least two adjacent blue cells first.");return;}
@@ -2028,6 +2032,7 @@ function bindIsometricCamera(dialog:HTMLElement):void {
     viewport.scrollLeft=padX()+focus.x*zoom-viewport.clientWidth/2;
     viewport.scrollTop=padY()+focus.y*zoom-viewport.clientHeight/2;
   };
+  viewport.addEventListener("merzkava:center-isometric-map",centerMap);
   const apply=(next:number,focusX?:number,focusY?:number)=>{
     if(!baseW||!baseH)measure();
     const old=zoom;zoom=Math.max(.08,Math.min(2.4,next));
@@ -2319,7 +2324,7 @@ function syncIsoDepthAndOcclusion(board:HTMLElement):void {
   tokens.forEach(token=>{
     const cellX=Number(token.dataset.x||0),cellY=Number(token.dataset.y||0);
     const x=Number(token.dataset.posX??cellX),y=Number(token.dataset.posY??cellY);
-    const z=String(20+x+y);
+    const z=String(Math.round(20+x+y));
     if(token.style.getPropertyValue("--character-z")!==z)token.style.setProperty("--character-z",z);
     const opacity=isoCellHasLayer(data,"opacityCells",cellX,cellY)||data.opacityQuadrants.some(key=>key.startsWith(cellX+","+cellY+":"))?"0.42":"1";
     if(token.style.getPropertyValue("--character-opacity")!==opacity)token.style.setProperty("--character-opacity",opacity);
@@ -2459,26 +2464,32 @@ function startActorScanners(board:HTMLElement):void {
   visibilityHandler();
   updateScannerContacts(board);
 }
+const tokenMoveAnimations=new WeakMap<HTMLElement,Animation>();
 function animateGridMove(token:HTMLElement,update:()=>void,sync=true,updateSensors=true):void {
   const board=token.closest<HTMLElement>("[data-wmh-board]");
   const fromX=Number(token.dataset.posX??token.dataset.x??0);
   const fromY=Number(token.dataset.posY??token.dataset.y??0);
+  tokenMoveAnimations.get(token)?.cancel();
   update();
   if(board&&sync)syncIsoDepthAndOcclusion(board);
   const toX=Number(token.dataset.posX??token.dataset.x??fromX);
   const toY=Number(token.dataset.posY??token.dataset.y??fromY);
   const grid=board?readIsoMapData(board).grid:DEFAULT_ISOMETRIC_GRID;
-  // Isometric projection gives the local pixel delta without reading layout
-  // before and after every movement step (which forced WebView reflow).
+  // Animate only the actor's compositor translation. The JPG/SVG/canvas ground
+  // remains mounted and is never repainted as part of a walking step.
   const dx=((fromX-fromY)-(toX-toY))*grid.tileW/2;
   const dy=((fromX+fromY)-(toX+toY))*grid.tileH/2;
   const reduceMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches===true;
-  if(reduceMotion||Math.abs(dx)+Math.abs(dy)<.01)token.style.transform="";
-  else animate(token,{translateX:[dx,0],translateY:[dy,0],duration:150,ease:"outQuad"});
-  if(board){
-    if(!reduceMotion)emitTileTrailWave(board,token,toX-fromX,toY-fromY);
-    if(updateSensors)updateScannerContacts(board,false);
+  if(!reduceMotion&&Math.abs(dx)+Math.abs(dy)>=.01&&typeof token.animate==="function"){
+    const animation=token.animate(
+      [{translate:dx+"px "+dy+"px"},{translate:"0px 0px"}],
+      {duration:150,easing:"cubic-bezier(.2,.75,.25,1)"}
+    );
+    tokenMoveAnimations.set(token,animation);
+    animation.onfinish=()=>{if(tokenMoveAnimations.get(token)===animation)tokenMoveAnimations.delete(token);};
+    animation.oncancel=()=>{if(tokenMoveAnimations.get(token)===animation)tokenMoveAnimations.delete(token);};
   }
+  if(board&&updateSensors)updateScannerContacts(board,false);
 }
 function stopNpcWander(dialog:HTMLElement):void {
   const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
@@ -2497,23 +2508,31 @@ function startNpcWander(dialog:HTMLElement):void {
     if(!board.isConnected){window.clearInterval(Number(board.dataset.npcTimer||0));delete board.dataset.npcTimer;return;}
     const mapData=readIsoMapData(board);
     let actorsMoved=false;
+    const quadrants:IsoQuadrant[]=["tl-a","tl-b","tr-a","tr-b","bl-a","bl-b","br-a","br-b"];
     board.querySelectorAll<HTMLElement>("[data-wmh-npc]").forEach(npc=>{
       if(Math.random()>.48)return;
       const x=Number(npc.dataset.x||0),y=Number(npc.dataset.y||0);
-      const occupied=new Set(Array.from(board.querySelectorAll<HTMLElement>("[data-wmh-player-token],[data-wmh-npc]"))
+      const position={x:Number(npc.dataset.posX??x),y:Number(npc.dataset.posY??y)};
+      const startQuadrant=(npc.dataset.quadrant as IsoQuadrant)||nearestWalkableIsoQuadrant(mapData,x,y,position);
+      if(!startQuadrant||!isIsoQuadrantWalkable(mapData,x,y,startQuadrant))return;
+      const start={x,y,quadrant:startQuadrant};
+      const occupied=Array.from(board.querySelectorAll<HTMLElement>("[data-wmh-player-token],[data-wmh-npc]"))
         .filter(actor=>actor!==npc)
-        .map(actor=>String(actor.dataset.x||0)+","+String(actor.dataset.y||0)));
-      const options=[[x+1,y],[x-1,y],[x,y+1],[x,y-1]].filter(([nx,ny])=>{
-        const tile=board.querySelector<HTMLElement>('[data-wmh-tile][data-x="'+nx+'"][data-y="'+ny+'"]');
-        return isoGridCellExists(mapData,nx,ny)&&
-          !!tile&&isoCanStep(mapData,x,y,nx,ny)&&
-          !occupied.has(nx+","+ny);
-      });
+        .map(actor=>String(actor.dataset.x||0)+","+String(actor.dataset.y||0));
+      const candidateCells=[[x,y],[x+1,y],[x-1,y],[x,y+1],[x,y-1]];
+      const options:Array<{x:number;y:number;quadrant:IsoQuadrant}>=[];
+      for(const [cellX,cellY] of candidateCells)for(const quadrant of quadrants){
+        const destination={x:cellX,y:cellY,quadrant};
+        const path=findIsoQuadrantPath(mapData,start,destination,occupied);
+        if(path&&path.length===2)options.push(destination);
+      }
       if(!options.length)return;
-      const [nx,ny]=options[Math.floor(Math.random()*options.length)];
+      const node=options[Math.floor(Math.random()*options.length)];
+      const visual=isoQuadrantCenterGridPosition(node.x,node.y,node.quadrant);
       animateGridMove(npc,()=>{
-        npc.dataset.x=String(nx);npc.dataset.y=String(ny);
-        npc.style.setProperty("--token-x",String(nx));npc.style.setProperty("--token-y",String(ny));
+        npc.dataset.x=String(node.x);npc.dataset.y=String(node.y);npc.dataset.quadrant=node.quadrant;
+        npc.dataset.posX=String(visual.x);npc.dataset.posY=String(visual.y);
+        npc.style.setProperty("--token-x",String(visual.x));npc.style.setProperty("--token-y",String(visual.y));
       },false,false);
       actorsMoved=true;
     });
