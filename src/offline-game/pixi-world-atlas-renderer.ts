@@ -302,7 +302,7 @@ function mountPixiBoard(board:HTMLElement,modal:HTMLElement,onFailure:()=>void):
       const asset=loadImageTexture(image);textures.push(asset);
       addSprite(asset.texture,image.clientWidth||image.naturalWidth,image.clientHeight||image.naturalHeight,image.offsetLeft,image.offsetTop);
     }
-    if(scene){
+    if(scene&&!keepMapArtworkInDom){
       const asset=await loadSvgTexture(scene);
       if(disposed||!app||!worldLayer){asset.release();return;}
       textures.push(asset);
@@ -318,7 +318,7 @@ function mountPixiBoard(board:HTMLElement,modal:HTMLElement,onFailure:()=>void):
       sprite.eventMode="none";
       foregroundLayer.addChild(sprite);
     }
-    if(overlay&&foregroundLayer){
+    if(overlay&&foregroundLayer&&!keepMapArtworkInDom){
       const asset=await loadSvgTexture(overlay);
       if(disposed||!app||!foregroundLayer){asset.release();return;}
       textures.push(asset);
