@@ -2411,6 +2411,19 @@
 .wmh-overlay[data-visual-mode="augusto-pxl"] .wmh-bag-button{
   border-color:#c5a36e!important;background:linear-gradient(145deg,#29494a,#172f34)!important;color:#f1e4cb!important;
 }
+
+/* PXL Atlas: only the left rail represents absorbed Spirit Rings.
+   Skill buttons keep their art glyphs, but never draw a second ring around them. */
+.wmh-overlay[data-visual-mode="augusto-pxl"] .wmh-skill-ring{
+  border:0!important;border-radius:0!important;background:none!important;box-shadow:none!important;
+  overflow:visible!important;
+}
+.wmh-overlay[data-visual-mode="augusto-pxl"] .wmh-skill-ring>i[data-pxl-asset-id]{
+  position:relative!important;inset:auto!important;display:block!important;
+  width:100%!important;height:100%!important;border:0!important;border-radius:0!important;background-color:transparent!important;
+}
+.wmh-overlay[data-visual-mode="augusto-pxl"] .wmh-skill-ring>b{display:none!important}
+
 .wmh-overlay[data-visual-mode="augusto-pxl"] .wmh-skill-ring i[data-pxl-asset-id],
 .wmh-overlay[data-visual-mode="augusto-pxl"] .wmh-bag-button span[data-pxl-asset-id],
 .wmh-overlay[data-visual-mode="augusto-pxl"] .wmh-item-icon[data-pxl-asset-id],

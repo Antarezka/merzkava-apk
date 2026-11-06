@@ -35,6 +35,9 @@ describe("Augusto PXL World Atlas visual mode", () => {
     expect(pxl.slice(ringStart,ringEnd)).toContain('data-pxl-asset-id="effect.spirit-ring.tier-1"');
     expect(pxl.slice(dockStart,dockEnd)).not.toContain('data-pxl-asset-id="effect.spirit-ring.');
     expect(pxl.slice(dockStart,dockEnd)).toContain('data-pxl-asset-id="ui.skill.spirit-art"');
+    const hudCss=readFileSync(new URL("../../src/offline-game/world-map-hierarchy.css",import.meta.url),"utf8");
+    expect(hudCss).toContain('.wmh-overlay[data-visual-mode="augusto-pxl"] .wmh-skill-ring{');
+    expect(hudCss).toContain("border:0!important;border-radius:0!important;background:none!important;box-shadow:none!important;");
     const actorCss=readFileSync(new URL("../../src/offline-game/world-map-hierarchy.css",import.meta.url),"utf8");
     expect(actorCss).not.toContain("background-position:center bottom!important");
     const actorRuntime=readFileSync(new URL("../../src/offline-game/augusto-pxl-runtime.ts",import.meta.url),"utf8");
