@@ -133,11 +133,11 @@ describe("isometric NPC conversations", () => {
   });
 
   it("keeps choice labels, Player utterances and NPC replies aligned for every scripted character",()=>{
-    const rows=worldMapSource.split("\\n").filter(line=>/^\\s*"[^"]+":\\{/.test(line));
+    const rows=worldMapSource.split("\n").filter(line=>/^\s*"[^"]+":\{/.test(line));
     const npcRows=rows.filter(line=>line.includes("choices:"));
     expect(npcRows.length).toBeGreaterThan(0);
     for(const row of npcRows){
-      const match=row.match(/choices:(\\[[^\\]]*\\]),playerLines:(\\[[^\\]]*\\]),replies:(\\[[^\\]]*\\])/);
+      const match=row.match(/choices:(\[[^\]]*\]),playerLines:(\[[^\]]*\]),replies:(\[[^\]]*\])/);
       expect(match,row.slice(0,80)).not.toBeNull();
       if(!match)continue;
       const choices=JSON.parse(match[1]);
