@@ -63,8 +63,9 @@ export async function playWorldAtlasAccessSequence(
   const progress=gate.querySelector<HTMLElement>("[data-atlas-buffer-progress]");
   if(!buffer||!status||!log)return;
 
-  const stages=(gate.dataset.bufferStages||buffer.dataset.bufferStages||"Resolving account identity...|Checking account state...|Verifying credentials...|Preparing access...").split("|");
-  const logs=(gate.dataset.bufferLogs||buffer.dataset.bufferLogs||"ACCOUNT ROUTE...|CREDENTIAL STORE...|VERIFICATION...|SESSION HANDOFF...").split("|");
+  // The buffer profile is action-specific; the gate-level attributes are only a legacy fallback.
+  const stages=(buffer.dataset.bufferStages||gate.dataset.bufferStages||"Resolving account identity...|Checking account state...|Verifying credentials...|Preparing access...").split("|");
+  const logs=(buffer.dataset.bufferLogs||gate.dataset.bufferLogs||"ACCOUNT ROUTE...|CREDENTIAL STORE...|VERIFICATION...|SESSION HANDOFF...").split("|");
   const started=performance.now();
   const reduced=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches??false;
   if(signal?.aborted)throw abortError();
