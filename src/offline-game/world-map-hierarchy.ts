@@ -7,11 +7,11 @@ import { getEternalSave, getExpeditionAtmosphere } from "./expedition-game";
 import { TIANHAI_ACADEMY_MAP_REFERENCE } from "./tianhai-academy-map-reference";
 import {
   createIsoMapEditorData, DEFAULT_ISOMETRIC_GRID, DEFAULT_ISO_CANVAS_EXPANSION, normalizeIsoCanvasExpansion, isoCellAtPoint, isoCellCenter, isoCellHasLayer,
-  isoCellKey, isoClientToImagePoint, isoMapStorageKey, isoPointerGesture, isoQuadrantAtPoint, mergeIsoWalkableCells, normalizeIsoMapEditorData, removeIsoWalkableCell, toggleIsoQuadrantLayer, unmergeIsoWalkableCell,
+  isoCellKey, isoClientToImagePoint, isoMapStorageKey, isoPointerGesture, isoQuadrantAtPoint, mergeIsoWalkableCells, type IsoQuadrant, normalizeIsoMapEditorData, removeIsoWalkableCell, toggleIsoQuadrantLayer, unmergeIsoWalkableCell,
   type IsoMapEditorData, type IsoMapGridConfig, type IsoMapPoint, type IsoQuadrant, type IsoQuadrantLayer,
 } from "./isometric-map-editor";
 import { renderIsometricSvgSceneMarkup, refreshIsometricSvgScene, type IsometricSvgTheme } from "./isometric-svg-board";
-import { isIsoQuadrantEdgeFullyBlocked, isNpcInteractionCellReachable, isoSubcellPositionAtPoint } from "./isometric-interaction";
+import { findIsoQuadrantPath, isIsoQuadrantEdgeFullyBlocked, isIsoQuadrantWalkable, isNpcInteractionCellReachable, isoQuadrantCenterGridPosition, isoSubcellPositionAtPoint, nearestWalkableIsoQuadrant } from "./isometric-interaction";
 import { renderPlayerHudMarkup, refreshPlayerHud, handlePlayerHudClick, mountPlayerHudMotion, disposePlayerHudMotion } from "./player-hud";
 import "./player-hud.css";
 
@@ -2450,8 +2450,8 @@ function renderChat(dialog:HTMLElement,npcId:string):void {
   thread.innerHTML='<article class="wmh-chat-message npc-message"><div class="wmh-chat-bust '+npc.gender+'"><i></i></div><div class="wmh-chat-copy"><b>'+npc.name+'</b><p>'+npc.greeting+'</p></div></article>';
   replies.innerHTML=npc.choices.map((choice,i)=>'<button type="button" data-wmh-reply="'+i+'" data-npc-id="'+npcId+'">'+choice+'</button>').join("");
 }
-function resolveIsoSubcellTarget(board:HTMLElement,clientX:number,clientY:number,cellX:number,cellY:number,grid:IsoMapGridConfig):{x:number;y:number}|null {
-  const svg=board.querySelector<SVGSVGElement>("[data-wmh-overlay-svg]");
+function resolveIsoSubcellTarget(board:HTMLElement,clientX:number,clientY:number,cellX:number,cellY:number,grid:IsoMapGridConfig):{position:{x:number;y:number};quadrant:IsoQuadrant}|null {
+  const svg=board.querySelector<SVGSVGElement>("[data-wmh-scene-svg]");
   const rect=svg?.getBoundingClientRect();
   if(!svg||!rect||rect.width<=0||rect.height<=0)return null;
   const viewBox=svg.viewBox?.baseVal;
@@ -2459,9 +2459,16 @@ function resolveIsoSubcellTarget(board:HTMLElement,clientX:number,clientY:number
     left:rect.left,top:rect.top,width:rect.width,height:rect.height,
     naturalWidth:viewBox?.width||rect.width,naturalHeight:viewBox?.height||rect.height
   });
-  return point?isoSubcellPositionAtPoint(point,cellX,cellY,grid):null;
+  const position=point?isoSubcellPositionAtPoint(point,cellX,cellY,grid):null;
+  return point&&position?{position,quadrant:isoQuadrantAtPoint(point,cellX,cellY,grid)}:null;
 }
-function walkToTile(dialog:HTMLElement,targetX:number,targetY:number,surface:string,targetPosition?:{x:number;y:number}):void {
+function walkToTile(
+  dialog:HTMLElement,
+  targetX:number,
+  targetY:number,
+  surface:string,
+  target?:{position:{x:number;y:number};quadrant:IsoQuadrant},
+):void {
   const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
   if(board?.dataset.editorPaused==="true"||board?.classList.contains("wmh-overlay-editing"))return;
   const player=board?.querySelector<HTMLElement>("[data-wmh-player-token]");
@@ -2470,67 +2477,92 @@ function walkToTile(dialog:HTMLElement,targetX:number,targetY:number,surface:str
   const mapData=readIsoMapData(board);
   if(!Number.isInteger(targetX)||!Number.isInteger(targetY)||!isoGridCellExists(mapData,targetX,targetY))return;
   const destination=board.querySelector<HTMLElement>('[data-wmh-tile][data-x="'+targetX+'"][data-y="'+targetY+'"]');
-  if(!destination||!isoCanWalkTile(board,destination,targetX,targetY)){delete runtime.__wmhPendingPlayerDestination;return;}
+  if(!destination||!isoCanWalkTile(board,destination,targetX,targetY,mapData)){delete runtime.__wmhPendingPlayerDestination;return;}
   emitPlayerTapGlow(board,targetX,targetY,mapData.grid);
   runtime.__wmhPendingPlayerDestination={x:targetX,y:targetY,surface};
+
   const oldTimer=Number(player.dataset.moveTimer||0);
   if(oldTimer)window.clearTimeout(oldTimer);
   const startX=Number(player.dataset.x||5),startY=Number(player.dataset.y||8);
-  // Fixed-order breadth-first path: every tap resolves to the exact tile's
-  // stored grid coordinates; no random destination or visual-position guess.
-  const queue:Array<[number,number]>=[[startX,startY]];
-  const previous=new Map<string,string|null>([[startX+","+startY,null]]);
-  const occupiedNpcs=new Set(Array.from(board.querySelectorAll<HTMLElement>("[data-wmh-npc]"))
-    .map(npc=>String(npc.dataset.x||0)+","+String(npc.dataset.y||0)));
-  for(let cursor=0;cursor<queue.length;cursor++){
-    const [x,y]=queue[cursor];
-    if(x===targetX&&y===targetY)break;
-    const neighbors:[[number,number],[number,number],[number,number],[number,number]]=[[x,y-1],[x+1,y],[x,y+1],[x-1,y]];
-    for(const [nx,ny] of neighbors){
-      const key=nx+","+ny;
-      if(!isoGridCellExists(mapData,nx,ny)||previous.has(key))continue;
-      const nextTile=board.querySelector<HTMLElement>('[data-wmh-tile][data-x="'+nx+'"][data-y="'+ny+'"]');
-      if(!nextTile||!isoCanStep(mapData,x,y,nx,ny))continue;
-      if(occupiedNpcs.has(key))continue;
-      previous.set(key,x+","+y);queue.push([nx,ny]);
+  const currentVisualX=Number(player.dataset.posX??startX);
+  const currentVisualY=Number(player.dataset.posY??startY);
+  const startQuadrant=(player.dataset.quadrant as IsoQuadrant)||nearestWalkableIsoQuadrant(
+    mapData,startX,startY,{x:currentVisualX,y:currentVisualY}
+  );
+  if(!startQuadrant||!isIsoQuadrantWalkable(mapData,startX,startY,startQuadrant)){
+    delete runtime.__wmhPendingPlayerDestination;
+    refreshPlayerHud(dialog,"The current tile has no open quadrant for movement.");
+    return;
+  }
+
+  let destinationQuadrant=target?.quadrant;
+  if(!destinationQuadrant||!isIsoQuadrantWalkable(mapData,targetX,targetY,destinationQuadrant)){
+    const nearCellCenter=!target||Math.abs(target.position.x-targetX)+Math.abs(target.position.y-targetY)<0.035;
+    if(!nearCellCenter){
+      delete runtime.__wmhPendingPlayerDestination;
+      refreshPlayerHud(dialog,"That quadrant is blocked. Choose an open part of the diamond.");
+      return;
     }
+    destinationQuadrant=nearestWalkableIsoQuadrant(mapData,targetX,targetY,{x:targetX,y:targetY})||undefined;
   }
-  const targetKey=targetX+","+targetY;
-  if(!previous.has(targetKey)){delete runtime.__wmhPendingPlayerDestination;return;}
-  const path:Array<[number,number]>=[];
-  let cursor:string|null=targetKey;
-  while(cursor){
-    const [x,y]=cursor.split(",").map(Number);
-    path.unshift([x,y]);cursor=previous.get(cursor)||null;
+  if(!destinationQuadrant){
+    delete runtime.__wmhPendingPlayerDestination;
+    refreshPlayerHud(dialog,"That cell has no walkable quadrant.");
+    return;
   }
-  path.shift();
-  const finalPosition=targetPosition??{x:targetX,y:targetY};
-  const currentVisualX=Number(player.dataset.posX??player.dataset.x??startX);
-  const currentVisualY=Number(player.dataset.posY??player.dataset.y??startY);
-  if(path.length===0&&Math.hypot(finalPosition.x-currentVisualX,finalPosition.y-currentVisualY)<0.015){
-    delete runtime.__wmhPendingPlayerDestination;return;
+
+  const occupiedNpcs=Array.from(board.querySelectorAll<HTMLElement>("[data-wmh-npc]"))
+    .map(npc=>String(npc.dataset.x||0)+","+String(npc.dataset.y||0));
+  const path=findIsoQuadrantPath(
+    mapData,
+    {x:startX,y:startY,quadrant:startQuadrant},
+    {x:targetX,y:targetY,quadrant:destinationQuadrant},
+    occupiedNpcs,
+  );
+  if(!path){
+    delete runtime.__wmhPendingPlayerDestination;
+    refreshPlayerHud(dialog,"No open quadrant route reaches that point.");
+    return;
   }
-  if(path.length===0)path.push([targetX,targetY]);
+
+  const finalPosition=target?.position&&target.quadrant===destinationQuadrant
+    ?target.position
+    :isoQuadrantCenterGridPosition(targetX,targetY,destinationQuadrant);
+  const steps=path.slice(1);
+  if(steps.length===0&&Math.hypot(finalPosition.x-currentVisualX,finalPosition.y-currentVisualY)<0.015){
+    delete runtime.__wmhPendingPlayerDestination;
+    return;
+  }
+  if(steps.length===0)steps.push(path[0]);
   let step=0;
   const move=()=>{
-    if(step>=path.length){delete player.dataset.moveTimer;delete runtime.__wmhPendingPlayerDestination;return;}
-    const [x,y]=path[step++];
-    const isFinal=step===path.length;
-    const visualX=isFinal?finalPosition.x:x,visualY=isFinal?finalPosition.y:y;
-    const tile=board.querySelector<HTMLElement>('[data-wmh-tile][data-x="'+x+'"][data-y="'+y+'"]');
+    if(step>=steps.length){
+      delete player.dataset.moveTimer;
+      delete runtime.__wmhPendingPlayerDestination;
+      return;
+    }
+    const node=steps[step++];
+    const isFinal=step===steps.length;
+    const visual=isFinal?finalPosition:isoQuadrantCenterGridPosition(node.x,node.y,node.quadrant);
+    const previousCellX=Number(player.dataset.x||startX),previousCellY=Number(player.dataset.y||startY);
+    const tile=board.querySelector<HTMLElement>('[data-wmh-tile][data-x="'+node.x+'"][data-y="'+node.y+'"]');
     animateGridMove(player,()=>{
-      player.dataset.x=String(x);player.dataset.y=String(y);
-      player.dataset.posX=String(visualX);player.dataset.posY=String(visualY);
-      player.style.setProperty("--token-x",String(visualX));
-      player.style.setProperty("--token-y",String(visualY));
+      player.dataset.x=String(node.x);player.dataset.y=String(node.y);
+      player.dataset.quadrant=node.quadrant;
+      player.dataset.posX=String(visual.x);player.dataset.posY=String(visual.y);
+      player.style.setProperty("--token-x",String(visual.x));
+      player.style.setProperty("--token-y",String(visual.y));
     });
     syncIsoDepthAndOcclusion(board);
-    const material=tile?.dataset.surface||surface;
-    playFootstep(material as "earth"|"wet"|"stone"|"wood"|"tile");
+    if(node.x!==previousCellX||node.y!==previousCellY){
+      const material=tile?.dataset.surface||surface;
+      playFootstep(material as "earth"|"wet"|"stone"|"wood"|"tile");
+    }
     player.dataset.moveTimer=String(window.setTimeout(move,235));
   };
   move();
 }
+
 function closeTransitionOverlays(dialog:HTMLElement):void {
   dialog.querySelectorAll<HTMLElement>("[data-wmh-transition-dialog],[data-wmh-transition-notice]").forEach(node=>node.hidden=true);
 }
@@ -2675,8 +2707,8 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
   if(action.hasAttribute("data-wmh-tile")){
     if(dialog.querySelector<HTMLElement>("[data-wmh-board]")?.classList.contains("wmh-overlay-editing"))return true;
     const x=Number(action.dataset.x),y=Number(action.dataset.y),board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
-    const position=pointer&&board?resolveIsoSubcellTarget(board,pointer.clientX,pointer.clientY,x,y,readIsoMapData(board).grid):null;
-    walkToTile(dialog,x,y,action.dataset.surface||"earth",position||undefined);return true;
+    const target=pointer&&board?resolveIsoSubcellTarget(board,pointer.clientX,pointer.clientY,x,y,readIsoMapData(board).grid):null;
+    walkToTile(dialog,x,y,action.dataset.surface||"earth",target||undefined);return true;
   }
   if(action.dataset.wmhNpc){
     const npcId=action.dataset.wmhNpc;

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createIsoMapEditorData, DEFAULT_ISOMETRIC_GRID, isoCellCenter } from "../../src/offline-game/isometric-map-editor";
-import { isIsoQuadrantEdgeFullyBlocked, isNpcInteractionCellReachable, isoSubcellPositionAtPoint } from "../../src/offline-game/isometric-interaction";
+import { findIsoQuadrantPath, isIsoQuadrantEdgeFullyBlocked, isIsoQuadrantWalkable, isNpcInteractionCellReachable, isoQuadrantCenterGridPosition, isoSubcellPositionAtPoint, nearestWalkableIsoQuadrant } from "../../src/offline-game/isometric-interaction";
 
 describe("tile-aware NPC interaction reach",()=>{
   it("allows interaction from one orthogonally adjacent walkable cell",()=>{
@@ -66,5 +66,51 @@ describe("fractional isometric actor positions",()=>{
     expect(resolved).not.toBeNull();
     expect(Math.abs(resolved!.x-2)+Math.abs(resolved!.y-3)).toBeCloseTo(0.86,5);
     expect(isoSubcellPositionAtPoint({x:center.x+halfW*1.1,y:center.y},2,3,DEFAULT_ISOMETRIC_GRID)).toBeNull();
+  });
+});
+
+
+describe("walkable isometric quadrant routing", () => {
+  it("uses fractional centers for the eight triangular sectors", () => {
+    expect(isoQuadrantCenterGridPosition(2, 3, "tl-a")).toEqual({ x: 2 - 1 / 3, y: 3 - 1 / 6 });
+    expect(isoQuadrantCenterGridPosition(2, 3, "br-b")).toEqual({ x: 2 + 1 / 3, y: 3 + 1 / 6 });
+  });
+
+  it("routes through the remaining half-edge when one quadrant is blocked", () => {
+    const data = createIsoMapEditorData("quadrant-half-edge", { cols: 2, rows: 1 });
+    data.blockedQuadrants = ["0,0:br-a"];
+    expect(isIsoQuadrantWalkable(data, 0, 0, "br-a")).toBe(false);
+    expect(isIsoQuadrantWalkable(data, 0, 0, "br-b")).toBe(true);
+    const path = findIsoQuadrantPath(
+      data,
+      { x: 0, y: 0, quadrant: "tl-a" },
+      { x: 1, y: 0, quadrant: "tl-b" },
+    );
+    expect(path).not.toBeNull();
+    expect(path?.some(node => node.x === 0 && node.y === 0 && node.quadrant === "br-a")).toBe(false);
+    expect(path?.some(node => node.x === 0 && node.y === 0 && node.quadrant === "br-b")).toBe(true);
+  });
+
+  it("closes a full cell edge only when both of its matching half-sectors are blocked", () => {
+    const data = createIsoMapEditorData("quadrant-closed-edge", { cols: 2, rows: 1 });
+    data.blockedQuadrants = ["0,0:br-a", "0,0:br-b"];
+    expect(findIsoQuadrantPath(
+      data,
+      { x: 0, y: 0, quadrant: "tl-a" },
+      { x: 1, y: 0, quadrant: "tl-a" },
+    )).toBeNull();
+  });
+
+  it("respects the walkable-cell whitelist and chooses a safe start sector", () => {
+    const data = createIsoMapEditorData("quadrant-whitelist", { cols: 2, rows: 1 });
+    data.walkableAreaEnabled = true;
+    data.walkableCells = ["0,0"];
+    data.blockedQuadrants = ["0,0:tl-a"];
+    expect(nearestWalkableIsoQuadrant(data, 0, 0, { x: 0, y: 0 })).not.toBe("tl-a");
+    expect(findIsoQuadrantPath(
+      data,
+      { x: 0, y: 0, quadrant: "tl-b" },
+      { x: 1, y: 0, quadrant: "tl-a" },
+    )).toBeNull();
   });
 });
