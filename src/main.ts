@@ -49,7 +49,7 @@ if (!app) throw new Error("App root element was not found.");
 const root = app;
 
 async function runAccountAccessTransition<T>(
-  context:"player"|"developer",
+  context:"player"|"developer"|"player-session",
   action:()=>Promise<T>,
   duration=3600
 ):Promise<T> {
@@ -1420,7 +1420,7 @@ root.addEventListener("click", async (event: MouseEvent) => {
     if(!developerAuthenticated)return;activeScreen="control";notice="";render();return;
   }
   if(target.closest("[data-player-logout]")){
-    await runAccountAccessTransition("player",async()=>{
+    await runAccountAccessTransition("player-session",async()=>{
       // Keep logout available even offline; this sequence presents local session cleanup.
       developerAuthenticated=false;playerAuthenticated=false;playerLoginName="";activeCharacterId="";activeProfileMarkdown="";activeChat={messages:[],started:false,showOptions:activeChat.showOptions};
       authMessage="";setWorldMapDeveloperMode(false);activeScreen="control";accessLoginMode="player";notice="";
