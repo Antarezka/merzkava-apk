@@ -7,6 +7,18 @@ import {
 } from "../../src/offline-game/expedition-game";
 
 describe("Eternal Path live world scene", () => {
+  it("renders the separate pink Augusto PXL TV/console launcher at the existing TV size", () => {
+    const html=renderExpeditionInterface();
+    expect(html).toContain('class="expedition-pxl-trigger" data-augusto-pxl-open');
+    expect(html).toContain('aria-label="Open Augusto PXL integration panel"');
+    expect(html).toContain('class="expedition-pxl-emblem"');
+    expect(html).toContain("AUGUSTO PXL");
+    expect(html).toContain('class="expedition-pxl-modal" data-augusto-pxl-modal hidden');
+    expect(html).toContain("Full visual-production pipeline for Merzkava Universe");
+    expect(html).toContain("PixiJS is not being reintroduced");
+    expect(html).toContain('width:54px;height:54px');
+  });
+
   beforeEach(() => resetEternalGame());
 
   it("keeps Journey Manager behind the clerk-emblem dropdown before a journey starts", () => {
