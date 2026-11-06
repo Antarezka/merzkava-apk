@@ -2170,18 +2170,24 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
           if(!valid)throw new Error("Incorrect password.");
         }
       })();
+      // Keep the access buffer visible through source validation, credential verification,
+      // first-password persistence, and the remembered-player update.
+      const accountWork=(async()=>{
+        await connectionWork;
+        await credentialWork;
+        if(!passwordExists)await setAtlasPassword(playerName,password);
+        await rememberAtlasPlayer(playerName,remember);
+      })();
       const results=await Promise.allSettled([
-        connectionWork,
-        credentialWork,
-        playWorldAtlasAccessSequence(gate,4000,connectionWork,abortController.signal)
+        accountWork,
+        playWorldAtlasAccessSequence(gate,4200,accountWork,abortController.signal)
       ]);
       if(loginAttempt!==worldAtlasLoginAttempt||abortController.signal.aborted)return;
-      if(results[0].status==="rejected")throw new Error(offlineMessage);
-      if(results[1].status==="rejected")throw results[1].reason;
-      // A first-time password is persisted only after the live official-source check succeeds.
-      if(!passwordExists)await setAtlasPassword(playerName,password);
-      if(loginAttempt!==worldAtlasLoginAttempt||abortController.signal.aborted)return;
-      await rememberAtlasPlayer(playerName,remember);
+      if(results[0].status==="rejected"){
+        const connectionResult=await Promise.allSettled([connectionWork]);
+        if(connectionResult[0].status==="rejected")throw new Error(offlineMessage);
+        throw results[0].reason;
+      }
       if(loginAttempt!==worldAtlasLoginAttempt||abortController.signal.aborted)return;
       if(message)message.textContent=gate.dataset.successLabel||"Access granted.";
       form.querySelector<HTMLInputElement>("#world-atlas-password")!.value="";
