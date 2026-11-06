@@ -35,7 +35,7 @@ describe("Account controls in Settings",()=>{
 
 describe("Mode-specific animated access sequence",()=>{
   it("uses a live-source diagnostic sequence for Player login",()=>{
-    const html=developerLoginPanel("en","","",false,"",false,"player");
+    const html=developerLoginPanel("en","",false,false,"",false,"player");
     expect(html).toContain('data-offline-label="Player sign-in requires an active internet connection');
     expect(html).toContain('data-buffer-context="player"');
     expect(html).toContain("NETWORK REACHABILITY...");
