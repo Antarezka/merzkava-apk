@@ -27,3 +27,7 @@ android/**/*.keystore
 *.p12
 *.pfx
 *.key
+
+# PXL authoring tool checkout and generated source-local scratch outputs
+.tools/
+pxl/**/out/
