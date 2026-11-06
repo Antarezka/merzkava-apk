@@ -2320,3 +2320,12 @@
  .wmh-top-coordinates{font-size:5px!important}
  .wmh-minimap-toggle{width:21px!important;height:21px!important}
 }
+
+.wmh-isometric-play-screen .wmh-top-info{
+  top:var(--hud-layout-top,max(4px,env(safe-area-inset-top)))!important;
+  left:var(--hud-layout-left,max(8px,env(safe-area-inset-left)))!important;
+  right:var(--hud-layout-right,max(8px,env(safe-area-inset-right)))!important;
+  bottom:var(--hud-layout-bottom,auto)!important;
+  transform:var(--hud-layout-transform,none)!important;
+  transform-origin:top left!important;
+}
