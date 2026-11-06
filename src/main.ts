@@ -2202,8 +2202,9 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       // Keep the access buffer visible through source validation, credential verification,
       // first-password persistence, and the remembered-player update.
       const accountWork=(async()=>{
-        await connectionWork;
-        await credentialWork;
+        const verificationResults=await Promise.allSettled([connectionWork,credentialWork]);
+        if(verificationResults[0].status==="rejected")throw verificationResults[0].reason;
+        if(verificationResults[1].status==="rejected")throw verificationResults[1].reason;
         if(!passwordExists)await setAtlasPassword(playerName,password);
         await rememberAtlasPlayer(playerName,remember);
       })();
