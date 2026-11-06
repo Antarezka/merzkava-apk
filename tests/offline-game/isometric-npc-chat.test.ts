@@ -69,7 +69,7 @@ describe("isometric NPC conversations", () => {
     expect(worldMapSource).toContain("const saved=board?readIsoMapData(board).cameraCenter:undefined;");
     expect(worldMapSource).toContain("academyMarginLeft+(saved?saved.x");
     expect(worldMapSource).toContain("academyMarginTop+(saved?saved.y");
-    expect(worldMapSource).toContain('persist(false)');
+    expect(worldMapSource).toContain('persist(false,false)');
     expect(worldMapSource).toContain('dispatchEvent(new CustomEvent("merzkava:center-isometric-map"))');
     expect(worldMapSource).toContain('viewport.addEventListener("merzkava:center-isometric-map",centerMap)');
   });
