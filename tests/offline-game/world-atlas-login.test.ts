@@ -127,7 +127,7 @@ describe("Shared Anime.js access buffer profiles",()=>{
 
 
   it("ends every rapidly rotating diagnostic status with an ellipsis in every language",()=>{
-    const contexts=["world-atlas","player","developer","player-session","developer-session","developer-reset","clipboard"] as const;
+    const contexts=["world-atlas-list","world-atlas","player","developer","player-session","developer-session","developer-reset","clipboard"] as const;
     for(const language of APP_LANGUAGES){
       for(const context of contexts){
         const html=worldAtlasAccessBufferMarkup(language.code,context);
