@@ -5,6 +5,7 @@ import { ATLAS_RESET_GRANTS } from "./atlas-reset-grants.generated";
 const ITERATIONS = 310_000;
 const KEY_PREFIX = "merzkava.world-atlas.account.";
 const REMEMBER_KEY = "merzkava.world-atlas.remembered-player.v1";
+let activePlayer = "";
 
 type StoredCredential = {
   version?: number;
