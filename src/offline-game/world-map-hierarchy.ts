@@ -835,7 +835,10 @@ function escapeMapEditorText(value: unknown): string {
   return String(value).replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]||char));
 }
 function isoOverlayKey(board: HTMLElement): string {
-  return isoMapStorageKey(board.dataset.mapId||"unnamed-isometric-map");
+  const base=isoMapStorageKey(board.dataset.mapId||"unnamed-isometric-map");
+  return board.closest<HTMLElement>("[data-world-map-hierarchy]")?.dataset.visualMode==="augusto-pxl"
+    ? "merzkava.augusto-pxl.map-data.v1:"+base
+    : base;
 }
 const isoMapDataCache=new WeakMap<HTMLElement,IsoMapEditorData>();
 function readIsoMapData(board: HTMLElement): IsoMapEditorData {
@@ -853,7 +856,8 @@ function readIsoMapData(board: HTMLElement): IsoMapEditorData {
   };
   let data:IsoMapEditorData;
   if(mapId===TIANHAI_ACADEMY_MAP_REFERENCE.mapId){
-    const appliedKey="merzkava.tianhai-academy-map-reference.v1.applied";
+    const pxlMode=board.closest<HTMLElement>("[data-world-map-hierarchy]")?.dataset.visualMode==="augusto-pxl";
+    const appliedKey="merzkava.tianhai-academy-map-reference.v1.applied"+(pxlMode?".augusto-pxl":"");
     try{
       if(localStorage.getItem(appliedKey)!=="done"){
         const bundled=normalizeIsoMapEditorData(TIANHAI_ACADEMY_MAP_REFERENCE,mapId,fallback);
