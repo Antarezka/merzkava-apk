@@ -9,6 +9,13 @@ describe("World Atlas player login gate",()=>{
       expect(html).toContain('data-world-atlas-gate hidden');
       expect(html).toContain('id="world-atlas-login-form"');
       expect(html).toContain('id="world-atlas-login-form" novalidate');
+      expect(html).toContain('class="world-atlas-login-scroll mk-panel-scroll" data-atlas-login-scroll');
+      const scrollBodyIndex=html.indexOf('data-atlas-login-scroll');
+      const loadingOverlayIndex=html.indexOf('data-world-atlas-buffer');
+      const fixedFootIndex=html.indexOf('class="world-atlas-login-foot"');
+      expect(scrollBodyIndex).toBeGreaterThan(-1);
+      expect(scrollBodyIndex).toBeLessThan(loadingOverlayIndex);
+      expect(loadingOverlayIndex).toBeLessThan(fixedFootIndex);
       expect(html).toContain('data-password-required-label=');
       expect(html).toContain('data-world-atlas-player');
       expect(html).toContain('data-world-atlas-confirm-row');
