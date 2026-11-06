@@ -12,6 +12,7 @@ import {
 } from "./isometric-map-editor";
 import { renderIsometricSvgSceneMarkup, refreshIsometricSvgScene, type IsometricSvgTheme } from "./isometric-svg-board";
 import { findIsoQuadrantPath, isIsoQuadrantEdgeFullyBlocked, isIsoQuadrantWalkable, isNpcInteractionCellReachable, isoQuadrantCenterGridPosition, isoSubcellPositionAtPoint, nearestWalkableIsoQuadrant } from "./isometric-interaction";
+import { getIsoMovementOffset } from "./isometric-runtime-performance";
 import { renderPlayerHudMarkup, refreshPlayerHud, handlePlayerHudClick, mountPlayerHudMotion, disposePlayerHudMotion, bindPlayerHudLayoutEditor } from "./player-hud";
 import "./player-hud.css";
 
@@ -2460,8 +2461,7 @@ function animateGridMove(token:HTMLElement,update:()=>void,sync=true,updateSenso
   update();
   if(board&&sync)syncIsoDepthAndOcclusion(board);
   const to={x:Number(token.dataset.posX??token.dataset.x??0),y:Number(token.dataset.posY??token.dataset.y??0)};
-  const dx=((from.x-to.x)-(from.y-to.y))*(grid.tileW/2)*renderScaleX/zoom;
-  const dy=((from.x-to.x)+(from.y-to.y))*(grid.tileH/2)*renderScaleY/zoom;
+  const {x:dx,y:dy}=getIsoMovementOffset(from,to,grid,zoom,renderScaleX,renderScaleY);
   const reduceMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches===true;
   const suspendNpcIdle=!reduceMotion&&token.matches(".wmh-character-token:not(.wmh-player-token)");
   if(suspendNpcIdle)token.classList.add("wmh-npc-moving");
@@ -2512,14 +2512,14 @@ function startNpcWander(dialog:HTMLElement):void {
     npcs.forEach(npc=>{
       if(Math.random()>.48)return;
       const x=Number(npc.dataset.x||0),y=Number(npc.dataset.y||0);
-      const options:[[number,number],[number,number],[number,number],[number,number]]=[
+      const options:[number,number][]=[
         [x+1,y],[x-1,y],[x,y+1],[x,y-1]
       ].filter(([nx,ny])=>{
         const key=isoCellKey(nx,ny),tile=tilesByCell.get(key);
         return isoGridCellExists(mapData,nx,ny)&&
           !!tile&&isoCanStep(mapData,x,y,nx,ny)&&
           !occupied.has(key);
-      }) as [[number,number],[number,number],[number,number],[number,number]];
+      });
       if(!options.length)return;
       const [nx,ny]=options[Math.floor(Math.random()*options.length)];
       removeOccupant(isoCellKey(x,y));
