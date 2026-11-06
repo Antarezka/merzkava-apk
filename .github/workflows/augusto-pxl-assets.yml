@@ -33,7 +33,7 @@ jobs:
         with:
           node-version: "22.18.0"
       - name: Install app dependencies
-        run: npm ci
+        run: npm install
       - name: Validate and export Augusto PXL source
         run: npm run pxl:build
       - name: Validate app TypeScript and production bundle
