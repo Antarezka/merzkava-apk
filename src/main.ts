@@ -135,6 +135,7 @@ let menuRevealPending = false;
 let menuToggleAnimationPending = false;
 let languageAnimationPending = false;
 let cleanupExpeditionAnimations: (() => void) | undefined;
+let cleanupPixiWorldAtlas: (() => void) | undefined;
 let lastAnimatedScreen: AppScreen | null = null;
 const splashAnimationCleanup=new WeakMap<HTMLDivElement,()=>void>();
 initializeLedgerNotifications();
@@ -609,6 +610,10 @@ function render(): void {
     try { cleanupExpeditionAnimations(); }
     finally { cleanupExpeditionAnimations = undefined; }
   }
+  if(cleanupPixiWorldAtlas){
+    try{cleanupPixiWorldAtlas();}
+    finally{cleanupPixiWorldAtlas=undefined;}
+  }
   if (activeScreen === "gameplay" && notice && notice !== lastPlayWarningNotice) {
     playWarningBeep();
     lastPlayWarningNotice = notice;
@@ -876,12 +881,21 @@ function setWorldAtlasAccessBufferContext(gate:HTMLElement,context:"world-atlas-
 }
 function closeWorldAtlas(syncHistory=true):void {
   const modal=root.querySelector<HTMLElement>("[data-idle-rpg-modal]");
-  const trigger=root.querySelector<HTMLButtonElement>("[data-idle-rpg-open]");
+  const isPixi=modal?.dataset.renderer==="pixi";
+  const trigger=root.querySelector<HTMLButtonElement>(isPixi?"[data-idle-pixi-open]":"[data-idle-rpg-open]");
   const gate=modal?.querySelector<HTMLElement>("[data-world-atlas-gate]");
   if(gate)unlockAtlasBackground(gate);
+  if(cleanupPixiWorldAtlas){
+    try{cleanupPixiWorldAtlas();}
+    finally{cleanupPixiWorldAtlas=undefined;}
+  }
   if(modal&&!modal.hidden)modal.hidden=true;
+  if(modal){
+    delete modal.dataset.renderer;
+    delete modal.dataset.pixiRendererStatus;
+  }
   root.querySelector(".app-shell")?.classList.remove("is-idle-world");
-  trigger?.setAttribute("aria-expanded","false");
+  root.querySelectorAll<HTMLButtonElement>("[data-idle-rpg-open],[data-idle-pixi-open]").forEach(item=>item.setAttribute("aria-expanded","false"));
   // Back/Escape/close invalidates the in-flight attempt and aborts the live source request.
   worldAtlasLoginAttempt += 1;
   worldAtlasLoginAbort?.abort();
@@ -898,16 +912,32 @@ function closeWorldAtlas(syncHistory=true):void {
   trigger?.focus();
   if(syncHistory&&history.state?.idleRpgNotice)history.back();
 }
-async function openWorldAtlasFromTv():Promise<void> {
+async function openWorldAtlasFromTv(renderer:"dom"|"pixi"="dom"):Promise<void> {
   const modal=root.querySelector<HTMLElement>("[data-idle-rpg-modal]");
-  const trigger=root.querySelector<HTMLButtonElement>("[data-idle-rpg-open]");
+  const isPixi=renderer==="pixi";
+  const trigger=root.querySelector<HTMLButtonElement>(isPixi?"[data-idle-pixi-open]":"[data-idle-rpg-open]");
   const gate=modal?.querySelector<HTMLElement>("[data-world-atlas-gate]");
   if(!modal||!gate)return;
   if(!modal.hidden){closeWorldAtlas();return;}
   modal.hidden=false;
+  modal.dataset.renderer=renderer;
   root.querySelector(".app-shell")?.classList.add("is-idle-world");
-  trigger?.setAttribute("aria-expanded","true");
+  root.querySelectorAll<HTMLButtonElement>("[data-idle-rpg-open],[data-idle-pixi-open]").forEach(item=>item.setAttribute("aria-expanded",String(item===trigger)));
   initializeWorldMapHierarchy(root);
+  if(cleanupPixiWorldAtlas){
+    try{cleanupPixiWorldAtlas();}
+    finally{cleanupPixiWorldAtlas=undefined;}
+  }
+  if(isPixi){
+    try{
+      const {mountPixiWorldAtlas}=await import("./offline-game/pixi-world-atlas-renderer");
+      if(modal.hidden||modal.dataset.renderer!=="pixi")return;
+      cleanupPixiWorldAtlas=mountPixiWorldAtlas(modal);
+    }catch(error){
+      modal.dataset.pixiRendererStatus="dom-fallback";
+      recordBug(error,"Initialize Pixi World Atlas renderer","Pixi World Atlas");
+    }
+  }
   history.pushState({idleRpgNotice:true,worldAtlasFromTv:true},"");
   gate.hidden=false;
   gate.removeAttribute("aria-hidden");
@@ -1215,11 +1245,7 @@ root.addEventListener("keydown", event => {
   if(event.key==="Escape"&&devAccess&&!devAccess.hidden){if(!hasAppAccess()&&activeScreen==="control")return;devAccess.hidden=true;return;}
   const idleNotice=root.querySelector<HTMLElement>("[data-idle-rpg-modal]");
   if(event.key==="Escape"&&idleNotice&&!idleNotice.hidden){
-    idleNotice.hidden=true;
-    root.querySelector(".app-shell")?.classList.remove("is-idle-world");
-    root.querySelector<HTMLButtonElement>("[data-idle-rpg-open]")?.setAttribute("aria-expanded","false");
-    root.querySelector<HTMLButtonElement>("[data-idle-rpg-open]")?.focus();
-    if(history.state?.idleRpgNotice) history.back();
+    closeWorldAtlas();
     return;
   }
   if(event.key==="Tab"&&idleNotice&&!idleNotice.hidden){
@@ -1545,7 +1571,8 @@ root.addEventListener("click", async (event: MouseEvent) => {
     if(worldAtlasLoginBusy)return;
     closeWorldAtlas();return;
   }
-  if (target.closest("[data-idle-rpg-open]")) { await openWorldAtlasFromTv(); return; }
+  if (target.closest("[data-idle-pixi-open]")) { await openWorldAtlasFromTv("pixi"); return; }
+  if (target.closest("[data-idle-rpg-open]")) { await openWorldAtlasFromTv("dom"); return; }
   if (target.closest("[data-idle-rpg-close]")) { closeWorldAtlas(); return; }
   if (target.closest("[data-eternal-manager-toggle]")) {
     const panel=root.querySelector<HTMLElement>("[data-eternal-manager-content]");
