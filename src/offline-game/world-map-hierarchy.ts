@@ -2248,17 +2248,17 @@ function isometricEditorMarkup(): string {
 }
 function isometricHudMarkup(title: string, mapImage: string, showMinimap = true,visualMode:WorldMapVisualMode="legacy"): string {
   const minimapMarkup=
-    '<button type="button" class="wmh-minimap-toggle" data-wmh-minimap-toggle aria-label="Open draggable field minimap" aria-expanded="false" title="Open minimap"><span aria-hidden="true">⌖</span></button>'+
-    '<section class="wmh-minimap-window" data-wmh-minimap data-wmh-scroll-resize hidden role="dialog" aria-label="Draggable field minimap">'+
+    '<button type="button" class="wmh-minimap-toggle" data-wmh-minimap-toggle '+(visualMode==="augusto-pxl"?'data-pxl-asset-id="ui.hud.minimap-toggle" ':'')+'aria-label="Open draggable field minimap" aria-expanded="false" title="Open minimap"><span aria-hidden="true">⌖</span></button>'+
+    '<section class="wmh-minimap-window" data-wmh-minimap data-wmh-scroll-resize '+(visualMode==="augusto-pxl"?'data-pxl-asset-id="ui.hud.minimap-frame" data-pxl-fit="100% 100%" ':'')+'hidden role="dialog" aria-label="Draggable field minimap">'+
       '<header class="wmh-minimap-window-header" data-wmh-minimap-drag-handle><b>FIELD MAP</b><button type="button" data-wmh-minimap-close aria-label="Close minimap">×</button></header>'+
       '<div class="wmh-minimap-world" data-wmh-minimap-world>'+
-        (mapImage?'<img data-wmh-academy-map-art src="'+mapImage+'" alt="" aria-hidden="true" draggable="false"/>':"")+
+        (mapImage?'<img data-wmh-academy-map-art '+(visualMode==="augusto-pxl"?'data-pxl-asset-id="map.academy.minimap" ':'')+'src="'+mapImage+'" alt="" aria-hidden="true" draggable="false"/>':"")+
         '<svg class="wmh-minimap-grid" data-wmh-minimap-grid viewBox="0 0 2816 1536" preserveAspectRatio="none" aria-hidden="true"></svg><span class="wmh-minimap-actors" data-wmh-minimap-actors></span>'+
       '</div><small class="wmh-minimap-footer" data-wmh-minimap-footer>YOU · X 05 / Y 17 · TAP TO MOVE</small>'+
     '</section>';
   return '<div class="wmh-isometric-hud" data-wmh-isometric-hud data-visual-mode="'+visualMode+'">'+
-    '<section class="wmh-top-info" data-wmh-hud-layout="world-status" aria-label="World conditions">'+
-      '<span class="wmh-top-weather"><i data-wmh-weather-icon>☀</i><b data-wmh-weather-label>CERAH</b></span>'+
+    '<section class="wmh-top-info" data-wmh-hud-layout="world-status" '+(visualMode==="augusto-pxl"?'data-pxl-asset-id="ui.hud.world-strip" data-pxl-fit="100% 100%" ':'')+'aria-label="World conditions">'+
+      '<span class="wmh-top-weather"><i data-wmh-weather-icon '+(visualMode==="augusto-pxl"?'data-pxl-asset-id="ui.hud.weather-icon" ':'')+'>☀</i><b data-wmh-weather-label>CERAH</b></span>'+
       '<span class="wmh-top-location" data-wmh-status-location>'+escapeMapEditorText(title)+'</span>'+
       '<strong data-wmh-time>8:00 AM</strong>'+
       '<span class="wmh-top-coordinates" data-wmh-player-grid>(X: -- · Y: --)</span>'+
