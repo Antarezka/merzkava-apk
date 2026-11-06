@@ -74,6 +74,21 @@ describe("isometric NPC conversations", () => {
     expect(worldMapSource).toContain('viewport.addEventListener("merzkava:center-isometric-map",centerMap)');
   });
 
+  it("opens Tianhai Academy on the Player token while CENTER MAP uses its separate saved focal point",()=>{
+    const start=worldMapSource.indexOf("const centerOnPlayer = () =>");
+    const end=worldMapSource.indexOf('viewport.addEventListener("merzkava:center-isometric-map",centerMap)',start);
+    const entryCamera=start>=0&&end>=0?worldMapSource.slice(start,end):"";
+    expect(entryCamera).toContain('querySelector<HTMLElement>("[data-wmh-player-token]")');
+    expect(entryCamera).toContain('isoCellCenter(visualX,visualY,mapData.grid)');
+    expect(entryCamera).not.toContain("cameraCenter");
+    expect(worldMapSource).toContain("const initialCenter=academyCanvas?centerOnPlayer:centerMap");
+    const savedCenterStart=worldMapSource.indexOf("const centerMap = () =>");
+    const savedCenterEnd=worldMapSource.indexOf("const centerOnPlayer = () =>",savedCenterStart);
+    const savedCenter=savedCenterStart>=0&&savedCenterEnd>=0?worldMapSource.slice(savedCenterStart,savedCenterEnd):"";
+    expect(savedCenter).toContain("readIsoMapData(board).cameraCenter");
+    expect(worldMapSource).toContain('viewport.addEventListener("merzkava:center-isometric-map",centerMap)');
+  });
+
   it("keeps a visible, map-base-aligned minimap on every isometric area",()=>{
     expect(worldMapSource).toContain("function shouldShowIsometricMinimap(_mapId:string,_title:string):boolean {");
     expect(worldMapSource).toContain("return true;");
