@@ -315,7 +315,8 @@ export function bindPlayerHudLayoutEditor(dialog:HTMLElement):void {
   hud.dataset.hudLayoutBound="true";
   const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
   const mapId=board?.dataset.mapId||"default";
-  const storageKey="merzkava.rpg-hud-layout.v1:"+encodeURIComponent(mapId);
+  const pxlMode=dialog.closest<HTMLElement>("[data-world-map-hierarchy]")?.dataset.visualMode==="augusto-pxl";
+  const storageKey=(pxlMode?"merzkava.augusto-pxl.":"")+"merzkava.rpg-hud-layout.v1:"+encodeURIComponent(mapId);
   const elements=Array.from(dialog.querySelectorAll<HTMLElement>("[data-wmh-hud-layout]"));
   const editor=dialog.querySelector<HTMLElement>("[data-wmh-hud-layout-editor]");
   const select=editor?.querySelector<HTMLSelectElement>("[data-wmh-hud-layout-select]");
