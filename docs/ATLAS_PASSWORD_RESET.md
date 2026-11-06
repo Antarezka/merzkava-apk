@@ -16,8 +16,8 @@ The Developer and Player sign-in panels use the same Merzkava access-buffer pres
 
 - **Player sign-in requires an active internet connection.** It fetches the current official Universe player registry and the selected profile, then checks exact identity and source-commit consistency. World Atlas sign-in, password verification, and password replacement also require a fresh connection check against the active pinned Universe snapshot.
 - **Developer sign-in remains offline-capable.** It verifies the Developer ID and password locally with PBKDF2-SHA-256 and uses the device's secure credential storage where available. It does not call the Universe source, Supabase, or another server merely to authenticate Developer access. The same animation is shown, but its status lines describe local credential and session work rather than server synchronization.
-- **Developer Master Reset request creation and copying use the local Developer sequence.** No network connection is required to prepare the AI request block.
-- Sign-out remains available offline. Its animation describes local session revocation and cleanup rather than a network sync.
+- **Developer Master Reset request creation uses a dedicated local sequence:** account binding, random Request-ID, cryptographic challenge, Player-Key SHA-256, and request-block serialization. **Copying uses its own device-clipboard sequence** (clipboard capability, request-buffer read, text encoding, clipboard write, and copy confirmation). Neither operation requires internet or performs server synchronization.
+- Developer sign-out and Player sign-out each use separate local cleanup sequences. They remain available offline and describe session/authorization-marker revocation and secure-storage cleanup rather than a network sync.
 
 The animation runs alongside the real operation and remains visible until verification finishes. If a required Player connection or source check fails, access is denied with an error; the animation never grants access by itself.
 
