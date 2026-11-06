@@ -169,25 +169,11 @@ groundScreen("stone",505,177,578,254,0.055)
 groundScreen("stone",112,252,184,322,0.065)
 groundScreen("stone",520,207,687,294,0.075)
 
-// Small ceremonial medallion, kept clear of actor spawn and navigation lanes.
-const medallion=Array.from({length:32},(_,i)=>{
-  const a=2*Math.PI*i/32
-  const [x,z]=atScreen(353+Math.cos(a)*19,173+Math.sin(a)*18)
-  return [x,z,0.105]
-})
-CAMPUS.face("trim",...medallion)
-const innerMedallion=Array.from({length:24},(_,i)=>{
-  const a=2*Math.PI*i/24
-  const [x,z]=atScreen(353+Math.cos(a)*9,173+Math.sin(a)*8)
-  return [x,z,0.112]
-})
-CAMPUS.face("stone",...innerMedallion)
-
 // Three rear study halls and the layered central academy hall.
-hallAtScreen(104,78,5.9,3.9,2.05,1.18)
-hallAtScreen(352,70,7.5,4.2,2.5,1.55)
-hallAtScreen(604,82,5.8,3.8,2.05,1.18)
-hallAtScreen(352,63,4.4,2.6,1.05,0.88,3.25)
+hallAtScreen(104,96,5.9,3.9,2.05,1.18)
+hallAtScreen(352,102,7.5,4.2,2.5,1.55)
+hallAtScreen(604,98,5.8,3.8,2.05,1.18)
+hallAtScreen(352,102,4.4,2.6,1.05,0.88,3.25)
 
 // Side wings, lecture pavilions and the small waterside pavilion.
 hallAtScreen(194,205,4.9,3.1,1.8,0.98)
@@ -309,7 +295,7 @@ sprites.push(
 const LIGHT = {
   light:[-0.72,0.42,0.55],
   sun:{color:"#ffe0b2",strength:1.12},
-  sky:{color:"#9ab2c9",strength:0.45},
+  sky:{color:"#9ab2c9",strength:0.65},
   shadows:true,
   lamps:[
     {at:[lanternOne[0],lanternOne[1],1.25],color:"#ffbf78",r:2.6,strength:0.8},
