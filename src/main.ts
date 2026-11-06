@@ -1621,7 +1621,7 @@ root.addEventListener("click", async (event: MouseEvent) => {
   if (target.closest("[data-augusto-pxl-open]")) {
     const panel=root.querySelector<HTMLElement>("[data-augusto-pxl-modal]");
     const trigger=root.querySelector<HTMLButtonElement>("[data-augusto-pxl-open]");
-    if(panel&&trigger){panel.hidden=false;trigger.setAttribute("aria-expanded","true");history.pushState({augustoPxlPanel:true},"");panel.querySelector<HTMLButtonElement>("[data-augusto-pxl-close]")?.focus();}
+    if(panel&&trigger){panel.hidden=false;trigger.setAttribute("aria-expanded","true");history.pushState({augustoPxlPanel:true},"");panel.querySelector<HTMLButtonElement>(".expedition-pxl-dialog header [data-augusto-pxl-close]")?.focus();}
     return;
   }
   if (target.closest("[data-augusto-pxl-close]")) {
