@@ -114,6 +114,22 @@ describe("Shared Anime.js access buffer profiles",()=>{
     expect(html).not.toContain("NETWORK REACHABILITY...");
   });
 
+
+  it("ends every rapidly rotating diagnostic status with an ellipsis in every language",()=>{
+    const contexts=["world-atlas","player","developer","player-session","developer-session","developer-reset","clipboard"] as const;
+    for(const language of APP_LANGUAGES){
+      for(const context of contexts){
+        const html=worldAtlasAccessBufferMarkup(language.code,context);
+        const stages=html.match(/data-buffer-stages="([^"]+)"/)?.[1]?.split("|")??[];
+        const logs=html.match(/data-buffer-logs="([^"]+)"/)?.[1]?.split("|")??[];
+        expect(stages.length,language.code+" "+context+" stages").toBeGreaterThan(0);
+        expect(logs.length,language.code+" "+context+" logs").toBeGreaterThan(0);
+        expect(stages.every(value=>value.endsWith("..."))).toBe(true);
+        expect(logs.every(value=>value.endsWith("..."))).toBe(true);
+      }
+    }
+  });
+
   it("uses a local cleanup sequence for Player sign-out",()=>{
     const html=worldAtlasAccessBufferMarkup("en","player-session");
     expect(html).toContain("PLAYER SESSION CLOSE...");
