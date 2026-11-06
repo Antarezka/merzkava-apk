@@ -79,9 +79,18 @@ These are two distinct camera behaviors and must never be conflated:
 | `src/offline-game/tianhai-academy-map-reference.ts` | Academy's owner-provided one-time map reference |
 | `tests/offline-game/isometric-interaction.test.ts` | Eight-sector walkability, edge and route behavior |
 | `tests/offline-game/isometric-map-editor.test.ts` | Map JSON, focal-point and editor coordinate behavior |
-| `tests/offline-game/isometric-npc-chat.test.ts` | Runtime source contracts for actor-only motion, NPC routes and center application |
+| `tests/offline-game/isometric-npc-chat.test.ts` | Runtime source contracts for actor-only motion, NPC routes, camera focus and dialogue utterance separation |
 | `.github/workflows/validate.yml` | Gameplay tests, TypeScript and Vite production build |
 | `.github/workflows/build-android.yml` | APK packaging, verification, artifact upload and Android 14 emulator smoke-test |
+
+## 4A. Player dialogue must be a natural utterance, not an action label
+
+- Each scripted NPC record has three separate parallel arrays: `choices[]` (short button/action labels), `playerLines[]` (the natural sentence the Player actually says after selecting that button), and `replies[]` (the NPC's authored response).
+- On button selection, the chat transcript must render `playerLines[index]`, never echo `choices[index]`. Example: the button may say **Ask about training**, but the chat transcript should say **“What kind of footwork are you practicing today?”**
+- Phrase the Player as curious, polite and context-aware. Prefer a question or a natural response to what the NPC just said. Avoid imperative/command language, stage directions, and labels such as “Ask about X”, “Tell them Y”, or “End conversation”.
+- Keep the reply paired to the same index and preserve all authored NPC knowledge/agenda boundaries. This is still scripted local conversation, not AI-generated free text.
+- When adding an NPC or changing its options, keep `choices.length === playerLines.length === replies.length`. Escape both Player and NPC transcript strings before injecting them into chat markup.
+- Tests should assert that the chat handler reads `playerLines[index]`, not `choices[index]`, and that every action has a matching Player utterance/reply.
 
 ## 5. Runtime invariants — do not regress
 
@@ -119,6 +128,7 @@ These are two distinct camera behaviors and must never be conflated:
 - **Fixed:** confirming a focal point applies the saved editor CENTER MAP point without stale scroll restoration or map repaint; Academy entry camera remains a separate Player-token focus.
 - **Reorganized:** generic-map and test-board actors are grouped under a dedicated actor layer; obsolete whole-cell movement helper/import were removed.
 - **Added tests:** runtime contract assertions cover the fragment route graph, token-only animation, the center-apply event, and the distinction between Player entry focus and saved CENTER MAP focal point.
+- **Dialogue:** split short choice-button labels from natural contextual Player utterances via per-NPC `playerLines[]`; chat now speaks the utterance rather than repeating an instruction-like label.
 - **No new rendering dependency:** PixiJS was not added to this branch.
 
 ---
