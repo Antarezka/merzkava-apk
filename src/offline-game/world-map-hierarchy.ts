@@ -2432,21 +2432,6 @@ function stopActorScanners(board:HTMLElement):void {
   board.classList.remove("wmh-motion-paused");
   board.querySelectorAll<HTMLElement>("[data-wmh-player-token],[data-wmh-npc]").forEach(actor=>actor.classList.remove("wmh-scanner-active"));
 }
-function emitTileTrailWave(board:HTMLElement,actor:HTMLElement,dx=0,dy=0):void {
-  if(!board.isConnected||window.matchMedia?.("(prefers-reduced-motion: reduce)").matches)return;
-  let glow=actor.querySelector<HTMLElement>(":scope > .wmh-token-movement-glow");
-  if(!glow){
-    glow=document.createElement("span");
-    glow.className="wmh-token-movement-glow";
-    glow.setAttribute("aria-hidden","true");
-    glow.addEventListener("animationend",()=>glow?.classList.remove("is-active"));
-    actor.append(glow);
-  }
-  glow.style.setProperty("--move-shift-x",(-Math.sign(dx)*5)+"px");
-  glow.style.setProperty("--move-shift-y",(-Math.sign(dy)*4)+"px");
-  // One short CSS animation per step; the same element is reused later.
-  if(!glow.classList.contains("is-active"))glow.classList.add("is-active");
-}
 function startActorScanners(board:HTMLElement):void {
   stopActorScanners(board);
   const reduceMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches===true;
