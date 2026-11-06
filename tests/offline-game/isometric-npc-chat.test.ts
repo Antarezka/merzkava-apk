@@ -132,6 +132,22 @@ describe("isometric NPC conversations", () => {
     expect(hiddenGuard).toContain("pointer-events:none!important");
   });
 
+  it("keeps choice labels, Player utterances and NPC replies aligned for every scripted character",()=>{
+    const rows=worldMapSource.split("\\n").filter(line=>/^\\s*"[^"]+":\\{/.test(line));
+    const npcRows=rows.filter(line=>line.includes("choices:"));
+    expect(npcRows.length).toBeGreaterThan(0);
+    for(const row of npcRows){
+      const match=row.match(/choices:(\\[[^\\]]*\\]),playerLines:(\\[[^\\]]*\\]),replies:(\\[[^\\]]*\\])/);
+      expect(match,row.slice(0,80)).not.toBeNull();
+      if(!match)continue;
+      const choices=JSON.parse(match[1]);
+      const playerLines=JSON.parse(match[2]);
+      const replies=JSON.parse(match[3]);
+      expect(playerLines.length).toBe(choices.length);
+      expect(replies.length).toBe(choices.length);
+    }
+  });
+
   it("shows contextual Player dialogue instead of repeating the action-button label",()=>{
     expect(worldMapSource).toContain('playerLines:string[]');
     expect(worldMapSource).toContain('"student-wei":{name:"Shen Wei"');
