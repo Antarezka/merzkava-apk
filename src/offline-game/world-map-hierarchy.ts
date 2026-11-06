@@ -1283,7 +1283,18 @@ function bindArcanistryBackClearance(dialog:HTMLElement):void {
     };
     frame=requestAnimationFrame(tick);
   };
-  const observer=new MutationObserver(()=>{sync();follow();});
+  const observer=new MutationObserver(()=>{
+    if(!screen.isConnected){
+      observer.disconnect();window.removeEventListener("resize",sync);
+      if(frame)cancelAnimationFrame(frame);
+      if(machine){
+        machine.removeEventListener("transitionrun",follow);machine.removeEventListener("transitionend",sync);
+        machine.removeEventListener("animationstart",follow);machine.removeEventListener("animationend",sync);
+      }
+      return;
+    }
+    sync();follow();
+  });
   observer.observe(document.body,{childList:true,subtree:true});
   window.addEventListener("resize",sync,{passive:true});
   sync();
