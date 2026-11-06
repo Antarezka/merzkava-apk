@@ -2197,3 +2197,16 @@
 [data-wmh-board].wmh-pixi-render-active.wmh-pixi-render-paused .wmh-token-movement-glow{
   opacity:initial!important;
 }
+
+
+/* Academy artwork is an authored high-resolution base, not a Pixi-owned texture.
+   Keep the original DOM image and foreground redraw visible beneath the transparent
+   Pixi overlay so Android WebView/GPU texture limits can never blank the whole map. */
+.wmh-isometric-board.has-map-base.wmh-pixi-render-active>[data-wmh-map-art],
+.wmh-isometric-board.has-map-base.wmh-pixi-render-active>[data-wmh-foreground-canvas]{
+  opacity:1!important;
+  visibility:visible!important;
+}
+.wmh-isometric-board.has-map-base.wmh-pixi-render-active>[data-wmh-map-art]{
+  display:block!important;
+}
