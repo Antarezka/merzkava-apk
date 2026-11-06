@@ -268,13 +268,16 @@ function mountPixiBoard(board:HTMLElement,modal:HTMLElement,onFailure:()=>void):
 
     if(image){
       if(!image.complete&&typeof image.decode==="function")try{await image.decode();}catch{/* Use the existing visible DOM fallback if the source is not ready. */}
+      if(disposed||!app||!worldLayer)return;
       if(image.naturalWidth){
         const asset=loadImageTexture(image);textures.push(asset);
         addSprite(asset.texture,image.clientWidth||image.naturalWidth,image.clientHeight||image.naturalHeight);
       }
     }
     if(scene){
-      const asset=await loadSvgTexture(scene);textures.push(asset);
+      const asset=await loadSvgTexture(scene);
+      if(disposed||!app||!worldLayer){asset.release();return;}
+      textures.push(asset);
       addSprite(asset.texture,width,height);
     }
     if(foreground&&foreground.width>0&&foreground.height>0&&foregroundLayer){
@@ -288,11 +291,27 @@ function mountPixiBoard(board:HTMLElement,modal:HTMLElement,onFailure:()=>void):
       foregroundLayer.addChild(sprite);
     }
     if(overlay&&foregroundLayer){
-      const asset=await loadSvgTexture(overlay);textures.push(asset);
+      const asset=await loadSvgTexture(overlay);
+      if(disposed||!app||!foregroundLayer){asset.release();return;}
+      textures.push(asset);
       const sprite=new PIXI.Sprite(asset.texture);
       sprite.width=width;sprite.height=height;sprite.eventMode="none";
       foregroundLayer.addChild(sprite);
     }
+  };
+
+  let staticRefreshSequence=0;
+  const refreshStaticWorld=async():Promise<void>=>{
+    if(disposed||!app||!worldLayer||!foregroundLayer||isPaused(board))return;
+    const refreshId=++staticRefreshSequence;
+    worldLayer.removeChildren().forEach(child=>child.destroy({children:true}));
+    foregroundLayer.removeChildren().forEach(child=>child.destroy({children:true}));
+    textures.forEach(asset=>asset.release());
+    textures=[];
+    await buildStaticWorld();
+    if(disposed||refreshId!==staticRefreshSequence||!app||isPaused(board))return;
+    syncActors(false);
+    app.renderer.render({container:app.stage});
   };
 
   const syncActors=(animateChanges:boolean)=>{
@@ -462,6 +481,7 @@ function mountPixiBoard(board:HTMLElement,modal:HTMLElement,onFailure:()=>void):
       app.renderer.render({container:app.stage});
       triggerScanPulse();
       pulseTimer=window.setInterval(triggerScanPulse,SCAN_INTERVAL);
+      let editorWasActive=board.classList.contains("wmh-overlay-editing");
       actorObserver=new MutationObserver(records=>{
         const actorChanged=records.some(record=>
           record.target instanceof HTMLElement&&
@@ -473,7 +493,23 @@ function mountPixiBoard(board:HTMLElement,modal:HTMLElement,onFailure:()=>void):
           (record.target===board&&record.attributeName==="class")||
           (record.target instanceof HTMLElement&&record.target.matches("[data-wmh-chat],[data-world-atlas-gate]")&&record.attributeName==="hidden")
         );
-        if(modeChanged)setPaused(isPaused(board));
+        const editorNow=board.classList.contains("wmh-overlay-editing");
+        const editorChanged=editorNow!==editorWasActive;
+        editorWasActive=editorNow;
+        if(editorChanged&&editorNow){
+          setPaused(true);
+        }else if(editorChanged&&!editorNow){
+          setPaused(true);
+          void refreshStaticWorld().then(()=>{
+            if(disposed)return;
+            setPaused(isPaused(board));
+            requestFrame();
+          }).catch(()=>{
+            if(!disposed)modal.dataset.pixiRendererStatus="dom-fallback";
+          });
+        }else if(modeChanged){
+          setPaused(isPaused(board));
+        }
         if(actorChanged||modeChanged)requestFrame();
       });
       actorObserver.observe(board,{subtree:true,attributes:true,attributeFilter:["data-x","data-y","data-pos-x","data-pos-y","data-scan-tone","data-interaction-ready","class"]});
