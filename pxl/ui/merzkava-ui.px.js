@@ -38,9 +38,12 @@ sprite("skill-movement",{w:32,h:32},c=>{
   c.px(13,12,"W");c.px(18,20,"W")
 })
 sprite("skill-spirit-art",{w:32,h:32},c=>{
-  c.circ(16,16,11,"p");c.circ(16,16,8,"P");c.circ(16,16,5,"k");c.circ(16,16,3,"y")
-  c.px(16,3,"w");c.px(27,16,"G");c.px(16,28,"w");c.px(4,16,"G")
-  c.px(10,9,"C");c.px(22,9,"C");c.px(10,22,"C");c.px(22,22,"C")
+  // Flame-and-rune crest, deliberately distinct from absorbed Spirit Rings.
+  c.poly([16,2,20,8,23,13,27,17,24,23,20,28,16,30,12,27,8,22,6,17,10,12,13,7],"p")
+  c.poly([16,8,20,15,19,21,16,26,12,22,11,17],"P")
+  c.vline(16,11,11,"y");c.hline(13,16,7,"Y")
+  c.px(16,10,"w");c.px(21,17,"C");c.px(11,20,"C")
+  c.px(16,27,"w");c.px(9,13,"G");c.px(23,13,"G")
 })
 sprite("ration-small",{w:24,h:24},c=>{
   c.rect(4,8,16,11,"k");c.rect(5,9,14,9,"g");c.hline(6,7,12,"G")

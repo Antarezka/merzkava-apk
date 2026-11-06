@@ -780,23 +780,7 @@ function atlasEligiblePlayers():AtlasEligiblePlayer[] {
   }
   return result;
 }
-function atlasOfflinePxlPlayers():AtlasEligiblePlayer[] {
-  const seen=new Set<string>(),result:AtlasEligiblePlayer[]=[];
-  // The pink PXL Atlas intentionally authenticates only against local records.
-  for(const character of characters){
-    const key=character.name.trim().toLocaleLowerCase();
-    if(!key||seen.has(key))continue;
-    seen.add(key);
-    result.push({id:character.id,name:character.name,registryPath:"",source:"local-profile"});
-  }
-  for(const journey of listEternalSaves()){
-    const key=journey.characterName.trim().toLocaleLowerCase();
-    if(!key||seen.has(key))continue;
-    seen.add(key);
-    result.push({id:"journey:"+journey.id,name:journey.characterName,registryPath:"",source:"local-journey"});
-  }
-  return result;
-}
+
 function refreshDeveloperAtlasResetOptions(selectedName?:string):void {
   const select=root.querySelector<HTMLSelectElement>("[data-atlas-reset-player-select]");
   if(!select)return;
@@ -897,8 +881,9 @@ async function refreshAtlasPasswordMode(gate:HTMLElement):Promise<void> {
   const password=gate.querySelector<HTMLInputElement>("#world-atlas-password");
   const safetyNote=gate.querySelector<HTMLElement>("[data-password-safety-note]");
   const selected=select?.value||"";
-  const pxlOffline=gate.closest<HTMLElement>("[data-idle-rpg-modal]")?.dataset.renderer==="augusto-pxl";
-  const eligible=(pxlOffline?atlasOfflinePxlPlayers():atlasEligiblePlayers()).some(player=>player.name===selected);
+  const pxlAtlas=gate.closest<HTMLElement>("[data-idle-rpg-modal]")?.dataset.renderer==="augusto-pxl";
+  const playerOptions=atlasEligiblePlayers();
+  const eligible=playerOptions.some(player=>player.name===selected);
   if(!loginPanel||!signupPanel||!loginBlock||!loginSubmit||!signupOpen||!password)return;
   loginPanel.hidden=false;signupPanel.hidden=true;
   if(loginForm)loginForm.dataset.atlasSubmitMode="login";
@@ -910,24 +895,24 @@ async function refreshAtlasPasswordMode(gate:HTMLElement):Promise<void> {
     if(resetActions)resetActions.hidden=true;
     if(resetPanel)resetPanel.hidden=true;
     loginSubmit.disabled=true;
-    if(message)message.textContent=(pxlOffline?atlasOfflinePxlPlayers().length:atlasEligiblePlayers().length)
+    if(message)message.textContent=playerOptions.length
       ?(gate.dataset.selectLabel||"Select a registered character to continue.")
-      :(pxlOffline?"PXL OFFLINE · No local profile or saved journey is available. Create one inside the app first.":(gate.dataset.emptyLabel||""));
+      :(pxlAtlas?"No verified Universe player list or local character records are available. Connect to load the current registry.":(gate.dataset.emptyLabel||""));
     return;
   }
   try{
     const exists=await hasAtlasPassword(selected);
     if(select?.value!==selected)return;
     if(resetPanel)resetPanel.hidden=true;
-    if(resetActions)resetActions.hidden=pxlOffline;
-    if(changeButton)changeButton.hidden=pxlOffline||!exists;
+    if(resetActions)resetActions.hidden=pxlAtlas;
+    if(changeButton)changeButton.hidden=pxlAtlas||!exists;
     loginBlock.hidden=!exists;
     if(safetyNote)safetyNote.hidden=!exists;
     signupOpen.hidden=exists;
     loginSubmit.hidden=!exists;
     loginSubmit.disabled=false;
     password.autocomplete="current-password";
-    if(message)message.textContent=(pxlOffline?"PXL OFFLINE · ":"")+(exists
+    if(message)message.textContent=(pxlAtlas?"PXL ATLAS · ":"")+(exists
       ?(gate.dataset.loginPrompt||"Enter this character's password.")
       :(gate.dataset.signupPrompt||"Create a password to continue."));
   }catch(error){
@@ -1020,11 +1005,34 @@ async function openWorldAtlasFromTv(renderer:"dom"|"augusto-pxl"="dom"):Promise<
   const offlineMessage=gate.dataset.offlineLabel||"An active internet connection to the official Universe source is required.";
   if(renderer==="augusto-pxl"){
     await refreshCharacters();
-    const options=atlasOfflinePxlPlayers();
+    let registryNotice="";
+    if(navigator.onLine){
+      try{
+        let canon=getCanonStatus();
+        if(!canon.commitSha||canon.status==="error"){
+          const refreshed=await refreshCanon();
+          canonMessage=refreshed.message;
+          canon=getCanonStatus();
+        }
+        if(!canon.commitSha||canon.status==="error")throw new Error(offlineMessage);
+        while(playerRegistryBusy)await new Promise<void>(resolve=>window.setTimeout(resolve,60));
+        const registry=await refreshLatestPlayerRegistry(canon.commitSha);
+        if(registry.commitSha!==canon.commitSha)throw new Error("The player registry does not match the verified active Universe snapshot.");
+        await verifyCanonSourceConnection(canon.commitSha);
+        registeredCharacters=mapRegistryCharacters(registry);
+        playerRegistryMessage=registeredCharacters.length+" Universe players · snapshot "+registry.commitSha;
+      }catch(error){
+        registryNotice=error instanceof Error?error.message:"The verified Universe player registry could not be loaded.";
+      }
+    }else{
+      registryNotice="Offline · using previously loaded Universe names and local records.";
+    }
+    const options=atlasEligiblePlayers();
+    const universeCount=options.filter(player=>player.source==="universe").length;
     const remembered=await restoreAtlasPlayer().catch(()=> "");
     if(select){
-      select.innerHTML='<option value="">— Select a local character —</option>'+options.map(player=>{
-        const sourceLabel=player.source==="local-journey"?" · Local Journey":" · Local Profile";
+      select.innerHTML='<option value="">— Select a character —</option>'+options.map(player=>{
+        const sourceLabel=player.source==="universe"?" · Universe":player.source==="local-journey"?" · Local Journey":" · Local Profile";
         return '<option value="'+escapeHtml(player.name)+'">'+escapeHtml(player.name+sourceLabel)+'</option>';
       }).join("");
       if(options.some(player=>player.name===remembered))select.value=remembered;
@@ -1032,8 +1040,8 @@ async function openWorldAtlasFromTv(renderer:"dom"|"augusto-pxl"="dom"):Promise<
       if(rememberCheckbox)rememberCheckbox.checked=options.some(player=>player.name===remembered);
       const loginPassword=gate.querySelector<HTMLInputElement>("#world-atlas-password");
       if(loginPassword)loginPassword.value=remembered?await restoreRememberedAtlasPassword(remembered):"";
-      if(rememberCheckbox&&rememberCheckbox.dataset.pxlOfflineRestoreBound!=="true"){
-        rememberCheckbox.dataset.pxlOfflineRestoreBound="true";
+      if(rememberCheckbox&&rememberCheckbox.dataset.pxlAtlasRestoreBound!=="true"){
+        rememberCheckbox.dataset.pxlAtlasRestoreBound="true";
         rememberCheckbox.addEventListener("change",()=>{
           if(!rememberCheckbox.checked){
             const selectedName=select.value;
@@ -1043,8 +1051,8 @@ async function openWorldAtlasFromTv(renderer:"dom"|"augusto-pxl"="dom"):Promise<
           }
         });
       }
-      if(select.dataset.pxlOfflineLoginBound!=="true"){
-        select.dataset.pxlOfflineLoginBound="true";
+      if(select.dataset.pxlAtlasLoginBound!=="true"){
+        select.dataset.pxlAtlasLoginBound="true";
         select.addEventListener("change",()=>{
           const panel=gate.querySelector<HTMLElement>("[data-atlas-reset-panel]");
           const passwordInput=gate.querySelector<HTMLInputElement>("#world-atlas-password");
@@ -1058,9 +1066,13 @@ async function openWorldAtlasFromTv(renderer:"dom"|"augusto-pxl"="dom"):Promise<
         });
       }
     }
-    if(message)message.textContent=options.length
-      ?"PXL OFFLINE · Local profiles and saved journeys only. No network access is used."
-      :"PXL OFFLINE · No local profile or saved journey was found. Create one in the app first.";
+    if(message){
+      message.textContent=universeCount
+        ?String(universeCount)+" verified Universe players · local profiles and saved journeys included."+(registryNotice?" "+registryNotice:"")
+        :options.length
+          ?"No verified Universe player names are currently loaded; showing "+options.length+" local records."+(registryNotice?" "+registryNotice:"")
+          :(registryNotice||"No Universe or local player records are available. Connect once to load players.md.");
+    }
     if(submit)submit.disabled=options.length===0;
     await refreshAtlasPasswordMode(gate);
     requestAnimationFrame(()=>gate.querySelector<HTMLInputElement>("#world-atlas-player")?.focus());
@@ -2332,12 +2344,12 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     const confirmation=String(data.get(signingUp?"signupConfirm":"confirm")??"");
     const remember=data.get("remember")==="yes";
     const pxlOffline=gate?.closest<HTMLElement>("[data-idle-rpg-modal]")?.dataset.renderer==="augusto-pxl";
-    const eligible=(pxlOffline?atlasOfflinePxlPlayers():atlasEligiblePlayers()).some(player=>player.name===playerName);
+    const eligible=atlasEligiblePlayers().some(player=>player.name===playerName);
     const message=gate?.querySelector<HTMLElement>("[data-world-atlas-message]");
     const button=signingUp?form.querySelector<HTMLButtonElement>('[data-atlas-submit-mode="signup"]'):form.querySelector<HTMLButtonElement>('[data-atlas-submit-mode="login"]');
     if(!gate)return;
     if(!playerName){if(message)message.textContent=gate.dataset.selectLabel||"Select a registered character to continue.";return;}
-    if(!eligible){if(message)message.textContent=pxlOffline?"This character is not stored locally on this device. PXL Offline accepts local profiles and saved journeys only.":"This character is not registered in the verified players.md and local Eternal Path account list.";return;}
+    if(!eligible){if(message)message.textContent="This character is not in the verified Universe player list or the locally saved character list.";return;}
     if(!password){if(message)message.textContent=gate.dataset.passwordRequiredLabel||"Enter a password to continue.";return;}
     if(password.length<8||password.length>128){if(message)message.textContent="Use a password between 8 and 128 characters.";return;}
     const offlineMessage=gate.dataset.offlineLabel||"No internet connection or the official Universe source is unavailable. Check your connection and try again.";

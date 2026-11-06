@@ -2385,7 +2385,7 @@
   position:absolute!important;left:50%!important;right:auto!important;top:auto!important;bottom:0!important;
   display:block!important;visibility:visible!important;opacity:1!important;inset:auto auto 0 50%!important;
   transform:translateX(-50%)!important;border:0!important;border-radius:0!important;
-  background-color:transparent!important;background-repeat:no-repeat!important;background-position:center bottom!important;
+  background-color:transparent!important;background-repeat:no-repeat!important;
   box-shadow:none!important;pointer-events:none!important;
 }
 .wmh-overlay[data-visual-mode="augusto-pxl"] .wmh-pxl-actor-sprite:not([data-pxl-resolved])::after{

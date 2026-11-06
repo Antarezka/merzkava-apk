@@ -90,6 +90,9 @@ function applySpriteSheet(element:HTMLElement,asset:PxlAsset,src:string):void {
   if(src.startsWith("blob:"))objectUrls.set(element,src);
   element.style.backgroundImage='url("'+src+'")';
   element.style.backgroundRepeat="no-repeat";
+  // Academy actor sheets are horizontal strips; preserve their native sheet dimensions.
+  element.style.backgroundSize=(asset.columns*asset.frameWidth)+"px "+asset.frameHeight+"px";
+  element.style.backgroundPosition="0px 0px";
   element.style.width=asset.frameWidth+"px";
   element.style.height=asset.frameHeight+"px";
   const animation=selectAnimation(asset,element);

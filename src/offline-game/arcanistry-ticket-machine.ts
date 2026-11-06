@@ -174,7 +174,6 @@ export function mountArcanistryTicketMachine(root: HTMLElement, onTravel: Travel
     const card = machine.querySelector<HTMLButtonElement>("[data-arcanistry-card-insert]");
     if (!ticket) return;
     machine.dataset.machineState = "printing";
-    machine.style.setProperty("--lamp-flicker-duration", (0.38 + Math.random() * .74).toFixed(2) + "s");
     machine.classList.add("is-running");
     machine.classList.remove("is-card-required", "has-ticket", "is-traveling");
     lever.disabled = true;

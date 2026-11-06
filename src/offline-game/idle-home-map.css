@@ -296,7 +296,7 @@
 .arcanist-card-slot:before{content:"";position:absolute;left:12%;right:12%;top:5px;height:1px;background:#d4b57866;box-shadow:0 0 4px #d4b57855}
 .arcanist-card-slot>i{position:absolute;left:50%;top:50%;width:3px;height:3px;transform:translate(-50%,-50%);border-radius:50%;background:#d8a24c;opacity:.25}
 .arcanist-card-warning-lamp{position:absolute;right:-12px;top:50%;width:7px;height:7px;transform:translateY(-50%);border:1px solid #8a6236;border-radius:50%;background:#4a2c16}
-.arcanist-card-warning-lamp.is-lit{background:#ff9b32;box-shadow:0 0 5px 2px #ff8a27,0 0 12px #ff9d3caa;will-change:opacity;animation:arcanist-warning-flicker .43s steps(2,end) infinite}
+.arcanist-card-warning-lamp.is-lit{background:#ff9b32;box-shadow:0 0 5px 2px #ff8a27,0 0 12px #ff9d3caa;opacity:1;will-change:auto;animation:none}
 @keyframes arcanist-warning-flicker{0%,100%{opacity:1}31%{opacity:.35}54%{opacity:.9}72%{opacity:.18}}
 .arcanist-card-inserted-indicator{position:absolute;left:50%;top:auto;bottom:-14px;transform:translateX(-50%);white-space:nowrap;color:#e8ca8d;font:700 6px system-ui,sans-serif;letter-spacing:.08em;text-shadow:0 0 5px #edc77b}
 .arcanist-card-inserted-indicator[hidden]{display:none!important}
@@ -349,10 +349,10 @@
 .arcanist-route-loading strong{font:700 9px system-ui,sans-serif;letter-spacing:.2em;color:#e6c68d}
 .arcanist-route-loading span{font:11px Georgia,serif;color:#bdb29d}
 @keyframes arcanist-seal-turn{to{transform:rotate(360deg)}}
-.arcanist-machine-shell.is-traveling .arcanist-master-lamp i,.arcanist-machine-shell.is-running .arcanist-master-lamp i{animation:arcanist-master-flicker var(--lamp-flicker-duration,.73s) steps(1,end) infinite}
-.arcanist-machine-shell.is-card-required .arcanist-master-lamp i{animation:arcanist-warning-master .47s steps(2,end) infinite}
-@keyframes arcanist-master-breathe{0%,100%{opacity:.48}50%{opacity:1}}
-@keyframes arcanist-master-flicker{0%{opacity:1}7%{opacity:.12}13%{opacity:.92}24%{opacity:.28}39%{opacity:1}43%{opacity:.08}58%{opacity:.72}74%{opacity:.18}88%{opacity:1}100%{opacity:.62}}
+.arcanist-machine-shell.is-traveling .arcanist-master-lamp i,.arcanist-machine-shell.is-running .arcanist-master-lamp i{animation:arcanist-master-breathe 2.2s ease-in-out infinite}
+.arcanist-machine-shell.is-card-required .arcanist-master-lamp i{animation:arcanist-master-breathe 1.8s ease-in-out infinite}
+@keyframes arcanist-master-breathe{0%,100%{opacity:.84}50%{opacity:1}}
+@keyframes arcanist-master-flicker{0%,100%{opacity:1}}
 @media(max-width:390px){
  .arcanist-device-drawer{padding:6px}
  .arcanist-machine-shell{padding:8px 7px 7px;gap:6px}
@@ -553,8 +553,8 @@
 .atlas-buffer-lamp{
   flex:0 0 8px;width:8px;height:8px;border:1px solid #e2ce9b;border-radius:50%;
   background:radial-gradient(circle at 35% 30%,#fff1c2,#b59657 76%);
-  box-shadow:0 0 8px #e8ca83,0 0 17px #e8ca8366;
-  will-change:opacity,box-shadow;animation:atlas-lamp-pulse 1.1s ease-in-out infinite;
+  box-shadow:0 0 7px #e8ca83,0 0 12px #e8ca8344;
+  opacity:1;animation:none;will-change:auto;
 }
 .atlas-buffer-visual{
   position:relative;display:grid;place-items:center;width:clamp(92px,27vw,116px);
@@ -609,11 +609,11 @@
   color:#f0e4c6;font:600 clamp(10px,3.2vw,13px)/1.35 ui-monospace,SFMono-Regular,Consolas,monospace;
   letter-spacing:.035em;white-space:nowrap;text-overflow:clip;
   text-shadow:0 0 12px #e1c17b22;mask-image:linear-gradient(90deg,#000 0%,#000 88%,transparent 100%);
-  transition:opacity .12s ease,transform .12s ease;will-change:opacity,transform;
+  transition:none;will-change:auto;
 }
 .atlas-buffer-caret{
   flex:0 0 5px;width:5px;height:11px;border-radius:1px;
-  background:#d7c184;box-shadow:0 0 8px #d7c184;animation:atlas-caret-blink .72s steps(2,end) infinite;
+  background:#d7c184;box-shadow:0 0 8px #d7c184;opacity:.9;animation:none;
 }
 .atlas-buffer-track{
   position:relative;width:100%;max-width:330px;height:8px;padding:1px;overflow:hidden;

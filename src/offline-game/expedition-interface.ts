@@ -94,11 +94,11 @@ export function renderExpeditionInterface():string {
           <path d="M14 45v2m24-2v2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
         </svg>
       </button>
-      <button type="button" class="expedition-pxl-trigger" data-augusto-pxl-open data-drag-position-key="merzkava.eternal-path.augusto-pxl-position.v1" aria-label="Open Augusto PXL World Atlas" aria-haspopup="dialog" aria-expanded="false" title="Augusto PXL · World Atlas">
+      <button type="button" class="expedition-pxl-trigger" data-augusto-pxl-open data-drag-position-key="merzkava.eternal-path.augusto-pxl-position.v1" aria-label="Open World Atlas" aria-haspopup="dialog" aria-expanded="false" title="World Atlas">
         <span class="pxl-tv-art" aria-hidden="true">
           <span class="pxl-tv-antenna"><i></i><b></b></span>
           <span class="pxl-tv-shell"><i class="pxl-tv-screen"></i><i class="pxl-tv-knobs"><b></b><b></b></i></span>
-          <span class="pxl-console-box"><i class="pxl-console-dpad"></i><i class="pxl-console-stick"><b></b></i><i class="pxl-console-lamp"></i><small class="pxl-console-ink">AUGUSTO PXL</small></span>
+          <span class="pxl-console-box"><i class="pxl-console-dpad"></i><i class="pxl-console-stick"><b></b></i><i class="pxl-console-lamp"></i></span>
         </span>
       </button>
       ${renderIdleHomeMap(save?{day:save.day,hour:save.hour,minute:save.minute,cycle:atmosphere.cycle==="Morning"?"Day":atmosphere.cycle}:null)}
