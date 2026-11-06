@@ -96,7 +96,10 @@ describe("isometric NPC conversations", () => {
   });
 
   it("lets a hidden isometric overlay release the menu and its pointer layer", () => {
-    const hiddenGuard=chatStyles.match(/\.wmh-overlay\\[hidden\\]:has\\(\.wmh-isometric-play-screen\\)\\{([^}]*)\\}/)?.[1]??"";
+    const selector=".wmh-overlay[hidden]:has(.wmh-isometric-play-screen){";
+    const start=chatStyles.lastIndexOf(selector);
+    const end=start>=0?chatStyles.indexOf("}",start):-1;
+    const hiddenGuard=start>=0&&end>=0?chatStyles.slice(start+selector.length,end):"";
     expect(hiddenGuard).toContain("display:none!important");
     expect(hiddenGuard).toContain("visibility:hidden!important");
     expect(hiddenGuard).toContain("pointer-events:none!important");
