@@ -53,7 +53,7 @@ function drawAcademyCharacter(c,look){
   }else if(frontDiagonal){
    const eye=right?headX+faceWidth-4:headX+3
    c.px(eye,14+bob,"k");c.px(eye+(right?-1:1),17+bob,"s")
-   c.px(right?headX+3:headX+faceWidth-4,"d")
+   c.px(right?headX+3:headX+faceWidth-4,16+bob,"d")
   }else{
    const eye=right?headX+faceWidth-3:headX+2
    c.px(eye,14+bob,"k");c.px(eye+(right?-1:1),17+bob,"s")
