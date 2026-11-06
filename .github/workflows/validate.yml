@@ -10,6 +10,7 @@ on:
       - feat/secure-atlas-reset-transitions-2026-11-06
       - feat/developer-issued-atlas-reset-2026-11-06
       - feat/player-hud-subcell-runtime-2026-11-06
+      - feat/player-hud-inventory-2026-11-06
   pull_request:
 
 jobs:
