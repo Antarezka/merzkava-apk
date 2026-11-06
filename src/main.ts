@@ -844,6 +844,18 @@ function unlockAtlasBackground(gate:HTMLElement):void {
   lockAtlasBackground(gate,false);
   gate.hidden=true;
 }
+
+async function requireWorldAtlasSourceConnection(gate:HTMLElement):Promise<void> {
+  const offlineMessage=gate.dataset.offlineLabel||"An active internet connection to the official Universe source is required.";
+  if(!navigator.onLine)throw new Error(offlineMessage);
+  const source=getCanonStatus();
+  if(!source.commitSha)throw new Error(offlineMessage);
+  try {
+    await verifyCanonSourceConnection(source.commitSha);
+  } catch {
+    throw new Error(offlineMessage);
+  }
+}
 function closeWorldAtlas(syncHistory=true):void {
   const modal=root.querySelector<HTMLElement>("[data-idle-rpg-modal]");
   const trigger=root.querySelector<HTMLButtonElement>("[data-idle-rpg-open]");
