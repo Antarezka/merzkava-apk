@@ -116,6 +116,7 @@ export function renderPlayerHudMarkup():string {
     '</section>'+
     '<section class="wmh-inventory-window" data-hud-panel="inventory" data-wmh-scroll-resize hidden role="dialog" aria-label="Traveler Satchel inventory">'+
       '<header class="wmh-inventory-header"><div><b>TRAVELER\'S SATCHEL</b><small>PERSONAL INVENTORY · <span data-hud-capacity>9 / 25</span></small></div><button type="button" data-hud-action="close-inventory" aria-label="Close inventory">×</button></header>'+
+      '<small class="wmh-player-hud-feedback" data-hud-feedback role="status" aria-live="polite"></small>'+
       '<div class="wmh-inventory-grid">'+itemsMarkup+'</div>'+
       '<section class="wmh-currency-purse"><header class="wmh-currency-header"><b>◈ CURRENCY PURSE</b><small>SEPARATE STORAGE</small></header><div class="wmh-currency-list">'+currencyMarkup+'</div></section>'+
     '</section>'+
