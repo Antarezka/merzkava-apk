@@ -65,7 +65,7 @@ describe("Pixi World Atlas Android input isolation",()=>{
     expect(rendererSource).toContain("textures.forEach(asset=>asset.release())");
     expect(rendererSource).toContain("if(editorChanged&&!editorNow)");
     expect(rendererSource).toContain("texture.destroy(true)");
-    expect(rendererSource).toContain("image.src=""");
+    expect(rendererSource).toContain('image.src=""');
 
   });
 
