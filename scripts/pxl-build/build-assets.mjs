@@ -44,6 +44,7 @@ async function ensurePinnedPxl() {
   if (actual !== PXL_COMMIT) throw new Error(`PXL pin mismatch: expected ${PXL_COMMIT}, got ${actual}`);
   const cli = path.join(TOOL_DIR, "bin", "pxl.js");
   await fs.access(cli);
+  await fs.mkdir(path.dirname(LICENSE_DEST), { recursive: true });
   await fs.copyFile(path.join(TOOL_DIR, "LICENSE"), LICENSE_DEST);
   return cli;
 }
