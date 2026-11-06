@@ -280,6 +280,8 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
       viewport.scrollLeft=left;viewport.scrollTop=top;
     }) as EventListener);
   }
+  // CENTER MAP is an editor calibration command: it uses the saved Map Base
+  // focal point. It is deliberately different from the first-entry camera.
   const centerMap = () => {
     sizeBaseMap();
     zoom = 1;
@@ -296,6 +298,29 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
     viewport.scrollTop = Math.max(0, focusY*zoom-viewport.clientHeight/2);
     const level = dialog.querySelector<HTMLElement>("[data-wmh-zoom-level]");
     if (level) level.textContent = "100%";
+  };
+  // First entry into Tianhai Academy follows the Player token's spawn/current
+  // position, not the editor's independently saved CENTER MAP focal point.
+  const centerOnPlayer = () => {
+    sizeBaseMap();
+    zoom = 1;
+    applySurfaceSize(1);
+    const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
+    const player=board?.querySelector<HTMLElement>("[data-wmh-player-token]");
+    const mapData=board?readIsoMapData(board):null;
+    const visualX=Number(player?.dataset.posX??player?.dataset.x??12);
+    const visualY=Number(player?.dataset.posY??player?.dataset.y??31);
+    const point=mapData?isoCellCenter(visualX,visualY,mapData.grid):{x:baseWidth/2,y:baseHeight/2};
+    const focusX=academyCanvas
+      ? academyMarginLeft+point.x*(academyImageWidth/Math.max(1,image.naturalWidth))
+      : point.x;
+    const focusY=academyCanvas
+      ? academyMarginTop+point.y*(academyImageHeight/Math.max(1,image.naturalHeight))
+      : point.y;
+    viewport.scrollLeft=Math.max(0,focusX*zoom-viewport.clientWidth/2);
+    viewport.scrollTop=Math.max(0,focusY*zoom-viewport.clientHeight/2);
+    const level=dialog.querySelector<HTMLElement>("[data-wmh-zoom-level]");
+    if(level)level.textContent="100%";
   };
   viewport.addEventListener("merzkava:center-isometric-map",centerMap);
   // World-map markers are fixed map anchors: their pointer gestures must never
@@ -387,8 +412,9 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
   };
   viewport.addEventListener("pointerup", endPointer);
   viewport.addEventListener("pointercancel", endPointer);
-  if (image.complete && image.naturalWidth) centerMap();
-  else image.addEventListener("load", centerMap, { once: true });
+  const initialCenter=academyCanvas?centerOnPlayer:centerMap;
+  if (image.complete && image.naturalWidth) initialCenter();
+  else image.addEventListener("load", initialCenter, { once: true });
 }
 function mapEditorMarkup(): string {
   if (!worldMapDeveloperMode) return "";
