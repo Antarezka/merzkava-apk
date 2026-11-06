@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createIsoMapEditorData, DEFAULT_ISOMETRIC_GRID, isoCellCenter } from "../../src/offline-game/isometric-map-editor";
+import { createIsoMapEditorData, DEFAULT_ISOMETRIC_GRID, isoCellCenter, normalizeIsoMapEditorData } from "../../src/offline-game/isometric-map-editor";
 import { findIsoQuadrantPath, isIsoQuadrantEdgeFullyBlocked, isIsoQuadrantWalkable, isNpcInteractionCellReachable, isoQuadrantCenterGridPosition, isoSubcellPositionAtPoint, nearestWalkableIsoQuadrant } from "../../src/offline-game/isometric-interaction";
 
 describe("tile-aware NPC interaction reach",()=>{
@@ -112,5 +112,21 @@ describe("walkable isometric quadrant routing", () => {
       { x: 0, y: 0, quadrant: "tl-b" },
       { x: 1, y: 0, quadrant: "tl-a" },
     )).toBeNull();
+  });
+});
+
+
+describe("isometric transition marker metadata",()=>{
+  it("persists a valid target region",()=>{
+    const data=createIsoMapEditorData("transition-target",{cols:4,rows:4});
+    data.transitions=[{id:"gate",x:2,y:2,label:"Exit Academy",targetRegion:"golden-dragon-empire"}];
+    expect(normalizeIsoMapEditorData(data,"transition-target",data.grid).transitions[0]?.targetRegion).toBe("golden-dragon-empire");
+  });
+  it("drops malformed target region slugs but retains the marker",()=>{
+    const data=createIsoMapEditorData("transition-invalid",{cols:4,rows:4});
+    data.transitions=[{id:"gate",x:2,y:2,label:"Exit Academy",targetRegion:"../bad path"} as never];
+    const marker=normalizeIsoMapEditorData(data,"transition-invalid",data.grid).transitions[0];
+    expect(marker?.label).toBe("Exit Academy");
+    expect(marker?.targetRegion).toBeUndefined();
   });
 });

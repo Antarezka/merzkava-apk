@@ -2478,3 +2478,26 @@
 .wmh-overlay[data-visual-mode="augusto-pxl"] .wmh-regional-site>i[data-pxl-resolved="image"]{
   color:transparent;font-size:0;
 }
+
+.wmh-map-transition-confirm[hidden]{display:none!important}
+.wmh-map-transition-confirm{
+  position:fixed;inset:0;z-index:2147483644;display:grid;place-items:center;
+  box-sizing:border-box;padding:18px;background:rgba(4,9,12,.82);
+}
+.wmh-map-transition-confirm-card{
+  width:min(360px,calc(100vw - 36px));padding:22px 20px 18px;
+  border:1px solid #b9945d;border-radius:12px;
+  background:linear-gradient(155deg,#27342f,#111a1b 72%);
+  box-shadow:0 18px 55px #000b,inset 0 0 0 2px #d6bd8320;
+  color:#f2e8d4;text-align:center;
+}
+.wmh-map-transition-confirm-card>small{color:#d9b879;font:700 9px system-ui,sans-serif;letter-spacing:.2em}
+.wmh-map-transition-confirm-card h3{margin:10px 0 8px;font:600 22px Georgia,serif}
+.wmh-map-transition-confirm-card p{margin:0;color:#d1c8b7;font:13px/1.5 system-ui,sans-serif}
+.wmh-map-transition-confirm-card>div{display:flex;justify-content:center;gap:12px;margin-top:18px}
+.wmh-map-transition-confirm-card button{
+  min-width:104px;padding:10px 18px;border:1px solid #b9945d;border-radius:7px;
+  background:#26332e;color:#f4e8d1;font:700 12px system-ui,sans-serif;
+}
+.wmh-map-transition-confirm-card button[data-wmh-transition-yes]{background:#8a683a;color:#fff4db}
+@media(prefers-reduced-motion:reduce){.wmh-map-transition-confirm-card{animation:none!important;transition:none!important}}

@@ -37,8 +37,8 @@ export const TIANHAI_ACADEMY_MAP_REFERENCE: IsoMapEditorData = {
 9,22:bl-b 9,22:bl-a 9,22:tl-b 8,22:br-b 8,22:br-a 9,22:tl-a 9,22:tr-a 9,22:br-b 9,22:br-a 10,22:tl-a 10,22:tl-b 10,22:bl-a 10,22:bl-b 10,22:br-b 10,22:br-a 10,22:tr-b 10,22:tr-a 9,22:tr-b 14,25:br-b 10,23:tr-a 10,23:tl-a 10,23:tr-b 10,23:br-a 11,23:bl-a 11,23:tl-b 10,23:br-b 10,23:bl-b 10,17:tr-a 10,16:tl-b 10,16:bl-a 10,16:tl-a 10,16:tr-a 9,15:bl-b 9,15:br-b 10,15:tl-b 9,16:tr-b 9,16:br-a 9,16:br-b 9,16:bl-b 9,15:bl-a 9,15:tl-b 8,15:bl-b 8,15:br-b 8,16:tr-b 8,16:tr-a 8,16:tl-a
 `),
   transitions:[
-    {id:"transition-1793864008899-0",x:11,y:31,label:"Akses ke map golden dragon empire"},
-    {id:"transition-1793864011340-1",x:12,y:31,label:"Akses ke map golden dragon empire"},
+    {id:"transition-1793864008899-0",x:11,y:31,label:"Akses ke map golden dragon empire",targetRegion:"golden-dragon-empire"},
+    {id:"transition-1793864011340-1",x:12,y:31,label:"Akses ke map golden dragon empire",targetRegion:"golden-dragon-empire"},
     {id:"transition-1793864745728-2",x:9,y:3,label:"Dialog box: you're not qualified yet"},
     {id:"transition-1793864803234-3",x:14,y:-5,label:"Event scene: pengenalan dunia merzkava tentang spirit realm dan archanistry"}
   ],

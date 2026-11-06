@@ -25,6 +25,7 @@ export type IsoTransitionMarker = {
   x: number;
   y: number;
   label: string;
+  targetRegion?: string;
 };
 
 export type IsoMapEditorData = {
@@ -205,6 +206,8 @@ export function normalizeIsoMapEditorData(
         x,
         y,
         label: String(marker.label || "").slice(0, 80),
+        ...(typeof marker.targetRegion==="string"&&/^[a-z0-9]+(?:-[a-z0-9]+)*$/i.test(marker.targetRegion.trim())
+          ?{targetRegion:marker.targetRegion.trim().toLowerCase().slice(0,80)}:{}),
       }];
     })
     : [];

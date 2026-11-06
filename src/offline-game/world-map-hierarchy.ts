@@ -8,7 +8,7 @@ import { TIANHAI_ACADEMY_MAP_REFERENCE } from "./tianhai-academy-map-reference";
 import {
   createIsoMapEditorData, DEFAULT_ISOMETRIC_GRID, DEFAULT_ISO_CANVAS_EXPANSION, normalizeIsoCanvasExpansion, isoCellAtPoint, isoCellCenter, isoCellHasLayer,
   isoCellKey, isoClientToImagePoint, isoMapStorageKey, isoPointerGesture, isoQuadrantAtPoint, mergeIsoWalkableCells, normalizeIsoMapEditorData, removeIsoWalkableCell, toggleIsoQuadrantLayer, unmergeIsoWalkableCell,
-  type IsoMapEditorData, type IsoMapGridConfig, type IsoMapPoint, type IsoQuadrant, type IsoQuadrantLayer,
+  type IsoMapEditorData, type IsoMapGridConfig, type IsoMapPoint, type IsoQuadrant, type IsoQuadrantLayer, type IsoTransitionMarker,
 } from "./isometric-map-editor";
 import { renderIsometricSvgSceneMarkup, refreshIsometricSvgScene, type IsometricSvgTheme } from "./isometric-svg-board";
 import { findIsoQuadrantPath, isIsoQuadrantWalkable, isNpcInteractionCellReachable, isoQuadrantCenterGridPosition, isoSubcellPositionAtPoint, nearestWalkableIsoQuadrant } from "./isometric-interaction";
@@ -1028,6 +1028,98 @@ function animateIsometricArrival(dialog:HTMLElement,from:{day:number;minutes:num
   if(cycleLabel)cycleLabel.dataset.arrived=to.cycle;
   if(weatherLabel)weatherLabel.dataset.arrived=to.weather;
 }
+function resolveTransitionRegion(marker:IsoTransitionMarker):RegionId|null {
+  const explicit=(marker.targetRegion||"").trim().toLowerCase();
+  const labelMatch=/^(?:akses\s+ke\s+map|exit\s+to\s+map|travel\s+to\s+map|map\s*:)\s*(.+)$/i.exec(marker.label.trim());
+  const raw=explicit||labelMatch?.[1]?.trim().toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"";
+  return raw in regionData?raw as RegionId:null;
+}
+type TransitionSafePosition={x:number;y:number;quadrant:IsoQuadrant;position:{x:number;y:number}};
+type PendingMapTransition={markerId:string;region:RegionId;safe:TransitionSafePosition};
+const pendingMapTransitions=new WeakMap<HTMLElement,PendingMapTransition>();
+function ensureMapTransitionPrompt(dialog:HTMLElement):HTMLElement {
+  let panel=dialog.querySelector<HTMLElement>("[data-wmh-map-transition-confirm]");
+  if(panel)return panel;
+  panel=document.createElement("section");
+  panel.className="wmh-map-transition-confirm";
+  panel.dataset.wmhMapTransitionConfirm="";
+  panel.hidden=true;
+  panel.setAttribute("role","dialog");panel.setAttribute("aria-modal","true");
+  panel.setAttribute("aria-label","Confirm map transition");
+  panel.innerHTML='<div class="wmh-map-transition-confirm-card"><small>WORLD TRANSITION</small><h3 data-wmh-map-transition-title></h3><p data-wmh-map-transition-copy></p><div><button type="button" data-wmh-transition-no>TIDAK</button><button type="button" data-wmh-transition-yes>YA</button></div></div>';
+  dialog.append(panel);
+  return panel;
+}
+function showMapTransitionConfirmation(dialog:HTMLElement,marker:IsoTransitionMarker,region:RegionId,safe:TransitionSafePosition):void {
+  const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
+  if(!board)return;
+  const panel=ensureMapTransitionPrompt(dialog);
+  const title=panel.querySelector<HTMLElement>("[data-wmh-map-transition-title]");
+  const copy=panel.querySelector<HTMLElement>("[data-wmh-map-transition-copy]");
+  const isAcademy=board.dataset.mapId==="golden-dragon-empire:tianhai-academy:exterior";
+  if(title)title.textContent=isAcademy?"Keluar dari Akademi?":"Pindah wilayah?";
+  if(copy)copy.textContent="Jika YA, pindah ke "+regionData[region].name+". Jika TIDAK, karakter akan kembali ke petak aman.";
+  pendingMapTransitions.set(board,{markerId:marker.id,region,safe});
+  stopNpcWander(dialog);
+  panel.hidden=false;
+  const card=panel.querySelector<HTMLElement>(".wmh-map-transition-confirm-card");
+  if(card&&!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches)animate(card,{opacity:[0,1],translateY:[12,0],scale:[.98,1],duration:260,ease:"outCubic"});
+}
+function findTransitionRetreat(board:HTMLElement,player:HTMLElement,marker:IsoTransitionMarker):TransitionSafePosition|null {
+  const data=readIsoMapData(board);
+  const currentX=Number(player.dataset.x||marker.x),currentY=Number(player.dataset.y||marker.y);
+  const currentQuadrant=(player.dataset.quadrant||"tl-a") as IsoQuadrant;
+  const start={x:currentX,y:currentY,quadrant:currentQuadrant};
+  const occupied=new Set(data.transitions.map(item=>isoCellKey(item.x,item.y)));
+  const candidates:Array<{x:number;y:number;quadrant:IsoQuadrant;pathLength:number}>=[];
+  for(let radius=1;radius<=5;radius++){
+    for(let dy=-radius;dy<=radius;dy++)for(let dx=-radius;dx<=radius;dx++){
+      if(Math.abs(dx)+Math.abs(dy)!==radius)continue;
+      const x=marker.x+dx,y=marker.y+dy;
+      if(occupied.has(isoCellKey(x,y)))continue;
+      const tile=board.querySelector<HTMLElement>('[data-wmh-tile][data-x="'+x+'"][data-y="'+y+'"]');
+      if(!tile||!isoCanWalkTile(board,tile,x,y,data))continue;
+      const quadrant=nearestWalkableIsoQuadrant(data,x,y,{x,y});
+      if(!quadrant)continue;
+      const path=findIsoQuadrantPath(data,start,{x,y,quadrant});
+      if(path)candidates.push({x,y,quadrant,pathLength:path.length});
+    }
+    if(candidates.length)break;
+  }
+  candidates.sort((a,b)=>a.pathLength-b.pathLength);
+  const best=candidates[0];
+  return best?{x:best.x,y:best.y,quadrant:best.quadrant,position:isoQuadrantCenterGridPosition(best.x,best.y,best.quadrant)}:null;
+}
+function finishMapTransition(dialog:HTMLElement,accept:boolean):boolean {
+  const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
+  const panel=dialog.querySelector<HTMLElement>("[data-wmh-map-transition-confirm]");
+  if(!board)return false;
+  const pending=pendingMapTransitions.get(board);
+  if(!pending)return true;
+  pendingMapTransitions.delete(board);
+  if(panel)panel.hidden=true;
+  if(accept){
+    const overlay=dialog.closest<HTMLElement>("[data-world-map-hierarchy]");
+    if(!overlay)return true;
+    stopNpcWander(dialog);
+    overlay.dataset.level="regional";overlay.dataset.region=pending.region;
+    replaceWorldMapDialogMarkup(dialog,renderPanel("regional",pending.region));
+    bindIsometricMapArt(dialog);
+    return true;
+  }
+  const player=board.querySelector<HTMLElement>("[data-wmh-player-token]");
+  if(player){
+    animateGridMove(player,()=>{
+      player.dataset.x=String(pending.safe.x);player.dataset.y=String(pending.safe.y);
+      player.dataset.quadrant=pending.safe.quadrant;
+      player.dataset.posX=String(pending.safe.position.x);player.dataset.posY=String(pending.safe.position.y);
+      player.style.setProperty("--token-x",String(pending.safe.position.x));
+      player.style.setProperty("--token-y",String(pending.safe.position.y));
+    });
+  }
+  startNpcWander(dialog);
+  return true;
+}
 function renderIsometricTransitions(board:HTMLElement):void {
   const data=readIsoMapData(board);
   const host=board.querySelector<HTMLElement>("[data-wmh-actor-layer]")||board;
@@ -1035,7 +1127,7 @@ function renderIsometricTransitions(board:HTMLElement):void {
   if(!layer){layer=document.createElement("div");layer.dataset.wmhTransitionLayer="";host.append(layer);}
   layer.innerHTML=data.transitions.map(marker=>{
     const label=marker.label.trim();
-    const kind=/^akses ke map golden dragon empire$/i.test(label)?"gate":
+    const kind=resolveTransitionRegion(marker)?"gate":
       /^dialog box:/i.test(label)?"dialogue":/^event scene:/i.test(label)?"event":"generic";
     const glyph=kind==="gate"?"↗":kind==="dialogue"?"…":kind==="event"?"✦":"◇";
     const center=isoCellCenter(marker.x,marker.y,data.grid);
@@ -1419,6 +1511,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
   const mode=()=>modeSelect?.value||"cell-add";
   const transitionTools=panel.querySelector<HTMLElement>("[data-wmh-transition-tools]");
   const transitionField=panel.querySelector<HTMLInputElement>("[data-wmh-transition-label]");
+  const transitionRegionField=panel.querySelector<HTMLInputElement>("[data-wmh-transition-region]");
   const exportField=panel.querySelector<HTMLTextAreaElement>("[data-wmh-overlay-export]");
   const exportWrap=panel.querySelector<HTMLElement>("[data-wmh-overlay-export-wrap]");
   const importField=panel.querySelector<HTMLTextAreaElement>("[data-wmh-overlay-import-text]");
@@ -1876,13 +1969,15 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       const existing=transitionId?data.transitions.find(marker=>marker.id===transitionId):data.transitions.find(marker=>marker.x===cell.x&&marker.y===cell.y);
       if(existing){
         selectedTransitionId=existing.id;if(transitionField)transitionField.value=existing.label;
-        redraw();setStatus(existing.label?"Selected named transition: "+existing.label:"Selected unnamed transition. Enter a destination label.");return;
+        if(transitionRegionField)transitionRegionField.value=existing.targetRegion||"";
+        redraw();setStatus(existing.label?"Selected named transition: "+existing.label:"Selected unnamed transition. Enter a destination label and optional target region.");return;
       }
       remember();
       const marker={id:"transition-"+Date.now()+"-"+data.transitions.length,x:cell.x,y:cell.y,label:""};
       data.transitions.push(marker);selectedTransitionId=marker.id;
       if(transitionField)transitionField.value="";
-      persist();setStatus("Transition cell selected. Enter its destination label; it stays red until named.");return;
+      if(transitionRegionField)transitionRegionField.value="";
+      persist();setStatus("Transition cell selected. Enter its destination label and optional target region; it stays red until named.");return;
     }
     const key=isoCellKey(cell.x,cell.y),isWalkable=data.walkableCells.includes(key);
     if(mode()==="cell-delete"){
@@ -1985,12 +2080,17 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
   });
   panel.querySelector<HTMLElement>("[data-wmh-transition-apply]")?.addEventListener("click",()=>{
     const marker=data.transitions.find(m=>m.id===selectedTransitionId);if(!marker){setStatus("Select a transition marker first.");return;}
-    remember();marker.label=(transitionField?.value||"").trim().slice(0,80);persist();setStatus(marker.label?"Destination named. Marker is now blue.":"Destination name cleared. Marker is red.");
+    remember();marker.label=(transitionField?.value||"").trim().slice(0,80);
+    const targetRegion=(transitionRegionField?.value||"").trim().toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,80);
+    if(targetRegion)marker.targetRegion=targetRegion;else delete marker.targetRegion;
+    persist();setStatus(marker.label?"Destination named. Marker is now blue.":"Destination name cleared. Marker is red.");
   });
   panel.querySelector<HTMLElement>("[data-wmh-transition-delete]")?.addEventListener("click",()=>{
     if(!selectedTransitionId){setStatus("Select a transition marker first.");return;}
     remember();data.transitions=data.transitions.filter(m=>m.id!==selectedTransitionId);selectedTransitionId=null;
-    if(transitionField)transitionField.value="";persist();setStatus("Transition marker removed.");
+    if(transitionField)transitionField.value="";
+    if(transitionRegionField)transitionRegionField.value="";
+    persist();setStatus("Transition marker removed.");
   });
   panel.querySelectorAll<HTMLInputElement>("[data-wmh-grid-control]").forEach(input=>{
     const update=()=>{
@@ -2237,7 +2337,7 @@ function isometricEditorMarkup(): string {
     '<header class="wmh-overlay-modal-head" data-wmh-overlay-drag-handle><div><b>WORLD ARCHIVE · FIELD TOOLS</b><small>MAP GLASS · CAMERA · CELL WORKBENCH</small></div><div class="wmh-overlay-window-actions"><button type="button" data-wmh-overlay-minimize aria-label="Minimize editor panel" title="Minimize">—</button><button type="button" data-wmh-overlay-close aria-label="Close editor mode" title="Close editor mode">×</button></div></header><div class="wmh-drawer-map-controls" aria-label="Map camera controls"><span>CAMERA</span><button type="button" data-wmh-zoom="out" aria-label="Zoom out">−</button><output data-wmh-zoom-level>100%</output><button type="button" data-wmh-zoom="in" aria-label="Zoom in">+</button><button type="button" data-wmh-zoom="reset">FIT</button><button type="button" data-wmh-map-center>⌖ CENTER MAP</button></div>'+
     '<label>EDITING MODE<select data-wmh-overlay-mode><option value="cell-add">＋ ADD CELL</option><option value="cell-delete">－ DELETE CELL</option><option value="cell-merge">⇧ SELECT CELLS TO MERGE</option><option value="cell-unmerge">↔ UNMERGE CELL GROUP</option><option value="foreground">○ Foreground sectors</option><option value="blocked">X Blocked sectors</option><option value="opacity">◌ Character opacity sectors</option><option value="transition">Area transition markers</option></select></label><div class="wmh-cell-layout-tools" data-wmh-cell-tools hidden><b>CELL LAYOUT</b><span data-wmh-cell-selection-count>0 CELLS SELECTED</span><button type="button" data-wmh-merge-apply>MERGE SELECTED CELLS</button><button type="button" data-wmh-merge-clear>CLEAR SELECTION</button><small>Tap adjacent cells to select them. Tap-drag only pans the map.</small></div><label class="wmh-walkable-switch"><input type="checkbox" data-wmh-walkable-enabled/> LIMIT MOVEMENT TO BLUE CELLS</label>'+
     '<p class="wmh-editor-mode-note">Paint only the image area that should be used. Each main diamond has 8 smaller sectors: two inside each of the four former quadrants. X marks one half of a crossing; mark both halves of the same side to close that full passage. If one half remains open, movement can still pass through it. ○ redraws that sector above characters, and ◌ makes characters translucent. The source image and canvas gaps are never resized by grid calibration.</p>'+
-    '<div data-wmh-transition-tools hidden><label>DESTINATION LABEL<input type="text" maxlength="80" data-wmh-transition-label placeholder="e.g. Academy · Main Hall"/></label><button type="button" data-wmh-transition-apply>APPLY LABEL</button><button type="button" data-wmh-transition-delete>DELETE SELECTED</button><p>Red = unnamed. Blue = named. Tap a marker to select it.</p></div>'+
+    '<div data-wmh-transition-tools hidden><label>DESTINATION LABEL<input type="text" maxlength="80" data-wmh-transition-label placeholder="e.g. Exit Academy"/></label><label>TARGET REGION ID · OPTIONAL<input type="text" maxlength="80" data-wmh-transition-region placeholder="golden-dragon-empire"/></label><button type="button" data-wmh-transition-apply>APPLY LABEL</button><button type="button" data-wmh-transition-delete>DELETE SELECTED</button><p>Use a target region slug for a YES / NO map transfer. Red = unnamed. Blue = named.</p></div>'+
     '<div class="wmh-grid-calibration"><b>GRID CALIBRATION</b>'+
     '<div data-wmh-grid-row><label>Columns <output data-wmh-grid-value="cols">24</output></label><button type="button" data-wmh-grid-dir="minus" data-wmh-grid-step="1">−</button><input type="range" min="1" max="128" step="1" value="24" data-wmh-grid-control="cols"/><button type="button" data-wmh-grid-dir="plus" data-wmh-grid-step="1">+</button></div>'+
     '<div data-wmh-grid-row><label>Rows <output data-wmh-grid-value="rows">20</output></label><button type="button" data-wmh-grid-dir="minus" data-wmh-grid-step="1">−</button><input type="range" min="1" max="128" step="1" value="20" data-wmh-grid-control="rows"/><button type="button" data-wmh-grid-dir="plus" data-wmh-grid-step="1">+</button></div>'+
@@ -2824,6 +2924,8 @@ function walkToTile(
     const isFinal=step===steps.length;
     const visual=isFinal?finalPosition:isoQuadrantCenterGridPosition(node.x,node.y,node.quadrant);
     const previousCellX=Number(player.dataset.x||startX),previousCellY=Number(player.dataset.y||startY);
+    const previousQuadrant=(player.dataset.quadrant||"tl-a") as IsoQuadrant;
+    const previousPosition={x:Number(player.dataset.posX??previousCellX),y:Number(player.dataset.posY??previousCellY)};
     const tile=board.querySelector<HTMLElement>('[data-wmh-tile][data-x="'+node.x+'"][data-y="'+node.y+'"]');
     animateGridMove(player,()=>{
       player.dataset.x=String(node.x);player.dataset.y=String(node.y);
@@ -2835,6 +2937,20 @@ function walkToTile(
     if(node.x!==previousCellX||node.y!==previousCellY){
       const material=tile?.dataset.surface||surface;
       playFootstep(material as "earth"|"wet"|"stone"|"wood"|"tile");
+    }
+    const transition=mapData.transitions.find(item=>item.x===node.x&&item.y===node.y);
+    if(transition){
+      if(player.dataset.moveTimer)window.clearTimeout(Number(player.dataset.moveTimer));
+      delete player.dataset.moveTimer;
+      delete runtime.__wmhPendingPlayerDestination;
+      delete runtime.__wmhPendingNpcInteraction;
+      const targetRegion=resolveTransitionRegion(transition);
+      const safe={x:previousCellX,y:previousCellY,quadrant:previousQuadrant,position:previousPosition};
+      if(targetRegion)showMapTransitionConfirmation(dialog,transition,targetRegion,safe);
+      else if(/^dialog box:/i.test(transition.label))showTransitionDialogue(dialog,"TIANHAI ACADEMY",transition.label.replace(/^dialog box:\s*/i,""));
+      else if(/^event scene:/i.test(transition.label))showTransitionNotice(dialog,"An Introduction to Merzkava",transition.label.replace(/^event scene:\s*/i,""));
+      else showTransitionDialogue(dialog,"WORLD ARCHIVE",transition.label||"The route is not yet identified.");
+      return;
     }
     player.dataset.moveTimer=String(window.setTimeout(move,235));
   };
@@ -2892,7 +3008,7 @@ function walkToNpcAndInteract(dialog:HTMLElement,npcId:string):void {
 }
 
 function closeTransitionOverlays(dialog:HTMLElement):void {
-  dialog.querySelectorAll<HTMLElement>("[data-wmh-transition-dialog],[data-wmh-transition-notice]").forEach(node=>node.hidden=true);
+  dialog.querySelectorAll<HTMLElement>("[data-wmh-transition-dialog],[data-wmh-transition-notice],[data-wmh-map-transition-confirm]").forEach(node=>node.hidden=true);
 }
 function showTransitionDialogue(dialog:HTMLElement,speaker:string,message:string):void {
   closeTransitionOverlays(dialog);
@@ -2927,7 +3043,7 @@ function replaceWorldMapDialogMarkup(dialog:HTMLElement,markup:string):void {
 }
 export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement, onAdvanceTime: (minutes: number) => void, pointer?: {clientX:number;clientY:number}): boolean {
   if (!worldMapDeveloperMode && target.closest("[data-wmh-overlay-toggle],[data-wmh-overlay-tools],[data-wmh-overlay-minimize],[data-wmh-overlay-close],[data-wmh-academy-editor],[data-wmh-drag-marker],[data-wmh-coordinate],[data-wmh-editor-canvas]")) return true;
-  const action=target.closest<HTMLElement>("[data-wmh-action],[data-wmh-info],[data-wmh-site],[data-wmh-building],[data-wmh-npc],[data-wmh-plot],[data-wmh-tile],[data-wmh-reply],[data-wmh-transition],[data-wmh-transition-close],[data-wmh-dismiss-layer],[data-wmh-selection-card],[data-hud-action]");
+  const action=target.closest<HTMLElement>("[data-wmh-action],[data-wmh-info],[data-wmh-site],[data-wmh-building],[data-wmh-npc],[data-wmh-plot],[data-wmh-tile],[data-wmh-reply],[data-wmh-transition],[data-wmh-transition-close],[data-wmh-transition-yes],[data-wmh-transition-no],[data-wmh-dismiss-layer],[data-wmh-selection-card],[data-hud-action]");
   if(!action)return false;
   const overlay=target.closest<HTMLElement>("[data-world-map-hierarchy]");
   const dialog=overlay?.querySelector<HTMLElement>("[data-wmh-dialog]");
@@ -2979,6 +3095,8 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
     closeTransitionOverlays(dialog);
     return true;
   }
+  if(action.hasAttribute("data-wmh-transition-yes"))return finishMapTransition(dialog,true);
+  if(action.hasAttribute("data-wmh-transition-no"))return finishMapTransition(dialog,false);
   if(action.dataset.wmhTransition){
     const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
     const marker=board?readIsoMapData(board).transitions.find(item=>item.id===action.dataset.wmhTransition):null;
