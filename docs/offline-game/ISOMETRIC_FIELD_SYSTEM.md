@@ -1,10 +1,24 @@
 # Isometric Field System — Runtime Contract and Continuation Guide
 
-**Last source audit:** 2026-11-05  
-**Audited source commit:** ed5ef007cead9ecf8e6e70662c29ec5cce9527b0  
-**Working branch:** feature/global-isometric-canvas-margins-2026-11-05
+**Last source audit:** 2026-11-06  
+**Selected rollback baseline:** Build 1348 — `1a128afe0c0dee753963144c2f4fc71a54b41805`  
+**Current working branch:** `fix/1348-token-only-motion-camera-center-subcell`  
+**Current implementation checkpoint:** fetch the live branch HEAD; the center-save and token-only patch is recorded in the branch history.
 
 This is the implementation contract for isometric maps, the field-tool editor, actor movement, NPC interactions/chat, animation, scanner events, and the combat boundary. It separates working runtime behavior from planned mechanics. A UI element or event name is not proof that a gameplay rule has been implemented.
+
+## 0. Current runtime override — 2026-11-06
+
+This section supersedes any older movement/animation description below when it conflicts with the latest Build 1348-based fix branch. The authoritative handoff is [AI_HANDOFF_2026-11-06_ISOMETRIC_RUNTIME.md](../AI_HANDOFF_2026-11-06_ISOMETRIC_RUNTIME.md).
+
+- **Renderer:** the current implementation remains DOM/CSS/SVG plus the Academy JPG. Do not use the later PixiJS experiment branch as the source of truth. This fix adds no renderer dependency.
+- **Movement granularity:** Player and NPC movement use eight triangular nodes per isometric diamond: `tl-a`, `tl-b`, `tr-a`, `tr-b`, `bl-a`, `bl-b`, `br-a`, `br-b`. A token may occupy a fractional sub-cell position. The Player hit target is resolved from the exact tapped point; NPC wandering chooses an available adjacent sector node through `findIsoQuadrantPath()`.
+- **Actor-only updates:** ordinary movement changes token data/position and animates that token with `Element.animate()` on its individual `translate` property. It must not redraw/replace the map image, ground SVG, ground tiles or foreground canvas. Static tile depth is recalculated only after map/editor invalidation, not on every actor step.
+- **Reduced field effects:** the per-step `emitTileTrailWave()` implementation was removed. The wide expanding sonar pseudo-element sweep is disabled in low-power gameplay CSS; scanner contact tracking and the `merzkava:field-scanner-overlap` / `merzkava:field-scanner-clear` observation events remain. These events still do not change gameplay state.
+- **Camera center:** center confirmation uses `persist(false, false)`, which saves the selected Map Base pixel point without restoring stale scroll coordinates or repainting map/foreground visuals. It dispatches `merzkava:center-isometric-map`; both Academy and regular isometric camera controllers call their current `centerMap()` handler.
+- **Editing vs play:** editor edits may redraw editor marks/foreground as part of a real map edit. That is not permission to call editor redraw functions during ordinary Player/NPC movement.
+
+For continuation, keep the distinction explicit: static world plane = artwork/ground; dynamic actor plane = tokens only.
 
 ## 1. Source map and ownership
 
@@ -66,28 +80,33 @@ ADD CELL, DELETE CELL, SELECT & MERGE, UNMERGE, walkable whitelist, foreground, 
 
 ## 4. Walkability, Player pathfinding and NPC wandering
 
-When walkableAreaEnabled is true, walkableCells and valid customGridCells define the allowed movement graph. A missing/unmarked cell is not walkable. blockedCells and blockedQuadrants block cells/sector edges. Use shared checks instead of bypassing the map data:
+When walkableAreaEnabled is true, walkableCells and valid customGridCells define the allowed movement graph. A missing/unmarked cell is not walkable. blockedCells and blockedQuadrants block cells/sector edges. The movement graph is the eight triangular sectors in each parent diamond. Use shared checks instead of bypassing the map data:
 
-- isoGridCellExists(...)
-- isoCanWalkTile(...)
-- isoCanStep(...)
+- `isoGridCellExists(...)`
+- `isoCanWalkTile(...)`
+- `isIsoQuadrantWalkable(...)`
+- `findIsoQuadrantPath(...)`
+- `isoSubcellPositionAtPoint(...)`
+
+The retired whole-cell step helper `isoCanStep()` is not the active NPC movement path. Do not reintroduce whole-cell-only routing as a shortcut.
 
 Player movement is resolved by walkToTile(dialog, targetX, targetY, surface):
 
-1. Validate integer target coordinates and that the destination exists on the map.
-2. Reject a destination that fails walkability checks.
-3. Resolve a deterministic breadth-first path in the fixed cardinal order north, east, south, west.
-4. Exclude occupied NPC cells.
-5. Update the Player one tile at a time, update depth/occlusion, emit the movement animation/trail and schedule the next step.
+1. Validate the parent grid coordinate and the destination cell.
+2. Resolve the exact tapped point with `resolveIsoSubcellTarget()`, `isoSubcellPositionAtPoint()` and `isoQuadrantAtPoint()`; do not round it to the parent cell center.
+3. Reject a target sector that fails `isIsoQuadrantWalkable()`. If the user taps near a parent-cell center, the runtime may select the nearest open sector; otherwise a blocked selected sector is rejected.
+4. Resolve a deterministic breadth-first path using `findIsoQuadrantPath()` across the eight sector nodes. Exclude occupied NPC parent cells and honor the matched half-edge pair for every crossing.
+5. Update only the Player token's sector/position data and animate that token. Update actor depth/minimap/status as required; do not repaint the map/ground/foreground.
 6. Preserve the pending destination if movement is paused by entering editor mode; resume it only when editor mode exits and chat is not open.
 
 NPC wandering is deliberately simple presentation behavior, not an AI combatant brain:
 
 - Timer interval: 2,400 ms.
-- Each NPC skips a tick when Math.random() > 0.48.
-- Candidate steps are cardinal neighbors only.
-- Candidate cells must exist, satisfy the same blocked-edge/walkability checks, and must not be occupied by the Player or another NPC.
-- stopNpcWander() clears the timer and stops actor scanners. Call it when leaving the area, opening NPC chat, or entering editor mode.
+- Each NPC skips a tick when `Math.random() > 0.48`.
+- NPC movement enumerates the eight sector nodes in its current parent cell and cardinally adjacent cells, then keeps only destinations reachable in one graph edge (`path.length === 2`) through `findIsoQuadrantPath()`.
+- Every move stores parent cell (`data-x/data-y`), sector (`data-quadrant`) and fractional visual point (`data-posX/data-posY`). This lets an NPC move within a diamond instead of snapping only between cell centers.
+- Candidate sectors must pass whitelist/blocked-sector checks and must not occupy another actor's parent cell.
+- `stopNpcWander()` clears the timer and stops actor scanners. Call it when leaving the area, opening NPC chat, or entering editor mode.
 
 Do not loosen the whitelist or blocked-sector rules to make an actor move. Unmarked space is intentionally inert.
 
@@ -110,7 +129,7 @@ Chat presentation is a lower-screen dialogue box, not a full-screen centered mod
 
 The map currently uses local scripted greetings/choices/replies. A future AI dialogue integration must use the appropriate NPC profile/knowledge boundaries and owner-approved prompt/data contract. It must not silently turn ordinary NPC taps into Convo login or expose developer-only Convo panels.
 
-## 6. Actor status colors, tile trail and submarine scanner
+## 6. Actor status colors and scanner event contract
 
 Actor tone is explicit metadata: data-scan-tone. actorScanTone() returns unknown if the value is absent or invalid. Never infer threat/cultivation status from NPC name, gender, clothing, role, or visual appearance.
 
@@ -123,14 +142,14 @@ Actor tone is explicit metadata: data-scan-tone. actorScanTone() returns unknown
 
 The four Academy students/staff have explicit friendly metadata. Other NPCs/Player tokens default to unknown (white) until a valid source assigns a tone. Do not classify an NPC as hostile merely because the owner listed bandits/assassins/monsters as examples; an actual actor must be explicitly typed.
 
-### Current Anime.js effects
+### Current low-power actor movement and scanner effects
 
-- animateGridMove() uses Anime.js to ease actor translation after a tile coordinate changes (225 ms, outCubic).
-- emitTileTrailWave() places one short-lived colored wave on the tile reached after movement (760 ms, outQuad). It is presentation only.
-- Each Player/NPC token receives two expanding sonar rings. Pulse interval: 2,450 ms; each ring duration: 1,800 ms with staggered delay.
-- CSS scanner bounds are approximately five tile widths/heights across (about 2.5 tiles radius from the actor).
-- Reduced-motion users get a static scanner treatment and no animated tile trail.
-- Scanners start with the local actor/NPC field and stop when the field is hidden/paused, NPC wander lifecycle stops, chat opens, or editor mode begins.
+- `animateGridMove()` uses the Web Animations API on the moved token's individual `translate` property (150 ms). It does not animate a map wrapper and does not read layout with `getBoundingClientRect()` before/after each step.
+- The previous `emitTileTrailWave()` per-step trail was removed from the current gameplay path. Do not rely on its former keyframes or reintroduce broad tile effects during movement.
+- The two large expanding scanner pseudo-element rings are hidden in low-power gameplay CSS because their area caused costly WebView compositing. Scanner contact tracking is still active; `startActorScanners()` and `updateScannerContacts()` remain sensor logic, not permission to redraw the ground.
+- Actor-attached NPC proximity decoration may remain, but it must be confined to the actor element and must not animate/filter a map-sized surface.
+- Respect `prefers-reduced-motion`; movement should settle immediately when reduced motion is enabled.
+- Scanners/contact observers stop when the field is hidden/paused, NPC wander lifecycle stops, chat opens, or editor mode begins.
 
 ### Scanner event contract
 
