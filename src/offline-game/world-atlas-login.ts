@@ -182,7 +182,7 @@ export function worldAtlasLoginPanelMarkup(language:AppLanguage):string {
     '<small class="atlas-password-policy" data-atlas-reset-policy hidden>'+esc(reset.passwordPolicy)+'</small>'+
     '<label data-atlas-reset-confirm-row hidden>'+esc(reset.confirmNew)+'<input id="atlas-reset-confirm" type="password" minlength="8" maxlength="128" autocomplete="new-password"/></label>'+
     '<p data-atlas-reset-message role="status"></p><div class="atlas-password-reset-actions"><button type="button" data-atlas-reset-cancel>'+esc(reset.cancel)+'</button><button type="button" data-atlas-reset-apply>'+esc(reset.update)+'</button></div></section></form>'+
-    worldAtlasAccessBufferMarkup(language,"world-atlas")+
+    worldAtlasAccessBufferMarkup(language,"world-atlas-list")+
     '<small class="world-atlas-login-foot">'+esc(t.foot)+'</small>'+
     '</section></div>';
 }
