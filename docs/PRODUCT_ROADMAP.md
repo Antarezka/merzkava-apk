@@ -1131,14 +1131,17 @@ Current source baseline for this workstream: ed5ef007cead9ecf8e6e70662c29ec5cce9
 **Still open:** physical TECNO Spark Go 1 KL4 verification; confirm that the static artwork does not flicker/dim during Player/NPC motion, test several fractional sectors, test CENTER MAP at a non-midpoint focal point, verify Academy entry follows the Player token independently of the saved editor focal point, and review natural Player/NPC dialogue in chat.
 
 
-## 16. Augusto PXL — full visual asset pipeline (next priority)
+## 16. Augusto PXL — pink World Atlas and full visual pipeline
 
-- [x] Add a separate pink 54 × 54 px CRT/console launcher in Eternal Path for the Augusto PXL workstream; keep the existing green World Atlas TV gateway and its behavior intact.
-- [x] Record the owner-approved full visual-production scope and phased integration contract in [AUGUSTO_PXL_INTEGRATION_PLAN.md](./AUGUSTO_PXL_INTEGRATION_PLAN.md).
-- [ ] Pin and validate the PXL toolchain in GitHub Actions; establish editable PXL sources, reproducible exports, validation and license preservation.
-- [ ] Build a manifest/TypeScript adapter for PXL outputs into the existing DOM/CSS/SVG runtime. Do not reintroduce PixiJS or replace the current game engine/input path.
-- [ ] Integrate a representative character, environment, object and effect slice; then expand to World Atlas maps, tilesets, Spirit Realm/Martial Soul/Spirit Ring/Arcanistry effects, UI artwork and cinematics.
-- [ ] Preserve the existing Academy map, movement, NPC logic, minimap, map editor, HUD, inventory, menu, save data and floating TV gateway throughout gradual migration.
-- [ ] Profile asset size, decoding, memory, frame pacing and touch reliability on TECNO Spark Go 1 KL4 before broad rollout.
+- [x] Add a separate pink 54 × 54 px CSS CRT/console launcher beside the legacy green TV in Eternal Path; keep the old TV's World Atlas entry intact.
+- [x] Add a second World Atlas visual-mode instance for the pink TV. It reuses the existing map hierarchy, isometric movement, walkability, NPC logic, editor, minimap, camera, HUD/inventory actions and save systems while keeping legacy and PXL presentation modes separate.
+- [x] Route pink-Atlas access through local profiles/journeys and local password credentials only; bundle runtime assets under `public/assets/augusto-pxl/` for offline use.
+- [x] Add an Android-native optional AES-GCM asset cache using an Android Keystore-backed key. Static APK artwork remains extractable; encryption protects mutable cached copies, not bundled files.
+- [x] Add the editable `pxl/` source workspace, app-local asset manifest, export folder, asset map, Academy HD-2D brief, and a pinned PXL Node 22.18 CI build step.
+- [ ] Author and map the actual world/region artworks, 2816 × 1536 HD-2D isometric Academy, 2D Player/NPC directional sprites, props, effects, HUD/bag/skills/items/currency artwork and cinematic assets. Existing manifest entries remain pending until real exports exist.
+- [ ] Verify the full TypeScript build and regression suite for both World Atlas modes, then test offline entry, local login, movement, NPC interactions, HUD/inventory and encrypted cache on Android.
+- [ ] Profile asset size, decode cost, memory and frame pacing on TECNO Spark Go 1 KL4 before broad art rollout.
 
-**Baseline note:** Android Build #1374 points to source commit `5a1532acb526539315a3f92d2ab3b273bc9c9dc9` on `feat/player-hud-inventory-2026-11-06`; that workflow run failed. The baseline is retained for source continuity, not described as a successful APK.
+**Important:** PXL is the offline visual asset authoring/export pipeline, not the live game engine. Existing DOM/CSS/SVG controls and gameplay logic remain authoritative; do not reintroduce PixiJS. See [AUGUSTO_PXL_INTEGRATION_PLAN.md](./AUGUSTO_PXL_INTEGRATION_PLAN.md).
+
+**Baseline:** Android Build #1374 source commit `5a1532acb526539315a3f92d2ab3b273bc9c9dc9` on `feat/player-hud-inventory-2026-11-06` (workflow failed). PXL smoke-source CLI check/build has passed in Augusto PXL Asset Pipeline #5; the application typecheck/build/test steps were still running when this roadmap entry was written.
