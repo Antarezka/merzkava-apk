@@ -91,7 +91,9 @@ describe("isometric NPC conversations", () => {
     expect(worldMapSource).toContain("const tokenMoveAnimations=new WeakMap<HTMLElement,Animation>()");
     expect(worldMapSource).toContain("token.animate(");
     expect(worldMapSource).toContain("[{translate:dx+\"px \"+dy+\"px\"},{translate:\"0px 0px\"}]");
-    expect(worldMapSource).not.toContain("drawIsometricForeground(board,data);");
+    const movement=worldMapSource.match(/function animateGridMove\\([\\s\\S]*?\\n}/)?.[0]??"";
+    expect(movement).not.toContain("drawIsometricForeground");
+    expect(movement).not.toContain("renderIsometricSvgSceneMarkup");
     expect(chatStyles).toContain(".wmh-isometric-actor-layer");
     expect(chatStyles).toContain("display:none!important;content:none!important;animation:none!important");
     expect(worldMapSource).not.toContain("window.setInterval(pulse,2450)");
