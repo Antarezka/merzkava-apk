@@ -2249,12 +2249,14 @@ function academyCanvasEditorMarkup(): string {
   if (!worldMapDeveloperMode) return "";
   const sides=["top","bottom","left","right"] as const;
   return '<div class="wmh-academy-canvas-editor" data-wmh-academy-editor>'+
-    '<button type="button" data-wmh-academy-editor-toggle aria-expanded="false">▦ CANVAS EDITOR</button>'+
-    '<section data-wmh-academy-editor-panel hidden><b>ACADEMY CANVAS EXPANSION</b><small>Adjust each side independently. Preview updates live; confirm to save.</small>'+
-    '<div class="wmh-canvas-default-gap" aria-label="Read-only automatic default gap"><b>DEFAULT GAP · AUTO (READ ONLY)</b><div><span>TOP</span><output data-wmh-default-gap="top">— px</output><span>BOTTOM</span><output data-wmh-default-gap="bottom">— px</output><span>LEFT</span><output data-wmh-default-gap="left">— px</output><span>RIGHT</span><output data-wmh-default-gap="right">— px</output></div><small>Initial automatic gap before your extra values below.</small></div>'+
-    sides.map(side=>'<label>'+side.toUpperCase()+' <output data-wmh-canvas-value="'+side+'">'+DEFAULT_ISO_CANVAS_EXPANSION[side]+' px</output><input type="range" min="0" max="12000" step="100" value="'+DEFAULT_ISO_CANVAS_EXPANSION[side]+'" data-wmh-canvas-side="'+side+'"/></label>').join("")+
-    '<div class="wmh-academy-canvas-actions"><button type="button" data-wmh-canvas-refresh>↻ REFRESH PREVIEW</button><button type="button" data-wmh-canvas-confirm>✓ CONFIRM & SAVE</button><button type="button" data-wmh-canvas-copy>COPY CONFIG</button></div>'+
-    '<textarea data-wmh-canvas-export readonly aria-label="Copyable Academy canvas configuration" placeholder="Confirmed canvas configuration appears here..."></textarea><small data-wmh-canvas-status>Unconfirmed changes are preview-only.</small></section></div>';
+    '<button type="button" class="wmh-overlay-float wmh-canvas-editor-float" data-wmh-academy-editor-toggle aria-expanded="false" aria-label="Open Academy canvas editor"><i aria-hidden="true">▦</i><span>CANVAS</span></button>'+
+    '<section class="wmh-canvas-editor-window" data-wmh-academy-editor-panel data-wmh-scroll-resize hidden role="dialog" aria-label="Academy canvas editor">'+
+      '<header class="wmh-overlay-modal-head wmh-canvas-editor-header" data-wmh-canvas-drag-handle><div><b>ACADEMY CANVAS EXPANSION</b><small>MAP BASE · CANVAS MARGINS · PREVIEW</small></div><div class="wmh-overlay-window-actions"><button type="button" data-wmh-canvas-minimize aria-label="Minimize canvas editor" title="Minimize">—</button><button type="button" data-wmh-canvas-close aria-label="Close canvas editor" title="Close">×</button></div></header>'+
+      '<div class="wmh-canvas-editor-content"><small>Adjust each side independently. Preview updates live; confirm to save.</small>'+
+      '<div class="wmh-canvas-default-gap" aria-label="Read-only automatic default gap"><b>DEFAULT GAP · AUTO (READ ONLY)</b><div><span>TOP</span><output data-wmh-default-gap="top">— px</output><span>BOTTOM</span><output data-wmh-default-gap="bottom">— px</output><span>LEFT</span><output data-wmh-default-gap="left">— px</output><span>RIGHT</span><output data-wmh-default-gap="right">— px</output></div><small>Initial automatic gap before your extra values below.</small></div>'+
+      sides.map(side=>'<label>'+side.toUpperCase()+' <output data-wmh-canvas-value="'+side+'">'+DEFAULT_ISO_CANVAS_EXPANSION[side]+' px</output><input type="range" min="0" max="12000" step="100" value="'+DEFAULT_ISO_CANVAS_EXPANSION[side]+'" data-wmh-canvas-side="'+side+'"/></label>').join("")+
+      '<div class="wmh-academy-canvas-actions"><button type="button" data-wmh-canvas-refresh>↻ REFRESH PREVIEW</button><button type="button" data-wmh-canvas-confirm>✓ CONFIRM & SAVE</button><button type="button" data-wmh-canvas-copy>COPY CONFIG</button></div>'+
+      '<textarea data-wmh-canvas-export readonly aria-label="Copyable Academy canvas configuration" placeholder="Confirmed canvas configuration appears here..."></textarea><small data-wmh-canvas-status>Unconfirmed changes are preview-only.</small></div></section></div>';
 }
 function bindAcademyCanvasEditor(dialog:HTMLElement):void {
   if (!worldMapDeveloperMode) return;
@@ -2289,7 +2291,53 @@ function bindAcademyCanvasEditor(dialog:HTMLElement):void {
     const saved=normalizeIsoCanvasExpansion(JSON.parse(localStorage.getItem(key)||"{}"));
     controls.forEach(input=>{input.value=String(saved[(input.dataset.wmhCanvasSide||"left") as keyof typeof saved]);});showValues();
   }catch{}
-  toggle.addEventListener("click",()=>{panel.hidden=!panel.hidden;toggle.setAttribute("aria-expanded",String(!panel.hidden));if(!panel.hidden)showDefaultGap();});
+  const closeWindow=()=>{
+    panel.hidden=true;
+    toggle.setAttribute("aria-expanded","false");
+    toggle.setAttribute("aria-label","Open Academy canvas editor");
+  };
+  toggle.addEventListener("click",()=>{
+    panel.hidden=!panel.hidden;
+    toggle.setAttribute("aria-expanded",String(!panel.hidden));
+    toggle.setAttribute("aria-label",panel.hidden?"Open Academy canvas editor":"Minimize Academy canvas editor");
+    if(!panel.hidden)showDefaultGap();
+  });
+  panel.querySelector<HTMLElement>("[data-wmh-canvas-minimize]")?.addEventListener("click",closeWindow);
+  panel.querySelector<HTMLElement>("[data-wmh-canvas-close]")?.addEventListener("click",closeWindow);
+
+  const positionKey="merzkava.academy-canvas-window.v1";
+  const screen=dialog.querySelector<HTMLElement>("[data-wmh-isometric-play-screen]")||editor;
+  try{
+    const saved=JSON.parse(localStorage.getItem(positionKey)||"null");
+    if(saved&&Number.isFinite(saved.left)&&Number.isFinite(saved.top)){
+      panel.style.left=saved.left+"px";panel.style.top=saved.top+"px";
+      panel.style.right="auto";panel.style.bottom="auto";panel.style.transform="none";
+    }
+  }catch{}
+  const dragHandle=panel.querySelector<HTMLElement>("[data-wmh-canvas-drag-handle]");
+  dragHandle?.addEventListener("pointerdown",event=>{
+    if((event.target as Element).closest("button,input,select,textarea"))return;
+    event.preventDefault();
+    const screenRect=screen.getBoundingClientRect(),rect=panel.getBoundingClientRect();
+    const startX=event.clientX,startY=event.clientY;
+    const left=rect.left-screenRect.left,top=rect.top-screenRect.top;
+    const move=(next:PointerEvent)=>{
+      next.preventDefault();
+      const maxLeft=Math.max(0,screen.clientWidth-panel.offsetWidth);
+      const maxTop=Math.max(0,screen.clientHeight-panel.offsetHeight);
+      panel.style.left=Math.max(0,Math.min(maxLeft,left+next.clientX-startX))+"px";
+      panel.style.top=Math.max(0,Math.min(maxTop,top+next.clientY-startY))+"px";
+      panel.style.right="auto";panel.style.bottom="auto";panel.style.transform="none";
+    };
+    const finish=()=>{
+      window.removeEventListener("pointermove",move);window.removeEventListener("pointerup",finish);window.removeEventListener("pointercancel",finish);
+      try{
+        const finalRect=panel.getBoundingClientRect(),parentRect=screen.getBoundingClientRect();
+        localStorage.setItem(positionKey,JSON.stringify({left:Math.round(finalRect.left-parentRect.left),top:Math.round(finalRect.top-parentRect.top)}));
+      }catch{}
+    };
+    window.addEventListener("pointermove",move,{passive:false});window.addEventListener("pointerup",finish);window.addEventListener("pointercancel",finish);
+  });
   controls.forEach(input=>input.addEventListener("input",preview));
   panel.querySelector<HTMLElement>("[data-wmh-canvas-refresh]")?.addEventListener("click",preview);
   panel.querySelector<HTMLElement>("[data-wmh-canvas-confirm]")?.addEventListener("click",()=>{
