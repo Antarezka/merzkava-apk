@@ -62,8 +62,8 @@ describe("in-world player HUD and Traveler Satchel",()=>{
     expect(worldMapSource).toContain("wmh-minimap-window");
     expect(worldMapSource).toContain("data-wmh-minimap-drag-handle");
     expect(worldMapSource).toContain("pointermove");
-    expect(worldStyles).toContain(".wmh-top-info");
-    expect(worldStyles).toContain("rgba(13,17,13,.24)");
+    expect(hudStyles).toContain(".wmh-top-info");
+    expect(hudStyles).toContain("rgba(13,17,13,.24)");
   });
 
   it("applies internal scrolling and touch resizing to long windows",()=>{
@@ -109,7 +109,7 @@ describe("in-world player HUD and Traveler Satchel",()=>{
 
   it("keeps HUD fields transparent and moves Back clear of the Arcanistry machine",()=>{
     expect(hudStyles).toContain("background:transparent!important;border:0!important");
-    expect(worldStyles).toContain(".has-archanistry-machine .wmh-map-back");
+    expect(hudStyles).toContain(".has-archanistry-machine .wmh-map-back");
     expect(worldMapSource).toContain("data-arcanistry-machine");
     expect(worldMapSource).toContain("wmh-machine-back-offset");
   });
