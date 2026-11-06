@@ -86,9 +86,8 @@ export async function playWorldAtlasAccessSequence(
 ):Promise<void> {
   const buffer=gate.querySelector<HTMLElement>("[data-world-atlas-buffer]");
   const status=buffer?.querySelector<HTMLElement>("[data-atlas-buffer-status]");
-  const log=buffer?.querySelector<HTMLElement>("[data-atlas-buffer-log]");
   const progress=buffer?.querySelector<HTMLElement>("[data-atlas-buffer-progress]");
-  if(!buffer||!status||!log||!progress)return;
+  if(!buffer||!status||!progress)return;
 
   const stages=(buffer.dataset.bufferStages||gate.dataset.bufferStages||"Resolving account identity...|Checking account state...|Verifying credentials...|Preparing access...").split("|");
   const logs=(buffer.dataset.bufferLogs||gate.dataset.bufferLogs||"ACCOUNT ROUTE...|CREDENTIAL STORE...|VERIFICATION...|SESSION HANDOFF...").split("|");
@@ -137,10 +136,9 @@ export async function playWorldAtlasAccessSequence(
     await wait(40,signal);
   };
   const showFrame=async(stage:string,logLine:string,dots:number)=>{
-    await Promise.all([
-      transitionDiagnostic(status,formatAccessDiagnosticFrame(stage,dots)),
-      transitionDiagnostic(log,formatAccessDiagnosticFrame(logLine,dots))
-    ]);
+    status.dataset.technicalStep=logLine;
+    status.setAttribute("aria-label",stage+" · "+logLine);
+    await transitionDiagnostic(status,formatAccessDiagnosticFrame(stage,dots));
   };
   const moveProgress=async(from:number,to:number,milliseconds:number)=>{
     if(signal?.aborted)throw abortError();
