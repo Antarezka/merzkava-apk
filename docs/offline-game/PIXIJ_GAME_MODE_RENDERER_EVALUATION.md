@@ -1,6 +1,6 @@
 # Isometric Game-Mode Renderer — PixiJS Evaluation
 
-**Status:** implemented as an isolated dual-renderer prototype; awaiting CI and physical-device QA, not approved for production merge.
+**Status:** isolated dual-renderer prototype; CI passed at `a4e4425832d446cbb991a1a43e2171096fa330d7`; physical-device QA remains pending, not approved for production merge.
 **Evaluation base:** Build #1341 lineage, with the first performance pass carried forward.
 **Primary runtime:** `src/offline-game/world-map-hierarchy.ts`
 **Data authority:** `IsoMapEditorData` and the existing deterministic movement / interaction helpers.
@@ -147,4 +147,4 @@ Automated tests and Web build validation are necessary but do not certify Androi
 
 The owner has explicitly authorized this isolated Pixi World Atlas prototype. The exception is limited to the second Eternal Path floating gateway and the visual renderer in `src/offline-game/pixi-world-atlas-renderer.ts`. The original Coastal Receiver remains DOM/SVG.
 
-The canonical safeguards in `docs/FORBIDDEN_TECHNOLOGIES.md` remain active everywhere else. This branch is not production-approved until CI passes and physical-device QA verifies both TV icons, DOM controls, gestures, editor handoff, cleanup, and fallback on the TECNO target. A successful prototype or CI build alone is not production approval.
+The canonical safeguards in `docs/FORBIDDEN_TECHNOLOGIES.md` remain active everywhere else. GitHub Actions Web App Validation #42191549934 passed on commit `a4e4425832d446cbb991a1a43e2171096fa330d7` (40 test files / 293 tests, TypeScript, gateway type-check, Vite production build, npm audit with 0 vulnerabilities). This branch is not production-approved until physical-device QA verifies both TV icons, DOM controls, gestures, editor handoff, cleanup, and fallback on the TECNO target. A successful CI build alone is not production approval.
