@@ -1387,19 +1387,23 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       ?"Saved · X "+Math.round(data.cameraCenter.x)+" / Y "+Math.round(data.cameraCenter.y)
       :"No custom camera center saved · map midpoint is used";
   };
-  const persist=(restoreCamera=true)=>{
+  const persist=(restoreCamera=true,redrawVisuals=true)=>{
     const cameraViewport=board.closest<HTMLElement>("[data-wmh-map-viewport],[data-wmh-iso-viewport]");
     const cameraAnchor=cameraViewport?{left:cameraViewport.scrollLeft,top:cameraViewport.scrollTop}:null;
     data.grid={...grid};
     // Any subsequent edit invalidates the last explicit confirmation.
     data.confirmed=false;data.confirmedAt="";
     isoMapDataCache.set(board,data);
-    delete board.dataset.wmhTileDepthSynced;
-    board.dataset.wmhMinimapDirty="true";
+    if(redrawVisuals){
+      delete board.dataset.wmhTileDepthSynced;
+      board.dataset.wmhMinimapDirty="true";
+    }
     if(exportWrap)exportWrap.hidden=true;
     try{localStorage.setItem(key,JSON.stringify(data));setStatus("Draft auto-saved on this device. Confirm & Save when the image grid is final.");}
     catch{setStatus("Local storage is unavailable. Use COPY DATA FOR AI to create a portable backup.");}
-    redraw();drawIsometricForeground(board,data);syncIsoDepthAndOcclusion(board);renderIsometricTransitions(board);
+    if(redrawVisuals){
+      redraw();drawIsometricForeground(board,data);syncIsoDepthAndOcclusion(board);renderIsometricTransitions(board);
+    }
     // DOM/canvas redraws must not let browser scroll anchoring move the camera.
     if(restoreCamera&&cameraViewport&&cameraAnchor)requestAnimationFrame(()=>{
       cameraViewport.scrollLeft=cameraAnchor.left;
@@ -1824,7 +1828,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     remember();data.cameraCenter={...pendingCameraCenter};pendingCameraCenter=null;centerPickActive=false;
     const pick=panel.querySelector<HTMLButtonElement>("[data-wmh-center-pick]");if(pick){pick.setAttribute("aria-pressed","false");pick.textContent="SELECT CENTER ON MAP";}
     const confirm=panel.querySelector<HTMLButtonElement>("[data-wmh-center-confirm]");if(confirm)confirm.disabled=true;
-    persist(false);
+    persist(false,false);
     board.closest<HTMLElement>("[data-wmh-map-viewport],[data-wmh-iso-viewport]")
       ?.dispatchEvent(new CustomEvent("merzkava:center-isometric-map"));
     setStatus("✓ Map camera center confirmed, saved, and applied to the current view. It is now part of COPY DATA FOR AI.");
