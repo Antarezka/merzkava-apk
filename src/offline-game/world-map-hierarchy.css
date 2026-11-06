@@ -2234,3 +2234,11 @@
 .wmh-isometric-play-screen .wmh-minimap-heading{font-size:6px!important}
 .wmh-isometric-play-screen .wmh-minimap-footer{font-size:5px!important}
 @media(max-height:700px){.wmh-isometric-play-screen .wmh-rpg-minimap{top:max(104px,calc(env(safe-area-inset-top) + 96px))!important}}
+
+
+/* The isometric full-screen rule uses :has(); never let it override the hidden state. */
+.wmh-overlay[hidden]:has(.wmh-isometric-play-screen){
+  display:none!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
+}
