@@ -67,12 +67,23 @@ const developerBufferCopy:Record<AppLanguage,BufferCopy> = {
   ko:{stages:["보호된 자격 증명 저장소 여는 중...","Developer ID 읽는 중...","PBKDF2-SHA-256 검증값 도출 중...","ID 상수 시간 비교 중...","비밀번호 자격 증명 확인 중...","보안 저장소 상태 확인 중...","Remember Me 설정 저장 중...","로컬 Developer 세션 준비 중..."],logs:["LOCAL CREDENTIAL STORE...","DEVELOPER ID READ...","PBKDF2-SHA256 DERIVATION...","CONSTANT-TIME ID MATCH...","PASSWORD VERIFIER...","SECURE STORAGE CHECK...","REMEMBER STATE...","LOCAL SESSION HANDOFF..."]}
 };
 
-export type AccessBufferContext = "world-atlas" | "player" | "developer";
+const playerSessionBufferCopy:Record<AppLanguage,BufferCopy> = {
+  id:{stages:["Menutup sesi pemain...","Mencabut status akses aktif...","Membersihkan penanda sesi...","Mengamankan status akun..."],logs:["PLAYER SESSION CLOSE...","ACTIVE ACCESS REVOKE...","SESSION MARKER CLEAR...","ACCOUNT STATE COMMIT..."]},
+  en:{stages:["Closing the Player session...","Revoking the active access state...","Clearing the session marker...","Securing the account state..."],logs:["PLAYER SESSION CLOSE...","ACTIVE ACCESS REVOKE...","SESSION MARKER CLEAR...","ACCOUNT STATE COMMIT..."]},
+  pt:{stages:["Encerrando a sessão do jogador...","Revogando o acesso ativo...","Limpando o marcador de sessão...","Protegendo o estado da conta..."],logs:["PLAYER SESSION CLOSE...","ACTIVE ACCESS REVOKE...","SESSION MARKER CLEAR...","ACCOUNT STATE COMMIT..."]},
+  fr:{stages:["Fermeture de la session joueur...","Révocation de l’accès actif...","Suppression du marqueur de session...","Sécurisation de l’état du compte..."],logs:["PLAYER SESSION CLOSE...","ACTIVE ACCESS REVOKE...","SESSION MARKER CLEAR...","ACCOUNT STATE COMMIT..."]},
+  ru:{stages:["Завершение сеанса игрока...","Отзыв активного доступа...","Очистка маркера сеанса...","Защита состояния аккаунта..."],logs:["PLAYER SESSION CLOSE...","ACTIVE ACCESS REVOKE...","SESSION MARKER CLEAR...","ACCOUNT STATE COMMIT..."]},
+  ja:{stages:["プレイヤーセッションを終了中...","有効なアクセス権を取り消し中...","セッションマーカーを消去中...","アカウント状態を保護中..."],logs:["PLAYER SESSION CLOSE...","ACTIVE ACCESS REVOKE...","SESSION MARKER CLEAR...","ACCOUNT STATE COMMIT..."]},
+  "zh-CN":{stages:["正在关闭玩家会话...","正在撤销当前访问状态...","正在清除会话标记...","正在保护账户状态..."],logs:["PLAYER SESSION CLOSE...","ACTIVE ACCESS REVOKE...","SESSION MARKER CLEAR...","ACCOUNT STATE COMMIT..."]},
+  ko:{stages:["플레이어 세션 종료 중...","활성 접근 권한 취소 중...","세션 마커 정리 중...","계정 상태 보호 중..."],logs:["PLAYER SESSION CLOSE...","ACTIVE ACCESS REVOKE...","SESSION MARKER CLEAR...","ACCOUNT STATE COMMIT..."]}
+};
+
+export type AccessBufferContext = "world-atlas" | "player" | "developer" | "player-session";
 
 export function worldAtlasAccessBufferMarkup(language:AppLanguage,context:AccessBufferContext="world-atlas"):string {
-  const source=context==="developer"?developerBufferCopy:context==="player"?playerBufferCopy:bufferCopy;
+  const source=context==="developer"?developerBufferCopy:context==="player"?playerBufferCopy:context==="player-session"?playerSessionBufferCopy:bufferCopy;
   const loading=source[language]||source.en;
-  const footer=context==="developer"?"MERZKAVA · LOCAL DEVELOPER HANDSHAKE":context==="player"?"MERZKAVA · PLAYER SOURCE HANDSHAKE":"WORLD ATLAS · ACCOUNT HANDSHAKE";
+  const footer=context==="developer"?"MERZKAVA · LOCAL DEVELOPER HANDSHAKE":context==="player"?"MERZKAVA · PLAYER SOURCE HANDSHAKE":context==="player-session"?"MERZKAVA · PLAYER SESSION EXIT":"WORLD ATLAS · ACCOUNT HANDSHAKE";
   return '<div class="atlas-access-buffer" data-world-atlas-buffer hidden aria-hidden="true" data-buffer-context="'+context+'" data-buffer-stages="'+esc(loading.stages.join("|"))+'" data-buffer-logs="'+esc(loading.logs.join("|"))+'">'+
     '<div class="atlas-buffer-head"><span>MERZKAVA ACCESS ROUTINE</span><i class="atlas-buffer-lamp"></i></div>'+
     '<div class="atlas-buffer-visual"><span class="atlas-buffer-orbit"></span><span class="atlas-buffer-core"></span><span class="atlas-buffer-scan"></span></div>'+
