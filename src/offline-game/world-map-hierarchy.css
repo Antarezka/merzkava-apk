@@ -2163,11 +2163,25 @@
 }
 
 
+/* Static world plane + independent actor plane.
+   Walking updates only token nodes; the Academy artwork and ground SVG stay untouched. */
+.wmh-isometric-actor-layer{
+  position:absolute!important;inset:0!important;width:100%!important;height:100%!important;
+  z-index:350!important;pointer-events:none!important;overflow:visible!important;
+}
+.wmh-isometric-actor-layer>.wmh-character-token{pointer-events:auto!important}
+.wmh-isometric-actor-layer>[data-wmh-transition-layer]{position:absolute!important;inset:0!important;pointer-events:none!important}
+.wmh-academy-map-surface>[data-wmh-map-art]{transition:none!important;animation:none!important;will-change:auto!important}
+
 /* Low-power field rendering: preserve actor character through compositor-friendly effects. */
 .wmh-isometric-play-screen .wmh-isometric-board,
 .wmh-isometric-play-screen .wmh-academy-map-surface{filter:none!important}
 .wmh-isometric-play-screen .wmh-character-token{transition:none!important}
 .wmh-isometric-play-screen .wmh-character-token:not(.wmh-player-token){animation:none!important}
+/* Large expanding sonar pseudo-elements forced WebView to composite broad map-sized areas.
+   Scanner contact events stay active; only the expensive decorative scan sweep is disabled. */
+.wmh-isometric-play-screen .wmh-character-token.wmh-scanner-active::before,
+.wmh-isometric-play-screen .wmh-character-token.wmh-scanner-active::after{display:none!important;content:none!important;animation:none!important}
 .wmh-isometric-play-screen .wmh-world-status,
 .wmh-isometric-play-screen .wmh-player-card,
 .wmh-isometric-play-screen .wmh-skill-dock,
