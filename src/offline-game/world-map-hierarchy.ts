@@ -36,7 +36,7 @@ const PXL_ACADEMY_MAP_PLACEHOLDER="/assets/augusto-pxl/placeholders/academy-map-
 const PXL_LOCAL_MAP_PLACEHOLDER="/assets/augusto-pxl/placeholders/local-map-pending.svg";
 function pxlActorMarkup(assetId:string,mode:WorldMapVisualMode):string {
   return mode==="augusto-pxl"
-    ? '<i class="wmh-pxl-actor-sprite" data-pxl-actor-sprite data-pxl-asset-id="'+escapeMapEditorText(assetId)+'" aria-hidden="true"></i>'
+    ? '<i class="wmh-pxl-actor-sprite" data-pxl-actor-sprite data-pxl-asset-id="'+escapeMapEditorText(assetId)+'" data-pxl-motion="idle" data-pxl-direction="south" aria-hidden="true"></i>'
     : '<i></i>';
 }
 function pxlNpcAssetId(npcId:string):string {return "character.npc."+npcId+".idle";}
@@ -748,7 +748,7 @@ function tileMapMarkup(
   const boardHeight=Math.max(projectedHeight,baseHeight);
   const theme:IsometricSvgTheme=interior?"interior":regionId;
   const title=selectedBuilding+(interior?" · INTERIOR":"");
-  const pxlMapAssetId=mapId==="golden-dragon-empire:tianhai-academy:exterior"?"map.academy.exterior":"map.area."+mapId.replace(/[^a-z0-9]+/gi,".").toLowerCase();
+  const pxlMapAssetId=visualMode==="augusto-pxl"?"map.local.default":mapId==="golden-dragon-empire:tianhai-academy:exterior"?"map.academy.exterior":"map.area."+mapId.replace(/[^a-z0-9]+/gi,".").toLowerCase();
   const imageMarkup=mapImage
     ? '<img class="wmh-isometric-map-base" data-wmh-map-art '+(visualMode==="augusto-pxl"?'data-pxl-asset-id="'+pxlMapAssetId+'" ':'')+'src="'+mapImage+'" alt="'+(visualMode==="augusto-pxl"?"Augusto PXL isometric environment":"Tianhai Academy map base")+'" draggable="false" loading="eager" decoding="async"/><canvas class="wmh-isometric-foreground" data-wmh-foreground-canvas aria-hidden="true"></canvas>'
     : "";
@@ -2590,6 +2590,8 @@ function startActorScanners(board:HTMLElement):void {
 const tokenMoveAnimations=new WeakMap<HTMLElement,Animation>();
 function animateGridMove(token:HTMLElement,update:()=>void,sync=true,updateSensors=true):void {
   const board=token.closest<HTMLElement>("[data-wmh-board]");
+  const pxlMode=token.closest<HTMLElement>("[data-world-map-hierarchy]")?.dataset.visualMode==="augusto-pxl";
+  const sprite=pxlMode?token.querySelector<HTMLElement>("[data-pxl-actor-sprite]"):null;
   const fromX=Number(token.dataset.posX??token.dataset.x??0);
   const fromY=Number(token.dataset.posY??token.dataset.y??0);
   tokenMoveAnimations.get(token)?.cancel();
@@ -2598,20 +2600,32 @@ function animateGridMove(token:HTMLElement,update:()=>void,sync=true,updateSenso
   const toX=Number(token.dataset.posX??token.dataset.x??fromX);
   const toY=Number(token.dataset.posY??token.dataset.y??fromY);
   const grid=board?readIsoMapData(board).grid:DEFAULT_ISOMETRIC_GRID;
-  // Animate only the actor's compositor translation. The JPG/SVG/canvas ground
-  // remains mounted and is never repainted as part of a walking step.
+  // Animate only the actor's compositor translation. The environment image,
+  // walkability graph and SVG/canvas editor layers remain authoritative.
   const dx=((fromX-fromY)-(toX-toY))*grid.tileW/2;
   const dy=((fromX+fromY)-(toX+toY))*grid.tileH/2;
   const reduceMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches===true;
+  if(sprite){
+    const vx=toX-fromX,vy=toY-fromY;
+    const direction=vx===0&&vy===0?"south":
+      Math.abs(vx)>Math.abs(vy)*2?(vx>0?"south-east":"north-west"):
+      Math.abs(vy)>Math.abs(vx)*2?(vy>0?"south-west":"north-east"):
+      vx>=0?(vy>=0?"south":"east"):(vy>=0?"west":"north");
+    sprite.dataset.pxlDirection=direction;
+    sprite.dataset.pxlMotion=reduceMotion?"idle":"walk";
+  }
   if(!reduceMotion&&Math.abs(dx)+Math.abs(dy)>=.01&&typeof token.animate==="function"){
     const animation=token.animate(
       [{translate:dx+"px "+dy+"px"},{translate:"0px 0px"}],
       {duration:150,easing:"cubic-bezier(.2,.75,.25,1)"}
     );
     tokenMoveAnimations.set(token,animation);
-    animation.onfinish=()=>{if(tokenMoveAnimations.get(token)===animation)tokenMoveAnimations.delete(token);};
+    animation.onfinish=()=>{
+      if(tokenMoveAnimations.get(token)===animation)tokenMoveAnimations.delete(token);
+      if(sprite&&sprite.dataset.pxlMotion==="walk")sprite.dataset.pxlMotion="idle";
+    };
     animation.oncancel=()=>{if(tokenMoveAnimations.get(token)===animation)tokenMoveAnimations.delete(token);};
-  }
+  }else if(sprite)sprite.dataset.pxlMotion="idle";
   if(board&&updateSensors)updateScannerContacts(board,false);
 }
 function stopNpcWander(dialog:HTMLElement):void {
