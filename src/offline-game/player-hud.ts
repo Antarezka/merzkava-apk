@@ -141,7 +141,7 @@ export function handlePlayerHudClick(target:Element,dialog:HTMLElement):boolean 
   }
   return false;
 }
-const motionScopes=new WeakMap<HTMLElement,{reveconst motionScopes=new WeakMap<HTMLElement,()=>void>();
+const motionScopes=new WeakMap<HTMLElement,()=>void>();
 export function mountPlayerHudMotion(root:HTMLElement):void {
   const hud=root.matches("[data-wmh-player-hud]")?root:root.querySelector<HTMLElement>("[data-wmh-player-hud]");
   if(!hud||motionScopes.has(hud)||typeof document==="undefined")return;
@@ -159,7 +159,7 @@ export function disposePlayerHudMotion(root:HTMLElement):void {
   motionScopes.get(hud)?.();
   motionScopes.delete(hud);
 }
-le:number};
+type PlayerHudLayoutPoint={x:number;y:number;scale:number};
 type PlayerHudLayoutGesture={
   element:HTMLElement;
   mode:"drag"|"resize"|"pinch";
