@@ -945,7 +945,21 @@ async function openWorldAtlasFromTv():Promise<void> {
           ["#atlas-reset-current","#atlas-reset-master","#atlas-reset-new","#atlas-reset-confirm"].forEach(selector=>{
             const input=gate.querySelector<HTMLInputElement>(selector);if(input)input.value="";
           });
-          void refreshAtlasPasswordMode(gate);
+          const selectionTask=(async()=>{
+            await requireWorldAtlasSourceConnection(gate);
+            await refreshAtlasPasswordMode(gate);
+          })();
+          void Promise.allSettled([
+            selectionTask,
+            playWorldAtlasAccessSequence(gate,1900,selectionTask)
+          ]).then(results=>{
+            if(results[0].status==="rejected"){
+              const status=gate.querySelector<HTMLElement>("[data-world-atlas-message]");
+              if(status)status.textContent=results[0].reason instanceof Error?results[0].reason.message:(gate.dataset.offlineLabel||"The official Universe source is unavailable.");
+              const submit=gate.querySelector<HTMLButtonElement>("[data-world-atlas-submit]");
+              if(submit)submit.disabled=true;
+            }
+          });
         });
       }
     }
