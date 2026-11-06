@@ -10,18 +10,13 @@ sprite("world-map-overview", {
   genre: "atlas-art",
 })
 
-// The supplied Academy illustration is the approved composition reference, not a runtime passthrough.
-// PXL reduces it to a 704×384 art canvas, resolves it through Endesga32, then exports a 4× scene.
-// This returns to the exact 2816×1536 map coordinate space used by the Academy grid and walkability.
-sprite("_academy-pixel-source", {
+// Full-resolution PXL palette treatment of the approved Academy composition.
+// Keep the source's native coordinate space intact: 2816×1536, no scene rescaling or cropping.
+sprite("academy-exterior", {
   png: "references/academy-exterior-source.png",
-  shrink: 4,
   palettize: true,
-  pivot: "center",
   genre: "atlas-art",
 })
-// The old map remains a PXL reference layer only. The runtime export is now a PXL-authored
-// perspective/mesh campus scene with the same world-map bounds and Academy landmark arrangement.
 
 sprite("academy-minimap", {
   png: "references/academy-exterior-source.png",
