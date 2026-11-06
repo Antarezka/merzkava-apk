@@ -74,7 +74,7 @@ function setImageSource(element:HTMLElement,src:string):void {
   element.style.backgroundImage='url("'+src+'")';
   element.style.backgroundRepeat="no-repeat";
   element.style.backgroundPosition="center";
-  element.style.backgroundSize="contain";
+  element.style.backgroundSize=element.dataset.pxlFit||"contain";
   element.dataset.pxlResolved="image";
 }
 function selectAnimation(asset:PxlAsset,element:HTMLElement):PxlAnimation|null {
