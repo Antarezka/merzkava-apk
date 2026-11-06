@@ -299,7 +299,7 @@
 .wmh-tile-coord{position:absolute;z-index:2;left:50%;top:9px;transform:translate(-50%,-50%);font:5px/1 Arial,sans-serif;color:#fff4d9;opacity:.65;white-space:nowrap;pointer-events:none}
 .wmh-tile>b{position:absolute;z-index:3;left:50%;top:9px;transform:translate(-50%,-50%);font:700 5px Arial;text-shadow:0 1px 3px #000;white-space:nowrap;pointer-events:none}
 .wmh-character-token{position:absolute;left:calc((var(--token-x) - var(--token-y))*32px + 320px);top:calc((var(--token-x) + var(--token-y))*16px + 8px);transform:translate(-50%,-100%);margin:0;justify-self:auto;align-self:auto}
-.wmh-character-token{transition:left .13s linear,top .13s linear,filter .15s ease}
+.wmh-character-token{transition:filter .15s ease}
 @media(max-width:390px){.wmh-isometric-board{width:704px;max-width:none;transform:none}.wmh-isometric-wrap{min-height:300px}}
 
 
@@ -366,7 +366,7 @@
 }
 .wmh-tile.building-footprint{transition:opacity .18s ease}
 .wmh-character-token{transition:filter .15s ease}
-.wmh-character-token.wmh-token-moving{will-change:transform}
+.wmh-character-token.wmh-token-moving{transition:none!important;will-change:translate}
 
 
 /* Larger world-space footprints: small homes 2x2, academy buildings 4x4,
