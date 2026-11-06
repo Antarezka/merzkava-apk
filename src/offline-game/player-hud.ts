@@ -112,7 +112,7 @@ export function renderPlayerHudMarkup():string {
     '</article>'+
     '<aside class="wmh-spirit-ring-list" aria-label="Absorbed Spirit Rings, maximum nine">'+ringMarkup+'</aside>'+
     '<section class="wmh-player-dock" data-wmh-hud-layout="skill-dock" aria-label="Tactical skills and bag"><div class="wmh-skill-dock"><header><b>TACTICAL SKILLS</b><small>PLACEHOLDER</small></header><div class="wmh-skill-slots">'+skillMarkup+'</div></div>'+
-      '<button type="button" class="wmh-bag-button" data-hud-action="toggle-inventory" aria-label="Open Traveler Satchel" title="Traveler Satchel"><span aria-hidden="true">♧</span></button>'+
+      '<button type="button" class="wmh-bag-button" data-hud-action="toggle-inventory" aria-label="Open Traveler Satchel" title="Traveler Satchel"><span aria-hidden="true"></span></button>'+
     '</section>'+
     '<section class="wmh-inventory-window" data-hud-panel="inventory" data-wmh-scroll-resize hidden role="dialog" aria-label="Traveler Satchel inventory">'+
       '<header class="wmh-inventory-header"><div><b>TRAVELER\'S SATCHEL</b><small>PERSONAL INVENTORY · <span data-hud-capacity>9 / 25</span></small></div><button type="button" data-hud-action="close-inventory" aria-label="Close inventory">×</button></header>'+
@@ -205,7 +205,9 @@ export function disposePlayerHudMotion(root:HTMLElement):void {
   const hud=root.matches("[data-wmh-player-hud]")?root:root.querySelector<HTMLElement>("[data-wmh-player-hud]");
   if(!hud)return;
   motionScopes.get(hud)?.();
+  hudInteractionScopes.get(hud)?.();
   motionScopes.delete(hud);
+  hudInteractionScopes.delete(hud);
 }
 const hudInteractionScopes=new WeakMap<HTMLElement,()=>void>();
 function bindPlayerHudInteractions(hud:HTMLElement):void {
@@ -260,7 +262,7 @@ export function bindScrollableResizableWindows(root:HTMLElement):void {
     panel.style.maxHeight="min(82dvh,720px)";
     panel.style.overflowY="auto";
     panel.style.overscrollBehavior="contain";
-    panel.style.webkitOverflowScrolling="touch";
+    panel.style.setProperty("-webkit-overflow-scrolling","touch");
     panel.style.resize="both";
     panel.style.minWidth="min(210px,82vw)";
     panel.style.minHeight="110px";
