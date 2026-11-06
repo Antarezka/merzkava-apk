@@ -34,6 +34,7 @@ describe("World Atlas player login gate",()=>{
       expect(html).toContain('data-atlas-buffer-log');
       expect(html).toContain('data-atlas-buffer-progress');
       expect(html).toContain('data-password-safety-note');
+      expect(html).not.toContain("Kata sandi disimpan secara lokal dalam bentuk hash bersalt.");
       expect(html).toContain('data-password-recovery-note');
       expect(html).toContain('data-password-reset-required-label=');
       expect(html).toContain('data-password-policy-label=');
