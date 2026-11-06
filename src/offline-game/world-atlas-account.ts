@@ -70,7 +70,7 @@ export function atlasPasswordPolicyError(password: string): string | null {
   if (!/[A-Z]/.test(password)) return "Include at least one uppercase letter.";
   if (!/[a-z]/.test(password)) return "Include at least one lowercase letter.";
   if (!/[0-9]/.test(password)) return "Include at least one number.";
-  if (!/[^A-Za-z0-9\\s]/.test(password)) return "Include at least one symbol.";
+  if (!/[^A-Za-z0-9\s]/.test(password)) return "Include at least one symbol.";
   return null;
 }
 export async function verifyAtlasMasterResetPassword(password: string): Promise<boolean> {
