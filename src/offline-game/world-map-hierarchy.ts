@@ -940,7 +940,6 @@ function renderIsometricWorldStatus(dialog:HTMLElement):void {
     Clear:{label:"CERAH",icon:"☀"},Cloudy:{label:"BERAWAN",icon:"☁"},
     Fog:{label:"KABUT",icon:"≋"},Rain:{label:"HUJAN",icon:"☂"},Snow:{label:"SALJU",icon:"❄"},
   };
-  const c=cycle[atmosphere.cycle]||cycle.Morning;
   const w=weather[atmosphere.weather]||weather.Clear;
   const rawHour=Math.max(0,Math.min(23,Number(save?.hour??8)));
   const hour=String(rawHour%12||12);
