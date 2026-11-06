@@ -103,6 +103,30 @@ function loadSvgTexture(svg:SVGSVGElement):Promise<TextureAsset> {
   });
 }
 
+async function ensureImageReady(image:HTMLImageElement):Promise<boolean> {
+  if(image.complete)return image.naturalWidth>0&&image.naturalHeight>0;
+  if(typeof image.decode==="function"){
+    try{await image.decode();}catch{/* Fall through to the native load/error events. */}
+    if(image.naturalWidth>0&&image.naturalHeight>0)return true;
+    if(image.complete)return false;
+  }
+  return new Promise(resolve=>{
+    let settled=false;
+    const finish=(ready:boolean)=>{
+      if(settled)return;
+      settled=true;
+      image.removeEventListener("load",onLoad);
+      image.removeEventListener("error",onError);
+      resolve(ready);
+    };
+    const onLoad=()=>finish(image.naturalWidth>0&&image.naturalHeight>0);
+    const onError=()=>finish(false);
+    image.addEventListener("load",onLoad,{once:true});
+    image.addEventListener("error",onError,{once:true});
+    if(image.complete)finish(image.naturalWidth>0&&image.naturalHeight>0);
+  });
+}
+
 function loadImageTexture(image:HTMLImageElement):TextureAsset {
   const texture=PIXI.Texture.from(image);
   return {texture,release:()=>{try{texture.destroy(false);}catch{/* Texture may already be released. */}}};
@@ -203,6 +227,7 @@ function positionCanvas(canvas:HTMLCanvasElement,board:HTMLElement):void {
   canvas.style.width="100%";
   canvas.style.height="100%";
   canvas.style.pointerEvents="none";
+  canvas.style.background="transparent";
   canvas.style.zIndex="300";
   board.append(canvas);
 }
@@ -264,14 +289,18 @@ function mountPixiBoard(board:HTMLElement,modal:HTMLElement,onFailure:()=>void):
     const overlay=board.querySelector<SVGSVGElement>("[data-wmh-overlay-svg]");
     const foreground=board.querySelector<HTMLCanvasElement>("[data-wmh-foreground-canvas]");
     const width=boardWidth(),height=boardHeight();
+    // Large authored map artwork stays in its native DOM image layer. Uploading
+    // the full Academy JPG again as a GPU texture is unnecessary and fragile on
+    // low-end Android WebViews; Pixi remains responsible for the visual overlays
+    // and actor/effect layers above it.
+    const keepMapArtworkInDom=board.classList.contains("has-map-base");
 
-    if(image){
-      if(!image.complete&&typeof image.decode==="function")try{await image.decode();}catch{/* Use the existing visible DOM fallback if the source is not ready. */}
+    if(image&&!keepMapArtworkInDom){
+      const imageReady=await ensureImageReady(image);
       if(disposed||!app||!worldLayer)return;
-      if(image.naturalWidth){
-        const asset=loadImageTexture(image);textures.push(asset);
-        addSprite(asset.texture,image.clientWidth||image.naturalWidth,image.clientHeight||image.naturalHeight);
-      }
+      if(!imageReady)throw new Error("World Atlas map artwork was not ready for the Pixi renderer.");
+      const asset=loadImageTexture(image);textures.push(asset);
+      addSprite(asset.texture,image.clientWidth||image.naturalWidth,image.clientHeight||image.naturalHeight,image.offsetLeft,image.offsetTop);
     }
     if(scene){
       const asset=await loadSvgTexture(scene);
@@ -279,7 +308,7 @@ function mountPixiBoard(board:HTMLElement,modal:HTMLElement,onFailure:()=>void):
       textures.push(asset);
       addSprite(asset.texture,width,height);
     }
-    if(foreground&&foreground.width>0&&foreground.height>0&&foregroundLayer){
+    if(foreground&&foreground.width>0&&foreground.height>0&&foregroundLayer&&!keepMapArtworkInDom){
       const asset=loadCanvasTexture(foreground);textures.push(asset);
       const sprite=new PIXI.Sprite(asset.texture);
       sprite.x=numberValue(foreground.style.left,0);
@@ -451,7 +480,7 @@ function mountPixiBoard(board:HTMLElement,modal:HTMLElement,onFailure:()=>void):
     try{
       app=new PIXI.Application();
       await app.init({
-        width:boardWidth(),height:boardHeight(),backgroundAlpha:0,
+        width:boardWidth(),height:boardHeight(),backgroundAlpha:0,backgroundColor:0x000000,
         antialias:false,autoDensity:true,
         // Keep the low-end Android GPU buffer at CSS-pixel size; textures retain source detail.
         resolution:1,
