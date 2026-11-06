@@ -20,13 +20,14 @@ describe("isometric NPC conversations", () => {
     expect(html).toContain('data-wmh-npc="test-mechanic"');
   });
 
-  it("docks the choice conversation at the bottom of the isometric map", () => {
+  it("centers the choice conversation over the blurred isometric map", () => {
     const rules = [...chatStyles.matchAll(/\.wmh-isometric-play-screen \.wmh-chat-panel\{([^}]*)\}/g)];
     const finalRule = rules.filter(rule => rule[1].includes("position:fixed")).at(-1)?.[1] ?? "";
     expect(finalRule).toContain("position:fixed");
-    expect(finalRule).toContain("inset:auto 0 0");
-    expect(finalRule).toContain("align-items:flex-end");
-    expect(finalRule).not.toContain("place-items:center");
+    expect(finalRule).toContain("inset:0");
+    expect(finalRule).toContain("place-items:center");
+    expect(finalRule).toContain("backdrop-filter:blur(6px)");
+    expect(finalRule).not.toContain("align-items:flex-end");
   });
 
   it("renders the shared world HUD and map-tool drawer on the isometric play screen", () => {

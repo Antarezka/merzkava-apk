@@ -19,8 +19,8 @@ vi.mock("../../src/offline-game/atlas-reset-grants.generated",()=>({
 
 import {
   atlasPasswordPolicyError, clearAtlasPlayer, completeAtlasMasterReset,
-  createAtlasMasterResetRequest, hasAtlasPassword, rememberAtlasPlayer,
-  restoreAtlasPlayer, setAtlasPassword, verifyAtlasMasterResetCode, verifyAtlasPassword
+  createAtlasMasterResetRequest, hasAtlasPassword, rememberAtlasCredentials, rememberAtlasPlayer,
+  restoreAtlasPlayer, restoreRememberedAtlasPassword, setAtlasPassword, verifyAtlasMasterResetCode, verifyAtlasPassword
 } from "../../src/offline-game/world-atlas-account";
 
 const values=new Map<string,string>();
