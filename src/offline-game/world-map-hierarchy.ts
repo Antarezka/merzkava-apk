@@ -212,7 +212,8 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
   // Android WebView begin a competing native scroll gesture on the viewport.
   if(academyCanvas)viewport.style.setProperty("touch-action","none","important");
   let academyImageWidth=0,academyImageHeight=0,academyMarginLeft=0,academyMarginRight=0,academyMarginTop=0,academyMarginBottom=0;
-  const academyExpansionKey="merzkava.academy-canvas-expansion.v2";
+  const pxlMode=dialog.closest<HTMLElement>("[data-world-map-hierarchy]")?.dataset.visualMode==="augusto-pxl";
+  const academyExpansionKey=(pxlMode?"merzkava.augusto-pxl.":"")+"merzkava.academy-canvas-expansion.v2";
   let academyExpansion={...DEFAULT_ISO_CANVAS_EXPANSION};
   if(academyCanvas){try{academyExpansion=normalizeIsoCanvasExpansion(JSON.parse(localStorage.getItem(academyExpansionKey)||"{}"));}catch{}}
   const pointers = new Map<number, { x: number; y: number }>();
@@ -2284,7 +2285,8 @@ function bindAcademyCanvasEditor(dialog:HTMLElement):void {
   const toggle=editor?.querySelector<HTMLButtonElement>("[data-wmh-academy-editor-toggle]");
   if(!editor||!panel||!toggle||editor.dataset.bound==="true")return;
   editor.dataset.bound="true";
-  const key="merzkava.academy-canvas-expansion.v2";
+  const pxlMode=dialog.closest<HTMLElement>("[data-world-map-hierarchy]")?.dataset.visualMode==="augusto-pxl";
+  const key=(pxlMode?"merzkava.augusto-pxl.":"")+"merzkava.academy-canvas-expansion.v2";
   const controls=[...panel.querySelectorAll<HTMLInputElement>("[data-wmh-canvas-side]")];
   const mapViewport=dialog.querySelector<HTMLElement>("[data-wmh-map-viewport]");
   const status=panel.querySelector<HTMLElement>("[data-wmh-canvas-status]");
@@ -2413,7 +2415,8 @@ function resetLegacyIsometricMapLayouts(): void {
 }
 
 export function initializeWorldMapHierarchy(root: HTMLElement): void {
-  resetLegacyIsometricMapLayouts();
+  // Legacy migration/reset must never run as a side effect of opening the PXL Atlas.
+  if(root.querySelector<HTMLElement>('[data-world-map-hierarchy][data-visual-mode="legacy"]:not([hidden])'))resetLegacyIsometricMapLayouts();
   root.querySelectorAll<HTMLElement>("[data-world-map-hierarchy]").forEach(overlay=>{
     const dialog=overlay.querySelector<HTMLElement>("[data-wmh-dialog]");
     if(!dialog||overlay.hidden)return;
