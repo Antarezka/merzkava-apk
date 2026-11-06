@@ -87,10 +87,12 @@ Still required:
 
 A passing unit test or web build does not prove the fog looks correct on device.
 
-## Forbidden technology policy
+## Separate World Atlas renderer boundary
 
-PixiJS is prohibited in this application. Do not add it as a dependency, import it, initialize its renderer/canvas, use its ticker/sprite/event system, or restore PixiJS-specific settings, stored preferences, CSS, fallbacks, or lifecycle code. The incident and permanent safeguards are recorded in [Forbidden Technologies & Regression Safeguards](../FORBIDDEN_TECHNOLOGIES.md) and [the PixiJS Android input failure incident](../INCIDENT_PIXIJS_ANDROID_INPUT_FAILURE.md).
+Anime.js remains the owner of the Eternal Path cinematic Scene Window, weather plates/particles, entrance transitions and other Expedition-page motion. Its scoped mount/revert lifecycle is unchanged.
 
-Keep Eternal Path presentation animation on the existing Anime.js + ordinary DOM/CSS implementation. Weather and seasonal particles must remain DOM elements animated through Anime.js; they must not introduce a parallel pointer/touch event system over the app's native DOM controls.
+The second floating CRT-console entry opens the same World Atlas/gameplay flow with a separate PixiJS visual renderer for the isometric board. It is deliberately outside this Anime.js scene module. The Pixi renderer must remove PixiJS EventSystem and AccessibilitySystem before initialization, while all map interaction and gameplay authority stay on the existing DOM/gameplay engine.
 
-This restriction remains in force until the owner personally identifies a workable solution and explicitly approves reconsideration. A successful build, a claimed performance benefit, or a proposed fallback is not permission to reintroduce PixiJS.
+The Coastal Receiver remains the existing DOM/SVG World Atlas path. Pixi is not used in the shared app shell, Convo, login, settings, Noticeboard, Floating Control, Kitty bubble, pull cord, splash, loading screens, or this cinematic Scene Window.
+
+See [the Pixi World Atlas renderer evaluation](./PIXIJ_GAME_MODE_RENDERER_EVALUATION.md), [Forbidden Technologies & Regression Safeguards](../FORBIDDEN_TECHNOLOGIES.md), and [the historical PixiJS Android input incident](../INCIDENT_PIXIJS_ANDROID_INPUT_FAILURE.md). A passing web build is not Android touch proof; physical-device QA remains required.
