@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
-import { projectIsoActorPosition } from "../../src/offline-game/pixi-world-atlas-renderer";
+import { projectIsoActorPosition } from "../../src/offline-game/pixi-world-atlas-projection";
 
 const GRID={cols:24,rows:20,tileW:64,tileH:32,offsetX:0,offsetY:0};
 
