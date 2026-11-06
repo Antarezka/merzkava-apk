@@ -37,6 +37,7 @@ describe("Pixi World Atlas Android input isolation",()=>{
   const expeditionSource=readFileSync(new URL("../../src/offline-game/expedition-interface.ts",import.meta.url),"utf8");
   const atlasSource=readFileSync(new URL("../../src/offline-game/idle-home-map.ts",import.meta.url),"utf8");
   const atlasCss=readFileSync(new URL("../../src/offline-game/idle-home-map.css",import.meta.url),"utf8");
+  const cssStyles=readFileSync(new URL("../../src/offline-game/world-map-hierarchy.css",import.meta.url),"utf8");
 
   it("removes Pixi pointer and accessibility extensions before renderer initialization",()=>{
     const removal=rendererSource.indexOf("PIXI.extensions.remove(EventSystem, AccessibilitySystem)");
@@ -44,6 +45,7 @@ describe("Pixi World Atlas Android input isolation",()=>{
     expect(removal).toBeGreaterThanOrEqual(0);
     expect(initialization).toBeGreaterThan(removal);
     expect(rendererSource).toContain('canvas.style.pointerEvents="none"');
+    expect(rendererSource).toContain('canvas.style.zIndex="300"');
     expect(rendererSource).toContain("resolution:1,");
     expect(rendererSource).toContain("antialias:false");
     expect(rendererSource).toContain("powerPreference:"low-power"");
@@ -60,6 +62,12 @@ describe("Pixi World Atlas Android input isolation",()=>{
     expect(mainSource).toContain('target.closest("[data-idle-pixi-open]")');
     expect(mainSource).toContain('openWorldAtlasFromTv("pixi")');
     expect(mainSource).toContain('import("./offline-game/pixi-world-atlas-renderer")');
+  });
+
+  it("keeps DOM transition markers above the Pixi world canvas",()=>{
+    expect(rendererSource).toContain('canvas.style.zIndex="300"');
+    expect(cssStyles).toContain(".wmh-isometric-play-screen [data-wmh-transition-layer]{position:absolute;inset:0;z-index:380");
+    expect(cssStyles).toContain(".wmh-transition-token");
   });
 
   it("rebuilds map textures after editor changes and releases the prior layers",()=>{
