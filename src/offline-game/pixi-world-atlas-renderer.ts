@@ -1,6 +1,5 @@
 import * as PIXI from "pixi.js";
-import { EventSystem } from "pixi.js/events";
-import { AccessibilitySystem } from "pixi.js/accessibility";
+import { EventSystem, AccessibilitySystem } from "pixi.js";
 
 /*
  * IMPORTANT ANDROID INPUT BOUNDARY:
