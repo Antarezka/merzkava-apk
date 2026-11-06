@@ -131,6 +131,7 @@ function makeActorVisual(actor:HTMLElement):{visual:PIXI.Container;body:PIXI.Gra
   proximity.visible=false;
   const firstRing=new PIXI.Graphics();
   const secondRing=new PIXI.Graphics();
+  drawScannerRings([firstRing,secondRing],actor.dataset.scanTone||"unknown");
   firstRing.visible=false;
   secondRing.visible=false;
   firstRing.alpha=0;
@@ -155,6 +156,14 @@ function drawActorBody(graphics:PIXI.Graphics,tone:string,isPlayer:boolean):void
   graphics.roundRect(-7,3,14,9,4).fill({color:isPlayer?0xe8c98f:tone==="friendly"?0x8db5c6:0x68675d});
   graphics.circle(5,-5,1.2).fill({color:0x181917});
   graphics.circle(-2,-5,1.2).fill({color:0x181917});
+}
+
+function drawScannerRings(rings:[PIXI.Graphics,PIXI.Graphics],tone:string):void {
+  const color=toneColor(tone);
+  rings[0].clear();
+  rings[0].circle(0,0,42).stroke({color,width:1.45,alpha:.8});
+  rings[1].clear();
+  rings[1].circle(0,0,52).stroke({color,width:1,alpha:.72});
 }
 
 function actorId(element:HTMLElement):string {
@@ -205,11 +214,11 @@ function releaseApplication(app:PIXI.Application|null):void {
 
 function mountPixiBoard(board:HTMLElement,modal:HTMLElement,onFailure:()=>void):()=>void {
   let disposed=false;
-  let sequence=0;
   let app:PIXI.Application|null=null;
   let canvas:HTMLCanvasElement|null=null;
   let worldLayer:PIXI.Container|null=null;
   let actorLayer:PIXI.Container|null=null;
+  let foregroundLayer:PIXI.Container|null=null;
   let actors=new Map<string,PixiActor>();
   let textures:TextureAsset[]=[];
   let frameId=0;
@@ -217,7 +226,6 @@ function mountPixiBoard(board:HTMLElement,modal:HTMLElement,onFailure:()=>void):
   let lastFrame=0;
   let resizeObserver:ResizeObserver|null=null;
   let actorObserver:MutationObserver|null=null;
-  const boardVersion=++sequence;
 
   const cleanup=()=>{
     disposed=true;
@@ -236,6 +244,7 @@ function mountPixiBoard(board:HTMLElement,modal:HTMLElement,onFailure:()=>void):
     canvas=null;
     worldLayer=null;
     actorLayer=null;
+    foregroundLayer=null;
   };
 
   const boardWidth=()=>Math.max(1,board.offsetWidth||numberValue(board.dataset.boardWidth,704));
@@ -268,15 +277,21 @@ function mountPixiBoard(board:HTMLElement,modal:HTMLElement,onFailure:()=>void):
       const asset=await loadSvgTexture(scene);textures.push(asset);
       addSprite(asset.texture,width,height);
     }
-    if(foreground&&foreground.width>0&&foreground.height>0){
+    if(foreground&&foreground.width>0&&foreground.height>0&&foregroundLayer){
       const asset=loadCanvasTexture(foreground);textures.push(asset);
-      const left=numberValue(foreground.style.left,0),top=numberValue(foreground.style.top,0);
-      const layerWidth=numberValue(foreground.style.width,foreground.width),layerHeight=numberValue(foreground.style.height,foreground.height);
-      addSprite(asset.texture,layerWidth,layerHeight,left,top);
+      const sprite=new PIXI.Sprite(asset.texture);
+      sprite.x=numberValue(foreground.style.left,0);
+      sprite.y=numberValue(foreground.style.top,0);
+      sprite.width=numberValue(foreground.style.width,foreground.width);
+      sprite.height=numberValue(foreground.style.height,foreground.height);
+      sprite.eventMode="none";
+      foregroundLayer.addChild(sprite);
     }
-    if(overlay){
+    if(overlay&&foregroundLayer){
       const asset=await loadSvgTexture(overlay);textures.push(asset);
-      addSprite(asset.texture,width,height);
+      const sprite=new PIXI.Sprite(asset.texture);
+      sprite.width=width;sprite.height=height;sprite.eventMode="none";
+      foregroundLayer.addChild(sprite);
     }
   };
 
@@ -315,6 +330,7 @@ function mountPixiBoard(board:HTMLElement,modal:HTMLElement,onFailure:()=>void):
         if(actor.tone!==tone){
           actor.tone=tone;
           drawActorBody(actor.body,tone,element.matches("[data-wmh-player-token]"));
+          drawScannerRings(actor.rings,tone);
           renderActorProximity(actor);
         }
         if(actor.interactionReady!==ready){
@@ -348,7 +364,6 @@ function mountPixiBoard(board:HTMLElement,modal:HTMLElement,onFailure:()=>void):
       return;
     }
     setPaused(false);
-    const delta=lastFrame?Math.min(64,time-lastFrame):33;
     lastFrame=time;
     let moving=false;
     for(const actor of actors.values()){
@@ -374,9 +389,6 @@ function mountPixiBoard(board:HTMLElement,modal:HTMLElement,onFailure:()=>void):
           ring.visible=false;ring.alpha=0;continue;
         }
         const progress=Math.max(0,Math.min(1,elapsed/SCAN_DURATION));
-        ring.clear();
-        const radius=index===0?42:52;
-        ring.circle(0,0,radius).stroke({color:toneColor(actor.tone),width:index===0?1.45:1,alpha:.8});
         ring.scale.set(.08+.92*progress);
         ring.alpha=.44*(1-progress);
         ring.visible=true;
@@ -398,8 +410,13 @@ function mountPixiBoard(board:HTMLElement,modal:HTMLElement,onFailure:()=>void):
     const wasPaused=canvas.hidden;
     canvas.hidden=paused;
     board.classList.toggle("wmh-pixi-render-paused",paused);
-    if(paused&&frameId){cancelAnimationFrame(frameId);frameId=0;}
-    if(!paused&&wasPaused&&app)app.renderer.render({container:app.stage});
+    if(paused){
+      if(frameId){cancelAnimationFrame(frameId);frameId=0;}
+      if(pulseTimer){window.clearInterval(pulseTimer);pulseTimer=0;}
+    }else{
+      if(!pulseTimer)pulseTimer=window.setInterval(triggerScanPulse,SCAN_INTERVAL);
+      if(wasPaused&&app)app.renderer.render({container:app.stage});
+    }
   };
 
   const triggerScanPulse=()=>{
@@ -428,14 +445,15 @@ function mountPixiBoard(board:HTMLElement,modal:HTMLElement,onFailure:()=>void):
         powerPreference:"low-power",preference:["webgl","canvas"],
         autoStart:false,sharedTicker:false
       });
-      if(disposed||boardVersion!==sequence||!board.isConnected){releaseApplication(app);app=null;return;}
+      if(disposed||!board.isConnected){releaseApplication(app);app=null;return;}
       canvas=app.canvas;
       positionCanvas(canvas,board);
       app.stage.eventMode="none";
       app.stage.sortableChildren=true;
       worldLayer=new PIXI.Container();worldLayer.eventMode="none";
       actorLayer=new PIXI.Container();actorLayer.eventMode="none";actorLayer.sortableChildren=true;
-      app.stage.addChild(worldLayer,actorLayer);
+      foregroundLayer=new PIXI.Container();foregroundLayer.eventMode="none";
+      app.stage.addChild(worldLayer,actorLayer,foregroundLayer);
       await buildStaticWorld();
       if(disposed||!board.isConnected)return;
       board.classList.add("wmh-pixi-render-active");
@@ -446,13 +464,23 @@ function mountPixiBoard(board:HTMLElement,modal:HTMLElement,onFailure:()=>void):
       triggerScanPulse();
       pulseTimer=window.setInterval(triggerScanPulse,SCAN_INTERVAL);
       actorObserver=new MutationObserver(records=>{
-        if(records.some(record=>record.type==="attributes")){
-          syncActors(true);
-          requestFrame();
-        }
+        const actorChanged=records.some(record=>
+          record.target instanceof HTMLElement&&
+          record.target.matches("[data-wmh-player-token],[data-wmh-npc]")&&
+          record.attributeName!=="class"
+        );
+        if(actorChanged)syncActors(true);
+        const modeChanged=records.some(record=>
+          (record.target===board&&record.attributeName==="class")||
+          (record.target instanceof HTMLElement&&record.target.matches("[data-wmh-chat]")&&record.attributeName==="hidden")
+        );
+        if(modeChanged)setPaused(isPaused(board));
+        if(actorChanged||modeChanged)requestFrame();
       });
-      actorObserver.observe(board,{subtree:true,attributes:true,attributeFilter:["data-x","data-y","data-pos-x","data-pos-y","data-scan-tone","data-interaction-ready"]});
+      actorObserver.observe(board,{subtree:true,attributes:true,attributeFilter:["data-x","data-y","data-pos-x","data-pos-y","data-scan-tone","data-interaction-ready","class"]});
+      actorObserver.observe(modal,{subtree:true,attributes:true,attributeFilter:["hidden"]});
       board.addEventListener("merzkava:actor-moved",onActorMoved);
+      setPaused(isPaused(board));
       resizeObserver=new ResizeObserver(()=>{
         if(!app||disposed)return;
         const width=boardWidth(),height=boardHeight();
@@ -470,11 +498,11 @@ function mountPixiBoard(board:HTMLElement,modal:HTMLElement,onFailure:()=>void):
   })();
 
   function onVisibility(){
-    if(document.hidden){
-      if(frameId)cancelAnimationFrame(frameId);
-      frameId=0;
-    }else if(anyMotion()||hasActivePulse())requestFrame();
-    else if(app)app.renderer.render({container:app.stage});
+    setPaused(document.hidden||isPaused(board));
+    if(!document.hidden&&!isPaused(board)){
+      if(anyMotion()||hasActivePulse())requestFrame();
+      else if(app)app.renderer.render({container:app.stage});
+    }
   }
 
   return ()=>{
