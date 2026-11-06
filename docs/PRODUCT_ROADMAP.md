@@ -1106,3 +1106,12 @@ Current source baseline for this workstream: ed5ef007cead9ecf8e6e70662c29ec5cce9
 - No new animation or rendering dependency is added. PixiJS, Phaser and Konva remain possible future renderer options, but replacing the current interactive map for these effects is not needed for this performance pass.
 
 **Still open:** verify the restored effects and minimap on the Tecno Spark Go 1 KL4; confirm minimap taps route to the same visible map coordinates; confirm map flicker, touch interaction, app memory and movement frame pacing under simultaneous NPC/player motion.
+
+
+### 13P. Isometric menu release and compact field HUD (2026-11-06)
+
+- Fix the full-screen `.wmh-overlay:has(.wmh-isometric-play-screen)` rule so an overlay with the `hidden` attribute is truly removed from layout, hit testing and pointer interaction. This prevents a closed map from continuing to sit above the app menu.
+- Redesign the Player HUD as compact opaque instruments, reducing panel width/height, decorative shadows and backdrop-filter work while keeping identity, Spirit Realm, HP, Satiety, affiliation, four tier-coded skill slots and test inventory accessible.
+- Replace eight perpetual Anime.js skill-ring loops with tier-specific CSS transform animations; pause them when the document is hidden and disable them for reduced-motion users. No PixiJS runtime is added: the inspected PR branch currently uses the shared SVG/DOM map renderer.
+
+**Still open:** verify menu navigation after closing the isometric world map; check the compact HUD on the Tecno Spark Go 1 KL4 at portrait and landscape sizes; confirm minimap, skill slots, inventory taps, NPC movement and editor controls remain reachable. Physical-device validation is still required.
