@@ -1,12 +1,16 @@
 # Isometric Game-Mode Renderer — PixiJS Evaluation
 
-**Status:** isolated evaluation branch; not approved for production merge.
+**Status:** implemented as an isolated dual-renderer prototype; awaiting CI and physical-device QA, not approved for production merge.
 **Evaluation base:** Build #1341 lineage, with the first performance pass carried forward.
 **Primary runtime:** `src/offline-game/world-map-hierarchy.ts`
 **Data authority:** `IsoMapEditorData` and the existing deterministic movement / interaction helpers.
 **Target device:** TECNO Spark Go 1 KL4, Android 14 / WebView.
 
-This is an architecture investigation, not permission to replace the shared app shell or rewrite gameplay rules. The objective is to move the expensive *world presentation* out of a large DOM/SVG tree while leaving the app's real controls and game rules intact.
+This evaluation is now wired to the second floating CRT-console gateway on Eternal Path. The original Coastal Receiver still opens the original DOM/SVG World Atlas. Both entries use the same Atlas markup, login gate, map hierarchy, local game data, movement, pathfinding, sub-cell coordinate model, NPC interactions and dialogue. Only the map's visual renderer changes.
+
+The second icon is a CSS-only vintage CRT plus console box/joystick and has an independent draggable position. The shared World Atlas header shows the tiny brush-ink `Pixi Architecture` annotation only while this entry is active.
+
+This remains a prototype, not production approval. Do not change the shared app shell or gameplay rules to accommodate the renderer.
 
 ## 1. Why the game mode is the target
 
@@ -141,4 +145,6 @@ Automated tests and Web build validation are necessary but do not certify Androi
 
 ## 8. Evaluation-only policy
 
-This branch is a controlled investigation. The canonical restriction in `docs/FORBIDDEN_TECHNOLOGIES.md` remains active until the input-isolated renderer passes automated checks and physical-device QA, and the owner explicitly approves promotion. A successful prototype or CI build alone is not production approval.
+The owner has explicitly authorized this isolated Pixi World Atlas prototype. The exception is limited to the second Eternal Path floating gateway and the visual renderer in `src/offline-game/pixi-world-atlas-renderer.ts`. The original Coastal Receiver remains DOM/SVG.
+
+The canonical safeguards in `docs/FORBIDDEN_TECHNOLOGIES.md` remain active everywhere else. This branch is not production-approved until CI passes and physical-device QA verifies both TV icons, DOM controls, gestures, editor handoff, cleanup, and fallback on the TECNO target. A successful prototype or CI build alone is not production approval.
