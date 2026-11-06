@@ -26,6 +26,7 @@ on:
       - feat/player-hud-inventory-2026-11-06
       - feat/augusto-pxl-floating-tv-2026-11-06
     paths:
+      - "pxl/**"
       - "src/**"
       - "public/**"
       - "native/**"
@@ -65,6 +66,13 @@ jobs:
         with:
           distribution: temurin
           java-version: "21"
+
+      - name: Install FFmpeg for PXL image normalization
+        run: |
+          if ! command -v ffmpeg >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y ffmpeg
+          fi
 
       - name: Install dependencies
         run: npm install
