@@ -3,25 +3,26 @@ import { APP_LANGUAGES } from "../../src/i18n";
 import { accountSettingsPanel, developerLoginPanel } from "../../src/app/developer-access-panel";
 
 describe("Account controls in Settings",()=>{
-  it("keeps developer Floating Control, Lock and the guided Master Reset request in the account panel for every language",()=>{
+  it("keeps developer Floating Control, Lock and a lightweight Master Reset scanner in the account panel for every language",()=>{
     for(const language of APP_LANGUAGES){
-      const html=accountSettingsPanel(language.code,true,false,["Nafila","Ilya"]);
+      const html=accountSettingsPanel(language.code,true,false,[{name:"Nafila",source:"universe"},{name:"Ilya",source:"local-profile"}]);
       expect(html).toContain("data-dev-open-control");
       expect(html).toContain("data-dev-logout");
       expect(html).toContain("account-access-icon icon-floating");
       expect(html).toContain("account-access-icon icon-lock");
       expect(html).toContain("data-atlas-developer-reset-submit");
       expect(html).toContain('id="developer-atlas-reset-player"');
-      expect(html).toContain("<option value=\"Nafila\">Nafila</option>");
+      expect(html).toContain("<option value=\"Nafila\">Nafila · Universe</option>");
+      expect(html).toContain("<option value=\"Ilya\">Ilya · Local Profile</option>");
       expect(html).toContain("data-atlas-developer-reset-proof");
       expect(html).toContain("developer-atlas-reset-confirm");
       expect(html).toContain('id="developer-atlas-reset-request"');
       expect(html).toContain("data-atlas-reset-copy-request");
-      expect(html).toContain('data-buffer-context="developer-reset"');
-      expect(html).toContain("PLAYER ACCOUNT BINDING...");
-      expect(html).toContain('data-atlas-reset-copy-buffer');
-      expect(html).toContain('data-buffer-context="clipboard"');
-      expect(html).toContain("SYSTEM CLIPBOARD WRITE...");
+      expect(html).toContain("data-atlas-reset-scan-refresh");
+      expect(html).toContain("data-developer-atlas-reset-scan-status");
+      expect(html).not.toContain("PLAYER ACCOUNT BINDING...");
+      expect(html).not.toContain("SYSTEM CLIPBOARD WRITE...");
+
     }
   });
 

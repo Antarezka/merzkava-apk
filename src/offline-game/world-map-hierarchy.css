@@ -2161,3 +2161,23 @@
   fill:none!important;stroke:rgba(220,197,148,.22)!important;stroke-width:.8!important;
   vector-effect:non-scaling-stroke!important;pointer-events:none!important;
 }
+
+
+/* Low-power field rendering: keep map artwork stable while tokens move. */
+.wmh-isometric-play-screen .wmh-isometric-board,
+.wmh-isometric-play-screen .wmh-academy-map-surface{filter:none!important}
+.wmh-isometric-play-screen .wmh-character-token{transition:none!important;will-change:transform}
+.wmh-isometric-play-screen .wmh-character-token:not(.wmh-player-token){animation:none!important}
+.wmh-isometric-play-screen .wmh-sonar-ring,
+.wmh-isometric-play-screen .wmh-token-movement-glow,
+.wmh-isometric-play-screen .wmh-tile-trail-wave{display:none!important}
+.wmh-isometric-play-screen .wmh-character-token>.wmh-npc-proximity-glow{
+  background:transparent!important;box-shadow:none!important;filter:none!important;
+  transition:none!important;will-change:auto!important
+}
+.wmh-isometric-play-screen .wmh-world-status,
+.wmh-isometric-play-screen .wmh-player-card,
+.wmh-isometric-play-screen .wmh-skill-dock,
+.wmh-isometric-play-screen .wmh-hud-drawer{
+  backdrop-filter:none!important;-webkit-backdrop-filter:none!important
+}

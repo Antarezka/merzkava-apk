@@ -1,4 +1,4 @@
-import { animate, stagger } from "animejs";
+import { animate } from "animejs";
 
 /**
  * Shared shell transitions. The fixed navigation rail stays anchored; Anime.js
@@ -8,198 +8,29 @@ import { animate, stagger } from "animejs";
 export function animateAppScreen(shell: HTMLElement | null, options: { menuToggle?: boolean } = {}): void {
   if (!shell) return;
   const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
-  const header = shell.querySelector<HTMLElement>(".app-header");
-  const content = shell.querySelector<HTMLElement>(".main-content");
   const nav = shell.querySelector<HTMLElement>(".bottom-nav");
   const toggle = shell.querySelector<HTMLElement>(".nav-toggle-handle");
-
-  if (reducedMotion) {
-    [header, content, nav].forEach(element => {
-      if (element) { element.style.opacity = "1"; element.style.transform = ""; }
-    });
-    if (toggle) {
-      const collapsed = shell.classList.contains("is-nav-collapsed");
-      toggle.style.opacity = "1";
-      toggle.style.transform = collapsed ? "translateY(25px)" : "";
-    }
-    return;
-  }
-
-  // The shell owns opacity; child wrappers contribute subtle movement only.
-  if (!options.menuToggle) {
-    shell.style.willChange = "opacity";
-    animate(shell, {
-      opacity: [0, 1],
-      duration: 480,
-      ease: "outCubic",
-      onComplete: () => { shell.style.willChange = ""; }
-    });
-  }
-
   if (options.menuToggle) {
     const collapsed = shell.classList.contains("is-nav-collapsed");
     if (nav) {
-      // Move the entire dock below the viewport; the detached lever remains accessible.
-      const hideDistance = nav.offsetHeight + 12;
-      const from = collapsed ? 0 : hideDistance;
-      const to = collapsed ? hideDistance : 0;
+      const distance = nav.offsetHeight + 12;
+      const target = collapsed ? distance : 0;
       nav.style.pointerEvents = "auto";
-      nav.style.opacity = "1";
-      nav.style.transform = `translateX(-50%) translateY(${from}px)`;
-      const direction = Math.sign(to - from);
-      const distance = Math.abs(to - from);
-      const stages = [
-        { to: from + direction * distance * 0.12, duration: 180, ease: "outSine" },
-        { to: to - direction * Math.min(5, distance * 0.035), duration: 560, ease: "inOutSine" },
-        { to, duration: 220, ease: "outCubic" }
-      ];
-      animate(nav, {
-        translateY: stages,
-        opacity: [1, 1],
-        duration: 960,
-        ease: "inOutSine",
-        onComplete: () => {
-          nav.style.transform = `translateX(-50%) translateY(${to}px)`;
-          nav.style.pointerEvents = "auto";
-          nav.querySelectorAll<HTMLElement>(".nav-item").forEach(item => {
-            item.style.pointerEvents = collapsed ? "none" : "auto";
-          });
-        }
-      });
-      // The lever follows the dock's corner, then clamps at the screen edge.
-      // Its travel is the difference between the expanded and collapsed CSS bottom offsets.
-      if (toggle) {
-        const leverFrom = collapsed ? 0 : 25;
-        const leverTo = collapsed ? 25 : 0;
-        const leverDirection = Math.sign(leverTo - leverFrom);
-        const leverDistance = Math.abs(leverTo - leverFrom);
-        const leverStages = [
-          { to: leverFrom + leverDirection * leverDistance * 0.12, duration: 180, ease: "outSine" },
-          { to: leverTo - leverDirection * Math.min(5, leverDistance * 0.035), duration: 560, ease: "inOutSine" },
-          { to: leverTo, duration: 220, ease: "outCubic" }
-        ];
-        animate(toggle, {
-          translateY: leverStages,
-          duration: 960,
-          ease: "inOutSine",
-          onComplete: () => {
-            toggle.style.transform = leverTo ? `translateY(${leverTo}px)` : "";
-          }
-        });
-      }
+      nav.querySelectorAll<HTMLElement>(".nav-item").forEach(item => { item.style.pointerEvents = collapsed ? "none" : "auto"; });
+      if (reducedMotion) nav.style.transform = "translateX(-50%) translateY(" + target + "px)";
+      else animate(nav, { translateY: [collapsed ? 0 : distance, target], duration: 150, ease: "outQuad", onComplete: () => { nav.style.transform = "translateX(-50%) translateY(" + target + "px)"; } });
     }
-    // The lever is a sibling of the dock, so it stays visible and moves independently.
-    const grip = toggle?.querySelector<HTMLElement>(".nav-lever-grip");
-    const arrow = toggle?.querySelector<HTMLElement>(".nav-toggle-arrow");
-    if (grip) animate(grip, {
-      rotate: collapsed ? [0, -180] : [180, 0],
-      scaleX: [1, 1.25, 1],
-      duration: 460,
-      ease: "outBack"
-    });
-    if (arrow) animate(arrow, {
-      rotate: collapsed ? [0, 180] : [180, 0],
-      duration: 360,
-      ease: "outCubic"
-    });
-    if (toggle) animate(toggle, {
-      scale: [0.96, 1.04, 1],
-      duration: 430,
-      ease: "outBack"
-    });
+    if (toggle) {
+      const target = collapsed ? 25 : 0;
+      if (reducedMotion) toggle.style.transform = target ? "translateY(" + target + "px)" : "";
+      else animate(toggle, { translateY: [collapsed ? 0 : 25, target], duration: 140, ease: "outQuad", onComplete: () => { toggle.style.transform = target ? "translateY(" + target + "px)" : ""; } });
+    }
     return;
   }
-
-  if (header) animate(header, { translateY: [-5, 0], duration: 440, delay: 35, ease: "outCubic" });
-  if (content) {
-    const panels = Array.from(content.querySelectorAll<HTMLElement>(":scope > *"))
-      .filter(panel => !panel.matches(".dusty-letter, .language-preference, .developer-credit"));
-    panels.forEach((panel, index) => animate(panel, {
-      ...(panel.classList.contains("expedition-page") ? {} : { translateY: [7, 0] }),
-      duration: 500,
-      delay: 44 * index,
-      ease: "outCubic"
-    }));
-
-    const letter = content.querySelector<HTMLElement>(".dusty-letter");
-    if (letter) {
-      const paragraphs = letter.querySelectorAll<HTMLElement>("p, .dusty-letter-author, .dusty-letter-title, .dusty-letter-farewell, .dusty-letter-foot");
-      const dust = letter.querySelector<HTMLElement>(".dusty-letter-dust");
-      const ink = letter.querySelector<HTMLElement>(".dusty-letter-ink");
-      const seal = letter.querySelector<HTMLElement>(".kitty-wax-seal");
-      const sealLayers = seal?.querySelectorAll<HTMLElement>("img");
-      animate(letter, { translateY: [10, 0], duration: 620, delay: 75, ease: "outCubic" });
-      if (dust) animate(dust, { opacity: [0.18, 0.48, 0.28], translateX: [-4, 5, 0], duration: 2400, delay: 520, ease: "inOutSine" });
-      if (ink) animate(ink, { opacity: [0.14, 0.28, 0.18], translateX: [2, -3, 0], duration: 3100, delay: 640, ease: "inOutSine" });
-      if (paragraphs.length) animate(paragraphs, {
-        translateY: [6, 0],
-        delay: stagger(72, { start: 260 }),
-        duration: 520,
-        ease: "outCubic"
-      });
-      if (seal) animate(seal, {
-        scale: [0.72, 1.08, 1],
-        rotate: [-16, 4, 0],
-        duration: 820,
-        delay: 340,
-        ease: "outBack"
-      });
-      if (sealLayers?.length) animate(sealLayers, {
-        scale: [0.86, 1],
-        delay: stagger(65, { start: 480 }),
-        duration: 460,
-        ease: "outCubic"
-      });
-    }
-
-    const languagePanel = content.querySelector<HTMLElement>(".language-preference");
-    const credit = content.querySelector<HTMLElement>(".developer-credit");
-    if (languagePanel) animate(languagePanel, {
-      translateY: [7, 0], duration: 500, delay: 70, ease: "outCubic"
-    });
-    if (credit) {
-      const creditLines = credit.querySelectorAll<HTMLElement>("span, strong, em");
-      animate(credit, { translateY: [7, 0], duration: 500, delay: 105, ease: "outCubic" });
-      if (creditLines.length) animate(creditLines, {
-        translateY: [5, 0],
-        delay: stagger(75, { start: 260 }), duration: 430, ease: "outCubic"
-      });
-    }
-  }
-
-  if (nav) {
-    // Navigation opacity is inherited from the shell; avoid a second fade owner.
-    const items = nav.querySelectorAll<HTMLElement>(".nav-item-motion");
-    if (items.length) {
-      animate(items, { translateY: [2, 0], duration: 340, delay: stagger(30, { start: 110 }), ease: "outCubic" });
-      items.forEach(item => {
-        const enter = () => animate(item, { scale: [1, 1.055], duration: 160, ease: "outQuad" });
-        const leave = () => animate(item, { scale: [1.055, 1], duration: 190, ease: "outQuad" });
-        item.addEventListener("pointerenter", enter);
-        item.addEventListener("pointerleave", leave);
-      });
-      const active = nav.querySelector<HTMLElement>(".nav-item.active");
-      const activeIcon = active?.querySelector<HTMLElement>(".nav-icon");
-      if (activeIcon) animate(activeIcon, { scale: [0.9, 1.1, 1], duration: 480, ease: "outBack" });
-    }
-  }
-
-  const controls = shell.querySelectorAll<HTMLElement>("button:not(.nav-item):not(.nav-toggle-handle)");
-  controls.forEach(button => {
-    const enter = () => animate(button, { scale: [1, 1.018], duration: 150, ease: "outQuad" });
-    const leave = () => animate(button, { scale: [1.018, 1], duration: 190, ease: "outQuad" });
-    button.addEventListener("pointerenter", enter);
-    button.addEventListener("pointerleave", leave);
-  });
-
-  if (toggle) {
-    const grip = toggle.querySelector<HTMLElement>(".nav-toggle-grip");
-    const arrow = toggle.querySelector<HTMLElement>(".nav-toggle-arrow");
-    if (grip) animate(grip, { scaleX: [0.7, 1.2, 1], duration: 440, ease: "outBack" });
-    if (arrow) animate(arrow, { rotate: [0, 0], duration: 1 });
-  }
+  if (reducedMotion) { shell.style.opacity = "1"; shell.style.willChange = ""; return; }
+  shell.style.willChange = "opacity";
+  animate(shell, { opacity: [0, 1], duration: 130, ease: "outQuad", onComplete: () => { shell.style.opacity = "1"; shell.style.willChange = ""; } });
 }
-
 
 /** Audio-timed mechanical lever: opening slack, secondary ratchet, hard catch, spring return. */
 export function animateNavLeverPull(button: HTMLElement, onComplete: () => void): void {

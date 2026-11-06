@@ -1088,3 +1088,12 @@ Current source baseline for this workstream: ed5ef007cead9ecf8e6e70662c29ec5cce9
 - [ ] Replace filled RPG HUD panels with transparent instrument frames; separate Player identity/status, skill/inventory dock, and world-time ticket into independently movable layers.
 - [ ] Add per-map HUD layout editor controls for drag, corner resize, two-finger pinch, save, and reset. Persist coordinates and scale separately from map walkability and grid data.
 - [ ] Verify NPC dialogue, movement, editor save/undo/import, camera gestures, HUD layout restore, World Atlas password flow, and emulator startup on a fresh Android build. Physical device QA remains separate.
+
+
+### 13N. Build #1342 menu, map-render and Master Reset performance pass (2026-11-06)
+
+- Shortened menu transitions and removed the full-screen outgoing DOM clone to reduce WebView memory, paint and animation work.
+- Reworked isometric actor movement to use projected grid deltas instead of forced layout reads; cached map data, avoided repeated tile-depth scans, removed perpetual sonar/trail effects, and limited minimap/HUD refreshes to relevant changes.
+- Center Map now uses the saved Map Base focal point with the Academy canvas margins applied. Developer Settings now scans local profiles, local journeys and the verified pinned `players.md` name list without downloading every profile or running access animations.
+
+**Still open:** physical-device verification on Tecno Spark Go 1 KL4; confirm the dark-map flicker is gone during simultaneous player/NPC movement; verify center selection against several points on the expanded Academy canvas; verify Master Reset options and request generation with online and offline states; verify no regression in map editing, NPC interactions or menu navigation.

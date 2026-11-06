@@ -55,16 +55,21 @@ export function developerHeaderControls(language:AppLanguage,authenticated:boole
   return '<button type="button" class="developer-access-key" data-dev-login-open aria-label="'+t.open+'" title="'+t.open+'">⌑</button>';
 }
 
-export function accountSettingsPanel(language:AppLanguage,developerAuthenticated:boolean,playerAuthenticated:boolean,playerNames:string[]=[]):string {
+export function accountSettingsPanel(language:AppLanguage,developerAuthenticated:boolean,playerAuthenticated:boolean,playerNames:Array<string|{name:string;source:string}>=[]):string {
   const t=labels[language]||labels.en;
   if(!developerAuthenticated&&!playerAuthenticated)return "";
   const developer=developerAuthenticated;
   const actions=developer
     ? '<button type="button" class="account-access-action" data-dev-open-control><span class="account-access-icon icon-floating" aria-hidden="true"><i></i></span><span>'+t.control+'</span><b>↗</b></button><button type="button" class="account-access-action is-lock" data-dev-logout><span class="account-access-icon icon-lock" aria-hidden="true"><i></i></span><span>'+t.lock+'</span><b>×</b></button>'
     : '<button type="button" class="account-access-action is-lock" data-player-logout><span class="account-access-icon icon-lock" aria-hidden="true"><i></i></span><span>'+t.playerLogout+'</span><b>×</b></button>';
-  const playerOptions=playerNames.map(name=>'<option value="'+escape(name)+'">'+escape(name)+'</option>').join("");
+  const playerOptions=playerNames.map(entry=>{
+    const name=typeof entry==="string"?entry:entry.name;
+    const source=typeof entry==="string"?"":entry.source;
+    const sourceLabel=source==="universe"?" · Universe":source==="local-profile"?" · Local Profile":source==="local-journey"?" · Local Journey":"";
+    return '<option value="'+escape(name)+'">'+escape(name+sourceLabel)+'</option>';
+  }).join("");
   const resetTool=developer
-    ? '<section class="developer-atlas-reset" data-developer-atlas-reset><div class="section-heading"><span>'+t.resetPlayer+'</span></div><p class="muted">'+t.resetPlayerHint+'</p><label for="developer-atlas-reset-player">'+t.resetPlayerPlaceholder+'</label><select id="developer-atlas-reset-player" data-atlas-reset-player-select><option value="">—</option>'+playerOptions+'</select><p class="muted developer-atlas-reset-proof">'+t.resetPlayerProof+'</p><label class="developer-atlas-reset-confirm"><input type="checkbox" data-atlas-developer-reset-proof/><span>'+t.resetPlayerConfirm+'</span></label><p class="canon-status" data-developer-atlas-reset-message role="status"></p><button type="button" class="action-button" data-atlas-developer-reset-submit>'+t.resetPlayerAction+'</button><textarea id="developer-atlas-reset-request" class="developer-atlas-reset-request" rows="8" readonly hidden aria-label="Reset request code"></textarea><button type="button" class="action-button" data-atlas-reset-copy-request hidden>'+t.resetRequestCopy+'</button>'+worldAtlasAccessBufferMarkup(language,"developer-reset")+'<div class="developer-atlas-copy-buffer" data-atlas-reset-copy-buffer>'+worldAtlasAccessBufferMarkup(language,"clipboard")+'</div></section>'
+    ? '<section class="developer-atlas-reset" data-developer-atlas-reset><div class="section-heading"><span>'+t.resetPlayer+'</span><button type="button" class="action-button" data-atlas-reset-scan-refresh>SCAN AGAIN</button></div><p class="muted">'+t.resetPlayerHint+'</p><p class="canon-status" data-developer-atlas-reset-scan-status role="status">Waiting to scan local and official player records…</p><label for="developer-atlas-reset-player">'+t.resetPlayerPlaceholder+'</label><select id="developer-atlas-reset-player" data-atlas-reset-player-select><option value="">—</option>'+playerOptions+'</select><p class="muted developer-atlas-reset-proof">'+t.resetPlayerProof+'</p><label class="developer-atlas-reset-confirm"><input type="checkbox" data-atlas-developer-reset-proof/><span>'+t.resetPlayerConfirm+'</span></label><p class="canon-status" data-developer-atlas-reset-message role="status"></p><button type="button" class="action-button" data-atlas-developer-reset-submit>'+t.resetPlayerAction+'</button><textarea id="developer-atlas-reset-request" class="developer-atlas-reset-request" rows="8" readonly hidden aria-label="Reset request code"></textarea><button type="button" class="action-button" data-atlas-reset-copy-request hidden>'+t.resetRequestCopy+'</button></section>'
     : "";
   return '<section class="section-block account-access-settings"><div class="section-heading"><span>'+t.accountHeading+'</span><small>'+(developer?t.developerSession:t.playerSession)+'</small></div><p class="muted">'+t.accountDescription+'</p><div class="account-access-actions">'+actions+'</div>'+resetTool+'</section>';
 }

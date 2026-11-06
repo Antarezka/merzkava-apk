@@ -53,6 +53,22 @@ describe("isometric NPC conversations", () => {
     expect(worldMapSource).toContain('!occupied.has(nx+","+ny)');
   });
 
+  it("keeps actor movement independent of layout measurement and repeated map redraws",()=>{
+    const movement=worldMapSource.match(/function animateGridMove\([\s\S]*?\n}/)?.[0]??"";
+    expect(movement).toContain("grid.tileW/2");
+    expect(movement).toContain("grid.tileH/2");
+    expect(movement).not.toContain("getBoundingClientRect");
+    expect(worldMapSource).toContain("const isoMapDataCache=new WeakMap");
+    expect(worldMapSource).toContain("updateIsometricMinimapActors(board)");
+    expect(worldMapSource).toContain("board.dataset.wmhTileDepthSynced!==\"true\"");
+  });
+
+  it("centers the camera on the saved Map Base point inside an expanded canvas",()=>{
+    expect(worldMapSource).toContain("const saved=board?readIsoMapData(board).cameraCenter:undefined;");
+    expect(worldMapSource).toContain("academyMarginLeft+(saved?saved.x");
+    expect(worldMapSource).toContain("academyMarginTop+(saved?saved.y");
+  });
+
   it("does not render editor controls when Developer Mode is disabled", () => {
     setWorldMapDeveloperMode(false);
     const html=renderIsometricMapTestArea();
@@ -66,18 +82,18 @@ describe("isometric NPC conversations", () => {
     expect(chatStyles).toContain(".wmh-isometric-play-screen .wmh-chat-panel[hidden]{display:none!important}");
     expect(chatStyles).toContain(".wmh-transition-notice{align-items:center!important;justify-content:center!important;background:#030806d9!important}");
     expect(chatStyles).toContain(".wmh-isometric-play-screen .wmh-overlay-float span{writing-mode:vertical-rl");
-    expect(chatStyles).toContain(".wmh-sonar-ring{");
-    expect(chatStyles).toContain(".wmh-tile-trail-wave{");
+    expect(chatStyles).toContain(".wmh-isometric-play-screen .wmh-sonar-ring,");
+    expect(chatStyles).toContain("animation:none!important");
     expect(worldMapSource).toContain("merzkava:field-scanner-overlap");
-    expect(worldMapSource).toContain("function emitTileTrailWave");
     expect(worldMapSource).toContain("function startActorScanners");
+    expect(worldMapSource).not.toContain("function emitTileTrailWave");
     expect(worldMapSource).toContain("updateNpcInteractionProximity(board)");
     expect(worldMapSource).toContain("isNpcInteractionCellReachable(");
     expect(worldMapSource).toContain("dataset.interactionReady");
     expect(chatStyles).toContain(".wmh-npc-proximity-glow");
     expect(worldMapSource).toContain("translateX:[dx,0]");
     expect(worldMapSource).toContain("translateY:[dy,0]");
-    expect(worldMapSource).toContain("duration:225");
+    expect(worldMapSource).toContain("duration:150,ease:\"outQuad\"");
     expect(worldMapSource).toContain("scanTone:\"friendly\"");
     expect(worldMapSource).toContain("const minimizeWorkbench=()=>");
     expect(worldMapSource).toContain("const restoreWorkbench=()=>");

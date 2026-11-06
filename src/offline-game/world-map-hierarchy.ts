@@ -284,8 +284,16 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
     sizeBaseMap();
     zoom = 1;
     applySurfaceSize(1);
-    viewport.scrollLeft = Math.max(0, (baseWidth - viewport.clientWidth) / 2);
-    viewport.scrollTop = Math.max(0, (baseHeight - viewport.clientHeight) / 2);
+    const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
+    const saved=board?readIsoMapData(board).cameraCenter:undefined;
+    const focusX=academyCanvas
+      ? academyMarginLeft+(saved?saved.x*(academyImageWidth/Math.max(1,image.naturalWidth)):academyImageWidth/2)
+      : saved?saved.x:baseWidth/2;
+    const focusY=academyCanvas
+      ? academyMarginTop+(saved?saved.y*(academyImageHeight/Math.max(1,image.naturalHeight)):academyImageHeight/2)
+      : saved?saved.y:baseHeight/2;
+    viewport.scrollLeft = Math.max(0, focusX*zoom-viewport.clientWidth/2);
+    viewport.scrollTop = Math.max(0, focusY*zoom-viewport.clientHeight/2);
     const level = dialog.querySelector<HTMLElement>("[data-wmh-zoom-level]");
     if (level) level.textContent = "100%";
   };
@@ -792,7 +800,10 @@ function escapeMapEditorText(value: unknown): string {
 function isoOverlayKey(board: HTMLElement): string {
   return isoMapStorageKey(board.dataset.mapId||"unnamed-isometric-map");
 }
+const isoMapDataCache=new WeakMap<HTMLElement,IsoMapEditorData>();
 function readIsoMapData(board: HTMLElement): IsoMapEditorData {
+  const cached=isoMapDataCache.get(board);
+  if(cached)return cached;
   const mapId=board.dataset.mapId||"unnamed-isometric-map";
   const fallback:IsoMapGridConfig={
     ...DEFAULT_ISOMETRIC_GRID,
@@ -803,6 +814,7 @@ function readIsoMapData(board: HTMLElement): IsoMapEditorData {
     offsetX:Number(board.dataset.offsetX||0),
     offsetY:Number(board.dataset.offsetY||0),
   };
+  let data:IsoMapEditorData;
   if(mapId===TIANHAI_ACADEMY_MAP_REFERENCE.mapId){
     const appliedKey="merzkava.tianhai-academy-map-reference.v1.applied";
     try{
@@ -812,16 +824,22 @@ function readIsoMapData(board: HTMLElement): IsoMapEditorData {
         localStorage.setItem(appliedKey,"done");
       }
       const saved=JSON.parse(localStorage.getItem(isoOverlayKey(board))||"null");
-      if(saved)return normalizeIsoMapEditorData(saved,mapId,fallback);
-    }catch{/* bundled reference remains available when local persistence is unavailable */}
-    return normalizeIsoMapEditorData(TIANHAI_ACADEMY_MAP_REFERENCE,mapId,fallback);
+      if(saved)data=normalizeIsoMapEditorData(saved,mapId,fallback);
+      else data=normalizeIsoMapEditorData(TIANHAI_ACADEMY_MAP_REFERENCE,mapId,fallback);
+    }catch{
+      data=normalizeIsoMapEditorData(TIANHAI_ACADEMY_MAP_REFERENCE,mapId,fallback);
+    }
+  }else{
+    try{
+      const saved=JSON.parse(localStorage.getItem(isoOverlayKey(board))||"null");
+      if(saved)data=normalizeIsoMapEditorData(saved,mapId,fallback);
+      else data=createIsoMapEditorData(mapId,fallback);
+    }catch{
+      data=createIsoMapEditorData(mapId,fallback);
+    }
   }
-  try {
-    const saved=JSON.parse(localStorage.getItem(isoOverlayKey(board))||"null");
-    if(saved)return normalizeIsoMapEditorData(saved,mapId,fallback);
-  } catch {}
-  // Other map IDs start clean; old maps are not silently imported.
-  return createIsoMapEditorData(mapId,fallback);
+  isoMapDataCache.set(board,data);
+  return data;
 }
 function drawIsometricForeground(board:HTMLElement,data=readIsoMapData(board)):void {
   const canvas=board.querySelector<HTMLCanvasElement>("[data-wmh-foreground-canvas]");
@@ -995,6 +1013,9 @@ function renderIsometricMinimap(board:HTMLElement):void {
   const style=getComputedStyle(board);
   const boardWidth=Number.parseFloat(style.getPropertyValue("--iso-board-width"))||board.offsetWidth||1;
   const boardHeight=Number.parseFloat(style.getPropertyValue("--iso-board-height"))||board.offsetHeight||1;
+  board.dataset.wmhMinimapBoardWidth=String(boardWidth);
+  board.dataset.wmhMinimapBoardHeight=String(boardHeight);
+  world.dataset.wmhRendered="true";
   world.style.setProperty("aspect-ratio",boardWidth+" / "+boardHeight,"important");
 
   const isTianhaiAcademy=board.dataset.mapId==="golden-dragon-empire:tianhai-academy:exterior";
@@ -1097,6 +1118,30 @@ function renderIsometricMinimap(board:HTMLElement):void {
     footer.textContent="YOU · X "+String(player.dataset.x||0).padStart(2,"0")+" / Y "+String(player.dataset.y||0).padStart(2,"0")+" · TAP TO MOVE";
   }
 }
+function updateIsometricMinimapActors(board:HTMLElement):void {
+  const world=board.closest<HTMLElement>("[data-wmh-isometric-play-screen]")?.querySelector<HTMLElement>("[data-wmh-minimap-world]");
+  const actors=world?.querySelector<HTMLElement>("[data-wmh-minimap-actors]");
+  if(!world||!actors)return;
+  const width=Number(board.dataset.wmhMinimapBoardWidth)||1,height=Number(board.dataset.wmhMinimapBoardHeight)||1;
+  const position=(token:HTMLElement)=>{
+    const center=isoCellCenter(Number(token.dataset.x||0),Number(token.dataset.y||0),readIsoMapData(board).grid);
+    return {x:Math.max(0,Math.min(100,center.x/width*100)),y:Math.max(0,Math.min(100,center.y/height*100))};
+  };
+  const player=board.querySelector<HTMLElement>("[data-wmh-player-token]");
+  const items:string[]=[];
+  if(!board.classList.contains("wmh-overlay-editing")&&player){
+    const p=position(player);
+    items.push('<span class="wmh-minimap-dot is-player" data-minimap-player style="left:'+p.x+'%;top:'+p.y+'%" aria-label="Player position"></span>');
+  }
+  if(!board.classList.contains("wmh-overlay-editing"))board.querySelectorAll<HTMLElement>("[data-wmh-npc]").forEach((npc,index)=>{
+    const p=position(npc);
+    items.push('<span class="wmh-minimap-dot is-npc '+(npc.classList.contains("is-female")?"is-female":"is-male")+'" data-minimap-npc="'+index+'" style="left:'+p.x+'%;top:'+p.y+'%" title="'+escapeMapEditorText(npc.dataset.wmhNpc||"NPC")+'"></span>');
+  });
+  actors.innerHTML=items.join("");
+  const footer=world.closest<HTMLElement>("[data-wmh-minimap]")?.querySelector<HTMLElement>("[data-wmh-minimap-footer]");
+  if(footer&&player)footer.textContent="YOU · X "+String(player.dataset.x||0).padStart(2,"0")+" / Y "+String(player.dataset.y||0).padStart(2,"0")+" · TAP TO MOVE";
+}
+
 function bindAcademyMapControls(dialog:HTMLElement):void {
   const viewport=dialog.querySelector<HTMLElement>("[data-wmh-academy-map-viewport]");
   const surface=viewport?.querySelector<HTMLElement>(".wmh-academy-empty-surface");
@@ -1350,6 +1395,8 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     data.grid={...grid};
     // Any subsequent edit invalidates the last explicit confirmation.
     data.confirmed=false;data.confirmedAt="";
+    isoMapDataCache.set(board,data);
+    delete board.dataset.wmhTileDepthSynced;
     board.dataset.wmhMinimapDirty="true";
     if(exportWrap)exportWrap.hidden=true;
     try{localStorage.setItem(key,JSON.stringify(data));setStatus("Draft auto-saved on this device. Confirm & Save when the image grid is final.");}
@@ -2253,14 +2300,19 @@ const npcData: Record<string,{name:string;gender:string;greeting:string;choices:
 function syncIsoDepthAndOcclusion(board:HTMLElement):void {
   const data=readIsoMapData(board);
   const tokens=Array.from(board.querySelectorAll<HTMLElement>("[data-wmh-player-token],[data-wmh-npc]"));
-  board.querySelectorAll<HTMLElement>("[data-wmh-tile]").forEach(tile=>{
-    if(tile.dataset.depthSynced==="true")return;
-    const x=Number(tile.dataset.x||0),y=Number(tile.dataset.y||0);
-    tile.style.zIndex=String(1+x+y);
-    tile.dataset.depthSynced="true";
-  });
+  if(board.dataset.wmhTileDepthSynced!=="true"){
+    board.querySelectorAll<HTMLElement>("[data-wmh-tile]").forEach(tile=>{
+      const x=Number(tile.dataset.x||0),y=Number(tile.dataset.y||0);
+      tile.style.zIndex=String(1+x+y);
+      tile.dataset.depthSynced="true";
+    });
+    board.dataset.wmhTileDepthSynced="true";
+  }
   const actorCellSignature=tokens.map(token=>(token.dataset.wmhNpc||"player")+":"+String(token.dataset.x||0)+","+String(token.dataset.y||0)).join("|");
   const cellsChanged=board.dataset.actorCellSignature!==actorCellSignature;
+  const player=tokens.find(token=>token.hasAttribute("data-wmh-player-token"));
+  const playerCellSignature=player?String(player.dataset.x||0)+","+String(player.dataset.y||0):"";
+  const playerCellChanged=board.dataset.playerCellSignature!==playerCellSignature;
   tokens.forEach(token=>{
     const cellX=Number(token.dataset.x||0),cellY=Number(token.dataset.y||0);
     const x=Number(token.dataset.posX??cellX),y=Number(token.dataset.posY??cellY);
@@ -2279,13 +2331,17 @@ function syncIsoDepthAndOcclusion(board:HTMLElement):void {
   if(cellsChanged||board.dataset.wmhMinimapDirty==="true"){
     board.dataset.actorCellSignature=actorCellSignature;
     delete board.dataset.wmhMinimapDirty;
-    renderIsometricMinimap(board);
-    const dialog=board.closest<HTMLElement>("[data-wmh-dialog]");
-    if(dialog)renderIsometricWorldStatus(dialog);
+    const world=board.closest<HTMLElement>("[data-wmh-isometric-play-screen]")?.querySelector<HTMLElement>("[data-wmh-minimap-world]");
+    if(world?.dataset.wmhRendered==="true")updateIsometricMinimapActors(board);
+    else renderIsometricMinimap(board);
+    if(playerCellChanged){
+      board.dataset.playerCellSignature=playerCellSignature;
+      const dialog=board.closest<HTMLElement>("[data-wmh-dialog]");
+      if(dialog)renderIsometricWorldStatus(dialog);
+    }
     updateNpcInteractionProximity(board);
   }
 }
-
 type ActorScanTone="friendly"|"hostile"|"spirit-expert"|"unknown";
 const scannerContacts=new WeakMap<HTMLElement,Set<string>>();
 function actorScanTone(actor:HTMLElement):ActorScanTone {
@@ -2296,20 +2352,17 @@ function actorScanColor(tone:ActorScanTone):string {
   return tone==="friendly"?"#55baff":tone==="hostile"?"#ed5353":tone==="spirit-expert"?"#090b0d":"#f5f6f7";
 }
 
-const npcProximityAnimations=new WeakMap<HTMLElement,{pause?:()=>void}>();
 function isNpcInteractionReady(board:HTMLElement,npc:HTMLElement,data:IsoMapEditorData):boolean {
   if(board.dataset.editorPaused==="true"||board.classList.contains("wmh-overlay-editing"))return false;
   if(board.closest<HTMLElement>("[data-wmh-dialog]")?.querySelector<HTMLElement>("[data-wmh-chat]")?.hidden===false)return false;
   const player=board.querySelector<HTMLElement>("[data-wmh-player-token]");
   if(!player)return false;
-  return isNpcInteractionCellReachable(
-    data,
+  return isNpcInteractionCellReachable(data,
     {x:Number(player.dataset.x||0),y:Number(player.dataset.y||0)},
     {x:Number(npc.dataset.x||0),y:Number(npc.dataset.y||0)}
   );
 }
 function updateNpcInteractionProximity(board:HTMLElement):void {
-  const reduceMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches===true;
   const data=readIsoMapData(board);
   board.querySelectorAll<HTMLElement>("[data-wmh-npc]").forEach(npc=>{
     const ready=isNpcInteractionReady(board,npc,data);
@@ -2322,37 +2375,12 @@ function updateNpcInteractionProximity(board:HTMLElement):void {
       glow=document.createElement("span");
       glow.className="wmh-npc-proximity-glow";
       glow.setAttribute("aria-hidden","true");
-      glow.style.opacity="0";
-      glow.style.transform="scale(.82)";
       npc.prepend(glow);
     }
     glow.style.setProperty("--npc-proximity-color",actorScanColor(actorScanTone(npc)));
-    npcProximityAnimations.get(glow)?.pause?.();
-    if(reduceMotion){
-      glow.style.opacity=ready?".72":"0";
-      glow.style.transform=ready?"scale(1)":"scale(.82)";
-      return;
-    }
-    const animation=animate(glow,{
-      opacity:ready ? 0.72 : 0,
-      scale:ready?1:.82,
-      duration:ready?360:420,
-      ease:ready?"outCubic":"inOutSine"
-    });
-    npcProximityAnimations.set(glow,animation);
+    glow.style.opacity=ready?".58":"0";
+    glow.style.transform=ready?"scale(1)":"scale(.9)";
   });
-}
-
-function emitTileTrailWave(_board:HTMLElement,actor:HTMLElement,dx=0,dy=0):void {
-  actor.querySelectorAll(":scope > .wmh-token-movement-glow").forEach(node=>node.remove());
-  const glow=document.createElement("span");
-  glow.className="wmh-token-movement-glow";glow.setAttribute("aria-hidden","true");
-  // The glow is a child of the actor, so it follows the actor and its local movement direction under every camera pan/zoom.
-  glow.style.setProperty("--move-shift-x",(-Math.sign(dx)*5)+"px");
-  glow.style.setProperty("--move-shift-y",(-Math.sign(dy)*4)+"px");
-  actor.append(glow);
-  if(window.matchMedia?.("(prefers-reduced-motion: reduce)").matches){glow.remove();return;}
-  animate(glow,{scale:[.62,1.5],opacity:[0,.42,0],duration:540,ease:"outCubic",onComplete:()=>glow.remove()});
 }
 
 function updateScannerContacts(board:HTMLElement,refreshProximity=true):void {
@@ -2384,28 +2412,6 @@ function updateScannerContacts(board:HTMLElement,refreshProximity=true):void {
   scannerContacts.set(board,next);
   if(refreshProximity)updateNpcInteractionProximity(board);
 }
-function pulseActorScanner(actor:HTMLElement,index:number):void {
-  const tone=actorScanTone(actor),color=actorScanColor(tone);
-  actor.style.setProperty("--scan-color",color);
-  let rings=Array.from(actor.querySelectorAll<HTMLElement>(".wmh-sonar-ring"));
-  if(rings.length!==2){
-    actor.querySelectorAll(".wmh-sonar-ring").forEach(node=>node.remove());
-    rings=[0,1].map(n=>{
-      const ring=document.createElement("span");
-      ring.className="wmh-sonar-ring ring-"+n;ring.setAttribute("aria-hidden","true");
-      actor.prepend(ring);return ring;
-    });
-  }
-  rings.forEach((ring,n)=>{
-    ring.style.borderColor=color;
-    ring.style.background="radial-gradient(ellipse,transparent 58%,"+color+"12 100%)";
-    if(window.matchMedia?.("(prefers-reduced-motion: reduce)").matches){
-      ring.style.opacity=".1";ring.style.transform="scale(1)";
-    }else{
-      animate(ring,{scale:[.08,1],opacity:[.44,0],duration:1800,ease:"outQuad",delay:index*65+n*820});
-    }
-  });
-}
 function stopActorScanners(board:HTMLElement):void {
   const timer=Number(board.dataset.scannerTimer||0);
   if(timer)window.clearInterval(timer);
@@ -2413,35 +2419,28 @@ function stopActorScanners(board:HTMLElement):void {
   board.querySelectorAll<HTMLElement>(".wmh-sonar-ring").forEach(ring=>ring.remove());
 }
 function startActorScanners(board:HTMLElement):void {
+  // Scanner overlap/clear events are evaluated on actor movement. No perpetual
+  // sonar animation loop is needed to preserve their gameplay semantics.
   stopActorScanners(board);
-  const pulse=()=>{
-    if(!board.isConnected||board.dataset.editorPaused==="true"||board.hidden){stopActorScanners(board);return;}
-    board.querySelectorAll<HTMLElement>("[data-wmh-player-token],[data-wmh-npc]").forEach((actor,index)=>pulseActorScanner(actor,index));
-    updateScannerContacts(board);
-  };
-  pulse();
-  board.dataset.scannerTimer=String(window.setInterval(pulse,2450));
+  updateScannerContacts(board);
 }
 function animateGridMove(token:HTMLElement,update:()=>void,sync=true,updateSensors=true):void {
   const board=token.closest<HTMLElement>("[data-wmh-board]");
-  const fromX=Number(token.dataset.x||0),fromY=Number(token.dataset.y||0);
-  const before=token.getBoundingClientRect();
+  const fromX=Number(token.dataset.posX??token.dataset.x??0);
+  const fromY=Number(token.dataset.posY??token.dataset.y??0);
   update();
   if(board&&sync)syncIsoDepthAndOcclusion(board);
+  const toX=Number(token.dataset.posX??token.dataset.x??fromX);
+  const toY=Number(token.dataset.posY??token.dataset.y??fromY);
+  const grid=board?readIsoMapData(board).grid:DEFAULT_ISOMETRIC_GRID;
+  // Isometric projection gives the local pixel delta without reading layout
+  // before and after every movement step (which forced WebView reflow).
+  const dx=((fromX-fromY)-(toX-toY))*grid.tileW/2;
+  const dy=((fromX+fromY)-(toX+toY))*grid.tileH/2;
   const reduceMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches===true;
-  const suspendNpcIdle=!reduceMotion&&token.matches(".wmh-character-token:not(.wmh-player-token)");
-  if(suspendNpcIdle)token.classList.add("wmh-npc-moving");
-  const after=token.getBoundingClientRect();
-  const zoom=board?Number.parseFloat(getComputedStyle(board).getPropertyValue("--wmh-camera-zoom"))||1:1;
-  const dx=(before.left-after.left)/zoom,dy=(before.top-after.top)/zoom;
-  if(reduceMotion)token.style.transform="";
-  else animate(token,{translateX:[dx,0],translateY:[dy,0],duration:225,ease:"outCubic",
-    onComplete:()=>{if(suspendNpcIdle)token.classList.remove("wmh-npc-moving");}
-  });
-  if(board){
-    emitTileTrailWave(board,token,Number(token.dataset.x||0)-fromX,Number(token.dataset.y||0)-fromY);
-    if(updateSensors)updateScannerContacts(board,false);
-  }
+  if(reduceMotion||Math.abs(dx)+Math.abs(dy)<.01)token.style.transform="";
+  else animate(token,{translateX:[dx,0],translateY:[dy,0],duration:150,ease:"outQuad"});
+  if(board&&updateSensors)updateScannerContacts(board,false);
 }
 function stopNpcWander(dialog:HTMLElement):void {
   const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");

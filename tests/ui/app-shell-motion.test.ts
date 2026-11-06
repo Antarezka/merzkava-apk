@@ -22,11 +22,11 @@ describe("screen and noticeboard transitions",()=>{
     mocks.animate.mockReturnValue({pause:vi.fn()});
   });
 
-  it("fades the incoming shell in while preserving the child panel entrances",()=>{
+  it("uses one short, lightweight fade for menu navigation",()=>{
     const shell:any={style:{},querySelector:vi.fn(()=>null),querySelectorAll:vi.fn(()=>[])};
     animateAppScreen(shell);
     expect(mocks.animate).toHaveBeenCalledWith(shell,expect.objectContaining({
-      opacity:[0,1],duration:480
+      opacity:[0,1],duration:130
     }));
   });
 

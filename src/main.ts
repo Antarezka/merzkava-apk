@@ -29,11 +29,12 @@ import { startFloatingMode, requestFloatingOverlayPermission, getFloatingReadine
 import { floatingControlMarkup } from "./app/floating-control";
 import { exitConfirmationPanelMarkup } from "./app/exit-confirm-panel";
 import { accountSettingsPanel, developerLoginPanel } from "./app/developer-access-panel";
+import { parseAtlasResetRegistryNames } from "./offline-game/atlas-reset-registry";
 import { dustyLetterMarkup } from "./app/dusty-letter";
 import { APP_NAME, APP_VERSION } from "./app/app-meta";
 import { getLanguage, languagePanelMarkup, translateLabel, translateRenderedContent, setLanguage, type AppLanguage } from "./i18n";
 import { animateOpeningSplash, animateSplashCurtain } from "./ui/splash-animation";
-import { animateAppScreen, animateAppScreenExit, animateNoticeboardExit } from "./ui/app-shell-motion";
+import { animateAppScreen, animateNoticeboardExit } from "./ui/app-shell-motion";
 import { initializeGravityPullCord } from "./ui/gravity-pull-cord";
 import { installSoftKeyboardStability } from "./ui/soft-keyboard-stability";
 import { mountArcanistryTicketMachine } from "./offline-game/arcanistry-ticket-machine";
@@ -231,6 +232,9 @@ function floatingSetupComplete(): boolean {
 let databaseMessage = "Checking local storage…";
 let characters: Character[] = [];
 let registeredCharacters: Character[] = [];
+let developerResetRegistryNames: Array<{name:string;path:string}> = [];
+let developerResetScanBusy = false;
+let developerResetSettingsScanMounted = false;
 let playerRegistryBusy = false;
 let playerRegistryMessage = "Registry players.md belum dimuat.";
 let notice = "";
@@ -571,35 +575,7 @@ function render(): void {
   if(!hasAppAccess()&&activeScreen!=="control")activeScreen="control";
   if(!developerAuthenticated&&activeScreen==="gameplay")activeScreen="home";
 
-  // Route snapshot cross-fades are deliberately separate from the live screen's pointer/focus lifecycle.
-  // Keep a non-interactive visual snapshot of the previous screen above the
-  // new shell. Both surfaces animate at the same time, so navigation never
-  // flashes through an empty frame between render() calls.
-  let outgoingTransitionGhost: HTMLElement | null = null;
-  if (lastAnimatedScreen !== null && activeScreen !== lastAnimatedScreen) {
-    const outgoingShell = root.querySelector<HTMLElement>(".app-shell");
-    if (outgoingShell) {
-      const bounds = outgoingShell.getBoundingClientRect();
-      const computed = window.getComputedStyle(outgoingShell);
-      outgoingTransitionGhost = outgoingShell.cloneNode(true) as HTMLElement;
-      outgoingTransitionGhost.setAttribute("aria-hidden", "true");
-      outgoingTransitionGhost.inert = true;
-      outgoingTransitionGhost.classList.add("app-shell-transition-ghost");
-      outgoingTransitionGhost.style.position = "fixed";
-      outgoingTransitionGhost.style.top = bounds.top + "px";
-      outgoingTransitionGhost.style.left = bounds.left + "px";
-      outgoingTransitionGhost.style.width = bounds.width + "px";
-      outgoingTransitionGhost.style.height = bounds.height + "px";
-      outgoingTransitionGhost.style.minHeight = "100svh";
-      outgoingTransitionGhost.style.margin = "0";
-      outgoingTransitionGhost.style.zIndex = "2147483000";
-      outgoingTransitionGhost.style.pointerEvents = "none";
-      outgoingTransitionGhost.style.transform = "none";
-      outgoingTransitionGhost.style.opacity = computed.opacity;
-      outgoingTransitionGhost.style.willChange = "opacity";
-      document.body.append(outgoingTransitionGhost);
-    }
-  }
+  // Avoid cloning the complete previous screen: duplicating DOM and images increases WebView memory and GPU work.
   const visibleNavigation=developerAuthenticated?navigation:navigation.filter(item=>item.id!=="gameplay");
   // Each render replaces the screen DOM. Stop all Anime.js loops/listeners
   // attached to the previous Eternal Path tree before those nodes are detached.
@@ -631,7 +607,7 @@ function render(): void {
   root.innerHTML = `<div class="app-shell ${isControl ? "control-shell" : ""} ${menuRevealPending ? "is-entering" : ""} ${navigationCollapsed ? "is-nav-collapsed" : ""}">
     ${isControl ? "" : `<header class="app-header"><button class="brand" data-screen="home" aria-label="Merzkava home"><span class="brand-mark">M</span><span class="brand-wordmark"><small>MERZKAVA UNIVERSE</small><strong>Merzkava</strong></span></button><div class="header-context"><small>TACTICAL ACADEMY</small><strong>${translateLabel(navigation.find(item => item.id === activeScreen)?.label ?? "Command Hall", currentLanguage)}</strong></div><div class="header-tools"><button class="header-settings header-kitty-trigger" data-floating-action="start-bubble" aria-label="Start Bubble Mode" title="Start Bubble Mode"><span class="header-kitty-mascot" aria-hidden="true"><img class="header-kitty-layer header-kitty-shadow" src="/kitty/shadow/kitty-shadow.png" alt="" /><img class="header-kitty-layer header-kitty-tail" src="/kitty/ekor/kitty-tail.png" alt="" /><img class="header-kitty-layer header-kitty-body" src="/kitty/body/kitty-body.png" alt="" /><img class="header-kitty-layer header-kitty-head" src="/kitty/kepala/kitty-head.png" alt="" /></span></button><button class="header-settings" data-screen="settings" aria-label="Settings">⚙</button></div></header>
     `}${notice ? `<p class="notice" role="status">${escapeHtml(notice)}</p>` : ""}
-    ${isControl ? content : `<main class="main-content">${activeScreen === "settings" ? `<details class="settings-category app-settings-category" open><summary><span>APP SETTINGS</span><small>Appearance · Wallpapers · Language · Sound · Storage</small></summary><div class="settings-category-content">${languagePanelMarkup(currentLanguage)}${content}${accountSettingsPanel(currentLanguage,developerAuthenticated,playerAuthenticated,atlasEligiblePlayers().map(player=>player.name))}</div></details>${developerAuthenticated ? `<details class="settings-category world-settings-category"><summary><span>WORLD & ACCOUNT</span><small>Supabase · AI Gateway · Canon Source</small></summary><div class="settings-category-content">${authPanel()}${canonPanel()}</div></details>` : ""}` : `${content}${activeScreen === "home" ? dustyLetterMarkup(currentLanguage, APP_VERSION) : ""}`}</main>`}
+    ${isControl ? content : `<main class="main-content">${activeScreen === "settings" ? `<details class="settings-category app-settings-category" open><summary><span>APP SETTINGS</span><small>Appearance · Wallpapers · Language · Sound · Storage</small></summary><div class="settings-category-content">${languagePanelMarkup(currentLanguage)}${content}${accountSettingsPanel(currentLanguage,developerAuthenticated,playerAuthenticated,atlasEligiblePlayers().map(player=>({name:player.name,source:player.source})))}</div></details>${developerAuthenticated ? `<details class="settings-category world-settings-category"><summary><span>WORLD & ACCOUNT</span><small>Supabase · AI Gateway · Canon Source</small></summary><div class="settings-category-content">${authPanel()}${canonPanel()}</div></details>` : ""}` : `${content}${activeScreen === "home" ? dustyLetterMarkup(currentLanguage, APP_VERSION) : ""}`}</main>`}
     ${isControl ? "" : `<nav class="bottom-nav" aria-label="Academy navigation"><span class="nav-cable nav-cable-left" aria-hidden="true"></span><span class="nav-cable nav-cable-right" aria-hidden="true"></span><div class="nav-roulette-track">${visibleNavigation.map((item, index) => `<button class="nav-item ${activeScreen === item.id ? "active" : ""}" data-screen="${item.id}" ${activeScreen === item.id ? 'aria-current="page"' : ""}><span class="nav-item-motion"><span class="nav-index">${String(index + 1).padStart(2, "0")}</span><span class="nav-rotor" aria-hidden="true"><span class="nav-rotor-mark"></span><span class="nav-rotor-grip" data-nav-rotor="${item.id}"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="21" fill="none" stroke="transparent" stroke-width="7" pointer-events="stroke"/></svg></span><span class="nav-icon-frame nav-icon-frame-${item.id}"><span class="nav-icon"><span class="nav-icon-art">${item.icon}</span></span></span></span><small>${translateLabel(item.label, currentLanguage)}</small></span></button>`).join("")}</div></nav>`}
     ${!isControl ? `<div class="gravity-pull-cord" data-gravity-cord aria-hidden="true"><span class="gravity-cord-anchor"></span><svg class="gravity-cord-line" viewBox="0 0 54 210" aria-hidden="true"><defs><linearGradient id="cord-braid" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#491416"/><stop offset=".28" stop-color="#9d302c"/><stop offset=".52" stop-color="#d26b52"/><stop offset=".72" stop-color="#9d302c"/><stop offset="1" stop-color="#491416"/></linearGradient></defs><path data-cord-line d="M 27 5 C 27 48, 27 76, 27 118"/><path class="cord-thread-highlight" d="M 27 5 C 27 48, 27 76, 27 118"/></svg><button class="gravity-cord-terminal" type="button" data-cord-handle aria-label="${translateLabel(navigationCollapsed ? "Pull upward to show toolbar" : "Pull downward to hide toolbar", currentLanguage)}" title="${translateLabel(navigationCollapsed ? "Show toolbar" : "Hide toolbar", currentLanguage)}"><span class="gravity-cord-jewel" aria-hidden="true"></span></button></div>` : ""}
 
@@ -660,15 +636,17 @@ function render(): void {
     navigationDock?.style.setProperty("--cable-right-offset", `${-navigationCableTension}px`);
     navigationDock?.style.setProperty("--cable-gear-angle", `${navigationCableRotation}deg`);
   }
+  if(activeScreen==="settings"&&developerAuthenticated){
+    if(!developerResetSettingsScanMounted){
+      developerResetSettingsScanMounted=true;
+      void refreshDeveloperAtlasResetPlayers();
+    }
+  }else developerResetSettingsScanMounted=false;
   menuRevealPending = false;
   if (shouldAnimateScreen || menuToggleAnimationPending || languageAnimationPending) {
     animateAppScreen(root.querySelector<HTMLElement>(".app-shell"), { menuToggle: menuToggleAnimationPending });
     menuToggleAnimationPending = false;
     languageAnimationPending = false;
-  }
-  if (outgoingTransitionGhost) {
-    const ghost = outgoingTransitionGhost;
-    animateAppScreenExit(ghost, () => ghost.remove());
   }
   if (activeScreen === "offline-game") {
     const expeditionPage = root.querySelector<HTMLElement>(".expedition-page");
@@ -773,6 +751,12 @@ function atlasEligiblePlayers():AtlasEligiblePlayer[] {
     seen.add(key);
     result.push({id:player.id,name:player.name,registryPath:player.registryPath||"",source:"universe"});
   }
+  for(const player of developerResetRegistryNames){
+    const key=player.name.trim().toLocaleLowerCase();
+    if(!key||seen.has(key))continue;
+    seen.add(key);
+    result.push({id:"registry-name:"+player.path,name:player.name,registryPath:player.path,source:"universe"});
+  }
   for(const character of characters){
     const key=character.name.trim().toLocaleLowerCase();
     if(!key||seen.has(key))continue;
@@ -787,6 +771,81 @@ function atlasEligiblePlayers():AtlasEligiblePlayer[] {
   }
   return result;
 }
+function refreshDeveloperAtlasResetOptions(selectedName?:string):void {
+  const select=root.querySelector<HTMLSelectElement>("[data-atlas-reset-player-select]");
+  if(!select)return;
+  const previous=selectedName??select.value;
+  const players=atlasEligiblePlayers();
+  select.innerHTML='<option value="">— Select a player account —</option>'+players.map(player=>{
+    const source=player.source==="universe"?" · Universe":player.source==="local-profile"?" · Local Profile":" · Local Journey";
+    return '<option value="'+escapeHtml(player.name)+'">'+escapeHtml(player.name+source)+'</option>';
+  }).join("");
+  if(previous&&players.some(player=>player.name.toLocaleLowerCase()===previous.toLocaleLowerCase()))select.value=previous;
+  const generate=root.querySelector<HTMLButtonElement>("[data-atlas-developer-reset-submit]");
+  if(generate)generate.disabled=players.length===0;
+}
+
+async function refreshDeveloperAtlasResetPlayers():Promise<void> {
+  if(!developerAuthenticated||activeScreen!=="settings"||developerResetScanBusy)return;
+  const section=root.querySelector<HTMLElement>("[data-developer-atlas-reset]");
+  const status=section?.querySelector<HTMLElement>("[data-developer-atlas-reset-scan-status]");
+  const refresh=section?.querySelector<HTMLButtonElement>("[data-atlas-reset-scan-refresh]");
+  if(!section)return;
+  developerResetScanBusy=true;
+  const selected=root.querySelector<HTMLSelectElement>("[data-atlas-reset-player-select]")?.value||"";
+  if(refresh)refresh.disabled=true;
+  if(status)status.textContent=navigator.onLine
+    ?"Scanning local accounts and the pinned Universe players.md registry…"
+    :"Offline · loading local player records only…";
+  try{
+    await refreshCharacters();
+    if(navigator.onLine){
+      let canon=getCanonStatus();
+      if(!canon.commitSha||canon.status==="error"){
+        const refreshed=await refreshCanon();
+        canonMessage=refreshed.message;
+        canon=getCanonStatus();
+      }
+      if(!canon.commitSha||canon.status==="error")throw new Error("The active Universe snapshot could not be verified.");
+      await verifyCanonSourceConnection(canon.commitSha);
+      const registry=await loadPlayerRegistry(canon.commitSha);
+      const entries=parseAtlasResetRegistryNames(registry.content);
+      if(!entries.length)throw new Error("No valid player entries were found in the verified players.md registry.");
+      developerResetRegistryNames=entries;
+    }
+    if(activeScreen!=="settings"||!developerAuthenticated)return;
+    refreshDeveloperAtlasResetOptions(selected);
+    const players=atlasEligiblePlayers();
+    const count=(source:string)=>players.filter(player=>player.source===source).length;
+    if(status){
+      status.textContent=navigator.onLine
+        ?"Scan complete · Universe "+count("universe")+" · Local Profile "+count("local-profile")+" · Local Journey "+count("local-journey")
+        :"Offline · showing "+players.length+" local / previously verified player records. Universe scan retries when online.";
+    }
+  }catch(error){
+    if(activeScreen==="settings"&&developerAuthenticated){
+      refreshDeveloperAtlasResetOptions(selected);
+      if(status)status.textContent="Universe scan unavailable · showing local and last verified records. "+(error instanceof Error?error.message:"Connection failed.");
+    }
+  }finally{
+    developerResetScanBusy=false;
+    if(activeScreen==="settings"&&developerAuthenticated){
+      const button=root.querySelector<HTMLButtonElement>("[data-atlas-reset-scan-refresh]");
+      if(button)button.disabled=false;
+    }
+  }
+}
+
+window.addEventListener("online",()=>{
+  if(developerAuthenticated&&activeScreen==="settings")void refreshDeveloperAtlasResetPlayers();
+});
+window.addEventListener("offline",()=>{
+  if(developerAuthenticated&&activeScreen==="settings"){
+    const status=root.querySelector<HTMLElement>("[data-developer-atlas-reset-scan-status]");
+    if(status)status.textContent="Offline · local player records remain available; the Universe scan will retry when online.";
+  }
+});
+
 function lockAtlasBackground(gate:HTMLElement,locked:boolean):void {
   const dialog=gate.parentElement;
   if(!dialog)return;
@@ -1403,6 +1462,11 @@ root.addEventListener("click", async (event: MouseEvent) => {
     if(!hasAppAccess()&&activeScreen==="control")return;
     const panel=root.querySelector<HTMLElement>("[data-dev-login-panel]");if(panel)panel.hidden=true;return;
   }
+  if(target.closest("[data-atlas-reset-scan-refresh]")){
+    if(!developerAuthenticated)return;
+    void refreshDeveloperAtlasResetPlayers();
+    return;
+  }
   if(target.closest("[data-atlas-developer-reset-submit]")){
     if(!developerAuthenticated)return;
     const playerSelect=root.querySelector<HTMLSelectElement>("#developer-atlas-reset-player");
@@ -1416,17 +1480,10 @@ root.addEventListener("click", async (event: MouseEvent) => {
     if(!eligible){if(resetMessage)resetMessage.textContent="That player is not present in the current player list.";return;}
     if(!proofInput?.checked){if(resetMessage)resetMessage.textContent="Verify account ownership through an official channel before issuing a reset request.";return;}
     const resetButton=root.querySelector<HTMLButtonElement>("[data-atlas-developer-reset-submit]");
-    const resetSection=root.querySelector<HTMLElement>("[data-developer-atlas-reset]");
     if(resetButton)resetButton.disabled=true;
-    if(resetMessage)resetMessage.textContent="Preparing the account-specific reset request...";
+    if(resetMessage)resetMessage.textContent="Preparing the account-specific reset request…";
     try{
-      const requestTask=createAtlasMasterResetRequest(eligible.name);
-      const requestResults=await Promise.allSettled([
-        requestTask,
-        resetSection?playWorldAtlasAccessSequence(resetSection,3600,requestTask):requestTask.then(()=>undefined)
-      ]);
-      if(requestResults[0].status==="rejected")throw requestResults[0].reason;
-      const request=requestResults[0].value;
+      const request=await createAtlasMasterResetRequest(eligible.name);
       if(requestField){requestField.value=request;requestField.hidden=false;}
       if(copyButton)copyButton.hidden=false;
       if(resetMessage)resetMessage.textContent="Request ready. Copy it to the AI to prepare the unique player confirmation code for the next app update. This has not reset the player's password yet.";
@@ -1445,23 +1502,15 @@ root.addEventListener("click", async (event: MouseEvent) => {
     const request=requestField?.value??"";
     if(!request||!copyButton)return;
     try{
-      const copyHost=root.querySelector<HTMLElement>("[data-atlas-reset-copy-buffer]");
-      const copyTask=(async()=>{
-        if(navigator.clipboard?.writeText)await navigator.clipboard.writeText(request);
-        else{
-          const field=document.createElement("textarea");
-          field.value=request;field.setAttribute("readonly","");
-          field.style.position="fixed";field.style.opacity="0";
-          document.body.append(field);field.select();
-          const copied=document.execCommand("copy");field.remove();
-          if(!copied)throw new Error("Clipboard is unavailable on this device.");
-        }
-      })();
-      const copyResults=await Promise.allSettled([
-        copyTask,
-        copyHost?playWorldAtlasAccessSequence(copyHost,2500,copyTask):copyTask.then(()=>undefined)
-      ]);
-      if(copyResults[0].status==="rejected")throw copyResults[0].reason;
+      if(navigator.clipboard?.writeText)await navigator.clipboard.writeText(request);
+      else{
+        const field=document.createElement("textarea");
+        field.value=request;field.setAttribute("readonly","");
+        field.style.position="fixed";field.style.opacity="0";
+        document.body.append(field);field.select();
+        const copied=document.execCommand("copy");field.remove();
+        if(!copied)throw new Error("Clipboard is unavailable on this device.");
+      }
       copyButton.textContent="Copied ✓";
       const message=root.querySelector<HTMLElement>("[data-developer-atlas-reset-message]");
       if(message)message.textContent="Request copied. Paste it into the AI handoff. Give the player confirmation code only after the updated APK is available.";
