@@ -50,13 +50,21 @@ The user's active requirement is explicit: **redraw/movement updates may affect 
 - **Never place `redraw()`, `drawIsometricForeground()`, `refreshIsometricSvgScene()`, or a full-board SVG replacement inside the actor movement path.**
 - Editor map edits may redraw the editor overlay/foreground as part of saving a real edit. This is a different code path from ordinary Player/NPC movement.
 
-### C. Camera center selection and application
+### C. Separate entry camera and editor CENTER MAP focal point
 
-- The selected center is stored as Map Base pixel coordinates in `cameraCenter`, and exported through the existing AI reference JSON.
+These are two distinct camera behaviors and must never be conflated:
+
+**Area entry camera (Tianhai Academy):**
+- On first image-ready initialization after entering Academy, focus the camera on the Player token's current map position. The default spawn is parent cell `(12,31)`; if a Player position is already present, use its current `data-posX/data-posY` visual coordinates, falling back to `data-x/data-y`.
+- Convert that token position through `isoCellCenter(visualX, visualY, mapData.grid)`, then apply Academy canvas margins and actual artwork scaling. This entry focus is independent of `cameraCenter` and must not read or overwrite the saved editor focal point.
+- The initial Academy image load calls `centerOnPlayer()`. Returning to Academy/newly mounting the area should follow the Player again.
+
+**Editor CENTER MAP:**
+- The selected focal point is stored as Map Base pixel coordinates in `cameraCenter`, and exported through the existing AI reference JSON.
+- The editor's **CENTER MAP** button, reset/fit action, and `merzkava:center-isometric-map` event use `centerMap()`, which reads the saved `cameraCenter`; automatic midpoint is the fallback when none is saved.
 - The old `persist()` method restored the old viewport scroll position on the next animation frame. When confirming a new center, that callback could overwrite the newly requested position.
 - `persist(restoreCamera, redrawVisuals)` now supports a center-only save. Confirming a center uses `persist(false, false)`: save data without restoring the prior scroll anchor and without repainting the map/foreground.
-- The editor dispatches `merzkava:center-isometric-map` after saving. Both the Academy camera controller (`bindWorldMapZoom`) and the regular isometric controller (`bindIsometricCamera`) listen for it and run their existing `centerMap()` logic.
-- Academy centering includes expanded-canvas margins and scales the saved image coordinates against the actual artwork dimensions. The regular map centers against the saved focal point or uses the automatic midpoint fallback.
+- Both camera behaviors use the same viewport geometry, Academy expanded-canvas margins and image scaling, but they have separate focus sources: Player coordinates for entry; `cameraCenter` for editor CENTER MAP.
 - Do not replace the camera controller or change map-image geometry to solve a center-selection issue.
 
 ## 4. File ownership and exact touch points
@@ -108,9 +116,9 @@ The user's active requirement is explicit: **redraw/movement updates may affect 
 
 - **Added/extended:** NPC wandering now uses the same eight-sector path graph as Player movement and selects fragment-level steps rather than whole-cell-only moves.
 - **Changed:** Player/NPC visual motion now animates the actor token only; map JPG, ground SVG and foreground canvas are not redrawn by each movement step. Large decorative scanner sweeps and the per-step tile trail were removed from the low-power gameplay path.
-- **Fixed:** confirming a focal point now applies the new center to both camera controllers without a stale scroll restore or an unnecessary foreground/map repaint.
+- **Fixed:** confirming a focal point applies the saved editor CENTER MAP point without stale scroll restoration or map repaint; Academy entry camera remains a separate Player-token focus.
 - **Reorganized:** generic-map and test-board actors are grouped under a dedicated actor layer; obsolete whole-cell movement helper/import were removed.
-- **Added tests:** runtime contract assertions now cover the fragment route graph, token-only animation, and the center-apply event.
+- **Added tests:** runtime contract assertions cover the fragment route graph, token-only animation, the center-apply event, and the distinction between Player entry focus and saved CENTER MAP focal point.
 - **No new rendering dependency:** PixiJS was not added to this branch.
 
 ---
