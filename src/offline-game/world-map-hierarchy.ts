@@ -263,7 +263,17 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
       const overlay=surface.querySelector<SVGSVGElement>("[data-wmh-overlay-svg]");
       if(overlay){overlay.style.position="absolute";overlay.style.left=artLeft+"px";overlay.style.top=artTop+"px";overlay.style.right="auto";overlay.style.bottom="auto";overlay.style.width=artWidth+"px";overlay.style.height=artHeight+"px";overlay.setAttribute("viewBox","0 0 "+(image.naturalWidth||2816)+" "+(image.naturalHeight||1536));}
       const foreground=surface.querySelector<HTMLCanvasElement>("[data-wmh-foreground-canvas]");
-      if(foreground){foreground.style.position="absolute";foreground.style.left=artLeft+"px";foreground.style.top=artTop+"px";foreground.style.right="auto";foreground.style.bottom="auto";foreground.style.width=artWidth+"px";foreground.style.height=artHeight+"px";}
+      if(foreground){
+        const naturalWidth=image.naturalWidth||2816,naturalHeight=image.naturalHeight||1536;
+        const cropLeft=Number(foreground.dataset.cropLeft||0),cropTop=Number(foreground.dataset.cropTop||0);
+        const cropWidth=Number(foreground.dataset.cropWidth)||naturalWidth,cropHeight=Number(foreground.dataset.cropHeight)||naturalHeight;
+        foreground.style.position="absolute";
+        foreground.style.left=(artLeft+cropLeft/naturalWidth*artWidth)+"px";
+        foreground.style.top=(artTop+cropTop/naturalHeight*artHeight)+"px";
+        foreground.style.right="auto";foreground.style.bottom="auto";
+        foreground.style.width=(cropWidth/naturalWidth*artWidth)+"px";
+        foreground.style.height=(cropHeight/naturalHeight*artHeight)+"px";
+      }
       const actors=surface.querySelector<HTMLElement>("[data-wmh-actor-layer]");
       if(actors){actors.style.position="absolute";actors.style.left=artLeft+"px";actors.style.top=artTop+"px";actors.style.right="auto";actors.style.bottom="auto";actors.style.width=artWidth+"px";actors.style.height=artHeight+"px";}
     }else{
@@ -922,6 +932,8 @@ function drawIsometricForeground(board:HTMLElement,data=readIsoMapData(board)):v
   const width=image.clientWidth||naturalWidth,height=image.clientHeight||naturalHeight;
   const scaleX=width/naturalWidth,scaleY=height/naturalHeight;
   const cropWidth=cropRight-cropLeft,cropHeight=cropBottom-cropTop;
+  canvas.dataset.cropLeft=String(cropLeft);canvas.dataset.cropTop=String(cropTop);
+  canvas.dataset.cropWidth=String(cropWidth);canvas.dataset.cropHeight=String(cropHeight);
   // This is a static occlusion mask, not the source artwork. Allocate pixels
   // only around marked foreground geometry, at a mobile-safe raster scale.
   const dpr=Math.max(1,Math.min(1.25,window.devicePixelRatio||1));
