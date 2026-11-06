@@ -240,7 +240,7 @@ function bindPlayerHudInteractions(hud:HTMLElement):void {
   };
   const up=()=>{
     clear();
-    if(held&&active){active.dataset.skipNextClick="true";hide();}
+    if(held&&active){const pressed=active;pressed.dataset.skipNextClick="true";window.setTimeout(()=>{if(pressed.dataset.skipNextClick==="true")delete pressed.dataset.skipNextClick;},0);hide();}
     active=null;held=false;
   };
   hud.addEventListener("pointerdown",down);
