@@ -203,7 +203,7 @@ function positionCanvas(canvas:HTMLCanvasElement,board:HTMLElement):void {
   canvas.style.width="100%";
   canvas.style.height="100%";
   canvas.style.pointerEvents="none";
-  canvas.style.zIndex="700";
+  canvas.style.zIndex="300";
   board.append(canvas);
 }
 
