@@ -18,6 +18,7 @@ sprite("_academy-pixel-source", {
   shrink: 4,
   palettize: true,
   pivot: "center",
+  genre: "atlas-art",
 })
 scene("academy-campus-pixel-pass", {
   w: 704,
