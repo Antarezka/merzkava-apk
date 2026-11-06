@@ -857,6 +857,15 @@ async function requireWorldAtlasSourceConnection(gate:HTMLElement):Promise<void>
     throw new Error(offlineMessage);
   }
 }
+
+function setWorldAtlasAccessBufferContext(gate:HTMLElement,context:"world-atlas-list"|"world-atlas"):void {
+  const current=gate.querySelector<HTMLElement>("[data-world-atlas-buffer]");
+  if(!current||current.dataset.bufferContext===context)return;
+  const template=document.createElement("template");
+  template.innerHTML=worldAtlasAccessBufferMarkup(currentLanguage,context);
+  const replacement=template.content.firstElementChild;
+  if(replacement)current.replaceWith(replacement);
+}
 function closeWorldAtlas(syncHistory=true):void {
   const modal=root.querySelector<HTMLElement>("[data-idle-rpg-modal]");
   const trigger=root.querySelector<HTMLButtonElement>("[data-idle-rpg-open]");
@@ -887,6 +896,7 @@ async function openWorldAtlasFromTv():Promise<void> {
   const gate=modal?.querySelector<HTMLElement>("[data-world-atlas-gate]");
   if(!modal||!gate)return;
   if(!modal.hidden){closeWorldAtlas();return;}
+  setWorldAtlasAccessBufferContext(gate,"world-atlas-list");
   modal.hidden=false;
   root.querySelector(".app-shell")?.classList.add("is-idle-world");
   trigger?.setAttribute("aria-expanded","true");
@@ -944,6 +954,7 @@ async function openWorldAtlasFromTv():Promise<void> {
           const submitButton=gate.querySelector<HTMLButtonElement>("[data-world-atlas-submit]");
           if(panel)panel.hidden=true;
           if(submitButton)submitButton.disabled=true;
+          setWorldAtlasAccessBufferContext(gate,"world-atlas-list");
           ["#atlas-reset-current","#atlas-reset-master","#atlas-reset-new","#atlas-reset-confirm"].forEach(selector=>{
             const input=gate.querySelector<HTMLInputElement>(selector);if(input)input.value="";
           });
@@ -2006,6 +2017,7 @@ root.addEventListener("click", async event => {
       ?panel.dataset.atlasCurrentAuthorized==="true"
       :panel.dataset.atlasMasterAuthorized==="true";
     if(!authorized){
+      setWorldAtlasAccessBufferContext(gate,"world-atlas");
       const verification=(async()=>{
         await requireWorldAtlasSourceConnection(gate);
         return mode==="change"
@@ -2159,6 +2171,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       if(message)message.textContent=offlineMessage;
       return;
     }
+    setWorldAtlasAccessBufferContext(gate,"world-atlas");
     worldAtlasLoginBusy=true;
     const loginAttempt=++worldAtlasLoginAttempt;
     const abortController=new AbortController();
