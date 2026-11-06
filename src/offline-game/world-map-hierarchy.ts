@@ -161,8 +161,13 @@ function academyMarginGridMarkup(
   const slope=cellH/cellW;
   const first=Math.floor(-slope*width/cellH)-1;
   const last=Math.ceil((height+slope*width)/cellH)+1;
+  const lineCount=last-first+1;
+  // Expansion can reach many thousands of pixels on mobile. Keep the
+  // decorative margin guide bounded instead of generating thousands of SVG
+  // segments over a huge blank scroll surface.
+  const stride=Math.max(1,Math.ceil(lineCount/160));
   const lines:string[]=[];
-  for(let index=first;index<=last;index++){
+  for(let index=first;index<=last;index+=stride){
     const y=index*cellH;
     lines.push("M0 "+y.toFixed(2)+" L"+width.toFixed(2)+" "+(slope*width+y).toFixed(2));
     lines.push("M0 "+y.toFixed(2)+" L"+width.toFixed(2)+" "+(-slope*width+y).toFixed(2));
@@ -894,30 +899,53 @@ function drawIsometricForeground(board:HTMLElement,data=readIsoMapData(board)):v
     return;
   }
   canvas.style.display="block";
-  const width=image.clientWidth||image.naturalWidth,height=image.clientHeight||image.naturalHeight;
-  // This is a static occlusion mask, not the source artwork. 1.25x is enough
-  // on mobile and avoids a second high-DPR copy of the full map in GPU memory.
-  const dpr=Math.max(1,Math.min(1.25,window.devicePixelRatio||1));
-  const scaleX=width/image.naturalWidth,scaleY=height/image.naturalHeight;
-  canvas.width=Math.max(1,Math.round(width*dpr));canvas.height=Math.max(1,Math.round(height*dpr));
-  canvas.style.left=image.offsetLeft+"px";canvas.style.top=image.offsetTop+"px";
-  canvas.style.width=width+"px";canvas.style.height=height+"px";
-  const ctx=canvas.getContext("2d");if(!ctx)return;
-  ctx.setTransform(dpr*scaleX,0,0,dpr*scaleY,0,0);ctx.clearRect(0,0,image.naturalWidth,image.naturalHeight);
-  const halfW=data.grid.tileW/2,halfH=data.grid.tileH/2,left=0,top=0;
-  ctx.save();ctx.beginPath();
+  const halfW=data.grid.tileW/2,halfH=data.grid.tileH/2;
+  let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
+  const include=(x:number,y:number)=>{
+    minX=Math.min(minX,x);minY=Math.min(minY,y);maxX=Math.max(maxX,x);maxY=Math.max(maxY,y);
+  };
   for(const key of data.foregroundCells){
-    const [x,y]=key.split(",").map(Number),center=isoCellCenter(x,y,data.grid),cx=center.x-left,cy=center.y-top;
-    ctx.moveTo(cx,cy-halfH);ctx.lineTo(cx+halfW,cy);ctx.lineTo(cx,cy+halfH);ctx.lineTo(cx-halfW,cy);ctx.closePath();
+    const [x,y]=key.split(",").map(Number),center=isoCellCenter(x,y,data.grid);
+    include(center.x-halfW,center.y-halfH);include(center.x+halfW,center.y+halfH);
   }
   for(const key of data.foregroundQuadrants){
     const match=/^(-?[0-9]+),(-?[0-9]+):(tl|tr|bl|br)-([ab])$/.exec(key);if(!match)continue;
-    const points=isoQuadrantTrianglePoints(Number(match[1]),Number(match[2]),(match[3]+"-"+match[4]) as IsoQuadrant,data.grid).split(" ").map(point=>point.split(",").map(Number));
-    ctx.moveTo(points[0][0]-left,points[0][1]-top);
-    for(let i=1;i<points.length;i++)ctx.lineTo(points[i][0]-left,points[i][1]-top);
+    const points=isoQuadrantTrianglePoints(Number(match[1]),Number(match[2]),(match[3]+"-"+match[4]) as IsoQuadrant).split(" ").map(point=>point.split(",").map(Number));
+    points.forEach(point=>include(point[0],point[1]));
+  }
+  const naturalWidth=image.naturalWidth,naturalHeight=image.naturalHeight;
+  const cropLeft=Math.max(0,Math.floor(minX)-2),cropTop=Math.max(0,Math.floor(minY)-2);
+  const cropRight=Math.min(naturalWidth,Math.ceil(maxX)+2),cropBottom=Math.min(naturalHeight,Math.ceil(maxY)+2);
+  if(!Number.isFinite(cropLeft)||!Number.isFinite(cropTop)||cropRight<=cropLeft||cropBottom<=cropTop){
+    canvas.width=1;canvas.height=1;canvas.style.width="0px";canvas.style.height="0px";canvas.style.display="none";return;
+  }
+  const width=image.clientWidth||naturalWidth,height=image.clientHeight||naturalHeight;
+  const scaleX=width/naturalWidth,scaleY=height/naturalHeight;
+  const cropWidth=cropRight-cropLeft,cropHeight=cropBottom-cropTop;
+  // This is a static occlusion mask, not the source artwork. Allocate pixels
+  // only around marked foreground geometry, at a mobile-safe raster scale.
+  const dpr=Math.max(1,Math.min(1.25,window.devicePixelRatio||1));
+  const cssWidth=cropWidth*scaleX,cssHeight=cropHeight*scaleY;
+  canvas.width=Math.max(1,Math.round(cssWidth*dpr));canvas.height=Math.max(1,Math.round(cssHeight*dpr));
+  canvas.style.left=(image.offsetLeft+cropLeft*scaleX)+"px";
+  canvas.style.top=(image.offsetTop+cropTop*scaleY)+"px";
+  canvas.style.width=cssWidth+"px";canvas.style.height=cssHeight+"px";
+  const ctx=canvas.getContext("2d");if(!ctx)return;
+  ctx.setTransform(dpr*scaleX,0,0,dpr*scaleY,-cropLeft*dpr*scaleX,-cropTop*dpr*scaleY);
+  ctx.clearRect(cropLeft,cropTop,cropWidth,cropHeight);
+  ctx.save();ctx.beginPath();
+  for(const key of data.foregroundCells){
+    const [x,y]=key.split(",").map(Number),center=isoCellCenter(x,y,data.grid);
+    ctx.moveTo(center.x,center.y-halfH);ctx.lineTo(center.x+halfW,center.y);ctx.lineTo(center.x,center.y+halfH);ctx.lineTo(center.x-halfW,center.y);ctx.closePath();
+  }
+  for(const key of data.foregroundQuadrants){
+    const match=/^(-?[0-9]+),(-?[0-9]+):(tl|tr|bl|br)-([ab])$/.exec(key);if(!match)continue;
+    const points=isoQuadrantTrianglePoints(Number(match[1]),Number(match[2]),(match[3]+"-"+match[4]) as IsoQuadrant).split(" ").map(point=>point.split(",").map(Number));
+    ctx.moveTo(points[0][0],points[0][1]);
+    for(let i=1;i<points.length;i++)ctx.lineTo(points[i][0],points[i][1]);
     ctx.closePath();
   }
-  ctx.clip();ctx.drawImage(image,0,0,image.naturalWidth,image.naturalHeight);ctx.restore();
+  ctx.clip();ctx.drawImage(image,0,0,naturalWidth,naturalHeight);ctx.restore();
 }
 function isoCanWalkTile(board:HTMLElement,tile:HTMLElement|null,x:number,y:number,data=readIsoMapData(board)):boolean {
   if(!tile)return false;
