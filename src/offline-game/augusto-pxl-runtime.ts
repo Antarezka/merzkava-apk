@@ -1,4 +1,5 @@
 import type { WorldMapVisualMode } from "./world-map-hierarchy";
+import { cacheBundledAugustoPxlAsset, createCachedAugustoPxlObjectUrl } from "./augusto-pxl-vault";
 
 type PxlAnimation = { frames:number[]; fps?:number };
 type PxlAsset = {
@@ -16,6 +17,8 @@ type PxlManifest = { schemaVersion:number; assets:Record<string,PxlAsset> };
 const MANIFEST_URL="/assets/augusto-pxl/manifest.json";
 const observers=new WeakMap<HTMLElement,MutationObserver>();
 const runningAnimations=new WeakMap<HTMLElement,Animation>();
+const objectUrls=new WeakMap<HTMLElement,string>();
+const resolvedSourcePromises=new Map<string,Promise<string>>();
 let manifestPromise:Promise<PxlManifest|null>|null=null;
 
 function isBundledAssetPath(value:string):boolean {
@@ -36,15 +39,35 @@ async function loadManifest():Promise<PxlManifest|null> {
   }
   return manifestPromise;
 }
-function setImageSource(element:HTMLElement,asset:PxlAsset):void {
-  if(!asset.src||!isBundledAssetPath(asset.src))return;
+async function resolveBundledSource(id:string,src:string):Promise<string> {
+  if(!isBundledAssetPath(src))return src;
+  const cacheId=id+"@"+src;
+  const existing=resolvedSourcePromises.get(cacheId);
+  if(existing)return existing;
+  const task=(async()=>{
+    try{
+      // Prefer a previously encrypted per-install copy. The APK-bundled file is
+      // always the offline fallback, so vault failures never block the map.
+      const cached=await createCachedAugustoPxlObjectUrl(cacheId);
+      if(cached)return cached;
+    }catch{/* IndexedDB/Keystore unavailability must not prevent offline play. */}
+    void cacheBundledAugustoPxlAsset(cacheId,src).catch(()=>{});
+    return src;
+  })();
+  resolvedSourcePromises.set(cacheId,task);
+  return task;
+}
+function setImageSource(element:HTMLElement,asset:PxlAsset,src:string):void {
   const image=element instanceof HTMLImageElement?element:element.querySelector<HTMLImageElement>("img");
+  const oldUrl=objectUrls.get(element);
+  if(oldUrl&&oldUrl!==src){URL.revokeObjectURL(oldUrl);objectUrls.delete(element);}
+  if(src.startsWith("blob:"))objectUrls.set(element,src);
   if(image){
-    if(image.getAttribute("src")!==asset.src)image.setAttribute("src",asset.src);
+    if(image.getAttribute("src")!==src)image.setAttribute("src",src);
     element.dataset.pxlResolved="image";
     return;
   }
-  element.style.backgroundImage='url("'+asset.src+'")';
+  element.style.backgroundImage='url("'+src+'")';
   element.style.backgroundRepeat="no-repeat";
   element.style.backgroundPosition="center";
   element.style.backgroundSize="contain";
@@ -55,10 +78,13 @@ function selectAnimation(asset:PxlAsset,element:HTMLElement):PxlAnimation|null {
   const motion=element.dataset.pxlMotion||"idle";
   return asset.directions?.[direction]?.[motion]??asset.animations?.[motion]??null;
 }
-function applySpriteSheet(element:HTMLElement,asset:PxlAsset):void {
-  if(!asset.src||!isBundledAssetPath(asset.src)||!asset.frameWidth||!asset.frameHeight||!asset.columns)return;
+function applySpriteSheet(element:HTMLElement,asset:PxlAsset,src:string):void {
+  if(!asset.frameWidth||!asset.frameHeight||!asset.columns)return;
   runningAnimations.get(element)?.cancel();
-  element.style.backgroundImage='url("'+asset.src+'")';
+  const oldUrl=objectUrls.get(element);
+  if(oldUrl&&oldUrl!==src){URL.revokeObjectURL(oldUrl);objectUrls.delete(element);}
+  if(src.startsWith("blob:"))objectUrls.set(element,src);
+  element.style.backgroundImage='url("'+src+'")';
   element.style.backgroundRepeat="no-repeat";
   element.style.width=asset.frameWidth+"px";
   element.style.height=asset.frameHeight+"px";
@@ -82,20 +108,22 @@ function applySpriteSheet(element:HTMLElement,asset:PxlAsset):void {
   runningAnimations.set(element,motion);
   element.dataset.pxlResolved="sprite";
 }
-function applyAsset(element:HTMLElement,manifest:PxlManifest):void {
+async function applyAsset(element:HTMLElement,manifest:PxlManifest):Promise<void> {
   const id=element.dataset.pxlAssetId;
   if(!id)return;
   const asset=manifest.assets[id];
-  if(!asset||asset.status!=="ready"||!asset.src)return;
-  if(asset.type==="sprite-sheet")applySpriteSheet(element,asset);
-  else setImageSource(element,asset);
+  if(!asset||asset.status!=="ready"||!asset.src||!isBundledAssetPath(asset.src))return;
+  const src=await resolveBundledSource(id,asset.src);
+  if(!element.isConnected)return;
+  if(asset.type==="sprite-sheet")applySpriteSheet(element,asset,src);
+  else setImageSource(element,asset,src);
 }
 export function mountAugustoPxlAssets(overlay:HTMLElement):void {
   if(overlay.dataset.visualMode!=="augusto-pxl")return;
   const mount=async()=>{
     const manifest=await loadManifest();
     if(!manifest||!overlay.isConnected||overlay.hidden)return;
-    overlay.querySelectorAll<HTMLElement>("[data-pxl-asset-id]").forEach(node=>applyAsset(node,manifest));
+    overlay.querySelectorAll<HTMLElement>("[data-pxl-asset-id]").forEach(node=>{void applyAsset(node,manifest);});
     if(observers.has(overlay))return;
     const observer=new MutationObserver(records=>{
       if(overlay.hidden)return;
@@ -109,7 +137,7 @@ export function mountAugustoPxlAssets(overlay:HTMLElement):void {
           added.querySelectorAll<HTMLElement>("[data-pxl-asset-id]").forEach(item=>touched.add(item));
         });
       }
-      touched.forEach(node=>applyAsset(node,manifest));
+      touched.forEach(node=>{void applyAsset(node,manifest);});
     });
     observer.observe(overlay,{subtree:true,childList:true,attributes:true,attributeFilter:["data-pxl-asset-id","data-pxl-motion","data-pxl-direction"]});
     observers.set(overlay,observer);
@@ -122,6 +150,8 @@ export function disposeAugustoPxlAssets(overlay:HTMLElement):void {
   overlay.querySelectorAll<HTMLElement>("[data-pxl-asset-id]").forEach(node=>{
     runningAnimations.get(node)?.cancel();
     runningAnimations.delete(node);
+    const url=objectUrls.get(node);
+    if(url){URL.revokeObjectURL(url);objectUrls.delete(node);}
   });
 }
 export function isAugustoPxlVisualMode(overlay:HTMLElement|null):boolean {
