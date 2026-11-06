@@ -39,7 +39,6 @@ import { initializeGravityPullCord } from "./ui/gravity-pull-cord";
 import { installSoftKeyboardStability } from "./ui/soft-keyboard-stability";
 import { mountArcanistryTicketMachine } from "./offline-game/arcanistry-ticket-machine";
 import { handleWorldMapHierarchyClick, initializeWorldMapHierarchy, setWorldMapDeveloperMode } from "./offline-game/world-map-hierarchy";
-import { bindScrollableResizableWindows } from "./offline-game/player-hud";
 import { closeLoreEntry, closeLoreSource, closeLorePlaceholder, openLoreEntry, openLoreSource, openLorePlaceholder, setLoreCategory, setLoreSearch, renderLoreResults } from "./world-archive/lore-library";
 import { playWorldAtlasAccessSequence } from "./offline-game/world-atlas-login-motion";
 import { worldAtlasAccessBufferMarkup } from "./offline-game/world-atlas-login";
@@ -50,13 +49,6 @@ const app = document.querySelector<HTMLDivElement>("#app");
 if (!app) throw new Error("App root element was not found.");
 const root = app;
 
-bindScrollableResizableWindows(document.body);
-const scrollResizeObserver=new MutationObserver(records=>{
-  for(const record of records)for(const node of Array.from(record.addedNodes)){
-    if(node instanceof HTMLElement)bindScrollableResizableWindows(node);
-  }
-});
-scrollResizeObserver.observe(document.body,{childList:true,subtree:true});
 
 async function runAccountAccessTransition<T>(
   context:"player"|"developer"|"player-session"|"developer-session",
