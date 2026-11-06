@@ -780,6 +780,23 @@ function atlasEligiblePlayers():AtlasEligiblePlayer[] {
   }
   return result;
 }
+function atlasOfflinePxlPlayers():AtlasEligiblePlayer[] {
+  const seen=new Set<string>(),result:AtlasEligiblePlayer[]=[];
+  // The pink PXL Atlas intentionally authenticates only against local records.
+  for(const character of characters){
+    const key=character.name.trim().toLocaleLowerCase();
+    if(!key||seen.has(key))continue;
+    seen.add(key);
+    result.push({id:character.id,name:character.name,registryPath:"",source:"local-profile"});
+  }
+  for(const journey of listEternalSaves()){
+    const key=journey.characterName.trim().toLocaleLowerCase();
+    if(!key||seen.has(key))continue;
+    seen.add(key);
+    result.push({id:"journey:"+journey.id,name:journey.characterName,registryPath:"",source:"local-journey"});
+  }
+  return result;
+}
 function refreshDeveloperAtlasResetOptions(selectedName?:string):void {
   const select=root.querySelector<HTMLSelectElement>("[data-atlas-reset-player-select]");
   if(!select)return;
@@ -880,7 +897,8 @@ async function refreshAtlasPasswordMode(gate:HTMLElement):Promise<void> {
   const password=gate.querySelector<HTMLInputElement>("#world-atlas-password");
   const safetyNote=gate.querySelector<HTMLElement>("[data-password-safety-note]");
   const selected=select?.value||"";
-  const eligible=atlasEligiblePlayers().some(player=>player.name===selected);
+  const pxlOffline=gate.closest<HTMLElement>("[data-idle-rpg-modal]")?.dataset.renderer==="augusto-pxl";
+  const eligible=(pxlOffline?atlasOfflinePxlPlayers():atlasEligiblePlayers()).some(player=>player.name===selected);
   if(!loginPanel||!signupPanel||!loginBlock||!loginSubmit||!signupOpen||!password)return;
   loginPanel.hidden=false;signupPanel.hidden=true;
   if(loginForm)loginForm.dataset.atlasSubmitMode="login";
@@ -909,9 +927,9 @@ async function refreshAtlasPasswordMode(gate:HTMLElement):Promise<void> {
     loginSubmit.hidden=!exists;
     loginSubmit.disabled=false;
     password.autocomplete="current-password";
-    if(message)message.textContent=exists
+    if(message)message.textContent=(pxlOffline?"PXL OFFLINE · ":"")+(exists
       ?(gate.dataset.loginPrompt||"Enter this character's password.")
-      :(gate.dataset.signupPrompt||"Create a password to continue.");
+      :(gate.dataset.signupPrompt||"Create a password to continue."));
   }catch(error){
     loginSubmit.disabled=true;
     if(message)message.textContent=error instanceof Error?error.message:"Could not read the account credential.";
@@ -1002,6 +1020,54 @@ async function openWorldAtlasFromTv(renderer:"dom"|"augusto-pxl"="dom"):Promise<
   if(select)select.innerHTML='<option value="">Loading player records…</option>';
   if(submit)submit.disabled=true;
   const offlineMessage=gate.dataset.offlineLabel||"An active internet connection to the official Universe source is required.";
+  if(renderer==="augusto-pxl"){
+    await refreshCharacters();
+    const options=atlasOfflinePxlPlayers();
+    const remembered=await restoreAtlasPlayer().catch(()=> "");
+    if(select){
+      select.innerHTML='<option value="">— Select a local character —</option>'+options.map(player=>{
+        const sourceLabel=player.source==="local-journey"?" · Local Journey":" · Local Profile";
+        return '<option value="'+escapeHtml(player.name)+'">'+escapeHtml(player.name+sourceLabel)+'</option>';
+      }).join("");
+      if(options.some(player=>player.name===remembered))select.value=remembered;
+      const rememberCheckbox=gate.querySelector<HTMLInputElement>('input[name="remember"]');
+      if(rememberCheckbox)rememberCheckbox.checked=options.some(player=>player.name===remembered);
+      const loginPassword=gate.querySelector<HTMLInputElement>("#world-atlas-password");
+      if(loginPassword)loginPassword.value=remembered?await restoreRememberedAtlasPassword(remembered):"";
+      if(rememberCheckbox&&rememberCheckbox.dataset.pxlOfflineRestoreBound!=="true"){
+        rememberCheckbox.dataset.pxlOfflineRestoreBound="true";
+        rememberCheckbox.addEventListener("change",()=>{
+          if(!rememberCheckbox.checked){
+            const selectedName=select.value;
+            const passwordInput=gate.querySelector<HTMLInputElement>("#world-atlas-password");
+            if(passwordInput)passwordInput.value="";
+            if(selectedName)void rememberAtlasCredentials(selectedName,"",false).catch(()=>{});
+          }
+        });
+      }
+      if(select.dataset.pxlOfflineLoginBound!=="true"){
+        select.dataset.pxlOfflineLoginBound="true";
+        select.addEventListener("change",()=>{
+          const panel=gate.querySelector<HTMLElement>("[data-atlas-reset-panel]");
+          const passwordInput=gate.querySelector<HTMLInputElement>("#world-atlas-password");
+          if(panel)panel.hidden=true;
+          if(passwordInput)passwordInput.value="";
+          const name=select.value;
+          if(name&&rememberCheckbox?.checked)void restoreRememberedAtlasPassword(name).then(value=>{
+            if(select.value===name&&rememberCheckbox.checked&&passwordInput)passwordInput.value=value;
+          }).catch(()=>{});
+          void refreshAtlasPasswordMode(gate);
+        });
+      }
+    }
+    if(message)message.textContent=options.length
+      ?"PXL OFFLINE · Local profiles and saved journeys only. No network access is used."
+      :"PXL OFFLINE · No local profile or saved journey was found. Create one in the app first.";
+    if(submit)submit.disabled=options.length===0;
+    await refreshAtlasPasswordMode(gate);
+    requestAnimationFrame(()=>gate.querySelector<HTMLInputElement>("#world-atlas-player")?.focus());
+    return;
+  }
   if(!navigator.onLine){
     if(message)message.textContent=offlineMessage;
     if(select)select.innerHTML='<option value="">—</option>';
@@ -2261,7 +2327,8 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     const password=String(data.get(signingUp?"signupPassword":"password")??"");
     const confirmation=String(data.get(signingUp?"signupConfirm":"confirm")??"");
     const remember=data.get("remember")==="yes";
-    const eligible=atlasEligiblePlayers().some(player=>player.name===playerName);
+    const pxlOffline=gate?.closest<HTMLElement>("[data-idle-rpg-modal]")?.dataset.renderer==="augusto-pxl";
+    const eligible=(pxlOffline?atlasOfflinePxlPlayers():atlasEligiblePlayers()).some(player=>player.name===playerName);
     const message=gate?.querySelector<HTMLElement>("[data-world-atlas-message]");
     const button=signingUp?form.querySelector<HTMLButtonElement>('[data-atlas-submit-mode="signup"]'):form.querySelector<HTMLButtonElement>('[data-atlas-submit-mode="login"]');
     if(!gate)return;
@@ -2270,12 +2337,12 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     if(!password){if(message)message.textContent=gate.dataset.passwordRequiredLabel||"Enter a password to continue.";return;}
     if(password.length<8||password.length>128){if(message)message.textContent="Use a password between 8 and 128 characters.";return;}
     const offlineMessage=gate.dataset.offlineLabel||"No internet connection or the official Universe source is unavailable. Check your connection and try again.";
-    if(!navigator.onLine){
+    if(!pxlOffline&&!navigator.onLine){
       if(message)message.textContent=offlineMessage;
       return;
     }
     const activeCanon=getCanonStatus();
-    if(!activeCanon.commitSha){
+    if(!pxlOffline&&!activeCanon.commitSha){
       if(message)message.textContent=offlineMessage;
       return;
     }
@@ -2303,7 +2370,7 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       }else if(!passwordExists){
         throw new Error("This character has no password yet. Choose Create account to set one.");
       }
-      const connectionWork=verifyCanonSourceConnection(activeCanon.commitSha,abortController.signal);
+      const connectionWork=pxlOffline?Promise.resolve():verifyCanonSourceConnection(activeCanon.commitSha,abortController.signal);
       const credentialWork=(async()=>{
         if(passwordExists){
           const valid=await verifyAtlasPassword(playerName,password);
