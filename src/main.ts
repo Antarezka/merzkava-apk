@@ -2192,23 +2192,37 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
       const message=root.querySelector<HTMLElement>("[data-player-login-message]");if(message)message.textContent=playerLoginMessage;
       return;
     }
-    const name=String(new FormData(form).get("playerName")??"");
-    if(!name.trim()){
+    const name=String(new FormData(form).get("playerName")??"").trim();
+    if(!name){
       playerLoginMessage="Masukkan nama karakter yang terdaftar.";
+      const message=root.querySelector<HTMLElement>("[data-player-login-message]");if(message)message.textContent=playerLoginMessage;
+      return;
+    }
+    if(!navigator.onLine){
+      playerLoginMessage=form.dataset.offlineLabel||"Player sign-in requires an active internet connection to verify the official Universe registry.";
       const message=root.querySelector<HTMLElement>("[data-player-login-message]");if(message)message.textContent=playerLoginMessage;
       return;
     }
     playerLoginBusy=true;
     const button=form.querySelector<HTMLButtonElement>("[type=submit]");if(button)button.disabled=true;
     root.querySelectorAll<HTMLButtonElement>("[data-access-mode]").forEach(tab=>tab.disabled=true);
+    const accessPanel=root.querySelector<HTMLElement>("[data-dev-login-panel]")||form;
     try{
-      const selected=await findOfficialPlayer(name);
-      await signOutDeveloper();
-      if(getAuthSession())await signOut();
+      const playerTask=(async()=>{
+        const selected=await findOfficialPlayer(name);
+        await signOutDeveloper();
+        if(getAuthSession())await signOut();
+        return selected;
+      })();
+      const results=await Promise.allSettled([
+        playerTask,
+        playWorldAtlasAccessSequence(accessPanel,4000,playerTask)
+      ]);
+      if(results[0].status==="rejected")throw results[0].reason;
+      const selected=results[0].value;
       developerAuthenticated=false;
       setWorldMapDeveloperMode(false);
       playerAuthenticated=true;
-      
       activeCharacterId=selected.id;
       activeProfileMarkdown=selected.profileMarkdown??"";
       loadCharacterWorldTime(selected.id);
@@ -2236,14 +2250,20 @@ root.addEventListener("submit", async (event: SubmitEvent) => {
     const identifier=String(data.get("identifier")??"");
     const password=String(data.get("password")??"");
     const remember=data.get("remember")==="yes";
-    // Initial app Developer access is intentionally local/offline-capable.
-    // Only the separate World Atlas form performs the live Universe connectivity check.
+    // Developer verification is device-local; this path deliberately makes no network request.
     developerLoginBusy=true;developerLoginMessage="";
     const button=form.querySelector<HTMLButtonElement>("[type=submit]");
     const submitLabel=button?.textContent??"";
     if(button){button.disabled=true;button.textContent="…";}
+    const accessPanel=root.querySelector<HTMLElement>("[data-dev-login-panel]")||form;
     try{
-      const valid=await authenticateDeveloper(identifier,password,remember);
+      const authTask=authenticateDeveloper(identifier,password,remember);
+      const results=await Promise.allSettled([
+        authTask,
+        playWorldAtlasAccessSequence(accessPanel,3600,authTask)
+      ]);
+      if(results[0].status==="rejected")throw results[0].reason;
+      const valid=results[0].value;
       if(!valid){
         developerLoginBusy=false;developerLoginMessage="Access denied. Check the developer ID and password.";
         const message=root.querySelector<HTMLElement>("[data-dev-login-message]");if(message)message.textContent=developerLoginMessage;
