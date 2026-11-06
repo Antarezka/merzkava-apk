@@ -9,7 +9,7 @@ import {
 describe("Eternal Path live world scene", () => {
   beforeEach(() => resetEternalGame());
 
-  it("renders the separate pink Augusto PXL TV/console launcher at the existing TV size", () => {
+  it("opens an independent Augusto PXL World Atlas from the pink CRT console", () => {
     const html=renderExpeditionInterface();
     expect(html).toContain('class="expedition-pxl-trigger" data-augusto-pxl-open');
     expect(html).toContain('aria-label="Open Augusto PXL integration panel"');
@@ -17,10 +17,11 @@ describe("Eternal Path live world scene", () => {
     expect(html).toContain('class="pxl-tv-shell"');
     expect(html).toContain('class="pxl-console-box"');
     expect(html).toContain('class="pxl-console-ink">AUGUSTO PXL</small>');
-    expect(html).toContain("AUGUSTO PXL");
-    expect(html).toContain('class="expedition-pxl-modal" data-augusto-pxl-modal hidden');
-    expect(html).toContain("Full visual-production pipeline for Merzkava Universe");
-    expect(html).toContain("PixiJS is not being reintroduced");
+    expect(html).toContain('data-world-map-hierarchy data-visual-mode="legacy"');
+    expect(html).toContain('data-world-map-hierarchy data-visual-mode="augusto-pxl" aria-label="Map Navigation" hidden');
+    expect(html).toContain('data-pxl-asset-id="map.world.overview"');
+    expect(html).toContain('/assets/augusto-pxl/placeholders/world-map-pending.svg');
+    expect(html).not.toContain('data-augusto-pxl-modal');
   });
 
   it("keeps Journey Manager behind the clerk-emblem dropdown before a journey starts", () => {
