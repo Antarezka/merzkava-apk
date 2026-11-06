@@ -15,7 +15,7 @@ This section supersedes any older movement/animation description below when it c
 - **Movement granularity:** Player and NPC movement use eight triangular nodes per isometric diamond: `tl-a`, `tl-b`, `tr-a`, `tr-b`, `bl-a`, `bl-b`, `br-a`, `br-b`. A token may occupy a fractional sub-cell position. The Player hit target is resolved from the exact tapped point; NPC wandering chooses an available adjacent sector node through `findIsoQuadrantPath()`.
 - **Actor-only updates:** ordinary movement changes token data/position and animates that token with `Element.animate()` on its individual `translate` property. It must not redraw/replace the map image, ground SVG, ground tiles or foreground canvas. Static tile depth is recalculated only after map/editor invalidation, not on every actor step.
 - **Reduced field effects:** the per-step `emitTileTrailWave()` implementation was removed. The wide expanding sonar pseudo-element sweep is disabled in low-power gameplay CSS; scanner contact tracking and the `merzkava:field-scanner-overlap` / `merzkava:field-scanner-clear` observation events remain. These events still do not change gameplay state.
-- **Camera center:** center confirmation uses `persist(false, false)`, which saves the selected Map Base pixel point without restoring stale scroll coordinates or repainting map/foreground visuals. It dispatches `merzkava:center-isometric-map`; both Academy and regular isometric camera controllers call their current `centerMap()` handler.
+- **Camera focus is deliberately split:** on first entry to Tianhai Academy, the initial camera uses `centerOnPlayer()` and follows the Player token's current/spawn coordinates (`data-posX/data-posY`, falling back to `data-x/data-y`); the saved editor focal point is not read for this initial view. The editor's **CENTER MAP** button and `merzkava:center-isometric-map` event use `centerMap()` and the separate saved Map Base pixel point `cameraCenter`. Confirming that point uses `persist(false, false)`, so it saves/applies the editor focal point without restoring stale scroll coordinates or repainting map/foreground visuals. Do not merge these two camera targets.
 - **Editing vs play:** editor edits may redraw editor marks/foreground as part of a real map edit. That is not permission to call editor redraw functions during ordinary Player/NPC movement.
 
 For continuation, keep the distinction explicit: static world plane = artwork/ground; dynamic actor plane = tokens only.
@@ -59,6 +59,16 @@ The runtime authorization flag is worldMapDeveloperMode, initially false. setWor
 Protected code paths include mapEditorMarkup/bindWorldMapEditor, academyCanvasEditorMarkup/bindAcademyCanvasEditor, isometricEditorMarkup/bindIsoAreaEditor, editor-open and test-isometric actions, and direct click targets for editor canvas/markers/controls.
 
 When Developer Mode is false, editor markup is not rendered, binders do not activate, and direct editor actions are rejected. On sign-out, mounted editor controls are removed and editor pause classes are cleared. Do not weaken this to CSS-only hiding.
+
+### Camera focus contract — Player entry vs editor CENTER MAP
+
+These are separate controls with separate sources:
+
+- **Enter Academy:** center the initial view on the Player token. The default Academy spawn is cell `(12,31)`; use the token's current fractional map position when available. Apply Academy artwork scale and expanded-canvas margins to that token coordinate.
+- **CENTER MAP:** center the editor view on the explicit focal point saved in `cameraCenter` (Map Base pixel coordinates). If no focal point has been confirmed, use the automatic midpoint fallback.
+- Saving a new `cameraCenter` must immediately update the editor's CENTER MAP result, but it must not change the Player's world position or redefine the Player-entry focus.
+
+Do not make Academy entry read `cameraCenter`, and do not make CENTER MAP follow the Player automatically.
 
 ### Field-tool window behavior
 
