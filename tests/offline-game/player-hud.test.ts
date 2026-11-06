@@ -6,35 +6,74 @@ import {
 } from "../../src/offline-game/player-hud";
 
 const hudStyles=readFileSync(new URL("../../src/offline-game/player-hud.css",import.meta.url),"utf8");
+const worldStyles=readFileSync(new URL("../../src/offline-game/world-map-hierarchy.css",import.meta.url),"utf8");
 const hudMotionSource=readFileSync(new URL("../../src/offline-game/player-hud.ts",import.meta.url),"utf8");
+const worldMapSource=readFileSync(new URL("../../src/offline-game/world-map-hierarchy.ts",import.meta.url),"utf8");
 
-describe("in-world player HUD preview",()=>{
-  it("renders identity, status, affiliation, skill tiers and test inventory",()=>{
+describe("in-world player HUD and Traveler Satchel",()=>{
+  it("renders text-only character status and the approved 25-slot inventory",()=>{
     const html=renderPlayerHudMarkup();
-    expect(html).toContain("WORLD ATLAS · PLAYER");
-    expect(html).toContain("SPIRIT REALM");
+    expect(html).toContain('class="wmh-player-card"');
+    expect(html).toContain('class="wmh-player-topline"');
+    expect(html).toContain('class="wmh-player-bottomline"');
+    expect(html).toContain("MORTAL");
     expect(html).toContain("AFFILIATION");
-    expect(html).toContain("Clan · Sect · Trade Guild · Assassin Guild · Empire Unit");
-    expect((html.match(/class="wmh-skill-slot"/g)||[]).length).toBe(4);
-    expect(html).toContain('data-realm-tier="1"');
-    expect(html).toContain('data-realm-tier="4"');
-    expect(html).toContain("SR 1 · SPIRIT INITIATE");
-    expect(html).toContain("TURN-BASED · TIME ORDER NOT CONNECTED");
-    expect(html).toContain('data-hud-panel="quests"');
-    expect(html).toContain('data-hud-panel="social"');
-    expect((html.match(/data-hud-action="consume"/g)||[]).length).toBe(3);
-    expect(html).toContain("NON-CANON FIXTURE");
-    expect(html).toContain("×999");
+    expect((html.match(/class="wmh-inventory-slot/g)||[]).length).toBe(25);
+    expect((html.match(/data-hud-item-id=/g)||[]).length).toBe(9);
+    expect(html).toContain("Field Ration");
+    expect(html).toContain("Bread");
+    expect(html).toContain("Wood");
+    expect(html).toContain("data-hud-item-tooltip");
+    expect(html).toContain("data-hud-consume-dialog");
   });
-  it("renders independent movable HUD layers with default placement keys",()=>{
+
+  it("keeps currency in a separate purse with all five official denominations",()=>{
     const html=renderPlayerHudMarkup();
-    expect(html).toContain('data-wmh-hud-layout="player-card"');
-    expect(html).toContain('data-wmh-hud-layout="skill-dock"');
-    expect(html).toContain('class="wmh-player-dock"');
-    expect(html).not.toContain('background:linear-gradient(145deg,#111d17f2');
+    for(const code of ["xc","xs","xg","zj","az"])expect(html).toContain('data-hud-currency="'+code+'"');
+    expect(html).toContain("CURRENCY PURSE");
+    expect(html).toContain("0 xc");
+    expect(html).toContain("0 xs");
+    expect(html).toContain("0 xg");
   });
-  it("uses compact blur-free instruments and tiered CSS ring rotation",()=>{
-    expect(hudStyles).toContain("backdrop-filter:none!important");
+
+  it("renders tier frames inside item slots and tiny item glyphs",()=>{
+    const html=renderPlayerHudMarkup();
+    expect(html).toContain('class="wmh-item-tier-frame"');
+    expect(html).toContain('data-tier="1"');
+    expect(html).toContain('data-tier="2"');
+    expect(hudStyles).toContain(".wmh-item-tier-frame");
+    expect(hudStyles).toContain(".wmh-item-icon");
+    expect(hudStyles).toContain(".wmh-item-quantity");
+  });
+
+  it("uses hold tooltip and consumption-only confirmation interactions",()=>{
+    expect(hudMotionSource).toContain("pointerdown");
+    expect(hudMotionSource).toContain("420");
+    expect(hudMotionSource).toContain('kind==="inventory-item"');
+    expect(hudMotionSource).toContain('item.kind!=="consumable"');
+    expect(hudMotionSource).toContain('kind==="confirm-consume"');
+    expect(hudMotionSource).toContain('kind==="cancel-consume"');
+    expect(hudMotionSource).toContain("Material items are reserved for trade or Home construction");
+  });
+
+  it("renders a draggable minimap window and low-opacity top information strip",()=>{
+    expect(worldMapSource).toContain("wmh-minimap-toggle");
+    expect(worldMapSource).toContain("wmh-minimap-window");
+    expect(worldMapSource).toContain("data-wmh-minimap-drag-handle");
+    expect(worldMapSource).toContain("pointermove");
+    expect(worldStyles).toContain(".wmh-top-info");
+    expect(worldStyles).toContain("rgba(13,17,13,.24)");
+  });
+
+  it("applies internal scrolling and touch resizing to long windows",()=>{
+    expect(hudMotionSource).toContain("bindScrollableResizableWindows");
+    expect(hudMotionSource).toContain("wmh-window-resize-handle");
+    expect(hudStyles).toContain(".wmh-scroll-resize-window");
+    expect(hudStyles).toContain("resize:both!important");
+    expect(worldMapSource).toContain("bindScrollableResizableWindows(dialog)");
+  });
+
+  it("keeps tactical ring animation lightweight and pauses it when hidden",()=>{
     expect(hudStyles).toContain("@keyframes wmh-hud-ring-spin");
     expect(hudStyles).toContain("--ring-speed:42s");
     expect(hudStyles).toContain(".wmh-player-hud.wmh-hud-motion-paused");
@@ -42,6 +81,7 @@ describe("in-world player HUD preview",()=>{
     expect(hudMotionSource).not.toContain('import { animate, createScope } from "animejs"');
     expect(hudMotionSource).not.toContain("animate(ring");
   });
+
   it("decreases Mortal Satiety by the official one-hour awake LIGHT interval",()=>{
     const initial=createDefaultPlayerHudPreviewState(),result=simulatePlayerHudPreviewAwakeHour(initial);
     expect(result.valid).toBe(true);
@@ -49,17 +89,27 @@ describe("in-world player HUD preview",()=>{
     expect(result.state.satiety).toBeCloseTo(80-(100/24*1.25),8);
     expect(initial.satiety).toBe(80);
   });
-  it("consumes test portions through official portion gains and caps Satiety at 100",()=>{
+
+  it("consumes test food through official portion gains and caps Satiety at 100",()=>{
     const initial=createDefaultPlayerHudPreviewState(),small=consumePlayerHudPreviewItem(initial,"ration-small");
     expect(small.valid).toBe(true);expect(small.gain).toBe(10);expect(small.state.satiety).toBe(90);
-    expect(small.state.items["ration-small"]).toBe(998);
+    expect(small.state.items["ration-small"]).toBe(4);
     const large=consumePlayerHudPreviewItem(small.state,"ration-large");
     expect(large.valid).toBe(true);expect(large.gain).toBe(10);expect(large.state.satiety).toBe(100);
-    expect(large.state.items["ration-large"]).toBe(998);
+    expect(large.state.items["ration-large"]).toBe(1);
   });
-  it("does not consume an unknown item or a depleted stack",()=>{
+
+  it("rejects material use, unknown items and depleted consumable stacks",()=>{
     const initial=createDefaultPlayerHudPreviewState();
+    expect(consumePlayerHudPreviewItem(initial,"wood").valid).toBe(false);
     expect(consumePlayerHudPreviewItem(initial,"unlisted-item").valid).toBe(false);
     expect(consumePlayerHudPreviewItem({...initial,items:{"ration-small":0}},"ration-small").valid).toBe(false);
+  });
+
+  it("keeps HUD fields transparent and moves Back clear of the Arcanistry machine",()=>{
+    expect(hudStyles).toContain("background:transparent!important;border:0!important");
+    expect(worldStyles).toContain(".has-archanistry-machine .wmh-map-back");
+    expect(worldMapSource).toContain("data-arcanistry-machine");
+    expect(worldMapSource).toContain("wmh-machine-back-offset");
   });
 });

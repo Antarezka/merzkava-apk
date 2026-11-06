@@ -2,18 +2,28 @@ import { getEternalSave } from "./expedition-game";
 import { applySatietyIntake, calculateSatietyInterval, getPortionSatietyGain, type SatietyPortion } from "./mechanics/satiety";
 
 export interface PlayerHudPreviewState {
-  hp: number; maxHp: number; satiety: number; items: Record<string, number>;
+  hp:number; maxHp:number; satiety:number;
+  items:Record<string,number>;
+  wallet:Record<"xc"|"xs"|"xg"|"zj"|"az",number>;
 }
-const TEST_ITEMS: ReadonlyArray<{id:string;label:string;portion:SatietyPortion;description:string}> = [
-  {id:"ration-small",label:"Field ration · Small",portion:"SMALL",description:"Test portion · +10 Satiety maximum"},
-  {id:"ration-standard",label:"Field ration · Standard",portion:"STANDARD",description:"Test portion · +34 Satiety maximum"},
-  {id:"ration-large",label:"Field ration · Large",portion:"LARGE",description:"Test portion · +50 Satiety maximum"}
+type HudItem={id:string;label:string;glyph:string;tier:number;kind:"consumable"|"material";description:string;portion?:SatietyPortion};
+const TEST_ITEMS:ReadonlyArray<HudItem>=[
+  {id:"ration-small",label:"Field Ration · Small",glyph:"🍖",tier:1,kind:"consumable",portion:"SMALL",description:"A compact travel ration prepared for short journeys. Commonly carried by students, couriers, and ordinary travelers."},
+  {id:"ration-standard",label:"Field Ration · Standard",glyph:"🥩",tier:1,kind:"consumable",portion:"STANDARD",description:"A balanced preserved meal suited to a longer day on the road. Often prepared by inns and supply merchants."},
+  {id:"ration-large",label:"Field Ration · Large",glyph:"🍱",tier:1,kind:"consumable",portion:"LARGE",description:"A generous travel meal intended for demanding journeys. Usually packed before expeditions or extended travel."},
+  {id:"bread",label:"Bread",glyph:"🍞",tier:1,kind:"consumable",portion:"SMALL",description:"A simple baked staple that keeps well for ordinary travel. Commonly bought from bakeries and market stalls."},
+  {id:"apple",label:"Apple",glyph:"🍎",tier:1,kind:"consumable",portion:"SMALL",description:"A fresh piece of fruit gathered from orchards or purchased from local produce sellers."},
+  {id:"wood",label:"Wood",glyph:"🪵",tier:1,kind:"material",description:"Cut timber used as a basic construction and workshop material. Usually gathered through woodcutting or collected from suitable natural sources."},
+  {id:"stone",label:"Stone",glyph:"🪨",tier:1,kind:"material",description:"Common stone used in simple building work and material preparation. Often collected from exposed deposits or quarry sites."},
+  {id:"herb",label:"Herbs",glyph:"🌿",tier:2,kind:"material",description:"A bundle of useful field herbs valued by apothecaries and makers. They are commonly gathered in suitable wild habitats."},
+  {id:"potion",label:"Restorative Draught",glyph:"🧪",tier:2,kind:"consumable",portion:"SMALL",description:"A small prepared restorative mixture carried for emergencies. Its precise effects depend on the verified formula and item record."}
 ];
-const STORAGE_PREFIX="merzkava.player-hud-preview.v1:";
-const DEFAULT_ITEMS:Record<string,number>={"ration-small":999,"ration-standard":999,"ration-large":999};
+const STORAGE_PREFIX="merzkava.player-hud-preview.v2:";
+const DEFAULT_ITEMS:Record<string,number>={"ration-small":5,"ration-standard":3,"ration-large":2,bread:3,apple:4,wood:8,stone:12,herb:6,potion:2};
+const DEFAULT_WALLET={xc:0,xs:0,xg:0,zj:0,az:0};
 
 export function createDefaultPlayerHudPreviewState():PlayerHudPreviewState {
-  return {hp:100,maxHp:100,satiety:80,items:{...DEFAULT_ITEMS}};
+  return {hp:100,maxHp:100,satiety:80,items:{...DEFAULT_ITEMS},wallet:{...DEFAULT_WALLET}};
 }
 function storageKey():string {
   const saveId=getEternalSave()?.saveId??"unbound-world-atlas-preview";
@@ -30,12 +40,18 @@ function normalizeState(value:unknown):PlayerHudPreviewState {
     const raw=(rawItems as Record<string,unknown>)[item.id],count=Number(raw);
     if(raw!==undefined&&Number.isInteger(count)&&count>=0&&count<=999)items[item.id]=count;
   }
+  const rawWallet=source.wallet&&typeof source.wallet==="object"?source.wallet:{};
+  const wallet={...DEFAULT_WALLET};
+  for(const key of Object.keys(wallet) as Array<keyof typeof wallet>){
+    const count=Number((rawWallet as Record<string,unknown>)[key]);
+    if(Number.isInteger(count)&&count>=0&&count<=999999999)wallet[key]=count;
+  }
   const safeMax=Number.isFinite(maxHp)&&maxHp>0?Math.min(999999,maxHp):100;
   return {
     hp:Number.isFinite(hp)?Math.max(0,Math.min(safeMax,hp)):100,
     maxHp:safeMax,
     satiety:Number.isFinite(satiety)?Math.max(0,Math.min(100,satiety)):80,
-    items
+    items,wallet
   };
 }
 export function readPlayerHudPreviewState():PlayerHudPreviewState {
@@ -60,11 +76,12 @@ export function simulatePlayerHudPreviewAwakeHour(state:PlayerHudPreviewState):{
 }
 export function consumePlayerHudPreviewItem(state:PlayerHudPreviewState,itemId:string):{state:PlayerHudPreviewState;gain:number;valid:boolean} {
   const item=TEST_ITEMS.find(candidate=>candidate.id===itemId);
-  if(!item||state.items[itemId]<=0)return {state:{...state,items:{...state.items}},gain:0,valid:false};
+  if(!item||item.kind!=="consumable"||!item.portion||state.items[itemId]<=0)
+    return {state:{...state,items:{...state.items},wallet:{...state.wallet}},gain:0,valid:false};
   const intake=applySatietyIntake(state.satiety,getPortionSatietyGain(item.portion));
-  if(!intake.valid)return {state:{...state,items:{...state.items}},gain:0,valid:false};
+  if(!intake.valid)return {state:{...state,items:{...state.items},wallet:{...state.wallet}},gain:0,valid:false};
   return {
-    state:{...state,satiety:intake.after,items:{...state.items,[itemId]:state.items[itemId]-1}},
+    state:{...state,satiety:intake.after,items:{...state.items,[itemId]:state.items[itemId]-1},wallet:{...state.wallet}},
     gain:intake.actualGain,valid:true
   };
 }
@@ -78,19 +95,34 @@ function meterMarkup(label:string,value:number,max:number,kind:"hp"|"satiety"):s
 export function renderPlayerHudMarkup():string {
   const state=readPlayerHudPreviewState();
   const name=getEternalSave()?.character.name?.trim()||"PLAYER";
-  const items=TEST_ITEMS.map(item=>'<button type="button" class="wmh-inventory-item" data-hud-action="consume" data-item-id="'+item.id+'" aria-label="Consume '+item.label+'"><span class="wmh-inventory-glyph" aria-hidden="true">✧</span><span class="wmh-inventory-copy"><b>'+item.label+'</b><small>'+item.description+'</small></span><strong data-hud-item-count="'+item.id+'">×'+state.items[item.id]+'</strong></button>').join("");
+  const ringMarkup=[1,2,3,4].map(index=>'<div class="wmh-spirit-ring" data-realm-tier="'+index+'" aria-label="Spirit Ring preview slot '+index+'"><span class="wmh-spirit-ring-orbit"><i></i></span><b>SR'+index+'</b></div>').join("");
   const skills=["Technique","Guard","Movement","Spirit Art"],realms=["SPIRIT INITIATE","SPIRIT ADEPT","SPIRIT ELDER","SPIRIT MONARCH"];
-  const skillMarkup=skills.map((skill,index)=>'<button type="button" class="wmh-skill-slot" data-hud-action="skill" data-skill-slot="'+(index+1)+'" data-realm-tier="'+(index+1)+'" aria-label="Skill slot '+(index+1)+', Spirit Realm '+(index+1)+', placeholder"><span class="wmh-skill-ring" data-hud-ring aria-hidden="true"><i data-hud-ring-inner></i><b></b></span><small class="wmh-skill-realm">SR '+(index+1)+' · '+realms[index]+'</small><strong>'+skill+'</strong><em>PLACEHOLDER</em></button>').join("");
+  const skillMarkup=skills.map((skill,index)=>'<button type="button" class="wmh-skill-slot" data-hud-action="skill" data-skill-slot="'+(index+1)+'" data-realm-tier="'+(index+1)+'" aria-label="Skill slot '+(index+1)+' placeholder"><span class="wmh-skill-ring" aria-hidden="true"><i></i><b></b></span><small class="wmh-skill-realm">SR '+(index+1)+' · '+realms[index]+'</small><strong>'+skill+'</strong></button>').join("");
+  const itemsMarkup=Array.from({length:25},(_,index)=>{
+    const item=TEST_ITEMS[index];
+    if(!item)return '<div class="wmh-inventory-slot is-empty" data-slot="'+String(index+1).padStart(2,"0")+'" aria-label="Empty inventory slot '+(index+1)+'"><span>'+String(index+1).padStart(2,"0")+'</span></div>';
+    return '<button type="button" class="wmh-inventory-slot wmh-inventory-item" data-hud-action="inventory-item" data-hud-item-id="'+item.id+'" data-item-kind="'+item.kind+'" aria-label="'+esc(item.label)+' · quantity '+state.items[item.id]+'"><span class="wmh-item-tier-frame" data-tier="'+item.tier+'"><span class="wmh-item-icon" aria-hidden="true">'+item.glyph+'</span></span><strong class="wmh-item-quantity" data-hud-item-count="'+item.id+'">×'+state.items[item.id]+'</strong></button>';
+  }).join("");
+  const currency=[["xc","Xuan Copper","●"],["xs","Xuan Silver","◉"],["xg","Xuan Gold","✦"],["zj","Zun Jade","◆"],["az","Ancient Zun","◇"]] as const;
+  const currencyMarkup=currency.map(([key,label,glyph])=>'<div class="wmh-currency-row"><span class="wmh-currency-name"><i aria-hidden="true">'+glyph+'</i>'+label+'</span><b class="wmh-currency-amount" data-hud-currency="'+key+'">'+state.wallet[key]+' '+key+'</b></div>').join("");
   return '<section class="wmh-player-hud" data-wmh-player-hud aria-label="Player field status">'+
-    '<article class="wmh-player-card" data-wmh-hud-layout="player-card" aria-label="Player identity and status"><header class="wmh-player-hud-header"><span class="wmh-player-crest" aria-hidden="true">✦</span><div class="wmh-player-id"><small>WORLD ATLAS · PLAYER</small><strong data-hud-character-name>'+esc(name)+'</strong><em>PREVIEW PROFILE · NOT CANON STATE</em></div><div class="wmh-player-realm"><small>SPIRIT REALM</small><b>MORTAL</b></div></header>'+
-    '<div class="wmh-player-vitals">'+meterMarkup("HP",state.hp,state.maxHp,"hp")+meterMarkup("SATIETY",state.satiety,100,"satiety")+'</div>'+
-    '<div class="wmh-player-affiliation"><span><small>AFFILIATION</small><b>NOT LINKED</b></span><em>Clan · Sect · Trade Guild · Assassin Guild · Empire Unit</em></div>'+
-    '<div class="wmh-player-hud-actions"><button type="button" data-hud-action="open-panel" data-hud-panel-open="quests">✦ QUEST BOARD <small>MAIN / SIDE</small></button><button type="button" data-hud-action="open-panel" data-hud-panel-open="social">◎ SOCIAL LINKS <small>RELATIONSHIPS</small></button><button type="button" data-hud-action="advance-hour">SIMULATE 1H <small>AWAKE · LIGHT</small></button></div>'+
-    '<small class="wmh-player-hud-feedback" data-hud-feedback aria-live="polite">Preview data. Satiety formula is active; inventory and profile bindings are placeholders.</small>'+
-    '<section class="wmh-hud-drawer" data-hud-panel="quests" hidden role="dialog" aria-label="Quest board placeholder"><header><b>QUEST BOARD</b><button type="button" data-hud-action="close-panels" aria-label="Close quest board">×</button></header><article class="wmh-quest-preview"><small>MAIN QUEST · NOT CONNECTED</small><strong>Awaiting a verified world objective</strong><p>The quest resolver and recorded objectives are not wired into this field HUD yet.</p></article><article class="wmh-quest-preview"><small>SIDE QUEST · NOT CONNECTED</small><strong>No recorded side objective</strong><p>Quest rewards and time costs remain inactive placeholders.</p></article></section>'+
-    '<section class="wmh-hud-drawer wmh-social-drawer" data-hud-panel="social" hidden role="dialog" aria-label="Social links placeholder"><header><b>SOCIAL LINKS</b><button type="button" data-hud-action="close-panels" aria-label="Close social links">×</button></header><p class="wmh-social-intro">PERSONA-INSPIRED RELATIONSHIP BOARD · PREVIEW ONLY</p>'+
-    '<div class="wmh-social-card"><span>01</span><div><b>NEARBY NPC</b><small>RELATIONSHIP UNINITIALIZED</small></div><meter min="0" max="100" value="0"></meter></div><div class="wmh-social-card"><span>02</span><div><b>KNOWN CONTACT</b><small>NO RECORDED SOCIAL LINK</small></div><meter min="0" max="100" value="0"></meter></div><div class="wmh-social-card"><span>03</span><div><b>FACTION CONTACT</b><small>NO AFFILIATION BINDING</small></div><meter min="0" max="100" value="0"></meter></div><small class="wmh-social-foot">No disposition, bond or NPC agenda is changed by this preview.</small></section></article>'+
-    '<section class="wmh-player-dock" data-wmh-hud-layout="skill-dock" aria-label="Combat and inventory quick slots"><div class="wmh-skill-dock"><header><b>TACTICAL SKILLS</b><small>TURN-BASED · TIME ORDER NOT CONNECTED</small></header><div class="wmh-skill-slots">'+skillMarkup+'</div></div><div class="wmh-inventory-dock"><header><b>INVENTORY · TEST ITEMS</b><small>NON-CANON FIXTURE · ×999</small></header><div class="wmh-inventory-slots">'+items+'</div></div></section></section>';
+    '<article class="wmh-player-card" data-wmh-hud-layout="player-card" aria-label="Player status">'+
+      '<div class="wmh-player-topline"><div class="wmh-player-id"><strong data-hud-character-name>'+esc(name)+'</strong></div><div class="wmh-player-satiety-label">SATIETY</div><div class="wmh-player-realm"><b>MORTAL</b></div></div>'+
+      '<div class="wmh-player-bottomline"><div class="wmh-player-hp">'+meterMarkup("HP",state.hp,state.maxHp,"hp")+'</div><div class="wmh-player-satiety">'+meterMarkup("",state.satiety,100,"satiety")+'</div><div class="wmh-player-affiliation"><small>AFFILIATION</small><b>NOT LINKED</b></div></div>'+
+    '</article>'+
+    '<aside class="wmh-spirit-ring-list" aria-label="Absorbed Spirit Rings, maximum nine">'+ringMarkup+'</aside>'+
+    '<section class="wmh-player-dock" data-wmh-hud-layout="skill-dock" aria-label="Tactical skills and bag"><div class="wmh-skill-dock"><header><b>TACTICAL SKILLS</b><small>PLACEHOLDER</small></header><div class="wmh-skill-slots">'+skillMarkup+'</div></div>'+
+      '<button type="button" class="wmh-bag-button" data-hud-action="toggle-inventory" aria-label="Open Traveler Satchel" title="Traveler Satchel"><span aria-hidden="true"></span></button>'+
+    '</section>'+
+    '<section class="wmh-inventory-window" data-hud-panel="inventory" data-wmh-scroll-resize hidden role="dialog" aria-label="Traveler Satchel inventory">'+
+      '<header class="wmh-inventory-header"><div><b>TRAVELER\'S SATCHEL</b><small>PERSONAL INVENTORY · <span data-hud-capacity>9 / 25</span></small></div><button type="button" data-hud-action="close-inventory" aria-label="Close inventory">×</button></header>'+
+      '<small class="wmh-player-hud-feedback" data-hud-feedback role="status" aria-live="polite"></small>'+
+      '<div class="wmh-inventory-grid">'+itemsMarkup+'</div>'+
+      '<section class="wmh-currency-purse"><header class="wmh-currency-header"><b>◈ CURRENCY PURSE</b><small>SEPARATE STORAGE</small></header><div class="wmh-currency-list">'+currencyMarkup+'</div></section>'+
+    '</section>'+
+    '<section class="wmh-item-tooltip" data-hud-item-tooltip hidden role="tooltip"><header><b data-tooltip-name></b><span data-tooltip-tier></span></header><p data-tooltip-description></p></section>'+
+    '<section class="wmh-item-action-dialog" data-hud-consume-dialog hidden data-wmh-scroll-resize role="dialog" aria-label="Use item confirmation"><div class="wmh-item-action-copy"><b data-consume-name></b><small data-consume-quantity></small></div><p>Ingin menggunakan item ini?</p><div class="wmh-item-action-buttons"><button type="button" data-hud-action="confirm-consume">YES</button><button type="button" class="cancel" data-hud-action="cancel-consume">NO</button></div></section>'+
+  '</section>';
 }
 export function refreshPlayerHud(root:HTMLElement,feedback?:string):void {
   const hud=root.matches("[data-wmh-player-hud]")?root:root.querySelector<HTMLElement>("[data-wmh-player-hud]");
@@ -107,38 +139,53 @@ export function refreshPlayerHud(root:HTMLElement,feedback?:string):void {
   update("hp",state.hp,state.maxHp);update("satiety",state.satiety,100);
   for(const item of TEST_ITEMS){
     const count=hud.querySelector<HTMLElement>('[data-hud-item-count="'+item.id+'"]');
-    const button=hud.querySelector<HTMLButtonElement>('[data-item-id="'+item.id+'"]');
+    const button=hud.querySelector<HTMLButtonElement>('[data-hud-item-id="'+item.id+'"]');
     if(count)count.textContent="×"+state.items[item.id];
-    if(button)button.disabled=state.items[item.id]<=0;
+    if(button){button.disabled=state.items[item.id]<=0;button.setAttribute("aria-label",item.label+" · quantity "+state.items[item.id]);}
   }
+  for(const key of Object.keys(state.wallet) as Array<keyof typeof state.wallet>){
+    const node=hud.querySelector<HTMLElement>('[data-hud-currency="'+key+'"]');
+    if(node)node.textContent=state.wallet[key]+" "+key;
+  }
+  const capacity=hud.querySelector<HTMLElement>("[data-hud-capacity]");
+  if(capacity)capacity.textContent=String(TEST_ITEMS.filter(item=>state.items[item.id]>0).length)+" / 25";
   if(feedback){const note=hud.querySelector<HTMLElement>("[data-hud-feedback]");if(note)note.textContent=feedback;}
 }
 export function handlePlayerHudClick(target:Element,dialog:HTMLElement):boolean {
   const action=target.closest<HTMLElement>("[data-hud-action]");
   const hud=dialog.querySelector<HTMLElement>("[data-wmh-player-hud]");
   if(!action||!hud||!hud.contains(action))return false;
+  if(action.dataset.skipNextClick==="true"){delete action.dataset.skipNextClick;return true;}
   const kind=action.dataset.hudAction;
-  if(kind==="open-panel"){
-    const name=action.dataset.hudPanelOpen;
-    hud.querySelectorAll<HTMLElement>("[data-hud-panel]").forEach(panel=>{panel.hidden=panel.dataset.hudPanel!==name;});
+  const inventory=hud.querySelector<HTMLElement>('[data-hud-panel="inventory"]');
+  const consumeDialog=hud.querySelector<HTMLElement>("[data-hud-consume-dialog]");
+  if(kind==="toggle-inventory"){if(inventory)inventory.hidden=!inventory.hidden;return true;}
+  if(kind==="close-inventory"){if(inventory)inventory.hidden=true;return true;}
+  if(kind==="inventory-item"){
+    const item=TEST_ITEMS.find(candidate=>candidate.id===action.dataset.hudItemId);
+    if(!item)return true;
+    if(item.kind!=="consumable"||!item.portion){refreshPlayerHud(dialog,"Material items are reserved for trade or Home construction, not consumption.");return true;}
+    if(consumeDialog){
+      consumeDialog.dataset.itemId=item.id;
+      const name=consumeDialog.querySelector<HTMLElement>("[data-consume-name]");
+      const quantity=consumeDialog.querySelector<HTMLElement>("[data-consume-quantity]");
+      if(name)name.textContent=item.label;
+      if(quantity)quantity.textContent="QUANTITY · "+readPlayerHudPreviewState().items[item.id];
+      consumeDialog.hidden=false;
+    }
     return true;
   }
-  if(kind==="close-panels"){hud.querySelectorAll<HTMLElement>("[data-hud-panel]").forEach(panel=>{panel.hidden=true;});return true;}
+  if(kind==="cancel-consume"){if(consumeDialog)consumeDialog.hidden=true;return true;}
+  if(kind==="confirm-consume"){
+    const itemId=consumeDialog?.dataset.itemId||"";
+    const result=consumePlayerHudPreviewItem(readPlayerHudPreviewState(),itemId);
+    if(consumeDialog)consumeDialog.hidden=true;
+    if(!result.valid){refreshPlayerHud(dialog,"This item cannot be used or no quantity remains.");return true;}
+    writePlayerHudPreviewState(result.state);
+    refreshPlayerHud(dialog,"Item used · Satiety +"+result.gain.toFixed(1)+". Preview inventory only.");
+    return true;
+  }
   if(kind==="skill"){refreshPlayerHud(dialog,"SKILL SLOT "+(action.dataset.skillSlot||"?")+" · Placeholder only. Combat resolution is not connected.");return true;}
-  if(kind==="advance-hour"){
-    const result=simulatePlayerHudPreviewAwakeHour(readPlayerHudPreviewState());
-    if(!result.valid){refreshPlayerHud(dialog,"Satiety preview could not be calculated.");return true;}
-    writePlayerHudPreviewState(result.state);
-    refreshPlayerHud(dialog,"1 awake hour · LIGHT ×1.25 · Satiety −"+result.drain.toFixed(1)+" (official formula preview; world clock unchanged).");
-    return true;
-  }
-  if(kind==="consume"){
-    const result=consumePlayerHudPreviewItem(readPlayerHudPreviewState(),action.dataset.itemId||"");
-    if(!result.valid){refreshPlayerHud(dialog,"No test portion remains in that slot.");return true;}
-    writePlayerHudPreviewState(result.state);
-    refreshPlayerHud(dialog,"Test portion consumed · Satiety +"+result.gain.toFixed(1)+" · non-canon test inventory.");
-    return true;
-  }
   return false;
 }
 const motionScopes=new WeakMap<HTMLElement,()=>void>();
@@ -148,6 +195,8 @@ export function mountPlayerHudMotion(root:HTMLElement):void {
   const sync=()=>hud.classList.toggle("wmh-hud-motion-paused",document.hidden);
   sync();
   document.addEventListener("visibilitychange",sync,{passive:true});
+  bindPlayerHudInteractions(hud);
+  bindScrollableResizableWindows(root);
   motionScopes.set(hud,()=>{
     document.removeEventListener("visibilitychange",sync);
     hud.classList.remove("wmh-hud-motion-paused");
@@ -157,7 +206,93 @@ export function disposePlayerHudMotion(root:HTMLElement):void {
   const hud=root.matches("[data-wmh-player-hud]")?root:root.querySelector<HTMLElement>("[data-wmh-player-hud]");
   if(!hud)return;
   motionScopes.get(hud)?.();
+  hudInteractionScopes.get(hud)?.();
   motionScopes.delete(hud);
+  hudInteractionScopes.delete(hud);
+}
+const hudInteractionScopes=new WeakMap<HTMLElement,()=>void>();
+function bindPlayerHudInteractions(hud:HTMLElement):void {
+  if(hudInteractionScopes.has(hud))return;
+  const tooltip=hud.querySelector<HTMLElement>("[data-hud-item-tooltip]");
+  if(!tooltip)return;
+  let timer:number|undefined,active:HTMLButtonElement|null=null,held=false;
+  const clear=()=>{if(timer!==undefined){window.clearTimeout(timer);timer=undefined;}};
+  const hide=()=>{tooltip.hidden=true;};
+  const show=(button:HTMLButtonElement,item:HudItem)=>{
+    const name=tooltip.querySelector<HTMLElement>("[data-tooltip-name]");
+    const tier=tooltip.querySelector<HTMLElement>("[data-tooltip-tier]");
+    const description=tooltip.querySelector<HTMLElement>("[data-tooltip-description]");
+    if(name)name.textContent=item.label;
+    if(tier)tier.textContent="TIER "+item.tier;
+    if(description)description.textContent=item.description;
+    tooltip.hidden=false;
+    const rect=button.getBoundingClientRect();
+    const width=Math.min(230,window.innerWidth-16);
+    tooltip.style.left=Math.max(8,Math.min(window.innerWidth-width-8,rect.left))+"px";
+    tooltip.style.top=Math.max(8,rect.top-tooltip.offsetHeight-8)+"px";
+  };
+  const down=(event:PointerEvent)=>{
+    const button=(event.target instanceof Element?event.target.closest<HTMLButtonElement>("[data-hud-item-id]"):null);
+    if(!button||event.pointerType==="mouse"&&event.button!==0)return;
+    const item=TEST_ITEMS.find(candidate=>candidate.id===button.dataset.hudItemId);
+    if(!item)return;
+    clear();active=button;held=false;
+    timer=window.setTimeout(()=>{if(active!==button)return;held=true;show(button,item);},420);
+  };
+  const up=()=>{
+    clear();
+    if(held&&active){const pressed=active;pressed.dataset.skipNextClick="true";window.setTimeout(()=>{if(pressed.dataset.skipNextClick==="true")delete pressed.dataset.skipNextClick;},0);hide();}
+    active=null;held=false;
+  };
+  hud.addEventListener("pointerdown",down);
+  hud.addEventListener("pointerup",up);
+  hud.addEventListener("pointercancel",up);
+  hud.addEventListener("pointerleave",up);
+  hud.addEventListener("contextmenu",event=>{if((event.target as Element|null)?.closest("[data-hud-item-id]"))event.preventDefault();});
+  hudInteractionScopes.set(hud,()=>{clear();hide();hud.removeEventListener("pointerdown",down);hud.removeEventListener("pointerup",up);hud.removeEventListener("pointercancel",up);hud.removeEventListener("pointerleave",up);});
+}
+const scrollResizeScopes=new WeakSet<HTMLElement>();
+export function bindScrollableResizableWindows(root:HTMLElement):void {
+  const selector='[data-wmh-scroll-resize],[role="dialog"]:not(.wmh-chat-panel):not(.wmh-transition-dialog):not(.wmh-transition-notice):not([data-wmh-dialog]),.wmh-hud-drawer,.wmh-minimap-window,.wmh-inventory-window,.wmh-chat-card,.wmh-transition-dialog-card,.wmh-transition-notice-card,.wmh-academy-canvas-editor,.noticeboard-panel,.preference-panel,.registry-profile,.wmh-floating-panel,.wmh-panel-window';
+  const panels=[...(root.matches(selector)?[root]:[]),...Array.from(root.querySelectorAll<HTMLElement>(selector))];
+  for(const panel of panels){
+    if(scrollResizeScopes.has(panel))continue;
+    scrollResizeScopes.add(panel);
+    panel.classList.add("wmh-scroll-resize-window");
+    panel.style.maxHeight="min(82dvh,720px)";
+    panel.style.overflowY="auto";
+    panel.style.overscrollBehavior="contain";
+    panel.style.setProperty("-webkit-overflow-scrolling","touch");
+    panel.style.resize="both";
+    panel.style.minWidth="min(210px,82vw)";
+    panel.style.minHeight="110px";
+    let handle=panel.querySelector<HTMLElement>(":scope > [data-wmh-window-resize]");
+    if(!handle){
+      handle=document.createElement("span");
+      handle.className="wmh-window-resize-handle";
+      handle.dataset.wmhWindowResize="";
+      handle.setAttribute("role","presentation");
+      handle.setAttribute("aria-hidden","true");
+      panel.append(handle);
+    }
+    let start:{x:number;y:number;width:number;height:number}|null=null;
+    handle.addEventListener("pointerdown",event=>{
+      event.preventDefault();event.stopPropagation();
+      const rect=panel.getBoundingClientRect();
+      start={x:event.clientX,y:event.clientY,width:rect.width,height:rect.height};
+      handle!.setPointerCapture?.(event.pointerId);
+    });
+    handle.addEventListener("pointermove",event=>{
+      if(!start)return;
+      const maxWidth=Math.max(210,Math.min(window.innerWidth-16,panel.parentElement?.clientWidth||window.innerWidth-16));
+      const maxHeight=Math.max(110,Math.min(window.innerHeight*.86,window.innerHeight-16));
+      panel.style.width=Math.max(210,Math.min(maxWidth,start.width+event.clientX-start.x))+"px";
+      panel.style.height=Math.max(110,Math.min(maxHeight,start.height+event.clientY-start.y))+"px";
+    });
+    const finish=()=>{start=null;};
+    handle.addEventListener("pointerup",finish);
+    handle.addEventListener("pointercancel",finish);
+  }
 }
 type PlayerHudLayoutPoint={x:number;y:number;scale:number};
 type PlayerHudLayoutGesture={
@@ -181,7 +316,7 @@ export function bindPlayerHudLayoutEditor(dialog:HTMLElement):void {
   const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
   const mapId=board?.dataset.mapId||"default";
   const storageKey="merzkava.rpg-hud-layout.v1:"+encodeURIComponent(mapId);
-  const elements=Array.from(hud.querySelectorAll<HTMLElement>("[data-wmh-hud-layout]"));
+  const elements=Array.from(dialog.querySelectorAll<HTMLElement>("[data-wmh-hud-layout]"));
   const editor=dialog.querySelector<HTMLElement>("[data-wmh-hud-layout-editor]");
   const select=editor?.querySelector<HTMLSelectElement>("[data-wmh-hud-layout-select]");
   const status=editor?.querySelector<HTMLElement>("[data-wmh-hud-layout-status]");

@@ -226,3 +226,199 @@
 @media(prefers-reduced-motion:reduce){
  .wmh-isometric-play-screen .wmh-skill-ring,.wmh-isometric-play-screen .wmh-skill-ring>i{animation:none!important}
 }
+
+
+/* ==========================================================
+   MERZKAVA FIELD HUD · APPROVED MINIMAL LAYOUT + SATCHEL
+   ========================================================== */
+.wmh-isometric-play-screen .wmh-player-card{
+  position:absolute!important;
+  top:max(39px,calc(env(safe-area-inset-top) + 34px))!important;
+  left:max(10px,env(safe-area-inset-left))!important;
+  right:max(10px,env(safe-area-inset-right))!important;
+  width:auto!important;max-width:430px!important;
+  display:flex!important;flex-direction:column!important;gap:4px!important;
+  padding:0!important;margin:0!important;
+  color:#f1e5cb!important;
+  background:transparent!important;border:0!important;border-radius:0!important;
+  box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+  pointer-events:none!important;
+}
+.wmh-player-topline,.wmh-player-bottomline{
+  display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto!important;
+  align-items:end!important;column-gap:10px!important;min-width:0!important;
+  background:transparent!important;border:0!important;padding:0!important;
+}
+.wmh-player-id{display:block!important;min-width:0!important}
+.wmh-player-id>strong{display:block!important;overflow:hidden!important;color:#fff0d2!important;font:700 11px/1.1 Georgia,serif!important;text-overflow:ellipsis!important;white-space:nowrap!important;text-shadow:0 1px 3px #000!important}
+.wmh-player-satiety-label{color:#e4d3af!important;font:800 7px/1 Arial,sans-serif!important;letter-spacing:.12em!important;text-shadow:0 1px 3px #000!important}
+.wmh-player-realm{align-items:flex-end!important}
+.wmh-player-realm>b{padding:0!important;border:0!important;color:#f3dfb8!important;background:transparent!important;font:800 8px/1 Arial,sans-serif!important;letter-spacing:.08em!important;text-shadow:0 1px 3px #000!important}
+.wmh-player-bottomline .wmh-player-meter-copy{margin:0 0 2px!important}
+.wmh-player-bottomline .wmh-player-meter-copy>b{font:800 6px/1 Arial,sans-serif!important;color:#d9c79f!important}
+.wmh-player-bottomline .wmh-player-meter-copy>strong{font:700 7px/1 Arial,sans-serif!important;color:#fff0d4!important}
+.wmh-player-bottomline .wmh-player-meter-copy>strong small{font-size:6px!important}
+.wmh-player-bottomline .wmh-player-meter-track{height:4px!important;border:0!important;border-radius:8px!important;background:#161a14a8!important}
+.wmh-player-bottomline .wmh-player-meter-hp .wmh-player-meter-track>span{background:linear-gradient(90deg,#994b40,#e28b68)!important}
+.wmh-player-bottomline .wmh-player-meter-satiety .wmh-player-meter-track>span{background:linear-gradient(90deg,#789a61,#c7ca7c)!important}
+.wmh-player-affiliation{display:flex!important;flex-direction:column!important;align-items:flex-end!important;gap:2px!important;padding:0!important;border:0!important;background:transparent!important}
+.wmh-player-affiliation small{font:700 5px/1 Arial,sans-serif!important;letter-spacing:.12em!important;color:#cdb680!important}
+.wmh-player-affiliation b{font:800 7px/1 Arial,sans-serif!important;color:#f4e1b8!important;text-shadow:0 1px 3px #000!important}
+
+/* Absorbed rings float along the left edge; no enclosing panel. */
+.wmh-spirit-ring-list{
+  position:absolute!important;z-index:6!important;top:50%!important;left:max(8px,env(safe-area-inset-left))!important;
+  display:flex!important;flex-direction:column!important;gap:7px!important;
+  padding:0!important;margin:0!important;background:transparent!important;border:0!important;box-shadow:none!important;
+  transform:translateY(-50%)!important;pointer-events:none!important;
+}
+.wmh-spirit-ring{
+  position:relative!important;display:grid!important;place-items:center!important;
+  width:29px!important;height:29px!important;border:1px solid var(--ring-color,#b99a65)!important;border-radius:50%!important;
+  color:var(--ring-accent,#f0ddb4)!important;background:radial-gradient(circle,#10150f99 0 48%,transparent 52%)!important;
+  box-shadow:0 0 7px color-mix(in srgb,var(--ring-color,#b99a65) 35%,transparent)!important;
+}
+.wmh-spirit-ring-orbit{position:absolute;inset:3px;border:1px dashed var(--ring-color,#b99a65);border-radius:50%;animation:wmh-hud-ring-spin 42s linear infinite}
+.wmh-spirit-ring-orbit i{position:absolute;top:-2px;left:50%;width:4px;height:4px;border-radius:50%;background:var(--ring-accent,#f0ddb4)}
+.wmh-spirit-ring>b{font:800 6px/1 Arial,sans-serif!important;letter-spacing:.02em!important}
+.wmh-spirit-ring[data-realm-tier="1"]{--ring-color:#71bca8;--ring-accent:#d2fff0}
+.wmh-spirit-ring[data-realm-tier="2"]{--ring-color:#6e9ee1;--ring-accent:#d5e4ff}
+.wmh-spirit-ring[data-realm-tier="3"]{--ring-color:#b58cd8;--ring-accent:#efd9ff}
+.wmh-spirit-ring[data-realm-tier="4"]{--ring-color:#d28d70;--ring-accent:#ffe0bc}
+
+/* Keep tactical skills light; the bag is the only inventory entry point. */
+.wmh-isometric-play-screen .wmh-player-dock{
+  width:auto!important;min-width:0!important;max-width:min(232px,calc(100vw - 18px))!important;
+  padding:0!important;border:0!important;border-radius:0!important;
+  background:transparent!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+  display:flex!important;flex-direction:column!important;align-items:flex-end!important;gap:8px!important;
+}
+.wmh-isometric-play-screen .wmh-skill-dock{padding:0!important;border:0!important;background:transparent!important}
+.wmh-isometric-play-screen .wmh-skill-dock>header{display:none!important}
+.wmh-isometric-play-screen .wmh-skill-slots{gap:3px!important}
+.wmh-isometric-play-screen .wmh-skill-slot{min-height:38px!important;background:rgba(10,15,11,.38)!important}
+.wmh-bag-button{
+  position:relative!important;display:grid!important;place-items:center!important;
+  width:42px!important;height:42px!important;padding:0!important;
+  border:1px solid #b99a65!important;border-radius:9px!important;
+  color:#e8d1a3!important;background:linear-gradient(145deg,#483522,#241d16)!important;
+  box-shadow:0 3px 9px #0006,inset 0 1px #f3d7a333!important;
+  pointer-events:auto!important;touch-action:manipulation!important;
+}
+.wmh-bag-button>span{position:relative;display:block;width:20px;height:17px;margin-top:5px;border:1.5px solid #e0bd83;border-radius:4px 4px 6px 6px;background:linear-gradient(135deg,#98744a,#493321)}
+.wmh-bag-button>span:before{content:"";position:absolute;left:5px;top:-7px;width:8px;height:7px;border:1.5px solid #e0bd83;border-bottom:0;border-radius:6px 6px 0 0}
+.wmh-bag-button>span:after{content:"";position:absolute;left:8px;top:5px;width:3px;height:3px;border:1px solid #e8d3a7;border-radius:50%}
+
+/* 25 tiny slots; every item has its own tier frame inside the brown slot. */
+.wmh-inventory-window{
+  position:absolute!important;z-index:30!important;right:max(8px,env(safe-area-inset-right))!important;
+  bottom:calc(54px + env(safe-area-inset-bottom))!important;
+  width:min(250px,78vw)!important;max-width:calc(100vw - 16px)!important;
+  min-width:210px!important;max-height:min(78dvh,650px)!important;
+  padding:9px!important;box-sizing:border-box!important;
+  color:#ead8b8!important;background:rgba(31,26,20,.98)!important;
+  border:1px solid #9a784e!important;border-radius:8px!important;
+  box-shadow:0 9px 26px #0009,inset 0 0 0 2px #d1b17b12!important;
+  overflow-x:hidden!important;overflow-y:auto!important;overscroll-behavior:contain!important;
+  -webkit-overflow-scrolling:touch!important;resize:both!important;pointer-events:auto!important;
+}
+.wmh-inventory-window[hidden]{display:none!important}
+.wmh-inventory-header{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:8px!important;padding-bottom:7px!important;margin-bottom:7px!important;border-bottom:1px solid #796044!important}
+.wmh-inventory-header>div{display:flex;min-width:0;flex-direction:column;gap:3px}
+.wmh-inventory-header b{font:800 9px/1 Georgia,serif!important;letter-spacing:.12em!important;color:#ecd5aa!important}
+.wmh-inventory-header small{font:600 6px/1 Arial,sans-serif!important;letter-spacing:.08em!important;color:#b7a184!important}
+.wmh-inventory-header button{width:24px!important;height:24px!important;border:1px solid #896a46!important;border-radius:50%!important;color:#ead8b8!important;background:#30251c!important;font:16px/1 Georgia,serif!important}
+.wmh-inventory-grid{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:4px!important}
+.wmh-inventory-slot{
+  position:relative!important;display:grid!important;place-items:center!important;
+  width:100%!important;aspect-ratio:1!important;min-width:0!important;min-height:0!important;padding:2px!important;
+  border:1px solid #896a46!important;border-radius:4px!important;
+  color:#e8d5b4!important;background:#382b20!important;box-sizing:border-box!important;
+}
+button.wmh-inventory-slot{cursor:pointer!important;touch-action:manipulation!important}
+.wmh-inventory-slot:disabled{opacity:.38!important}
+.wmh-item-tier-frame{
+  display:grid!important;place-items:center!important;width:70%!important;height:70%!important;min-width:0!important;
+  border:1px solid var(--item-tier-color,#a8895c)!important;border-radius:3px!important;
+  background:#29251f!important;box-shadow:inset 0 0 0 1px #fff1!important;
+}
+.wmh-item-tier-frame[data-tier="1"]{--item-tier-color:#a8895c}
+.wmh-item-tier-frame[data-tier="2"]{--item-tier-color:#9c9c80}
+.wmh-item-tier-frame[data-tier="3"]{--item-tier-color:#b68dd1}
+.wmh-item-tier-frame[data-tier="4"]{--item-tier-color:#78a9b4}
+.wmh-item-icon{display:block;font-size:18px!important;line-height:1!important;transform:scale(.52)!important;transform-origin:center!important}
+.wmh-item-quantity{position:absolute!important;right:2px!important;bottom:2px!important;color:#f0d9ad!important;font:800 7px/1 ui-monospace,monospace!important;text-shadow:0 1px 2px #21170f!important}
+.wmh-inventory-slot.is-empty{background:#30251c!important;border-color:#705438!important}
+.wmh-inventory-slot.is-empty>span{color:#755d42!important;font:600 6px/1 Arial,sans-serif!important}
+
+/* Dedicated currency purse: never consumes a 25-slot item cell. */
+.wmh-currency-purse{margin-top:9px!important;padding-top:8px!important;border-top:1px solid #796044!important}
+.wmh-currency-header{display:flex!important;justify-content:space-between!important;align-items:center!important;gap:6px!important;margin-bottom:6px!important}
+.wmh-currency-header>b{color:#d5b578!important;font:800 7px/1 Arial,sans-serif!important;letter-spacing:.12em!important}
+.wmh-currency-header>small{color:#9e896a!important;font:600 5px/1 Arial,sans-serif!important;letter-spacing:.08em!important}
+.wmh-currency-list{display:grid!important;gap:4px!important}
+.wmh-currency-row{display:flex!important;align-items:center!important;justify-content:space-between!important;min-height:17px!important}
+.wmh-currency-name{display:flex!important;align-items:center!important;gap:6px!important;color:#dccbae!important;font:600 7px/1 Arial,sans-serif!important}
+.wmh-currency-name i{display:grid;place-items:center;width:12px;height:12px;color:#d6b47b;font:700 9px/1 Georgia,serif!important}
+.wmh-currency-amount{color:#f0d9ad!important;font:700 7px/1 ui-monospace,monospace!important;font-variant-numeric:tabular-nums!important}
+
+/* Hold tooltip and explicit Yes/No consumption confirmation. */
+.wmh-item-tooltip{
+  position:fixed!important;z-index:1100!important;width:min(230px,calc(100vw - 16px))!important;
+  padding:9px!important;color:#e8dcc5!important;background:rgba(12,12,11,.97)!important;
+  border:1px solid #66543d!important;border-radius:7px!important;box-shadow:0 6px 20px #0009!important;
+  pointer-events:none!important;
+}
+.wmh-item-tooltip[hidden],.wmh-item-action-dialog[hidden]{display:none!important}
+.wmh-item-tooltip>header{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:8px!important}
+.wmh-item-tooltip>header>b{font:700 10px/1.2 Georgia,serif!important;color:#f0dfc1!important}
+.wmh-item-tooltip>header>span{font:800 7px/1 Arial,sans-serif!important;color:#c2a16b!important}
+.wmh-item-tooltip>p{margin:7px 0 0!important;color:#d0c3aa!important;font:8px/1.5 Arial,sans-serif!important}
+.wmh-item-action-dialog{
+  position:absolute!important;z-index:1101!important;left:50%!important;top:50%!important;right:auto!important;bottom:auto!important;
+  transform:translate(-50%,-50%)!important;width:min(230px,calc(100vw - 28px))!important;
+  padding:12px!important;color:#f0dec0!important;background:#29231d!important;
+  border:1px solid #a8895c!important;border-radius:9px!important;box-shadow:0 8px 24px #000b!important;
+}
+.wmh-item-action-copy{display:flex!important;justify-content:space-between!important;gap:8px!important}
+.wmh-item-action-copy>b{font:700 10px/1.2 Georgia,serif!important}
+.wmh-item-action-copy>small{color:#c3ac88!important;font:600 7px/1 Arial,sans-serif!important}
+.wmh-item-action-dialog>p{margin:13px 0!important;text-align:center!important;color:#f0dec0!important;font:700 11px/1.3 Georgia,serif!important}
+.wmh-item-action-buttons{display:flex!important;gap:8px!important}
+.wmh-item-action-buttons button{flex:1!important;min-height:34px!important;border:1px solid #8a704d!important;border-radius:5px!important;color:#f0dec0!important;background:#66513a!important;font:800 9px/1 Arial,sans-serif!important}
+.wmh-item-action-buttons .cancel{background:#40372d!important}
+
+/* Every long in-world window has internal scrolling and a touch resize grip. */
+.wmh-scroll-resize-window{
+  max-height:min(82dvh,720px)!important;min-height:110px!important;
+  overflow-x:hidden!important;overflow-y:auto!important;overscroll-behavior:contain!important;
+  -webkit-overflow-scrolling:touch!important;resize:both!important;
+}
+.wmh-window-resize-handle{
+  position:sticky!important;display:block!important;float:right!important;bottom:0!important;right:0!important;
+  width:17px!important;height:17px!important;margin-top:-17px!important;z-index:50!important;
+  border:1px solid #b99a65!important;border-radius:3px 0 6px 0!important;
+  background:linear-gradient(135deg,transparent 43%,#d8b777 44% 54%,transparent 55%)!important;
+  touch-action:none!important;cursor:nwse-resize!important;pointer-events:auto!important;
+}
+@media(max-width:520px){
+  .wmh-isometric-play-screen .wmh-player-card{top:max(39px,calc(env(safe-area-inset-top) + 34px))!important;left:8px!important;right:8px!important}
+  .wmh-player-topline,.wmh-player-bottomline{column-gap:6px!important}
+  .wmh-player-id>strong{font-size:9px!important}
+  .wmh-player-satiety-label{font-size:6px!important}
+  .wmh-player-realm>b{font-size:7px!important}
+  .wmh-player-affiliation b{font-size:6px!important}
+  .wmh-spirit-ring{width:25px!important;height:25px!important}
+  .wmh-inventory-window{width:min(238px,78vw)!important;padding:8px!important}
+  .wmh-inventory-grid{gap:3px!important}
+  .wmh-item-icon{font-size:16px!important}
+}
+
+/* Machine visibility pushes Back clear of its slide path, then returns it. */
+.wmh-isometric-play-screen .wmh-map-back{
+  left:max(12px,env(safe-area-inset-left))!important;right:auto!important;
+  transition:left .18s ease!important;z-index:720!important;
+}
+.wmh-isometric-play-screen.has-archanistry-machine .wmh-map-back{
+  left:var(--wmh-machine-back-offset,62px)!important;
+}
