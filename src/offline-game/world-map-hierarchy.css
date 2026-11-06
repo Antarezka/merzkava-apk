@@ -2162,3 +2162,37 @@
   fill:none!important;stroke:rgba(220,197,148,.22)!important;stroke-width:.8!important;
   vector-effect:non-scaling-stroke!important;pointer-events:none!important;
 }
+
+
+/* Pixi World Atlas: visuals move to the transparent canvas; native DOM hit targets remain active. */
+.wmh-pixi-world-canvas{position:absolute!important;inset:0!important;z-index:700!important;pointer-events:none!important;touch-action:auto!important}
+.wmh-pixi-world-canvas[hidden]{display:none!important}
+.wmh-isometric-board.wmh-pixi-render-active [data-wmh-map-art],
+.wmh-isometric-board.wmh-pixi-render-active [data-wmh-scene-svg],
+.wmh-isometric-board.wmh-pixi-render-active [data-wmh-foreground-canvas],
+.wmh-isometric-board.wmh-pixi-render-active [data-wmh-overlay-svg]{
+  opacity:0!important;
+}
+.wmh-isometric-board.wmh-pixi-render-active [data-wmh-tile]{pointer-events:all!important}
+.wmh-isometric-board.wmh-pixi-render-active .wmh-character-token{
+  opacity:0!important;pointer-events:auto!important;
+}
+.wmh-isometric-board.wmh-pixi-render-active .wmh-npc-proximity-glow,
+.wmh-isometric-board.wmh-pixi-render-active .wmh-sonar-ring,
+.wmh-isometric-board.wmh-pixi-render-active .wmh-token-movement-glow{
+  opacity:0!important;
+}
+.wmh-isometric-board.wmh-pixi-render-active.wmh-pixi-render-paused [data-wmh-map-art],
+.wmh-isometric-board.wmh-pixi-render-active.wmh-pixi-render-paused [data-wmh-scene-svg],
+.wmh-isometric-board.wmh-pixi-render-active.wmh-pixi-render-paused [data-wmh-foreground-canvas],
+.wmh-isometric-board.wmh-pixi-render-active.wmh-pixi-render-paused [data-wmh-overlay-svg]{
+  opacity:1!important;
+}
+.wmh-isometric-board.wmh-pixi-render-active.wmh-pixi-render-paused .wmh-character-token{
+  opacity:1!important;
+}
+.wmh-isometric-board.wmh-pixi-render-active.wmh-pixi-render-paused .wmh-npc-proximity-glow,
+.wmh-isometric-board.wmh-pixi-render-active.wmh-pixi-render-paused .wmh-sonar-ring,
+.wmh-isometric-board.wmh-pixi-render-active.wmh-pixi-render-paused .wmh-token-movement-glow{
+  opacity:initial!important;
+}
