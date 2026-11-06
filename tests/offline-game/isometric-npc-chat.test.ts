@@ -95,6 +95,13 @@ describe("isometric NPC conversations", () => {
     expect(html).not.toContain("data-wmh-academy-editor");
   });
 
+  it("lets a hidden isometric overlay release the menu and its pointer layer", () => {
+    const hiddenGuard=chatStyles.match(/\.wmh-overlay\\[hidden\\]:has\\(\.wmh-isometric-play-screen\\)\\{([^}]*)\\}/)?.[1]??"";
+    expect(hiddenGuard).toContain("display:none!important");
+    expect(hiddenGuard).toContain("visibility:hidden!important");
+    expect(hiddenGuard).toContain("pointer-events:none!important");
+  });
+
   it("keeps the hidden state intact until a player taps an NPC", () => {
     const html = renderIsometricMapTestArea();
     expect(html).toContain('data-wmh-chat hidden');
