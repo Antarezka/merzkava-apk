@@ -291,8 +291,8 @@ function mountPixiBoard(board:HTMLElement,modal:HTMLElement,onFailure:()=>void):
     const width=boardWidth(),height=boardHeight();
     // Large authored map artwork stays in its native DOM image layer. Uploading
     // the full Academy JPG again as a GPU texture is unnecessary and fragile on
-    // low-end Android WebViews; Pixi remains responsible for the visual overlays
-    // and actor/effect layers above it.
+    // low-end Android WebViews. Static artwork and map guides stay native; Pixi
+    // handles the dynamic actor/effect layer above them.
     const keepMapArtworkInDom=board.classList.contains("has-map-base");
 
     if(image&&!keepMapArtworkInDom){
