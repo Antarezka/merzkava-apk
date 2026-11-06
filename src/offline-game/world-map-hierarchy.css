@@ -2428,3 +2428,36 @@
 @media(prefers-reduced-motion:reduce){
   .wmh-overlay[data-visual-mode="augusto-pxl"] .wmh-pxl-actor-sprite{animation:none!important}
 }
+
+
+/* PXL asset slots in the shared field UI. Actual art is supplied by the local manifest. */
+.wmh-overlay[data-visual-mode="augusto-pxl"] .wmh-power>i[data-pxl-asset-id]{
+  display:block;flex:0 0 24px;width:24px;height:24px;min-width:24px;
+  background-repeat:no-repeat;background-position:center;background-size:contain;
+}
+.wmh-overlay[data-visual-mode="augusto-pxl"] .wmh-regional-site>i[data-pxl-asset-id]{
+  display:block;width:26px;height:26px;flex:0 0 26px;
+  background-repeat:no-repeat;background-position:center;background-size:contain;
+}
+.wmh-overlay[data-visual-mode="augusto-pxl"] .wmh-top-info[data-pxl-asset-id],
+.wmh-overlay[data-visual-mode="augusto-pxl"] .wmh-player-card[data-pxl-asset-id],
+.wmh-overlay[data-visual-mode="augusto-pxl"] .wmh-player-dock[data-pxl-asset-id],
+.wmh-overlay[data-visual-mode="augusto-pxl"] .wmh-inventory-window[data-pxl-asset-id],
+.wmh-overlay[data-visual-mode="augusto-pxl"] .wmh-currency-purse[data-pxl-asset-id],
+.wmh-overlay[data-visual-mode="augusto-pxl"] .wmh-minimap-window[data-pxl-asset-id]{
+  background-repeat:no-repeat!important;background-position:center!important;background-size:100% 100%!important;
+}
+.wmh-overlay[data-visual-mode="augusto-pxl"] .wmh-top-weather i[data-pxl-asset-id]{
+  display:inline-block;width:19px;height:19px;background-repeat:no-repeat;background-position:center;background-size:contain;
+}
+.wmh-overlay[data-visual-mode="augusto-pxl"] .wmh-top-weather i[data-pxl-resolved="image"]{font-size:0;color:transparent}
+.wmh-overlay[data-visual-mode="augusto-pxl"] .wmh-minimap-toggle[data-pxl-asset-id]{
+  background-repeat:no-repeat;background-position:center;background-size:contain;
+}
+.wmh-overlay[data-visual-mode="augusto-pxl"] .wmh-item-tier-frame[data-pxl-asset-id]{
+  background-repeat:no-repeat;background-position:center;background-size:100% 100%;
+}
+.wmh-overlay[data-visual-mode="augusto-pxl"] .wmh-power>i[data-pxl-resolved="image"],
+.wmh-overlay[data-visual-mode="augusto-pxl"] .wmh-regional-site>i[data-pxl-resolved="image"]{
+  color:transparent;font-size:0;
+}
