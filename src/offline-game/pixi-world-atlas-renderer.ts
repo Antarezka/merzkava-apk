@@ -95,7 +95,7 @@ function loadSvgTexture(svg:SVGSVGElement):Promise<TextureAsset> {
       try{
         const texture=PIXI.Texture.from(image);
         releaseUrl();
-        resolve({texture,release:()=>{try{texture.destroy(false);}catch{/* Already released. */}image.src="";}});
+        resolve({texture,release:()=>{try{texture.destroy(true);}catch{/* Already released. */}image.src="";}});
       }catch(error){releaseUrl();reject(error);}
     };
     image.onerror=()=>{releaseUrl();reject(new Error("Could not rasterize the current World Atlas SVG map."));};
