@@ -691,3 +691,9 @@ html.soft-keyboard-open .idle-home-footer { padding-top:6px !important; }
 .atlas-password-reset-actions button{flex:1;min-height:40px;padding:9px 12px;border-radius:5px;font:700 9px/1.15 Cinzel,Georgia,serif;letter-spacing:.06em}
 @media(max-width:390px){.atlas-password-reset-panel{padding:11px}.atlas-password-reset-actions button{font-size:8px}}
 @media(prefers-reduced-motion:reduce){.atlas-password-actions button,.atlas-password-reset-actions button{transition:none!important}}
+
+.atlas-buffer-status strong,
+.atlas-buffer-console [data-atlas-buffer-log]{
+  transition:opacity .12s ease,transform .12s ease;
+  will-change:opacity,transform;
+}
