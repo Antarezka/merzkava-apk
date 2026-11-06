@@ -2200,10 +2200,13 @@
 
 
 /* Academy artwork is an authored high-resolution base, not a Pixi-owned texture.
-   Keep the original DOM image and foreground redraw visible beneath the transparent
-   Pixi overlay so Android WebView/GPU texture limits can never blank the whole map. */
+   Keep the authored Academy artwork and SVG map guides in their original DOM layers
+   beneath the transparent Pixi actor canvas; Android WebView/GPU texture limits must
+   never blank the whole map. */
 .wmh-isometric-board.has-map-base.wmh-pixi-render-active>[data-wmh-map-art],
-.wmh-isometric-board.has-map-base.wmh-pixi-render-active>[data-wmh-foreground-canvas]{
+.wmh-isometric-board.has-map-base.wmh-pixi-render-active>[data-wmh-scene-svg],
+.wmh-isometric-board.has-map-base.wmh-pixi-render-active>[data-wmh-foreground-canvas],
+.wmh-isometric-board.has-map-base.wmh-pixi-render-active>[data-wmh-overlay-svg]{
   opacity:1!important;
   visibility:visible!important;
 }
