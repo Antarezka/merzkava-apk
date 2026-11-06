@@ -1958,17 +1958,18 @@ root.addEventListener("click", async event => {
       ?panel.dataset.atlasCurrentAuthorized==="true"
       :panel.dataset.atlasMasterAuthorized==="true";
     if(!authorized){
-      let valid=false;
-      if(mode==="change"){
-        valid=await verifyAtlasPassword(playerName,current);
-      }else{
-        const verification=verifyAtlasMasterResetCode(playerName,master);
-        const [,verified]=await Promise.all([
-          playWorldAtlasAccessSequence(gate,4000,verification),
-          verification
-        ]);
-        valid=verified;
-      }
+      const verification=(async()=>{
+        await requireWorldAtlasSourceConnection(gate);
+        return mode==="change"
+          ?await verifyAtlasPassword(playerName,current)
+          :await verifyAtlasMasterResetCode(playerName,master);
+      })();
+      const results=await Promise.allSettled([
+        verification,
+        playWorldAtlasAccessSequence(gate,4000,verification)
+      ]);
+      if(results[0].status==="rejected")throw results[0].reason;
+      const valid=results[0].value;
       if(resetAttempt!==worldAtlasResetAttempt)return;
       if(!valid)throw new Error(mode==="change"
         ?(gate.dataset.resetCurrentInvalid||"The current password is incorrect.")
@@ -1994,8 +1995,16 @@ root.addEventListener("click", async event => {
     if(policyError)throw new Error(gate.dataset.passwordPolicyLabel||policyError);
     if(next!==confirmation)throw new Error(gate.dataset.resetMismatch||"The new passwords do not match.");
     if(resetAttempt!==worldAtlasResetAttempt)return;
-    if(mode==="master")await completeAtlasMasterReset(playerName,master,next);
-    else await setAtlasPassword(playerName,next);
+    const saveWork=(async()=>{
+      await requireWorldAtlasSourceConnection(gate);
+      if(mode==="master")await completeAtlasMasterReset(playerName,master,next);
+      else await setAtlasPassword(playerName,next);
+    })();
+    const saveResults=await Promise.allSettled([
+      saveWork,
+      playWorldAtlasAccessSequence(gate,3600,saveWork)
+    ]);
+    if(saveResults[0].status==="rejected")throw saveResults[0].reason;
     if(resetAttempt!==worldAtlasResetAttempt)return;
     const masterCodeInput=gate.querySelector<HTMLInputElement>("#atlas-reset-master");
     if(masterCodeInput)masterCodeInput.value="";
