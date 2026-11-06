@@ -1199,15 +1199,17 @@ function bindIsometricHud(dialog:HTMLElement):void {
     dragHandle.addEventListener("pointerdown",event=>{
       if((event.target as Element|null)?.closest("button"))return;
       const rect=minimap.getBoundingClientRect();
-      drag={pointerId:event.pointerId,x:event.clientX,y:event.clientY,left:rect.left,top:rect.top};
+      const parentRect=minimap.offsetParent instanceof HTMLElement?minimap.offsetParent.getBoundingClientRect():{left:0,top:0,width:window.innerWidth};
+      drag={pointerId:event.pointerId,x:event.clientX,y:event.clientY,left:rect.left-parentRect.left,top:rect.top-parentRect.top};
       dragHandle.setPointerCapture(event.pointerId);
       event.preventDefault();
     });
     dragHandle.addEventListener("pointermove",event=>{
       if(!drag||drag.pointerId!==event.pointerId)return;
       const width=minimap.offsetWidth,height=minimap.offsetHeight;
-      const left=Math.max(8,Math.min(window.innerWidth-width-8,drag.left+event.clientX-drag.x));
-      const top=Math.max(8,Math.min(window.innerHeight-height-8,drag.top+event.clientY-drag.y));
+      const parentRect=minimap.offsetParent instanceof HTMLElement?minimap.offsetParent.getBoundingClientRect():{left:0,top:0,width:window.innerWidth};
+      const left=Math.max(0,Math.min(parentRect.width-width,drag.left+event.clientX-drag.x));
+      const top=Math.max(0,Math.min(window.innerHeight-parentRect.top-height-8,drag.top+event.clientY-drag.y));
       minimap.style.left=left+"px";minimap.style.top=top+"px";minimap.style.right="auto";
     });
     const finish=()=>{drag=null;};
