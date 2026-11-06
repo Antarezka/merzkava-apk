@@ -9,6 +9,11 @@ on:
       - "scripts/pxl-build/**"
       - "public/assets/augusto-pxl/**"
       - "src/offline-game/augusto-pxl-runtime.ts"
+      - "src/offline-game/**"
+      - "src/main.ts"
+      - "tests/**"
+      - "package.json"
+      - "docs/AUGUSTO_PXL_INTEGRATION_PLAN.md"
       - ".github/workflows/augusto-pxl-assets.yml"
   pull_request:
     paths:
