@@ -73,6 +73,8 @@ describe("isometric NPC conversations", () => {
     expect(worldMapSource).toContain("if(distance>2)continue;");
     expect(worldMapSource).toContain("function syncActorDepthAndOcclusion");
     expect(worldMapSource).toContain("function updateIsometricMinimapActors");
+    expect(worldMapSource).toContain("const queuePanFrame=");
+    expect(worldMapSource).toContain("const queuePinchFrame=");
     expect(worldMapSource).toContain("requestAnimationFrame(()=>{");
     expect(chatStyles).toContain("width:calc(var(--tile-w,64px)*3)!important");
     expect(worldMapSource).toContain("animate(token,{translateX:[dx,0],translateY:[dy,0]");
