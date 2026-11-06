@@ -1,4 +1,3 @@
-import type { WorldMapVisualMode } from "./world-map-hierarchy";
 import { cacheBundledAugustoPxlAsset, readCachedAugustoPxlAsset } from "./augusto-pxl-vault";
 
 type PxlAnimation = { frames:number[]; fps?:number };
@@ -62,7 +61,7 @@ async function resolveBundledSource(element:HTMLElement,id:string,src:string):Pr
   element.dataset.pxlSource=src;
   return src;
 }
-function setImageSource(element:HTMLElement,asset:PxlAsset,src:string):void {
+function setImageSource(element:HTMLElement,src:string):void {
   const image=element instanceof HTMLImageElement?element:element.querySelector<HTMLImageElement>("img");
   const oldUrl=objectUrls.get(element);
   if(oldUrl&&oldUrl!==src){URL.revokeObjectURL(oldUrl);objectUrls.delete(element);}
@@ -126,7 +125,7 @@ async function applyAsset(element:HTMLElement,manifest:PxlManifest):Promise<void
     return;
   }
   if(asset.type==="sprite-sheet")applySpriteSheet(element,asset,src);
-  else setImageSource(element,asset,src);
+  else setImageSource(element,src);
 }
 export function mountAugustoPxlAssets(overlay:HTMLElement):void {
   if(overlay.dataset.visualMode!=="augusto-pxl")return;
