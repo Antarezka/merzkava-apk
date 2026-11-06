@@ -48,7 +48,7 @@ describe("Pixi World Atlas Android input isolation",()=>{
     expect(rendererSource).toContain('canvas.style.zIndex="300"');
     expect(rendererSource).toContain("resolution:1,");
     expect(rendererSource).toContain("antialias:false");
-    expect(rendererSource).toContain("powerPreference:"low-power"");
+    expect(rendererSource).toContain('powerPreference:"low-power"');
     expect(rendererSource).toContain("autoStart:false,sharedTicker:false");
     expect(rendererSource).toContain('app.stage.eventMode="none"');
     expect(rendererSource).not.toContain('addEventListener("pointerdown"');
