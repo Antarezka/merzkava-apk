@@ -1,5 +1,5 @@
 // Merzkava HUD and inventory artwork. Live text, currency values and interactive hit areas stay HTML.
-pal({k:"#18282a",n:"#2b4140",b:"#45645e",B:"#739083",g:"#9d8456",G:"#d5b77a",y:"#f0dcae",Y:"#ead08e",w:"#f4ead6",r:"#a35e48",R:"#d18b64",s:"#a8b6ad",S:"#d9e3d6",p:"#876d91",P:"#c0a6c8",c:"#6e9fa5",C:"#a8d1c9",t:"#8f8778",T:"#c1b49d"})
+pal({k:"#18282a",n:"#2b4140",b:"#45645e",B:"#739083",g:"#9d8456",G:"#d5b77a",y:"#f0dcae",Y:"#ead08e",w:"#f4ead6",r:"#a35e48",R:"#d18b64",s:"#a8b6ad",S:"#d9e3d6",p:"#876d91",P:"#c0a6c8",c:"#6e9fa5",C:"#a8d1c9",t:"#8f8778",T:"#c1b49d",W:"#fff8e8",H:"#c8d9a5"})
 function ornateFrame(c,w,h,accent="G"){
   c.hline(3,1,w-6,"k");c.hline(4,2,w-8,accent);c.hline(7,4,w-14,"n")
   c.hline(3,h-3,w-6,"k");c.hline(4,h-4,w-8,accent);c.hline(7,h-6,w-14,"n")
