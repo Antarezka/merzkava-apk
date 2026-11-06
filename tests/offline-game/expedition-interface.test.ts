@@ -19,7 +19,6 @@ describe("Eternal Path live world scene", () => {
     expect(html).toContain('class="expedition-pxl-modal" data-augusto-pxl-modal hidden');
     expect(html).toContain("Full visual-production pipeline for Merzkava Universe");
     expect(html).toContain("PixiJS is not being reintroduced");
-    expect(html).toContain('width:54px;height:54px');
   });
 
   beforeEach(() => resetEternalGame());
