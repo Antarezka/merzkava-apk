@@ -247,6 +247,8 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
       if(foreground){foreground.style.position="absolute";foreground.style.left=artLeft+"px";foreground.style.top=artTop+"px";foreground.style.right="auto";foreground.style.bottom="auto";foreground.style.width=artWidth+"px";foreground.style.height=artHeight+"px";}
       const actors=surface.querySelector<HTMLElement>("[data-wmh-actor-layer]");
       if(actors){actors.style.position="absolute";actors.style.left=artLeft+"px";actors.style.top=artTop+"px";actors.style.right="auto";actors.style.bottom="auto";actors.style.width=artWidth+"px";actors.style.height=artHeight+"px";}
+      const mapHit=surface.querySelector<HTMLElement>("[data-wmh-map-hit]");
+      if(mapHit){mapHit.style.left=artLeft+"px";mapHit.style.top=artTop+"px";mapHit.style.right="auto";mapHit.style.bottom="auto";mapHit.style.width=artWidth+"px";mapHit.style.height=artHeight+"px";}
     }else{
       image.style.width="100%";
       image.style.height="100%";
@@ -641,22 +643,7 @@ function bindIsometricMapArt(dialog: HTMLElement): void {
       image.style.opacity = "1";
       image.style.visibility = "visible";
       image.style.display = "block";
-      if(board){
-        if(board.dataset.academyArtworkBoard==="true"){
-          const svg=board.querySelector<SVGSVGElement>("[data-wmh-overlay-svg]");
-          let interaction=svg?.querySelector<SVGGElement>("[data-wmh-interaction-grid]");
-          if(svg&&!interaction){
-            interaction=document.createElementNS("http://www.w3.org/2000/svg","g");
-            interaction.dataset.wmhInteractionGrid="";
-            svg.insertBefore(interaction,svg.firstChild);
-          }
-          if(interaction){
-            const mapData=readIsoMapData(board);
-            interaction.innerHTML=academyInteractionGridMarkup(mapData.grid,mapData);
-          }
-        }
-        drawIsometricForeground(board);
-      }
+      if(board)drawIsometricForeground(board);
     };
     if (image.complete && image.naturalWidth) ready();
     else if (image.complete && image.naturalWidth === 0) image.dispatchEvent(new Event("error"));
@@ -1459,7 +1446,8 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
   const redraw=()=>{
     if(interactionGroup){
       if(board.dataset.academyArtworkBoard==="true"){
-        interactionGroup.innerHTML=academyInteractionGridMarkup(grid,data);
+        interactionGroup.innerHTML=editorModeActive&&board.classList.contains("wmh-overlay-editing")
+          ?academyInteractionGridMarkup(grid,data):"";
       }else{
         const marks:string[]=[];
         const addDivider=(x:number,y:number)=>{
@@ -1483,6 +1471,9 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       }
     }
     if(cellGroup){
+      if(!editorModeActive||!board.classList.contains("wmh-overlay-editing")){
+        cellGroup.replaceChildren();
+      }else{
       const marks:string[]=[];
       const add=(cells:string[],cls:string,symbol:string)=>{
         for(const key of cells){
@@ -1513,12 +1504,13 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
         marks.push('<polygon class="wmh-cell-merge-selected" points="'+points+'"/>');
       });
       cellGroup.innerHTML=marks.join("");
+      }
     }
     if(selectionCount)selectionCount.textContent=selectedMergeCells.size+" CELLS SELECTED";
-    if(transitionGroup)transitionGroup.innerHTML=data.transitions.map(marker=>{
+    if(transitionGroup)transitionGroup.innerHTML=editorModeActive&&board.classList.contains("wmh-overlay-editing")?data.transitions.map(marker=>{
       const c=isoCellCenter(marker.x,marker.y,grid),label=escapeMapEditorText(marker.label),hw=grid.tileW/2,hh=grid.tileH/2;
       return '<g class="wmh-transition-marker '+(marker.label.trim()?"is-named":"is-unlabelled")+(selectedTransitionId===marker.id?" is-selected":"")+'" data-transition-id="'+escapeMapEditorText(marker.id)+'" transform="translate('+c.x+" "+c.y+')"><polygon class="wmh-transition-cell-highlight" points="0 '+(-hh)+' '+hw+' 0 0 '+hh+' '+(-hw)+' 0"/><circle r="11"></circle><text text-anchor="middle" dominant-baseline="central">'+(marker.label.trim()?"↗":"?")+'</text><title>'+(label||"UNLABELLED TRANSITION")+'</title></g>';
-    }).join("");
+    }).join(""):"";
     if(walkableToggle)walkableToggle.checked=data.walkableAreaEnabled;
     renderCameraCenterGuide();
     const centerStatus=panel.querySelector<HTMLElement>("[data-wmh-center-status]");
@@ -1581,7 +1573,8 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
     if(academyArtwork){
       svg.setAttribute("viewBox","0 0 "+width+" "+height);
       const interaction=svg.querySelector<SVGGElement>("[data-wmh-interaction-grid]");
-      if(interaction)interaction.innerHTML=academyInteractionGridMarkup(grid,data);
+      if(interaction)interaction.innerHTML=editorModeActive&&board.classList.contains("wmh-overlay-editing")
+        ?academyInteractionGridMarkup(grid,data):"";
     }else{
       board.style.setProperty("--iso-board-width",width+"px");board.style.setProperty("--iso-board-height",height+"px");
       board.style.width=width+"px";board.style.height=height+"px";svg.setAttribute("viewBox","0 0 "+width+" "+height);
@@ -1641,6 +1634,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       }
       board.dataset.editorPaused="true";
       board.classList.add("wmh-overlay-editing","wmh-editor-paused");
+      redraw();
       updateNpcInteractionProximity(board);
       board.querySelectorAll<HTMLElement>("[data-wmh-player-token],[data-wmh-npc]").forEach(token=>token.getAnimations().forEach(animation=>animation.pause()));
       if(!relocateActorsFromBlockedCells(board,data))setStatus("Warning: this map has no free cell for one or more characters. Clear some X cells before resuming play.");
@@ -1653,6 +1647,7 @@ function bindIsoAreaEditor(dialog:HTMLElement):void {
       renderCameraCenterGuide();
       board.dataset.editorPaused="false";
       board.classList.remove("wmh-overlay-editing","wmh-editor-paused");
+      redraw();
       board.querySelectorAll<HTMLElement>("[data-wmh-player-token],[data-wmh-npc]").forEach(token=>token.getAnimations().forEach(animation=>animation.play()));
       const chat=dialog.querySelector<HTMLElement>("[data-wmh-chat]");
       const chatWasVisible=board.dataset.editorChatWasVisible==="true";
@@ -2345,6 +2340,7 @@ function isometricPlayMarkup(regionId: RegionId, selectedBuilding: string, inter
       '<svg class="wmh-academy-margin-grid" data-wmh-academy-margin-grid preserveAspectRatio="none" aria-hidden="true"></svg>'+
       '<img class="wmh-academy-map-art" data-wmh-academy-map-art data-wmh-map-art '+(visualMode==="augusto-pxl"?'data-pxl-asset-id="map.academy.exterior" ':'')+'src="'+academyMapImage+'" alt="Tianhai Academy full map" draggable="false" loading="eager" decoding="async"/>'+
       '<canvas class="wmh-isometric-foreground" data-wmh-foreground-canvas aria-hidden="true"></canvas>'+
+      '<button type="button" class="wmh-academy-map-hit" data-wmh-map-hit aria-label="Move to this position on the Academy map" tabindex="-1"></button>'+
       '<svg class="wmh-area-overlay-svg wmh-academy-grid-overlay" data-wmh-overlay-svg viewBox="0 0 2816 1536" preserveAspectRatio="none" aria-label="Editable isometric interaction grid"><g data-wmh-interaction-grid></g><g data-wmh-overlay-marks></g><g data-wmh-manual-marks></g><g data-wmh-transition-marks></g><path data-wmh-overlay-preview class="wmh-area-mark-preview" d=""></path></svg>'+
       '<div class="wmh-academy-actor-layer" data-wmh-actor-layer><button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token data-scan-tone="unknown" data-token-label="" data-x="12" data-y="31" aria-label="Player character">'+pxlActorMarkup("character.player.idle",visualMode)+'</button>'+isometricNpcTokensMarkup(academyMapId,false,visualMode)+'<div data-wmh-transition-layer></div></div>'+
       '</div></div>'+(visualMode==="augusto-pxl"?isometricHudMarkup("Tianhai Academy",academyMapImage,true,visualMode):isometricHudMarkup("Tianhai Academy",academyMapImage,true))+academyCanvasEditorMarkup()+isometricEditorMarkup()+
@@ -2737,8 +2733,9 @@ function walkToTile(
   const runtime=board as HTMLElement & {__wmhPendingPlayerDestination?:{x:number;y:number;surface:string};__wmhPendingNpcInteraction?:string};
   const mapData=readIsoMapData(board);
   if(!Number.isInteger(targetX)||!Number.isInteger(targetY)||!isoGridCellExists(mapData,targetX,targetY))return;
-  const destination=board.querySelector<HTMLElement>('[data-wmh-tile][data-x="'+targetX+'"][data-y="'+targetY+'"]');
-  if(!destination||!isoCanWalkTile(board,destination,targetX,targetY,mapData)){delete runtime.__wmhPendingPlayerDestination;delete runtime.__wmhPendingNpcInteraction;return;}
+  const academyArtwork=board.dataset.academyArtworkBoard==="true";
+  const destination=academyArtwork?null:board.querySelector<HTMLElement>('[data-wmh-tile][data-x="'+targetX+'"][data-y="'+targetY+'"]');
+  if(academyArtwork?!isoCellIsWalkable(mapData,targetX,targetY):!destination||!isoCanWalkTile(board,destination,targetX,targetY,mapData)){delete runtime.__wmhPendingPlayerDestination;delete runtime.__wmhPendingNpcInteraction;return;}
   runtime.__wmhPendingPlayerDestination={x:targetX,y:targetY,surface};
 
   const oldTimer=Number(player.dataset.moveTimer||0);
@@ -2927,7 +2924,7 @@ function replaceWorldMapDialogMarkup(dialog:HTMLElement,markup:string):void {
 }
 export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement, onAdvanceTime: (minutes: number) => void, pointer?: {clientX:number;clientY:number}): boolean {
   if (!worldMapDeveloperMode && target.closest("[data-wmh-overlay-toggle],[data-wmh-overlay-tools],[data-wmh-overlay-minimize],[data-wmh-overlay-close],[data-wmh-academy-editor],[data-wmh-drag-marker],[data-wmh-coordinate],[data-wmh-editor-canvas]")) return true;
-  const action=target.closest<HTMLElement>("[data-wmh-action],[data-wmh-info],[data-wmh-site],[data-wmh-building],[data-wmh-npc],[data-wmh-plot],[data-wmh-tile],[data-wmh-reply],[data-wmh-transition],[data-wmh-transition-close],[data-wmh-dismiss-layer],[data-wmh-selection-card],[data-hud-action]");
+  const action=target.closest<HTMLElement>("[data-wmh-action],[data-wmh-info],[data-wmh-site],[data-wmh-building],[data-wmh-npc],[data-wmh-plot],[data-wmh-tile],[data-wmh-map-hit],[data-wmh-reply],[data-wmh-transition],[data-wmh-transition-close],[data-wmh-dismiss-layer],[data-wmh-selection-card],[data-hud-action]");
   if(!action)return false;
   const overlay=target.closest<HTMLElement>("[data-world-map-hierarchy]");
   const dialog=overlay?.querySelector<HTMLElement>("[data-wmh-dialog]");
@@ -3036,6 +3033,23 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
     bindIsoAreaEditor(dialog);bindIsometricCamera(dialog);bindIsometricMapArt(dialog);bindIsometricHud(dialog);
     requestAnimationFrame(()=>animateIsometricArrival(dialog,arrival));
     return true;
+  }
+  if(action.hasAttribute("data-wmh-map-hit")){
+    const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
+    if(!board||board.classList.contains("wmh-overlay-editing")||!pointer)return true;
+    const mapData=readIsoMapData(board);
+    const image=board.querySelector<HTMLImageElement>("[data-wmh-map-art]");
+    if(!image||!image.naturalWidth||!image.naturalHeight)return true;
+    const rect=image.getBoundingClientRect();
+    const point=isoClientToImagePoint(pointer.clientX,pointer.clientY,{
+      left:rect.left,top:rect.top,width:rect.width,height:rect.height,
+      naturalWidth:image.naturalWidth,naturalHeight:image.naturalHeight
+    });
+    const cell=point?isoCellAtPoint(point,mapData.grid,true):null;
+    if(!point||!cell||!isoGridCellExists(mapData,cell.x,cell.y))return true;
+    const position=isoSubcellPositionAtPoint(point,cell.x,cell.y,mapData.grid);
+    const target=position?{position,quadrant:isoQuadrantAtPoint(point,cell.x,cell.y,mapData.grid)}:undefined;
+    walkToTile(dialog,cell.x,cell.y,"earth",target);return true;
   }
   if(action.hasAttribute("data-wmh-tile")){
     if(dialog.querySelector<HTMLElement>("[data-wmh-board]")?.classList.contains("wmh-overlay-editing"))return true;

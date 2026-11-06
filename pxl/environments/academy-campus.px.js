@@ -12,8 +12,14 @@ pal({
 })
 ramps("kKnN","sSpPW","bBcC","gGhH","rRyY","ayAY","vV","nyY")
 
-// The approved map is a faint editor-only layout guide, never baked into the runtime scene.
+// The approved map and the full cell/quadrant calibration are non-exported authoring guides.
 genre("academy-reference", { mix: true })
+sprite("_academy-quadrant-guide", {
+  png: "../maps/references/academy-quadrant-guide.png",
+  shrink: 1,
+  pivot: "center",
+  genre: "academy-reference",
+})
 sprite("_academy-pixel-source", {
   png: "../maps/references/academy-exterior-source.png",
   shrink: 4,
@@ -308,8 +314,9 @@ scene("academy-exterior-render", {
   sizes:{"academy-exterior":4},
   check:{every:1},
 },
-  // The faint guide is editor-only and excluded from the exported PNG.
+  // Both guides are authoring-only and are excluded from the exported runtime PNG.
   layer("approved-layout-reference",{ref:0.12},stamp("_academy-pixel-source",352,192)),
+  layer("quadrant-layout-reference",{ref:0.48},stamp("_academy-quadrant-guide",352,192)),
   (c)=>c.mesh(CAM,CAMPUS.faces,MATS,{sprites,...LIGHT}),
   post({bloom:{levels:3,strength:0.18,above:0.95},vignette:0.06}),
 )

@@ -54,3 +54,8 @@ Academy interior and all non-Academy interiors remain empty Map Base placeholder
 The Player keeps integer data-x/y coordinates for whitelist checks, actor occupancy, NPC interaction and BFS. Separate data-pos-x/y visual coordinates may be fractional inside the selected walkable diamond. A tap is mapped through the isometric overlay SVG viewBox and inset into the diamond so the actor is not forced to stop at its center. This remains a visual sub-cell endpoint; it does not authorize movement through blocked cells or closed half-edges.
 
 For a cardinal transition, each half-edge is checked independently by the sector graph: one blocked child sector leaves the matching open half traversable; blocking both closes the full edge. NPC interaction reachability uses the same full-edge condition.
+
+
+## Academy runtime grid rendering
+
+Tianhai Academy gameplay does not mount the per-cell SVG polygon grid. A single transparent hit plane follows the exact Map Base rectangle and converts each pointer tap to the calibrated isometric cell and one of its eight sectors. Actor buttons and transition controls stay above that plane. The full 24 × 20 plus custom-cell diamond/quadrant geometry, O/X/opacity overlays, and transition pins are generated only while the editor is active, then cleared when editing closes. This keeps the visual map free of grid lines and avoids hundreds of idle SVG nodes without removing the coordinate-based editor.

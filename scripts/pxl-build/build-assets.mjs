@@ -190,6 +190,7 @@ async function main() {
   checkNodeVersion();
   for (const directory of [SOURCE_DIR, EXPORT_DIR]) await fs.access(directory);
   await ensurePxlReferences();
+  run(process.execPath, [path.join(ROOT, "scripts/pxl-build/build-academy-quadrant-guide.mjs")], { cwd: ROOT });
   const cli = await ensurePinnedPxl();
   const sources = await walk(SOURCE_DIR);
   if (!sources.length) throw new Error("No .px.js sources were found under pxl/.");

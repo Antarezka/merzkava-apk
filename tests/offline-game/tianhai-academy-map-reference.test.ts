@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { TIANHAI_ACADEMY_MAP_REFERENCE as map } from "../../src/offline-game/tianhai-academy-map-reference";
-import { normalizeIsoMapEditorData } from "../../src/offline-game/isometric-map-editor";
+import { isoCellAtPoint, isoCellCenter, normalizeIsoMapEditorData } from "../../src/offline-game/isometric-map-editor";
 
 describe("Tianhai Academy owner-supplied map reference", () => {
   const normalized=normalizeIsoMapEditorData(map,map.mapId);
@@ -11,6 +11,30 @@ describe("Tianhai Academy owner-supplied map reference", () => {
     expect(normalized.grid).toMatchObject({cols:24,rows:20,tileW:128,tileH:69.5,offsetX:0,offsetY:0,playerScale:1,npcScale:1});
     expect(normalized.confirmed).toBe(false);
     expect(normalized.confirmedAt).toBe("");
+  });
+
+  it("maps every base and custom Academy diamond through one calibrated image-space projection", () => {
+    const coordinates=new Set<string>();
+    for(let y=0;y<map.grid.rows;y++)for(let x=0;x<map.grid.cols;x++)coordinates.add(x+","+y);
+    for(const key of normalized.customGridCells)coordinates.add(key);
+    expect(map.grid.cols*map.grid.rows).toBe(480);
+    expect(coordinates.size).toBe(480+normalized.customGridCells.filter(key=>{
+      const [x,y]=key.split(",").map(Number);
+      return x<0||y<0||x>=map.grid.cols||y>=map.grid.rows;
+    }).length);
+    for(const key of coordinates){
+      const [x,y]=key.split(",").map(Number);
+      expect(isoCellAtPoint(isoCellCenter(x,y,map.grid),map.grid,true)).toEqual({x,y});
+    }
+  });
+
+  it("preserves the five existing custom diamonds that cross the Map Base edge without shifting them", () => {
+    const clipped=normalized.customGridCells.filter(key=>{
+      const [x,y]=key.split(",").map(Number),center=isoCellCenter(x,y,map.grid);
+      return center.x-map.grid.tileW/2<0||center.y-map.grid.tileH/2<0||
+        center.x+map.grid.tileW/2>map.mapBase!.width||center.y+map.grid.tileH/2>map.mapBase!.height;
+    }).sort();
+    expect(clipped).toEqual(["10,30","11,31","12,31","7,27","8,28"]);
   });
 
   it("keeps the entrance, NPC start cells and event cells in the selected walkable area", () => {
