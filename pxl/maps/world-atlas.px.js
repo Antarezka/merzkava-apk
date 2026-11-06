@@ -1,8 +1,9 @@
 // Merzkava map illustrations: source crops only; never alter gameplay geometry.
-sprite("world-map-overview", { png: "references/world-map-source.png", shrink: 2 })
+genre("atlas-art", { mix: true })
+sprite("world-map-overview", { png: "references/world-map-source.png", shrink: 2, genre: "atlas-art" })
 sprite("academy-exterior", { png: "references/academy-exterior-source.png" })
-sprite("academy-minimap", { png: "references/academy-exterior-source.png", shrink: 8 })
-sprite("local-default", { png: "references/local-default-source.png", shrink: 2 })
+sprite("academy-minimap", { png: "references/academy-exterior-source.png", shrink: 8, genre: "atlas-art" })
+sprite("local-default", { png: "references/local-default-source.png", shrink: 2, genre: "atlas-art" })
 const REGIONS = [
 ["golden-dragon-empire",1700,350,800,750],["tianhai-yunzhou",0,425,950,750],["beiming-gu",550,0,1300,675],
 ["lawless-territories",1200,850,1050,625],["ashen-borderlands",1050,850,650,625],["black-tide-expanse",1150,1175,900,450],
@@ -17,4 +18,4 @@ const REGIONS = [
 ["lanfan-port",2150,550,500,400],["chaoguan-port",2150,675,500,425],["yuhai-port",2100,825,550,450],
 ["yuandeng-port",2000,925,550,450],["longchao-port",1950,1075,700,500]
 ]
-for (const [id,x,y,w,h] of REGIONS) sprite("region-"+id,{png:"references/world-map-source.png",area:[x,y,w,h],shrink:2})
+for (const [id,x,y,w,h] of REGIONS) sprite("region-"+id,{png:"references/world-map-source.png",area:[x,y,w,h],shrink:2,genre:"atlas-art"})
