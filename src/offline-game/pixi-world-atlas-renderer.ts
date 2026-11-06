@@ -506,7 +506,9 @@ function mountPixiBoard(board:HTMLElement,modal:HTMLElement,onFailure:()=>void):
             setPaused(isPaused(board));
             requestFrame();
           }).catch(()=>{
-            if(!disposed)modal.dataset.pixiRendererStatus="dom-fallback";
+            if(disposed)return;
+            cleanup();
+            onFailure();
           });
         }else if(modeChanged){
           setPaused(isPaused(board));
