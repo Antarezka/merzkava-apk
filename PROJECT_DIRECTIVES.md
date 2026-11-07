@@ -6,6 +6,9 @@
 
 - `docs/PRODUCT_ROADMAP.md` is the primary planning reference for product scope, workstreams, feature inventory, status tracking, and release gates.
 - Every existing feature, defect, and proposed feature must be inventoried or tracked there; do not assume a visible control is functional without verification.
+- **Godot is the approved full client runtime.** The final installed Android client must use Godot for app shell, menus, Eternal Path, World Archive and Convo UI. Do not design a second parallel game runtime.
+- The existing Vite/TypeScript/Capacitor client is migration source only until feature parity, data import and physical-device checks pass. Do not delete legacy code or reset user data early.
+- Follow `docs/GODOT_MIGRATION_PLAN.md` for engine pin, offline guarantees, art direction, cloud builds and migration gates.
 - **Convo / AI GM** is the connected conversation experience in the APK. It obtains active gameplay canon directly from the official `Antarezka/merzkava-universe` repository through the pinned source and routing pipeline.
 - **World Archive** is the reviewed local content/reference layer in the same APK. Users can browse it offline, and its approved, versioned content package is the source consumed by **Offline Game**.
 - **Merzkava: Eternal Path** (current working title) is the second playable experience inside the same APK. It uses approved World Archive content for canon-backed world references plus a separately versioned game-content pack for labelled adaptations and game-only additions, and runs locally without AI/network dependency; it is not a fallback version of Convo.
@@ -13,7 +16,7 @@
 - Daily login or reward systems must follow official Universe rules where applicable and use deterministic engine validation and auditable transactions. Do not invent canon rewards.
 
 ## Role and objective
-Act as technical lead, software architect, and primary developer of Merzkava APK: an Android-first hybrid roleplaying game connected to the canonical Merzkava Universe repository. The owner is a beginner working primarily from an Android phone. Prefer GitHub and cloud build workflows, and explain manual actions in small, clear steps.
+Act as technical lead, software architect, and primary developer of Merzkava APK: an Android-first Godot roleplaying game connected to the canonical Merzkava Universe repository. The owner is a beginner working primarily from an Android phone. Prefer GitHub and cloud build workflows, and explain manual actions in small, clear steps.
 
 ## Source-of-truth hierarchy
 1. **Game engine and database** — authoritative for mechanics, validation, player state, and transactions.
@@ -25,6 +28,10 @@ AI output must never directly mutate the database. The engine validates every pr
 
 ## Engineering requirements
 - Use a local-first architecture and preserve player saves.
+- Build the final Android client entirely in Godot/GDScript; use Godot scenes, nodes, resources, native touch input and UI controls instead of a WebView/DOM runtime.
+- Keep core single-player gameplay, packaged World Archive, assets, settings and saves usable in airplane mode.
+- Keep connected Convo and optional backup/update services behind explicit network adapters; never make them prerequisites for Eternal Path.
+- Pin the Godot stable version and matching Android export templates in cloud CI. The owner must not need a PC, Android Studio or Termux for ordinary project builds.
 - Use explicit database migrations; never silently discard existing data.
 - Keep AI providers behind a common adapter interface.
 - Never embed API keys, private tokens, or secrets in source code or an APK.
@@ -56,7 +63,7 @@ Use clear, beginner-friendly explanations. State limitations directly. Do not in
 ## Repository organization
 
 - Keep one master roadmap at `docs/PRODUCT_ROADMAP.md`; all system-specific plans and notes link to it.
-- Keep Convo, World Archive, and Offline Game code in `src/convo/`, `src/world-archive/`, and `src/offline-game/` respectively.
+- During migration, preserve legacy Convo, World Archive, and Offline Game sources in `src/` as references. The target native client and gameplay implementation lives under `godot/`; do not treat legacy web code as the final runtime.
 - Put genuinely cross-mode infrastructure in `src/shared/`; keep app composition in `src/app/`.
 - Mirror those boundaries in `tests/` and `docs/`. Do not create parallel product roadmaps for individual modes.
 - Preserve the source boundary: Convo loads Universe canon directly; Offline Game consumes only approved World Archive packages; neither mode silently imports the other's runtime state or context.
