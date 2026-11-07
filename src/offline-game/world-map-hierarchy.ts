@@ -2311,7 +2311,17 @@ function bindAcademyCanvasEditor(dialog:HTMLElement):void {
   };
   const showValues=()=>controls.forEach(input=>{const side=input.dataset.wmhCanvasSide||"",value=panel.querySelector<HTMLOutputElement>('[data-wmh-canvas-value="'+side+'"]');if(value)value.value=Number(input.value).toLocaleString()+" px";});
   const showDefaultGap=()=>{const info=gapInfo();(Object.keys(info.defaults) as Array<keyof typeof info.defaults>).forEach(side=>{const value=panel.querySelector<HTMLOutputElement>('[data-wmh-default-gap="'+side+'"]');if(value)value.value=info.defaults[side].toLocaleString()+" px";});return info;};
-  const exportConfig=()=>{const info=showDefaultGap();return {format:"merzkava-academy-canvas-expansion",version:1,mapId:"golden-dragon-empire:tianhai-academy:exterior",defaultGapPx:info.defaults,canvasExpansion:info.extra,finalGapPx:info.final};};
+  const exportConfig=()=>{
+    const info=showDefaultGap();
+    const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
+    const image=board?.querySelector<HTMLImageElement>("[data-wmh-map-art]");
+    return {
+      format:"merzkava-academy-canvas-expansion",version:2,
+      mapId:board?.dataset.mapId||"unnamed-academy-map",
+      mapBase:{width:image?.naturalWidth||2816,height:image?.naturalHeight||1536},
+      defaultGapPx:info.defaults,canvasExpansion:info.extra,finalGapPx:info.final
+    };
+  };
   const preview=()=>{showValues();showDefaultGap();mapViewport?.dispatchEvent(new CustomEvent("merzkava-academy-canvas-expansion-preview",{detail:read()}));if(status)status.textContent="Live preview updated. Confirm to save these values.";};
   try{
     const saved=normalizeIsoCanvasExpansion(JSON.parse(localStorage.getItem(key)||"{}"));
