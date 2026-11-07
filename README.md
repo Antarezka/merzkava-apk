@@ -1,8 +1,10 @@
 # merzkava-apk
 
-Android-first hybrid roleplaying game for **Merzkava Universe**.
+Android-first roleplaying game for **Merzkava Universe**, migrating to a full native **Godot** client.
 
 ## Project direction
+
+**Engine decision (2026-11-07):** Godot is the target runtime for the complete Android client—app shell, Eternal Path, World Archive and Convo UI. The Vite/TypeScript/Capacitor client is retained only as a migration source until feature parity and save migration are verified. The Godot port is in progress; the current production APK is not yet fully migrated. See [Godot Migration Plan](./docs/GODOT_MIGRATION_PLAN.md) and the new project under `godot/`.
 
 **The master product roadmap is [docs/PRODUCT_ROADMAP.md](./docs/PRODUCT_ROADMAP.md).** It is the primary planning reference for the app's workstreams, existing-feature audit, priorities, progress checklist, and release gates.
 
@@ -13,9 +15,9 @@ The app contains **two playable experiences in one APK**: (1) **Convo / AI GM**,
 - **Convo / AI GM:** connected conversation experience; reads current pinned canon directly from `merzkava-universe` through the canon loader.
 - **World Archive:** reviewed, versioned local content library; browsable offline and the approved content source for Offline Game.
 - **Merzkava: Eternal Path:** standalone Life Simulation Text RPG (current working title); consumes a release package that pins the approved World Archive package and a reviewed game-content pack, and uses deterministic local mechanics without AI/network dependency.
-- **Shared app foundation:** Android shell, navigation, UI components, assets, and app services shared by both experiences where appropriate.
+- **Godot client foundation:** one native Godot runtime owns the final Android app shell, navigation, UI, assets, offline gameplay and connected Convo client. The existing Capacitor shell remains temporary migration source.
 - **Separate mode state:** Convo and Offline Game keep distinct session/save state and source-version records; no implicit state or context crossover.
-- **Deterministic engine and local database:** validate mechanics and persist authoritative local state; SQLite remains the planned save store.
+- **Deterministic Godot engine and local persistence:** validate mechanics and persist authoritative local state; use versioned local saves with explicit migrations. A SQLite extension is subject to Android compatibility verification.
 
 > The AI is not the authority for game mechanics or saved data. The game engine validates every proposed state change before it can be stored.
 
@@ -36,7 +38,7 @@ See [PROJECT_DIRECTIVES.md](./PROJECT_DIRECTIVES.md) for the working contract, [
 - **World Archive:** [content manifest](./docs/world-archive/CONTENT_MANIFEST.md) and [coverage matrix](./docs/world-archive/COVERAGE_MATRIX.md).
 - **Merzkava: Eternal Path:** [content provenance contract](./docs/offline-game/CONTENT_PROVENANCE.md), [canonical formula snapshot](./docs/offline-game/CANON_FORMULA_SNAPSHOT.md), and [isometric field-system handoff](./docs/offline-game/ISOMETRIC_FIELD_SYSTEM.md); implementation lives in `src/offline-game/`.
 - **AI continuation:** [2026-11-06 Build 1348 isometric runtime handoff](./docs/AI_HANDOFF_2026-11-06_ISOMETRIC_RUNTIME.md) is the current map/movement continuation point; [developer access / World Atlas / Back navigation](./docs/APP_ACCESS_AND_NAVIGATION.md) remains authoritative for access/navigation. The [2026-11-05 handoff](./docs/AI_HANDOFF_2026-11-05.md) is historical.
-- **Shared infrastructure:** `src/shared/`; app composition: `src/app/`.
+- **New native client:** `godot/` — Godot project, scenes, GDScript and native UI. Legacy web sources remain in `src/` during the migration only.
 - **Tests:** grouped by system under `tests/`.
 
 Every system-specific note is subordinate to the single [master roadmap](./docs/PRODUCT_ROADMAP.md).
