@@ -181,8 +181,8 @@ jobs:
           - ABI: arm64-v8a
           - Build type: debug
           - Native Android plugin: Android Keystore vault, overlay permission bridge and draggable Kitty bubble.
-- Mini-window mode uses Android picture-in-picture; resizable overlay parity remains a device QA item.
-- This APK is a migration build; unported gameplay/content modules remain explicitly marked in-app.
+          - Mini-window mode uses Android Picture-in-Picture; resizable overlay parity remains a device QA item.
+          - This APK is a migration build; unported gameplay/content modules remain explicitly marked in-app.
           - The development package is intentionally separate from the legacy production package.
           EOF
 
