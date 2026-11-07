@@ -142,8 +142,10 @@ A cloud workflow is not considered complete until a real APK artifact is produce
 ### G0 — Godot project foundation
 - [x] Create a dedicated migration branch without modifying the default branch.
 - [x] Pin the initial engine target to a published stable Godot release.
-- [ ] Add a minimal Godot project and headless CI validation.
-- [ ] Produce a real debug APK from GitHub Actions.
+- [x] Add a minimal Godot project scaffold, main scene and GDScript migration placeholder.
+- [x] Add GitHub Actions workflow definitions for headless validation and Android APK export.
+- [ ] Observe a successful headless validation run.
+- [ ] Produce and verify a real debug APK artifact from GitHub Actions.
 - [ ] Verify the APK installs and launches on the target TECNO device.
 
 ### G1 — Native Godot app shell
