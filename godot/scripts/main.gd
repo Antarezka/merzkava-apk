@@ -88,6 +88,7 @@ var auth_attempt := 0
 var login_name_field: LineEdit
 var developer_id_field: LineEdit
 var developer_password_field: LineEdit
+var developer_remember_check: CheckBox
 var access_message_label: Label
 var access_progress: ProgressBar
 var access_stage_label: Label
@@ -114,6 +115,7 @@ var nav_scroll: ScrollContainer
 var content_scroll: ScrollContainer
 var audio_player: AudioStreamPlayer
 var nav_scroll_position := 0.0
+var navigation_collapsed := false
 var map_position := Vector2i(0, 0)
 var map_move_count := 0
 var access_buffer_active := false
@@ -143,6 +145,9 @@ func _ready() -> void:
 	if Engine.has_singleton("MerzkavaAndroid"):
 		native_plugin = Engine.get_singleton("MerzkavaAndroid")
 		native_bridge_status = "CONNECTED"
+		account_service.set_native_plugin(native_plugin)
+		account_service.restore_device_access()
+	navigation_collapsed = bool(preferences.get("navigation_collapsed", false))
 	_refresh_native_readiness()
 	_render()
 	if account_service.active_role.is_empty():
@@ -659,18 +664,25 @@ func _show_login_gate() -> void:
 	else:
 		_add_label(wrapper, "Device-local Developer verifier · offline capable · 600,000 PBKDF2 rounds.", 11, MUTED)
 		developer_id_field = LineEdit.new()
+		var remembered: Dictionary = account_service.remembered_developer_credentials
+		developer_id_field.text = str(remembered.get("identifier", ""))
 		developer_id_field.placeholder_text = "Developer ID"
 		developer_id_field.max_length = 80
 		developer_id_field.custom_minimum_size.y = 44
 		developer_id_field.add_theme_stylebox_override("normal", _style_box(Color("#17231d"), Color("#69755f")))
 		wrapper.add_child(developer_id_field)
 		developer_password_field = LineEdit.new()
+		developer_password_field.text = str(account_service.remembered_developer_credentials.get("password", ""))
 		developer_password_field.placeholder_text = "Password"
 		developer_password_field.secret = true
 		developer_password_field.custom_minimum_size.y = 44
 		developer_password_field.add_theme_stylebox_override("normal", _style_box(Color("#17231d"), Color("#69755f")))
 		wrapper.add_child(developer_password_field)
-		var note := _add_label(wrapper, "Remember Me is held until the native Android Keystore vault is integrated. Credentials are not written as plain text to user://.", 9, MUTED)
+		developer_remember_check = CheckBox.new()
+		developer_remember_check.text = "Remember account and password on this device"
+		developer_remember_check.button_pressed = not account_service.remembered_developer_credentials.is_empty()
+		wrapper.add_child(developer_remember_check)
+		var note := _add_label(wrapper, "Remember Me uses the Android Keystore vault. Lock removes the active session marker but keeps explicitly remembered credentials.", 9, MUTED)
 		note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		access_message_label = _add_label(wrapper, notice_text, 10, ALERT)
 		_wide_button(wrapper, "Sign in as Developer", _submit_developer_login, true)
@@ -760,6 +772,7 @@ func _submit_developer_login() -> void:
 		return
 	var identifier := developer_id_field.text
 	var password := developer_password_field.text
+	var remember_me := is_instance_valid(developer_remember_check) and developer_remember_check.button_pressed
 	if identifier.strip_edges().is_empty() or password.is_empty():
 		notice_text = "ID dan kata sandi wajib diisi."
 		_show_login_gate()
@@ -769,7 +782,7 @@ func _submit_developer_login() -> void:
 	var attempt := auth_attempt
 	auth_result = {"done": false, "ok": false, "message": ""}
 	_show_access_buffer("DEVELOPER")
-	_perform_developer_check.call_deferred(identifier, password, attempt)
+	_perform_developer_check.call_deferred(identifier, password, remember_me, attempt)
 	var succeeded := await _run_access_sequence(DEVELOPER_ACCESS_STAGES, DEVELOPER_ACCESS_LOGS, attempt)
 	is_busy = false
 	if not succeeded:
@@ -781,8 +794,8 @@ func _submit_developer_login() -> void:
 	current_page = "control"
 	_render()
 
-func _perform_developer_check(identifier: String, password: String, attempt: int) -> void:
-	var result: Dictionary = await account_service.authenticate_developer(identifier, password)
+func _perform_developer_check(identifier: String, password: String, remember_me: bool, attempt: int) -> void:
+	var result: Dictionary = await account_service.authenticate_developer(identifier, password, remember_me)
 	if attempt != auth_attempt:
 		return
 	auth_result = {"done": true, "ok": bool(result.get("ok", false)), "message": str(result.get("message", ""))}
@@ -977,18 +990,22 @@ func _add_kitty_layer(parent: Control, path: String, layer_size: Vector2) -> Tex
 
 func _start_bubble_mode() -> void:
 	if not _has_native_bridge():
-		_set_notice("Android FloatingWindow bridge belum terpasang pada build ini. Bubble tidak akan ditampilkan sebagai animasi palsu di dalam layar.")
+		_set_notice("Android Floating Mode bridge belum terpasang. Bubble lintas aplikasi tidak akan dipalsukan di dalam layar.")
 		return
+	_refresh_native_readiness()
 	if not _floating_setup_complete():
-		_set_notice("Selesaikan tiga izin Android secara berurutan sebelum memulai Bubble Mode.")
+		_set_notice("Selesaikan izin overlay, notifications dan battery sebelum memulai Bubble Mode.")
 		return
 	await _play_entry_splash()
+	current_page = "home"
+	_render()
 	_native_call("startBubble")
 
 func _open_mini_window() -> void:
 	if not _has_native_bridge() or overlay_status != "READY":
-		_set_notice("Mini-window membutuhkan Android overlay bridge dan izin Display over other apps.")
+		_set_notice("Picture-in-picture membutuhkan Android bridge dan izin Display over other apps.")
 		return
+	await _play_entry_splash()
 	_native_call("openMiniWindow")
 
 func _stop_floating_service() -> void:
@@ -1015,7 +1032,9 @@ func _native_call(method: String) -> void:
 		_set_notice("Native bridge terdeteksi, tetapi metode " + method + " belum tersedia.")
 		return
 	var result: Variant = native_plugin.call(method)
-	if result is Dictionary and not bool(result.get("ok", true)):
+	if result is bool and not result:
+		_set_notice("Android menolak perintah " + method + ". Periksa izin dan status sistem.")
+	elif result is Dictionary and not bool(result.get("ok", true)):
 		_set_notice(str(result.get("message", "Android action gagal.")))
 	else:
 		_set_notice("Perintah Android dikirim. Status akan dibaca ulang dari sistem.")
@@ -1030,12 +1049,15 @@ func _refresh_native_readiness() -> void:
 		return
 	native_bridge_status = "CONNECTED"
 	if native_plugin.has_method("getReadiness"):
-		var state: Variant = native_plugin.call("getReadiness")
+		var response: Variant = native_plugin.call("getReadiness")
+		var state: Variant = JSON.parse_string(str(response)) if response is String else response
 		if state is Dictionary:
 			overlay_status = "READY" if bool(state.get("displayOverApps", false)) else "NOT READY"
 			notification_status = "READY" if bool(state.get("notifications", false)) else "NOT READY"
 			battery_status = "READY" if bool(state.get("batteryExemption", false)) else "NOT READY"
 			service_status = "RUNNING" if bool(state.get("serviceRunning", false)) else "NOT RUNNING"
+		else:
+			_set_native_unavailable("Android readiness response could not be parsed.")
 
 func _has_native_bridge() -> bool:
 	return native_plugin != null
@@ -1087,7 +1109,8 @@ func _open_world_atlas_gate() -> void:
 	atlas_remember_check.text = "Remember this player on this device"
 	atlas_remember_check.button_pressed = not account_service.get_remembered_atlas_player().is_empty()
 	wrapper.add_child(atlas_remember_check)
-	atlas_message_label = _add_label(wrapper, "World Atlas uses its own local password. It is not the Player or Developer app login.", 10, MUTED)
+	atlas_password_field.text = await account_service.restore_remembered_atlas_password(atlas_name_field.text)
+	atlas_message_label = _add_label(wrapper, "World Atlas uses its own local password and independent Remember Me vault.", 10, MUTED)
 	_add_wide_button(wrapper, "Sign in / Create account", _submit_atlas_login, true)
 	_add_wide_button(wrapper, "Close World Atlas", _close_world_atlas)
 
@@ -1113,7 +1136,10 @@ func _submit_atlas_login() -> void:
 			atlas_message_label.text = str(auth_result.get("message", "World Atlas access failed."))
 		_rebuild_atlas_gate()
 		return
-	account_service.remember_atlas_player(name, atlas_remember_check.button_pressed)
+	var remember_result: Dictionary = account_service.remember_atlas_credentials(name, password, atlas_remember_check.button_pressed)
+	if not bool(remember_result.get("ok", false)):
+		_rebuild_atlas_gate(str(remember_result.get("message", "Remember Me could not be saved.")))
+		return
 	_close_world_atlas()
 	_set_notice("World Atlas access granted for this session.")
 
@@ -1190,11 +1216,13 @@ func _run_atlas_access_sequence(attempt: int) -> bool:
 	await finish.finished
 	return true
 
-func _rebuild_atlas_gate() -> void:
+func _rebuild_atlas_gate(message: String = "") -> void:
 	if is_instance_valid(atlas_layer):
 		atlas_layer.queue_free()
 	atlas_layer = null
-	_open_world_atlas_gate()
+	await _open_world_atlas_gate()
+	if is_instance_valid(atlas_message_label) and not message.is_empty():
+		atlas_message_label.text = message
 
 func _close_world_atlas() -> void:
 	if is_instance_valid(atlas_layer):
@@ -1216,17 +1244,18 @@ func _toggle_sound() -> void:
 	_render()
 
 func _toggle_navigation_cord() -> void:
-	if current_page == "control":
-		return
-	if _cord_active:
+	if current_page == "control" or _cord_active:
 		return
 	_cord_active = true
-	var was_collapsed := bool(account_service.get_preferences().get("navigation_collapsed", false))
-	account_service.set_preference("navigation_collapsed", not was_collapsed)
-	_play_asset(CORD_ACTIVATE_SOUND if not was_collapsed else CORD_SPRING_SOUND, -9.0)
-	var target := root_box.position.y + (12.0 if not was_collapsed else -12.0)
+	navigation_collapsed = not navigation_collapsed
+	account_service.set_preference("navigation_collapsed", navigation_collapsed)
+	_play_asset(CORD_ACTIVATE_SOUND if navigation_collapsed else CORD_SPRING_SOUND, -9.0)
+	if is_instance_valid(_cord_handle):
+		_cord_handle.text = "↑" if navigation_collapsed else "⌁"
+		_cord_handle.tooltip_text = "Pull down to restore the navigation dock" if navigation_collapsed else "Pull down to retract the navigation dock"
 	var tween := create_tween()
-	tween.tween_property(root_box, "position:y", target, 0.22).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_property(_cord_handle, "scale", Vector2(0.9, 0.9), 0.08)
+	tween.tween_property(_cord_handle, "scale", Vector2.ONE, 0.16).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	await tween.finished
 	_cord_active = false
 	_render()
