@@ -85,11 +85,6 @@ function labelColor(category:string):string {
 function markerLayer(marker:Marker):IsoQuadrantLayer {
   return marker==="O"?"foregroundQuadrants":marker==="X"?"blockedQuadrants":"opacityQuadrants";
 }
-function countLabelText(labels:StudioLabel[]):string {
-  const counts=new Map<string,number>();
-  labels.forEach(label=>counts.set(label.category,(counts.get(label.category)||0)+1));
-  return [...counts.entries()].map(([category,count])=>category+" "+count).join(" · ");
-}
 
 export function renderPxlMapStudioMarkup():string {
   return '<div class="pxl-studio" data-pxl-studio>'+
@@ -159,6 +154,7 @@ export function bindPxlMapStudio(dialog:HTMLElement,onEditingChange?:(active:boo
   const windowPanel=studio?.querySelector<HTMLElement>("[data-pxl-studio-window]");
   if(!studio||!board||!svg||!rail||!windowPanel||studio.dataset.bound==="true")return;
   studio.dataset.bound="true";
+  board.dataset.editorPaused="false";
 
   let data=loadData();
   let labels=loadLabels();
@@ -453,13 +449,13 @@ export function bindPxlMapStudio(dialog:HTMLElement,onEditingChange?:(active:boo
   const categoryInput=windowPanel.querySelector<HTMLSelectElement>("[data-pxl-label-category]");
   const descriptionInput=windowPanel.querySelector<HTMLTextAreaElement>("[data-pxl-label-description]");
   nameInput?.addEventListener("change",()=>{
-    const label=selected();if(label){label.name=nameInput.value.trim()||label.name;labelsDirty=true;renderLabels();}
+    const label=selected();if(label){label.name=nameInput.value.trim()||label.name;renderLabels();}
   });
   categoryInput?.addEventListener("change",()=>{
-    const label=selected();if(label){label.category=categoryInput.value;labelsDirty=true;renderLabels();}
+    const label=selected();if(label){label.category=categoryInput.value;renderLabels();}
   });
   descriptionInput?.addEventListener("change",()=>{
-    const label=selected();if(label){label.description=descriptionInput.value;labelsDirty=true;}
+    const label=selected();if(label){label.description=descriptionInput.value;}
   });
   windowPanel.addEventListener("click",event=>{
     const target=event.target as Element;
@@ -490,7 +486,7 @@ export function bindPxlMapStudio(dialog:HTMLElement,onEditingChange?:(active:boo
   svg.addEventListener("pointermove",event=>{
     if(dragVertex){
       const point=readPoint(event),label=labels.find(item=>item.id===dragVertex!.labelId);
-      if(point&&label&&label.points[dragVertex.index]){label.points[dragVertex.index]=[point.x,point.y];renderLabels();labelsDirty=true;}
+      if(point&&label&&label.points[dragVertex.index]){label.points[dragVertex.index]=[point.x,point.y];renderLabels();}
       event.preventDefault();event.stopPropagation();return;
     }
     if(!drawing)return;
@@ -512,7 +508,7 @@ export function bindPxlMapStudio(dialog:HTMLElement,onEditingChange?:(active:boo
         name:mapName,category,points:currentPoints.map(point=>[point.x,point.y]),
         description,zOrder:6,
       };
-      labels.push(label);selectedLabelId=label.id;labelsDirty=true;lassoActive=false;
+      labels.push(label);selectedLabelId=label.id;lassoActive=false;
       say("Contour created. Adjust vertices, then SAVE DRAFT.");
     }else say("Lasso discarded: draw a closed contour with at least three points.");
     currentPoints=[];renderPreview();renderTab();event.stopPropagation();
@@ -536,7 +532,7 @@ export function bindPxlMapStudio(dialog:HTMLElement,onEditingChange?:(active:boo
     if(!vertex||!selectedLabelId)return;
     const label=selected();const index=Number(vertex.dataset.pxlLabelVertex);
     if(!label||label.points.length<=3)return;
-    event.preventDefault();label.points.splice(index,1);labelsDirty=true;renderLabels();persist();say("Vertex removed.");
+    event.preventDefault();label.points.splice(index,1);renderLabels();persist();say("Vertex removed.");
   });
 
   windowPanel.querySelector<HTMLElement>("[data-pxl-studio-save]")?.addEventListener("click",()=>{
