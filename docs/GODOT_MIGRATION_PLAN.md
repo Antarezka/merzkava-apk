@@ -144,7 +144,7 @@ A cloud workflow is not considered complete until a real APK artifact is produce
 - [x] Pin the initial engine target to a published stable Godot release.
 - [x] Add a minimal Godot project scaffold, main scene and GDScript migration placeholder.
 - [x] Add GitHub Actions workflow definitions for headless validation and Android APK export.
-- [ ] Observe a successful headless validation run.
+- [x] Headless validation passed on Godot Runtime Validation #2; project import, script parsing and main-scene headless launch succeeded. [Run #2](https://github.com/Antarezka/merzkava-apk/actions/runs/42360136902).
 - [ ] Produce and verify a real debug APK artifact from GitHub Actions.
 - [ ] Verify the APK installs and launches on the target TECNO device.
 
