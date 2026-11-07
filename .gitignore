@@ -34,3 +34,8 @@ pxl/**/out/
 
 # Generated, normalized PXL reference images (recreated during CI)
 /pxl/maps/references/
+
+# Godot editor/import cache and generated Android exports
+godot/.godot/
+godot/.mono/
+godot/build/
