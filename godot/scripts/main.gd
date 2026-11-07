@@ -1275,7 +1275,7 @@ func _on_pull_cord_gui_input(event: InputEvent) -> void:
 			_cord_active = true
 			_play_asset(CORD_GRAB_SOUND, -12.0)
 		elif _cord_active:
-			var delta := event.position - _cord_start
+			var delta: Vector2 = event.position - _cord_start
 			_cord_active = false
 			if delta.y >= 16.0 and absf(delta.y) > absf(delta.x) * 0.72:
 				_toggle_navigation_cord()
