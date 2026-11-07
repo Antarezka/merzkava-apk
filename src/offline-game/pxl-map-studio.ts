@@ -536,6 +536,24 @@ export function bindPxlMapStudio(dialog:HTMLElement,onEditingChange?:(active:boo
     const shape=target.closest<SVGPolygonElement>("[data-pxl-label-shape]");
     if(shape&&activeTab==="labels"&&!lassoActive){chooseLabel(shape.dataset.pxlLabelShape||null);event.preventDefault();event.stopPropagation();}
   });
+  svg.addEventListener("dblclick",event=>{
+    if(activeTab!=="labels"||lassoActive||!selectedLabelId)return;
+    const label=selected(),point=readPoint(event);
+    if(!label||!point)return;
+    let best={index:-1,distance:Infinity,point:{x:0,y:0}};
+    for(let index=0;index<label.points.length;index++){
+      const a=label.points[index],b=label.points[(index+1)%label.points.length];
+      const dx=b[0]-a[0],dy=b[1]-a[1],lengthSquared=dx*dx+dy*dy;
+      const t=lengthSquared?Math.max(0,Math.min(1,((point.x-a[0])*dx+(point.y-a[1])*dy)/lengthSquared)):0;
+      const projected={x:a[0]+t*dx,y:a[1]+t*dy};
+      const distance=Math.hypot(point.x-projected.x,point.y-projected.y);
+      if(distance<best.distance)best={index,distance,point:projected};
+    }
+    if(best.index<0||best.distance>42)return;
+    event.preventDefault();event.stopPropagation();
+    label.points.splice(best.index+1,0,[best.point.x,best.point.y]);
+    renderLabels();persist();say("Vertex added to the selected lasso edge.");
+  });
   svg.addEventListener("contextmenu",event=>{
     const target=event.target as Element,vertex=target.closest<SVGCircleElement>("[data-pxl-label-vertex]");
     if(!vertex||!selectedLabelId)return;
