@@ -258,13 +258,18 @@ export function bindPxlMapStudio(dialog:HTMLElement,onEditingChange?:(active:boo
         polygon.dataset.pxlSector=sector;polygon.dataset.pxlCellX=String(x);polygon.dataset.pxlCellY=String(y);
         polygon.setAttribute("points",polygonPoints(triangles[sector].map(point=>[point.x,point.y])));
         polygon.setAttribute("class","pxl-cell-sector");
-        const active=isMarked("foregroundQuadrants",x,y,sector)?"O":
-          isMarked("blockedQuadrants",x,y,sector)?"X":
-          isMarked("opacityQuadrants",x,y,sector)?"opacity":"";
+        const flags=[
+          isMarked("foregroundQuadrants",x,y,sector)?"O":"",
+          isMarked("blockedQuadrants",x,y,sector)?"X":"",
+          isMarked("opacityQuadrants",x,y,sector)?"opacity":"",
+        ].filter(Boolean);
+        const active=flags.includes(activeMarker)?activeMarker:(flags[0]||"");
         polygon.dataset.pxlFlag=active;
+        polygon.dataset.pxlFlags=flags.join("|");
         if(active==="O"){polygon.setAttribute("fill","#f0c65e");polygon.setAttribute("fill-opacity",".43");}
         else if(active==="X"){polygon.setAttribute("fill","#e16a5e");polygon.setAttribute("fill-opacity",".48");}
         else if(active==="opacity"){polygon.setAttribute("fill","#73aee2");polygon.setAttribute("fill-opacity",".43");}
+        else if(flags.length){polygon.setAttribute("fill","#c3bba5");polygon.setAttribute("fill-opacity",".14");}
         else {polygon.setAttribute("fill","#e8dfc1");polygon.setAttribute("fill-opacity",".025");}
         polygon.setAttribute("stroke","#f5e8ca");polygon.setAttribute("stroke-opacity",".22");
         polygon.setAttribute("stroke-width","1");polygon.setAttribute("vector-effect","non-scaling-stroke");
