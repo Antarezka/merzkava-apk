@@ -40,50 +40,33 @@ Offline mode must not require:
 
 All game outcomes and save changes are calculated and validated locally by deterministic GDScript. AI may narrate or propose connected Convo actions, but it is not the authority for Offline Game state.
 
-## 3. Game and visual direction
+## 3. Original Merzkava art direction
 
-The requested references are used as **visual/design references only**. Merzkava must have original maps, sprites, animation, UI, names and world content; do not copy protected game assets, maps, character designs, logos or proprietary layouts.
+All shipped artwork must be original Merzkava material or assets with a documented license. Design discussion may use private visual references, but public project files describe only the resulting art requirements. Do not reproduce third-party maps, sprites, characters, logos, interface layouts or proprietary assets.
 
-### Cổ Tiên Lộ
+### World presentation
 
-The identified Cổ Tiên Lộ is a browser-based 2D online RPG. It is useful as a reference for a dense cultivation-world activity loop, regional exploration, creatures, factions and a world that feels inhabited. Its online-only/server features are not the technical model for Merzkava.
-
-Reference pages:
-- https://www.cotienlo.com/
-- https://cotienlo.com/choi
-
-### Elemental 2D MMORPG — Daeri Soft
-
-Use as a reference for readable 2D MMORPG pixel-art language:
-- Compact, recognizable character silhouettes.
-- Clear ground tiles, paths, trees, rocks, buildings and environmental landmarks.
-- Readable character-to-world scale and directional movement.
-- Distinct idle/walk/combat animations and effects that remain legible on a phone.
-- A compact mobile HUD that does not cover the playable field.
-
-Reference material:
-- https://elemental-daeri-soft-inc.en.aptoide.com/app
-- https://w.atwiki.jp/elemental2dmmorpg/
-
-### Hidden Dragon / Wuxia RPG
-
-The exact title meant by "Hidden Dragon Wuxia RPG" is not yet verified. Search results distinguish at least a 2016 mobile MMORPG called Hidden Dragon and the PC/PS4 action game Hidden Dragon: Legend. Do not silently assume they are the same game or lock a style decision to the wrong title. Keep this reference provisional until its exact store link, video or screenshot is supplied.
-
-### Merzkava synthesis
-
-Create an original 2D fantasy/cultivation world with:
-- Rich, layered regional maps, settlements, academy grounds, forests, coasts, ruins, floating islands and interiors.
-- Pixel-art readability for field navigation and characters, with optional more detailed/painterly 2D scenery where performance allows.
+Create an inhabited 2D cultivation-fantasy world with:
+- Layered regional maps, settlements, academy grounds, forests, coasts, ruins, floating islands and interiors.
+- Clear ground tiles, readable paths, trees, rocks, buildings and recognizable environmental landmarks.
 - Elegant wuxia/xianxia architecture, natural terrain, atmospheric lighting and restrained magical effects.
-- Distinct NPC silhouettes, clothes, occupations, species and animations.
-- A coherent Merzkava interface identity; map art and UI must remain separate layers.
+- Distinct regional palettes and landmarks while keeping a consistent Merzkava world identity.
+- Separate art, collision, navigation, interaction and UI layers.
+
+### Character presentation
+
+- Compact, recognizable silhouettes that remain legible on a phone.
+- Distinct Player, NPC and creature proportions, clothing, occupations, species and animations.
+- Directional idle, walk and action animations with consistent timing and pivots.
+- Character-to-building scale must remain believable; ordinary characters must never appear larger than ordinary houses because of an import or scaling error.
+- Effects must remain readable without obscuring actors or the playable field.
 
 ### Global art-style selector
 
-Provide selectable, complete art-style profiles. A selected profile must apply consistently to the Player, all NPCs, creatures, map tiles/props and related UI illustrations wherever an asset exists. Do not mix incompatible sprite proportions within one active region.
+Provide selectable, complete art-style profiles. A selected profile must apply consistently to the Player, all NPCs, creatures, map tiles/props and related UI illustrations wherever compatible assets exist. Do not mix incompatible sprite proportions within one active region.
 
 Initial style candidates:
-1. **2D Pixel MMORPG** — small readable sprites and tile-based world presentation, using Elemental as a broad visual reference.
+1. **2D Pixel MMORPG** — compact sprites and tile-based world presentation.
 2. **Painterly Xianxia** — richer illustrated environments with clean, separately animated character sprites.
 3. **Soft Anime RPG** — standard-proportion anime characters and detailed fantasy environments.
 4. **Chibi Fantasy** — intentionally short, cute proportions with matching environment scale.
@@ -92,7 +75,6 @@ The selector is an art-pack choice, not a gameplay-stat modifier. Missing assets
 
 ### Scale and composition rules
 
-- Characters must never be visually larger than ordinary houses simply because of a sprite import/scale error.
 - Define one map-world unit/tile calibration per map family and a documented character-height ratio for each style.
 - Keep a stable bottom-center foot/ground pivot across idle, walk and action frames.
 - Buildings, trees, walls, bridges and foreground layers must use consistent world units and depth/occlusion rules.
@@ -204,5 +186,5 @@ Passing this gate is required before calling Merzkava offline-ready.
 - The production APK is still the legacy Capacitor app at the beginning of this migration.
 - The Godot files introduced in G0 are a migration scaffold, not a playable port of Eternal Path.
 - No Godot Android export preset or successful cloud APK build is claimed until the workflow produces and verifies an artifact.
-- The exact "Hidden Dragon Wuxia RPG" visual reference remains unresolved.
+- External visual reference titles are kept out of public project documentation; the repository records only original art requirements.
 - The target phone's memory and rendering performance must be measured with real Godot builds; Compatibility renderer is the conservative starting point, not a guarantee of performance.
