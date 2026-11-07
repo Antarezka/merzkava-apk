@@ -1,5 +1,5 @@
 // Tianhai Academy — an original PXL 3D-look HD-2D campus environment.
-// The old approved map is a faint editor-only composition guide. It is not baked into the export.
+// The editor-generated labels and full quadrant map are authoring-only guides; never bake them into runtime artwork.
 // Merzkava remains authoritative for coordinates, grid, walkability, actor placement and minimap.
 pal({
   k:"#211d24", K:"#403742", n:"#5a4a3e", N:"#786252",
@@ -185,140 +185,168 @@ function bridgeAtScreen(sx,sy,width=3.6) {
   }
 }
 
-// The full ground plane extends beyond all four screen edges so the exported map has no blank border.
+// Full campus footprint. The map remains a 2816×1536 Map Base (704×384 PXL preview).
+// Landmark anchors follow the spatial-label IDs in pxl/maps/tianhai-academy-map-structure.json.
+// The quadrant and label guides are build-only references; neither enters the final art.
 ground("grass",-55,Z-55,55,Z+55,0)
 
-// Courtyard, the main east/west walkways and the southern approach.
-// The center stays open for the existing player/NPC grid and touch targets.
-groundScreen("stone",158,91,548,252,0.06)
-groundScreen("stone",325,235,387,305,0.07)
-groundScreen("stone",112,181,205,226,0.055)
-groundScreen("stone",505,177,578,254,0.055)
-groundScreen("stone",112,252,184,322,0.065)
-groundScreen("stone",520,207,687,294,0.075)
+// Natural lawn pockets keep the open areas visually varied without rigid tile blocks.
+polygonScreen("grass",[[12,72],[54,48],[112,61],[142,102],[118,143],[64,151],[25,119]],0.025)
+polygonScreen("grass",[[222,28],[275,14],[324,30],[345,64],[315,86],[260,76],[230,55]],0.025)
+polygonScreen("grass",[[292,228],[324,210],[358,224],[359,257],[329,277],[298,258]],0.025)
+polygonScreen("grass",[[623,168],[659,150],[687,172],[682,211],[650,229],[624,205]],0.025)
+polygonScreen("grass",[[452,320],[487,300],[520,318],[515,351],[479,365],[450,344]],0.025)
 
-// Three rear study halls and the layered central academy hall.
-hallAtScreen(104,96,5.9,3.9,2.05,1.18)
-hallAtScreen(352,102,7.5,4.2,2.5,1.55)
-hallAtScreen(604,98,5.8,3.8,2.05,1.18)
-hallAtScreen(352,102,4.4,2.6,1.05,0.88,3.25)
+// Organic stone paths: each segment follows the lassoed centerline and widens at junctions.
+polygonScreen("stone",[[3,367],[14,347],[37,326],[57,333],[42,353],[18,380],[7,390]],0.075)
+polygonScreen("stone",[[31,337],[50,315],[80,292],[103,302],[84,326],[57,350],[42,359]],0.075)
+polygonScreen("stone",[[70,312],[92,286],[122,258],[149,239],[172,250],[151,272],[124,294],[96,320]],0.075)
+polygonScreen("stone",[[140,269],[163,244],[192,219],[220,194],[245,202],[224,226],[197,250],[169,278]],0.075)
+polygonScreen("stone",[[190,236],[214,211],[242,185],[270,160],[298,137],[322,111],[344,91],[362,101],[343,126],[320,151],[292,176],[264,201],[236,225],[210,251]],0.075)
+polygonScreen("stone",[[305,158],[331,137],[359,132],[392,142],[420,155],[449,142],[480,120],[511,96],[542,75],[569,65],[591,82],[565,106],[536,131],[505,155],[475,179],[445,199],[416,207],[386,194],[354,180],[327,179]],0.075)
+polygonScreen("stone",[[414,188],[439,202],[468,223],[497,243],[527,261],[559,277],[591,293],[579,317],[548,302],[516,284],[484,267],[454,246],[430,225],[409,205]],0.075)
+polygonScreen("stone",[[450,151],[477,126],[507,105],[538,91],[566,88],[590,102],[575,122],[547,128],[520,140],[492,160],[471,179]],0.075)
+polygonScreen("stone",[[423,230],[446,235],[473,247],[498,266],[524,282],[550,296],[569,307],[556,326],[529,314],[503,297],[478,281],[454,265],[431,251]],0.075)
+polygonScreen("stone",[[93,205],[116,191],[142,184],[168,193],[188,212],[180,231],[156,224],[135,211],[111,222]],0.07)
 
-// Side wings, lecture pavilions and the small waterside pavilion.
-hallAtScreen(194,205,4.9,3.1,1.8,0.98)
-hallAtScreen(533,190,5.2,3.25,1.85,1.02)
-hallAtScreen(424,295,3.45,2.25,1.28,0.78)
+// Open student courts are deliberately irregular and visually smaller than the campus landscape.
+polygonScreen("stone",[[74,270],[109,245],[172,246],[221,276],[207,319],[146,340],[87,322]],0.055)
+polygonScreen("stone",[[224,164],[276,139],[351,141],[406,174],[389,224],[321,247],[254,218]],0.055)
+polygonScreen("stone",[[275,70],[330,53],[394,67],[431,104],[410,145],[350,158],[300,132]],0.065)
+polygonScreen("stone",[[85,202],[116,180],[169,181],[201,216],[182,254],[129,267],[91,240]],0.06)
+polygonScreen("stone",[[507,95],[553,73],[615,79],[651,114],[632,157],[575,173],[524,145]],0.06)
+polygonScreen("stone",[[490,251],[534,232],[602,242],[646,282],[620,325],[551,337],[498,304]],0.06)
 
-// Main hall steps: shallow horizontal risers that lead from the court to the upper terrace.
-for(let i=0;i<6;i++) {
-  const inset=i*5, y=111-i*3, up=0.07+i*0.10
-  groundScreen("stone",316-inset,y,388+inset,y+5,up)
-}
-for(let i=0;i<5;i++) {
-  const y=217+i*4, up=0.06+i*0.075
-  groundScreen("stone",520+i*2,y,574+i*2,y+4,up)
-}
+// Western and southeastern garden ponds, each with a natural bank instead of rectangular borders.
+polygonScreen("water",[[35,181],[48,165],[72,165],[96,179],[110,198],[108,221],[91,238],[67,246],[45,233],[28,211]],0.018)
+polygonScreen("water",[[373,292],[393,275],[423,273],[448,286],[465,305],[462,327],[445,344],[417,351],[389,338],[370,317]],0.018)
+polygonScreen("water",[[250,250],[265,237],[286,239],[300,253],[295,271],[277,280],[257,270]],0.02)
 
-// Western garden pond and the large southern reflecting pond, placed at their approved map positions.
-polygonScreen("water",[
-  [28,149],[41,126],[73,113],[112,119],[145,140],
-  [156,166],[144,190],[112,204],[71,198],[39,177],
-],0.015)
-polygonScreen("water",[
-  [235,318],[252,291],[294,279],[353,275],[413,282],
-  [457,300],[479,324],[462,347],[414,360],[354,364],
-  [296,357],[258,342],
-],0.012)
-
-// Irregular stone edging keeps the waterline readable without covering the clear walkable lanes.
+// Soft stone edging: short separated pieces leave the waterline organic.
 for(const [sx,sy] of [
-  [31,151],[45,130],[74,116],[111,121],[142,141],[153,166],[141,188],[111,201],[72,196],[40,177],
-  [239,318],[258,294],[297,282],[351,278],[411,285],[453,302],[474,324],[458,345],[411,357],[355,361],[298,354],[263,340],
-]) blockAtScreen("stone","stone",sx,sy,0.34,0.34,0.02,0.18)
+  [38,185],[51,170],[74,168],[97,182],[109,202],[105,223],[88,239],[63,243],[41,228],
+  [377,295],[398,278],[425,276],[450,290],[463,309],[458,329],[440,345],[415,349],[389,336],
+  [253,251],[269,239],[289,254],[292,271],
+]) blockAtScreen("stone","stone",sx,sy,0.25,0.25,0.02,0.15)
 
-// Garden bridges cross the western pond path and the east lip of the reflecting pond.
-bridgeAtScreen(151,169,3.8)
-bridgeAtScreen(468,322,4.5)
+// Low bridges connect the gardens without blocking the organic route network.
+bridgeAtScreen(105,210,2.8)
+bridgeAtScreen(446,316,3.0)
 
-// Southern ceremonial gate, moved to the original southwest entrance instead of the middle of the map.
-const [gateX,gateZ]=atScreen(148,289)
-block("stone","stone",gateX-2.95,gateZ-0.34,gateX-2.28,gateZ+0.34,0.05,2.5)
-block("stone","stone",gateX+2.28,gateZ-0.34,gateX+2.95,gateZ+0.34,0.05,2.5)
-block("wood","wood",gateX-3.15,gateZ-0.48,gateX+3.15,gateZ+0.48,2.3,2.65)
+// Small entrance gate at the southwest edge: about two isometric diamonds wide.
+const [gateX,gateZ]=atScreen(16,365)
+block("stone","stone",gateX-1.05,gateZ-0.26,gateX-0.76,gateZ+0.26,0.03,1.9)
+block("stone","stone",gateX+0.76,gateZ-0.26,gateX+1.05,gateZ+0.26,0.03,1.9)
+block("wood","wood",gateX-1.16,gateZ-0.34,gateX+1.16,gateZ+0.34,1.75,1.98)
 CAMPUS.face("roof",
-  [gateX-3.25,gateZ-0.52,2.67],[gateX,gateZ-0.72,3.35],
-  [gateX+3.25,gateZ-0.52,2.67],[gateX,gateZ-0.25,3.35])
-block("brass","wood",gateX-0.15,gateZ-0.7,gateX+0.15,gateZ-0.55,3.25,3.55)
+  [gateX-1.28,gateZ-0.38,2.0],[gateX,gateZ-0.52,2.38],
+  [gateX+1.28,gateZ-0.38,2.0],[gateX,gateZ-0.20,2.38])
+block("brass","wood",gateX-0.08,gateZ-0.5,gateX+0.08,gateZ-0.38,2.32,2.55)
 
-// The southeast training yard keeps its own rectangular floor and raised practice platform.
-groundScreen("stone",520,207,687,294,0.075)
-groundScreen("stone",538,222,671,281,0.09)
-groundScreen("trim",566,233,641,269,0.105)
-blockAtScreen("wood","wood",603,251,4.5,2.1,0.11,0.29)
-blockAtScreen("brass","wood",603,246,4.5,0.14,0.29,0.34)
-blockAtScreen("brass","wood",603,257,4.5,0.14,0.29,0.34)
+// Teacher and instructor quarters: several small pavilions dispersed through a garden.
+hallAtScreen(93,133,2.25,1.55,1.18,0.66)
+hallAtScreen(151,158,2.05,1.45,1.08,0.58)
+hallAtScreen(184,132,1.85,1.25,0.98,0.55)
+hallAtScreen(113,177,1.55,1.1,0.88,0.48)
 
-// Low boundary stones define gardens while leaving every central route visually open.
+// Western dojo cluster and its open training yard.
+hallAtScreen(130,211,2.55,1.7,1.35,0.75)
+hallAtScreen(184,241,1.95,1.35,1.05,0.58)
+blockAtScreen("wood","wood",145,242,2.1,1.25,0.08,0.34)
+blockAtScreen("brass","wood",145,238,2.0,0.12,0.35,0.42)
+for(const [sx,sy] of [[112,246],[129,252],[161,254],[179,229]]) {
+  blockAtScreen("wood","wood",sx,sy,0.16,0.16,0.06,0.72)
+}
+
+// Outer student zone: low residences and study huts separated by broad lawns.
+hallAtScreen(83,296,1.95,1.35,1.0,0.54)
+hallAtScreen(137,315,2.2,1.45,1.12,0.62)
+hallAtScreen(216,315,2.05,1.4,1.05,0.57)
+hallAtScreen(246,284,1.8,1.25,0.92,0.48)
+hallAtScreen(67,326,1.45,1.0,0.78,0.42)
+
+// Inner student zone: modest lecture halls around a spacious landscaped court.
+hallAtScreen(265,181,2.0,1.38,1.1,0.6)
+hallAtScreen(412,183,2.2,1.5,1.18,0.66)
+hallAtScreen(366,220,1.8,1.22,0.9,0.5)
+hallAtScreen(300,225,1.55,1.1,0.84,0.46)
+
+// Core student zone: the central academy hall is important, but not oversized.
+hallAtScreen(368,101,3.0,2.0,1.72,0.96)
+hallAtScreen(293,117,2.05,1.42,1.12,0.62)
+hallAtScreen(442,123,1.95,1.34,1.02,0.55)
+hallAtScreen(397,151,1.65,1.12,0.88,0.48)
+
+// Small steps and a pair of open terraces, not one oversized central slab.
+for(let i=0;i<4;i++) {
+  const inset=i*3.4,y=129-i*3.1,up=0.06+i*0.075
+  groundScreen("stone",348-inset,y,389+inset,y+3.3,up)
+}
+groundScreen("stone",274,147,312,170,0.08)
+groundScreen("stone",417,150,449,170,0.08)
+
+// Advanced Spirit Realm grounds: a protected ring, light perimeter stones and instructor pavilion.
+hallAtScreen(590,101,2.15,1.48,1.15,0.62)
+hallAtScreen(642,151,1.65,1.15,0.88,0.48)
+hallAtScreen(516,91,1.7,1.18,0.92,0.50)
+polygonScreen("trim",[[557,102],[579,89],[607,91],[629,108],[630,134],[609,153],[581,151],[558,133]],0.09)
+polygonScreen("stone",[[567,106],[582,98],[605,99],[620,112],[620,130],[605,143],[582,141],[568,128]],0.105)
+for(const [sx,sy] of [[574,106],[616,106],[616,136],[574,136]])blockAtScreen("wood","wood",sx,sy,0.12,0.12,0.1,0.82)
+blockAtScreen("brass","wood",594,121,0.25,0.25,0.11,0.6)
+
+// Academy-level Arcanist learning and small workshops; the separate Tianhai Institute is not depicted here.
+hallAtScreen(523,273,2.25,1.55,1.2,0.66)
+hallAtScreen(610,284,2.1,1.45,1.08,0.6)
+hallAtScreen(555,321,1.75,1.2,0.92,0.5)
+hallAtScreen(649,248,1.5,1.08,0.82,0.44)
+groundScreen("stone",533,294,567,313,0.08)
+blockAtScreen("brass","wood",550,303,0.25,0.25,0.09,0.82)
+blockAtScreen("brass","wood",574,304,0.25,0.25,0.09,0.82)
+blockAtScreen("wood","wood",594,306,0.6,0.45,0.08,0.32)
+
+// Low walls define selected compounds while leaving every main route connected.
 for(const [sx,sy,w,d] of [
-  [31,102,3.2,0.22],[112,96,3.0,0.22],[194,93,2.8,0.22],
-  [510,98,2.8,0.22],[599,106,3.0,0.22],[677,138,0.22,3.2],
-  [20,215,0.22,3.0],[682,234,0.22,3.0],
-]) blockAtScreen("stone","stone",sx,sy,w,d,0.06,0.48)
+  [49,84,2.0,0.12],[91,72,1.8,0.12],[190,87,1.6,0.12],
+  [252,46,2.0,0.12],[324,34,1.8,0.12],[433,57,1.7,0.12],
+  [667,79,0.12,1.8],[683,185,0.12,1.9],[38,249,0.12,1.8],
+]) blockAtScreen("stone","stone",sx,sy,w,d,0.04,0.34)
 
-// Small ornate garden lamps and carved stone lanterns.
-sprite("_academy-cherry", { w:48, h:72, pivot:"bottom", height:2.55 }, c => {
+// Reusable compact garden sprites. The campus scale is carried by landscape, not giant trees.
+sprite("_academy-cherry",{w:48,h:72,pivot:"bottom",height:1.35},c=>{
   c.ellipse(24,70,12,3,"k");c.vline(23,43,27,"n");c.vline(25,47,23,"N")
-  for(const [x,y,r] of [[15,29,12],[29,24,13],[20,15,10],[36,37,9],[9,41,8]]) {
-    c.circ(x,y,r,"r");c.circ(x-2,y-3,Math.max(2,r-4),"R");c.px(x+2,y-4,"W")
-  }
+  for(const [x,y,r] of [[15,29,12],[29,24,13],[20,15,10],[36,37,9],[9,41,8]]){c.circ(x,y,r,"r");c.circ(x-2,y-3,Math.max(2,r-4),"R");c.px(x+2,y-4,"W")}
   for(const [x,y] of [[12,19],[29,12],[36,32],[8,38],[24,28]])c.px(x,y,"P")
 })
-sprite("_academy-pine", { w:44, h:72, pivot:"bottom", height:2.7 }, c => {
+sprite("_academy-pine",{w:44,h:72,pivot:"bottom",height:1.45},c=>{
   c.vline(21,41,29,"n");c.vline(23,45,25,"N")
-  for(let t=0;t<4;t++) {
-    const y=12+t*11, r=17-t*2
-    c.px(22,y-8,"H");c.circ(22,y,r,"g");c.circ(19,y-3,Math.max(3,r-5),"G")
-    c.hline(22-r+3,y+2,r*2-6,t%2?"G":"h")
-  }
+  for(let t=0;t<4;t++){const y=12+t*11,r=17-t*2;c.px(22,y-8,"H");c.circ(22,y,r,"g");c.circ(19,y-3,Math.max(3,r-5),"G");c.hline(22-r+3,y+2,r*2-6,t%2?"G":"h")}
   c.px(13,31,"H");c.px(31,42,"H")
 })
-sprite("_academy-shrub", { w:32, h:24, pivot:"bottom", height:0.9 }, c => {
-  c.ellipse(16,21,14,3,"k");c.circ(10,13,8,"g");c.circ(20,11,8,"G");c.circ(25,15,6,"g")
-  c.px(9,9,"H");c.px(19,7,"H")
+sprite("_academy-shrub",{w:32,h:24,pivot:"bottom",height:0.48},c=>{
+  c.ellipse(16,21,14,3,"k");c.circ(10,13,8,"g");c.circ(20,11,8,"G");c.circ(25,15,6,"g");c.px(9,9,"H");c.px(19,7,"H")
 })
-sprite("_academy-lantern", { w:20, h:42, pivot:"bottom", height:1.75 }, c => {
-  c.ellipse(10,41,6,1,"k");c.vline(9,5,34,"n");c.vline(11,5,34,"N")
-  c.rect(4,12,12,17,"k");c.rect(5,13,10,15,"r");c.rect(7,15,6,11,"Y")
-  c.hline(3,11,14,"y");c.hline(4,30,12,"y");c.px(10,17,"W")
+sprite("_academy-lantern",{w:20,h:42,pivot:"bottom",height:0.92},c=>{
+  c.ellipse(10,41,6,1,"k");c.vline(9,5,34,"n");c.vline(11,5,34,"N");c.rect(4,12,12,17,"k");c.rect(5,13,10,15,"r");c.rect(7,15,6,11,"Y");c.hline(3,11,14,"y");c.hline(4,30,12,"y");c.px(10,17,"W")
 })
-sprite("_academy-stone-lantern", { w:24, h:38, pivot:"bottom", height:1.6 }, c => {
-  c.rect(4,29,16,6,"s");c.rect(6,19,12,11,"S");c.rect(3,16,18,4,"n")
-  c.rect(5,8,14,8,"s");c.rect(2,6,20,3,"S");c.px(12,11,"Y")
-  c.rect(2,34,20,4,"s");c.hline(4,33,16,"S")
-  c.rect(4,35,16,3,"s");c.hline(4,35,16,"S")
+sprite("_academy-stone-lantern",{w:24,h:38,pivot:"bottom",height:0.82},c=>{
+  c.rect(4,29,16,6,"s");c.rect(6,19,12,11,"S");c.rect(3,16,18,4,"n");c.rect(5,8,14,8,"s");c.rect(2,6,20,3,"S");c.px(12,11,"Y");c.rect(2,34,20,4,"s");c.hline(4,33,16,"S")
 })
 
-const treePlaces = [
-  [24,127],[28,213],[142,112],[170,225],[222,345],
-  [468,350],[508,296],[647,112],[683,181],[672,249],
-  [286,39],[478,46],[34,260],
+const treePlaces=[
+  [34,130],[56,256],[82,92],[108,157],[172,105],[205,129],[229,329],[273,306],
+  [286,49],[327,286],[349,260],[456,237],[477,202],[496,67],[526,189],[650,193],
+  [672,248],[462,68],[604,340],[646,324],[37,291],[188,291],[245,171],[417,241],
 ]
-const sprites = treePlaces.map(([sx,sy],i)=>{
+const sprites=treePlaces.map(([sx,sy],i)=>{
   const [x,z]=atScreen(sx,sy)
-  return {name:i%3===0?"_academy-cherry":"_academy-pine",at:[x,z],seed:31+i,shadow:0.55}
+  return {name:i%4===0?"_academy-cherry":"_academy-pine",at:[x,z],seed:41+i,shadow:0.34}
 })
-const shrubPlaces=[[166,132],[198,246],[491,211],[501,280],[75,222]]
-for(const [sx,sy] of shrubPlaces){
-  const [x,z]=atScreen(sx,sy)
-  sprites.push({name:"_academy-shrub",at:[x,z],shadow:0.18})
-}
-const lanternOne=atScreen(214,238),lanternTwo=atScreen(493,232)
-const stoneLanternOne=atScreen(243,295),stoneLanternTwo=atScreen(455,294)
-sprites.push(
-  {name:"_academy-lantern",at:lanternOne,light:{r:2.5,strength:0.65},shadow:0.12},
-  {name:"_academy-lantern",at:lanternTwo,light:{r:2.5,strength:0.65},shadow:0.12},
-  {name:"_academy-stone-lantern",at:stoneLanternOne,shadow:0.2},
-  {name:"_academy-stone-lantern",at:stoneLanternTwo,shadow:0.2},
-)
+const shrubPlaces=[[70,184],[95,170],[177,179],[214,190],[248,244],[301,275],[389,252],[455,289],[493,226],[624,220],[655,303],[256,83],[330,55],[436,77]]
+for(const [sx,sy] of shrubPlaces){const [x,z]=atScreen(sx,sy);sprites.push({name:"_academy-shrub",at:[x,z],shadow:0.12})}
+const lanternPlaces=[[58,318],[141,278],[227,234],[304,190],[392,177],[468,182],[545,234],[608,247],[570,325],[349,135]]
+for(const [sx,sy] of lanternPlaces){const [x,z]=atScreen(sx,sy);sprites.push({name:"_academy-lantern",at:[x,z],light:{r:1.2,strength:0.22},shadow:0.08})}
+const stoneLanternPlaces=[[104,247],[198,185],[286,155],[431,206],[500,169],[633,169]]
+for(const [sx,sy] of stoneLanternPlaces){const [x,z]=atScreen(sx,sy);sprites.push({name:"_academy-stone-lantern",at:[x,z],shadow:0.14})}
 
 const LIGHT = {
   light:[-0.72,0.42,0.55],
