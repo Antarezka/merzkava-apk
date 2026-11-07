@@ -83,6 +83,27 @@ The selector is an art-pack choice, not a gameplay-stat modifier. Missing assets
 
 ## 4. Engine and runtime architecture
 
+### Native animation contract
+
+Every animation in the final installed Merzkava APK must be implemented and played by Godot. This includes the app shell, Kitty splash, menus, transitions, UI feedback, character/NPC/creature motion, map objects, environmental effects, skills, combat, and cutscenes. Do not ship Anime.js, CSS keyframe animations, JavaScript-driven animation loops, DOM animation, or a second animation runtime in the final client. Legacy web animation code may remain temporarily as migration reference only and must not be a runtime dependency after the Godot port is complete.
+
+Use Godot-native tools by job:
+- AnimatedSprite2D with SpriteFrames for compact frame-based character, creature, prop, and repeated effect animation.
+- AnimationPlayer for authored sequences, splash/cutscene timelines, UI transitions, and coordinated property animation.
+- Tween for short-lived interaction feedback, movement interpolation, fades, and camera/UI transitions that do not need a reusable timeline.
+- AnimationTree only when a character genuinely needs a complex blended state machine; do not add it by default.
+- GPUParticles2D only for effects that benefit from particles and pass device profiling. Prefer sprite-sheet effects or a small number of restrained emitters for common mobile effects.
+
+Performance rules:
+- Keep character frame counts, animation FPS, texture dimensions, particle counts, shader use, and simultaneous animated objects within a measured budget for TECNO Spark Go 1 KL4.
+- Stop or pause off-screen, hidden, background, and inactive-scene animation where possible.
+- Avoid per-frame GDScript work for animation that a built-in Godot animation node can perform.
+- Reuse sprite atlases and compatible animation resources; avoid loading duplicate full-size textures for each frame or actor.
+- Use short, purposeful UI motion; motion must never delay input, block navigation, or obscure gameplay information.
+- Profile on a real device before enabling expensive effects. Visual smoothness is a goal, but stable input, frame pacing, memory use, and battery use take priority.
+
+The final APK must contain one animation runtime: Godot. All animation acceptance checks belong in the Godot validation and device QA plan.
+
 - **Engine:** Godot 4.7.2 stable, GDScript-first. Avoid adding a C#/.NET toolchain unless a concrete requirement justifies it.
 - **Rendering:** 2D scene system with the Compatibility renderer as the initial Android target. Profile performance on the target phone before enabling heavier effects.
 - **Game world:** Godot TileMapLayer / Sprite2D / AnimatedSprite2D and dedicated scene nodes for maps, actors, UI and effects. Gameplay logic must not be embedded in animation timelines.
