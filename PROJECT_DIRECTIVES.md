@@ -29,6 +29,8 @@ AI output must never directly mutate the database. The engine validates every pr
 ## Engineering requirements
 - Use a local-first architecture and preserve player saves.
 - Build the final Android client entirely in Godot/GDScript; use Godot scenes, nodes, resources, native touch input and UI controls instead of a WebView/DOM runtime.
+- Implement every animation in the final APK with Godot-native animation systems (AnimatedSprite2D, AnimationPlayer, Tween, and only when justified AnimationTree/GPUParticles2D). Do not ship Anime.js, CSS/DOM animation, JavaScript animation loops, or a second animation runtime. Keep legacy web animation only as a temporary migration reference until parity is verified.
+- Optimize animation for the TECNO Spark Go 1 KL4: pause hidden/off-screen animations, limit particles and heavy shaders, reuse atlases, avoid per-frame script work, and profile real-device frame pacing, memory and battery before accepting effects.
 - Keep core single-player gameplay, packaged World Archive, assets, settings and saves usable in airplane mode.
 - Keep connected Convo and optional backup/update services behind explicit network adapters; never make them prerequisites for Eternal Path.
 - Pin the Godot stable version and matching Android export templates in cloud CI. The owner must not need a PC, Android Studio or Termux for ordinary project builds.
