@@ -47,7 +47,9 @@ jobs:
           echo "$SDKMANAGER_DIR" >> "$GITHUB_PATH"
           echo "$SDK_ROOT/platform-tools" >> "$GITHUB_PATH"
           export PATH="$SDKMANAGER_DIR:$PATH"
+          set +o pipefail
           yes | "$SDKMANAGER" --sdk_root="$SDK_ROOT" --licenses >/dev/null
+          set -o pipefail
           "$SDKMANAGER" --sdk_root="$SDK_ROOT" --install \
             "platform-tools" \
             "build-tools;35.0.1" \
