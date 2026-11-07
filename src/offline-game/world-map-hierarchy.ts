@@ -771,12 +771,10 @@ function tileMapMarkup(
     '<div class="wmh-isometric-actor-layer" data-wmh-actor-layer><button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token data-pxl-actor-id="player" data-scan-tone="unknown" data-token-label="" data-x="5" data-y="'+(interior?8:17)+'" style="--token-x:5;--token-y:'+(interior?8:17)+'" aria-label="Player character">'+pxlActorMarkup("character.player.idle",visualMode)+'</button>'+npcTokens+'<div data-wmh-transition-layer></div></div>'+
     '</div></div></div>';
 }
-function isometricMapBaseFor(regionId: RegionId, selectedBuilding: string, interior: boolean,visualMode:WorldMapVisualMode="legacy"): string {
-  if(visualMode==="augusto-pxl")return PXL_LOCAL_MAP_PLACEHOLDER;
-  if (interior) return "";
-  const place = selectedBuilding.trim().toLowerCase().replace(/\s+/g, " ");
-  
-  return "";
+function isometricMapBaseFor(_regionId:RegionId,_selectedBuilding:string,_interior:boolean,visualMode:WorldMapVisualMode="legacy"):string {
+  // Academy has its own dedicated sandbox renderer; ordinary local areas use the
+  // shared PXL local placeholder until their own full spatial map is authored.
+  return visualMode==="augusto-pxl"?PXL_LOCAL_MAP_PLACEHOLDER:"";
 }
 function makeIsometricMapId(regionId: RegionId, selectedBuilding: string, interior: boolean): string {
   const slug=selectedBuilding.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
