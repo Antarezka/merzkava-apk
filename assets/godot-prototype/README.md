@@ -1,20 +1,18 @@
 # Godot visual prototype assets
 
-This folder is an isolated art-prototype area. It does not replace or modify the existing app runtime.
+The active art prototype is now the native Godot project at `godot-art-workshop/`.
 
-## Player base sprite
+## Current working art
 
-- File: `characters/player_base_4dir.svg`
-- Format: SVG vector, transparent background
-- Sheet: 384 × 128 px, four 96 × 128 px cells
-- Directions: front, back, left, right
-- Intended import: Godot 4 as a texture; crop each 96 × 128 cell or convert to PNG during the art pipeline.
-- Visual direction: original Merzkava design combining a small readable 2D MMORPG character scale, wuxia travel clothing and a restrained atmospheric fantasy palette. This is an original interpretation, not a trace or copy of any reference game's art or assets.
+- Open `godot-art-workshop/project.godot` in Godot 4.
+- The reusable character scene is `godot-art-workshop/scenes/character_sprite.tscn`.
+- Its art is drawn directly in GDScript in `godot-art-workshop/scripts/character_sprite.gd`, using a 48 × 64 logical pixel canvas.
+- The preview scene compares the player against a house so ordinary buildings remain visibly larger than the character.
 
-## Current limitations
+## Historical proportion test
 
-This is a first silhouette/style block-in, not a finished production sprite. It has no walk/idle frame animation yet, and the side views are directional placeholders. Next art pass should refine proportions, face readability at gameplay scale, cloth folds, hair silhouette, and consistent side-view anatomy before adding animation frames.
+`characters/player_base_4dir.svg` is the earlier vector block-in that established the accepted character-to-world proportion. It is retained only as a historical reference and is **not loaded by the Godot project**.
 
-## Scale rule
+## Scope
 
-Character proportions must remain believable beside doors, houses, trees and other world objects. The player must not be scaled larger than ordinary buildings for visual emphasis.
+The Godot project is isolated on the `prototype/godot-art-assets` branch. It does not modify or replace the APK runtime. The current sprite is a four-direction static art pass; walk/idle animation, NPC variants, production buildings and map tiles remain future art tasks.
