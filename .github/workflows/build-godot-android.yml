@@ -11,6 +11,7 @@ on:
   pull_request:
     paths:
       - "godot/**"
+      - "native/godot-android-plugin/**"
       - ".github/workflows/build-godot-android.yml"
   workflow_dispatch:
 
