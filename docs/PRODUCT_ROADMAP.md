@@ -14,6 +14,30 @@ There is **one master roadmap only**: this file, `docs/PRODUCT_ROADMAP.md`. Syst
 
 ---
 
+## Godot engine migration — owner decision 2026-11-07
+
+**Decision:** migrate the complete installed client to a native Godot runtime. This includes the app shell, splash/home/navigation, Eternal Path gameplay, World Archive and Convo UI. Godot is not an embedded minigame or a second rendering option.
+
+**Current state:** G0 scaffold is being established on `migration/godot-offline-engine-2026-11-07`. The existing Capacitor client remains the current production implementation until the Godot port passes feature parity, data migration and physical Android checks. Do not claim the entire app is already Godot.
+
+- [x] Record the full-engine decision and migration contract in `docs/GODOT_MIGRATION_PLAN.md`.
+- [x] Create a dedicated migration branch and initial `godot/project.godot` scaffold.
+- [ ] Add headless Godot CI import/parse/launch validation.
+- [ ] Add cloud Android APK export with matching Godot templates and artifact verification.
+- [ ] Port app shell and all feature modes into Godot without losing current behavior.
+- [ ] Migrate existing local profile, save, map-editor and settings data with explicit schema migrations.
+- [ ] Prove fresh install, save/reload, gameplay and World Archive under airplane mode.
+- [ ] Complete physical-device input/performance QA on TECNO Spark Go 1 KL4.
+- [ ] Retire the legacy Vite/Capacitor client only after parity and save recovery are verified.
+
+**Offline gate:** Eternal Path, local profiles/saves, World Archive and packaged assets must not require login, AI, CDN, Supabase or any live server. Only connected Convo and explicitly optional backup/content-update features may require internet.
+
+**Visual direction:** original Merzkava art informed by Cổ Tiên Lộ's 2D cultivation-world presentation and Elemental 2D MMORPG's readable pixel-art field/character style. "Hidden Dragon Wuxia RPG" remains a provisional reference until the exact title is identified. No commercial assets, maps, sprites or character designs are to be copied. The art-style selector must apply a consistent selected pack to Player, NPCs, creatures, maps and relevant illustrations, with strict world-unit scale and ground-pivot checks so characters remain proportionate to buildings.
+
+**Pre-migration progress index:** the previous 18.8% figure belongs to the legacy web implementation snapshot; it is not a valid measure of Godot migration progress. Recalculate only after the engine migration checklist is established and statuses are verified.
+
+---
+
 ## 1. Product identity and non-negotiable boundaries
 
 Merzkava APK is **one Android application containing two playable experiences and one shared content/reference layer**:
