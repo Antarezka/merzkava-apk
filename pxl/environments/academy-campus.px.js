@@ -20,10 +20,9 @@ sprite("_academy-quadrant-guide", {
   pivot: "center",
   genre: "academy-reference",
 })
-sprite("_academy-pixel-source", {
-  png: "../maps/references/academy-exterior-source.png",
-  shrink: 4,
-  palettize: true,
+sprite("_academy-label-guide", {
+  png: "../maps/references/academy-label-guide.png",
+  shrink: 1,
   pivot: "center",
   genre: "academy-reference",
 })
@@ -348,6 +347,7 @@ for(const [sx,sy] of lanternPlaces){const [x,z]=atScreen(sx,sy);sprites.push({na
 const stoneLanternPlaces=[[104,247],[198,185],[286,155],[431,206],[500,169],[633,169]]
 for(const [sx,sy] of stoneLanternPlaces){const [x,z]=atScreen(sx,sy);sprites.push({name:"_academy-stone-lantern",at:[x,z],shadow:0.14})}
 
+const lanternOne=atScreen(58,318),lanternTwo=atScreen(141,278)
 const LIGHT = {
   light:[-0.72,0.42,0.55],
   sun:{color:"#ffe0b2",strength:1.12},
@@ -364,9 +364,9 @@ scene("academy-exterior-render", {
   sizes:{"academy-exterior":4},
   check:{every:1},
 },
-  // Both guides are authoring-only and are excluded from the exported runtime PNG.
-  layer("approved-layout-reference",{ref:0.12},stamp("_academy-pixel-source",352,192)),
-  layer("quadrant-layout-reference",{ref:0.48},stamp("_academy-quadrant-guide",352,192)),
+  // These two lasso/quadrant guides are PXL authoring references only; neither is included in the runtime render.
+  layer("quadrant-layout-reference",{ref:0.38},stamp("_academy-quadrant-guide",352,192)),
+  layer("spatial-label-reference",{ref:0.30},stamp("_academy-label-guide",352,192)),
   (c)=>c.mesh(CAM,CAMPUS.faces,MATS,{sprites,...LIGHT}),
   post({bloom:{levels:3,strength:0.18,above:0.95},vignette:0.06}),
 )
