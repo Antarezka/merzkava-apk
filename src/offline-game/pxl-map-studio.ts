@@ -361,15 +361,41 @@ export function bindPxlMapStudio(dialog:HTMLElement,onEditingChange?:(active:boo
   const exportPackage=()=>{
     const validation=validate();
     const canvasExpansion=loadCanvasExpansion();
+    const viewport=dialog.querySelector<HTMLElement>("[data-wmh-map-viewport]");
+    const image=board.querySelector<HTMLImageElement>("[data-wmh-map-art]");
+    const baseWidth=image?.naturalWidth||MAP_WIDTH,baseHeight=image?.naturalHeight||MAP_HEIGHT;
+    const viewportWidth=Math.max(1,viewport?.clientWidth||window.innerWidth);
+    const viewportHeight=Math.max(1,viewport?.clientHeight||window.innerHeight);
+    const ratio=baseWidth/baseHeight;
+    const coverWidth=Math.max(viewportWidth,viewportHeight*ratio);
+    const fitScale=coverWidth/baseWidth;
+    const cellWidth=128*fitScale,cellHeight=69.5*fitScale;
+    const defaultGapPx={
+      top:Math.round(Math.max(cellHeight*2,viewportHeight/2)),
+      bottom:Math.round(Math.max(cellHeight*2,viewportHeight/2)),
+      left:Math.round(Math.max(cellWidth*2,viewportWidth*2)),
+      right:Math.round(Math.max(cellWidth*2,viewportWidth/2)),
+    };
+    const finalGapPx=Object.fromEntries((Object.keys(defaultGapPx) as Array<keyof typeof defaultGapPx>).map(side=>[
+      side,Math.round(defaultGapPx[side]+canvasExpansion[side])
+    ]));
     return {
       format:"merzkava-pxl-map-studio",
-      version:1,
+      version:2,
       mapId:TIANHAI_PXL_SANDBOX_MAP_ID,
       mapTitle:"Tianhai Academy · Tianhai Yunzhou",
       canonSources:["world/TIANHAI_ACADEMIES_AND_ARCANIST_INSTITUTE.md","world/REGION_TIANHAI_YUNZHOU.md"],
       visualContract:"Regional/isometric exploration style inspired by Persona 4, Shin Megami Tensei and Raidou Kuzunoha; world map remains unchanged.",
       mapBase:{width:MAP_WIDTH,height:MAP_HEIGHT},
       canvasExpansion,
+      canvasLayout:{
+        source:"Existing Academy Canvas Editor",
+        mapBase:{width:baseWidth,height:baseHeight},
+        viewport:{width:viewportWidth,height:viewportHeight},
+        defaultGapPx,additionalExpansionPx:canvasExpansion,finalGapPx,
+        preserveBottomGap:true,
+        cameraPanDependsOnExpandedSurface:true,
+      },
       grid:data.grid,
       cellMapping:data,
       spatialLabels:labels,
