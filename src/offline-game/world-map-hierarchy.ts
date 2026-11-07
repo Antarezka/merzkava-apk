@@ -3059,19 +3059,12 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
       dialog.querySelector<HTMLButtonElement>("[data-wmh-map-center],[data-wmh-iso-center]")?.click();
       return true;
     }
-    const arrival=captureArrivalState();
     stopNpcWander(dialog);
-    overlay.dataset.region="golden-dragon-empire";
-    overlay.dataset.level="local";
-    overlay.dataset.building="Tianhai Academy";
-    replaceWorldMapDialogMarkup(dialog,renderPanel("local","golden-dragon-empire","Tianhai Academy"));
-    onAdvanceTime(180);
-    bindIsoAreaEditor(dialog);
-    bindIsometricCamera(dialog);
+    overlay.dataset.region="tianhai-yunzhou";
+    overlay.dataset.level="regional";
+    overlay.dataset.building="Academy";
+    replaceWorldMapDialogMarkup(dialog,panelMarkup("regional","tianhai-yunzhou","Academy",undefined,visualMode));
     bindIsometricMapArt(dialog);
-    bindIsometricHud(dialog);
-    startNpcWander(dialog);
-    requestAnimationFrame(()=>animateIsometricArrival(dialog,arrival));
     return true;
   }
   if(action.dataset.wmhAction==="back"){
