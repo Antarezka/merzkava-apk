@@ -5,6 +5,7 @@ const PANEL := Color("#191f28")
 const BRASS := Color("#c69b58")
 const TEXT_MAIN := Color("#eee5d6")
 const TEXT_MUTED := Color("#b1aa9c")
+const Motion = preload("res://scripts/motion/motion.gd")
 
 
 func _ready() -> void:
@@ -70,3 +71,7 @@ func _build_migration_screen() -> void:
 	offline.add_theme_color_override("font_color", BRASS)
 	offline.add_theme_font_size_override("font_size", 11)
 	stack.add_child(offline)
+
+	# All entrance motion is authored with Godot-native Tween helpers.
+	Motion.pop_in(panel, 0.24)
+	Motion.fade_in(title, 0.28)
