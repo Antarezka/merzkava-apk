@@ -21,9 +21,10 @@ There is **one master roadmap only**: this file, `docs/PRODUCT_ROADMAP.md`. Syst
 **Current state:** G0 scaffold is being established on `migration/godot-offline-engine-2026-11-07`. The existing Capacitor client remains the current production implementation until the Godot port passes feature parity, data migration and physical Android checks. Do not claim the entire app is already Godot.
 
 - [x] Record the full-engine decision and migration contract in `docs/GODOT_MIGRATION_PLAN.md`.
-- [x] Create a dedicated migration branch and initial `godot/project.godot` scaffold.
-- [ ] Add headless Godot CI import/parse/launch validation.
-- [ ] Add cloud Android APK export with matching Godot templates and artifact verification.
+- [x] Create a dedicated migration branch and initial `godot/project.godot` scaffold with main scene/GDScript placeholder.
+- [x] Add GitHub Actions workflow definitions for headless Godot validation and Android APK export with matching template downloads.
+- [ ] Observe successful headless CI validation.
+- [ ] Produce and verify a cloud Android APK artifact.
 - [ ] Port app shell and all feature modes into Godot without losing current behavior.
 - [ ] Migrate existing local profile, save, map-editor and settings data with explicit schema migrations.
 - [ ] Prove fresh install, save/reload, gameplay and World Archive under airplane mode.
