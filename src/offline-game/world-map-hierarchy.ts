@@ -658,7 +658,7 @@ function bindIsometricMapArt(dialog: HTMLElement): void {
 
 function isometricNpcTokensMarkup(mapId:string,interior:boolean,visualMode:WorldMapVisualMode="legacy"):string {
   const maps:Record<string,Array<{id:string;x:number;y:number;gender:"male"|"female";scanTone?:"friendly"|"hostile"|"spirit-expert"|"unknown"}>>={
-    "golden-dragon-empire:tianhai-academy:exterior":[
+    "pxl-studio:tianhai-academy:exterior":[
       {id:"student-lin",x:7,y:4,gender:"female",scanTone:"friendly"},{id:"student-wei",x:10,y:9,gender:"male",scanTone:"friendly"},
       {id:"teacher-mei",x:6,y:15,gender:"female",scanTone:"friendly"},{id:"groundskeeper",x:22,y:10,gender:"male",scanTone:"friendly"}],
     "golden-dragon-empire:public-arena:exterior":[
@@ -2382,6 +2382,29 @@ export function renderIsometricMapTestArea(): string {
     '<div class="wmh-isometric-test-caption"><b>ISOMETRIC RENDER TEST</b><span>16 × 12 TILES · PLAYER · 3 NPCs · LIVE CAMERA</span></div>'+
     '<button type="button" class="wmh-map-back" data-wmh-action="back" aria-label="Leave isometric test area"><span>‹</span><b>EXIT TEST</b></button>'+
     '<section class="wmh-chat-panel" data-wmh-chat hidden role="dialog" aria-label="Character conversation"><div class="wmh-chat-card"><button type="button" class="wmh-chat-close" data-wmh-action="chat-close" aria-label="Close conversation">×</button><div class="wmh-chat-thread" data-wmh-thread></div><div class="wmh-chat-input-row"><span>YOUR RESPONSE</span><div data-wmh-replies></div></div></div></section><section class="wmh-transition-dialog" data-wmh-transition-dialog hidden role="dialog" aria-label="World dialogue"><div class="wmh-transition-dialog-card"><small data-wmh-transition-speaker>WORLD ARCHIVE</small><p data-wmh-transition-dialog-text></p><button type="button" data-wmh-transition-close>CONTINUE</button></div></section><section class="wmh-transition-notice" data-wmh-transition-notice hidden role="dialog" aria-label="World event notification"><div class="wmh-transition-notice-card"><small>WORLD EVENT · ARCHIVE NOTICE</small><h3 data-wmh-transition-notice-title></h3><p data-wmh-transition-notice-text></p><button type="button" data-wmh-transition-close>CONTINUE</button></div></section></div>';
+}
+
+function renderPxlAcademySandboxTestArea():string {
+  const mapId=TIANHAI_PXL_SANDBOX_MAP_ID;
+  const mapImage=PXL_ACADEMY_MAP_PLACEHOLDER;
+  return '<div class="wmh-isometric-play-screen wmh-academy-map-screen pxl-academy-sandbox-screen" data-wmh-isometric-play-screen data-pxl-sandbox-screen>'+
+    '<div class="wmh-academy-map-viewport" data-wmh-map-viewport><div class="wmh-academy-map-surface" data-wmh-map-surface data-wmh-academy-canvas data-wmh-board data-academy-artwork-board="true" data-pxl-micro-actors="true" data-map-id="'+mapId+'" data-cols="24" data-rows="20" data-tile-w="128" data-tile-h="69.5" data-offset-x="0" data-offset-y="0" data-map-theme="tianhai-yunzhou" data-map-title="Tianhai Academy · PXL Sandbox" data-map-interior="false">'+
+      '<svg class="wmh-academy-margin-grid" data-wmh-academy-margin-grid preserveAspectRatio="none" aria-hidden="true"></svg>'+
+      '<img class="wmh-academy-map-art" data-wmh-academy-map-art data-wmh-map-art data-pxl-asset-id="map.academy.exterior" src="'+mapImage+'" alt="Tianhai Academy Augusto PXL sandbox artwork" draggable="false" loading="eager" decoding="async"/>'+
+      '<canvas class="wmh-isometric-foreground" data-wmh-foreground-canvas aria-hidden="true"></canvas>'+
+      '<button type="button" class="wmh-academy-map-hit" data-wmh-map-hit aria-label="Move to this position on the Academy sandbox map" tabindex="-1"></button>'+
+      '<svg class="wmh-area-overlay-svg wmh-academy-grid-overlay" data-wmh-overlay-svg viewBox="0 0 2816 1536" preserveAspectRatio="none" aria-label="Legacy gameplay cell overlay"><g data-wmh-interaction-grid></g><g data-wmh-overlay-marks></g><g data-wmh-manual-marks></g><g data-wmh-transition-marks></g><path data-wmh-overlay-preview class="wmh-area-mark-preview" d=""></path></svg>'+
+      '<svg class="pxl-studio-svg" data-pxl-studio-svg viewBox="0 0 2816 1536" preserveAspectRatio="none" aria-label="PXL editor-only lasso labels and cell sectors"><g data-pxl-cell-grid></g><g data-pxl-label-layer></g><g data-pxl-lasso-preview></g><g data-pxl-label-handles></g></svg>'+
+      '<div class="wmh-academy-actor-layer" data-wmh-actor-layer><button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token data-pxl-actor-id="player" data-scan-tone="unknown" data-token-label="" data-x="12" data-y="31" style="--token-x:12;--token-y:31" aria-label="Player character">'+pxlActorMarkup("character.player.idle","augusto-pxl")+'</button>'+
+      isometricNpcTokensMarkup(mapId,false,"augusto-pxl")+'<div data-wmh-transition-layer></div></div>'+
+    '</div></div>'+
+    isometricHudMarkup("TIANHAI ACADEMY · DEVELOPER SANDBOX",mapImage,true,"augusto-pxl")+
+    academyCanvasEditorMarkup()+renderPxlMapStudioMarkup()+
+    '<button type="button" class="wmh-map-back wmh-academy-map-back" data-wmh-action="back" aria-label="Return to Golden Dragon Empire developer area"><i class="wmh-academy-back-icon" aria-hidden="true"></i><b>DEVELOPER AREA</b></button>'+
+    '<section class="wmh-chat-panel" data-wmh-chat hidden role="dialog" aria-label="Character conversation"><div class="wmh-chat-card" data-wmh-scroll-resize><button type="button" class="wmh-chat-close" data-wmh-action="chat-close" aria-label="Close conversation">×</button><div class="wmh-chat-thread" data-wmh-thread></div><div class="wmh-chat-input-row"><span>YOUR RESPONSE</span><div data-wmh-replies></div></div></div></section>'+
+    '<section class="wmh-transition-dialog" data-wmh-transition-dialog hidden role="dialog" aria-label="World dialogue"><div class="wmh-transition-dialog-card" data-wmh-scroll-resize><small data-wmh-transition-speaker>WORLD ARCHIVE</small><p data-wmh-transition-dialog-text></p><button type="button" data-wmh-transition-close>CONTINUE</button></div></section>'+
+    '<section class="wmh-transition-notice" data-wmh-transition-notice hidden role="dialog" aria-label="World event notification"><div class="wmh-transition-notice-card" data-wmh-scroll-resize><small>WORLD EVENT · ARCHIVE NOTICE</small><h3 data-wmh-transition-notice-title></h3><p data-wmh-transition-notice-text></p><button type="button" data-wmh-transition-close>CONTINUE</button></div></section>'+
+  '</div>';
 }
 
 function panelMarkup(level: Level, regionId: RegionId = "golden-dragon-empire", selectedBuilding = "Tianhai Academy", selectedArea?: WorldMarker,visualMode:WorldMapVisualMode="legacy"): string {
