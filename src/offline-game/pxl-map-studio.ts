@@ -107,7 +107,7 @@ export function renderPxlMapStudioMarkup():string {
             '<option value="path">Path / walkway</option><option value="pond">Pond / water</option><option value="garden">Garden / landscape</option>'+
             '<option value="building">Building</option><option value="dojo">Dojo / training area</option><option value="spirit-training">Advanced Spirit Realm training</option>'+
             '<option value="arcanist-learning">Arcanist learning / workshop</option><option value="instructor-quarters">Teacher / instructor quarters</option>'+
-            '<option value="student-zone">Student zone</option><option value="courtyard">Courtyard</option><option value="bridge">Bridge</option>'+
+            '<option value="student-zone">Student zone</option><option value="courtyard">Courtyard</option><option value="training-yard">Training yard</option><option value="dojo-building">Dojo building</option><option value="spirit-training-ring">Spirit training ring</option><option value="arcanist-yard">Arcanist practice yard</option><option value="bridge">Bridge</option>'+
             '<option value="gate">Gate / entrance</option><option value="boundary">Wall / boundary</option><option value="tree-canopy">Tree canopy / foreground object</option>'+
             '</select></label>'+
           '<label>NOTES / VISUAL REFERENCE<textarea rows="2" data-pxl-label-description placeholder="Describe shape, materials, size, depth and reference..."></textarea></label>'+
