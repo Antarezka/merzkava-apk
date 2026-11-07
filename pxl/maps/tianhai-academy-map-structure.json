@@ -1,0 +1,2307 @@
+{
+  "format": "merzkava-pxl-map-structure",
+  "schemaVersion": 1,
+  "status": "authoring-reference",
+  "mapId": "pxl-studio:tianhai-academy:exterior",
+  "mapTitle": "Tianhai Academy · PXL Sandbox",
+  "mapBase": {
+    "width": 2816,
+    "height": 1536,
+    "previewScale": 4
+  },
+  "grid": {
+    "cols": 24,
+    "rows": 20,
+    "tileW": 128,
+    "tileH": 69.5,
+    "offsetX": 0,
+    "offsetY": 0,
+    "customGridCells": 105,
+    "quadrantsPerCell": 8
+  },
+  "canonSources": [
+    "world/TIANHAI_ACADEMIES_AND_ARCANIST_INSTITUTE.md",
+    "world/REGION_TIANHAI_YUNZHOU.md"
+  ],
+  "visualContract": "Persona 4 / Shin Megami Tensei / Raidou Kuzunoha style regional exploration map; not the world map.",
+  "workflowStage": "Labels and spatial intent are authoritative input to the Augusto PXL scene. Editor overlays are never exported.",
+  "labels": [
+    {
+      "id": "zone-outer-students",
+      "name": "Outer Student Zone",
+      "category": "student-zone",
+      "points": [
+        [
+          152,
+          1128
+        ],
+        [
+          288,
+          984
+        ],
+        [
+          604,
+          952
+        ],
+        [
+          976,
+          1028
+        ],
+        [
+          1168,
+          1240
+        ],
+        [
+          1020,
+          1416
+        ],
+        [
+          588,
+          1488
+        ],
+        [
+          220,
+          1376
+        ]
+      ],
+      "description": "Outer student grounds, arrival courts, dormitory buildings and open gardens",
+      "zOrder": 1,
+      "walkable": false,
+      "blocked": false,
+      "foreground": false,
+      "opacity": false
+    },
+    {
+      "id": "zone-inner-students",
+      "name": "Inner Student Zone",
+      "category": "student-zone",
+      "points": [
+        [
+          816,
+          684
+        ],
+        [
+          1008,
+          556
+        ],
+        [
+          1412,
+          528
+        ],
+        [
+          1832,
+          632
+        ],
+        [
+          1948,
+          916
+        ],
+        [
+          1684,
+          1080
+        ],
+        [
+          1184,
+          1032
+        ],
+        [
+          900,
+          888
+        ]
+      ],
+      "description": "Inner student learning halls and connected courtyards",
+      "zOrder": 2,
+      "walkable": false,
+      "blocked": false,
+      "foreground": false,
+      "opacity": false
+    },
+    {
+      "id": "zone-core-students",
+      "name": "Core Student Zone",
+      "category": "student-zone",
+      "points": [
+        [
+          988,
+          192
+        ],
+        [
+          1296,
+          136
+        ],
+        [
+          1676,
+          200
+        ],
+        [
+          1884,
+          432
+        ],
+        [
+          1760,
+          656
+        ],
+        [
+          1424,
+          696
+        ],
+        [
+          1112,
+          560
+        ]
+      ],
+      "description": "Restricted core student buildings and the central academy hall",
+      "zOrder": 3,
+      "walkable": false,
+      "blocked": false,
+      "foreground": false,
+      "opacity": false
+    },
+    {
+      "id": "zone-dojo-west",
+      "name": "Martial Dojo and Practice Grounds",
+      "category": "dojo",
+      "points": [
+        [
+          232,
+          684
+        ],
+        [
+          420,
+          572
+        ],
+        [
+          748,
+          628
+        ],
+        [
+          908,
+          852
+        ],
+        [
+          808,
+          1108
+        ],
+        [
+          496,
+          1160
+        ],
+        [
+          260,
+          980
+        ]
+      ],
+      "description": "Independent practice yards and academy martial instruction grounds",
+      "zOrder": 2,
+      "walkable": false,
+      "blocked": false,
+      "foreground": false,
+      "opacity": false
+    },
+    {
+      "id": "zone-spirit-training-east",
+      "name": "Advanced Spirit Realm Training Area",
+      "category": "spirit-training",
+      "points": [
+        [
+          1932,
+          220
+        ],
+        [
+          2268,
+          160
+        ],
+        [
+          2632,
+          272
+        ],
+        [
+          2732,
+          548
+        ],
+        [
+          2584,
+          804
+        ],
+        [
+          2192,
+          784
+        ],
+        [
+          1952,
+          600
+        ]
+      ],
+      "description": "Advanced supervised Spirit Realm training grounds with a protected practice ring",
+      "zOrder": 2,
+      "walkable": false,
+      "blocked": false,
+      "foreground": false,
+      "opacity": false
+    },
+    {
+      "id": "zone-arcanist-learning",
+      "name": "Arcanist Learning and Workshop Area",
+      "category": "arcanist-learning",
+      "points": [
+        [
+          1816,
+          888
+        ],
+        [
+          2128,
+          828
+        ],
+        [
+          2628,
+          904
+        ],
+        [
+          2748,
+          1216
+        ],
+        [
+          2512,
+          1428
+        ],
+        [
+          2056,
+          1408
+        ],
+        [
+          1800,
+          1192
+        ]
+      ],
+      "description": "Academy-level Arcanist lessons, supervised practice rooms and small workshops; not the separate Tianhai Arcanist Institute",
+      "zOrder": 2,
+      "walkable": false,
+      "blocked": false,
+      "foreground": false,
+      "opacity": false
+    },
+    {
+      "id": "zone-instructors",
+      "name": "Teacher and Instructor Quarters",
+      "category": "instructor-quarters",
+      "points": [
+        [
+          148,
+          364
+        ],
+        [
+          348,
+          240
+        ],
+        [
+          712,
+          292
+        ],
+        [
+          888,
+          504
+        ],
+        [
+          776,
+          736
+        ],
+        [
+          448,
+          816
+        ],
+        [
+          196,
+          636
+        ]
+      ],
+      "description": "Teacher residences, instructor garden and a quiet consultation pavilion",
+      "zOrder": 2,
+      "walkable": false,
+      "blocked": false,
+      "foreground": false,
+      "opacity": false
+    },
+    {
+      "id": "path-main-approach",
+      "name": "Main Entrance Approach",
+      "category": "path",
+      "points": [
+        [
+          12,
+          1468
+        ],
+        [
+          52,
+          1396
+        ],
+        [
+          144,
+          1360
+        ],
+        [
+          228,
+          1392
+        ],
+        [
+          172,
+          1468
+        ],
+        [
+          100,
+          1516
+        ],
+        [
+          52,
+          1536
+        ]
+      ],
+      "description": "Organic stone approach from the southern map edge to the small main gate",
+      "zOrder": 4,
+      "walkable": true,
+      "blocked": false,
+      "foreground": false,
+      "opacity": false
+    },
+    {
+      "id": "path-outer-court",
+      "name": "Outer Student Garden Path",
+      "category": "path",
+      "points": [
+        [
+          124,
+          1348
+        ],
+        [
+          188,
+          1280
+        ],
+        [
+          328,
+          1220
+        ],
+        [
+          424,
+          1256
+        ],
+        [
+          368,
+          1336
+        ],
+        [
+          252,
+          1404
+        ],
+        [
+          176,
+          1432
+        ]
+      ],
+      "description": "Curving path through the outer student gardens",
+      "zOrder": 4,
+      "walkable": true,
+      "blocked": false,
+      "foreground": false,
+      "opacity": false
+    },
+    {
+      "id": "path-main-spine-lower",
+      "name": "Lower Campus Path",
+      "category": "path",
+      "points": [
+        [
+          312,
+          1216
+        ],
+        [
+          376,
+          1140
+        ],
+        [
+          504,
+          1076
+        ],
+        [
+          616,
+          1112
+        ],
+        [
+          548,
+          1192
+        ],
+        [
+          448,
+          1272
+        ],
+        [
+          372,
+          1296
+        ]
+      ],
+      "description": "Organic main route linking the entrance to the outer and inner student zones",
+      "zOrder": 4,
+      "walkable": true,
+      "blocked": false,
+      "foreground": false,
+      "opacity": false
+    },
+    {
+      "id": "path-main-spine-middle",
+      "name": "Central Campus Path",
+      "category": "path",
+      "points": [
+        [
+          512,
+          1092
+        ],
+        [
+          604,
+          1012
+        ],
+        [
+          740,
+          928
+        ],
+        [
+          852,
+          956
+        ],
+        [
+          792,
+          1036
+        ],
+        [
+          676,
+          1120
+        ],
+        [
+          580,
+          1156
+        ]
+      ],
+      "description": "Main winding campus route connecting the dojo, student courts and inner zone",
+      "zOrder": 4,
+      "walkable": true,
+      "blocked": false,
+      "foreground": false,
+      "opacity": false
+    },
+    {
+      "id": "path-main-spine-upper",
+      "name": "Upper Campus Path",
+      "category": "path",
+      "points": [
+        [
+          760,
+          956
+        ],
+        [
+          836,
+          872
+        ],
+        [
+          944,
+          780
+        ],
+        [
+          1052,
+          808
+        ],
+        [
+          996,
+          888
+        ],
+        [
+          904,
+          980
+        ],
+        [
+          828,
+          1012
+        ]
+      ],
+      "description": "Upper connecting path to the inner and core student courts",
+      "zOrder": 4,
+      "walkable": true,
+      "blocked": false,
+      "foreground": false,
+      "opacity": false
+    },
+    {
+      "id": "path-core-approach",
+      "name": "Core Hall Approach",
+      "category": "path",
+      "points": [
+        [
+          976,
+          808
+        ],
+        [
+          1068,
+          724
+        ],
+        [
+          1192,
+          640
+        ],
+        [
+          1288,
+          672
+        ],
+        [
+          1224,
+          752
+        ],
+        [
+          1124,
+          844
+        ],
+        [
+          1040,
+          872
+        ]
+      ],
+      "description": "Stone path leading to the core academy hall",
+      "zOrder": 4,
+      "walkable": true,
+      "blocked": false,
+      "foreground": false,
+      "opacity": false
+    },
+    {
+      "id": "path-east-branch",
+      "name": "Eastern Learning Path",
+      "category": "path",
+      "points": [
+        [
+          1200,
+          748
+        ],
+        [
+          1320,
+          708
+        ],
+        [
+          1476,
+          724
+        ],
+        [
+          1580,
+          788
+        ],
+        [
+          1524,
+          856
+        ],
+        [
+          1388,
+          832
+        ],
+        [
+          1284,
+          816
+        ]
+      ],
+      "description": "Branching route linking inner students to advanced training and Arcanist classrooms",
+      "zOrder": 4,
+      "walkable": true,
+      "blocked": false,
+      "foreground": false,
+      "opacity": false
+    },
+    {
+      "id": "path-dojo-branch",
+      "name": "Dojo Garden Path",
+      "category": "path",
+      "points": [
+        [
+          468,
+          1056
+        ],
+        [
+          500,
+          968
+        ],
+        [
+          580,
+          880
+        ],
+        [
+          676,
+          880
+        ],
+        [
+          656,
+          964
+        ],
+        [
+          592,
+          1048
+        ],
+        [
+          548,
+          1116
+        ]
+      ],
+      "description": "Winding path through the dojo and instructor grounds",
+      "zOrder": 4,
+      "walkable": true,
+      "blocked": false,
+      "foreground": false,
+      "opacity": false
+    },
+    {
+      "id": "path-spirit-branch",
+      "name": "Spirit Training Approach",
+      "category": "path",
+      "points": [
+        [
+          1556,
+          772
+        ],
+        [
+          1664,
+          680
+        ],
+        [
+          1804,
+          580
+        ],
+        [
+          1892,
+          604
+        ],
+        [
+          1844,
+          688
+        ],
+        [
+          1732,
+          780
+        ],
+        [
+          1636,
+          844
+        ]
+      ],
+      "description": "Protected route to the advanced Spirit Realm training area",
+      "zOrder": 4,
+      "walkable": true,
+      "blocked": false,
+      "foreground": false,
+      "opacity": false
+    },
+    {
+      "id": "path-arcanist-branch",
+      "name": "Arcanist Workshop Walk",
+      "category": "path",
+      "points": [
+        [
+          1564,
+          840
+        ],
+        [
+          1684,
+          916
+        ],
+        [
+          1816,
+          992
+        ],
+        [
+          1788,
+          1076
+        ],
+        [
+          1688,
+          1040
+        ],
+        [
+          1580,
+          960
+        ],
+        [
+          1520,
+          892
+        ]
+      ],
+      "description": "Walkway connecting the inner zone to Arcanist classrooms and workshops",
+      "zOrder": 4,
+      "walkable": true,
+      "blocked": false,
+      "foreground": false,
+      "opacity": false
+    },
+    {
+      "id": "path-garden-east",
+      "name": "Eastern Garden Walk",
+      "category": "path",
+      "points": [
+        [
+          1864,
+          1064
+        ],
+        [
+          1964,
+          1004
+        ],
+        [
+          2096,
+          996
+        ],
+        [
+          2180,
+          1064
+        ],
+        [
+          2104,
+          1128
+        ],
+        [
+          1988,
+          1144
+        ],
+        [
+          1900,
+          1128
+        ]
+      ],
+      "description": "Small landscaped path around the Arcanist garden pond",
+      "zOrder": 4,
+      "walkable": true,
+      "blocked": false,
+      "foreground": false,
+      "opacity": false
+    },
+    {
+      "id": "court-outer",
+      "name": "Outer Student Courtyard",
+      "category": "courtyard",
+      "points": [
+        [
+          288,
+          1080
+        ],
+        [
+          436,
+          976
+        ],
+        [
+          696,
+          992
+        ],
+        [
+          888,
+          1108
+        ],
+        [
+          828,
+          1296
+        ],
+        [
+          580,
+          1376
+        ],
+        [
+          340,
+          1296
+        ]
+      ],
+      "description": "Large open outdoor meeting and student practice court",
+      "zOrder": 2,
+      "walkable": true,
+      "blocked": false,
+      "foreground": false,
+      "opacity": false
+    },
+    {
+      "id": "court-inner",
+      "name": "Inner Student Courtyard",
+      "category": "courtyard",
+      "points": [
+        [
+          904,
+          644
+        ],
+        [
+          1104,
+          560
+        ],
+        [
+          1404,
+          568
+        ],
+        [
+          1628,
+          696
+        ],
+        [
+          1552,
+          904
+        ],
+        [
+          1284,
+          992
+        ],
+        [
+          1016,
+          876
+        ]
+      ],
+      "description": "Open learning court between inner student halls",
+      "zOrder": 2,
+      "walkable": true,
+      "blocked": false,
+      "foreground": false,
+      "opacity": false
+    },
+    {
+      "id": "court-core",
+      "name": "Core Academy Forecourt",
+      "category": "courtyard",
+      "points": [
+        [
+          1100,
+          276
+        ],
+        [
+          1320,
+          208
+        ],
+        [
+          1576,
+          268
+        ],
+        [
+          1724,
+          416
+        ],
+        [
+          1640,
+          580
+        ],
+        [
+          1400,
+          632
+        ],
+        [
+          1200,
+          528
+        ]
+      ],
+      "description": "Stone forecourt below the main academy hall",
+      "zOrder": 2,
+      "walkable": true,
+      "blocked": false,
+      "foreground": false,
+      "opacity": false
+    },
+    {
+      "id": "court-dojo",
+      "name": "Dojo Practice Yard",
+      "category": "training-yard",
+      "points": [
+        [
+          340,
+          808
+        ],
+        [
+          464,
+          720
+        ],
+        [
+          676,
+          724
+        ],
+        [
+          804,
+          864
+        ],
+        [
+          728,
+          1020
+        ],
+        [
+          516,
+          1068
+        ],
+        [
+          364,
+          960
+        ]
+      ],
+      "description": "Open martial training ground and sparring space",
+      "zOrder": 2,
+      "walkable": true,
+      "blocked": false,
+      "foreground": false,
+      "opacity": false
+    },
+    {
+      "id": "court-spirit",
+      "name": "Advanced Spirit Realm Practice Court",
+      "category": "training-yard",
+      "points": [
+        [
+          2028,
+          380
+        ],
+        [
+          2212,
+          292
+        ],
+        [
+          2460,
+          316
+        ],
+        [
+          2604,
+          456
+        ],
+        [
+          2528,
+          628
+        ],
+        [
+          2300,
+          692
+        ],
+        [
+          2096,
+          580
+        ]
+      ],
+      "description": "Walkable training court surrounding the advanced practice ring",
+      "zOrder": 2,
+      "walkable": true,
+      "blocked": false,
+      "foreground": false,
+      "opacity": false
+    },
+    {
+      "id": "court-arcanist",
+      "name": "Arcanist Workshop Courtyard",
+      "category": "courtyard",
+      "points": [
+        [
+          1960,
+          1004
+        ],
+        [
+          2136,
+          928
+        ],
+        [
+          2408,
+          968
+        ],
+        [
+          2584,
+          1128
+        ],
+        [
+          2480,
+          1300
+        ],
+        [
+          2204,
+          1348
+        ],
+        [
+          1992,
+          1216
+        ]
+      ],
+      "description": "Open work yard between academy Arcanist classrooms and small workshops",
+      "zOrder": 2,
+      "walkable": true,
+      "blocked": false,
+      "foreground": false,
+      "opacity": false
+    },
+    {
+      "id": "gate-main",
+      "name": "Tianhai Academy Main Entrance",
+      "category": "gate",
+      "points": [
+        [
+          20,
+          1444
+        ],
+        [
+          112,
+          1424
+        ],
+        [
+          156,
+          1484
+        ],
+        [
+          96,
+          1536
+        ],
+        [
+          24,
+          1524
+        ]
+      ],
+      "description": "Small formal entrance, approximately two isometric diamonds wide",
+      "zOrder": 8,
+      "walkable": false,
+      "blocked": true,
+      "foreground": true,
+      "opacity": false
+    },
+    {
+      "id": "pond-west",
+      "name": "Western Garden Pond",
+      "category": "pond",
+      "points": [
+        [
+          140,
+          724
+        ],
+        [
+          208,
+          660
+        ],
+        [
+          320,
+          664
+        ],
+        [
+          412,
+          732
+        ],
+        [
+          448,
+          828
+        ],
+        [
+          392,
+          940
+        ],
+        [
+          284,
+          984
+        ],
+        [
+          176,
+          908
+        ],
+        [
+          108,
+          816
+        ]
+      ],
+      "description": "Irregular garden pond with stone edge and a small crossing bridge",
+      "zOrder": 3,
+      "walkable": false,
+      "blocked": true,
+      "foreground": false,
+      "opacity": false
+    },
+    {
+      "id": "pond-south-east",
+      "name": "Southeastern Reflecting Pond",
+      "category": "pond",
+      "points": [
+        [
+          1492,
+          1168
+        ],
+        [
+          1588,
+          1096
+        ],
+        [
+          1724,
+          1100
+        ],
+        [
+          1844,
+          1172
+        ],
+        [
+          1868,
+          1280
+        ],
+        [
+          1796,
+          1372
+        ],
+        [
+          1648,
+          1400
+        ],
+        [
+          1532,
+          1332
+        ],
+        [
+          1460,
+          1248
+        ]
+      ],
+      "description": "Natural reflecting pond among the southern gardens",
+      "zOrder": 3,
+      "walkable": false,
+      "blocked": true,
+      "foreground": false,
+      "opacity": false
+    },
+    {
+      "id": "pond-core",
+      "name": "Inner Garden Water Feature",
+      "category": "pond",
+      "points": [
+        [
+          1000,
+          1000
+        ],
+        [
+          1060,
+          948
+        ],
+        [
+          1144,
+          956
+        ],
+        [
+          1200,
+          1012
+        ],
+        [
+          1180,
+          1084
+        ],
+        [
+          1108,
+          1120
+        ],
+        [
+          1028,
+          1080
+        ]
+      ],
+      "description": "Small irregular pond beside the inner garden walk",
+      "zOrder": 3,
+      "walkable": false,
+      "blocked": true,
+      "foreground": false,
+      "opacity": false
+    },
+    {
+      "id": "building-core-main-hall",
+      "name": "Core Academy Main Hall",
+      "category": "building",
+      "points": [
+        [
+          1344,
+          312
+        ],
+        [
+          1512,
+          252
+        ],
+        [
+          1644,
+          344
+        ],
+        [
+          1628,
+          500
+        ],
+        [
+          1456,
+          572
+        ],
+        [
+          1316,
+          476
+        ]
+      ],
+      "description": "Main teaching hall of the academy, kept compact relative to the campus grounds",
+      "zOrder": 7,
+      "walkable": false,
+      "blocked": true,
+      "foreground": true,
+      "opacity": false
+    },
+    {
+      "id": "building-core-library",
+      "name": "Core Learning Library",
+      "category": "building",
+      "points": [
+        [
+          1080,
+          384
+        ],
+        [
+          1184,
+          340
+        ],
+        [
+          1284,
+          404
+        ],
+        [
+          1264,
+          508
+        ],
+        [
+          1152,
+          556
+        ],
+        [
+          1064,
+          480
+        ]
+      ],
+      "description": "Library and quiet study pavilion",
+      "zOrder": 7,
+      "walkable": false,
+      "blocked": true,
+      "foreground": true,
+      "opacity": false
+    },
+    {
+      "id": "building-core-lecture",
+      "name": "Core Lecture Pavilion",
+      "category": "building",
+      "points": [
+        [
+          1680,
+          420
+        ],
+        [
+          1788,
+          380
+        ],
+        [
+          1876,
+          444
+        ],
+        [
+          1844,
+          544
+        ],
+        [
+          1740,
+          588
+        ],
+        [
+          1660,
+          512
+        ]
+      ],
+      "description": "Small lecture pavilion for senior students",
+      "zOrder": 7,
+      "walkable": false,
+      "blocked": true,
+      "foreground": true,
+      "opacity": false
+    },
+    {
+      "id": "building-inner-east",
+      "name": "Inner Student Hall East",
+      "category": "building",
+      "points": [
+        [
+          1540,
+          664
+        ],
+        [
+          1648,
+          620
+        ],
+        [
+          1744,
+          684
+        ],
+        [
+          1716,
+          788
+        ],
+        [
+          1612,
+          840
+        ],
+        [
+          1524,
+          760
+        ]
+      ],
+      "description": "Inner student lesson hall",
+      "zOrder": 7,
+      "walkable": false,
+      "blocked": true,
+      "foreground": true,
+      "opacity": false
+    },
+    {
+      "id": "building-inner-west",
+      "name": "Inner Student Hall West",
+      "category": "building",
+      "points": [
+        [
+          940,
+          696
+        ],
+        [
+          1044,
+          640
+        ],
+        [
+          1144,
+          712
+        ],
+        [
+          1120,
+          808
+        ],
+        [
+          1012,
+          868
+        ],
+        [
+          928,
+          788
+        ]
+      ],
+      "description": "Inner student lesson hall",
+      "zOrder": 7,
+      "walkable": false,
+      "blocked": true,
+      "foreground": true,
+      "opacity": false
+    },
+    {
+      "id": "building-teacher-house",
+      "name": "Instructor Residence",
+      "category": "building",
+      "points": [
+        [
+          504,
+          564
+        ],
+        [
+          612,
+          512
+        ],
+        [
+          708,
+          572
+        ],
+        [
+          688,
+          672
+        ],
+        [
+          584,
+          728
+        ],
+        [
+          488,
+          648
+        ]
+      ],
+      "description": "Teacher and instructor residence",
+      "zOrder": 7,
+      "walkable": false,
+      "blocked": true,
+      "foreground": true,
+      "opacity": false
+    },
+    {
+      "id": "building-teacher-pavilion",
+      "name": "Instructor Pavilion",
+      "category": "building",
+      "points": [
+        [
+          288,
+          468
+        ],
+        [
+          388,
+          420
+        ],
+        [
+          476,
+          476
+        ],
+        [
+          460,
+          568
+        ],
+        [
+          364,
+          612
+        ],
+        [
+          280,
+          540
+        ]
+      ],
+      "description": "Quiet instructor consultation pavilion",
+      "zOrder": 7,
+      "walkable": false,
+      "blocked": true,
+      "foreground": true,
+      "opacity": false
+    },
+    {
+      "id": "building-dojo-west",
+      "name": "Western Dojo",
+      "category": "dojo-building",
+      "points": [
+        [
+          444,
+          840
+        ],
+        [
+          560,
+          776
+        ],
+        [
+          672,
+          840
+        ],
+        [
+          652,
+          956
+        ],
+        [
+          540,
+          1012
+        ],
+        [
+          432,
+          924
+        ]
+      ],
+      "description": "Small timber dojo with a separate practice yard",
+      "zOrder": 7,
+      "walkable": false,
+      "blocked": true,
+      "foreground": true,
+      "opacity": false
+    },
+    {
+      "id": "building-dojo-east",
+      "name": "Eastern Dojo",
+      "category": "dojo-building",
+      "points": [
+        [
+          672,
+          920
+        ],
+        [
+          768,
+          872
+        ],
+        [
+          860,
+          928
+        ],
+        [
+          844,
+          1020
+        ],
+        [
+          752,
+          1076
+        ],
+        [
+          656,
+          1000
+        ]
+      ],
+      "description": "Secondary martial arts pavilion",
+      "zOrder": 7,
+      "walkable": false,
+      "blocked": true,
+      "foreground": true,
+      "opacity": false
+    },
+    {
+      "id": "building-spirit-pavilion",
+      "name": "Spirit Realm Training Pavilion",
+      "category": "building",
+      "points": [
+        [
+          2232,
+          332
+        ],
+        [
+          2352,
+          280
+        ],
+        [
+          2460,
+          352
+        ],
+        [
+          2436,
+          452
+        ],
+        [
+          2320,
+          504
+        ],
+        [
+          2220,
+          428
+        ]
+      ],
+      "description": "Instructor station beside the advanced Spirit Realm ring",
+      "zOrder": 7,
+      "walkable": false,
+      "blocked": true,
+      "foreground": true,
+      "opacity": false
+    },
+    {
+      "id": "building-arcanist-class",
+      "name": "Arcanist Learning Hall",
+      "category": "building",
+      "points": [
+        [
+          2056,
+          1060
+        ],
+        [
+          2168,
+          1000
+        ],
+        [
+          2272,
+          1068
+        ],
+        [
+          2244,
+          1164
+        ],
+        [
+          2132,
+          1212
+        ],
+        [
+          2040,
+          1136
+        ]
+      ],
+      "description": "Academy Arcanist classroom, not the separate Tianhai Arcanist Institute",
+      "zOrder": 7,
+      "walkable": false,
+      "blocked": true,
+      "foreground": true,
+      "opacity": false
+    },
+    {
+      "id": "building-arcanist-workshop",
+      "name": "Arcanist Practice Workshop",
+      "category": "building",
+      "points": [
+        [
+          2348,
+          1084
+        ],
+        [
+          2456,
+          1028
+        ],
+        [
+          2552,
+          1092
+        ],
+        [
+          2532,
+          1184
+        ],
+        [
+          2420,
+          1236
+        ],
+        [
+          2324,
+          1160
+        ]
+      ],
+      "description": "Small supervised practice workshop for Arcanistry",
+      "zOrder": 7,
+      "walkable": false,
+      "blocked": true,
+      "foreground": true,
+      "opacity": false
+    },
+    {
+      "id": "building-outer-dorm-west",
+      "name": "Outer Student Residence West",
+      "category": "building",
+      "points": [
+        [
+          420,
+          1192
+        ],
+        [
+          524,
+          1136
+        ],
+        [
+          624,
+          1192
+        ],
+        [
+          604,
+          1288
+        ],
+        [
+          504,
+          1340
+        ],
+        [
+          404,
+          1264
+        ]
+      ],
+      "description": "Outer student residences",
+      "zOrder": 7,
+      "walkable": false,
+      "blocked": true,
+      "foreground": true,
+      "opacity": false
+    },
+    {
+      "id": "building-outer-dorm-east",
+      "name": "Outer Student Residence East",
+      "category": "building",
+      "points": [
+        [
+          776,
+          1224
+        ],
+        [
+          888,
+          1168
+        ],
+        [
+          992,
+          1228
+        ],
+        [
+          972,
+          1324
+        ],
+        [
+          864,
+          1376
+        ],
+        [
+          760,
+          1304
+        ]
+      ],
+      "description": "Outer student residences",
+      "zOrder": 7,
+      "walkable": false,
+      "blocked": true,
+      "foreground": true,
+      "opacity": false
+    },
+    {
+      "id": "building-outer-study",
+      "name": "Outer Student Study Pavilion",
+      "category": "building",
+      "points": [
+        [
+          268,
+          1144
+        ],
+        [
+          352,
+          1096
+        ],
+        [
+          432,
+          1152
+        ],
+        [
+          416,
+          1232
+        ],
+        [
+          332,
+          1276
+        ],
+        [
+          256,
+          1208
+        ]
+      ],
+      "description": "Small study pavilion near the arrival court",
+      "zOrder": 7,
+      "walkable": false,
+      "blocked": true,
+      "foreground": true,
+      "opacity": false
+    },
+    {
+      "id": "spirit-training-ring",
+      "name": "Advanced Spirit Realm Training Ring",
+      "category": "spirit-training-ring",
+      "points": [
+        [
+          2300,
+          444
+        ],
+        [
+          2376,
+          404
+        ],
+        [
+          2460,
+          448
+        ],
+        [
+          2460,
+          528
+        ],
+        [
+          2380,
+          580
+        ],
+        [
+          2300,
+          532
+        ],
+        [
+          2200,
+          1224
+        ],
+        [
+          2332,
+          1172
+        ],
+        [
+          2448,
+          1232
+        ],
+        [
+          2416,
+          1320
+        ],
+        [
+          2296,
+          1348
+        ],
+        [
+          2188,
+          1288
+        ]
+      ],
+      "description": "Practice ground with small artificial-artifact stations",
+      "zOrder": 4,
+      "walkable": true,
+      "blocked": false,
+      "foreground": false,
+      "opacity": false
+    },
+    {
+      "id": "garden-west",
+      "name": "Western Botanical Garden",
+      "category": "garden",
+      "points": [
+        [
+          80,
+          428
+        ],
+        [
+          216,
+          332
+        ],
+        [
+          400,
+          360
+        ],
+        [
+          532,
+          496
+        ],
+        [
+          500,
+          628
+        ],
+        [
+          364,
+          696
+        ],
+        [
+          192,
+          628
+        ]
+      ],
+      "description": "Tree-lined garden beside the instructor quarters",
+      "zOrder": 2,
+      "walkable": false,
+      "blocked": false,
+      "foreground": false,
+      "opacity": false
+    },
+    {
+      "id": "garden-north",
+      "name": "Northern Core Garden",
+      "category": "garden",
+      "points": [
+        [
+          912,
+          148
+        ],
+        [
+          1080,
+          84
+        ],
+        [
+          1268,
+          140
+        ],
+        [
+          1324,
+          252
+        ],
+        [
+          1200,
+          328
+        ],
+        [
+          1020,
+          296
+        ]
+      ],
+      "description": "Quiet garden above the core student buildings",
+      "zOrder": 2,
+      "walkable": false,
+      "blocked": false,
+      "foreground": false,
+      "opacity": false
+    },
+    {
+      "id": "garden-inner",
+      "name": "Inner Courtyard Garden",
+      "category": "garden",
+      "points": [
+        [
+          1160,
+          900
+        ],
+        [
+          1288,
+          852
+        ],
+        [
+          1404,
+          912
+        ],
+        [
+          1396,
+          1004
+        ],
+        [
+          1288,
+          1060
+        ],
+        [
+          1172,
+          996
+        ]
+      ],
+      "description": "Central landscaped pocket garden",
+      "zOrder": 2,
+      "walkable": false,
+      "blocked": false,
+      "foreground": false,
+      "opacity": false
+    },
+    {
+      "id": "garden-east",
+      "name": "Eastern Spirit Garden",
+      "category": "garden",
+      "points": [
+        [
+          2500,
+          696
+        ],
+        [
+          2632,
+          636
+        ],
+        [
+          2736,
+          708
+        ],
+        [
+          2712,
+          844
+        ],
+        [
+          2596,
+          900
+        ],
+        [
+          2500,
+          808
+        ]
+      ],
+      "description": "Outer garden bordering the advanced training grounds",
+      "zOrder": 2,
+      "walkable": false,
+      "blocked": false,
+      "foreground": false,
+      "opacity": false
+    },
+    {
+      "id": "garden-arcanist",
+      "name": "Arcanist Workshop Garden",
+      "category": "garden",
+      "points": [
+        [
+          1848,
+          1292
+        ],
+        [
+          1952,
+          1228
+        ],
+        [
+          2060,
+          1288
+        ],
+        [
+          2040,
+          1380
+        ],
+        [
+          1924,
+          1428
+        ],
+        [
+          1832,
+          1360
+        ]
+      ],
+      "description": "Small garden with water and specimen beds",
+      "zOrder": 2,
+      "walkable": false,
+      "blocked": false,
+      "foreground": false,
+      "opacity": false
+    },
+    {
+      "id": "tree-cluster-west",
+      "name": "Western Garden Tree Canopy",
+      "category": "tree-canopy",
+      "points": [
+        [
+          152,
+          520
+        ],
+        [
+          204,
+          468
+        ],
+        [
+          268,
+          468
+        ],
+        [
+          324,
+          528
+        ],
+        [
+          316,
+          600
+        ],
+        [
+          252,
+          640
+        ],
+        [
+          180,
+          604
+        ],
+        [
+          708,
+          480
+        ],
+        [
+          760,
+          432
+        ],
+        [
+          832,
+          444
+        ],
+        [
+          880,
+          508
+        ],
+        [
+          864,
+          584
+        ],
+        [
+          788,
+          620
+        ],
+        [
+          716,
+          576
+        ]
+      ],
+      "description": "Foreground tree canopy; fade the Player when passing behind it",
+      "zOrder": 9,
+      "walkable": false,
+      "blocked": false,
+      "foreground": true,
+      "opacity": true
+    },
+    {
+      "id": "tree-cluster-inner",
+      "name": "Inner Garden Tree Canopy",
+      "category": "tree-canopy",
+      "points": [
+        [
+          1228,
+          1000
+        ],
+        [
+          1284,
+          948
+        ],
+        [
+          1352,
+          956
+        ],
+        [
+          1404,
+          1016
+        ],
+        [
+          1380,
+          1088
+        ],
+        [
+          1312,
+          1120
+        ],
+        [
+          1240,
+          1068
+        ]
+      ],
+      "description": "Foreground canopy beside the inner garden path",
+      "zOrder": 9,
+      "walkable": false,
+      "blocked": false,
+      "foreground": true,
+      "opacity": true
+    },
+    {
+      "id": "tree-cluster-east",
+      "name": "Eastern Garden Tree Canopy",
+      "category": "tree-canopy",
+      "points": [
+        [
+          2576,
+          808
+        ],
+        [
+          2628,
+          760
+        ],
+        [
+          2696,
+          776
+        ],
+        [
+          2748,
+          836
+        ],
+        [
+          2724,
+          908
+        ],
+        [
+          2656,
+          948
+        ],
+        [
+          2584,
+          888
+        ]
+      ],
+      "description": "Foreground canopy beside the advanced training grounds",
+      "zOrder": 9,
+      "walkable": false,
+      "blocked": false,
+      "foreground": true,
+      "opacity": true
+    },
+    {
+      "id": "tree-cluster-outer",
+      "name": "Outer Student Garden Tree Canopy",
+      "category": "tree-canopy",
+      "points": [
+        [
+          988,
+          1328
+        ],
+        [
+          1048,
+          1280
+        ],
+        [
+          1116,
+          1288
+        ],
+        [
+          1164,
+          1352
+        ],
+        [
+          1136,
+          1420
+        ],
+        [
+          1068,
+          1460
+        ],
+        [
+          1000,
+          1408
+        ]
+      ],
+      "description": "Foreground canopy in the outer student gardens",
+      "zOrder": 9,
+      "walkable": false,
+      "blocked": false,
+      "foreground": true,
+      "opacity": true
+    },
+    {
+      "id": "boundary-north",
+      "name": "Northern Garden Boundary",
+      "category": "boundary",
+      "points": [
+        [
+          72,
+          260
+        ],
+        [
+          2752,
+          192
+        ],
+        [
+          2780,
+          228
+        ],
+        [
+          100,
+          316
+        ]
+      ],
+      "description": "Low boundary wall; blocks movement and renders in front of actors",
+      "zOrder": 8,
+      "walkable": false,
+      "blocked": true,
+      "foreground": true,
+      "opacity": false
+    },
+    {
+      "id": "boundary-east",
+      "name": "Eastern Campus Boundary",
+      "category": "boundary",
+      "points": [
+        [
+          2724,
+          360
+        ],
+        [
+          2780,
+          360
+        ],
+        [
+          2796,
+          1176
+        ],
+        [
+          2744,
+          1208
+        ]
+      ],
+      "description": "Low outer campus wall",
+      "zOrder": 8,
+      "walkable": false,
+      "blocked": true,
+      "foreground": true,
+      "opacity": false
+    },
+    {
+      "id": "bridge-west",
+      "name": "Western Garden Bridge",
+      "category": "bridge",
+      "points": [
+        [
+          368,
+          788
+        ],
+        [
+          444,
+          772
+        ],
+        [
+          484,
+          832
+        ],
+        [
+          420,
+          860
+        ]
+      ],
+      "description": "Walkable stone-and-wood bridge across the western pond edge",
+      "zOrder": 5,
+      "walkable": true,
+      "blocked": false,
+      "foreground": false,
+      "opacity": false
+    },
+    {
+      "id": "bridge-southeast",
+      "name": "Southeastern Garden Bridge",
+      "category": "bridge",
+      "points": [
+        [
+          1732,
+          1244
+        ],
+        [
+          1812,
+          1216
+        ],
+        [
+          1864,
+          1272
+        ],
+        [
+          1796,
+          1312
+        ]
+      ],
+      "description": "Walkable bridge across the reflecting pond inlet",
+      "zOrder": 5,
+      "walkable": true,
+      "blocked": false,
+      "foreground": false,
+      "opacity": false
+    }
+  ]
+}
