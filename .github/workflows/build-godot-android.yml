@@ -6,6 +6,7 @@ on:
       - migration/godot-offline-engine-2026-11-07
     paths:
       - "godot/**"
+      - "native/godot-android-plugin/**"
       - ".github/workflows/build-godot-android.yml"
   pull_request:
     paths:
@@ -35,6 +36,11 @@ jobs:
           distribution: temurin
           java-version: "17"
 
+      - name: Set up Gradle for Android plugin compilation
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.13"
+
       - name: Install Android export packages
         shell: bash
         run: |
@@ -53,7 +59,9 @@ jobs:
           "$SDKMANAGER" --sdk_root="$SDK_ROOT" --install \
             "platform-tools" \
             "build-tools;35.0.1" \
+            "build-tools;36.0.0" \
             "platforms;android-35" \
+            "platforms;android-36" \
             "cmdline-tools;latest" \
             "cmake;3.10.2.4988404" \
             "ndk;28.1.13356709"
@@ -116,6 +124,20 @@ jobs:
           echo "GODOT_ANDROID_KEYSTORE_DEBUG_USER=androiddebugkey" >> "$GITHUB_ENV"
           echo "GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD=android" >> "$GITHUB_ENV"
 
+      - name: Build native Godot Android plugin AAR
+        shell: bash
+        run: |
+          set -euo pipefail
+          gradle -p native/godot-android-plugin --no-daemon --stacktrace :plugin:assembleDebug :plugin:assembleRelease
+          mkdir -p godot/addons/merzkava_android/bin/debug godot/addons/merzkava_android/bin/release
+          DEBUG_AAR="$(find native/godot-android-plugin/plugin/build/outputs/aar -type f -name '*-debug.aar' -print -quit)"
+          RELEASE_AAR="$(find native/godot-android-plugin/plugin/build/outputs/aar -type f -name '*-release.aar' -print -quit)"
+          test -n "$DEBUG_AAR"
+          test -n "$RELEASE_AAR"
+          cp "$DEBUG_AAR" godot/addons/merzkava_android/bin/debug/MerzkavaAndroid-debug.aar
+          cp "$RELEASE_AAR" godot/addons/merzkava_android/bin/release/MerzkavaAndroid-release.aar
+          unzip -l godot/addons/merzkava_android/bin/debug/MerzkavaAndroid-debug.aar | grep -q 'classes.jar'
+
       - name: Validate Godot project
         run: |
           set -euo pipefail
@@ -134,7 +156,7 @@ jobs:
         run: |
           set -euo pipefail
           APK_PATH="$GITHUB_WORKSPACE/godot/build/Merzkava-Godot-dev.apk"
-          "$GODOT_BIN" --headless --path "$GITHUB_WORKSPACE/godot" --export-debug "Android" "$APK_PATH"
+          "$GODOT_BIN" --headless --path "$GITHUB_WORKSPACE/godot" --install-android-build-template --export-debug "Android" "$APK_PATH"
           test -s "$APK_PATH"
 
       - name: Verify APK package, alignment, signature and integrity
@@ -157,7 +179,9 @@ jobs:
           - Package: com.antarezka.merzkava.godotdev
           - ABI: arm64-v8a
           - Build type: debug
-          - This is a migration test shell, not a completed game port.
+          - Native Android plugin: Android Keystore vault, overlay permission bridge and draggable Kitty bubble.
+- Mini-window mode uses Android picture-in-picture; resizable overlay parity remains a device QA item.
+- This APK is a migration build; unported gameplay/content modules remain explicitly marked in-app.
           - The development package is intentionally separate from the legacy production package.
           EOF
 
