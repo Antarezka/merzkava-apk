@@ -755,6 +755,12 @@ func _submit_player_login() -> void:
 		notice_text = str(auth_result.get("message", "Player verification failed."))
 		_show_login_gate()
 		return
+	if account_service.is_developer():
+		var lock_result: Dictionary = account_service.sign_out()
+		if not bool(lock_result.get("ok", false)):
+			notice_text = str(lock_result.get("message", "Developer session could not be locked."))
+			_show_login_gate()
+			return
 	account_service.sign_in_player(name)
 	notice_text = ""
 	current_page = "control"
@@ -1153,7 +1159,7 @@ func _perform_atlas_check(name: String, password: String, confirmation: String, 
 		if attempt == auth_attempt:
 			auth_result = {"done": true, "ok": false, "message": str(source_check.get("message", "Universe verification failed."))}
 		return
-	var exists := account_service.has_atlas_password(name)
+	var exists: bool = account_service.has_atlas_password(name)
 	if exists:
 		var valid: bool = await account_service.verify_atlas_password(name, password)
 		if not valid:
@@ -1254,7 +1260,7 @@ func _on_pull_cord_gui_input(event: InputEvent) -> void:
 			_cord_active = true
 			_play_asset(CORD_GRAB_SOUND, -12.0)
 		elif _cord_active:
-			var delta := event.position - _cord_start
+			var delta: Vector2 = event.position - _cord_start
 			_cord_active = false
 			if delta.y >= 16.0 and absf(delta.y) > absf(delta.x) * 0.72:
 				_toggle_navigation_cord()
