@@ -15,12 +15,14 @@ import { findIsoQuadrantPath, isIsoQuadrantWalkable, isNpcInteractionCellReachab
 import { renderPlayerHudMarkup, refreshPlayerHud, handlePlayerHudClick, mountPlayerHudMotion, disposePlayerHudMotion, bindPlayerHudLayoutEditor, bindScrollableResizableWindows } from "./player-hud";
 import "./player-hud.css";
 import { disposeAugustoPxlAssets, mountAugustoPxlAssets } from "./augusto-pxl-runtime";
+import { bindPxlMapStudio, renderPxlMapStudioMarkup, TIANHAI_PXL_SANDBOX_MAP_ID } from "./pxl-map-studio";
 
 let worldMapDeveloperMode = false;
 export function setWorldMapDeveloperMode(enabled: boolean): void {
   worldMapDeveloperMode = enabled;
   if (enabled || typeof document === "undefined") return;
-  document.querySelectorAll<HTMLElement>("[data-wmh-editor-dock],[data-wmh-academy-editor]").forEach(node => node.remove());
+  document.querySelectorAll<HTMLElement>("[data-wmh-editor-dock],[data-wmh-academy-editor],[data-pxl-studio],[data-pxl-studio-svg]").forEach(node => node.remove());
+  document.querySelectorAll<HTMLElement>("[data-wmh-board].pxl-studio-board-active").forEach(board=>{board.classList.remove("pxl-studio-board-active");board.dataset.editorPaused="false";board.querySelectorAll<HTMLElement>("[data-wmh-player-token],[data-wmh-npc]").forEach(token=>token.getAnimations().forEach(animation=>animation.play()));});
   document.querySelectorAll<HTMLElement>("[data-wmh-board].wmh-overlay-editing").forEach(board => {
     board.classList.remove("wmh-overlay-editing","wmh-editor-paused");
     board.dataset.editorPaused = "false";
@@ -31,7 +33,7 @@ export function setWorldMapDeveloperMode(enabled: boolean): void {
 }
 export function isWorldMapDeveloperMode(): boolean { return worldMapDeveloperMode; }
 
-type Level = "world" | "regional" | "local" | "interior" | "home" | "map-editor" | "test";
+type Level = "world" | "regional" | "local" | "interior" | "home" | "map-editor" | "test" | "pxl-studio";
 export type WorldMapVisualMode = "legacy" | "augusto-pxl";
 const PXL_WORLD_MAP_PLACEHOLDER="/assets/augusto-pxl/placeholders/world-map-pending.svg";
 const PXL_REGION_MAP_PLACEHOLDER="/assets/augusto-pxl/placeholders/region-map-pending.svg";
@@ -56,7 +58,7 @@ const regionData: Record<RegionId, { name: string; subtitle: string; image: stri
   "golden-dragon-empire": {
     name: "Golden Dragon Empire", subtitle: "EASTERN POWER · IMPERIAL TERRITORIES",
     image: "/game/scenery/golden-dragon-empire/establishing-views/gde-01-imperial-city-panorama.png",
-    sites: ["Imperial Capital", "Tianhai Academy", "Imperial Market", "Eastern Port", "Public Pavilion", "Public Arena"]
+    sites: ["Imperial Capital", "Imperial Market", "Eastern Port", "Public Pavilion", "Public Arena"]
   },
   "tianhai-yunzhou": {
     name: "Tianhai Yunzhou", subtitle: "SOUTHWESTERN FLOATING POWER",
