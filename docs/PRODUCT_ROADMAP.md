@@ -23,7 +23,7 @@ There is **one master roadmap only**: this file, `docs/PRODUCT_ROADMAP.md`. Syst
 - [x] Record the full-engine decision and migration contract in `docs/GODOT_MIGRATION_PLAN.md`.
 - [x] Create a dedicated migration branch and initial `godot/project.godot` scaffold with main scene/GDScript placeholder.
 - [x] Add GitHub Actions workflow definitions for headless Godot validation and Android APK export with matching template downloads.
-- [ ] Observe successful headless CI validation.
+- [x] Godot Runtime Validation #2 passed: project import, script parsing and main-scene headless launch. [Run #2](https://github.com/Antarezka/merzkava-apk/actions/runs/42360136902).
 - [ ] Produce and verify a cloud Android APK artifact.
 - [ ] Port app shell and all feature modes into Godot without losing current behavior.
 - [ ] Migrate existing local profile, save, map-editor and settings data with explicit schema migrations.
