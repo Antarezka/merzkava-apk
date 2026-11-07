@@ -140,16 +140,13 @@ export function renderPxlMapStudioMarkup():string {
         '<output class="pxl-studio-status" data-pxl-studio-status>Pull the right-hand handle to open the controls.</output>'+
       '</div>'+
     '</section>'+
-    '<svg class="pxl-studio-svg" data-pxl-studio-svg viewBox="0 0 '+MAP_WIDTH+' '+MAP_HEIGHT+'" preserveAspectRatio="none" aria-label="Editor-only labels and isometric quadrant mapping">'+
-      '<g data-pxl-cell-grid></g><g data-pxl-label-layer></g><g data-pxl-lasso-preview></g><g data-pxl-label-handles></g>'+
-    '</svg>'+
   '</div>';
 }
 
 export function bindPxlMapStudio(dialog:HTMLElement,onEditingChange?:(active:boolean)=>void):void {
   const studio=dialog.querySelector<HTMLElement>("[data-pxl-studio]");
   const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
-  const svg=studio?.querySelector<SVGSVGElement>("[data-pxl-studio-svg]");
+  const svg=dialog.querySelector<SVGSVGElement>("[data-pxl-studio-svg]");
   const rail=studio?.querySelector<HTMLElement>("[data-pxl-studio-rail]");
   const windowPanel=studio?.querySelector<HTMLElement>("[data-pxl-studio-window]");
   if(!studio||!board||!svg||!rail||!windowPanel||studio.dataset.bound==="true")return;
@@ -387,7 +384,11 @@ export function bindPxlMapStudio(dialog:HTMLElement,onEditingChange?:(active:boo
     button.addEventListener("click",()=>openWindow(button.dataset.pxlStudioTab as StudioTab));
   });
   const grip=rail.querySelector<HTMLButtonElement>("[data-pxl-studio-grip]");
-  grip?.addEventListener("click",()=>rail.classList.toggle("is-open"));
+  let suppressGripClick=false;
+  grip?.addEventListener("click",()=>{
+    if(suppressGripClick){suppressGripClick=false;return;}
+    rail.classList.toggle("is-open");
+  });
   grip?.addEventListener("pointerdown",event=>{
     const startX=event.clientX;let moved=false;
     const move=(next:PointerEvent)=>{
@@ -397,7 +398,10 @@ export function bindPxlMapStudio(dialog:HTMLElement,onEditingChange?:(active:boo
     };
     const end=()=>{
       window.removeEventListener("pointermove",move);window.removeEventListener("pointerup",end);
-      if(moved)event.preventDefault();
+      if(moved){
+        suppressGripClick=true;
+        window.setTimeout(()=>{suppressGripClick=false;},280);
+      }
     };
     window.addEventListener("pointermove",move,{passive:false});window.addEventListener("pointerup",end,{once:true});
   });
