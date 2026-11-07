@@ -248,6 +248,8 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
       image.style.setProperty("height",artHeight+"px","important");
       const overlay=surface.querySelector<SVGSVGElement>("[data-wmh-overlay-svg]");
       if(overlay){overlay.style.position="absolute";overlay.style.left=artLeft+"px";overlay.style.top=artTop+"px";overlay.style.right="auto";overlay.style.bottom="auto";overlay.style.width=artWidth+"px";overlay.style.height=artHeight+"px";overlay.setAttribute("viewBox","0 0 "+(image.naturalWidth||2816)+" "+(image.naturalHeight||1536));}
+      const pxlOverlay=surface.querySelector<SVGSVGElement>("[data-pxl-studio-svg]");
+      if(pxlOverlay){pxlOverlay.style.position="absolute";pxlOverlay.style.left=artLeft+"px";pxlOverlay.style.top=artTop+"px";pxlOverlay.style.right="auto";pxlOverlay.style.bottom="auto";pxlOverlay.style.width=artWidth+"px";pxlOverlay.style.height=artHeight+"px";pxlOverlay.setAttribute("viewBox","0 0 "+(image.naturalWidth||2816)+" "+(image.naturalHeight||1536));}
       const foreground=surface.querySelector<HTMLCanvasElement>("[data-wmh-foreground-canvas]");
       if(foreground){foreground.style.position="absolute";foreground.style.left=artLeft+"px";foreground.style.top=artTop+"px";foreground.style.right="auto";foreground.style.bottom="auto";foreground.style.width=artWidth+"px";foreground.style.height=artHeight+"px";}
       const actors=surface.querySelector<HTMLElement>("[data-wmh-actor-layer]");
