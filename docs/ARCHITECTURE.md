@@ -8,7 +8,21 @@ Merzkava APK is **one Android application with two playable experiences and one 
 2. **Merzkava: Eternal Path** (current working title; Life Simulation Text RPG) — a standalone local game mode. Its canon-backed world references come from a versioned local **World Archive package**; its adaptations and game-only additions live in a separate versioned Offline Game content pack. It must be playable without AI or network access.
 3. **World Archive** — the reviewed local content library inside the app. Users can browse it offline; its approved package supplies canon-backed world references to Offline Game. It is not a hidden context source for Convo.
 
-The app shell, navigation, visual components, assets, and selected infrastructure may be shared. The modes themselves must remain clearly identified and isolated where state or authority differs.
+The final installed Android client uses **one native Godot runtime** for the application shell, splash/menu/navigation, Eternal Path, World Archive and Convo UI. The existing Vite/TypeScript/Capacitor client is retained only as a migration source until parity and save migration are proven. Do not ship two competing client/game runtimes.
+
+The modes remain clearly identified and isolated where state or authority differs. Remote services are optional network adapters for connected Convo and future backup/content updates; they are not dependencies of offline gameplay.
+
+## Godot runtime direction
+
+- Godot 4.7.2 stable is the initial pinned engine baseline; GDScript is the default implementation language.
+- Use Godot's native 2D scene/rendering system and Compatibility renderer as the initial Android target. Profile on the TECNO Spark Go 1 KL4 before enabling costly rendering features.
+- Use native Godot UI, touch input, scenes, resources, animation and lifecycle handling. No WebView/DOM layer is part of the target client runtime.
+- Store local game state under Godot's `user://` sandbox using a versioned schema, atomic writes, recoverable backups and explicit migrations.
+- Package approved maps, sprites, sound, fonts, World Archive and game-content data in the APK or local update package. No CDN or live server is required to enter/play Eternal Path.
+- AI/Convo requests and optional backups use isolated network adapters. If offline, the app remains usable and only the connected feature shows an unavailable state.
+- The PXL toolchain may create source art and export image assets for Godot. It is not a game engine and is never shipped as a runtime dependency.
+
+See [Godot Migration Plan](./GODOT_MIGRATION_PLAN.md) for phases and acceptance criteria.
 
 ## Source and authority flow
 
@@ -37,11 +51,11 @@ Official merzkava-universe repository
 
 ## Runtime layers
 
-1. **Shared Android/UI shell:** app lifecycle, navigation, accessibility, common visual components, and mode selection.
+1. **Godot native client:** Android lifecycle, splash, home, navigation, accessibility, common visual components and mode selection.
 2. **Convo services:** canon loader/router, pinned-revision tracking, context assembly, AI provider adapters, structured response parsing, and conversation/session handling.
 3. **World Archive service:** local dossier catalogue, search, entity graph/backlinks, reviewed source reader, visibility policy, and package/version metadata.
 4. **Offline Game runtime:** deterministic mechanics, event/choice orchestration, progression, local world simulation, and validation. No AI/network dependency for core play.
-5. **Persistence:** local database (SQLite is planned) with distinct Convo and Offline Game save/session namespaces and versioned migrations.
+5. **Persistence:** versioned Godot-local storage under `user://`, with explicit import/migrations and distinct Convo, World Archive and Offline Game namespaces. SQLite may be introduced through an Android-compatible Godot extension only after compatibility is verified.
 6. **Shared platform services:** settings, asset delivery, diagnostics, and Android packaging. Shared infrastructure must not erase mode-specific authority boundaries.
 
 ## State and mode isolation
@@ -88,7 +102,7 @@ Separate namespaces for Convo sessions/history and Offline Game saves/progressio
 
 ## Repository layout contract
 
-The source tree follows system ownership rather than a flat collection of feature folders:
+The legacy web source tree follows system ownership rather than a flat collection of feature folders. During migration it is a reference/compatibility source, not the target native runtime:
 
 ```text
 src/
@@ -123,3 +137,20 @@ docs/
 - Cross-system imports should be deliberate and one-directional: the app shell composes modes; World Archive provides approved content packages to Offline Game; Convo loads canon directly from Universe. Offline Game must not import Convo engines/auth/context, and Convo must not import Archive content as hidden prompt context.
 - Keep tests beside the same ownership boundary under `tests/`. Build/test discovery must include all nested test folders.
 - When a module is moved, update every import and test path in the same commit; do not leave compatibility shims or duplicate source copies unless a documented migration requires them.
+
+
+## Godot client project layout
+
+The native client is organized separately from legacy web sources:
+
+```text
+godot/
+  project.godot
+  scenes/              app shell, maps, actors, menus and feature screens
+  scripts/             GDScript systems and deterministic rules
+  resources/            reusable data definitions and themes
+  assets/               imported local sprites, tiles, audio and fonts
+  data/                 packaged World Archive and Offline Game packs
+```
+
+Keep system boundaries visible in scene/script ownership. Eternal Path must not import Convo session state; Convo must not silently use World Archive as active canon context. Map art is presentation only—the Godot data model owns collision, walkability, actor occupancy and transactions.
