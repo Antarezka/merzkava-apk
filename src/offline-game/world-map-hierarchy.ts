@@ -389,7 +389,7 @@ function bindWorldMapZoom(dialog: HTMLElement): void {
     pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
     if (pointers.size === 1) {
       const start={x:event.clientX,y:event.clientY,scrollLeft:viewport.scrollLeft,scrollTop:viewport.scrollTop};
-      const editorTapMode=academyCanvas&&surface.classList.contains("wmh-overlay-editing");
+      const editorTapMode=academyCanvas&&(surface.classList.contains("wmh-overlay-editing")||surface.classList.contains("pxl-studio-board-active"));
       panStart=editorTapMode?null:start;
       pendingCameraPan=editorTapMode?start:null;
       try { viewport.setPointerCapture(event.pointerId); } catch { /* pointer capture may be unavailable */ }
