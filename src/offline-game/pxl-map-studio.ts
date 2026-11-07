@@ -501,7 +501,8 @@ export function bindPxlMapStudio(dialog:HTMLElement,onEditingChange?:(active:boo
   svg.addEventListener("pointerdown",event=>{
     const target=event.target as Element;
     if(activeTab==="cells"){
-      if(target.closest("[data-pxl-sector]")){event.preventDefault();event.stopPropagation();}
+      // Let the single existing Academy camera distinguish a sector tap from a drag-pan.
+      // A tap still reaches the click handler below; a drag is consumed by the viewport camera.
       return;
     }
     if(activeTab!=="labels")return;
