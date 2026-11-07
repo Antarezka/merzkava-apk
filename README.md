@@ -16,6 +16,7 @@ The app contains **two playable experiences in one APK**: (1) **Convo / AI GM**,
 - **World Archive:** reviewed, versioned local content library; browsable offline and the approved content source for Offline Game.
 - **Merzkava: Eternal Path:** standalone Life Simulation Text RPG (current working title); consumes a release package that pins the approved World Archive package and a reviewed game-content pack, and uses deterministic local mechanics without AI/network dependency.
 - **Godot client foundation:** one native Godot runtime owns the final Android app shell, navigation, UI, assets, offline gameplay and connected Convo client. The existing Capacitor shell remains temporary migration source.
+- **Godot animation:** all animation in the final APK is native Godot (AnimatedSprite2D, AnimationPlayer, Tween); no web/CSS/JavaScript animation runtime ships. Effects are budgeted and profiled for low-end Android hardware.
 - **Separate mode state:** Convo and Offline Game keep distinct session/save state and source-version records; no implicit state or context crossover.
 - **Deterministic Godot engine and local persistence:** validate mechanics and persist authoritative local state; use versioned local saves with explicit migrations. A SQLite extension is subject to Android compatibility verification.
 
