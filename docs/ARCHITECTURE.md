@@ -21,6 +21,8 @@ The modes remain clearly identified and isolated where state or authority differ
 - Package approved maps, sprites, sound, fonts, World Archive and game-content data in the APK or local update package. No CDN or live server is required to enter/play Eternal Path.
 - AI/Convo requests and optional backups use isolated network adapters. If offline, the app remains usable and only the connected feature shows an unavailable state.
 - The PXL toolchain may create source art and export image assets for Godot. It is not a game engine and is never shipped as a runtime dependency.
+- All final-client animation is Godot-native: AnimatedSprite2D for frame animation, AnimationPlayer for authored sequences, and Tween for short property transitions. AnimationTree and GPUParticles2D are opt-in tools, used only when a measured need justifies their cost.
+- The final APK does not ship a browser, CSS or JavaScript animation runtime. Hidden/off-screen animations pause; particle, shader, texture and active-animation budgets are tested on the TECNO Spark Go 1 KL4.
 
 See [Godot Migration Plan](./GODOT_MIGRATION_PLAN.md) for phases and acceptance criteria.
 
