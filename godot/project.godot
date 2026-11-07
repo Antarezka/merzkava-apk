@@ -1,5 +1,6 @@
-; Merzkava native Godot client — migration foundation.
+; Merzkava native Godot client — portrait-only migration foundation.
 ; Keep this file pinned to the stable engine version used by cloud CI.
+; Portrait is locked in both project settings and the Android export manifest. Landscape is not supported.
 
 config_version=5
 
@@ -11,10 +12,11 @@ config/features=PackedStringArray("4.7", "GL Compatibility")
 
 [display]
 
-window/size/viewport_width=960
-window/size/viewport_height=540
+window/size/viewport_width=540
+window/size/viewport_height=960
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
+window/handheld/orientation=1
 
 [rendering]
 

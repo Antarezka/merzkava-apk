@@ -9,9 +9,13 @@
 
 Merzkava APK is moving to a **full Godot client runtime**.
 
-Godot is to own the complete installed client experience: launch/splash, home and navigation, menus, Eternal Path gameplay, World Archive, Convo client UI, settings, character presentation, maps, interactions, local storage and Android app lifecycle.
+Godot is to own the complete installed client experience: launch/splash, Floating Control and access gate, home and navigation, menus, Eternal Path gameplay, World Archive, Convo client UI, settings, character presentation, maps, interactions, local storage and Android app lifecycle.
 
 The previous Vite/TypeScript/Capacitor client is a migration source and compatibility reference only. It is not the intended final game engine or UI runtime. Do not run two competing game engines in the final APK. Do not delete legacy systems until their behavior and data have been migrated and verified.
+
+**Legacy parity contract:** [GODOT_PARITY_AUDIT.md](./GODOT_PARITY_AUDIT.md) records the final pre-migration source baseline at 818bf65 and is mandatory for G1 implementation. The app-entry Player role, local Developer role, Supabase Convo session and World Atlas local password are four separate security/data flows. Preserve the legacy control-first launch order, contextual real-task access buffer, Floating Control setup/actions, Kitty splash/bubble, clockwork dock/pull cord, audio, themes and launcher artwork. This is a behavior port, not a generic replacement menu.
+
+**Orientation:** Android is portrait-only. Landscape and sensor-landscape are unsupported in every export and runtime path. The project viewport must remain portrait-shaped and the Android manifest/export must lock portrait.
 
 Remote services may remain as optional backend services:
 - Cloudflare Worker / AI provider gateway for connected Convo requests.
@@ -151,11 +155,17 @@ A cloud workflow is not considered complete until a real APK artifact is produce
 - [ ] Produce and verify a real debug APK artifact from GitHub Actions.
 - [ ] Verify the APK installs and launches on the target TECNO device.
 
-### G1 — Native Godot app shell
-- [ ] Port splash, Home, navigation, main menu, settings and Android Back handling.
-- [ ] Port Kitty mascot presentation and existing app access/navigation rules.
-- [ ] Add responsive portrait/landscape layouts and touch-safe hit areas.
-- [ ] Verify every menu and floating control performs its actual action.
+### G1 — Native Godot app shell and full legacy parity
+- [ ] Replace the G0 placeholder with the legacy control-first launch order: Floating Control plus the Player/Developer gate above it; successful access returns to Floating Control until Open game / continue is selected.
+- [ ] Port the separate Player roster gate, offline-capable device-local Developer verifier, SecureStorage Remember Me / Lock behavior, and Supabase Convo session without merging credentials.
+- [ ] Port the separate World Atlas password gate, source verification, first-password setup, Remember Me, password change and account-bound reset grant.
+- [ ] Port the contextual, cancellable access-buffer sequence; run it only alongside an explicit real account/session/reset/clipboard operation and never claim 100% before success.
+- [ ] Port Floating Control permissions, readiness, foreground service, Kitty bubble, mini-window, restore/stop, Android Back and lifecycle through a Godot Android plugin/native service.
+- [ ] Port Kitty's aligned layered splash animation, header action, cross-app bubble art and launcher/adaptive icon from the registered source assets.
+- [ ] Port the eight-destination clockwork dock, independent rotary rings, gravity pull cord, short-tug gesture, spring return, haptics and matched local audio.
+- [ ] Port both app themes, bundled fonts, language and wallpaper preferences, and the original sound toggle.
+- [ ] Lock the entire APK to portrait; no landscape or sensor-based orientation is accepted. Validate short/narrow screen sizes and touch-safe hit areas.
+- [ ] Verify every visible control performs its intended action or clearly reports that its destination is not yet migrated.
 
 ### G2 — Offline storage and content foundation
 - [ ] Implement versioned local profile/save storage and recovery.

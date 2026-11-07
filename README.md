@@ -4,7 +4,7 @@ Android-first roleplaying game for **Merzkava Universe**, migrating to a full na
 
 ## Project direction
 
-**Engine decision (2026-11-07):** Godot is the target runtime for the complete Android client—app shell, Eternal Path, World Archive and Convo UI. The Vite/TypeScript/Capacitor client is retained only as a migration source until feature parity and save migration are verified. The Godot port is in progress; the current production APK is not yet fully migrated. See [Godot Migration Plan](./docs/GODOT_MIGRATION_PLAN.md) and the new project under `godot/`.
+**Engine decision (2026-11-07):** Godot is the target runtime for the complete Android client—app shell, Eternal Path, World Archive and Convo UI. The Vite/TypeScript/Capacitor client is retained only as a migration source until feature parity and save migration are verified. The Godot port is in progress; the current production APK is not yet fully migrated. See [Godot Migration Plan](./docs/GODOT_MIGRATION_PLAN.md), the [pre-Godot parity audit](./docs/GODOT_PARITY_AUDIT.md), and the new project under `godot/`.
 
 **The master product roadmap is [docs/PRODUCT_ROADMAP.md](./docs/PRODUCT_ROADMAP.md).** It is the primary planning reference for the app's workstreams, existing-feature audit, priorities, progress checklist, and release gates.
 

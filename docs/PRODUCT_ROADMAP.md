@@ -20,12 +20,20 @@ There is **one master roadmap only**: this file, `docs/PRODUCT_ROADMAP.md`. Syst
 
 **Current state:** G0 scaffold is being established on `migration/godot-offline-engine-2026-11-07`. The existing Capacitor client remains the current production implementation until the Godot port passes feature parity, data migration and physical Android checks. Do not claim the entire app is already Godot.
 
+**Legacy parity source audit:** the latest pre-migration source reviewed is main at `818bf65b12f4b20bc50f2db75cde065133cce088`. The last identified APK checkpoint is Build #1360 from `2be3fee29e56b6bb062bf93acf46ab0e19387928`; main then contains two later source commits, so source audit does not equal a physical APK test. The exact access/account, floating, Kitty, navigation, sound, theme and data contract is recorded in [GODOT_PARITY_AUDIT.md](./GODOT_PARITY_AUDIT.md).
+
 - [x] Record the full-engine decision and migration contract in `docs/GODOT_MIGRATION_PLAN.md`.
 - [x] Create a dedicated migration branch and initial `godot/project.godot` scaffold with main scene/GDScript placeholder.
 - [x] Add GitHub Actions workflow definitions for headless Godot validation and Android APK export with matching template downloads.
 - [x] Godot Runtime Validation #2 passed: project import, script parsing and main-scene headless launch. [Run #2](https://github.com/Antarezka/merzkava-apk/actions/runs/42360136902).
-- [ ] Produce and verify a cloud Android APK artifact.
+- [x] Produce and verify a cloud Android APK artifact: Godot Android Build #8 exported, signed, aligned and uploaded the arm64 debug artifact. Physical-device installation and runtime checks remain open.
 - [ ] Port app shell and all feature modes into Godot without losing current behavior.
+- [x] Audit the final pre-Godot source baseline and record the complete account, access-buffer, Floating Control, Kitty, menu, theme, audio and data parity contract in [GODOT_PARITY_AUDIT.md](./GODOT_PARITY_AUDIT.md).
+- [ ] Lock every Godot Android export to portrait-only; landscape is not an accepted layout or runtime state.
+- [ ] Port the legacy control-first access flow and keep Player, Developer, Supabase and World Atlas accounts separate.
+- [ ] Port the real-task-coupled account access buffer; do not show it for passive screen/list/form opening and never report false success.
+- [ ] Port Floating Control readiness/permissions/actions, the foreground service and the Godot-backed mini-window.
+- [ ] Port Kitty splash, header action, cross-app bubble/ring, original audio, launcher/adaptive icon and the complete clockwork dock/pull-cord behavior.
 - [ ] Migrate existing local profile, save, map-editor and settings data with explicit schema migrations.
 - [ ] Prove fresh install, save/reload, gameplay and World Archive under airplane mode.
 - [ ] Complete physical-device input/performance QA on TECNO Spark Go 1 KL4.
@@ -34,6 +42,8 @@ There is **one master roadmap only**: this file, `docs/PRODUCT_ROADMAP.md`. Syst
 **Offline gate:** Eternal Path, local profiles/saves, World Archive and packaged assets must not require login, AI, CDN, Supabase or any live server. Only connected Convo and explicitly optional backup/content-update features may require internet.
 
 **Animation gate:** every animation in the final APK—including splash, Kitty mascot, menus, UI feedback, characters, NPCs, creatures, environment, skills and cutscenes—must run through Godot-native systems only. Use AnimatedSprite2D, AnimationPlayer and Tween as the default toolbox; add AnimationTree or GPUParticles2D only when justified by measured need. No Anime.js, CSS/DOM animation or JavaScript animation runtime ships in the final client. Legacy web animation is migration reference only. Animation must be profiled for the TECNO Spark Go 1 KL4, with hidden/off-screen effects paused and particle/shader budgets kept modest.
+
+**Shell and interaction direction:** the legacy app's dark verdigris / aged-brass / parchment visual system, dual themes, editorial local fonts, eight-destination clockwork dock, independent rotary emblems, gravity pull cord, Kitty mascot and account access instrument are mandatory migration references. The Godot port must preserve their geometry, interaction and sounds rather than replacing them with generic dark-gold cards. See [GODOT_PARITY_AUDIT.md](./GODOT_PARITY_AUDIT.md).
 
 **Visual direction:** original Merzkava 2D cultivation-fantasy art with inhabited regional maps, readable compact characters, distinct idle/walk/action animation, layered terrain and architecture, and atmospheric but restrained effects. Public project documentation records the resulting art requirements rather than naming private visual inspirations. No commercial assets, maps, sprites or character designs are to be copied. The art-style selector must apply a consistent selected pack to Player, NPCs, creatures, maps and relevant illustrations, with strict world-unit scale and ground-pivot checks so characters remain proportionate to buildings.
 
