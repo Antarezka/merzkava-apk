@@ -4,6 +4,9 @@ This folder contains Eternal Path's local simulation/formula references and game
 
 ## Continue work on the isometric world
 
+For new regional maps, read [PXL Isometric Map Production Workflow](./PXL_MAP_PRODUCTION_WORKFLOW.md) first. It defines the canon → lasso/cell mapping → canvas validation → Augusto PXL → runtime sequence. The Academy sandbox calibration is in [Tianhai Academy PXL spatial and quadrant map](./ACADEMY_PXL_QUADRANT_MAPPING.md).
+
+
 Recommended AI/developer read order:
 
 1. [AI Handoff — Isometric Field, Combat and Access](../AI_HANDOFF_2026-11-05.md)
