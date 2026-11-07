@@ -469,6 +469,7 @@ func _build_settings(parent: VBoxContainer) -> void:
 
 func _build_navigation(parent: VBoxContainer) -> void:
 	var dock := PanelContainer.new()
+	dock.visible = not navigation_collapsed
 	dock.custom_minimum_size.y = 70
 	dock.add_theme_stylebox_override("panel", _style_box(ENAMEL_DARK, BRASS, 8, 1))
 	parent.add_child(dock)
@@ -502,14 +503,13 @@ func _build_pull_cord(parent: VBoxContainer) -> void:
 	row.alignment = BoxContainer.ALIGNMENT_BEGIN
 	parent.add_child(row)
 	var handle := Button.new()
-	handle.text = "⌁"
-	handle.tooltip_text = "Pull down to retract or restore the navigation dock"
+	handle.text = "↑" if navigation_collapsed else "⌁"
+	handle.tooltip_text = "Pull down to restore the navigation dock" if navigation_collapsed else "Pull down to retract the navigation dock"
 	handle.custom_minimum_size = Vector2(48, 38)
 	handle.add_theme_font_size_override("font_size", 24)
 	handle.add_theme_color_override("font_color", BRASS_LIGHT)
 	handle.add_theme_stylebox_override("normal", _style_box(ENAMEL_DARK, BRASS, 8, 1))
-	handle.button_down.connect(_play_asset.bind(CORD_GRAB_SOUND, -12.0))
-	handle.button_up.connect(_toggle_navigation_cord)
+	handle.gui_input.connect(_on_pull_cord_gui_input)
 	row.add_child(handle)
 	var note := Label.new()
 	note.text = "CLOCKWORK NAVIGATION"
@@ -863,10 +863,10 @@ func _sign_out_with_buffer() -> void:
 	_show_login_gate()
 
 func _perform_sign_out(attempt: int) -> void:
-	account_service.sign_out()
+	var result: Dictionary = account_service.sign_out()
 	if attempt != auth_attempt:
 		return
-	auth_result = {"done": true, "ok": true, "message": "Sesi lokal telah dikunci."}
+	auth_result = {"done": true, "ok": bool(result.get("ok", false)), "message": str(result.get("message", "Sesi lokal dikunci."))}
 
 func _navigate(destination: String) -> void:
 	if is_busy:
@@ -1057,7 +1057,11 @@ func _refresh_native_readiness() -> void:
 			battery_status = "READY" if bool(state.get("batteryExemption", false)) else "NOT READY"
 			service_status = "RUNNING" if bool(state.get("serviceRunning", false)) else "NOT RUNNING"
 		else:
-			_set_native_unavailable("Android readiness response could not be parsed.")
+			overlay_status = "NOT READY"
+			notification_status = "NOT READY"
+			battery_status = "NOT READY"
+			service_status = "NOT RUNNING"
+			native_bridge_status = "INVALID RESPONSE"
 
 func _has_native_bridge() -> bool:
 	return native_plugin != null
@@ -1242,6 +1246,38 @@ func _toggle_sound() -> void:
 	if not sound_enabled:
 		audio_player.stop()
 	_render()
+
+func _on_pull_cord_gui_input(event: InputEvent) -> void:
+	if event is InputEventScreenTouch:
+		if event.pressed:
+			_cord_start = event.position
+			_cord_active = true
+			_play_asset(CORD_GRAB_SOUND, -12.0)
+		elif _cord_active:
+			var delta := event.position - _cord_start
+			_cord_active = false
+			if delta.y >= 16.0 and absf(delta.y) > absf(delta.x) * 0.72:
+				_toggle_navigation_cord()
+			else:
+				_play_asset(CORD_SPRING_SOUND, -12.0)
+		_cord_handle.accept_event()
+	elif event is InputEventScreenDrag and _cord_active:
+		_cord_handle.accept_event()
+	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		if event.pressed:
+			_cord_start = event.position
+			_cord_active = true
+			_play_asset(CORD_GRAB_SOUND, -12.0)
+		elif _cord_active:
+			var delta := event.position - _cord_start
+			_cord_active = false
+			if delta.y >= 16.0 and absf(delta.y) > absf(delta.x) * 0.72:
+				_toggle_navigation_cord()
+			else:
+				_play_asset(CORD_SPRING_SOUND, -12.0)
+		_cord_handle.accept_event()
+	elif event is InputEventMouseMotion and _cord_active:
+		_cord_handle.accept_event()
 
 func _toggle_navigation_cord() -> void:
 	if current_page == "control" or _cord_active:
