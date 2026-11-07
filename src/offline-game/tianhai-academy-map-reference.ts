@@ -44,7 +44,7 @@ const has=(point:IsoMapPoint,flag:"walkable"|"blocked"|"foreground"|"opacity")=>
   labels.some(label=>label[flag]===true&&pointInPolygon(point,label.points));
 const walkableCells=[...allCells].filter(coordinate=>{
   const [x,y]=coordinate.split(",").map(Number);
-  return has(centerOf(x,y),"walkable")||["12,31","7,4","10,9","6,15","22,10"].includes(coordinate);
+  return (has(centerOf(x,y),"walkable")&&coordinate!=="22,14")||["12,31","7,4","10,9","6,15","22,10"].includes(coordinate);
 }).sort((a,b)=>{
   const [ax,ay]=a.split(",").map(Number),[bx,by]=b.split(",").map(Number);
   return ay-by||ax-bx;
