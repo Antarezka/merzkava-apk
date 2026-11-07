@@ -734,7 +734,7 @@ function tileMapMarkup(
       '</div></div></div>';
   }
 
-  const academyExterior = !interior && mapId.startsWith("golden-dragon-empire:tianhai-academy:exterior");
+  const academyExterior = !interior && mapId.startsWith("pxl-studio:tianhai-academy:exterior");
   const cols = interior ? 12 : 24;
   const rows = interior ? 10 : 20;
   const tileW = academyExterior && mapImage ? 128 : 64;
@@ -750,7 +750,7 @@ function tileMapMarkup(
   const boardHeight=Math.max(projectedHeight,baseHeight);
   const theme:IsometricSvgTheme=interior?"interior":regionId;
   const title=selectedBuilding+(interior?" · INTERIOR":"");
-  const pxlMapAssetId=visualMode==="augusto-pxl"?"map.local.default":mapId==="golden-dragon-empire:tianhai-academy:exterior"?"map.academy.exterior":"map.area."+mapId.replace(/[^a-z0-9]+/gi,".").toLowerCase();
+  const pxlMapAssetId=visualMode==="augusto-pxl"?"map.local.default":mapId===TIANHAI_PXL_SANDBOX_MAP_ID?"map.academy.exterior":"map.area."+mapId.replace(/[^a-z0-9]+/gi,".").toLowerCase();
   const imageMarkup=mapImage
     ? '<img class="wmh-isometric-map-base" data-wmh-map-art '+(visualMode==="augusto-pxl"?'data-pxl-asset-id="'+pxlMapAssetId+'" ':'')+'src="'+mapImage+'" alt="'+(visualMode==="augusto-pxl"?"Augusto PXL isometric environment":"Tianhai Academy map base")+'" draggable="false" loading="eager" decoding="async"/><canvas class="wmh-isometric-foreground" data-wmh-foreground-canvas aria-hidden="true"></canvas>'
     : "";
@@ -775,7 +775,7 @@ function isometricMapBaseFor(regionId: RegionId, selectedBuilding: string, inter
   if(visualMode==="augusto-pxl")return PXL_LOCAL_MAP_PLACEHOLDER;
   if (interior) return "";
   const place = selectedBuilding.trim().toLowerCase().replace(/\s+/g, " ");
-  if (regionId === "golden-dragon-empire" && (place === "tianhai academy" || place === "academy")) return "/maps/academy/full-map/1_academy.jpg";
+  
   return "";
 }
 function makeIsometricMapId(regionId: RegionId, selectedBuilding: string, interior: boolean): string {
@@ -1043,7 +1043,7 @@ function renderIsometricMinimap(board:HTMLElement):void {
   if(!world||!actors)return;
   const data=readIsoMapData(board);
   const style=getComputedStyle(board);
-  const isTianhaiAcademy=board.dataset.mapId==="golden-dragon-empire:tianhai-academy:exterior";
+  const isTianhaiAcademy=board.dataset.mapId===TIANHAI_PXL_SANDBOX_MAP_ID;
   const academyArtwork=board.querySelector<HTMLImageElement>("[data-wmh-map-art]");
   // The Academy camera canvas includes large pan margins. The minimap maps
   // only the artwork coordinate space, never the empty expansion margins.
@@ -2346,25 +2346,6 @@ function bindAcademyCanvasEditor(dialog:HTMLElement):void {
   });
 }
 function isometricPlayMarkup(regionId: RegionId, selectedBuilding: string, interior: boolean,visualMode:WorldMapVisualMode="legacy"): string {
-  const isEmptyAcademy = !interior && regionId === "golden-dragon-empire" &&
-    selectedBuilding.trim().toLowerCase() === "tianhai academy";
-  if (isEmptyAcademy) {
-    const academyMapImage=visualMode==="augusto-pxl"?PXL_ACADEMY_MAP_PLACEHOLDER:"/maps/academy/full-map/1_academy.jpg";
-    const academyMapId="golden-dragon-empire:tianhai-academy:exterior";
-    return '<div class="wmh-isometric-play-screen wmh-academy-map-screen" data-wmh-isometric-play-screen>'+
-      ''+
-      '<div class="wmh-academy-map-viewport" data-wmh-map-viewport><div class="wmh-academy-map-surface" data-wmh-map-surface data-wmh-academy-canvas data-wmh-board data-academy-artwork-board="true" data-map-id="'+academyMapId+'" data-cols="24" data-rows="20" data-tile-w="128" data-tile-h="69.5" data-offset-x="0" data-offset-y="0" data-map-theme="golden-dragon-empire" data-map-title="Tianhai Academy" data-map-interior="false">'+
-      '<svg class="wmh-academy-margin-grid" data-wmh-academy-margin-grid preserveAspectRatio="none" aria-hidden="true"></svg>'+
-      '<img class="wmh-academy-map-art" data-wmh-academy-map-art data-wmh-map-art '+(visualMode==="augusto-pxl"?'data-pxl-asset-id="map.academy.exterior" ':'')+'src="'+academyMapImage+'" alt="Tianhai Academy full map" draggable="false" loading="eager" decoding="async"/>'+
-      '<canvas class="wmh-isometric-foreground" data-wmh-foreground-canvas aria-hidden="true"></canvas>'+
-      '<button type="button" class="wmh-academy-map-hit" data-wmh-map-hit aria-label="Move to this position on the Academy map" tabindex="-1"></button>'+
-      '<svg class="wmh-area-overlay-svg wmh-academy-grid-overlay" data-wmh-overlay-svg viewBox="0 0 2816 1536" preserveAspectRatio="none" aria-label="Editable isometric interaction grid"><g data-wmh-interaction-grid></g><g data-wmh-overlay-marks></g><g data-wmh-manual-marks></g><g data-wmh-transition-marks></g><path data-wmh-overlay-preview class="wmh-area-mark-preview" d=""></path></svg>'+
-      '<div class="wmh-academy-actor-layer" data-wmh-actor-layer><button type="button" class="wmh-character-token wmh-player-token" data-wmh-player-token data-scan-tone="unknown" data-token-label="" data-x="12" data-y="31" aria-label="Player character">'+pxlActorMarkup("character.player.idle",visualMode)+'</button>'+isometricNpcTokensMarkup(academyMapId,false,visualMode)+'<div data-wmh-transition-layer></div></div>'+
-      '</div></div>'+(visualMode==="augusto-pxl"?isometricHudMarkup("Tianhai Academy",academyMapImage,true,visualMode):isometricHudMarkup("Tianhai Academy",academyMapImage,true))+academyCanvasEditorMarkup()+isometricEditorMarkup()+
-      '<button type="button" class="wmh-map-back wmh-academy-map-back" data-wmh-action="back" aria-label="Return to Golden Dragon Empire map"><i class="wmh-academy-back-icon" aria-hidden="true"></i><b>GOLDEN DRAGON EMPIRE</b></button>'+
-      '<section class="wmh-chat-panel" data-wmh-chat hidden role="dialog" aria-label="Character conversation"><div class="wmh-chat-card" data-wmh-scroll-resize><button type="button" class="wmh-chat-close" data-wmh-action="chat-close" aria-label="Close conversation">×</button><div class="wmh-chat-thread" data-wmh-thread></div><div class="wmh-chat-input-row"><span>YOUR RESPONSE</span><div data-wmh-replies></div></div></div></section><section class="wmh-transition-dialog" data-wmh-transition-dialog hidden role="dialog" aria-label="World dialogue"><div class="wmh-transition-dialog-card" data-wmh-scroll-resize><small data-wmh-transition-speaker>WORLD ARCHIVE</small><p data-wmh-transition-dialog-text></p><button type="button" data-wmh-transition-close>CONTINUE</button></div></section><section class="wmh-transition-notice" data-wmh-transition-notice hidden role="dialog" aria-label="World event notification"><div class="wmh-transition-notice-card" data-wmh-scroll-resize><small>WORLD EVENT · ARCHIVE NOTICE</small><h3 data-wmh-transition-notice-title></h3><p data-wmh-transition-notice-text></p><button type="button" data-wmh-transition-close>CONTINUE</button></div></section><section class="wmh-transition-confirm" data-wmh-transition-confirm-panel hidden role="dialog" aria-modal="true" aria-label="Confirm academy exit"><div class="wmh-transition-confirm-card" data-wmh-scroll-resize><small>TIANHAI ACADEMY · GATE</small><h3 data-wmh-transition-confirm-title>Leave Tianhai Academy?</h3><p data-wmh-transition-confirm-text>Leave through the academy gate and travel to Golden Dragon Empire?</p><div class="wmh-transition-confirm-actions"><button type="button" data-wmh-transition-confirm="no">NO · STAY</button><button type="button" data-wmh-transition-confirm="yes">YES · LEAVE ACADEMY</button></div></div></section>'+
-      '</div>';
-  }
   const mapId=makeIsometricMapId(regionId,selectedBuilding,interior);
   const mapImage=isometricMapBaseFor(regionId,selectedBuilding,interior,visualMode);
   const title=selectedBuilding+(interior?" · INTERIOR":"");
@@ -2432,10 +2413,10 @@ function panelMarkup(level: Level, regionId: RegionId = "golden-dragon-empire", 
     '<div class="wmh-home-grid">'+[["Farmland","▧"],["Building Plot","⌂"],["Training Area","⚔"],["Warehouse","▤"],["Fish Pond","◉"],["Lumber Area","♧"]].map(([name,icon])=>'<button data-wmh-plot="'+name+'"><span>'+icon+'</span><b>'+name+'</b><small>VIEW FUNCTION</small></button>').join("")+'</div><div class="wmh-bottom-actions"><button data-wmh-action="back">← WORLD MAP</button><span>PERSONAL DEVELOPMENT AREA</span></div>';
 }
 export function renderWorldMapHierarchy(visualMode:WorldMapVisualMode="legacy",hidden=false): string {
-  return '<section class="wmh-overlay" data-world-map-hierarchy data-visual-mode="'+visualMode+'" aria-label="Map Navigation" '+(hidden?'hidden':'')+'><div class="wmh-dialog" data-wmh-dialog>'+panelMarkup("world","golden-dragon-empire","Tianhai Academy",undefined,visualMode)+'</div></section>';
+  return '<section class="wmh-overlay" data-world-map-hierarchy data-visual-mode="'+visualMode+'" aria-label="Map Navigation" '+(hidden?'hidden':'')+'><div class="wmh-dialog" data-wmh-dialog>'+panelMarkup("world","golden-dragon-empire","Imperial Capital",undefined,visualMode)+'</div></section>';
 }
 function resetLegacyIsometricMapLayouts(): void {
-  // Clear only Tianhai Academy exterior once; other regions keep their saved editor data.
+  // Remove the former misplaced Golden Dragon Academy editor key once; the live PXL sample uses its separate Tianhai Yunzhou sandbox key.
   const academyMarker="merzkava.isometric-map-academy-reset.v3";
   try {
     if(localStorage.getItem(academyMarker)!=="done"){
