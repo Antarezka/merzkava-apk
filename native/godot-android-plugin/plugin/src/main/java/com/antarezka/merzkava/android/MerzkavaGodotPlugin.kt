@@ -69,18 +69,20 @@ class MerzkavaGodotPlugin(godot: Godot) : GodotPlugin(godot) {
     }
 
     @UsedByGodot
-    fun secureGet(key: String): String = try {
-        val packed = activity?.getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
-            ?.getString(keyFor(key), null) ?: return ""
-        val parts = packed.split(":", limit = 2)
-        if (parts.size != 2) return "ERROR:SECURE_STORAGE_FORMAT"
-        val iv = Base64.decode(parts[0], Base64.NO_WRAP)
-        val encrypted = Base64.decode(parts[1], Base64.NO_WRAP)
-        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
-        cipher.init(Cipher.DECRYPT_MODE, getOrCreateKey(), GCMParameterSpec(128, iv))
-        String(cipher.doFinal(encrypted), StandardCharsets.UTF_8)
-    } catch (error: Exception) {
-        "ERROR:" + error.javaClass.simpleName + ":" + (error.message ?: "unknown")
+    fun secureGet(key: String): String {
+        return try {
+            val packed = activity?.getSharedPreferences(preferencesName, Context.MODE_PRIVATE)
+                ?.getString(keyFor(key), null) ?: return ""
+            val parts = packed.split(":", limit = 2)
+            if (parts.size != 2) return "ERROR:SECURE_STORAGE_FORMAT"
+            val iv = Base64.decode(parts[0], Base64.NO_WRAP)
+            val encrypted = Base64.decode(parts[1], Base64.NO_WRAP)
+            val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+            cipher.init(Cipher.DECRYPT_MODE, getOrCreateKey(), GCMParameterSpec(128, iv))
+            String(cipher.doFinal(encrypted), StandardCharsets.UTF_8)
+        } catch (error: Exception) {
+            "ERROR:" + error.javaClass.simpleName + ":" + (error.message ?: "unknown")
+        }
     }
 
     @UsedByGodot
