@@ -32,6 +32,7 @@ AI output must never directly mutate the database. The engine validates every pr
 - Keep core single-player gameplay, packaged World Archive, assets, settings and saves usable in airplane mode.
 - Keep connected Convo and optional backup/update services behind explicit network adapters; never make them prerequisites for Eternal Path.
 - Pin the Godot stable version and matching Android export templates in cloud CI. The owner must not need a PC, Android Studio or Termux for ordinary project builds.
+- Keep external game titles used as private visual inspiration out of public repository files, commit messages, issues, pull requests, release notes, manifests, and build artifacts. Record only original Merzkava art requirements; never copy third-party assets or proprietary designs.
 - Use explicit database migrations; never silently discard existing data.
 - Keep AI providers behind a common adapter interface.
 - Never embed API keys, private tokens, or secrets in source code or an APK.
