@@ -53,7 +53,6 @@ async function ensurePxlReferences() {
   await fs.mkdir(REFERENCE_DIR, { recursive: true });
   const sources = [
     ["public/world/Untitled77_20261029054536.png", "world-map-source.png", "scale=2752:1640"],
-    ["assets/maps/academy/full-map/1_academy.jpg", "academy-exterior-source.png"],
     ["public/game/scenery/tianhai-yunzhou/ty-05-academy-environment.png", "local-default-source.png"],
   ];
   for (const [relativeInput, outputName, scaleFilter] of sources) {
