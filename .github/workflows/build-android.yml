@@ -41,7 +41,7 @@ permissions:
   contents: read
 
 concurrency:
-  # Keep builds isolated by branch so a test on another branch cannot cancel this APK build.
+  # Keep one APK attempt per branch; a newer source push supersedes stale builds.
   group: merzkava-android-build-${{ github.ref }}
   cancel-in-progress: true
 
