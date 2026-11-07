@@ -30,6 +30,11 @@ on:
 permissions:
   contents: read
 
+# Keep only the newest asset export for each branch; rapid source edits supersede stale CI.
+concurrency:
+  group: augusto-pxl-assets-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-assets:
     runs-on: ubuntu-latest
