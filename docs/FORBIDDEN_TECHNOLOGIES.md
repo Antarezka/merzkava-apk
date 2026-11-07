@@ -77,7 +77,21 @@ Only then may a separate, isolated evaluation be proposed. It must include a rep
 
 Until those conditions are met, do not install, import, prototype, or reintroduce PixiJS.
 
-## 7. Enforcement and maintenance
+## 7. Owner-approved Godot migration (2026-11-07)
+
+The owner has explicitly approved migration of the complete installed Merzkava APK client to **Godot**. This approval supersedes the previous sentence in §3 that prohibited replacing the approved DOM/CSS presentation approach without owner approval.
+
+Scope of approval:
+- Godot is the target native app/game runtime, including shell, menus, Eternal Path, World Archive and Convo UI.
+- Use native Godot 2D scenes, Controls, touch input, animation and local resources.
+- Keep the existing web client only as migration source until parity and data recovery are verified.
+- Keep PixiJS forbidden. Godot approval is not an exception for PixiJS, a WebView wrapper, or a second competing renderer.
+- Use the Compatibility renderer as the initial Android baseline and validate input/performance on the target phone.
+- The legacy Anime.js + DOM/CSS contract applies only to the legacy client during migration; new Godot screens use native Godot presentation systems.
+
+The authoritative engine, offline, art and release requirements are in [Godot Migration Plan](./GODOT_MIGRATION_PLAN.md).
+
+## 8. Enforcement and maintenance
 
 - This file is the canonical technology-restriction register.
 - `PROJECT_DIRECTIVES.md` requires developers to read it before dependency, renderer, animation, or input-layer changes.
