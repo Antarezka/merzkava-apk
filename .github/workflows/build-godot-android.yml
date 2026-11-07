@@ -52,6 +52,10 @@ jobs:
             "cmdline-tools;latest" \
             "cmake;3.10.2.4988404" \
             "ndk;28.1.13356709"
+          test -x "$SDK_ROOT/build-tools/35.0.1/aapt"
+          test -x "$SDK_ROOT/build-tools/35.0.1/zipalign"
+          test -x "$SDK_ROOT/build-tools/35.0.1/apksigner"
+          echo "$SDK_ROOT/build-tools/35.0.1" >> "$GITHUB_PATH"
           echo "ANDROID_HOME=$SDK_ROOT" >> "$GITHUB_ENV"
           echo "ANDROID_SDK_ROOT=$SDK_ROOT" >> "$GITHUB_ENV"
 
