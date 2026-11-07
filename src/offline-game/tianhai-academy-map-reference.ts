@@ -82,7 +82,7 @@ export const TIANHAI_ACADEMY_MAP_REFERENCE:IsoMapEditorData={
   opacityQuadrants:flagged("opacity"),
   transitions:[],
   notes:{
-    cellSectorOrder:["top-left","top-right","bottom-left","bottom-right"],
+    cellSectorOrder:["tl-a","tl-b","tr-a","tr-b","bl-a","bl-b","br-a","br-b"],
     quadrantKeys:"x,y:tl-a|tl-b|tr-a|tr-b|bl-a|bl-b|br-a|br-b",
     transitionColors:"Sandbox map has no live world exit until its route is explicitly authored.",
     walkableCellGroups:"Walkability is generated from the labelled path and courtyard polygons; markers remain independent.",
