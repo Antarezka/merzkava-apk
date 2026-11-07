@@ -2146,7 +2146,7 @@ function bindIsometricCamera(dialog:HTMLElement):void {
     baseW=board.offsetWidth||Number.parseFloat(style.width)||(cols+rows-2)*tileW/2+tileW;
     baseH=board.offsetHeight||Number.parseFloat(style.height)||(cols+rows-2)*tileH/2+tileH+7;
     if(!initialFitApplied){
-      const isTianhaiAcademy=board.dataset.mapId==="golden-dragon-empire:tianhai-academy:exterior";
+      const isTianhaiAcademy=board.dataset.mapId===TIANHAI_PXL_SANDBOX_MAP_ID;
       const fitWidth=(viewport.clientWidth-24)/Math.max(1,baseW);
       const fitHeight=(viewport.clientHeight-190)/Math.max(1,baseH);
       const cover=Math.max(viewport.clientWidth/Math.max(1,baseW),viewport.clientHeight/Math.max(1,baseH));
