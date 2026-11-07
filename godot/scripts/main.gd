@@ -2,6 +2,8 @@ extends Control
 
 const AccountServiceScript = preload("res://scripts/core/account_service.gd")
 const CanonServiceScript = preload("res://scripts/core/canon_service.gd")
+const SupabaseAuthServiceScript = preload("res://scripts/core/supabase_auth_service.gd")
+const GatewayGMServiceScript = preload("res://scripts/core/gateway_gm_service.gd")
 
 const INK := Color("#18231e")
 const INK_SOFT := Color("#26352d")
@@ -76,6 +78,8 @@ const ATLAS_ACCESS_LOGS := [
 
 var account_service: Node
 var canon_service: Node
+var supabase_auth: Node
+var gateway_gm: Node
 var current_page := "control"
 var access_mode := "player"
 var atlas_mode := "login"
@@ -98,6 +102,11 @@ var atlas_password_field: LineEdit
 var atlas_confirm_field: LineEdit
 var atlas_remember_check: CheckBox
 var atlas_message_label: Label
+var supabase_email_field: LineEdit
+var supabase_password_field: LineEdit
+var supabase_login_message := ""
+var supabase_busy := false
+var supabase_login_button: Button
 var gate_layer: CanvasLayer
 var atlas_layer: CanvasLayer
 var exit_layer: CanvasLayer
@@ -132,6 +141,11 @@ func _ready() -> void:
 	add_child(account_service)
 	canon_service = CanonServiceScript.new()
 	add_child(canon_service)
+	supabase_auth = SupabaseAuthServiceScript.new()
+	add_child(supabase_auth)
+	gateway_gm = GatewayGMServiceScript.new()
+	gateway_gm.set_auth_service(supabase_auth)
+	add_child(gateway_gm)
 	audio_player = AudioStreamPlayer.new()
 	audio_player.name = "AppAudio"
 	audio_player.bus = "Master"
@@ -146,10 +160,13 @@ func _ready() -> void:
 		native_plugin = Engine.get_singleton("MerzkavaAndroid")
 		native_bridge_status = "CONNECTED"
 		account_service.set_native_plugin(native_plugin)
+		supabase_auth.set_native_plugin(native_plugin)
 		account_service.restore_device_access()
 	navigation_collapsed = bool(preferences.get("navigation_collapsed", false))
 	_refresh_native_readiness()
 	_render()
+	_restore_supabase_session.call_deferred()
+	_refresh_canon_on_start.call_deferred()
 	if account_service.active_role.is_empty():
 		_show_login_gate()
 	set_process_unhandled_key_input(true)
@@ -409,9 +426,19 @@ func _build_convo(parent: VBoxContainer) -> void:
 	var card := _make_card(parent)
 	_add_label(card, "CONVO · AI GAME MASTER", 9, BRASS, true)
 	_add_label(card, "Connected roleplay.", 24, PAPER if is_dark_theme else INK, true)
-	_add_status_row(card, "Cloud authentication", "NOT CONNECTED")
-	_add_status_row(card, "AI provider gateway", "NOT CONFIGURED")
-	_add_label(card, "Convo remains a separate online service. No Player, Developer or World Atlas password is reused here. The Supabase token adapter and AI gateway are not yet ported into the Godot runtime.", 11, MUTED)
+	var auth_status: Dictionary = supabase_auth.get_status()
+	_add_status_row(card, "Supabase authentication", "SIGNED IN" if bool(auth_status.get("signed_in", false)) else "SIGNED OUT")
+	_add_status_row(card, "AI Gateway", "CONFIGURED" if gateway_gm.is_configured() else "NOT CONFIGURED")
+	_add_status_row(card, "Universe source", str(canon_service.source_status))
+	if not bool(auth_status.get("configured", false)):
+		_add_label(card, "Supabase client configuration is missing from this APK build. Local Eternal Path and World Archive remain independent.", 11, MUTED)
+	elif not bool(auth_status.get("signed_in", false)):
+		_add_label(card, "Masuk ke akun cloud di Settings → World & Account. Akun ini hanya untuk Convo; tidak membuka Developer Mode atau World Atlas.", 11, MUTED)
+		_add_wide_button(card, "Open Supabase account settings", _navigate.bind("settings"), true)
+	else:
+		_add_label(card, "Signed in as " + str(auth_status.get("email", "")) + ". The token is stored in the Android Keystore and refreshed before expiry.", 11, MUTED)
+		_add_label(card, "Gateway request adapter is connected. The full canon context assembler, strict GM proposal validator, profile reconciliation and transcript/save pipeline are still being ported; no placeholder AI response is shown as a real GM turn.", 10, MUTED)
+		_add_wide_button(card, "Manage cloud account", _navigate.bind("settings"))
 	_add_wide_button(card, "Return to Home", _navigate.bind("home"))
 
 func _build_inventory(parent: VBoxContainer) -> void:
@@ -457,8 +484,7 @@ func _build_settings(parent: VBoxContainer) -> void:
 		_add_wide_button(account_card, "Lock Developer session", _sign_out_with_buffer, false)
 		_add_label(account_card, "WORLD & ACCOUNT SERVICES", 9, BRASS, true)
 		_add_status_row(account_card, "Universe source", str(canon_service.source_status))
-		_add_status_row(account_card, "Supabase session", "NOT PORTED")
-		_add_status_row(account_card, "AI Gateway", "NOT PORTED")
+		_build_supabase_settings(account_card)
 	elif account_service.is_player():
 		_add_label(account_card, "PLAYER SESSION", 11, PAPER if is_dark_theme else INK, true)
 		_add_wide_button(account_card, "Open Floating Control", _navigate.bind("control"))
@@ -466,6 +492,71 @@ func _build_settings(parent: VBoxContainer) -> void:
 	else:
 		_add_label(account_card, "No active app role.", 11, MUTED)
 		_add_wide_button(account_card, "Open account gate", _show_login_gate, true)
+
+func _restore_supabase_session() -> void:
+	var result: Dictionary = await supabase_auth.restore_session()
+	if current_page == "settings" or current_page == "convo":
+		supabase_login_message = str(result.get("message", ""))
+		_render()
+
+func _refresh_canon_on_start() -> void:
+	var result: Dictionary = await canon_service.verify_snapshot()
+	if current_page == "settings" or current_page == "convo":
+		notice_text = str(result.get("message", canon_service.source_message))
+		_render()
+
+func _build_supabase_settings(parent: VBoxContainer) -> void:
+	var cloud := _make_card(parent)
+	_add_label(cloud, "SUPABASE AUTH · CONVO ONLY", 10, BRASS, true)
+	var status: Dictionary = supabase_auth.get_status()
+	if not bool(status.get("configured", false)):
+		_add_status_row(cloud, "Supabase client", "NOT CONFIGURED")
+		_add_label(cloud, "This build has no public Supabase anon key. The key is injected from the GitHub Actions secret during APK build; no service-role key is used.", 10, MUTED)
+		return
+	_add_status_row(cloud, "Cloud session", "SIGNED IN" if bool(status.get("signed_in", false)) else "SIGNED OUT")
+	if bool(status.get("signed_in", false)):
+		_add_label(cloud, "Account: " + str(status.get("email", "")), 11, PAPER if is_dark_theme else INK)
+		_add_label(cloud, "Session tokens are stored in the Android Keystore. This account does not grant Player, Developer or World Atlas access.", 10, MUTED)
+		_add_wide_button(cloud, "Sign out from Supabase", _sign_out_supabase, false, supabase_busy)
+	else:
+		supabase_email_field = LineEdit.new()
+		supabase_email_field.placeholder_text = "Email"
+		supabase_email_field.custom_minimum_size.y = 44
+		supabase_email_field.add_theme_stylebox_override("normal", _style_box(Color("#17231d"), Color("#69755f")))
+		cloud.add_child(supabase_email_field)
+		supabase_password_field = LineEdit.new()
+		supabase_password_field.placeholder_text = "Password"
+		supabase_password_field.secret = true
+		supabase_password_field.custom_minimum_size.y = 44
+		supabase_password_field.add_theme_stylebox_override("normal", _style_box(Color("#17231d"), Color("#69755f")))
+		cloud.add_child(supabase_password_field)
+		_add_wide_button(cloud, "Sign in to Supabase", _sign_in_supabase, true, supabase_busy)
+	if not supabase_login_message.is_empty():
+		_add_label(cloud, supabase_login_message, 10, ALERT if not supabase_auth.is_signed_in() else MUTED)
+
+func _sign_in_supabase() -> void:
+	if supabase_busy or not is_instance_valid(supabase_email_field) or not is_instance_valid(supabase_password_field):
+		return
+	var email := supabase_email_field.text.strip_edges()
+	var password := supabase_password_field.text
+	supabase_busy = true
+	supabase_login_message = "Signing in to Supabase..."
+	_render()
+	var result: Dictionary = await supabase_auth.sign_in(email, password)
+	supabase_busy = false
+	supabase_login_message = str(result.get("message", "Supabase sign-in failed."))
+	_render()
+
+func _sign_out_supabase() -> void:
+	if supabase_busy:
+		return
+	supabase_busy = true
+	supabase_login_message = "Signing out..."
+	_render()
+	var result: Dictionary = await supabase_auth.sign_out()
+	supabase_busy = false
+	supabase_login_message = str(result.get("message", "Supabase sign-out failed."))
+	_render()
 
 func _build_navigation(parent: VBoxContainer) -> void:
 	var dock := PanelContainer.new()
