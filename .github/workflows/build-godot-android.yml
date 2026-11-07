@@ -133,14 +133,15 @@ jobs:
       - name: Export Android APK
         run: |
           set -euo pipefail
-          "$GODOT_BIN" --headless --path godot --export-debug "Android" build/Merzkava-Godot-dev.apk
-          test -s godot/build/Merzkava-Godot-dev.apk
+          APK_PATH="$GITHUB_WORKSPACE/godot/build/Merzkava-Godot-dev.apk"
+          "$GODOT_BIN" --headless --path "$GITHUB_WORKSPACE/godot" --export-debug "Android" "$APK_PATH"
+          test -s "$APK_PATH"
 
       - name: Verify APK package, alignment, signature and integrity
         shell: bash
         run: |
           set -euo pipefail
-          APK="godot/build/Merzkava-Godot-dev.apk"
+          APK="$GITHUB_WORKSPACE/godot/build/Merzkava-Godot-dev.apk"
           unzip -t "$APK"
           aapt dump badging "$APK" | tee godot/build/APK_METADATA.txt
           grep -q "com.antarezka.merzkava.godotdev" godot/build/APK_METADATA.txt
