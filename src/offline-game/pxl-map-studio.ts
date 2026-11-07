@@ -26,9 +26,6 @@ type Marker="O"|"X"|"opacity";
 type StudioLabel=TianhaiAcademyMapLabel;
 type StudioData=IsoMapEditorData;
 
-function escapeHtml(value:string):string {
-  return value.replace(/[&<>"']/g,character=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[character]||character));
-}
 function copyLabels(value:StudioLabel[]):StudioLabel[] {
   return value.map(label=>({...label,points:label.points.map(point=>[point[0],point[1]] as [number,number])}));
 }
@@ -154,7 +151,7 @@ export function renderPxlMapStudioMarkup():string {
   '</div>';
 }
 
-export function bindPxlMapStudio(dialog:HTMLElement):void {
+export function bindPxlMapStudio(dialog:HTMLElement,onEditingChange?:(active:boolean)=>void):void {
   const studio=dialog.querySelector<HTMLElement>("[data-pxl-studio]");
   const board=dialog.querySelector<HTMLElement>("[data-wmh-board]");
   const svg=studio?.querySelector<SVGSVGElement>("[data-pxl-studio-svg]");
@@ -172,7 +169,7 @@ export function bindPxlMapStudio(dialog:HTMLElement):void {
   let drawing=false;
   let dragVertex:{labelId:string;index:number}|null=null;
   let currentPoints:IsoMapPoint[]=[];
-  let labelsDirty=false;
+  let editorPaused=false;
 
   const group=(selector:string)=>svg.querySelector<SVGGElement>(selector);
   const cellRoot=group("[data-pxl-cell-grid]")!;
@@ -181,6 +178,16 @@ export function bindPxlMapStudio(dialog:HTMLElement):void {
   const handleRoot=group("[data-pxl-label-handles]")!;
   const status=()=>studio.querySelector<HTMLOutputElement>("[data-pxl-studio-status]");
   const say=(message:string)=>{const node=status();if(node)node.value=message;};
+  const setEditorPaused=(active:boolean)=>{
+    if(editorPaused===active)return;
+    editorPaused=active;
+    board.classList.toggle("pxl-studio-board-active",active);
+    board.dataset.editorPaused=String(active);
+    board.querySelectorAll<HTMLElement>("[data-wmh-player-token],[data-wmh-npc]").forEach(token=>{
+      token.getAnimations().forEach(animation=>active?animation.pause():animation.play());
+    });
+    onEditingChange?.(active);
+  };
   const selected=()=>labels.find(label=>label.id===selectedLabelId)||null;
   const readPoint=(event:PointerEvent|MouseEvent):IsoMapPoint|null=>{
     const rect=svg.getBoundingClientRect(),view=svg.viewBox.baseVal;
@@ -286,7 +293,6 @@ export function bindPxlMapStudio(dialog:HTMLElement):void {
     data.confirmed=false;data.confirmedAt="";
     localStorage.setItem(DATA_KEY,JSON.stringify(data));
     localStorage.setItem(LABELS_KEY,JSON.stringify(labels));
-    labelsDirty=false;
   };
   const renderTab=()=>{
     studio.querySelectorAll<HTMLElement>("[data-pxl-studio-panel]").forEach(panel=>{panel.hidden=panel.dataset.pxlStudioPanel!==activeTab;});
@@ -302,6 +308,7 @@ export function bindPxlMapStudio(dialog:HTMLElement):void {
   const openWindow=(tab:StudioTab)=>{
     activeTab=tab;windowPanel.hidden=false;
     rail.classList.add("is-open");
+    setEditorPaused(true);
     renderTab();
   };
   const validate=()=>{
@@ -398,7 +405,10 @@ export function bindPxlMapStudio(dialog:HTMLElement):void {
     };
     window.addEventListener("pointermove",move,{passive:false});window.addEventListener("pointerup",end,{once:true});
   });
-  windowPanel.querySelector<HTMLElement>("[data-pxl-studio-minimize]")?.addEventListener("click",()=>{windowPanel.hidden=true;svg.classList.remove("is-active");cellRoot.replaceChildren();});
+  windowPanel.querySelector<HTMLElement>("[data-pxl-studio-minimize]")?.addEventListener("click",()=>{
+    windowPanel.hidden=true;svg.classList.remove("is-active");cellRoot.replaceChildren();
+    setEditorPaused(false);
+  });
   windowPanel.querySelectorAll<HTMLButtonElement>("[data-pxl-studio-tab]").forEach(button=>button.addEventListener("click",()=>openWindow(button.dataset.pxlStudioTab as StudioTab)));
 
   const drag=windowPanel.querySelector<HTMLElement>("[data-pxl-studio-drag]");
@@ -423,7 +433,7 @@ export function bindPxlMapStudio(dialog:HTMLElement):void {
   });
   windowPanel.querySelector<HTMLElement>("[data-pxl-studio-label-delete]")?.addEventListener("click",()=>{
     if(!selectedLabelId)return;
-    labels=labels.filter(label=>label.id!==selectedLabelId);selectedLabelId=null;labelsDirty=true;renderLabels();say("Selected contour deleted. SAVE DRAFT to keep the change.");
+    labels=labels.filter(label=>label.id!==selectedLabelId);selectedLabelId=null;renderLabels();say("Selected contour deleted. SAVE DRAFT to keep the change.");
   });
   windowPanel.querySelector<HTMLElement>("[data-pxl-studio-label-clear]")?.addEventListener("click",()=>chooseLabel(null));
   windowPanel.querySelector<HTMLButtonElement>("[data-pxl-studio-validate]")?.addEventListener("click",()=>{const report=validate();say(report.pass?"Map structure check passed.":"Map validation found "+report.issues.length+" issue(s).");});
