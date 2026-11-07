@@ -6,6 +6,10 @@ This is an isolated Godot 4 art prototype. It is not embedded into, or wired int
 
 Open this folder as a Godot project by selecting `project.godot`. Run the main scene to view the sprite and its scale beside a small house.
 
+## Preview
+
+- [Open the character and house scale preview](previews/art_preview.png). This PNG is rendered from the same pixel coordinates and palette as the GDScript drawing, for quick review on mobile. It is **not** a screenshot captured from the Godot editor/runtime.
+
 ## What is here
 
 - `scenes/character_sprite.tscn`: reusable Godot-native character scene.
