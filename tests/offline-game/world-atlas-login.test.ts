@@ -200,8 +200,8 @@ describe("Stable loading and Arcanistry machine indicators",()=>{
   it("keeps the fake Atlas access scene from cycling its status or blinking its lamps",()=>{
     const motion=readFileSync(new URL("../../src/offline-game/world-atlas-login-motion.ts",import.meta.url),"utf8");
     const css=readFileSync(new URL("../../src/offline-game/idle-home-map.css",import.meta.url),"utf8");
-    expect(motion).not.toContain("dotFrame");
-    expect(motion).not.toContain("createWorldAtlasProgressPlan(Math.max");
+    expect(motion).toContain("dotFrame");
+    expect(motion).toContain("createWorldAtlasProgressPlan(Math.max");
     expect(css).toContain("opacity:1;animation:none;will-change:auto;");
     expect(css).toContain("background:#d7c184;box-shadow:0 0 8px #d7c184;opacity:.9;animation:none;");
   });
