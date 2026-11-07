@@ -3010,7 +3010,7 @@ function replaceWorldMapDialogMarkup(dialog:HTMLElement,markup:string):void {
   if(overlay?.dataset.visualMode==="augusto-pxl")mountAugustoPxlAssets(overlay);
 }
 export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement, onAdvanceTime: (minutes: number) => void, pointer?: {clientX:number;clientY:number}): boolean {
-  if (!worldMapDeveloperMode && target.closest("[data-wmh-overlay-toggle],[data-wmh-overlay-tools],[data-wmh-overlay-minimize],[data-wmh-overlay-close],[data-wmh-academy-editor],[data-wmh-drag-marker],[data-wmh-coordinate],[data-wmh-editor-canvas]")) return true;
+  if (!worldMapDeveloperMode && target.closest("[data-wmh-overlay-toggle],[data-wmh-overlay-tools],[data-wmh-overlay-minimize],[data-wmh-overlay-close],[data-wmh-academy-editor],[data-pxl-studio],[data-pxl-studio-svg],[data-wmh-drag-marker],[data-wmh-coordinate],[data-wmh-editor-canvas]")) return true;
   const action=target.closest<HTMLElement>("[data-wmh-action],[data-wmh-info],[data-wmh-site],[data-wmh-building],[data-wmh-npc],[data-wmh-plot],[data-wmh-tile],[data-wmh-map-hit],[data-wmh-reply],[data-wmh-transition],[data-wmh-transition-close],[data-wmh-transition-confirm],[data-wmh-dismiss-layer],[data-wmh-selection-card],[data-hud-action]");
   if(!action)return false;
   const overlay=target.closest<HTMLElement>("[data-world-map-hierarchy]");
@@ -3035,6 +3035,23 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
     bindIsoAreaEditor(dialog);bindIsometricCamera(dialog);bindIsometricMapArt(dialog);bindIsometricHud(dialog);startNpcWander(dialog);
     return true;
   }
+  if(action.dataset.wmhAction==="open-pxl-studio"){
+    if(!worldMapDeveloperMode)return true;
+    stopNpcWander(dialog);
+    overlay.dataset.previousVisualMode=overlay.dataset.visualMode||"legacy";
+    overlay.dataset.previousRegion=regionId;
+    overlay.dataset.visualMode="augusto-pxl";
+    overlay.dataset.level="pxl-studio";
+    overlay.dataset.building="Tianhai Academy";
+    replaceWorldMapDialogMarkup(dialog,renderPxlAcademySandboxTestArea());
+    bindPxlMapStudio(dialog,active=>{if(active)stopNpcWander(dialog);else startNpcWander(dialog);});
+    bindAcademyCanvasEditor(dialog);
+    bindIsometricCamera(dialog);
+    bindIsometricMapArt(dialog);
+    bindIsometricHud(dialog);
+    startNpcWander(dialog);
+    return true;
+  }
   if(action.dataset.wmhAction==="academy-home"){
     if(current==="local"){
       dialog.querySelector<HTMLButtonElement>("[data-wmh-map-center],[data-wmh-iso-center]")?.click();
@@ -3056,6 +3073,18 @@ export function handleWorldMapHierarchyClick(target: Element, root: HTMLElement,
     return true;
   }
   if(action.dataset.wmhAction==="back"){
+    if(current==="pxl-studio"){
+      stopNpcWander(dialog);
+      const previousRegion=(overlay.dataset.previousRegion as RegionId)||"golden-dragon-empire";
+      const previousVisualMode:WorldMapVisualMode=overlay.dataset.previousVisualMode==="augusto-pxl"?"augusto-pxl":"legacy";
+      delete overlay.dataset.previousRegion;delete overlay.dataset.previousVisualMode;
+      overlay.dataset.region=previousRegion;
+      overlay.dataset.visualMode=previousVisualMode;
+      overlay.dataset.level="regional";
+      replaceWorldMapDialogMarkup(dialog,panelMarkup("regional",previousRegion,undefined,undefined,previousVisualMode));
+      bindIsometricMapArt(dialog);
+      return true;
+    }
     const next:Level=current==="interior"?"local":current==="local"?"regional":"world";
     stopNpcWander(dialog);overlay.dataset.level=next;replaceWorldMapDialogMarkup(dialog,renderPanel(next,regionId,building));if(next==="world")bindWorldMapZoom(dialog);if(next==="regional")bindIsometricMapArt(dialog);if(next==="local"){bindIsoAreaEditor(dialog);bindIsometricCamera(dialog);bindIsometricMapArt(dialog);bindIsometricHud(dialog);startNpcWander(dialog);}return true;
   }
