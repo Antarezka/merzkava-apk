@@ -2484,3 +2484,90 @@
 .wmh-overlay[data-visual-mode="augusto-pxl"] .wmh-regional-site>i[data-pxl-resolved="image"]{
   color:transparent;font-size:0;
 }
+
+
+/* Dedicated Augusto PXL developer entrance in the Golden Dragon regional console.
+   This is a tool portal, not a geographical marker or a canon location. */
+.wmh-pxl-sandbox-launch-wrap{
+  display:flex!important;justify-content:flex-end!important;align-items:center!important;
+  width:100%!important;box-sizing:border-box!important;padding:8px 12px 4px!important;
+}
+.wmh-pxl-sandbox-launch{
+  display:flex!important;align-items:center!important;gap:10px!important;
+  width:min(330px,100%)!important;min-height:58px!important;padding:8px 12px!important;
+  border:1px solid #c5a36c!important;border-radius:8px!important;
+  background:linear-gradient(145deg,#253d39,#132522 72%,#101a1d)!important;
+  color:#f3e6cb!important;box-shadow:0 6px 18px #0008,inset 0 1px #fff2!important;
+  text-align:left!important;touch-action:manipulation!important;
+}
+.wmh-pxl-sandbox-launch>span{display:flex!important;flex:1 1 auto!important;min-width:0!important;flex-direction:column!important;gap:4px!important}
+.wmh-pxl-sandbox-launch b{font:900 9px/1 Arial,sans-serif!important;letter-spacing:.14em!important;color:#f7e6c4!important}
+.wmh-pxl-sandbox-launch small{font:700 6px/1.2 Arial,sans-serif!important;letter-spacing:.08em!important;color:#c9b68f!important}
+.wmh-pxl-sandbox-icon{
+  position:relative!important;display:block!important;flex:none!important;width:32px!important;height:32px!important;
+  border:1px solid #d7b87e!important;border-radius:6px!important;transform:rotate(45deg) scale(.78)!important;
+  background:linear-gradient(135deg,#4d6d5d,#203c37)!important;box-shadow:0 2px 7px #0008!important;
+}
+.wmh-pxl-sandbox-icon:before,.wmh-pxl-sandbox-icon:after{
+  position:absolute!important;content:""!important;display:block!important;
+  border:1px solid #e5d09e!important;opacity:.9!important;
+}
+.wmh-pxl-sandbox-icon:before{inset:6px!important}
+.wmh-pxl-sandbox-icon:after{inset:12px 4px!important;border-left:0!important;border-right:0!important}
+.wmh-pxl-sandbox-arrow{font:22px/1 Georgia,serif!important;color:#e1c48e!important}
+.wmh-pxl-sandbox-launch:active{transform:translateY(1px)!important;background:linear-gradient(145deg,#344e45,#1c302d)!important}
+
+/* Sandbox camera, editor overlays and micro-actors are bound to the same Map Base. */
+.pxl-academy-sandbox-screen .wmh-academy-map-surface{position:relative!important;isolation:isolate!important}
+.pxl-academy-sandbox-screen .wmh-academy-map-surface .pxl-studio-svg{
+  position:absolute!important;inset:0!important;width:100%!important;height:100%!important;
+  z-index:320!important;pointer-events:none!important;overflow:visible!important;
+}
+.pxl-academy-sandbox-screen .wmh-academy-map-surface .pxl-studio-svg.is-active{display:block!important}
+.pxl-academy-sandbox-screen .wmh-academy-map-surface .pxl-studio-svg.is-cell-mode,
+.pxl-academy-sandbox-screen .wmh-academy-map-surface .pxl-studio-svg.is-lasso-mode{
+  pointer-events:auto!important;touch-action:none!important;
+}
+.pxl-academy-sandbox-screen .wmh-academy-map-surface .pxl-studio-svg.is-cell-mode .pxl-cell-sector,
+.pxl-academy-sandbox-screen .wmh-academy-map-surface .pxl-studio-svg.is-lasso-mode .pxl-map-label-shape,
+.pxl-academy-sandbox-screen .wmh-academy-map-surface .pxl-studio-svg.is-lasso-mode .pxl-map-label-vertex{pointer-events:all!important}
+.pxl-academy-sandbox-screen .wmh-academy-map-surface .wmh-academy-actor-layer{z-index:350!important}
+.pxl-academy-sandbox-screen [data-pxl-micro-actors="true"] .wmh-character-token{
+  display:block!important;width:26px!important;height:26px!important;min-width:26px!important;min-height:26px!important;
+  padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;
+  box-shadow:none!important;overflow:visible!important;pointer-events:auto!important;touch-action:manipulation!important;
+}
+.pxl-academy-sandbox-screen [data-pxl-micro-actors="true"] .wmh-character-token>i.wmh-pxl-actor-sprite{
+  position:absolute!important;left:50%!important;right:auto!important;top:auto!important;bottom:0!important;
+  width:32px!important;height:48px!important;transform:translateX(-50%) scale(.15)!important;
+  transform-origin:50% 100%!important;overflow:visible!important;
+}
+.pxl-academy-sandbox-screen [data-pxl-micro-actors="true"] .wmh-character-token:before,
+.pxl-academy-sandbox-screen [data-pxl-micro-actors="true"] .wmh-character-token:after,
+.pxl-academy-sandbox-screen [data-pxl-micro-actors="true"] .wmh-npc-proximity-glow,
+.pxl-academy-sandbox-screen [data-pxl-micro-actors="true"] .wmh-token-movement-glow{
+  display:none!important;opacity:0!important;animation:none!important;
+}
+
+/* The existing Canvas Editor keeps its original controls and margin math; only its
+   popover is moved to the right so the left Spirit Ring HUD stays unobstructed. */
+.pxl-academy-sandbox-screen .wmh-academy-canvas-editor{
+  position:absolute!important;z-index:9850!important;top:max(42px,calc(env(safe-area-inset-top) + 34px))!important;
+  left:auto!important;right:64px!important;bottom:auto!important;
+}
+.pxl-academy-sandbox-screen .wmh-academy-canvas-editor>button{
+  min-height:26px!important;padding:5px 8px!important;border:1px solid #c4a36e!important;
+  border-radius:5px!important;background:#1b302b!important;color:#f1e1bf!important;
+  font:800 7px/1 Arial,sans-serif!important;letter-spacing:.1em!important;
+}
+.pxl-academy-sandbox-screen [data-wmh-academy-editor-panel]{
+  right:0!important;left:auto!important;top:32px!important;width:min(270px,calc(100vw - 84px))!important;
+  max-height:58dvh!important;overflow-y:auto!important;overscroll-behavior:contain!important;
+  -webkit-overflow-scrolling:touch!important;z-index:9851!important;
+}
+@media(max-width:440px){
+  .wmh-pxl-sandbox-launch-wrap{padding:6px 8px 3px!important}
+  .wmh-pxl-sandbox-launch{width:min(300px,100%)!important;min-height:52px!important}
+  .pxl-academy-sandbox-screen .wmh-academy-canvas-editor{right:58px!important}
+  .pxl-academy-sandbox-screen [data-wmh-academy-editor-panel]{width:min(250px,calc(100vw - 72px))!important}
+}
