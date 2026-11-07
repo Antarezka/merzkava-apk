@@ -1,0 +1,164 @@
+name: Build Merzkava Godot Android APK
+
+on:
+  push:
+    branches:
+      - migration/godot-offline-engine-2026-11-07
+    paths:
+      - "godot/**"
+      - ".github/workflows/build-godot-android.yml"
+  pull_request:
+    paths:
+      - "godot/**"
+      - ".github/workflows/build-godot-android.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: godot-android-build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Export installable Godot Android debug APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up OpenJDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android export packages
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDK_ROOT="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"
+          test -n "$SDK_ROOT"
+          yes | sdkmanager --sdk_root="$SDK_ROOT" --licenses >/dev/null
+          sdkmanager --sdk_root="$SDK_ROOT" --install \
+            "platform-tools" \
+            "build-tools;35.0.1" \
+            "platforms;android-35" \
+            "cmdline-tools;latest" \
+            "cmake;3.10.2.4988404" \
+            "ndk;28.1.13356709"
+          echo "ANDROID_HOME=$SDK_ROOT" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$SDK_ROOT" >> "$GITHUB_ENV"
+
+      - name: Download pinned Godot 4.7.2 stable editor
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 \
+            "https://github.com/godotengine/godot/releases/download/4.7.2-stable/Godot_v4.7.2-stable_linux.x86_64.zip" \
+            --output /tmp/godot-editor.zip
+          mkdir -p "${RUNNER_TEMP}/godot"
+          unzip -q /tmp/godot-editor.zip -d "${RUNNER_TEMP}/godot"
+          GODOT_BIN="$(find "${RUNNER_TEMP}/godot" -maxdepth 2 -type f -name 'Godot_v4.7.2-stable_linux.x86_64' -print -quit)"
+          test -n "$GODOT_BIN"
+          chmod +x "$GODOT_BIN"
+          echo "GODOT_BIN=$GODOT_BIN" >> "$GITHUB_ENV"
+          "$GODOT_BIN" --version
+
+      - name: Install matching Godot Android export templates
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 \
+            "https://github.com/godotengine/godot/releases/download/4.7.2-stable/Godot_v4.7.2-stable_export_templates.tpz" \
+            --output /tmp/godot-templates.tpz
+          TMP_TEMPLATES="$(mktemp -d)"
+          unzip -q /tmp/godot-templates.tpz -d "$TMP_TEMPLATES"
+          TEMPLATE_SOURCE="$(find "$TMP_TEMPLATES" -type f -name android_debug.apk -print -quit | xargs -r dirname)"
+          test -n "$TEMPLATE_SOURCE"
+          TEMPLATE_DEST="$HOME/.local/share/godot/export_templates/4.7.2.stable"
+          mkdir -p "$TEMPLATE_DEST"
+          cp -a "$TEMPLATE_SOURCE/." "$TEMPLATE_DEST/"
+          printf '4.7.2.stable\n' > "$TEMPLATE_DEST/version.txt"
+          test -s "$TEMPLATE_DEST/android_debug.apk"
+          test -s "$TEMPLATE_DEST/android_release.apk"
+
+      - name: Configure Godot Android SDK paths and debug signing
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.config/godot" "$HOME/.android"
+          keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" \
+            -storepass android -alias androiddebugkey -keypass android \
+            -dname "CN=Android Debug,O=Android,C=US" -keyalg RSA -keysize 2048 -validity 10000
+          cat > "$HOME/.config/godot/editor_settings-4.tres" <<EOF
+          [gd_resource type="EditorSettings" format=3]
+
+          [resource]
+          export/android/android_sdk_path = "${ANDROID_HOME}"
+          export/android/java_sdk_path = "${JAVA_HOME}"
+          EOF
+          echo "GODOT_ANDROID_KEYSTORE_DEBUG_PATH=$HOME/.android/debug.keystore" >> "$GITHUB_ENV"
+          echo "GODOT_ANDROID_KEYSTORE_DEBUG_USER=androiddebugkey" >> "$GITHUB_ENV"
+          echo "GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD=android" >> "$GITHUB_ENV"
+
+      - name: Validate Godot project
+        run: |
+          set -euo pipefail
+          "$GODOT_BIN" --headless --path godot --editor --quit
+          "$GODOT_BIN" --headless --path godot --quit-after 3
+
+      - name: Set unique development APK version
+        shell: bash
+        run: |
+          set -euo pipefail
+          sed -i "s|version/code=1|version/code=${GITHUB_RUN_NUMBER}|" godot/export_presets.cfg
+          sed -i "s|version/name=\"0.1.0-godot-dev\"|version/name=\"0.1.0-godot.${GITHUB_RUN_NUMBER}\"|" godot/export_presets.cfg
+          mkdir -p godot/build
+
+      - name: Export Android APK
+        run: |
+          set -euo pipefail
+          "$GODOT_BIN" --headless --path godot --export-debug "Android" build/Merzkava-Godot-dev.apk
+          test -s godot/build/Merzkava-Godot-dev.apk
+
+      - name: Verify APK package, alignment, signature and integrity
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="godot/build/Merzkava-Godot-dev.apk"
+          unzip -t "$APK"
+          aapt dump badging "$APK" | tee godot/build/APK_METADATA.txt
+          grep -q "com.antarezka.merzkava.godotdev" godot/build/APK_METADATA.txt
+          zipalign -c -v 4 "$APK"
+          apksigner verify --verbose "$APK"
+          sha256sum "$APK" | tee godot/build/SHA256.txt
+          cat > godot/build/BUILD_NOTES.md <<EOF
+          # Merzkava Godot Android debug build
+
+          - Engine: Godot 4.7.2 stable
+          - Source commit: ${GITHUB_SHA}
+          - Workflow run: ${GITHUB_RUN_NUMBER}
+          - Package: com.antarezka.merzkava.godotdev
+          - ABI: arm64-v8a
+          - Build type: debug
+          - This is a migration test shell, not a completed game port.
+          - The development package is intentionally separate from the legacy production package.
+          EOF
+
+      - name: Upload installable APK and build record
+        uses: actions/upload-artifact@v4
+        with:
+          name: merzkava-godot-dev-${{ github.run_number }}
+          path: |
+            godot/build/Merzkava-Godot-dev.apk
+            godot/build/BUILD_NOTES.md
+            godot/build/APK_METADATA.txt
+            godot/build/SHA256.txt
+          if-no-files-found: error
+          retention-days: 14
